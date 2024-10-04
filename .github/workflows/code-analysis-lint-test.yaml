@@ -2,7 +2,7 @@ name: Code Analysis and Tests
 
 on:
   push:
-    branches: ["main", "go-cli"]
+    branches: ["main"]
   pull_request:
     paths:
       - ".github/workflows/*"
