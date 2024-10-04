@@ -22,16 +22,15 @@ func initDataOption() {
 	cobraParamName := "data"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCLI_REQUEST_DATA"
 
 	options.RequestDataOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
+		EnvVar:          "", // No environment variable
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The data to send in the request. Use prefix '@' to specify data filepath instead of raw data. Also configurable via environment variable %s.", envVar),
+			Usage:    "The data to send in the request. Use prefix '@' to specify data filepath instead of raw data.",
 			Value:    cobraValue,
 			DefValue: "",
 		},
@@ -44,22 +43,21 @@ func initHTTPMethodOption() {
 	cobraParamName := "http-method"
 	cobraValue := new(customtypes.HTTPMethod)
 	defaultValue := customtypes.HTTPMethod(customtypes.ENUM_HTTP_METHOD_GET)
-	envVar := "PINGCLI_REQUEST_HTTP_METHOD"
 
 	options.RequestHTTPMethodOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
+		EnvVar:          "", // No environment variable
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "m",
-			Usage:     fmt.Sprintf("The HTTP method to use for the request. Allowed: %s. Also configurable via environment variable %s.", strings.Join(customtypes.HTTPMethodValidValues(), ", "), envVar),
+			Usage:     fmt.Sprintf("The HTTP method to use for the request. Allowed: %s.", strings.Join(customtypes.HTTPMethodValidValues(), ", ")),
 			Value:     cobraValue,
 			DefValue:  customtypes.ENUM_HTTP_METHOD_GET,
 		},
 		Type:     options.ENUM_REQUEST_HTTP_METHOD,
-		ViperKey: "request.httpMethod",
+		ViperKey: "", // No viper key
 	}
 }
 
