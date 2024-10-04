@@ -22,12 +22,13 @@ func initDataOption() {
 	cobraParamName := "data"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_REQUEST_DATA"
 
 	options.RequestDataOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "", // No environment variable
+		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
 			Usage:    "The data to send in the request. Use prefix '@' to specify data filepath instead of raw data.",
