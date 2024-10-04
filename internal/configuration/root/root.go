@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/pflag"
 )
 
@@ -27,7 +27,7 @@ func initActiveProfileOption() {
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "PINGCTL_ACTIVE_PROFILE",
+		EnvVar:          "PINGCLI_ACTIVE_PROFILE",
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "P",
@@ -49,7 +49,7 @@ func initColorOption() {
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "PINGCTL_COLOR",
+		EnvVar:          "PINGCLI_COLOR",
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
 			Usage:    "Use colorized output",
@@ -70,13 +70,13 @@ func initConfigOption() {
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    defaultValue,
-		EnvVar:          "PINGCTL_CONFIG",
+		EnvVar:          "PINGCLI_CONFIG",
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "C",
 			Usage:     "Configuration file location",
 			Value:     cobraValue,
-			DefValue:  "\"$HOME/.pingctl/config.yaml\"",
+			DefValue:  "\"$HOME/.pingcli/config.yaml\"",
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
@@ -92,11 +92,11 @@ func initOutputFormatOption() {
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "PINGCTL_OUTPUT_FORMAT",
+		EnvVar:          "PINGCLI_OUTPUT_FORMAT",
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "O",
-			Usage:     fmt.Sprintf("Specifies pingctl's console output format. Allowed: %s", strings.Join(customtypes.OutputFormatValidValues(), ", ")),
+			Usage:     fmt.Sprintf("Specifies pingcli's console output format. Allowed: %s", strings.Join(customtypes.OutputFormatValidValues(), ", ")),
 			Value:     cobraValue,
 			DefValue:  customtypes.ENUM_OUTPUT_FORMAT_TEXT,
 		},
@@ -116,7 +116,7 @@ func getDefaultConfigFilepath() (defaultConfigFilepath *customtypes.String) {
 		return nil
 	}
 
-	err = defaultConfigFilepath.Set(fmt.Sprintf("%s/.pingctl/config.yaml", homeDir))
+	err = defaultConfigFilepath.Set(fmt.Sprintf("%s/.pingcli/config.yaml", homeDir))
 	if err != nil {
 		l.Err(err).Msg("Failed to set default config file path")
 		return nil

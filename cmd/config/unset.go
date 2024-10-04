@@ -1,16 +1,16 @@
 package config
 
 import (
-	"github.com/pingidentity/pingctl/cmd/common"
-	config_internal "github.com/pingidentity/pingctl/internal/commands/config"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	configUnsetCommandExamples = `  pingctl config unset color
-  pingctl config unset --profile myProfile service.pingone.regionCode`
+	configUnsetCommandExamples = `  pingcli config unset color
+  pingcli config unset --profile myProfile service.pingone.regionCode`
 )
 
 func NewConfigUnsetCommand() *cobra.Command {
@@ -18,9 +18,9 @@ func NewConfigUnsetCommand() *cobra.Command {
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               configUnsetCommandExamples,
-		Long:                  `Unset pingctl configuration settings.`,
+		Long:                  `Unset pingcli configuration settings.`,
 		RunE:                  configUnsetRunE,
-		Short:                 "Unset pingctl configuration settings.",
+		Short:                 "Unset pingcli configuration settings.",
 		Use:                   "unset [flags] key",
 	}
 

@@ -3,16 +3,16 @@ package config
 import (
 	"os"
 
-	"github.com/pingidentity/pingctl/cmd/common"
-	config_internal "github.com/pingidentity/pingctl/internal/commands/config"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	setActiveProfileCommandExamples = `  pingctl config set-active-profile
-  pingctl config set-active-profile --profile myprofile`
+	setActiveProfileCommandExamples = `  pingcli config set-active-profile
+  pingcli config set-active-profile --profile myprofile`
 )
 
 func NewConfigSetActiveProfileCommand() *cobra.Command {
@@ -20,9 +20,9 @@ func NewConfigSetActiveProfileCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               setActiveProfileCommandExamples,
-		Long:                  `Set a configuration profile as the in-use profile for pingctl.`,
+		Long:                  `Set a configuration profile as the in-use profile for pingcli.`,
 		RunE:                  configSetActiveProfileRunE,
-		Short:                 "Set a configuration profile as the in-use profile for pingctl.",
+		Short:                 "Set a configuration profile as the in-use profile for pingcli.",
 		Use:                   "set-active-profile [flags]",
 	}
 

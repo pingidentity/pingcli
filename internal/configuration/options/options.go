@@ -113,7 +113,7 @@ var (
 	PingfederateAuthenticationTypeOption                Option
 )
 
-// 'pingctl config' command options
+// 'pingcli config' command options
 var (
 	ConfigProfileOption     Option
 	ConfigNameOption        Option
@@ -136,7 +136,7 @@ var (
 	ConfigUnsetProfileOption Option
 )
 
-// 'pingctl platform export' command options
+// 'pingcli platform export' command options
 var (
 	PlatformExportExportFormatOption         Option
 	PlatformExportServiceOption              Option
@@ -158,7 +158,7 @@ var (
 	RootOutputFormatOption  Option
 )
 
-// 'pingctl request' command options
+// 'pingcli request' command options
 var (
 	RequestDataOption              Option
 	RequestHTTPMethodOption        Option

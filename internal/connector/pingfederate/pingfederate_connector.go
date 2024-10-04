@@ -3,10 +3,10 @@ package pingfederate
 import (
 	"context"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/connector/pingfederate/resources"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
+	"github.com/pingidentity/pingcli/internal/logger"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 

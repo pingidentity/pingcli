@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/pflag"
 )
 
@@ -22,7 +22,7 @@ func initDataOption() {
 	cobraParamName := "data"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_REQUEST_DATA"
+	envVar := "PINGCLI_REQUEST_DATA"
 
 	options.RequestDataOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -44,7 +44,7 @@ func initHTTPMethodOption() {
 	cobraParamName := "http-method"
 	cobraValue := new(customtypes.HTTPMethod)
 	defaultValue := customtypes.HTTPMethod(customtypes.ENUM_HTTP_METHOD_GET)
-	envVar := "PINGCTL_REQUEST_HTTP_METHOD"
+	envVar := "PINGCLI_REQUEST_HTTP_METHOD"
 
 	options.RequestHTTPMethodOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -67,7 +67,7 @@ func initServiceOption() {
 	cobraParamName := "service"
 	cobraValue := new(customtypes.RequestService)
 	defaultValue := customtypes.RequestService("")
-	envVar := "PINGCTL_REQUEST_SERVICE"
+	envVar := "PINGCLI_REQUEST_SERVICE"
 
 	options.RequestServiceOption = options.Option{
 		CobraParamName:  cobraParamName,

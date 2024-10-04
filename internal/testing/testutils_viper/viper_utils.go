@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/configuration"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/profiles"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
 const (

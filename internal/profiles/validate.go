@@ -5,9 +5,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/viper"
 )
 
@@ -23,7 +23,7 @@ func Validate() error {
 	// Make sure selected active profile is in the configuration file
 	activeProfile := GetMainConfig().ActiveProfile().Name()
 	if !slices.Contains(profileNames, activeProfile) {
-		return fmt.Errorf("failed to validate pingctl configuration: active profile '%s' not found in configuration file %s", activeProfile, GetMainConfig().ViperInstance().ConfigFileUsed())
+		return fmt.Errorf("failed to validate pingcli configuration: active profile '%s' not found in configuration file %s", activeProfile, GetMainConfig().ViperInstance().ConfigFileUsed())
 	}
 
 	// for each profile key, set the profile based on mainViper.Sub() and validate the profile
@@ -31,11 +31,11 @@ func Validate() error {
 		subViper := GetMainConfig().ViperInstance().Sub(pName)
 
 		if err := validateProfileKeys(pName, subViper); err != nil {
-			return fmt.Errorf("failed to validate pingctl configuration: %v", err)
+			return fmt.Errorf("failed to validate pingcli configuration: %v", err)
 		}
 
 		if err := validateProfileValues(pName, subViper); err != nil {
-			return fmt.Errorf("failed to validate pingctl configuration: %v", err)
+			return fmt.Errorf("failed to validate pingcli configuration: %v", err)
 		}
 	}
 

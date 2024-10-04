@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/pflag"
 )
 
@@ -29,7 +29,7 @@ func initHTTPSHostOption() {
 	cobraParamName := "pingfederate-https-host"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_PINGFEDERATE_HTTPS_HOST"
+	envVar := "PINGCLI_PINGFEDERATE_HTTPS_HOST"
 
 	options.PingfederateHTTPSHostOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -51,7 +51,7 @@ func initAdminAPIPathOption() {
 	cobraParamName := "pingfederate-admin-api-path"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("/pf-admin-api/v1")
-	envVar := "PINGCTL_PINGFEDERATE_ADMIN_API_PATH"
+	envVar := "PINGCLI_PINGFEDERATE_ADMIN_API_PATH"
 
 	options.PingfederateAdminAPIPathOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -73,7 +73,7 @@ func initXBypassExternalValidationHeaderOption() {
 	cobraParamName := "pingfederate-x-bypass-external-validation-header"
 	cobraValue := new(customtypes.Bool)
 	defaultValue := customtypes.Bool(false)
-	envVar := "PINGCTL_PINGFEDERATE_X_BYPASS_EXTERNAL_VALIDATION_HEADER"
+	envVar := "PINGCLI_PINGFEDERATE_X_BYPASS_EXTERNAL_VALIDATION_HEADER"
 
 	options.PingfederateXBypassExternalValidationHeaderOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -95,7 +95,7 @@ func initCACertificatePemFilesOption() {
 	cobraParamName := "pingfederate-ca-certificate-pem-files"
 	cobraValue := new(customtypes.StringSlice)
 	defaultValue := customtypes.StringSlice{}
-	envVar := "PINGCTL_PINGFEDERATE_CA_CERTIFICATE_PEM_FILES"
+	envVar := "PINGCLI_PINGFEDERATE_CA_CERTIFICATE_PEM_FILES"
 
 	options.PingfederateCACertificatePemFilesOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -117,7 +117,7 @@ func initInsecureTrustAllTLSOption() {
 	cobraParamName := "pingfederate-insecure-trust-all-tls"
 	cobraValue := new(customtypes.Bool)
 	defaultValue := customtypes.Bool(false)
-	envVar := "PINGCTL_PINGFEDERATE_INSECURE_TRUST_ALL_TLS"
+	envVar := "PINGCLI_PINGFEDERATE_INSECURE_TRUST_ALL_TLS"
 
 	options.PingfederateInsecureTrustAllTLSOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -139,7 +139,7 @@ func initUsernameOption() {
 	cobraParamName := "pingfederate-username"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_PINGFEDERATE_USERNAME"
+	envVar := "PINGCLI_PINGFEDERATE_USERNAME"
 
 	options.PingfederateBasicAuthUsernameOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -161,7 +161,7 @@ func initPasswordOption() {
 	cobraParamName := "pingfederate-password"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_PINGFEDERATE_PASSWORD"
+	envVar := "PINGCLI_PINGFEDERATE_PASSWORD"
 
 	options.PingfederateBasicAuthPasswordOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -183,7 +183,7 @@ func initAccessTokenOption() {
 	cobraParamName := "pingfederate-access-token"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_PINGFEDERATE_ACCESS_TOKEN"
+	envVar := "PINGCLI_PINGFEDERATE_ACCESS_TOKEN"
 
 	options.PingfederateAccessTokenAuthAccessTokenOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -205,7 +205,7 @@ func initClientIDOption() {
 	cobraParamName := "pingfederate-client-id"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_PINGFEDERATE_CLIENT_ID"
+	envVar := "PINGCLI_PINGFEDERATE_CLIENT_ID"
 
 	options.PingfederateClientCredentialsAuthClientIDOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -227,7 +227,7 @@ func initClientSecretOption() {
 	cobraParamName := "pingfederate-client-secret"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_PINGFEDERATE_CLIENT_SECRET"
+	envVar := "PINGCLI_PINGFEDERATE_CLIENT_SECRET"
 
 	options.PingfederateClientCredentialsAuthClientSecretOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -249,7 +249,7 @@ func initTokenURLOption() {
 	cobraParamName := "pingfederate-token-url"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_PINGFEDERATE_TOKEN_URL"
+	envVar := "PINGCLI_PINGFEDERATE_TOKEN_URL"
 
 	options.PingfederateClientCredentialsAuthTokenURLOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -271,7 +271,7 @@ func initScopesOption() {
 	cobraParamName := "pingfederate-scopes"
 	cobraValue := new(customtypes.StringSlice)
 	defaultValue := customtypes.StringSlice{}
-	envVar := "PINGCTL_PINGFEDERATE_SCOPES"
+	envVar := "PINGCLI_PINGFEDERATE_SCOPES"
 
 	options.PingfederateClientCredentialsAuthScopesOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -293,7 +293,7 @@ func initPingfederateAuthenticationTypeOption() {
 	cobraParamName := "pingfederate-authentication-type"
 	cobraValue := new(customtypes.PingfederateAuthenticationType)
 	defaultValue := customtypes.PingfederateAuthenticationType("")
-	envVar := "PINGCTL_PINGFEDERATE_AUTHENTICATION_TYPE"
+	envVar := "PINGCLI_PINGFEDERATE_AUTHENTICATION_TYPE"
 
 	options.PingfederateAuthenticationTypeOption = options.Option{
 		CobraParamName:  cobraParamName,

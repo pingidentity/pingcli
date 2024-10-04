@@ -11,9 +11,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 )
 
 var (
@@ -160,7 +160,7 @@ func InitPingOneTerraform(t *testing.T) {
 }
 	
 provider "pingone" {}
-`, os.Getenv("PINGCTL_PINGONE_PROVIDER_VERSION"))
+`, os.Getenv("PINGCLI_PINGONE_PROVIDER_VERSION"))
 
 	// Write main.tf to testing directory
 	mainTFFilepath := filepath.Join(exportDir, "main.tf")
@@ -209,13 +209,13 @@ provider "pingfederate" {
   insecure_trust_all_tls = true
   x_bypass_external_validation_header = true
 }
-`, os.Getenv("PINGCTL_PINGFEDERATE_PROVIDER_VERSION"),
-		os.Getenv("PINGCTL_PINGFEDERATE_CLIENT_ID"),
-		os.Getenv("PINGCTL_PINGFEDERATE_CLIENT_SECRET"),
-		os.Getenv("PINGCTL_PINGFEDERATE_SCOPES"),
-		os.Getenv("PINGCTL_PINGFEDERATE_TOKEN_URL"),
-		os.Getenv("PINGCTL_PINGFEDERATE_HTTPS_HOST"),
-		os.Getenv("PINGCTL_PINGFEDERATE_ADMIN_API_PATH"))
+`, os.Getenv("PINGCLI_PINGFEDERATE_PROVIDER_VERSION"),
+		os.Getenv("PINGCLI_PINGFEDERATE_CLIENT_ID"),
+		os.Getenv("PINGCLI_PINGFEDERATE_CLIENT_SECRET"),
+		os.Getenv("PINGCLI_PINGFEDERATE_SCOPES"),
+		os.Getenv("PINGCLI_PINGFEDERATE_TOKEN_URL"),
+		os.Getenv("PINGCLI_PINGFEDERATE_HTTPS_HOST"),
+		os.Getenv("PINGCLI_PINGFEDERATE_ADMIN_API_PATH"))
 
 	// Write main.tf to testing directory
 	mainTFFilepath := filepath.Join(exportDir, "main.tf")

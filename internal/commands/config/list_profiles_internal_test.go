@@ -3,7 +3,7 @@ package config_internal
 import (
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
 )
 
 // Test RunInternalConfigListProfiles function

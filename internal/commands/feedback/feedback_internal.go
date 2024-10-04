@@ -1,7 +1,7 @@
 package feedback_internal
 
 import (
-	"github.com/pingidentity/pingctl/internal/output"
+	"github.com/pingidentity/pingcli/internal/output"
 )
 
 const FeedbackMessage string = `Thank you for participating in early adoption of the refreshed Ping Identity universal CLI!
@@ -14,7 +14,7 @@ Please visit the following URL in your browser to fill out a short, anonymous su
 
 If you encounter any bugs while using the tool, please open an issue on the project's GitHub repository's issue tracker:
 
-	https://github.com/pingidentity/pingctl/issues/new
+	https://github.com/pingidentity/pingcli/issues/new
 
 `
 

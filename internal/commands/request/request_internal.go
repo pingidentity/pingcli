@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/output"
-	"github.com/pingidentity/pingctl/internal/profiles"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/output"
+	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
 type PingoneAuthResponse struct {

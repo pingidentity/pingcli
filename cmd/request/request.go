@@ -3,19 +3,19 @@ package request
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/cmd/common"
-	request_internal "github.com/pingidentity/pingctl/internal/commands/request"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	request_internal "github.com/pingidentity/pingcli/internal/commands/request"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	commandExamples = `  pingctl request --service pingone environments
-  pingctl request --service pingone --http-method GET environments/{{environmentID}}
-  pingctl request --service pingone --http-method POST --data {{raw-data}} environments
-  pingctl request --service pingone --http-method POST --data @{{filepath}} environments
-  pingctl request --service pingone --http-method DELETE environments/{{environmentID}}`
+	commandExamples = `  pingcli request --service pingone environments
+  pingcli request --service pingone --http-method GET environments/{{environmentID}}
+  pingcli request --service pingone --http-method POST --data {{raw-data}} environments
+  pingcli request --service pingone --http-method POST --data @{{filepath}} environments
+  pingcli request --service pingone --http-method DELETE environments/{{environmentID}}`
 
 	profileConfigurationFormat = `Profile Configuration Format:
 request:

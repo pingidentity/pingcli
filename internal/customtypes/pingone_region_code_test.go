@@ -3,8 +3,8 @@ package customtypes_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
 // Test PingOneRegion Set function

@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/pingidentity/pingctl/cmd"
-	"github.com/pingidentity/pingctl/internal/output"
+	"github.com/pingidentity/pingcli/cmd"
+	"github.com/pingidentity/pingcli/internal/output"
 )
 
 func main() {
@@ -12,7 +12,7 @@ func main() {
 	if err != nil {
 		output.Print(output.Opts{
 			ErrorMessage: err.Error(),
-			Message:      "Failed to execute pingctl",
+			Message:      "Failed to execute pingcli",
 			Result:       output.ENUM_RESULT_FAILURE,
 		})
 	}

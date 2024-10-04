@@ -3,9 +3,9 @@ package resources_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/pingone/sso/resources"
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/sso/resources"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
 func TestPopulationDefaultExport(t *testing.T) {

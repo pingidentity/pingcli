@@ -1,14 +1,14 @@
 package config
 
 import (
-	"github.com/pingidentity/pingctl/cmd/common"
-	config_internal "github.com/pingidentity/pingctl/internal/commands/config"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	listProfilesCommandExamples = `  pingctl config list-profiles`
+	listProfilesCommandExamples = `  pingcli config list-profiles`
 )
 
 func NewConfigListProfilesCommand() *cobra.Command {
@@ -16,9 +16,9 @@ func NewConfigListProfilesCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               listProfilesCommandExamples,
-		Long:                  `List all configuration profiles from pingctl.`,
+		Long:                  `List all configuration profiles from pingcli.`,
 		RunE:                  configListProfilesRunE,
-		Short:                 "List all configuration profiles from pingctl.",
+		Short:                 "List all configuration profiles from pingcli.",
 		Use:                   "list-profiles",
 	}
 

@@ -5,13 +5,13 @@ import (
 	"slices"
 	"strings"
 
-	configuration_config "github.com/pingidentity/pingctl/internal/configuration/config"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	configuration_platform "github.com/pingidentity/pingctl/internal/configuration/platform"
-	configuration_profiles "github.com/pingidentity/pingctl/internal/configuration/profiles"
-	configuration_request "github.com/pingidentity/pingctl/internal/configuration/request"
-	configuration_root "github.com/pingidentity/pingctl/internal/configuration/root"
-	configuration_services "github.com/pingidentity/pingctl/internal/configuration/services"
+	configuration_config "github.com/pingidentity/pingcli/internal/configuration/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	configuration_platform "github.com/pingidentity/pingcli/internal/configuration/platform"
+	configuration_profiles "github.com/pingidentity/pingcli/internal/configuration/profiles"
+	configuration_request "github.com/pingidentity/pingcli/internal/configuration/request"
+	configuration_root "github.com/pingidentity/pingcli/internal/configuration/root"
+	configuration_services "github.com/pingidentity/pingcli/internal/configuration/services"
 )
 
 func ViperKeys() (keys []string) {

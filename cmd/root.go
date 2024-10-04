@@ -5,15 +5,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/pingidentity/pingctl/cmd/config"
-	"github.com/pingidentity/pingctl/cmd/feedback"
-	"github.com/pingidentity/pingctl/cmd/platform"
-	"github.com/pingidentity/pingctl/cmd/request"
-	"github.com/pingidentity/pingctl/internal/configuration"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
-	"github.com/pingidentity/pingctl/internal/output"
-	"github.com/pingidentity/pingctl/internal/profiles"
+	"github.com/pingidentity/pingcli/cmd/config"
+	"github.com/pingidentity/pingcli/cmd/feedback"
+	"github.com/pingidentity/pingcli/cmd/platform"
+	"github.com/pingidentity/pingcli/cmd/request"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -31,7 +31,7 @@ activeProfile: <ProfileName>
 func init() {
 	l := logger.Get()
 
-	l.Debug().Msgf("Initializing Pingctl options...")
+	l.Debug().Msgf("Initializing Pingcli options...")
 	configuration.InitAllOptions()
 
 	l.Debug().Msgf("Initializing Root command...")
@@ -45,7 +45,7 @@ func NewRootCommand() *cobra.Command {
 		Long:          `A CLI tool for managing Ping Identity products.`,
 		Short:         "A CLI tool for managing Ping Identity products.",
 		SilenceErrors: true, // Upon error in RunE method, let output package in main.go handle error output
-		Use:           "pingctl",
+		Use:           "pingcli",
 		Version:       "v2.0.0-alpha.4",
 	}
 
@@ -114,7 +114,7 @@ func initViperProfile() {
 	// Validate the configuration
 	if err := profiles.Validate(); err != nil {
 		output.Print(output.Opts{
-			Message:      "Failed to validate pingctl configuration",
+			Message:      "Failed to validate pingcli configuration",
 			Result:       output.ENUM_RESULT_FAILURE,
 			FatalMessage: err.Error(),
 		})
@@ -128,7 +128,7 @@ func checkCfgFileLocation(cfgFile string) {
 		// Only create a new configuration file if it is the default configuration file location
 		if cfgFile == options.RootConfigOption.DefaultValue.String() {
 			output.Print(output.Opts{
-				Message: fmt.Sprintf("Pingctl configuration file '%s' does not exist.", cfgFile),
+				Message: fmt.Sprintf("Pingcli configuration file '%s' does not exist.", cfgFile),
 				Result:  output.ENUM_RESULT_NOACTION_WARN,
 			})
 
@@ -152,13 +152,13 @@ func checkCfgFileLocation(cfgFile string) {
 
 func createConfigFile(cfgFile string) {
 	l := logger.Get()
-	l.Debug().Msgf("Creating new pingctl configuration file at: %s", cfgFile)
+	l.Debug().Msgf("Creating new pingcli configuration file at: %s", cfgFile)
 
 	// MkdirAll does nothing if directories already exist. Create needed directories for config file location.
 	err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
 	if err != nil {
 		output.Print(output.Opts{
-			Message:      fmt.Sprintf("Failed to make directories needed for new pingctl configuration file: %s", cfgFile),
+			Message:      fmt.Sprintf("Failed to make directories needed for new pingcli configuration file: %s", cfgFile),
 			Result:       output.ENUM_RESULT_FAILURE,
 			FatalMessage: err.Error(),
 		})
@@ -166,7 +166,7 @@ func createConfigFile(cfgFile string) {
 
 	tempViper := viper.New()
 	tempViper.Set(options.RootActiveProfileOption.ViperKey, options.RootActiveProfileOption.DefaultValue)
-	tempViper.Set(fmt.Sprintf("%s.%v", options.RootActiveProfileOption.DefaultValue.String(), options.ProfileDescriptionOption.ViperKey), "Default profile created by pingctl")
+	tempViper.Set(fmt.Sprintf("%s.%v", options.RootActiveProfileOption.DefaultValue.String(), options.ProfileDescriptionOption.ViperKey), "Default profile created by pingcli")
 
 	err = tempViper.WriteConfigAs(cfgFile)
 	if err != nil {

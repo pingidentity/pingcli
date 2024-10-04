@@ -1,8 +1,8 @@
 package configuration_profiles
 
 import (
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 )
 
 func InitProfilesOptions() {

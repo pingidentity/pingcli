@@ -21,7 +21,7 @@ type HTTPMethod string
 // Verify that the custom type satisfies the pflag.Value interface
 var _ pflag.Value = (*HTTPMethod)(nil)
 
-// Implement pflag.Value interface for custom type in cobra pingctl-output parameter
+// Implement pflag.Value interface for custom type in cobra pingcli-output parameter
 
 func (hm *HTTPMethod) Set(httpMethod string) error {
 	if hm == nil {

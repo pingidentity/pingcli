@@ -1,4 +1,4 @@
-module github.com/pingidentity/pingctl
+module github.com/pingidentity/pingcli
 
 go 1.22.0
 

@@ -1,8 +1,8 @@
 package configuration_config
 
 import (
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/pflag"
 )
 
@@ -69,7 +69,7 @@ func initAddProfileSetActiveOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "s",
-			Usage:     "Set the new configuration profile as the active profile for pingctl.",
+			Usage:     "Set the new configuration profile as the active profile for pingcli.",
 			Value:     cobraValue,
 			DefValue:  "false",
 		},

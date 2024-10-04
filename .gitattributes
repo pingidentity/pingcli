@@ -4,7 +4,3 @@
 .gitattributes    export-ignore
 .github           export-ignore
 .gitignore        export-ignore
-mkdocs.yml        export-ignore
-docs              export-ignore
-install.sh        export-ignore
-pingctl-test.sh   export-ignore

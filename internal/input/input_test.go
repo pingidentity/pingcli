@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
 func mockValidateFunc(input string) error {

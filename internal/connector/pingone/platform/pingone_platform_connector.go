@@ -4,10 +4,10 @@ import (
 	"context"
 
 	pingoneGoClient "github.com/patrickcping/pingone-go-sdk-v2/pingone"
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/connector/pingone/platform/resources"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/platform/resources"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 const (

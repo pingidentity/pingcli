@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/output"
-	"github.com/pingidentity/pingctl/internal/profiles"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/output"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/viper"
 )
 
@@ -24,7 +24,7 @@ func RunInternalConfigSet(kvPair string) (err error) {
 
 	// Make sure value is not empty, and suggest unset command if it is
 	if vValue == "" {
-		return fmt.Errorf("failed to set configuration: value for key '%s' is empty. Use 'pingctl config unset %s' to unset the key", vKey, vKey)
+		return fmt.Errorf("failed to set configuration: value for key '%s' is empty. Use 'pingcli config unset %s' to unset the key", vKey, vKey)
 	}
 
 	if err = profiles.GetMainConfig().ValidateExistingProfileName(pName); err != nil {

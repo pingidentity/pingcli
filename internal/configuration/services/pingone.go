@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/pflag"
 )
 
@@ -22,7 +22,7 @@ func initAuthenticationWorkerClientIDOption() {
 	cobraParamName := "pingone-worker-client-id"
 	cobraValue := new(customtypes.UUID)
 	defaultValue := customtypes.UUID("")
-	envVar := "PINGCTL_PINGONE_WORKER_CLIENT_ID"
+	envVar := "PINGCLI_PINGONE_WORKER_CLIENT_ID"
 
 	options.PingoneAuthenticationWorkerClientIDOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -44,7 +44,7 @@ func initAuthenticationWorkerClientSecretOption() {
 	cobraParamName := "pingone-worker-client-secret"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCTL_PINGONE_WORKER_CLIENT_SECRET"
+	envVar := "PINGCLI_PINGONE_WORKER_CLIENT_SECRET"
 
 	options.PingoneAuthenticationWorkerClientSecretOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -66,7 +66,7 @@ func initAuthenticationWorkerEnvironmentIDOption() {
 	cobraParamName := "pingone-worker-environment-id"
 	cobraValue := new(customtypes.UUID)
 	defaultValue := customtypes.UUID("")
-	envVar := "PINGCTL_PINGONE_WORKER_ENVIRONMENT_ID"
+	envVar := "PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID"
 
 	options.PingoneAuthenticationWorkerEnvironmentIDOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -88,7 +88,7 @@ func initPingoneAuthenticationTypeOption() {
 	cobraParamName := "pingone-authentication-type"
 	cobraValue := new(customtypes.PingoneAuthenticationType)
 	defaultValue := customtypes.PingoneAuthenticationType("")
-	envVar := "PINGCTL_PINGONE_AUTHENTICATION_TYPE"
+	envVar := "PINGCLI_PINGONE_AUTHENTICATION_TYPE"
 
 	options.PingoneAuthenticationTypeOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -110,7 +110,7 @@ func initRegionCodeOption() {
 	cobraParamName := "pingone-region-code"
 	cobraValue := new(customtypes.PingoneRegionCode)
 	defaultValue := customtypes.PingoneRegionCode("")
-	envVar := "PINGCTL_PINGONE_REGION_CODE"
+	envVar := "PINGCLI_PINGONE_REGION_CODE"
 
 	options.PingoneRegionCodeOption = options.Option{
 		CobraParamName:  cobraParamName,

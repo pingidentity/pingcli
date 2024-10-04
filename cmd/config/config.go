@@ -3,17 +3,17 @@ package config
 import (
 	"os"
 
-	"github.com/pingidentity/pingctl/cmd/common"
-	config_internal "github.com/pingidentity/pingctl/internal/commands/config"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	configCommandExamples = `  pingctl config
-  pingctl config --profile myprofile
-  pingctl config --name myprofile --description "My Profile"`
+	configCommandExamples = `  pingcli config
+  pingcli config --profile myprofile
+  pingcli config --name myprofile --description "My Profile"`
 )
 
 func NewConfigCommand() *cobra.Command {

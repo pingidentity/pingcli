@@ -3,8 +3,8 @@ package common_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingctl/cmd/common"
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/spf13/cobra"
 )
 

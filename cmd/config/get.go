@@ -1,17 +1,17 @@
 package config
 
 import (
-	"github.com/pingidentity/pingctl/cmd/common"
-	config_internal "github.com/pingidentity/pingctl/internal/commands/config"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	configGetCommandExamples = `  pingctl config get pingone
-  pingctl config get --profile myProfile color
-  pingctl config get service.pingone.authentication.worker.environmentID`
+	configGetCommandExamples = `  pingcli config get pingone
+  pingcli config get --profile myProfile color
+  pingcli config get service.pingone.authentication.worker.environmentID`
 )
 
 func NewConfigGetCommand() *cobra.Command {
@@ -19,9 +19,9 @@ func NewConfigGetCommand() *cobra.Command {
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               configGetCommandExamples,
-		Long:                  `Get pingctl configuration settings.`,
+		Long:                  `Get pingcli configuration settings.`,
 		RunE:                  configGetRunE,
-		Short:                 "Get pingctl configuration settings.",
+		Short:                 "Get pingcli configuration settings.",
 		Use:                   "get [flags] key",
 	}
 

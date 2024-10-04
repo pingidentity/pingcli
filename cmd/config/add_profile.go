@@ -3,17 +3,17 @@ package config
 import (
 	"os"
 
-	"github.com/pingidentity/pingctl/cmd/common"
-	config_internal "github.com/pingidentity/pingctl/internal/commands/config"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	addProfilecommandExamples = `  pingctl config add-profile
-  pingctl config add-profile --name myprofile --description "My Profile desc"
-  pingctl config add-profile --set-active=true`
+	addProfilecommandExamples = `  pingcli config add-profile
+  pingcli config add-profile --name myprofile --description "My Profile desc"
+  pingcli config add-profile --set-active=true`
 )
 
 func NewConfigAddProfileCommand() *cobra.Command {
@@ -21,9 +21,9 @@ func NewConfigAddProfileCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               addProfilecommandExamples,
-		Long:                  `Add a new configuration profile to pingctl.`,
+		Long:                  `Add a new configuration profile to pingcli.`,
 		RunE:                  configAddProfileRunE,
-		Short:                 "Add a new configuration profile to pingctl.",
+		Short:                 "Add a new configuration profile to pingcli.",
 		Use:                   "add-profile [flags]",
 	}
 

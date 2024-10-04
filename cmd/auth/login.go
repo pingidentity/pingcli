@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"github.com/pingidentity/pingctl/cmd/common"
+	"github.com/pingidentity/pingcli/cmd/common"
 	"github.com/spf13/cobra"
 )
 

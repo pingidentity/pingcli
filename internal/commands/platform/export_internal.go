@@ -13,18 +13,18 @@ import (
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	pingoneGoClient "github.com/patrickcping/pingone-go-sdk-v2/pingone"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/connector/pingfederate"
-	"github.com/pingidentity/pingctl/internal/connector/pingone/mfa"
-	"github.com/pingidentity/pingctl/internal/connector/pingone/platform"
-	"github.com/pingidentity/pingctl/internal/connector/pingone/protect"
-	"github.com/pingidentity/pingctl/internal/connector/pingone/sso"
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/logger"
-	"github.com/pingidentity/pingctl/internal/output"
-	"github.com/pingidentity/pingctl/internal/profiles"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingfederate"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/mfa"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/platform"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/protect"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/sso"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 	"github.com/rs/zerolog"
 )
@@ -100,7 +100,7 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	return nil
 }
 
-func initPingFederateServices(ctx context.Context, pingctlVersion string) (err error) {
+func initPingFederateServices(ctx context.Context, pingcliVersion string) (err error) {
 	if ctx == nil {
 		return fmt.Errorf("failed to initialize PingFederate services. context is nil")
 	}
@@ -143,7 +143,7 @@ func initPingFederateServices(ctx context.Context, pingctlVersion string) (err e
 		},
 	}
 
-	if err = initPingFederateApiClient(tr, pingctlVersion); err != nil {
+	if err = initPingFederateApiClient(tr, pingcliVersion); err != nil {
 		return err
 	}
 
@@ -237,7 +237,7 @@ func initPingOneServices(ctx context.Context, cmdVersion string) (err error) {
 	return nil
 }
 
-func initPingFederateApiClient(tr *http.Transport, pingctlVersion string) (err error) {
+func initPingFederateApiClient(tr *http.Transport, pingcliVersion string) (err error) {
 	l := logger.Get()
 	l.Debug().Msgf("Initializing PingFederate API client.")
 
@@ -264,12 +264,12 @@ func initPingFederateApiClient(tr *http.Transport, pingctlVersion string) (err e
 	}
 
 	if httpsHost == "" {
-		return fmt.Errorf(`failed to initialize pingfederate API client. the pingfederate https host configuration value is not set: configure this property via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingctl/config.yaml)`)
+		return fmt.Errorf(`failed to initialize pingfederate API client. the pingfederate https host configuration value is not set: configure this property via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)`)
 	}
 
-	userAgent := fmt.Sprintf("pingctl/%s", pingctlVersion)
+	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
 
-	if v := strings.TrimSpace(os.Getenv("PINGCTL_PINGFEDERATE_APPEND_USER_AGENT")); v != "" {
+	if v := strings.TrimSpace(os.Getenv("PINGCLI_PINGFEDERATE_APPEND_USER_AGENT")); v != "" {
 		userAgent = fmt.Sprintf("%s %s", userAgent, v)
 	}
 
@@ -290,7 +290,7 @@ func initPingFederateApiClient(tr *http.Transport, pingctlVersion string) (err e
 	return nil
 }
 
-func initPingOneApiClient(ctx context.Context, pingctlVersion string) (err error) {
+func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error) {
 	l := logger.Get()
 	l.Debug().Msgf("Initializing PingOne API client.")
 
@@ -316,12 +316,12 @@ func initPingOneApiClient(ctx context.Context, pingctlVersion string) (err error
 	}
 
 	if pingoneApiClientId == "" || clientSecret == "" || environmentID == "" || regionCode == "" {
-		return fmt.Errorf(`failed to initialize pingone API client. one of worker client ID, worker client secret, pingone region code, and/or worker environment ID is empty. configure these properties via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingctl/config.yaml)`)
+		return fmt.Errorf(`failed to initialize pingone API client. one of worker client ID, worker client secret, pingone region code, and/or worker environment ID is empty. configure these properties via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)`)
 	}
 
-	userAgent := fmt.Sprintf("pingctl/%s", pingctlVersion)
+	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
 
-	if v := strings.TrimSpace(os.Getenv("PINGCTL_PINGONE_APPEND_USER_AGENT")); v != "" {
+	if v := strings.TrimSpace(os.Getenv("PINGCLI_PINGONE_APPEND_USER_AGENT")); v != "" {
 		userAgent = fmt.Sprintf("%s %s", userAgent, v)
 	}
 

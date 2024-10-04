@@ -3,23 +3,23 @@ package platform
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/cmd/common"
-	platform_internal "github.com/pingidentity/pingctl/internal/commands/platform"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	platform_internal "github.com/pingidentity/pingcli/internal/commands/platform"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	commandExamples = `  pingctl platform export
-  pingctl platform export --output-directory dir --overwrite
-  pingctl platform export --export-format HCL
-  pingctl platform export --services pingone-platform,pingone-sso
-  pingctl platform export --services pingone-platform --pingone-client-environment-id envID --pingone-worker-client-id clientID --pingone-worker-client-secret clientSecret --pingone-region-code regionCode
-  pingctl platform export --service pingfederate --pingfederate-username user --pingfederate-password password
-  pingctl platform export --service pingfederate --pingfederate-client-id clientID --pingfederate-client-secret clientSecret --pingfederate-token-url tokenURL
-  pingctl platform export --service pingfederate --pingfederate-access-token accessToken
-  pingctl platform export --service pingfederate --x-bypass-external-validation=false --ca-certificate-pem-files "/path/to/cert.pem,/path/to/cert2.pem" --insecure-trust-all-tls=false`
+	commandExamples = `  pingcli platform export
+  pingcli platform export --output-directory dir --overwrite
+  pingcli platform export --export-format HCL
+  pingcli platform export --services pingone-platform,pingone-sso
+  pingcli platform export --services pingone-platform --pingone-client-environment-id envID --pingone-worker-client-id clientID --pingone-worker-client-secret clientSecret --pingone-region-code regionCode
+  pingcli platform export --service pingfederate --pingfederate-username user --pingfederate-password password
+  pingcli platform export --service pingfederate --pingfederate-client-id clientID --pingfederate-client-secret clientSecret --pingfederate-token-url tokenURL
+  pingcli platform export --service pingfederate --pingfederate-access-token accessToken
+  pingcli platform export --service pingfederate --x-bypass-external-validation=false --ca-certificate-pem-files "/path/to/cert.pem,/path/to/cert2.pem" --insecure-trust-all-tls=false`
 
 	profileConfigurationFormat = `Profile Configuration Format:
 export:

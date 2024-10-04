@@ -5,9 +5,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/pflag"
 )
 
@@ -23,7 +23,7 @@ func initFormatOption() {
 	cobraParamName := "format"
 	cobraValue := new(customtypes.ExportFormat)
 	defaultValue := customtypes.ExportFormat(customtypes.ENUM_EXPORT_FORMAT_HCL)
-	envVar := "PINGCTL_EXPORT_FORMAT"
+	envVar := "PINGCLI_EXPORT_FORMAT"
 
 	options.PlatformExportExportFormatOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -46,7 +46,7 @@ func initServicesOption() {
 	cobraParamName := "services"
 	cobraValue := new(customtypes.ExportServices)
 	defaultValue := customtypes.ExportServices(customtypes.ExportServicesValidValues())
-	envVar := "PINGCTL_EXPORT_SERVICES"
+	envVar := "PINGCLI_EXPORT_SERVICES"
 
 	options.PlatformExportServiceOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -69,7 +69,7 @@ func initOutputDirectoryOption() {
 	cobraParamName := "output-directory"
 	cobraValue := new(customtypes.String)
 	defaultValue := getDefaultExportDir()
-	envVar := "PINGCTL_EXPORT_OUTPUT_DIRECTORY"
+	envVar := "PINGCLI_EXPORT_OUTPUT_DIRECTORY"
 
 	options.PlatformExportOutputDirectoryOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -97,7 +97,7 @@ func initOverwriteOption() {
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "PINGCTL_EXPORT_OVERWRITE",
+		EnvVar:          "PINGCLI_EXPORT_OVERWRITE",
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "o",
@@ -133,7 +133,7 @@ func initPingOneEnvironmentIDOption() {
 	cobraParamName := "pingone-export-environment-id"
 	cobraValue := new(customtypes.UUID)
 	defaultValue := customtypes.UUID("")
-	envVar := "PINGCTL_PINGONE_EXPORT_ENVIRONMENT_ID"
+	envVar := "PINGCLI_PINGONE_EXPORT_ENVIRONMENT_ID"
 
 	options.PlatformExportPingoneEnvironmentIDOption = options.Option{
 		CobraParamName:  cobraParamName,
