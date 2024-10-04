@@ -26,6 +26,8 @@ func (pat *PingoneAuthenticationType) Set(authType string) error {
 	switch {
 	case strings.EqualFold(authType, ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER):
 		*pat = PingoneAuthenticationType(ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)
+	case strings.EqualFold(authType, ""):
+		*pat = PingoneAuthenticationType("")
 	default:
 		return fmt.Errorf("unrecognized Pingone Authentication Type: '%s'. Must be one of: %s", authType, strings.Join(PingoneAuthenticationTypeValidValues(), ", "))
 	}

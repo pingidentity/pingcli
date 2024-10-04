@@ -44,6 +44,8 @@ func (prc *PingoneRegionCode) Set(regionCode string) error {
 		*prc = PingoneRegionCode(ENUM_PINGONE_REGION_CODE_EU)
 	case strings.EqualFold(regionCode, ENUM_PINGONE_REGION_CODE_NA):
 		*prc = PingoneRegionCode(ENUM_PINGONE_REGION_CODE_NA)
+	case strings.EqualFold(regionCode, ""):
+		*prc = PingoneRegionCode("")
 	default:
 		return fmt.Errorf("unrecognized Pingone Region Code: '%s'. Must be one of: %s", regionCode, strings.Join(PingoneRegionCodeValidValues(), ", "))
 	}

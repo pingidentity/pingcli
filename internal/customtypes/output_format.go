@@ -30,6 +30,8 @@ func (o *OutputFormat) Set(outputFormat string) error {
 		*o = OutputFormat(ENUM_OUTPUT_FORMAT_TEXT)
 	case strings.EqualFold(outputFormat, ENUM_OUTPUT_FORMAT_JSON):
 		*o = OutputFormat(ENUM_OUTPUT_FORMAT_JSON)
+	case strings.EqualFold(outputFormat, ""):
+		*o = OutputFormat("")
 	default:
 		return fmt.Errorf("unrecognized Output Format: '%s'. Must be one of: %s", outputFormat, strings.Join(OutputFormatValidValues(), ", "))
 	}

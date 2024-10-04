@@ -32,6 +32,8 @@ func (pat *PingfederateAuthenticationType) Set(authType string) error {
 		*pat = PingfederateAuthenticationType(ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_ACCESS_TOKEN)
 	case strings.EqualFold(authType, ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS):
 		*pat = PingfederateAuthenticationType(ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS)
+	case strings.EqualFold(authType, ""):
+		*pat = PingfederateAuthenticationType("")
 	default:
 		return fmt.Errorf("unrecognized Pingfederate Authentication Type: '%s'. Must be one of: %s", authType, strings.Join(PingfederateAuthenticationTypeValidValues(), ", "))
 	}

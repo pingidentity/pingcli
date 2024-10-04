@@ -17,6 +17,11 @@ func (u *UUID) Set(val string) error {
 		return fmt.Errorf("failed to set UUID value: %s. UUID is nil", val)
 	}
 
+	if val == "" {
+		*u = UUID(val)
+		return nil
+	}
+
 	_, err := uuid.ParseUUID(val)
 	if err != nil {
 		return err

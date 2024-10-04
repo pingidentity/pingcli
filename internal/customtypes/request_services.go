@@ -26,6 +26,8 @@ func (rs *RequestService) Set(service string) error {
 	switch {
 	case strings.EqualFold(service, ENUM_REQUEST_SERVICE_PINGONE):
 		*rs = RequestService(ENUM_REQUEST_SERVICE_PINGONE)
+	case strings.EqualFold(service, ""):
+		*rs = RequestService("")
 	default:
 		return fmt.Errorf("unrecognized Request Service: '%s'. Must be one of: %s", service, strings.Join(RequestServiceValidValues(), ", "))
 	}
