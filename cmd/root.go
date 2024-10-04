@@ -151,8 +151,10 @@ func checkCfgFileLocation(cfgFile string) {
 }
 
 func createConfigFile(cfgFile string) {
-	l := logger.Get()
-	l.Debug().Msgf("Creating new pingcli configuration file at: %s", cfgFile)
+	output.Print(output.Opts{
+		Message: fmt.Sprintf("Creating new pingcli configuration file at: %s", cfgFile),
+		Result:  output.ENUM_RESULT_NIL,
+	})
 
 	// MkdirAll does nothing if directories already exist. Create needed directories for config file location.
 	err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
