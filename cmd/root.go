@@ -21,7 +21,7 @@ import (
 func init() {
 	l := logger.Get()
 
-	l.Debug().Msgf("Initializing Pingcli options...")
+	l.Debug().Msgf("Initializing Ping CLI options...")
 	configuration.InitAllOptions()
 
 	l.Debug().Msgf("Initializing Root command...")
@@ -117,7 +117,7 @@ func checkCfgFileLocation(cfgFile string) {
 		// Only create a new configuration file if it is the default configuration file location
 		if cfgFile == options.RootConfigOption.DefaultValue.String() {
 			output.Print(output.Opts{
-				Message: fmt.Sprintf("Pingcli configuration file '%s' does not exist.", cfgFile),
+				Message: fmt.Sprintf("Ping CLI configuration file '%s' does not exist.", cfgFile),
 				Result:  output.ENUM_RESULT_NOACTION_WARN,
 			})
 

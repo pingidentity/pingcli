@@ -14,7 +14,7 @@ Start by running the command to create a new profile and answering the prompts.
 
 ```text
 $ pingcli config add-profile
-Pingcli configuration file '/Users/<me>/.pingcli/config.yaml' does not exist. - No Action (Warning)
+Ping CLI configuration file '/Users/<me>/.pingcli/config.yaml' does not exist. - No Action (Warning)
 Creating new pingcli configuration file at: /Users/<me>/.pingcli/config.yaml
 New profile name: : dev
 New profile description: : configuration for development environment
