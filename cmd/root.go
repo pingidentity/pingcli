@@ -103,7 +103,7 @@ func initViperProfile() {
 	// Validate the configuration
 	if err := profiles.Validate(); err != nil {
 		output.Print(output.Opts{
-			Message:      "Failed to validate pingcli configuration",
+			Message:      "Failed to validate Ping CLI configuration",
 			Result:       output.ENUM_RESULT_FAILURE,
 			FatalMessage: err.Error(),
 		})
@@ -141,7 +141,7 @@ func checkCfgFileLocation(cfgFile string) {
 
 func createConfigFile(cfgFile string) {
 	output.Print(output.Opts{
-		Message: fmt.Sprintf("Creating new pingcli configuration file at: %s", cfgFile),
+		Message: fmt.Sprintf("Creating new Ping CLI configuration file at: %s", cfgFile),
 		Result:  output.ENUM_RESULT_NIL,
 	})
 
@@ -149,7 +149,7 @@ func createConfigFile(cfgFile string) {
 	err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
 	if err != nil {
 		output.Print(output.Opts{
-			Message:      fmt.Sprintf("Failed to make directories needed for new pingcli configuration file: %s", cfgFile),
+			Message:      fmt.Sprintf("Failed to make directories needed for new Ping CLI configuration file: %s", cfgFile),
 			Result:       output.ENUM_RESULT_FAILURE,
 			FatalMessage: err.Error(),
 		})
@@ -157,7 +157,7 @@ func createConfigFile(cfgFile string) {
 
 	tempViper := viper.New()
 	tempViper.Set(options.RootActiveProfileOption.ViperKey, options.RootActiveProfileOption.DefaultValue)
-	tempViper.Set(fmt.Sprintf("%s.%v", options.RootActiveProfileOption.DefaultValue.String(), options.ProfileDescriptionOption.ViperKey), "Default profile created by pingcli")
+	tempViper.Set(fmt.Sprintf("%s.%v", options.RootActiveProfileOption.DefaultValue.String(), options.ProfileDescriptionOption.ViperKey), "Default profile created by Ping CLI")
 
 	err = tempViper.WriteConfigAs(cfgFile)
 	if err != nil {
