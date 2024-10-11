@@ -11,21 +11,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneGatewayRoleAssignmentResource{}
+	_ connector.ExportableResource = &PingOneGatewayRoleAssignmentResource{}
 )
 
-type PingoneGatewayRoleAssignmentResource struct {
+type PingOneGatewayRoleAssignmentResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneGatewayRoleAssignmentResource
-func GatewayRoleAssignment(clientInfo *connector.PingOneClientInfo) *PingoneGatewayRoleAssignmentResource {
-	return &PingoneGatewayRoleAssignmentResource{
+// Utility method for creating a PingOneGatewayRoleAssignmentResource
+func GatewayRoleAssignment(clientInfo *connector.PingOneClientInfo) *PingOneGatewayRoleAssignmentResource {
+	return &PingOneGatewayRoleAssignmentResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -101,6 +101,6 @@ func (r *PingoneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 	return &importBlocks, nil
 }
 
-func (r *PingoneGatewayRoleAssignmentResource) ResourceType() string {
+func (r *PingOneGatewayRoleAssignmentResource) ResourceType() string {
 	return "pingone_gateway_role_assignment"
 }

@@ -98,6 +98,6 @@ func InitAllOptions() {
 
 	configuration_request.InitRequestOptions()
 
-	configuration_services.InitPingfederateServiceOptions()
-	configuration_services.InitPingoneServiceOptions()
+	configuration_services.InitPingFederateServiceOptions()
+	configuration_services.InitPingOneServiceOptions()
 }

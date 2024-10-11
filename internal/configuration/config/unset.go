@@ -23,7 +23,7 @@ func initUnsetProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage:     "The configuration profile used to unset the configuration value.",
+			Usage:     "The name of the configuration profile to unset a configuration value from.",
 			Value:     cobraValue,
 			DefValue:  "The active profile",
 		},

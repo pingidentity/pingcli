@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneNotificationPolicyResource{}
+	_ connector.ExportableResource = &PingOneNotificationPolicyResource{}
 )
 
-type PingoneNotificationPolicyResource struct {
+type PingOneNotificationPolicyResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneNotificationPolicyResource
-func NotificationPolicy(clientInfo *connector.PingOneClientInfo) *PingoneNotificationPolicyResource {
-	return &PingoneNotificationPolicyResource{
+// Utility method for creating a PingOneNotificationPolicyResource
+func NotificationPolicy(clientInfo *connector.PingOneClientInfo) *PingOneNotificationPolicyResource {
+	return &PingOneNotificationPolicyResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneNotificationPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneNotificationPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneNotificationPolicyResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func (r *PingoneNotificationPolicyResource) ResourceType() string {
+func (r *PingOneNotificationPolicyResource) ResourceType() string {
 	return "pingone_notification_policy"
 }

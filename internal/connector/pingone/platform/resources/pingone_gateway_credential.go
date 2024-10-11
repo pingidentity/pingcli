@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneGatewayCredentialResource{}
+	_ connector.ExportableResource = &PingOneGatewayCredentialResource{}
 )
 
-type PingoneGatewayCredentialResource struct {
+type PingOneGatewayCredentialResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneGatewayCredentialResource
-func GatewayCredential(clientInfo *connector.PingOneClientInfo) *PingoneGatewayCredentialResource {
-	return &PingoneGatewayCredentialResource{
+// Utility method for creating a PingOneGatewayCredentialResource
+func GatewayCredential(clientInfo *connector.PingOneClientInfo) *PingOneGatewayCredentialResource {
+	return &PingOneGatewayCredentialResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -98,6 +98,6 @@ func (r *PingoneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func (r *PingoneGatewayCredentialResource) ResourceType() string {
+func (r *PingOneGatewayCredentialResource) ResourceType() string {
 	return "pingone_gateway_credential"
 }

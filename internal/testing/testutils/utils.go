@@ -26,7 +26,7 @@ var (
 
 func GetEnvironmentID() string {
 	envIdOnce.Do(func() {
-		environmentId = os.Getenv(options.PlatformExportPingoneEnvironmentIDOption.EnvVar)
+		environmentId = os.Getenv(options.PlatformExportPingOneEnvironmentIDOption.EnvVar)
 	})
 
 	return environmentId
@@ -40,10 +40,10 @@ func GetPingOneClientInfo(t *testing.T) *connector.PingOneClientInfo {
 		configuration.InitAllOptions()
 		// Grab environment vars for initializing the API client.
 		// These are set in GitHub Actions.
-		clientID := os.Getenv(options.PingoneAuthenticationWorkerClientIDOption.EnvVar)
-		clientSecret := os.Getenv(options.PingoneAuthenticationWorkerClientSecretOption.EnvVar)
+		clientID := os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar)
+		clientSecret := os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar)
 		environmentId := GetEnvironmentID()
-		regionCode := os.Getenv(options.PingoneRegionCodeOption.EnvVar)
+		regionCode := os.Getenv(options.PingOneRegionCodeOption.EnvVar)
 		sdkRegionCode := management.EnumRegionCode(regionCode)
 
 		if clientID == "" || clientSecret == "" || environmentId == "" || regionCode == "" {
@@ -82,10 +82,10 @@ func GetPingFederateClientInfo(t *testing.T) *connector.PingFederateClientInfo {
 
 	configuration.InitAllOptions()
 
-	httpsHost := os.Getenv(options.PingfederateHTTPSHostOption.EnvVar)
-	adminApiPath := os.Getenv(options.PingfederateAdminAPIPathOption.EnvVar)
-	pfUsername := os.Getenv(options.PingfederateBasicAuthUsernameOption.EnvVar)
-	pfPassword := os.Getenv(options.PingfederateBasicAuthPasswordOption.EnvVar)
+	httpsHost := os.Getenv(options.PingFederateHTTPSHostOption.EnvVar)
+	adminApiPath := os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar)
+	pfUsername := os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar)
+	pfPassword := os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar)
 
 	if httpsHost == "" || adminApiPath == "" || pfUsername == "" || pfPassword == "" {
 		t.Fatalf("Unable to retrieve env var value for one or more of httpsHost, adminApiPath, pfUsername, pfPassword.")

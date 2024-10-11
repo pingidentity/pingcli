@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneFormResource{}
+	_ connector.ExportableResource = &PingOneFormResource{}
 )
 
-type PingoneFormResource struct {
+type PingOneFormResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneFormResource
-func Form(clientInfo *connector.PingOneClientInfo) *PingoneFormResource {
-	return &PingoneFormResource{
+// Utility method for creating a PingOneFormResource
+func Form(clientInfo *connector.PingOneClientInfo) *PingOneFormResource {
+	return &PingOneFormResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func (r *PingoneFormResource) ResourceType() string {
+func (r *PingOneFormResource) ResourceType() string {
 	return "pingone_form"
 }

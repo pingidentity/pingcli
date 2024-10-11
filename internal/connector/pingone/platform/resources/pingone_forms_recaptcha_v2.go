@@ -8,21 +8,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneFormRecaptchaV2Resource{}
+	_ connector.ExportableResource = &PingOneFormRecaptchaV2Resource{}
 )
 
-type PingoneFormRecaptchaV2Resource struct {
+type PingOneFormRecaptchaV2Resource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneFormRecaptchaV2Resource
-func FormRecaptchaV2(clientInfo *connector.PingOneClientInfo) *PingoneFormRecaptchaV2Resource {
-	return &PingoneFormRecaptchaV2Resource{
+// Utility method for creating a PingOneFormRecaptchaV2Resource
+func FormRecaptchaV2(clientInfo *connector.PingOneClientInfo) *PingOneFormRecaptchaV2Resource {
+	return &PingOneFormRecaptchaV2Resource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -59,6 +59,6 @@ func (r *PingoneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 	return &importBlocks, nil
 }
 
-func (r *PingoneFormRecaptchaV2Resource) ResourceType() string {
+func (r *PingOneFormRecaptchaV2Resource) ResourceType() string {
 	return "pingone_forms_recaptcha_v2"
 }

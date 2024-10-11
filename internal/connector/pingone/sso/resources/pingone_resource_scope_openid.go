@@ -11,21 +11,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneResourceScopeOpenIdResource{}
+	_ connector.ExportableResource = &PingOneResourceScopeOpenIdResource{}
 )
 
-type PingoneResourceScopeOpenIdResource struct {
+type PingOneResourceScopeOpenIdResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneResourceScopeOpenIdResource
-func ResourceScopeOpenId(clientInfo *connector.PingOneClientInfo) *PingoneResourceScopeOpenIdResource {
-	return &PingoneResourceScopeOpenIdResource{
+// Utility method for creating a PingOneResourceScopeOpenIdResource
+func ResourceScopeOpenId(clientInfo *connector.PingOneClientInfo) *PingOneResourceScopeOpenIdResource {
+	return &PingOneResourceScopeOpenIdResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -83,6 +83,6 @@ func (r *PingoneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlo
 	return &importBlocks, nil
 }
 
-func (r *PingoneResourceScopeOpenIdResource) ResourceType() string {
+func (r *PingOneResourceScopeOpenIdResource) ResourceType() string {
 	return "pingone_resource_scope_openid"
 }

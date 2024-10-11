@@ -16,17 +16,17 @@ const (
 
 // Verify that the connector satisfies the expected interfaces
 var (
-	_ connector.Exportable      = &PingoneSSOConnector{}
-	_ connector.Authenticatable = &PingoneSSOConnector{}
+	_ connector.Exportable      = &PingOneSSOConnector{}
+	_ connector.Authenticatable = &PingOneSSOConnector{}
 )
 
-type PingoneSSOConnector struct {
+type PingOneSSOConnector struct {
 	clientInfo connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneSSOConnector
-func SSOConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingoneSSOConnector {
-	return &PingoneSSOConnector{
+// Utility method for creating a PingOneSSOConnector
+func SSOConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOneSSOConnector {
+	return &PingOneSSOConnector{
 		clientInfo: connector.PingOneClientInfo{
 			Context:             ctx,
 			ApiClient:           apiClient,
@@ -36,7 +36,7 @@ func SSOConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiCli
 	}
 }
 
-func (c *PingoneSSOConnector) Export(format, outputDir string, overwriteExport bool) error {
+func (c *PingOneSSOConnector) Export(format, outputDir string, overwriteExport bool) error {
 	l := logger.Get()
 
 	l.Debug().Msgf("Exporting all PingOne SSO Resources...")
@@ -70,14 +70,14 @@ func (c *PingoneSSOConnector) Export(format, outputDir string, overwriteExport b
 	return common.WriteFiles(exportableResources, format, outputDir, overwriteExport)
 }
 
-func (c *PingoneSSOConnector) ConnectorServiceName() string {
+func (c *PingOneSSOConnector) ConnectorServiceName() string {
 	return serviceName
 }
 
-func (c *PingoneSSOConnector) Login() error {
+func (c *PingOneSSOConnector) Login() error {
 	return nil
 }
 
-func (c *PingoneSSOConnector) Logout() error {
+func (c *PingOneSSOConnector) Logout() error {
 	return nil
 }

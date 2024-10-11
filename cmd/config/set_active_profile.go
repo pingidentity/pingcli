@@ -11,8 +11,11 @@ import (
 )
 
 const (
-	setActiveProfileCommandExamples = `  pingcli config set-active-profile
-  pingcli config set-active-profile --profile myprofile`
+	setActiveProfileCommandExamples = `  Set an active profile with an interactive prompt to select from an available profile.
+    pingcli config set-active-profile
+
+  Set an active profile with a specific profile name.
+    pingcli config set-active-profile --profile myprofile`
 )
 
 func NewConfigSetActiveProfileCommand() *cobra.Command {
@@ -20,9 +23,9 @@ func NewConfigSetActiveProfileCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               setActiveProfileCommandExamples,
-		Long:                  `Set a configuration profile as the in-use profile for pingcli.`,
+		Long:                  `Set a custom configuration profile as the in-use profile.`,
 		RunE:                  configSetActiveProfileRunE,
-		Short:                 "Set a configuration profile as the in-use profile for pingcli.",
+		Short:                 "Set a custom configuration profile as the in-use profile.",
 		Use:                   "set-active-profile [flags]",
 	}
 

@@ -12,37 +12,37 @@ const (
 	ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER string = "worker"
 )
 
-type PingoneAuthenticationType string
+type PingOneAuthenticationType string
 
 // Verify that the custom type satisfies the pflag.Value interface
-var _ pflag.Value = (*PingoneAuthenticationType)(nil)
+var _ pflag.Value = (*PingOneAuthenticationType)(nil)
 
 // Implement pflag.Value interface for custom type in cobra MultiService parameter
-func (pat *PingoneAuthenticationType) Set(authType string) error {
+func (pat *PingOneAuthenticationType) Set(authType string) error {
 	if pat == nil {
-		return fmt.Errorf("failed to set Pingone Authentication Type value: %s. Pingone Authentication Type is nil", authType)
+		return fmt.Errorf("failed to set PingOne Authentication Type value: %s. PingOne Authentication Type is nil", authType)
 	}
 
 	switch {
 	case strings.EqualFold(authType, ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER):
-		*pat = PingoneAuthenticationType(ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)
+		*pat = PingOneAuthenticationType(ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)
 	case strings.EqualFold(authType, ""):
-		*pat = PingoneAuthenticationType("")
+		*pat = PingOneAuthenticationType("")
 	default:
-		return fmt.Errorf("unrecognized Pingone Authentication Type: '%s'. Must be one of: %s", authType, strings.Join(PingoneAuthenticationTypeValidValues(), ", "))
+		return fmt.Errorf("unrecognized PingOne Authentication Type: '%s'. Must be one of: %s", authType, strings.Join(PingOneAuthenticationTypeValidValues(), ", "))
 	}
 	return nil
 }
 
-func (pat PingoneAuthenticationType) Type() string {
+func (pat PingOneAuthenticationType) Type() string {
 	return "string"
 }
 
-func (pat PingoneAuthenticationType) String() string {
+func (pat PingOneAuthenticationType) String() string {
 	return string(pat)
 }
 
-func PingoneAuthenticationTypeValidValues() []string {
+func PingOneAuthenticationTypeValidValues() []string {
 	types := []string{
 		ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER,
 	}

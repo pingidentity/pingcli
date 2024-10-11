@@ -9,21 +9,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneAgreementLocalizationEnableResource{}
+	_ connector.ExportableResource = &PingOneAgreementLocalizationEnableResource{}
 )
 
-type PingoneAgreementLocalizationEnableResource struct {
+type PingOneAgreementLocalizationEnableResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneAgreementLocalizationEnableResource
-func AgreementLocalizationEnable(clientInfo *connector.PingOneClientInfo) *PingoneAgreementLocalizationEnableResource {
-	return &PingoneAgreementLocalizationEnableResource{
+// Utility method for creating a PingOneAgreementLocalizationEnableResource
+func AgreementLocalizationEnable(clientInfo *connector.PingOneClientInfo) *PingOneAgreementLocalizationEnableResource {
+	return &PingOneAgreementLocalizationEnableResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneAgreementLocalizationEnableResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneAgreementLocalizationEnableResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all pingone_agreement_localization_enable resources...")
@@ -49,6 +49,6 @@ func (r *PingoneAgreementLocalizationEnableResource) ExportAll() (*[]connector.I
 	return &importBlocks, nil
 }
 
-func (r *PingoneAgreementLocalizationEnableResource) ResourceType() string {
+func (r *PingOneAgreementLocalizationEnableResource) ResourceType() string {
 	return "pingone_agreement_localization_enable"
 }

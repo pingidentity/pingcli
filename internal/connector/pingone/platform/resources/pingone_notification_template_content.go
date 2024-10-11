@@ -11,21 +11,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneNotificationTemplateContentResource{}
+	_ connector.ExportableResource = &PingOneNotificationTemplateContentResource{}
 )
 
-type PingoneNotificationTemplateContentResource struct {
+type PingOneNotificationTemplateContentResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneNotificationTemplateContentResource
-func NotificationTemplateContent(clientInfo *connector.PingOneClientInfo) *PingoneNotificationTemplateContentResource {
-	return &PingoneNotificationTemplateContentResource{
+// Utility method for creating a PingOneNotificationTemplateContentResource
+func NotificationTemplateContent(clientInfo *connector.PingOneClientInfo) *PingOneNotificationTemplateContentResource {
+	return &PingOneNotificationTemplateContentResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneNotificationTemplateContentResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -161,6 +161,6 @@ func (r *PingoneNotificationTemplateContentResource) ExportAll() (*[]connector.I
 	return &importBlocks, nil
 }
 
-func (r *PingoneNotificationTemplateContentResource) ResourceType() string {
+func (r *PingOneNotificationTemplateContentResource) ResourceType() string {
 	return "pingone_notification_template_content"
 }

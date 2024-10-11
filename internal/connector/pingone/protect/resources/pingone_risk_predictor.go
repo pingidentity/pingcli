@@ -11,21 +11,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneRiskPredictorResource{}
+	_ connector.ExportableResource = &PingOneRiskPredictorResource{}
 )
 
-type PingoneRiskPredictorResource struct {
+type PingOneRiskPredictorResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneRiskPredictorResource
-func RiskPredictor(clientInfo *connector.PingOneClientInfo) *PingoneRiskPredictorResource {
-	return &PingoneRiskPredictorResource{
+// Utility method for creating a PingOneRiskPredictorResource
+func RiskPredictor(clientInfo *connector.PingOneClientInfo) *PingOneRiskPredictorResource {
+	return &PingOneRiskPredictorResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -132,6 +132,6 @@ func (r *PingoneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 	return &importBlocks, nil
 }
 
-func (r *PingoneRiskPredictorResource) ResourceType() string {
+func (r *PingOneRiskPredictorResource) ResourceType() string {
 	return "pingone_risk_predictor"
 }

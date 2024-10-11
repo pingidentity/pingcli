@@ -11,9 +11,14 @@ import (
 )
 
 const (
-	addProfilecommandExamples = `  pingcli config add-profile
-  pingcli config add-profile --name myprofile --description "My Profile desc"
-  pingcli config add-profile --set-active=true`
+	addProfilecommandExamples = `  Add a new configuration profile with a guided experience.
+    pingcli config add-profile
+
+  Add a new configuration profile with a specific name and description.
+    pingcli config add-profile --name MyDeveloperEnv --description "My awesome new profile for my development environment"
+
+  Add a new configuration profile with a guided experience and set it as the active profile.
+    pingcli config add-profile --set-active=true`
 )
 
 func NewConfigAddProfileCommand() *cobra.Command {
@@ -21,10 +26,12 @@ func NewConfigAddProfileCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               addProfilecommandExamples,
-		Long:                  `Add a new configuration profile to pingcli.`,
-		RunE:                  configAddProfileRunE,
-		Short:                 "Add a new configuration profile to pingcli.",
-		Use:                   "add-profile [flags]",
+		Long: `Add a new custom configuration profile to the CLI.
+
+The new configuration profile will be stored in the CLI configuration file.`,
+		RunE:  configAddProfileRunE,
+		Short: "Add a new custom configuration profile.",
+		Use:   "add-profile [flags]",
 	}
 
 	cmd.Flags().AddFlag(options.ConfigAddProfileNameOption.Flag)

@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneIdentityPropagationPlanResource{}
+	_ connector.ExportableResource = &PingOneIdentityPropagationPlanResource{}
 )
 
-type PingoneIdentityPropagationPlanResource struct {
+type PingOneIdentityPropagationPlanResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneIdentityPropagationPlanResource
-func IdentityPropagationPlan(clientInfo *connector.PingOneClientInfo) *PingoneIdentityPropagationPlanResource {
-	return &PingoneIdentityPropagationPlanResource{
+// Utility method for creating a PingOneIdentityPropagationPlanResource
+func IdentityPropagationPlan(clientInfo *connector.PingOneClientInfo) *PingOneIdentityPropagationPlanResource {
+	return &PingOneIdentityPropagationPlanResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneIdentityPropagationPlanResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 	return &importBlocks, nil
 }
 
-func (r *PingoneIdentityPropagationPlanResource) ResourceType() string {
+func (r *PingOneIdentityPropagationPlanResource) ResourceType() string {
 	return "pingone_identity_propagation_plan"
 }

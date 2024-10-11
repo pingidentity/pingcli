@@ -8,21 +8,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneCustomDomainResource{}
+	_ connector.ExportableResource = &PingOneCustomDomainResource{}
 )
 
-type PingoneEnvironmentResource struct {
+type PingOneEnvironmentResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneEnvironmentResource
-func Environment(clientInfo *connector.PingOneClientInfo) *PingoneEnvironmentResource {
-	return &PingoneEnvironmentResource{
+// Utility method for creating a PingOneEnvironmentResource
+func Environment(clientInfo *connector.PingOneClientInfo) *PingOneEnvironmentResource {
+	return &PingOneEnvironmentResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -46,6 +46,6 @@ func (r *PingoneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 	return &importBlocks, nil
 }
 
-func (r *PingoneEnvironmentResource) ResourceType() string {
+func (r *PingOneEnvironmentResource) ResourceType() string {
 	return "pingone_environment"
 }

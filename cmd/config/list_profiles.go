@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	listProfilesCommandExamples = `  pingcli config list-profiles`
+	listProfilesCommandExamples = `  List all custom configuration profiles stored in the CLI configuration file.
+    pingcli config list-profiles`
 )
 
 func NewConfigListProfilesCommand() *cobra.Command {
@@ -16,9 +17,9 @@ func NewConfigListProfilesCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               listProfilesCommandExamples,
-		Long:                  `List all configuration profiles from pingcli.`,
+		Long:                  `List all custom configuration profiles stored in the CLI configuration file.`,
 		RunE:                  configListProfilesRunE,
-		Short:                 "List all configuration profiles from pingcli.",
+		Short:                 "List all custom configuration profiles.",
 		Use:                   "list-profiles",
 	}
 

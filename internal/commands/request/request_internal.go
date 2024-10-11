@@ -17,7 +17,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-type PingoneAuthResponse struct {
+type PingOneAuthResponse struct {
 	AccessToken string `json:"access_token"`
 	TokenType   string `json:"token_type"`
 	ExpiresIn   int64  `json:"expires_in"`
@@ -120,7 +120,7 @@ func runInternalPingOneRequest(uri string) (err error) {
 }
 
 func getTopLevelDomain() (topLevelDomain string, err error) {
-	pingoneRegionCode, err := profiles.GetOptionValue(options.PingoneRegionCodeOption)
+	pingoneRegionCode, err := profiles.GetOptionValue(options.PingOneRegionCodeOption)
 	if err != nil {
 		return "", err
 	}
@@ -141,7 +141,7 @@ func getTopLevelDomain() (topLevelDomain string, err error) {
 	case customtypes.ENUM_PINGONE_REGION_CODE_NA:
 		topLevelDomain = customtypes.ENUM_PINGONE_TLD_NA
 	default:
-		return "", fmt.Errorf("unrecognized Pingone region code: '%s'", pingoneRegionCode)
+		return "", fmt.Errorf("unrecognized PingOne region code: '%s'", pingoneRegionCode)
 	}
 
 	return topLevelDomain, nil
@@ -194,7 +194,7 @@ func pingoneAuth() (accessToken string, err error) {
 		return "", err
 	}
 
-	workerEnvId, err := profiles.GetOptionValue(options.PingoneAuthenticationWorkerEnvironmentIDOption)
+	workerEnvId, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
 	if err != nil {
 		return "", err
 	}
@@ -205,11 +205,11 @@ func pingoneAuth() (accessToken string, err error) {
 
 	authURL := fmt.Sprintf("https://auth.pingone.%s/%s/as/token", topLevelDomain, workerEnvId)
 
-	clientId, err := profiles.GetOptionValue(options.PingoneAuthenticationWorkerClientIDOption)
+	clientId, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
 	if err != nil {
 		return "", err
 	}
-	clientSecret, err := profiles.GetOptionValue(options.PingoneAuthenticationWorkerClientSecretOption)
+	clientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
 	if err != nil {
 		return "", err
 	}
@@ -246,7 +246,7 @@ func pingoneAuth() (accessToken string, err error) {
 		return "", fmt.Errorf("failed to authenticate with PingOne: Response Status %s: Response Body %s", res.Status, string(responseBodyBytes))
 	}
 
-	pingoneAuthResponse := new(PingoneAuthResponse)
+	pingoneAuthResponse := new(PingOneAuthResponse)
 	err = json.Unmarshal(responseBodyBytes, pingoneAuthResponse)
 	if err != nil {
 		return "", err

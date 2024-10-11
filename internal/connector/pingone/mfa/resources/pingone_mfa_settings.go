@@ -8,21 +8,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneMFASettingsResource{}
+	_ connector.ExportableResource = &PingOneMFASettingsResource{}
 )
 
-type PingoneMFASettingsResource struct {
+type PingOneMFASettingsResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneMFASettingsResource
-func MFASettings(clientInfo *connector.PingOneClientInfo) *PingoneMFASettingsResource {
-	return &PingoneMFASettingsResource{
+// Utility method for creating a PingOneMFASettingsResource
+func MFASettings(clientInfo *connector.PingOneClientInfo) *PingOneMFASettingsResource {
+	return &PingOneMFASettingsResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -57,6 +57,6 @@ func (r *PingoneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, erro
 	return &importBlocks, nil
 }
 
-func (r *PingoneMFASettingsResource) ResourceType() string {
+func (r *PingOneMFASettingsResource) ResourceType() string {
 	return "pingone_mfa_settings"
 }

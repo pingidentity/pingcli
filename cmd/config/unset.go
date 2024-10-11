@@ -9,8 +9,11 @@ import (
 )
 
 const (
-	configUnsetCommandExamples = `  pingcli config unset color
-  pingcli config unset --profile myProfile service.pingone.regionCode`
+	configUnsetCommandExamples = `  Unset the color setting for the currently active profile.
+    pingcli config unset color
+
+  Unset the PingOne tenant region code setting for the profile named 'myProfile'.
+    pingcli config unset --profile myProfile service.pingone.regionCode`
 )
 
 func NewConfigUnsetCommand() *cobra.Command {
@@ -18,10 +21,12 @@ func NewConfigUnsetCommand() *cobra.Command {
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               configUnsetCommandExamples,
-		Long:                  `Unset pingcli configuration settings.`,
-		RunE:                  configUnsetRunE,
-		Short:                 "Unset pingcli configuration settings.",
-		Use:                   "unset [flags] key",
+		Long: "Unset stored configuration settings for the CLI.\n\n" +
+			"The `--profile` parameter can be used to unset configuration settings for a specified custom configuration profile.\n" +
+			"Where `--profile` is not specified, configuration settings will be unset for the currently active profile.",
+		RunE:  configUnsetRunE,
+		Short: "Unset stored configuration settings for the CLI.",
+		Use:   "unset [flags] key",
 	}
 
 	cmd.Flags().AddFlag(options.ConfigUnsetProfileOption.Flag)

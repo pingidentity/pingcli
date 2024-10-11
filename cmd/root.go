@@ -18,16 +18,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
-	ConfigurationFileFormat = `Configuration File Format:
-activeProfile: <ProfileName>
-
-<ProfileName>:
-	color: <true|false>
-	outputFormat: <Format>
-	...`
-)
-
 func init() {
 	l := logger.Get()
 
@@ -41,9 +31,8 @@ func init() {
 // rootCmd represents the base command when called without any subcommands
 func NewRootCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Example:       ConfigurationFileFormat,
-		Long:          `A CLI tool for managing Ping Identity products.`,
-		Short:         "A CLI tool for managing Ping Identity products.",
+		Long:          "A CLI tool for managing the configuration of Ping Identity products.",
+		Short:         "A CLI tool for managing the configuration of Ping Identity products.",
 		SilenceErrors: true, // Upon error in RunE method, let output package in main.go handle error output
 		Use:           "pingcli",
 		Version:       "v2.0.0-alpha.4",

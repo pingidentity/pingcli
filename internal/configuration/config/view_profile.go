@@ -23,7 +23,7 @@ func initViewProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage:     "The configuration profile name to view.",
+			Usage:     "The name of configuration profile to view.",
 			Value:     cobraValue,
 			DefValue:  "The active profile",
 		},

@@ -22,45 +22,45 @@ const (
 	ENUM_PINGONE_TLD_NA string = "com"
 )
 
-type PingoneRegionCode string
+type PingOneRegionCode string
 
 // Verify that the custom type satisfies the pflag.Value interface
-var _ pflag.Value = (*PingoneRegionCode)(nil)
+var _ pflag.Value = (*PingOneRegionCode)(nil)
 
 // Implement pflag.Value interface for custom type in cobra pingone-region parameter
 
-func (prc *PingoneRegionCode) Set(regionCode string) error {
+func (prc *PingOneRegionCode) Set(regionCode string) error {
 	if prc == nil {
-		return fmt.Errorf("failed to set Pingone Region Code value: %s. Pingone Region Code is nil", regionCode)
+		return fmt.Errorf("failed to set PingOne Region Code value: %s. PingOne Region Code is nil", regionCode)
 	}
 	switch {
 	case strings.EqualFold(regionCode, ENUM_PINGONE_REGION_CODE_AP):
-		*prc = PingoneRegionCode(ENUM_PINGONE_REGION_CODE_AP)
+		*prc = PingOneRegionCode(ENUM_PINGONE_REGION_CODE_AP)
 	case strings.EqualFold(regionCode, ENUM_PINGONE_REGION_CODE_AU):
-		*prc = PingoneRegionCode(ENUM_PINGONE_REGION_CODE_AU)
+		*prc = PingOneRegionCode(ENUM_PINGONE_REGION_CODE_AU)
 	case strings.EqualFold(regionCode, ENUM_PINGONE_REGION_CODE_CA):
-		*prc = PingoneRegionCode(ENUM_PINGONE_REGION_CODE_CA)
+		*prc = PingOneRegionCode(ENUM_PINGONE_REGION_CODE_CA)
 	case strings.EqualFold(regionCode, ENUM_PINGONE_REGION_CODE_EU):
-		*prc = PingoneRegionCode(ENUM_PINGONE_REGION_CODE_EU)
+		*prc = PingOneRegionCode(ENUM_PINGONE_REGION_CODE_EU)
 	case strings.EqualFold(regionCode, ENUM_PINGONE_REGION_CODE_NA):
-		*prc = PingoneRegionCode(ENUM_PINGONE_REGION_CODE_NA)
+		*prc = PingOneRegionCode(ENUM_PINGONE_REGION_CODE_NA)
 	case strings.EqualFold(regionCode, ""):
-		*prc = PingoneRegionCode("")
+		*prc = PingOneRegionCode("")
 	default:
-		return fmt.Errorf("unrecognized Pingone Region Code: '%s'. Must be one of: %s", regionCode, strings.Join(PingoneRegionCodeValidValues(), ", "))
+		return fmt.Errorf("unrecognized PingOne Region Code: '%s'. Must be one of: %s", regionCode, strings.Join(PingOneRegionCodeValidValues(), ", "))
 	}
 	return nil
 }
 
-func (prc PingoneRegionCode) Type() string {
+func (prc PingOneRegionCode) Type() string {
 	return "string"
 }
 
-func (prc PingoneRegionCode) String() string {
+func (prc PingOneRegionCode) String() string {
 	return string(prc)
 }
 
-func PingoneRegionCodeValidValues() []string {
+func PingOneRegionCodeValidValues() []string {
 	pingoneRegionCodes := []string{
 		ENUM_PINGONE_REGION_CODE_AP,
 		ENUM_PINGONE_REGION_CODE_AU,

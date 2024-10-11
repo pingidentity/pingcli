@@ -69,7 +69,7 @@ func initAddProfileSetActiveOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "s",
-			Usage:     "Set the new configuration profile as the active profile for pingcli.",
+			Usage:     "Set the new configuration profile as the active profile.",
 			Value:     cobraValue,
 			DefValue:  "false",
 		},

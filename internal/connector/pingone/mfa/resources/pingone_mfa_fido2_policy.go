@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneMFAFido2PolicyResource{}
+	_ connector.ExportableResource = &PingOneMFAFido2PolicyResource{}
 )
 
-type PingoneMFAFido2PolicyResource struct {
+type PingOneMFAFido2PolicyResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneMFAFido2PolicyResource
-func MFAFido2Policy(clientInfo *connector.PingOneClientInfo) *PingoneMFAFido2PolicyResource {
-	return &PingoneMFAFido2PolicyResource{
+// Utility method for creating a PingOneMFAFido2PolicyResource
+func MFAFido2Policy(clientInfo *connector.PingOneClientInfo) *PingOneMFAFido2PolicyResource {
+	return &PingOneMFAFido2PolicyResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, e
 	return &importBlocks, nil
 }
 
-func (r *PingoneMFAFido2PolicyResource) ResourceType() string {
+func (r *PingOneMFAFido2PolicyResource) ResourceType() string {
 	return "pingone_mfa_fido2_policy"
 }

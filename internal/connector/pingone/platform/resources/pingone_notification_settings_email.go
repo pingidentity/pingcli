@@ -8,21 +8,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneNotificationSettingsEmailResource{}
+	_ connector.ExportableResource = &PingOneNotificationSettingsEmailResource{}
 )
 
-type PingoneNotificationSettingsEmailResource struct {
+type PingOneNotificationSettingsEmailResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneNotificationSettingsEmailResource
-func NotificationSettingsEmail(clientInfo *connector.PingOneClientInfo) *PingoneNotificationSettingsEmailResource {
-	return &PingoneNotificationSettingsEmailResource{
+// Utility method for creating a PingOneNotificationSettingsEmailResource
+func NotificationSettingsEmail(clientInfo *connector.PingOneClientInfo) *PingOneNotificationSettingsEmailResource {
+	return &PingOneNotificationSettingsEmailResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneNotificationSettingsEmailResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -77,6 +77,6 @@ func (r *PingoneNotificationSettingsEmailResource) ExportAll() (*[]connector.Imp
 	return &importBlocks, nil
 }
 
-func (r *PingoneNotificationSettingsEmailResource) ResourceType() string {
+func (r *PingOneNotificationSettingsEmailResource) ResourceType() string {
 	return "pingone_notification_settings_email"
 }

@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneGroupNestingResource{}
+	_ connector.ExportableResource = &PingOneGroupNestingResource{}
 )
 
-type PingoneGroupNestingResource struct {
+type PingOneGroupNestingResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneGroupNestingResource
-func GroupNesting(clientInfo *connector.PingOneClientInfo) *PingoneGroupNestingResource {
-	return &PingoneGroupNestingResource{
+// Utility method for creating a PingOneGroupNestingResource
+func GroupNesting(clientInfo *connector.PingOneClientInfo) *PingOneGroupNestingResource {
+	return &PingOneGroupNestingResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -81,6 +81,6 @@ func (r *PingoneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, err
 	return &importBlocks, nil
 }
 
-func (r *PingoneGroupNestingResource) ResourceType() string {
+func (r *PingOneGroupNestingResource) ResourceType() string {
 	return "pingone_group_nesting"
 }

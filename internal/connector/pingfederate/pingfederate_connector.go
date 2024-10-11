@@ -16,17 +16,17 @@ const (
 
 // Verify that the connector satisfies the expected interfaces
 var (
-	_ connector.Exportable      = &PingfederateConnector{}
-	_ connector.Authenticatable = &PingfederateConnector{}
+	_ connector.Exportable      = &PingFederateConnector{}
+	_ connector.Authenticatable = &PingFederateConnector{}
 )
 
-type PingfederateConnector struct {
+type PingFederateConnector struct {
 	clientInfo connector.PingFederateClientInfo
 }
 
-// Utility method for creating a PingfederateConnector
-func PFConnector(ctx context.Context, apiClient *pingfederateGoClient.APIClient) *PingfederateConnector {
-	return &PingfederateConnector{
+// Utility method for creating a PingFederateConnector
+func PFConnector(ctx context.Context, apiClient *pingfederateGoClient.APIClient) *PingFederateConnector {
+	return &PingFederateConnector{
 		clientInfo: connector.PingFederateClientInfo{
 			ApiClient: apiClient,
 			Context:   ctx,
@@ -34,10 +34,10 @@ func PFConnector(ctx context.Context, apiClient *pingfederateGoClient.APIClient)
 	}
 }
 
-func (c *PingfederateConnector) Export(format, outputDir string, overwriteExport bool) error {
+func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport bool) error {
 	l := logger.Get()
 
-	l.Debug().Msgf("Exporting all Pingfederate Resources...")
+	l.Debug().Msgf("Exporting all PingFederate Resources...")
 
 	exportableResources := []connector.ExportableResource{
 		resources.AuthenticationApiApplication(&c.clientInfo),
@@ -66,7 +66,7 @@ func (c *PingfederateConnector) Export(format, outputDir string, overwriteExport
 		resources.OpenIDConnectPolicy(&c.clientInfo),
 		resources.OpenIDConnectSettings(&c.clientInfo),
 		resources.PasswordCredentialValidator(&c.clientInfo),
-		resources.PingoneConnection(&c.clientInfo),
+		resources.PingOneConnection(&c.clientInfo),
 		resources.RedirectValidation(&c.clientInfo),
 		resources.ServerSettings(&c.clientInfo),
 		resources.ServerSettingsGeneral(&c.clientInfo),
@@ -81,14 +81,14 @@ func (c *PingfederateConnector) Export(format, outputDir string, overwriteExport
 	return common.WriteFiles(exportableResources, format, outputDir, overwriteExport)
 }
 
-func (c *PingfederateConnector) ConnectorServiceName() string {
+func (c *PingFederateConnector) ConnectorServiceName() string {
 	return serviceName
 }
 
-func (c *PingfederateConnector) Login() error {
+func (c *PingFederateConnector) Login() error {
 	return nil
 }
 
-func (c *PingfederateConnector) Logout() error {
+func (c *PingFederateConnector) Logout() error {
 	return nil
 }

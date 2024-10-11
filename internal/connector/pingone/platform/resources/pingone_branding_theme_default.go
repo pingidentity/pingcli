@@ -11,21 +11,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneBrandingThemeDefaultResource{}
+	_ connector.ExportableResource = &PingOneBrandingThemeDefaultResource{}
 )
 
-type PingoneBrandingThemeDefaultResource struct {
+type PingOneBrandingThemeDefaultResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneBrandingThemeDefaultResource
-func BrandingThemeDefault(clientInfo *connector.PingOneClientInfo) *PingoneBrandingThemeDefaultResource {
-	return &PingoneBrandingThemeDefaultResource{
+// Utility method for creating a PingOneBrandingThemeDefaultResource
+func BrandingThemeDefault(clientInfo *connector.PingOneClientInfo) *PingOneBrandingThemeDefaultResource {
+	return &PingOneBrandingThemeDefaultResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -84,6 +84,6 @@ func (r *PingoneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 	return &importBlocks, nil
 }
 
-func (r *PingoneBrandingThemeDefaultResource) ResourceType() string {
+func (r *PingOneBrandingThemeDefaultResource) ResourceType() string {
 	return "pingone_branding_theme_default"
 }

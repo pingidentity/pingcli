@@ -23,7 +23,7 @@ func initGetProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage:     "The configuration profile used to get the configuration value from.",
+			Usage:     "The name of the configuration profile used to get the configuration value from.",
 			Value:     cobraValue,
 			DefValue:  "The active profile",
 		},

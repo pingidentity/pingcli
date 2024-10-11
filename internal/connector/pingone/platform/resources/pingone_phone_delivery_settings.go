@@ -11,21 +11,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingonePhoneDeliverySettingsResource{}
+	_ connector.ExportableResource = &PingOnePhoneDeliverySettingsResource{}
 )
 
-type PingonePhoneDeliverySettingsResource struct {
+type PingOnePhoneDeliverySettingsResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingonePhoneDeliverySettingsResource
-func PhoneDeliverySettings(clientInfo *connector.PingOneClientInfo) *PingonePhoneDeliverySettingsResource {
-	return &PingonePhoneDeliverySettingsResource{
+// Utility method for creating a PingOnePhoneDeliverySettingsResource
+func PhoneDeliverySettings(clientInfo *connector.PingOneClientInfo) *PingOnePhoneDeliverySettingsResource {
+	return &PingOnePhoneDeliverySettingsResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingonePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -93,6 +93,6 @@ func (r *PingonePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportB
 	return &importBlocks, nil
 }
 
-func (r *PingonePhoneDeliverySettingsResource) ResourceType() string {
+func (r *PingOnePhoneDeliverySettingsResource) ResourceType() string {
 	return "pingone_phone_delivery_settings"
 }

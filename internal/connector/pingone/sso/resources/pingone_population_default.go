@@ -11,21 +11,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingonePopulationDefaultDefaultResource{}
+	_ connector.ExportableResource = &PingOnePopulationDefaultDefaultResource{}
 )
 
-type PingonePopulationDefaultDefaultResource struct {
+type PingOnePopulationDefaultDefaultResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingonePopulationDefaultDefaultResource
-func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingonePopulationDefaultDefaultResource {
-	return &PingonePopulationDefaultDefaultResource{
+// Utility method for creating a PingOnePopulationDefaultDefaultResource
+func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultDefaultResource {
+	return &PingOnePopulationDefaultDefaultResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingonePopulationDefaultDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOnePopulationDefaultDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -77,6 +77,6 @@ func (r *PingonePopulationDefaultDefaultResource) ExportAll() (*[]connector.Impo
 	return &importBlocks, nil
 }
 
-func (r *PingonePopulationDefaultDefaultResource) ResourceType() string {
+func (r *PingOnePopulationDefaultDefaultResource) ResourceType() string {
 	return "pingone_population_default"
 }

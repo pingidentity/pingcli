@@ -33,7 +33,7 @@ func initFormatOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "f",
-			Usage:     fmt.Sprintf("Specifies export format\nAllowed: [%s]. Also configurable via environment variable %s", strings.Join(customtypes.ExportFormatValidValues(), ", "), envVar),
+			Usage:     fmt.Sprintf("Specifies the export format\nOptions are: [%s]. Also configurable via environment variable %s", strings.Join(customtypes.ExportFormatValidValues(), ", "), envVar),
 			Value:     cobraValue,
 			DefValue:  customtypes.ENUM_EXPORT_FORMAT_HCL,
 		},
@@ -56,7 +56,7 @@ func initServicesOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "s",
-			Usage:     fmt.Sprintf("Specifies service(s) to export. Accepts comma-separated string to delimit multiple services. Allowed: [%s]. Also configurable via environment variable %s", strings.Join(customtypes.ExportServicesValidValues(), ", "), envVar),
+			Usage:     fmt.Sprintf("Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services. Options are: [%s]. Also configurable via environment variable %s", strings.Join(customtypes.ExportServicesValidValues(), ", "), envVar),
 			Value:     cobraValue,
 			DefValue:  strings.Join(customtypes.ExportServicesValidValues(), ", "),
 		},
@@ -79,7 +79,7 @@ func initOutputDirectoryOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "d",
-			Usage:     fmt.Sprintf("Specifies output directory for export. Also configurable via environment variable %s", envVar),
+			Usage:     fmt.Sprintf("Specifies the output directory for export. Also configurable via environment variable %s", envVar),
 			Value:     cobraValue,
 			DefValue:  "$(pwd)/export",
 		},
@@ -101,7 +101,7 @@ func initOverwriteOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "o",
-			Usage:     "Overwrite existing generated exports in output directory.",
+			Usage:     "Overwrite the existing generated exports in output directory.",
 			Value:     cobraValue,
 			DefValue:  "false",
 		},
@@ -135,14 +135,14 @@ func initPingOneEnvironmentIDOption() {
 	defaultValue := customtypes.UUID("")
 	envVar := "PINGCLI_PINGONE_EXPORT_ENVIRONMENT_ID"
 
-	options.PlatformExportPingoneEnvironmentIDOption = options.Option{
+	options.PlatformExportPingOneEnvironmentIDOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The ID of the Pingone environment to export. Also configurable via environment variable %s", envVar),
+			Usage:    fmt.Sprintf("The ID of the PingOne environment to export. Also configurable via environment variable %s", envVar),
 			Value:    cobraValue,
 			DefValue: "",
 		},

@@ -39,8 +39,8 @@ func TestConfigUnsetCmd_InvalidKey(t *testing.T) {
 
 // Test Config Unset Command for key 'pingone.worker.clientId' updates viper configuration
 func TestConfigUnsetCmd_CheckViperConfig(t *testing.T) {
-	viperKey := options.PingoneAuthenticationWorkerClientIDOption.ViperKey
-	viperOldValue := os.Getenv(options.PingoneAuthenticationWorkerClientIDOption.EnvVar)
+	viperKey := options.PingOneAuthenticationWorkerClientIDOption.ViperKey
+	viperOldValue := os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar)
 
 	err := testutils_cobra.ExecutePingcli(t, "config", "unset", viperKey)
 	testutils.CheckExpectedError(t, err, nil)

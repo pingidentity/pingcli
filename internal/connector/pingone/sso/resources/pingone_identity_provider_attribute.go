@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneIdentityProviderAttributeResource{}
+	_ connector.ExportableResource = &PingOneIdentityProviderAttributeResource{}
 )
 
-type PingoneIdentityProviderAttributeResource struct {
+type PingOneIdentityProviderAttributeResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneIdentityProviderAttributeResource
-func IdentityProviderAttribute(clientInfo *connector.PingOneClientInfo) *PingoneIdentityProviderAttributeResource {
-	return &PingoneIdentityProviderAttributeResource{
+// Utility method for creating a PingOneIdentityProviderAttributeResource
+func IdentityProviderAttribute(clientInfo *connector.PingOneClientInfo) *PingOneIdentityProviderAttributeResource {
+	return &PingOneIdentityProviderAttributeResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneIdentityProviderAttributeResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneIdentityProviderAttributeResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -108,6 +108,6 @@ func (r *PingoneIdentityProviderAttributeResource) ExportAll() (*[]connector.Imp
 	return &importBlocks, nil
 }
 
-func (r *PingoneIdentityProviderAttributeResource) ResourceType() string {
+func (r *PingOneIdentityProviderAttributeResource) ResourceType() string {
 	return "pingone_identity_provider_attribute"
 }

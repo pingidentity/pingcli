@@ -9,7 +9,7 @@ import (
 
 // Test PingOneRegion Set function
 func Test_PingOneRegion_Set(t *testing.T) {
-	prc := new(customtypes.PingoneRegionCode)
+	prc := new(customtypes.PingOneRegionCode)
 
 	err := prc.Set(customtypes.ENUM_PINGONE_REGION_CODE_AP)
 	if err != nil {
@@ -19,29 +19,29 @@ func Test_PingOneRegion_Set(t *testing.T) {
 
 // Test Set function fails with invalid value
 func Test_PingOneRegion_Set_InvalidValue(t *testing.T) {
-	prc := new(customtypes.PingoneRegionCode)
+	prc := new(customtypes.PingOneRegionCode)
 
 	invalidValue := "invalid"
 
-	expectedErrorPattern := `^unrecognized Pingone Region Code: '.*'\. Must be one of: .*$`
+	expectedErrorPattern := `^unrecognized PingOne Region Code: '.*'\. Must be one of: .*$`
 	err := prc.Set(invalidValue)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // Test Set function fails with nil
 func Test_PingOneRegion_Set_Nil(t *testing.T) {
-	var prc *customtypes.PingoneRegionCode
+	var prc *customtypes.PingOneRegionCode
 
 	val := customtypes.ENUM_PINGONE_REGION_CODE_AP
 
-	expectedErrorPattern := `^failed to set Pingone Region Code value: .* Pingone Region Code is nil$`
+	expectedErrorPattern := `^failed to set PingOne Region Code value: .* PingOne Region Code is nil$`
 	err := prc.Set(val)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // Test String function
 func Test_PingOneRegion_String(t *testing.T) {
-	pingoneRegion := customtypes.PingoneRegionCode(customtypes.ENUM_PINGONE_REGION_CODE_CA)
+	pingoneRegion := customtypes.PingOneRegionCode(customtypes.ENUM_PINGONE_REGION_CODE_CA)
 
 	expected := customtypes.ENUM_PINGONE_REGION_CODE_CA
 	actual := pingoneRegion.String()

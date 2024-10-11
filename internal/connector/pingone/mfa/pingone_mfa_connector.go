@@ -16,17 +16,17 @@ const (
 
 // Verify that the connector satisfies the expected interfaces
 var (
-	_ connector.Exportable      = &PingoneMFAConnector{}
-	_ connector.Authenticatable = &PingoneMFAConnector{}
+	_ connector.Exportable      = &PingOneMFAConnector{}
+	_ connector.Authenticatable = &PingOneMFAConnector{}
 )
 
-type PingoneMFAConnector struct {
+type PingOneMFAConnector struct {
 	clientInfo connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneMFAConnector
-func MFAConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingoneMFAConnector {
-	return &PingoneMFAConnector{
+// Utility method for creating a PingOneMFAConnector
+func MFAConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOneMFAConnector {
+	return &PingOneMFAConnector{
 		clientInfo: connector.PingOneClientInfo{
 			Context:             ctx,
 			ApiClient:           apiClient,
@@ -36,7 +36,7 @@ func MFAConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiCli
 	}
 }
 
-func (c *PingoneMFAConnector) Export(format, outputDir string, overwriteExport bool) error {
+func (c *PingOneMFAConnector) Export(format, outputDir string, overwriteExport bool) error {
 	l := logger.Get()
 
 	l.Debug().Msgf("Exporting all PingOne MFA Resources...")
@@ -51,14 +51,14 @@ func (c *PingoneMFAConnector) Export(format, outputDir string, overwriteExport b
 	return common.WriteFiles(exportableResources, format, outputDir, overwriteExport)
 }
 
-func (c *PingoneMFAConnector) ConnectorServiceName() string {
+func (c *PingOneMFAConnector) ConnectorServiceName() string {
 	return serviceName
 }
 
-func (c *PingoneMFAConnector) Login() error {
+func (c *PingOneMFAConnector) Login() error {
 	return nil
 }
 
-func (c *PingoneMFAConnector) Logout() error {
+func (c *PingOneMFAConnector) Logout() error {
 	return nil
 }

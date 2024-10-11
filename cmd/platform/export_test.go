@@ -158,10 +158,10 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 		"--output-directory", outputDir,
 		"--overwrite", "true",
 		"--services", "pingone-protect",
-		"--pingone-worker-environment-id", os.Getenv(options.PingoneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		"--pingone-worker-client-id", os.Getenv(options.PingoneAuthenticationWorkerClientIDOption.EnvVar),
-		"--pingone-worker-client-secret", os.Getenv(options.PingoneAuthenticationWorkerClientSecretOption.EnvVar),
-		"--pingone-region-code", os.Getenv(options.PingoneRegionCodeOption.EnvVar))
+		"--pingone-worker-environment-id", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
+		"--pingone-worker-client-id", os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
+		"--pingone-worker-client-secret", os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
+		"--pingone-region-code", os.Getenv(options.PingOneRegionCodeOption.EnvVar))
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -169,7 +169,7 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlagRequiredTogether(t *testing.T) {
 	expectedErrorPattern := `^if any flags in the group \[pingone-worker-environment-id pingone-worker-client-id pingone-worker-client-secret pingone-region-code] are set they must all be set; missing \[pingone-region-code pingone-worker-client-id pingone-worker-client-secret]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--pingone-worker-environment-id", os.Getenv(options.PingoneAuthenticationWorkerEnvironmentIDOption.EnvVar))
+		"--pingone-worker-environment-id", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -181,8 +181,8 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlags(t *testing.T) {
 		"--output-directory", outputDir,
 		"--overwrite", "true",
 		"--services", "pingfederate",
-		"--pingfederate-username", os.Getenv(options.PingfederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingfederateBasicAuthPasswordOption.EnvVar),
+		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -220,10 +220,10 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlags(t *testing.T) 
 		"--output-directory", outputDir,
 		"--overwrite", "true",
 		"--services", "pingfederate",
-		"--pingfederate-client-id", os.Getenv(options.PingfederateClientCredentialsAuthClientIDOption.EnvVar),
-		"--pingfederate-client-secret", os.Getenv(options.PingfederateClientCredentialsAuthClientSecretOption.EnvVar),
-		"--pingfederate-scopes", os.Getenv(options.PingfederateClientCredentialsAuthScopesOption.EnvVar),
-		"--pingfederate-token-url", os.Getenv(options.PingfederateClientCredentialsAuthTokenURLOption.EnvVar),
+		"--pingfederate-client-id", os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
+		"--pingfederate-client-secret", os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
+		"--pingfederate-scopes", os.Getenv(options.PingFederateClientCredentialsAuthScopesOption.EnvVar),
+		"--pingfederate-token-url", os.Getenv(options.PingFederateClientCredentialsAuthTokenURLOption.EnvVar),
 		"--pingfederate-authentication-type", "clientCredentialsAuth",
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -263,8 +263,8 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalidTokenURL
 		"--output-directory", outputDir,
 		"--overwrite", "true",
 		"--services", "pingfederate",
-		"--pingfederate-client-id", os.Getenv(options.PingfederateClientCredentialsAuthClientIDOption.EnvVar),
-		"--pingfederate-client-secret", os.Getenv(options.PingfederateClientCredentialsAuthClientSecretOption.EnvVar),
+		"--pingfederate-client-id", os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
+		"--pingfederate-client-secret", os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
 		"--pingfederate-token-url", "https://localhost:9031/as/invalid",
 		"--pingfederate-authentication-type", "clientCredentialsAuth",
 	)
@@ -280,8 +280,8 @@ func TestPlatformExportCmd_PingFederateXBypassHeaderFlag(t *testing.T) {
 		"--overwrite", "true",
 		"--services", "pingfederate",
 		"--pingfederate-x-bypass-external-validation-header=true",
-		"--pingfederate-username", os.Getenv(options.PingfederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingfederateBasicAuthPasswordOption.EnvVar),
+		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -296,8 +296,8 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
 		"--overwrite", "true",
 		"--services", "pingfederate",
 		"--pingfederate-insecure-trust-all-tls=true",
-		"--pingfederate-username", os.Getenv(options.PingfederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingfederateBasicAuthPasswordOption.EnvVar),
+		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -313,8 +313,8 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
 		"--overwrite", "true",
 		"--services", "pingfederate",
 		"--pingfederate-insecure-trust-all-tls=false",
-		"--pingfederate-username", os.Getenv(options.PingfederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingfederateBasicAuthPasswordOption.EnvVar),
+		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -330,8 +330,8 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
 		"--services", "pingfederate",
 		"--pingfederate-insecure-trust-all-tls=false",
 		"--pingfederate-ca-certificate-pem-files", "testdata/ssl-server-crt.pem",
-		"--pingfederate-username", os.Getenv(options.PingfederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingfederateBasicAuthPasswordOption.EnvVar),
+		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -343,8 +343,8 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--services", "pingfederate",
 		"--pingfederate-ca-certificate-pem-files", "invalid/crt.pem",
-		"--pingfederate-username", os.Getenv(options.PingfederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingfederateBasicAuthPasswordOption.EnvVar),
+		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)

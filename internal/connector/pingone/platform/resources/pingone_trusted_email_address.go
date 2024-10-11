@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneTrustedEmailAddressResource{}
+	_ connector.ExportableResource = &PingOneTrustedEmailAddressResource{}
 )
 
-type PingoneTrustedEmailAddressResource struct {
+type PingOneTrustedEmailAddressResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneTrustedEmailAddressResource
-func TrustedEmailAddress(clientInfo *connector.PingOneClientInfo) *PingoneTrustedEmailAddressResource {
-	return &PingoneTrustedEmailAddressResource{
+// Utility method for creating a PingOneTrustedEmailAddressResource
+func TrustedEmailAddress(clientInfo *connector.PingOneClientInfo) *PingOneTrustedEmailAddressResource {
+	return &PingOneTrustedEmailAddressResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -82,6 +82,6 @@ func (r *PingoneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlo
 	return &importBlocks, nil
 }
 
-func (r *PingoneTrustedEmailAddressResource) ResourceType() string {
+func (r *PingOneTrustedEmailAddressResource) ResourceType() string {
 	return "pingone_trusted_email_address"
 }

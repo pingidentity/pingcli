@@ -31,7 +31,7 @@ func initActiveProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "P",
-			Usage:     "Profile to use from configuration file",
+			Usage:     "The name of the stored custom configuration profile to use.",
 			Value:     cobraValue,
 			DefValue:  "default",
 		},
@@ -52,7 +52,7 @@ func initColorOption() {
 		EnvVar:          "PINGCLI_COLOR",
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    "Use colorized output",
+			Usage:    "Show text output in color.",
 			Value:    cobraValue,
 			DefValue: "true",
 		},
@@ -74,7 +74,7 @@ func initConfigOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "C",
-			Usage:     "Configuration file location",
+			Usage:     "The relative or full path to a custom Ping CLI configuration file.",
 			Value:     cobraValue,
 			DefValue:  "\"$HOME/.pingcli/config.yaml\"",
 		},
@@ -96,7 +96,7 @@ func initOutputFormatOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "O",
-			Usage:     fmt.Sprintf("Specifies pingcli's console output format. Allowed: %s", strings.Join(customtypes.OutputFormatValidValues(), ", ")),
+			Usage:     fmt.Sprintf("Specify the console output format. Options are: %s", strings.Join(customtypes.OutputFormatValidValues(), ", ")),
 			Value:     cobraValue,
 			DefValue:  customtypes.ENUM_OUTPUT_FORMAT_TEXT,
 		},

@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneMFAApplicationPushCredentialResource{}
+	_ connector.ExportableResource = &PingOneMFAApplicationPushCredentialResource{}
 )
 
-type PingoneMFAApplicationPushCredentialResource struct {
+type PingOneMFAApplicationPushCredentialResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneMFAApplicationPushCredentialResource
-func MFAApplicationPushCredential(clientInfo *connector.PingOneClientInfo) *PingoneMFAApplicationPushCredentialResource {
-	return &PingoneMFAApplicationPushCredentialResource{
+// Utility method for creating a PingOneMFAApplicationPushCredentialResource
+func MFAApplicationPushCredential(clientInfo *connector.PingOneClientInfo) *PingOneMFAApplicationPushCredentialResource {
+	return &PingOneMFAApplicationPushCredentialResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -100,6 +100,6 @@ func (r *PingoneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.
 	return &importBlocks, nil
 }
 
-func (r *PingoneMFAApplicationPushCredentialResource) ResourceType() string {
+func (r *PingOneMFAApplicationPushCredentialResource) ResourceType() string {
 	return "pingone_mfa_application_push_credential"
 }

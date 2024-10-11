@@ -7,37 +7,37 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-// Test Pingone Authentication Type Set function
-func Test_PingoneAuthType_Set(t *testing.T) {
-	// Create a new PingoneAuthType
-	pingAuthType := new(customtypes.PingoneAuthenticationType)
+// Test PingOne Authentication Type Set function
+func Test_PingOneAuthType_Set(t *testing.T) {
+	// Create a new PingOneAuthType
+	pingAuthType := new(customtypes.PingOneAuthenticationType)
 
 	err := pingAuthType.Set(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Set function fails with invalid value
-func Test_PingoneAuthType_Set_InvalidValue(t *testing.T) {
-	pingAuthType := new(customtypes.PingoneAuthenticationType)
+func Test_PingOneAuthType_Set_InvalidValue(t *testing.T) {
+	pingAuthType := new(customtypes.PingOneAuthenticationType)
 
 	invalidValue := "invalid"
-	expectedErrorPattern := `^unrecognized Pingone Authentication Type: '.*'\. Must be one of: .*$`
+	expectedErrorPattern := `^unrecognized PingOne Authentication Type: '.*'\. Must be one of: .*$`
 	err := pingAuthType.Set(invalidValue)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // Test Set function fails with nil
-func Test_PingoneAuthType_Set_Nil(t *testing.T) {
-	var pingAuthType *customtypes.PingoneAuthenticationType
+func Test_PingOneAuthType_Set_Nil(t *testing.T) {
+	var pingAuthType *customtypes.PingOneAuthenticationType
 
-	expectedErrorPattern := `^failed to set Pingone Authentication Type value: .*\. Pingone Authentication Type is nil$`
+	expectedErrorPattern := `^failed to set PingOne Authentication Type value: .*\. PingOne Authentication Type is nil$`
 	err := pingAuthType.Set(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // Test String function
-func Test_PingoneAuthType_String(t *testing.T) {
-	pingAuthType := customtypes.PingoneAuthenticationType(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)
+func Test_PingOneAuthType_String(t *testing.T) {
+	pingAuthType := customtypes.PingOneAuthenticationType(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)
 
 	expected := customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER
 	actual := pingAuthType.String()

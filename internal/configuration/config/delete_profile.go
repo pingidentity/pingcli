@@ -23,7 +23,7 @@ func initDeleteProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage:     "The configuration profile to delete.",
+			Usage:     "The name of the configuration profile to delete.",
 			Value:     cobraValue,
 			DefValue:  "",
 		},

@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneAgreementResource{}
+	_ connector.ExportableResource = &PingOneAgreementResource{}
 )
 
-type PingoneAgreementResource struct {
+type PingOneAgreementResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneAgreementResource
-func Agreement(clientInfo *connector.PingOneClientInfo) *PingoneAgreementResource {
-	return &PingoneAgreementResource{
+// Utility method for creating a PingOneAgreementResource
+func Agreement(clientInfo *connector.PingOneClientInfo) *PingOneAgreementResource {
+	return &PingOneAgreementResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneAgreementResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneAgreementResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -64,6 +64,6 @@ func (r *PingoneAgreementResource) ExportAll() (*[]connector.ImportBlock, error)
 	return &importBlocks, nil
 }
 
-func (r *PingoneAgreementResource) ResourceType() string {
+func (r *PingOneAgreementResource) ResourceType() string {
 	return "pingone_agreement"
 }

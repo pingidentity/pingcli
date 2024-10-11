@@ -16,17 +16,17 @@ const (
 
 // Verify that the connector satisfies the expected interfaces
 var (
-	_ connector.Exportable      = &PingonePlatformConnector{}
-	_ connector.Authenticatable = &PingonePlatformConnector{}
+	_ connector.Exportable      = &PingOnePlatformConnector{}
+	_ connector.Authenticatable = &PingOnePlatformConnector{}
 )
 
-type PingonePlatformConnector struct {
+type PingOnePlatformConnector struct {
 	clientInfo connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingonePlatformConnector
-func PlatformConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingonePlatformConnector {
-	return &PingonePlatformConnector{
+// Utility method for creating a PingOnePlatformConnector
+func PlatformConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOnePlatformConnector {
+	return &PingOnePlatformConnector{
 		clientInfo: connector.PingOneClientInfo{
 			Context:             ctx,
 			ApiClient:           apiClient,
@@ -36,7 +36,7 @@ func PlatformConnector(ctx context.Context, apiClient *pingoneGoClient.Client, a
 	}
 }
 
-func (c *PingonePlatformConnector) Export(format, outputDir string, overwriteExport bool) error {
+func (c *PingOnePlatformConnector) Export(format, outputDir string, overwriteExport bool) error {
 	l := logger.Get()
 
 	l.Debug().Msgf("Exporting all PingOne Platform Resources...")
@@ -77,14 +77,14 @@ func (c *PingonePlatformConnector) Export(format, outputDir string, overwriteExp
 	return common.WriteFiles(exportableResources, format, outputDir, overwriteExport)
 }
 
-func (c *PingonePlatformConnector) ConnectorServiceName() string {
+func (c *PingOnePlatformConnector) ConnectorServiceName() string {
 	return serviceName
 }
 
-func (c *PingonePlatformConnector) Login() error {
+func (c *PingOnePlatformConnector) Login() error {
 	return nil
 }
 
-func (c *PingonePlatformConnector) Logout() error {
+func (c *PingOnePlatformConnector) Logout() error {
 	return nil
 }

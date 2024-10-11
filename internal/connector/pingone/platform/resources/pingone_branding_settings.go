@@ -8,21 +8,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneBrandingSettingsResource{}
+	_ connector.ExportableResource = &PingOneBrandingSettingsResource{}
 )
 
-type PingoneBrandingSettingsResource struct {
+type PingOneBrandingSettingsResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneBrandingSettingsResource
-func BrandingSettings(clientInfo *connector.PingOneClientInfo) *PingoneBrandingSettingsResource {
-	return &PingoneBrandingSettingsResource{
+// Utility method for creating a PingOneBrandingSettingsResource
+func BrandingSettings(clientInfo *connector.PingOneClientInfo) *PingOneBrandingSettingsResource {
+	return &PingOneBrandingSettingsResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -57,6 +57,6 @@ func (r *PingoneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 	return &importBlocks, nil
 }
 
-func (r *PingoneBrandingSettingsResource) ResourceType() string {
+func (r *PingOneBrandingSettingsResource) ResourceType() string {
 	return "pingone_branding_settings"
 }

@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneLanguageResource{}
+	_ connector.ExportableResource = &PingOneLanguageResource{}
 )
 
-type PingoneLanguageResource struct {
+type PingOneLanguageResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneLanguageResource
-func Language(clientInfo *connector.PingOneClientInfo) *PingoneLanguageResource {
-	return &PingoneLanguageResource{
+// Utility method for creating a PingOneLanguageResource
+func Language(clientInfo *connector.PingOneClientInfo) *PingOneLanguageResource {
+	return &PingOneLanguageResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -75,6 +75,6 @@ func (r *PingoneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) 
 	return &importBlocks, nil
 }
 
-func (r *PingoneLanguageResource) ResourceType() string {
+func (r *PingOneLanguageResource) ResourceType() string {
 	return "pingone_language"
 }

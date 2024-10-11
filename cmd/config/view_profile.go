@@ -18,9 +18,9 @@ func NewConfigViewProfileCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               viewProfileCommandExamples,
-		Long:                  `View a configuration profile from pingcli.`,
+		Long:                  `View the stored configuration of a custom configuration profile.`,
 		RunE:                  configViewProfileRunE,
-		Short:                 "View a configuration profile from pingcli.",
+		Short:                 "View the stored configuration of a custom configuration profile.",
 		Use:                   "view-profile [flags]",
 	}
 

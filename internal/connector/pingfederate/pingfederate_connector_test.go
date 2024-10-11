@@ -168,8 +168,8 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			},
 		},
 		{
-			name:     "PingFederatePingoneConnection",
-			resource: resources.PingoneConnection(PingFederateClientInfo),
+			name:     "PingFederatePingOneConnection",
+			resource: resources.PingOneConnection(PingFederateClientInfo),
 			ignoredErrors: []string{
 				"Error: Missing Configuration for Required Attribute",
 			},

@@ -9,8 +9,11 @@ import (
 )
 
 const (
-	configSetCommandExamples = `  pingcli config set color=true
-  pingcli config set --profile myProfile service.pingone.regionCode=AP`
+	configSetCommandExamples = `  Set the color setting to true for the currently active profile.
+    pingcli config set color=true
+
+  Set the PingOne tenant region code setting to 'AP' for the profile named 'myProfile'.
+    pingcli config set --profile myProfile service.pingone.regionCode=AP`
 )
 
 func NewConfigSetCommand() *cobra.Command {
@@ -18,10 +21,12 @@ func NewConfigSetCommand() *cobra.Command {
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               configSetCommandExamples,
-		Long:                  `Set pingcli configuration settings.`,
-		RunE:                  configSetRunE,
-		Short:                 "Set pingcli configuration settings.",
-		Use:                   "set [flags] key=value",
+		Long: "Set stored configuration settings for the CLI.\n\n" +
+			"The `--profile` parameter can be used to set configuration settings for a specified custom configuration profile.\n" +
+			"Where `--profile` is not specified, configuration settings will be set for the currently active profile.",
+		RunE:  configSetRunE,
+		Short: "Set stored configuration settings for the CLI.",
+		Use:   "set [flags] key=value",
 	}
 
 	cmd.Flags().AddFlag(options.ConfigSetProfileOption.Flag)

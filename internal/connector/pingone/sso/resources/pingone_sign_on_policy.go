@@ -10,21 +10,21 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneSignOnPolicyResource{}
+	_ connector.ExportableResource = &PingOneSignOnPolicyResource{}
 )
 
-type PingoneSignOnPolicyResource struct {
+type PingOneSignOnPolicyResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneSignOnPolicyResource
-func SignOnPolicy(clientInfo *connector.PingOneClientInfo) *PingoneSignOnPolicyResource {
-	return &PingoneSignOnPolicyResource{
+// Utility method for creating a PingOneSignOnPolicyResource
+func SignOnPolicy(clientInfo *connector.PingOneClientInfo) *PingOneSignOnPolicyResource {
+	return &PingOneSignOnPolicyResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneSignOnPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneSignOnPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneSignOnPolicyResource) ExportAll() (*[]connector.ImportBlock, err
 	return &importBlocks, nil
 }
 
-func (r *PingoneSignOnPolicyResource) ResourceType() string {
+func (r *PingOneSignOnPolicyResource) ResourceType() string {
 	return "pingone_sign_on_policy"
 }
