@@ -33,7 +33,7 @@ func initFormatOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "f",
-			Usage:     fmt.Sprintf("Specifies the export format\nOptions are: [%s]. Also configurable via environment variable %s", strings.Join(customtypes.ExportFormatValidValues(), ", "), envVar),
+			Usage:     fmt.Sprintf("Specifies the export format.  E.g. `HCL`.\nOptions are: [%s]. Also configurable via environment variable %s", strings.Join(customtypes.ExportFormatValidValues(), ", "), envVar),
 			Value:     cobraValue,
 			DefValue:  customtypes.ENUM_EXPORT_FORMAT_HCL,
 		},

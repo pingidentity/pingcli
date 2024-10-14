@@ -82,7 +82,7 @@ func initXBypassExternalValidationHeaderOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("Bypass connection tests when configuring PingFederate (the `X-BypassExternalValidation` header when using PingFederate's admin API).  Also configurable via environment variable %s", envVar),
+			Usage:    fmt.Sprintf("Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API).  Also configurable via environment variable %s", envVar),
 			Value:    cobraValue,
 			DefValue: "false",
 		},

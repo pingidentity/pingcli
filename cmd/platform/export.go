@@ -9,15 +9,29 @@ import (
 )
 
 const (
-	commandExamples = `  pingcli platform export
-  pingcli platform export --output-directory dir --overwrite
-  pingcli platform export --export-format HCL
-  pingcli platform export --services pingone-platform,pingone-sso
-  pingcli platform export --services pingone-platform --pingone-client-environment-id envID --pingone-worker-client-id clientID --pingone-worker-client-secret clientSecret --pingone-region-code regionCode
-  pingcli platform export --service pingfederate --pingfederate-username user --pingfederate-password password
-  pingcli platform export --service pingfederate --pingfederate-client-id clientID --pingfederate-client-secret clientSecret --pingfederate-token-url tokenURL
-  pingcli platform export --service pingfederate --pingfederate-access-token accessToken
-  pingcli platform export --service pingfederate --x-bypass-external-validation=false --ca-certificate-pem-files "/path/to/cert.pem,/path/to/cert2.pem" --insecure-trust-all-tls=false`
+	commandExamples = `  Export configuration-as-code for all products configured in the configuration file, applying default options.
+    pingcli platform export
+
+  Export configuration-as-code packages for all configured products to a specific directory, overwriting any previous export.
+    pingcli platform export --output-directory /path/to/my/directory --overwrite
+
+  Export configuration-as-code packages for all configured products, specifying the export format as Terraform HCL.
+    pingcli platform export --export-format HCL
+
+  Export configuration-as-code packages for PingOne (core platform and SSO services).
+    pingcli platform export --services pingone-platform,pingone-sso
+
+  Export configuration-as-code packages for PingOne (core platform), specifying the PingOne environment connection details.
+    pingcli platform export --services pingone-platform --pingone-client-environment-id 3cf2... --pingone-worker-client-id a719... --pingone-worker-client-secret ey..... --pingone-region-code EU
+
+  Export configuration-as-code packages for PingFederate, specifying the PingFederate connection details using basic authentication.
+    pingcli platform export --service pingfederate --pingfederate-username administrator --pingfederate-password 2FederateM0re
+
+  Export configuration-as-code packages for PingFederate, specifying the PingFederate connection details using OAuth 2.0 client credentials.
+    pingcli platform export --service pingfederate --pingfederate-client-id clientID --pingfederate-client-secret clientSecret --pingfederate-token-url https://pingfederate.example.com/as/token.oauth2
+
+  Export configuration-as-code packages for PingFederate, specifying optional connection properties
+    pingcli platform export --service pingfederate --x-bypass-external-validation=false --ca-certificate-pem-files "/path/to/cert.pem,/path/to/cert2.pem" --insecure-trust-all-tls=false`
 )
 
 func NewExportCommand() *cobra.Command {
@@ -25,10 +39,14 @@ func NewExportCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               commandExamples,
-		Long:                  `Export configuration-as-code packages for the Ping Platform.`,
-		Short:                 "Export configuration-as-code packages for the Ping Platform.",
-		RunE:                  exportRunE,
-		Use:                   "export [flags]",
+		Long: "Export configuration-as-code packages for the Ping Platform.\n\n" +
+			"The CLI can export Terraform HCL to use with released Terraform providers.\n" +
+			"The Terraform HCL option generates `import {}` block statements for resources in the target environment.\n" +
+			"Using Terraform `import {}` blocks, the platform's configuration can be generated and imported into state management.\n" +
+			"More information can be found at https://developer.hashicorp.com/terraform/language/import",
+		Short: "Export configuration-as-code packages for the Ping Platform.",
+		RunE:  exportRunE,
+		Use:   "export [flags]",
 	}
 
 	initGeneralExportFlags(cmd)
