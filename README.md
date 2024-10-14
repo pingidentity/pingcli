@@ -69,7 +69,7 @@ The `pingcli platform export` command uses your configured settings to connect t
 An example command to export a PingOne environment for HCL generation looks like:
 
 ```shell
-pingctl platform export --services "pingone-platform,pingone-sso"
+pingcli platform export --services "pingone-platform,pingone-sso"
 ```
 
 The generated import blocks are organized into one folder with a file per resource type found. These import blocks can be used to [generate terraform configuration](https://developer.hashicorp.com/terraform/language/import/generating-configuration).
