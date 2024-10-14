@@ -38,7 +38,7 @@ func initHTTPSHostOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate HTTPS host used to communicate with PingFederate's admin API.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate HTTPS host used to communicate with PingFederate's admin API.",
 			Value:    cobraValue,
 			DefValue: "",
 		},
@@ -60,7 +60,7 @@ func initAdminAPIPathOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate API URL path used to communicate with PingFederate's admin API.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate API URL path used to communicate with PingFederate's admin API.",
 			Value:    cobraValue,
 			DefValue: "/pf-admin-api/v1",
 		},
@@ -82,7 +82,7 @@ func initXBypassExternalValidationHeaderOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API).  Also configurable via environment variable %s", envVar),
+			Usage:    "Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API).",
 			Value:    cobraValue,
 			DefValue: "false",
 		},
@@ -104,7 +104,7 @@ func initCACertificatePemFilesOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS. Accepts a comma-separated string to delimit multiple PEM files. Also configurable via environment variable %s", envVar),
+			Usage:    "Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS. Accepts a comma-separated string to delimit multiple PEM files.",
 			Value:    cobraValue,
 			DefValue: "[]",
 		},
@@ -126,7 +126,7 @@ func initInsecureTrustAllTLSOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("Trust any certificate when connecting to the PingFederate server admin API. This is insecure and should not be enabled outside of testing.  Also configurable via environment variable %s", envVar),
+			Usage:    "Trust any certificate when connecting to the PingFederate server admin API. This is insecure and should not be enabled outside of testing.",
 			Value:    cobraValue,
 			DefValue: "false",
 		},
@@ -148,7 +148,7 @@ func initUsernameOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate username used to authenticate to the PingFederate admin API when using basic authentication.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate username used to authenticate to the PingFederate admin API when using basic authentication.",
 			Value:    cobraValue,
 			DefValue: "",
 		},
@@ -170,7 +170,7 @@ func initPasswordOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate password used to authenticate to the PingFederate admin API when using basic authentication.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate password used to authenticate to the PingFederate admin API when using basic authentication.",
 			Value:    cobraValue,
 			DefValue: "",
 		},
@@ -192,7 +192,7 @@ func initAccessTokenOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate access token used to authenticate to the PingFederate admin API when using a custom OAuth 2.0 token method.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate access token used to authenticate to the PingFederate admin API when using a custom OAuth 2.0 token method.",
 			Value:    cobraValue,
 			DefValue: "",
 		},
@@ -214,7 +214,7 @@ func initClientIDOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate OAuth client ID used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate OAuth client ID used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.",
 			Value:    cobraValue,
 			DefValue: "",
 		},
@@ -236,7 +236,7 @@ func initClientSecretOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate OAuth client secret used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate OAuth client secret used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.",
 			Value:    cobraValue,
 			DefValue: "",
 		},
@@ -258,7 +258,7 @@ func initTokenURLOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate OAuth token URL used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate OAuth token URL used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.",
 			Value:    cobraValue,
 			DefValue: "",
 		},
@@ -280,7 +280,7 @@ func initScopesOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The PingFederate OAuth scopes used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type. Accepts a comma-separated string to delimit multiple scopes.  Also configurable via environment variable %s", envVar),
+			Usage:    "The PingFederate OAuth scopes used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type. Accepts a comma-separated string to delimit multiple scopes.",
 			Value:    cobraValue,
 			DefValue: "[]",
 		},
@@ -302,7 +302,7 @@ func initPingFederateAuthenticationTypeOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The authentication type to use when connecting to the PingFederate admin API. Options are: %s.  Also configurable via environment variable %s", strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "), envVar),
+			Usage:    fmt.Sprintf("The authentication type to use when connecting to the PingFederate admin API. Options are: %s.", strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", ")),
 			Value:    cobraValue,
 			DefValue: "",
 		},
