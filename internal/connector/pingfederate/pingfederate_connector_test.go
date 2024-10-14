@@ -71,6 +71,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			},
 		},
 		{
+			name:          "PingFederateDefaultURLs",
+			resource:      resources.DefaultURLs(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateExtendedProperties",
 			resource:      resources.ExtendedProperties(PingFederateClientInfo),
 			ignoredErrors: nil,
@@ -82,11 +87,6 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 				"Error: Missing Configuration for Required Attribute",
 				"Error: Reference to undeclared resource",
 			},
-		},
-		{
-			name:          "PingFederateIDPDefaultURLs",
-			resource:      resources.IDPDefaultURLs(PingFederateClientInfo),
-			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateIDPSPConnection",
@@ -121,12 +121,9 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederateOAuthAccessTokenMapping",
-			resource: resources.OAuthAccessTokenMapping(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid attribute configuration",
-				"Error: Invalid Attribute Value Length",
-			},
+			name:          "PingFederateOAuthAccessTokenMapping",
+			resource:      resources.OAuthAccessTokenMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateOAuthCIBAServerPolicySettings",
@@ -192,8 +189,8 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:          "PingFederateServerSettingsSystemKeys",
-			resource:      resources.ServerSettingsSystemKeys(PingFederateClientInfo),
+			name:          "PingFederateServerSettingsSystemKeysRotate",
+			resource:      resources.ServerSettingsSystemKeysRotate(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
@@ -202,11 +199,9 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederateSessionAuthenticationPoliciesGlobal",
-			resource: resources.SessionAuthenticationPoliciesGlobal(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid attribute configuration",
-			},
+			name:          "PingFederateSessionAuthenticationPoliciesGlobal",
+			resource:      resources.SessionAuthenticationPoliciesGlobal(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateSessionSettings",

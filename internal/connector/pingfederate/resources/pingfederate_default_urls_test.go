@@ -11,14 +11,14 @@ import (
 func TestPingFederateIDPDefaultURLsExport(t *testing.T) {
 	// Get initialized apiClient and resource
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.IDPDefaultURLs(PingFederateClientInfo)
+	resource := resources.DefaultURLs(PingFederateClientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_idp_default_urls",
-			ResourceName: "IDP Default URLs",
-			ResourceID:   "idp_default_urls_singleton_id",
+			ResourceType: "pingfederate_default_urls",
+			ResourceName: "Default URLs",
+			ResourceID:   "default_urls_singleton_id",
 		},
 	}
 
