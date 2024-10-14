@@ -11,26 +11,26 @@ var (
 	_ connector.ExportableResource = &PingFederateExtendedPropertiesResource{}
 )
 
-type PingFederateIDPDefaultURLsResource struct {
+type PingFederateDefaultURLsResource struct {
 	clientInfo *connector.PingFederateClientInfo
 }
 
-// Utility method for creating a PingFederateIDPDefaultURLsResource
-func IDPDefaultURLs(clientInfo *connector.PingFederateClientInfo) *PingFederateIDPDefaultURLsResource {
-	return &PingFederateIDPDefaultURLsResource{
+// Utility method for creating a PingFederateDefaultURLsResource
+func DefaultURLs(clientInfo *connector.PingFederateClientInfo) *PingFederateDefaultURLsResource {
+	return &PingFederateDefaultURLsResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingFederateIDPDefaultURLsResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingFederateDefaultURLsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	importBlocks := []connector.ImportBlock{}
 
 	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
-	idpDefaultURLsId := "idp_default_urls_singleton_id"
-	idpDefaultURLsName := "IDP Default URLs"
+	defaultURLsId := "default_urls_singleton_id"
+	defaultURLsName := "Default URLs"
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
@@ -39,14 +39,14 @@ func (r *PingFederateIDPDefaultURLsResource) ExportAll() (*[]connector.ImportBlo
 
 	importBlocks = append(importBlocks, connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       idpDefaultURLsName,
-		ResourceID:         idpDefaultURLsId,
+		ResourceName:       defaultURLsName,
+		ResourceID:         defaultURLsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	})
 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIDPDefaultURLsResource) ResourceType() string {
-	return "pingfederate_idp_default_urls"
+func (r *PingFederateDefaultURLsResource) ResourceType() string {
+	return "pingfederate_default_urls"
 }
