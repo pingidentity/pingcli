@@ -12,7 +12,7 @@
 #  https://developer.hashicorp.com/terraform/language/import
 #
 # To generate Terraform configuration, run `terraform plan` with the `-generate-config-out` flag.  For example:
-#  `terraform plan -generate-config-out=generated_resources.tf`
+#  terraform plan -generate-config-out=generated_resources.tf
 #
 # There are limitations in the generation process that may result in errors being shown on `terraform plan`.
 #
