@@ -1,4 +1,4 @@
-# Ping CLI
+# pingcli
 
 The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services.
 
@@ -14,8 +14,8 @@ Start by running the command to create a new profile and answering the prompts.
 
 ```text
 $ pingcli config add-profile
-Ping CLI configuration file '/Users/<me>/.pingcli/config.yaml' does not exist. - No Action (Warning)
-Creating new Ping CLI configuration file at: /Users/<me>/.pingcli/config.yaml
+Pingcli configuration file '/Users/<me>/.pingcli/config.yaml' does not exist. - No Action (Warning)
+Creating new pingcli configuration file at: /Users/<me>/.pingcli/config.yaml
 New profile name: : dev
 New profile description: : configuration for development environment
 Set new profile as active: : y
@@ -69,7 +69,7 @@ The `pingcli platform export` command uses your configured settings to connect t
 An example command to export a PingOne environment for HCL generation looks like:
 
 ```shell
-pingctl platform export --services "pingone-platform,pingone-sso"
+pingcli platform export --services "pingone-platform,pingone-sso"
 ```
 
 The generated import blocks are organized into one folder with a file per resource type found. These import blocks can be used to [generate terraform configuration](https://developer.hashicorp.com/terraform/language/import/generating-configuration).

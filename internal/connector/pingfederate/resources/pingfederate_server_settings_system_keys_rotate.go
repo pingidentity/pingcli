@@ -8,29 +8,29 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingFederateServerSettingsSystemKeysResource{}
+	_ connector.ExportableResource = &PingFederateServerSettingsSystemKeysRotateResource{}
 )
 
-type PingFederateServerSettingsSystemKeysResource struct {
+type PingFederateServerSettingsSystemKeysRotateResource struct {
 	clientInfo *connector.PingFederateClientInfo
 }
 
 // Utility method for creating a PingFederateServerSettingsSystemKeysResource
-func ServerSettingsSystemKeys(clientInfo *connector.PingFederateClientInfo) *PingFederateServerSettingsSystemKeysResource {
-	return &PingFederateServerSettingsSystemKeysResource{
+func ServerSettingsSystemKeysRotate(clientInfo *connector.PingFederateClientInfo) *PingFederateServerSettingsSystemKeysRotateResource {
+	return &PingFederateServerSettingsSystemKeysRotateResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingFederateServerSettingsSystemKeysResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingFederateServerSettingsSystemKeysRotateResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	importBlocks := []connector.ImportBlock{}
 
 	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
-	serverSettingsSystemKeysId := "server_settings_system_keys_singleton_id"
-	serverSettingsSystemKeysName := "Server Settings System Keys"
+	serverSettingsSystemKeysRotateId := "server_settings_system_keys_rotate_singleton_id"
+	serverSettingsSystemKeysRotateName := "Server Settings System Keys Rotate"
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
@@ -39,14 +39,14 @@ func (r *PingFederateServerSettingsSystemKeysResource) ExportAll() (*[]connector
 
 	importBlocks = append(importBlocks, connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       serverSettingsSystemKeysName,
-		ResourceID:         serverSettingsSystemKeysId,
+		ResourceName:       serverSettingsSystemKeysRotateName,
+		ResourceID:         serverSettingsSystemKeysRotateId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	})
 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateServerSettingsSystemKeysResource) ResourceType() string {
-	return "pingfederate_server_settings_system_keys"
+func (r *PingFederateServerSettingsSystemKeysRotateResource) ResourceType() string {
+	return "pingfederate_server_settings_system_keys_rotate"
 }

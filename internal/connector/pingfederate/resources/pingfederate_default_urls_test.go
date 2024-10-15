@@ -8,17 +8,17 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestPingFederateServerSettingsSystemKeysExport(t *testing.T) {
+func TestPingFederateIDPDefaultURLsExport(t *testing.T) {
 	// Get initialized apiClient and resource
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ServerSettingsSystemKeys(PingFederateClientInfo)
+	resource := resources.DefaultURLs(PingFederateClientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_server_settings_system_keys",
-			ResourceName: "Server Settings System Keys",
-			ResourceID:   "server_settings_system_keys_singleton_id",
+			ResourceType: "pingfederate_default_urls",
+			ResourceName: "Default URLs",
+			ResourceID:   "default_urls_singleton_id",
 		},
 	}
 
