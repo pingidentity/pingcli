@@ -3,9 +3,9 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
