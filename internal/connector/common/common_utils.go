@@ -52,9 +52,9 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		}
 		defer outputFile.Close()
 
-		err = writeHeader(format, outputFile)
+		err = writeHeader(format, outputFilePath, outputFile)
 		if err != nil {
-			return fmt.Errorf("failed to write header to file %q. err: %s", outputFilePath, err.Error())
+			return err
 		}
 
 		for _, importBlock := range *importBlocks {
@@ -65,7 +65,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 			case customtypes.ENUM_EXPORT_FORMAT_HCL:
 				err := hclImportBlockTemplate.Execute(outputFile, importBlock)
 				if err != nil {
-					return fmt.Errorf("failed to write import block template to file %q. err: %s", outputFilePath, err.Error())
+					return fmt.Errorf("failed to write import template to file %q. err: %s", outputFilePath, err.Error())
 				}
 			default:
 				return fmt.Errorf("unrecognized export format %q. Must be one of: %s", format, customtypes.ExportFormatValidValues())
@@ -75,7 +75,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 	return nil
 }
 
-func writeHeader(format string, outputFile *os.File) error {
+func writeHeader(format, outputFilePath string, outputFile *os.File) error {
 	// Parse the HCL header
 	hclImportHeaderTemplate, err := template.New("HCLImportHeader").Parse(connector.HCLImportHeaderTemplate)
 	if err != nil {
@@ -92,7 +92,7 @@ func writeHeader(format string, outputFile *os.File) error {
 	case customtypes.ENUM_EXPORT_FORMAT_HCL:
 		err := hclImportHeaderTemplate.Execute(outputFile, header)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to write import template to file %q. err: %s", outputFilePath, err.Error())
 		}
 	default:
 		return fmt.Errorf("unrecognized export format %q. Must be one of: %s", format, customtypes.ExportFormatValidValues())
