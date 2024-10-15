@@ -8,29 +8,29 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingFederateIncomingProxySettingsResource{}
+	_ connector.ExportableResource = &PingFederateExtendedPropertiesResource{}
 )
 
-type PingFederateIncomingProxySettingsResource struct {
+type PingFederateDefaultURLsResource struct {
 	clientInfo *connector.PingFederateClientInfo
 }
 
-// Utility method for creating a PingFederateIncomingProxySettingsResource
-func IncomingProxySettings(clientInfo *connector.PingFederateClientInfo) *PingFederateIncomingProxySettingsResource {
-	return &PingFederateIncomingProxySettingsResource{
+// Utility method for creating a PingFederateDefaultURLsResource
+func DefaultURLs(clientInfo *connector.PingFederateClientInfo) *PingFederateDefaultURLsResource {
+	return &PingFederateDefaultURLsResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingFederateIncomingProxySettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingFederateDefaultURLsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	importBlocks := []connector.ImportBlock{}
 
 	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
-	incomingProxySettingsId := "incoming_proxy_settings_singleton_id"
-	incomingProxySettingsName := "Incoming Proxy Settings"
+	defaultURLsId := "default_urls_singleton_id"
+	defaultURLsName := "Default URLs"
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
@@ -39,14 +39,14 @@ func (r *PingFederateIncomingProxySettingsResource) ExportAll() (*[]connector.Im
 
 	importBlocks = append(importBlocks, connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       incomingProxySettingsName,
-		ResourceID:         incomingProxySettingsId,
+		ResourceName:       defaultURLsName,
+		ResourceID:         defaultURLsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	})
 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIncomingProxySettingsResource) ResourceType() string {
-	return "pingfederate_incoming_proxy_settings"
+func (r *PingFederateDefaultURLsResource) ResourceType() string {
+	return "pingfederate_default_urls"
 }

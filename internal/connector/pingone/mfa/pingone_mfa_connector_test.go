@@ -3,10 +3,10 @@ package mfa_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/pingone/mfa/resources"
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
-	"github.com/pingidentity/pingctl/internal/testing/testutils_terraform"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/mfa/resources"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_terraform"
 )
 
 func TestMFATerraformPlan(t *testing.T) {

@@ -20,8 +20,8 @@ func Get() zerolog.Logger {
 	once.Do(func() {
 
 		// Viper config is not initialized yet, so read environment variables directly
-		logLevelEnv := os.Getenv("PINGCTL_LOG_LEVEL")
-		logPathEnv := os.Getenv("PINGCTL_LOG_PATH")
+		logLevelEnv := os.Getenv("PINGCLI_LOG_LEVEL")
+		logPathEnv := os.Getenv("PINGCLI_LOG_PATH")
 
 		var logLevel zerolog.Level
 
@@ -48,7 +48,7 @@ func Get() zerolog.Logger {
 
 		var output io.Writer
 
-		// Handle log file creation when PINGCTL_LOG_PATH is defined
+		// Handle log file creation when PINGCLI_LOG_PATH is defined
 		if logPathEnv != "" && logLevel != zerolog.Disabled {
 
 			var err error

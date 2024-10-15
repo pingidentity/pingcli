@@ -31,6 +31,11 @@ func (es *ExportServices) Set(services string) error {
 		return fmt.Errorf("failed to set ExportServices value: %s. ExportServices is nil", services)
 	}
 
+	if services == "" || services == "[]" {
+		*es = ExportServices([]string{})
+		return nil
+	}
+
 	validServices := ExportServicesValidValues()
 	serviceList := strings.Split(services, ",")
 

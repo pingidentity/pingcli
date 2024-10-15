@@ -8,17 +8,17 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestPingFederateAuthenticationPoliciesExport(t *testing.T) {
+func TestPingFederateServerSettingsSystemKeysExport(t *testing.T) {
 	// Get initialized apiClient and resource
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.AuthenticationPolicies(PingFederateClientInfo)
+	resource := resources.ServerSettingsSystemKeysRotate(PingFederateClientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_authentication_policies",
-			ResourceName: "Authentication Policies",
-			ResourceID:   "authentication_policies_singleton_id",
+			ResourceType: "pingfederate_server_settings_system_keys_rotate",
+			ResourceName: "Server Settings System Keys Rotate",
+			ResourceID:   "server_settings_system_keys_rotate_singleton_id",
 		},
 	}
 

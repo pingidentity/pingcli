@@ -4,28 +4,28 @@ import (
 	"fmt"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneResourceScopeResource{}
+	_ connector.ExportableResource = &PingOneResourceScopeResource{}
 )
 
-type PingoneResourceScopeResource struct {
+type PingOneResourceScopeResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneResourceScopeResource
-func ResourceScope(clientInfo *connector.PingOneClientInfo) *PingoneResourceScopeResource {
-	return &PingoneResourceScopeResource{
+// Utility method for creating a PingOneResourceScopeResource
+func ResourceScope(clientInfo *connector.PingOneClientInfo) *PingOneResourceScopeResource {
+	return &PingOneResourceScopeResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneResourceScopeResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneResourceScopeResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -84,6 +84,6 @@ func (r *PingoneResourceScopeResource) ExportAll() (*[]connector.ImportBlock, er
 	return &importBlocks, nil
 }
 
-func (r *PingoneResourceScopeResource) ResourceType() string {
+func (r *PingOneResourceScopeResource) ResourceType() string {
 	return "pingone_resource_scope"
 }

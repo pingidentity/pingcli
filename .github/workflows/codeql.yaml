@@ -13,7 +13,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: ["main", "go-cli"]
+    branches: ["main"]
   pull_request:
     paths:
       - "**.go"

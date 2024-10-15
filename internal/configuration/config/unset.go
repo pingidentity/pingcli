@@ -1,8 +1,8 @@
 package configuration_config
 
 import (
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/pflag"
 )
 
@@ -23,7 +23,7 @@ func initUnsetProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage:     "The configuration profile used to unset the configuration value.",
+			Usage:     "The name of the configuration profile to unset a configuration value from.",
 			Value:     cobraValue,
 			DefValue:  "The active profile",
 		},

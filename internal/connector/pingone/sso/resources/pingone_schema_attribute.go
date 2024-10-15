@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneSchemaAttributeResource{}
+	_ connector.ExportableResource = &PingOneSchemaAttributeResource{}
 )
 
-type PingoneSchemaAttributeResource struct {
+type PingOneSchemaAttributeResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneSchemaAttributeResource
-func SchemaAttribute(clientInfo *connector.PingOneClientInfo) *PingoneSchemaAttributeResource {
-	return &PingoneSchemaAttributeResource{
+// Utility method for creating a PingOneSchemaAttributeResource
+func SchemaAttribute(clientInfo *connector.PingOneClientInfo) *PingOneSchemaAttributeResource {
+	return &PingOneSchemaAttributeResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -80,6 +80,6 @@ func (r *PingoneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, 
 	return &importBlocks, nil
 }
 
-func (r *PingoneSchemaAttributeResource) ResourceType() string {
+func (r *PingOneSchemaAttributeResource) ResourceType() string {
 	return "pingone_schema_attribute"
 }

@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneApplicationSignOnPolicyAssignmentResource{}
+	_ connector.ExportableResource = &PingOneApplicationSignOnPolicyAssignmentResource{}
 )
 
-type PingoneApplicationSignOnPolicyAssignmentResource struct {
+type PingOneApplicationSignOnPolicyAssignmentResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneApplicationSignOnPolicyAssignmentResource
-func ApplicationSignOnPolicyAssignment(clientInfo *connector.PingOneClientInfo) *PingoneApplicationSignOnPolicyAssignmentResource {
-	return &PingoneApplicationSignOnPolicyAssignmentResource{
+// Utility method for creating a PingOneApplicationSignOnPolicyAssignmentResource
+func ApplicationSignOnPolicyAssignment(clientInfo *connector.PingOneClientInfo) *PingOneApplicationSignOnPolicyAssignmentResource {
+	return &PingOneApplicationSignOnPolicyAssignmentResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneApplicationSignOnPolicyAssignmentResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneApplicationSignOnPolicyAssignmentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -121,6 +121,6 @@ func (r *PingoneApplicationSignOnPolicyAssignmentResource) ExportAll() (*[]conne
 	return &importBlocks, nil
 }
 
-func (r *PingoneApplicationSignOnPolicyAssignmentResource) ResourceType() string {
+func (r *PingOneApplicationSignOnPolicyAssignmentResource) ResourceType() string {
 	return "pingone_application_sign_on_policy_assignment"
 }

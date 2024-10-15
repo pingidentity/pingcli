@@ -1,8 +1,8 @@
 package configuration_config
 
 import (
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/pflag"
 )
 
@@ -25,7 +25,7 @@ func initConfigProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage:     "The name of the profile to update.",
+			Usage:     "The name of the profile to update. E.g. `myAwesomeProfile`",
 			Value:     cobraValue,
 			DefValue:  "The active profile",
 		},

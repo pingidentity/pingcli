@@ -4,28 +4,28 @@ import (
 	"fmt"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneApplicationRoleAssignmentResource{}
+	_ connector.ExportableResource = &PingOneApplicationRoleAssignmentResource{}
 )
 
-type PingoneApplicationRoleAssignmentResource struct {
+type PingOneApplicationRoleAssignmentResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneApplicationRoleAssignmentResource
-func ApplicationRoleAssignment(clientInfo *connector.PingOneClientInfo) *PingoneApplicationRoleAssignmentResource {
-	return &PingoneApplicationRoleAssignmentResource{
+// Utility method for creating a PingOneApplicationRoleAssignmentResource
+func ApplicationRoleAssignment(clientInfo *connector.PingOneClientInfo) *PingOneApplicationRoleAssignmentResource {
+	return &PingOneApplicationRoleAssignmentResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneApplicationRoleAssignmentResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneApplicationRoleAssignmentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -124,6 +124,6 @@ func (r *PingoneApplicationRoleAssignmentResource) ExportAll() (*[]connector.Imp
 	return &importBlocks, nil
 }
 
-func (r *PingoneApplicationRoleAssignmentResource) ResourceType() string {
+func (r *PingOneApplicationRoleAssignmentResource) ResourceType() string {
 	return "pingone_application_role_assignment"
 }

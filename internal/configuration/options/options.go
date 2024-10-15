@@ -33,31 +33,31 @@ type Option struct {
 
 func Options() []Option {
 	return []Option{
-		PingoneAuthenticationTypeOption,
-		PingoneAuthenticationWorkerClientIDOption,
-		PingoneAuthenticationWorkerClientSecretOption,
-		PingoneAuthenticationWorkerEnvironmentIDOption,
-		PingoneRegionCodeOption,
+		PingOneAuthenticationTypeOption,
+		PingOneAuthenticationWorkerClientIDOption,
+		PingOneAuthenticationWorkerClientSecretOption,
+		PingOneAuthenticationWorkerEnvironmentIDOption,
+		PingOneRegionCodeOption,
 
 		PlatformExportExportFormatOption,
 		PlatformExportServiceOption,
 		PlatformExportOutputDirectoryOption,
 		PlatformExportOverwriteOption,
-		PlatformExportPingoneEnvironmentIDOption,
+		PlatformExportPingOneEnvironmentIDOption,
 
-		PingfederateHTTPSHostOption,
-		PingfederateAdminAPIPathOption,
-		PingfederateXBypassExternalValidationHeaderOption,
-		PingfederateCACertificatePemFilesOption,
-		PingfederateInsecureTrustAllTLSOption,
-		PingfederateBasicAuthUsernameOption,
-		PingfederateBasicAuthPasswordOption,
-		PingfederateAccessTokenAuthAccessTokenOption,
-		PingfederateClientCredentialsAuthClientIDOption,
-		PingfederateClientCredentialsAuthClientSecretOption,
-		PingfederateClientCredentialsAuthTokenURLOption,
-		PingfederateClientCredentialsAuthScopesOption,
-		PingfederateAuthenticationTypeOption,
+		PingFederateHTTPSHostOption,
+		PingFederateAdminAPIPathOption,
+		PingFederateXBypassExternalValidationHeaderOption,
+		PingFederateCACertificatePemFilesOption,
+		PingFederateInsecureTrustAllTLSOption,
+		PingFederateBasicAuthUsernameOption,
+		PingFederateBasicAuthPasswordOption,
+		PingFederateAccessTokenAuthAccessTokenOption,
+		PingFederateClientCredentialsAuthClientIDOption,
+		PingFederateClientCredentialsAuthClientSecretOption,
+		PingFederateClientCredentialsAuthTokenURLOption,
+		PingFederateClientCredentialsAuthScopesOption,
+		PingFederateAuthenticationTypeOption,
 
 		RootActiveProfileOption,
 		RootColorOption,
@@ -89,31 +89,31 @@ func Options() []Option {
 
 // pingone service options
 var (
-	PingoneAuthenticationTypeOption                Option
-	PingoneAuthenticationWorkerClientIDOption      Option
-	PingoneAuthenticationWorkerClientSecretOption  Option
-	PingoneAuthenticationWorkerEnvironmentIDOption Option
-	PingoneRegionCodeOption                        Option
+	PingOneAuthenticationTypeOption                Option
+	PingOneAuthenticationWorkerClientIDOption      Option
+	PingOneAuthenticationWorkerClientSecretOption  Option
+	PingOneAuthenticationWorkerEnvironmentIDOption Option
+	PingOneRegionCodeOption                        Option
 )
 
 // pingfederate service options
 var (
-	PingfederateHTTPSHostOption                         Option
-	PingfederateAdminAPIPathOption                      Option
-	PingfederateXBypassExternalValidationHeaderOption   Option
-	PingfederateCACertificatePemFilesOption             Option
-	PingfederateInsecureTrustAllTLSOption               Option
-	PingfederateBasicAuthUsernameOption                 Option
-	PingfederateBasicAuthPasswordOption                 Option
-	PingfederateAccessTokenAuthAccessTokenOption        Option
-	PingfederateClientCredentialsAuthClientIDOption     Option
-	PingfederateClientCredentialsAuthClientSecretOption Option
-	PingfederateClientCredentialsAuthTokenURLOption     Option
-	PingfederateClientCredentialsAuthScopesOption       Option
-	PingfederateAuthenticationTypeOption                Option
+	PingFederateHTTPSHostOption                         Option
+	PingFederateAdminAPIPathOption                      Option
+	PingFederateXBypassExternalValidationHeaderOption   Option
+	PingFederateCACertificatePemFilesOption             Option
+	PingFederateInsecureTrustAllTLSOption               Option
+	PingFederateBasicAuthUsernameOption                 Option
+	PingFederateBasicAuthPasswordOption                 Option
+	PingFederateAccessTokenAuthAccessTokenOption        Option
+	PingFederateClientCredentialsAuthClientIDOption     Option
+	PingFederateClientCredentialsAuthClientSecretOption Option
+	PingFederateClientCredentialsAuthTokenURLOption     Option
+	PingFederateClientCredentialsAuthScopesOption       Option
+	PingFederateAuthenticationTypeOption                Option
 )
 
-// 'pingctl config' command options
+// 'pingcli config' command options
 var (
 	ConfigProfileOption     Option
 	ConfigNameOption        Option
@@ -136,13 +136,13 @@ var (
 	ConfigUnsetProfileOption Option
 )
 
-// 'pingctl platform export' command options
+// 'pingcli platform export' command options
 var (
 	PlatformExportExportFormatOption         Option
 	PlatformExportServiceOption              Option
 	PlatformExportOutputDirectoryOption      Option
 	PlatformExportOverwriteOption            Option
-	PlatformExportPingoneEnvironmentIDOption Option
+	PlatformExportPingOneEnvironmentIDOption Option
 )
 
 // Generic viper profile options
@@ -158,7 +158,7 @@ var (
 	RootOutputFormatOption  Option
 )
 
-// 'pingctl request' command options
+// 'pingcli request' command options
 var (
 	RequestDataOption              Option
 	RequestHTTPMethodOption        Option

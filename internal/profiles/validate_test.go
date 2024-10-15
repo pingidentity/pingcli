@@ -3,8 +3,8 @@ package profiles_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/profiles"
-	"github.com/pingidentity/pingctl/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/profiles"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
 )
 
 // Test Validate function
@@ -55,7 +55,7 @@ func TestValidateInvalidBool(t *testing.T) {
 	fileContents := `activeProfile: default
 default:
     description: "default description"
-    pingctl:
+    pingcli:
         color: invalid`
 
 	testutils_viper.InitVipersCustomFile(t, fileContents)
@@ -71,7 +71,7 @@ func TestValidateInvalidOutputFormat(t *testing.T) {
 	fileContents := `activeProfile: default
 default:
     description: "default description"
-    pingctl:
+    pingcli:
         outputFormat: invalid`
 
 	testutils_viper.InitVipersCustomFile(t, fileContents)

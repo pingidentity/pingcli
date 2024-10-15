@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneApplicationFlowPolicyAssignmentResource{}
+	_ connector.ExportableResource = &PingOneApplicationFlowPolicyAssignmentResource{}
 )
 
-type PingoneApplicationFlowPolicyAssignmentResource struct {
+type PingOneApplicationFlowPolicyAssignmentResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneApplicationFlowPolicyAssignmentResource
-func ApplicationFlowPolicyAssignment(clientInfo *connector.PingOneClientInfo) *PingoneApplicationFlowPolicyAssignmentResource {
-	return &PingoneApplicationFlowPolicyAssignmentResource{
+// Utility method for creating a PingOneApplicationFlowPolicyAssignmentResource
+func ApplicationFlowPolicyAssignment(clientInfo *connector.PingOneClientInfo) *PingOneApplicationFlowPolicyAssignmentResource {
+	return &PingOneApplicationFlowPolicyAssignmentResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -120,6 +120,6 @@ func (r *PingoneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connect
 	return &importBlocks, nil
 }
 
-func (r *PingoneApplicationFlowPolicyAssignmentResource) ResourceType() string {
+func (r *PingOneApplicationFlowPolicyAssignmentResource) ResourceType() string {
 	return "pingone_application_flow_policy_assignment"
 }

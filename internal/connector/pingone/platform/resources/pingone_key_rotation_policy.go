@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneKeyRotationPolicyResource{}
+	_ connector.ExportableResource = &PingOneKeyRotationPolicyResource{}
 )
 
-type PingoneKeyRotationPolicyResource struct {
+type PingOneKeyRotationPolicyResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneKeyRotationPolicyResource
-func KeyRotationPolicy(clientInfo *connector.PingOneClientInfo) *PingoneKeyRotationPolicyResource {
-	return &PingoneKeyRotationPolicyResource{
+// Utility method for creating a PingOneKeyRotationPolicyResource
+func KeyRotationPolicy(clientInfo *connector.PingOneClientInfo) *PingOneKeyRotationPolicyResource {
+	return &PingOneKeyRotationPolicyResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func (r *PingoneKeyRotationPolicyResource) ResourceType() string {
+func (r *PingOneKeyRotationPolicyResource) ResourceType() string {
 	return "pingone_key_rotation_policy"
 }

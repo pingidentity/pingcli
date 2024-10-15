@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/output"
-	"github.com/pingidentity/pingctl/internal/profiles"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/output"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/viper"
 )
 
@@ -24,7 +24,7 @@ func RunInternalConfigSet(kvPair string) (err error) {
 
 	// Make sure value is not empty, and suggest unset command if it is
 	if vValue == "" {
-		return fmt.Errorf("failed to set configuration: value for key '%s' is empty. Use 'pingctl config unset %s' to unset the key", vKey, vKey)
+		return fmt.Errorf("failed to set configuration: value for key '%s' is empty. Use 'pingcli config unset %s' to unset the key", vKey, vKey)
 	}
 
 	if err = profiles.GetMainConfig().ValidateExistingProfileName(pName); err != nil {
@@ -130,9 +130,9 @@ func setValue(profileViper *viper.Viper, vKey, vValue string, valueType options.
 		}
 		profileViper.Set(vKey, outputFormat)
 	case options.ENUM_PINGONE_REGION_CODE:
-		region := new(customtypes.PingoneRegionCode)
+		region := new(customtypes.PingOneRegionCode)
 		if err = region.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid Pingone Region Code. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingoneRegionCodeValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid PingOne Region Code. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, region)
 	case options.ENUM_STRING:
@@ -154,15 +154,15 @@ func setValue(profileViper *viper.Viper, vKey, vValue string, valueType options.
 		}
 		profileViper.Set(vKey, uuid)
 	case options.ENUM_PINGONE_AUTH_TYPE:
-		authType := new(customtypes.PingoneAuthenticationType)
+		authType := new(customtypes.PingOneAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid Pingone Authentication Type. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingoneAuthenticationTypeValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid PingOne Authentication Type. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, authType)
 	case options.ENUM_PINGFEDERATE_AUTH_TYPE:
-		authType := new(customtypes.PingfederateAuthenticationType)
+		authType := new(customtypes.PingFederateAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid Pingfederate Authentication Type. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingfederateAuthenticationTypeValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid PingFederate Authentication Type. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, authType)
 	case options.ENUM_INT:

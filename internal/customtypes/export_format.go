@@ -27,6 +27,8 @@ func (ef *ExportFormat) Set(format string) error {
 	switch {
 	case strings.EqualFold(format, ENUM_EXPORT_FORMAT_HCL):
 		*ef = ExportFormat(ENUM_EXPORT_FORMAT_HCL)
+	case strings.EqualFold(format, ""):
+		*ef = ExportFormat("")
 	default:
 		return fmt.Errorf("unrecognized export format '%s'. Must be one of: %s", format, strings.Join(ExportFormatValidValues(), ", "))
 	}

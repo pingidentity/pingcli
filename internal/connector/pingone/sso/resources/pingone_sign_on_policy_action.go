@@ -4,28 +4,28 @@ import (
 	"fmt"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneSignOnPolicyActionResource{}
+	_ connector.ExportableResource = &PingOneSignOnPolicyActionResource{}
 )
 
-type PingoneSignOnPolicyActionResource struct {
+type PingOneSignOnPolicyActionResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneSignOnPolicyActionResource
-func SignOnPolicyAction(clientInfo *connector.PingOneClientInfo) *PingoneSignOnPolicyActionResource {
-	return &PingoneSignOnPolicyActionResource{
+// Utility method for creating a PingOneSignOnPolicyActionResource
+func SignOnPolicyAction(clientInfo *connector.PingOneClientInfo) *PingOneSignOnPolicyActionResource {
+	return &PingOneSignOnPolicyActionResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneSignOnPolicyActionResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneSignOnPolicyActionResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -117,6 +117,6 @@ func (r *PingoneSignOnPolicyActionResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func (r *PingoneSignOnPolicyActionResource) ResourceType() string {
+func (r *PingOneSignOnPolicyActionResource) ResourceType() string {
 	return "pingone_sign_on_policy_action"
 }

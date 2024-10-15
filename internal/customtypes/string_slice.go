@@ -17,9 +17,12 @@ func (ss *StringSlice) Set(val string) error {
 		return fmt.Errorf("failed to set StringSlice value: %s. StringSlice is nil", val)
 	}
 
-	valSs := strings.Split(val, ",")
-
-	*ss = StringSlice(valSs)
+	if val == "" || val == "[]" {
+		*ss = StringSlice([]string{})
+	} else {
+		valSs := strings.Split(val, ",")
+		*ss = StringSlice(valSs)
+	}
 
 	return nil
 }

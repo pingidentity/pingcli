@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/input"
-	"github.com/pingidentity/pingctl/internal/output"
-	"github.com/pingidentity/pingctl/internal/profiles"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/input"
+	"github.com/pingidentity/pingcli/internal/output"
+	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
 func RunInternalConfig(rc io.ReadCloser) (err error) {
@@ -30,7 +30,7 @@ func RunInternalConfig(rc io.ReadCloser) (err error) {
 	}
 
 	output.Print(output.Opts{
-		Message: fmt.Sprintf("Profile updated. Update additional profile attributes via 'pingctl config set' or directly within the config file at '%s'", profiles.GetMainConfig().ViperInstance().ConfigFileUsed()),
+		Message: fmt.Sprintf("Profile updated. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetMainConfig().ViperInstance().ConfigFileUsed()),
 		Result:  output.ENUM_RESULT_SUCCESS,
 	})
 

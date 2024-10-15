@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/pingone/sso/resources"
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/sso/resources"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
 func TestApplicationResourceGrantExport(t *testing.T) {

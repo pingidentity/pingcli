@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/configuration"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/profiles"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
 const (
@@ -109,14 +109,14 @@ func InitVipersCustomFile(t *testing.T, fileContents string) {
 func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
-		os.Getenv(options.PingoneRegionCodeOption.EnvVar),
-		os.Getenv(options.PingoneAuthenticationWorkerClientIDOption.EnvVar),
-		os.Getenv(options.PingoneAuthenticationWorkerClientSecretOption.EnvVar),
-		os.Getenv(options.PingoneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		os.Getenv(options.PingfederateAdminAPIPathOption.EnvVar),
-		os.Getenv(options.PingfederateClientCredentialsAuthClientIDOption.EnvVar),
-		os.Getenv(options.PingfederateClientCredentialsAuthClientSecretOption.EnvVar),
-		os.Getenv(options.PingfederateClientCredentialsAuthScopesOption.EnvVar),
-		os.Getenv(options.PingfederateClientCredentialsAuthTokenURLOption.EnvVar),
-		os.Getenv(options.PingfederateHTTPSHostOption.EnvVar))
+		os.Getenv(options.PingOneRegionCodeOption.EnvVar),
+		os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
+		os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
+		os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
+		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar),
+		os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
+		os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
+		os.Getenv(options.PingFederateClientCredentialsAuthScopesOption.EnvVar),
+		os.Getenv(options.PingFederateClientCredentialsAuthTokenURLOption.EnvVar),
+		os.Getenv(options.PingFederateHTTPSHostOption.EnvVar))
 }

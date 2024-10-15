@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneApplicationSecretResource{}
+	_ connector.ExportableResource = &PingOneApplicationSecretResource{}
 )
 
-type PingoneApplicationSecretResource struct {
+type PingOneApplicationSecretResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneApplicationSecretResource
-func ApplicationSecret(clientInfo *connector.PingOneClientInfo) *PingoneApplicationSecretResource {
-	return &PingoneApplicationSecretResource{
+// Utility method for creating a PingOneApplicationSecretResource
+func ApplicationSecret(clientInfo *connector.PingOneClientInfo) *PingOneApplicationSecretResource {
+	return &PingOneApplicationSecretResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -110,6 +110,6 @@ func (r *PingoneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func (r *PingoneApplicationSecretResource) ResourceType() string {
+func (r *PingOneApplicationSecretResource) ResourceType() string {
 	return "pingone_application_secret"
 }

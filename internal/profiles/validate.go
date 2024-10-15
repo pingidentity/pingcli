@@ -5,9 +5,9 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/viper"
 )
 
@@ -23,7 +23,7 @@ func Validate() error {
 	// Make sure selected active profile is in the configuration file
 	activeProfile := GetMainConfig().ActiveProfile().Name()
 	if !slices.Contains(profileNames, activeProfile) {
-		return fmt.Errorf("failed to validate pingctl configuration: active profile '%s' not found in configuration file %s", activeProfile, GetMainConfig().ViperInstance().ConfigFileUsed())
+		return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration file %s", activeProfile, GetMainConfig().ViperInstance().ConfigFileUsed())
 	}
 
 	// for each profile key, set the profile based on mainViper.Sub() and validate the profile
@@ -31,11 +31,11 @@ func Validate() error {
 		subViper := GetMainConfig().ViperInstance().Sub(pName)
 
 		if err := validateProfileKeys(pName, subViper); err != nil {
-			return fmt.Errorf("failed to validate pingctl configuration: %v", err)
+			return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
 		}
 
 		if err := validateProfileValues(pName, subViper); err != nil {
-			return fmt.Errorf("failed to validate pingctl configuration: %v", err)
+			return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
 		}
 	}
 
@@ -124,15 +124,15 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			}
 		case options.ENUM_PINGONE_REGION_CODE:
 			switch typedValue := vValue.(type) {
-			case *customtypes.PingoneRegionCode:
+			case *customtypes.PingOneRegionCode:
 				continue
 			case string:
-				prc := new(customtypes.PingoneRegionCode)
+				prc := new(customtypes.PingOneRegionCode)
 				if err = prc.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a Pingone Region Code value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingOne Region Code value: %v", pName, typedValue, key, err)
 				}
 			default:
-				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a Pingone Region Code value", pName, typedValue, key)
+				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a PingOne Region Code value", pName, typedValue, key)
 			}
 		case options.ENUM_STRING:
 			switch typedValue := vValue.(type) {
@@ -249,10 +249,10 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			}
 		case options.ENUM_PINGFEDERATE_AUTH_TYPE:
 			switch typedValue := vValue.(type) {
-			case *customtypes.PingfederateAuthenticationType:
+			case *customtypes.PingFederateAuthenticationType:
 				continue
 			case string:
-				pfa := new(customtypes.PingfederateAuthenticationType)
+				pfa := new(customtypes.PingFederateAuthenticationType)
 				if err = pfa.Set(typedValue); err != nil {
 					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingFederate Authentication Type value: %v", pName, typedValue, key, err)
 				}
@@ -261,10 +261,10 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			}
 		case options.ENUM_PINGONE_AUTH_TYPE:
 			switch typedValue := vValue.(type) {
-			case *customtypes.PingoneAuthenticationType:
+			case *customtypes.PingOneAuthenticationType:
 				continue
 			case string:
-				pat := new(customtypes.PingoneAuthenticationType)
+				pat := new(customtypes.PingOneAuthenticationType)
 				if err = pat.Set(typedValue); err != nil {
 					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingOne Authentication Type value: %v", pName, typedValue, key, err)
 				}

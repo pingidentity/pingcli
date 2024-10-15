@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneCustomDomainResource{}
+	_ connector.ExportableResource = &PingOneCustomDomainResource{}
 )
 
-type PingoneCustomDomainResource struct {
+type PingOneCustomDomainResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneCustomDomainResource
-func CustomDomain(clientInfo *connector.PingOneClientInfo) *PingoneCustomDomainResource {
-	return &PingoneCustomDomainResource{
+// Utility method for creating a PingOneCustomDomainResource
+func CustomDomain(clientInfo *connector.PingOneClientInfo) *PingOneCustomDomainResource {
+	return &PingOneCustomDomainResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 	return &importBlocks, nil
 }
 
-func (r *PingoneCustomDomainResource) ResourceType() string {
+func (r *PingOneCustomDomainResource) ResourceType() string {
 	return "pingone_custom_domain"
 }

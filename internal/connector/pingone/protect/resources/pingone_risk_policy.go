@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneRiskPolicyResource{}
+	_ connector.ExportableResource = &PingOneRiskPolicyResource{}
 )
 
-type PingoneRiskPolicyResource struct {
+type PingOneRiskPolicyResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneRiskPolicyResource
-func RiskPolicy(clientInfo *connector.PingOneClientInfo) *PingoneRiskPolicyResource {
-	return &PingoneRiskPolicyResource{
+// Utility method for creating a PingOneRiskPolicyResource
+func RiskPolicy(clientInfo *connector.PingOneClientInfo) *PingOneRiskPolicyResource {
+	return &PingOneRiskPolicyResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -66,6 +66,6 @@ func (r *PingoneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error
 	return &importBlocks, nil
 }
 
-func (r *PingoneRiskPolicyResource) ResourceType() string {
+func (r *PingOneRiskPolicyResource) ResourceType() string {
 	return "pingone_risk_policy"
 }

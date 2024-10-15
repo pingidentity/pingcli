@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneTrustedEmailDomainResource{}
+	_ connector.ExportableResource = &PingOneTrustedEmailDomainResource{}
 )
 
-type PingoneTrustedEmailDomainResource struct {
+type PingOneTrustedEmailDomainResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a Pingone Trusted Email Domain Resource
-func TrustedEmailDomain(clientInfo *connector.PingOneClientInfo) *PingoneTrustedEmailDomainResource {
-	return &PingoneTrustedEmailDomainResource{
+// Utility method for creating a PingOne Trusted Email Domain Resource
+func TrustedEmailDomain(clientInfo *connector.PingOneClientInfo) *PingOneTrustedEmailDomainResource {
+	return &PingOneTrustedEmailDomainResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneTrustedEmailDomainResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneTrustedEmailDomainResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneTrustedEmailDomainResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func (r *PingoneTrustedEmailDomainResource) ResourceType() string {
+func (r *PingOneTrustedEmailDomainResource) ResourceType() string {
 	return "pingone_trusted_email_domain"
 }

@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneMFADevicePolicyResource{}
+	_ connector.ExportableResource = &PingOneMFADevicePolicyResource{}
 )
 
-type PingoneMFADevicePolicyResource struct {
+type PingOneMFADevicePolicyResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneMFADevicePolicyResource
-func MFADevicePolicy(clientInfo *connector.PingOneClientInfo) *PingoneMFADevicePolicyResource {
-	return &PingoneMFADevicePolicyResource{
+// Utility method for creating a PingOneMFADevicePolicyResource
+func MFADevicePolicy(clientInfo *connector.PingOneClientInfo) *PingOneMFADevicePolicyResource {
+	return &PingOneMFADevicePolicyResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingoneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, 
 	return &importBlocks, nil
 }
 
-func (r *PingoneMFADevicePolicyResource) ResourceType() string {
+func (r *PingOneMFADevicePolicyResource) ResourceType() string {
 	return "pingone_mfa_device_policy"
 }

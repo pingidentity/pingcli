@@ -1,9 +1,9 @@
 package feedback
 
 import (
-	"github.com/pingidentity/pingctl/cmd/common"
-	feedback_internal "github.com/pingidentity/pingctl/internal/commands/feedback"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	feedback_internal "github.com/pingidentity/pingcli/internal/commands/feedback"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
@@ -11,13 +11,11 @@ func NewFeedbackCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
-		Example:               `  pingctl feedback`,
-		Long: `A command to provide the user information
-on how to give feedback or get help with the tool
-through the use of the GitHub repository's issue tracker.`,
-		RunE:  feedbackRunE,
-		Short: "Information on tool feedback",
-		Use:   "feedback [flags]",
+		Example:               `  pingcli feedback`,
+		Long:                  "Provides links to report issues and provide feedback on using the CLI to Ping Identity.",
+		RunE:                  feedbackRunE,
+		Short:                 "Help us improve the CLI. Report issues or send us feedback on using the CLI tool.",
+		Use:                   "feedback [flags]",
 	}
 
 	return cmd

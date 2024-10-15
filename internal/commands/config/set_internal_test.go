@@ -3,10 +3,10 @@ package config_internal
 import (
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
-	"github.com/pingidentity/pingctl/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
 )
 
 // Test RunInternalConfigSet function
@@ -90,7 +90,7 @@ func Test_RunInternalConfigSet_InvalidProfileName(t *testing.T) {
 func Test_RunInternalConfigSet_NoValue(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^failed to set configuration: value for key '.*' is empty. Use 'pingctl config unset .*' to unset the key$`
+	expectedErrorPattern := `^failed to set configuration: value for key '.*' is empty. Use 'pingcli config unset .*' to unset the key$`
 	err := RunInternalConfigSet("color=")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

@@ -3,9 +3,9 @@ package configuration_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/configuration"
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
-	"github.com/pingidentity/pingctl/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
 )
 
 // Test ValidateViperKey function

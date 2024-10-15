@@ -4,17 +4,17 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/pingidentity/pingctl/cmd"
-	"github.com/pingidentity/pingctl/internal/configuration"
-	testutils_viper "github.com/pingidentity/pingctl/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/cmd"
+	"github.com/pingidentity/pingcli/internal/configuration"
+	testutils_viper "github.com/pingidentity/pingcli/internal/testing/testutils_viper"
 )
 
-// ExecutePingctl executes the pingctl command with the provided arguments
+// ExecutePingcli executes the pingcli command with the provided arguments
 // and returns the error if any
-func ExecutePingctl(t *testing.T, args ...string) (err error) {
+func ExecutePingcli(t *testing.T, args ...string) (err error) {
 	t.Helper()
 
-	// Reset options for testing individual executions of pingctl
+	// Reset options for testing individual executions of pingcli
 	configuration.InitAllOptions()
 
 	root := cmd.NewRootCommand()
@@ -27,13 +27,13 @@ func ExecutePingctl(t *testing.T, args ...string) (err error) {
 	return root.Execute()
 }
 
-// ExecutePingctlCaptureCobraOutput executes the pingctl command with
+// ExecutePingcliCaptureCobraOutput executes the pingcli command with
 // the provided arguments and returns the output and error if any
 // Note: The returned output will only contain cobra module specific output
 // such as usage, help, and cobra errors
 // It will NOT include internal/output/output.go output
 // nor with it contain zerolog logs
-func ExecutePingctlCaptureCobraOutput(t *testing.T, args ...string) (output string, err error) {
+func ExecutePingcliCaptureCobraOutput(t *testing.T, args ...string) (output string, err error) {
 	t.Helper()
 
 	root := cmd.NewRootCommand()

@@ -17,7 +17,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
 )

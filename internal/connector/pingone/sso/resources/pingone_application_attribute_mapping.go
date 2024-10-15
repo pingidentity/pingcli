@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingoneApplicationAttributeMappingResource{}
+	_ connector.ExportableResource = &PingOneApplicationAttributeMappingResource{}
 )
 
-type PingoneApplicationAttributeMappingResource struct {
+type PingOneApplicationAttributeMappingResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingoneApplicationAttributeMappingResource
-func ApplicationAttributeMapping(clientInfo *connector.PingOneClientInfo) *PingoneApplicationAttributeMappingResource {
-	return &PingoneApplicationAttributeMappingResource{
+// Utility method for creating a PingOneApplicationAttributeMappingResource
+func ApplicationAttributeMapping(clientInfo *connector.PingOneClientInfo) *PingOneApplicationAttributeMappingResource {
+	return &PingOneApplicationAttributeMappingResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingoneApplicationAttributeMappingResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOneApplicationAttributeMappingResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -101,6 +101,6 @@ func (r *PingoneApplicationAttributeMappingResource) ExportAll() (*[]connector.I
 	return &importBlocks, nil
 }
 
-func (r *PingoneApplicationAttributeMappingResource) ResourceType() string {
+func (r *PingOneApplicationAttributeMappingResource) ResourceType() string {
 	return "pingone_application_attribute_mapping"
 }

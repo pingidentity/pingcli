@@ -4,10 +4,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/customtypes"
-	"github.com/pingidentity/pingctl/internal/testing/testutils"
-	"github.com/pingidentity/pingctl/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
 )
 
 // Test RunInternalRequest function
@@ -74,7 +74,7 @@ func Test_runInternalPingOneRequest_InvalidURI(t *testing.T) {
 func Test_getTopLevelDomain(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	t.Setenv(options.PingoneRegionCodeOption.EnvVar, customtypes.ENUM_PINGONE_REGION_CODE_CA)
+	t.Setenv(options.PingOneRegionCodeOption.EnvVar, customtypes.ENUM_PINGONE_REGION_CODE_CA)
 
 	domain, err := getTopLevelDomain()
 	testutils.CheckExpectedError(t, err, nil)
@@ -89,10 +89,10 @@ func Test_getTopLevelDomain(t *testing.T) {
 func Test_getTopLevelDomain_InvalidRegionCode(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	t.Setenv(options.PingoneRegionCodeOption.EnvVar, "invalid-region")
+	t.Setenv(options.PingOneRegionCodeOption.EnvVar, "invalid-region")
 
 	_, err := getTopLevelDomain()
-	expectedErrorPattern := "unrecognized Pingone region code: 'invalid-region'"
+	expectedErrorPattern := "unrecognized PingOne region code: 'invalid-region'"
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -132,7 +132,7 @@ func Test_pingoneAuth(t *testing.T) {
 func Test_pingoneAuth_InvalidCredentials(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	t.Setenv(options.PingoneAuthenticationWorkerClientIDOption.EnvVar, "invalid")
+	t.Setenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar, "invalid")
 
 	_, err := pingoneAuth()
 	expectedErrorPattern := `(?s)^failed to authenticate with PingOne: Response Status 401 Unauthorized: Response Body .*$`

@@ -3,17 +3,22 @@ package config
 import (
 	"os"
 
-	"github.com/pingidentity/pingctl/cmd/common"
-	config_internal "github.com/pingidentity/pingctl/internal/commands/config"
-	"github.com/pingidentity/pingctl/internal/configuration/options"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
-	addProfilecommandExamples = `  pingctl config add-profile
-  pingctl config add-profile --name myprofile --description "My Profile desc"
-  pingctl config add-profile --set-active=true`
+	addProfilecommandExamples = `  Add a new configuration profile with a guided experience.
+    pingcli config add-profile
+
+  Add a new configuration profile with a specific name and description.
+    pingcli config add-profile --name MyDeveloperEnv --description "My awesome new profile for my development environment"
+
+  Add a new configuration profile with a guided experience and set it as the active profile.
+    pingcli config add-profile --set-active=true`
 )
 
 func NewConfigAddProfileCommand() *cobra.Command {
@@ -21,10 +26,12 @@ func NewConfigAddProfileCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               addProfilecommandExamples,
-		Long:                  `Add a new configuration profile to pingctl.`,
-		RunE:                  configAddProfileRunE,
-		Short:                 "Add a new configuration profile to pingctl.",
-		Use:                   "add-profile [flags]",
+		Long: `Add a new custom configuration profile to the CLI.
+
+The new configuration profile will be stored in the CLI configuration file.`,
+		RunE:  configAddProfileRunE,
+		Short: "Add a new custom configuration profile.",
+		Use:   "add-profile [flags]",
 	}
 
 	cmd.Flags().AddFlag(options.ConfigAddProfileNameOption.Flag)

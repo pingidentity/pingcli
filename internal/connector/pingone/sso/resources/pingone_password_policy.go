@@ -3,28 +3,28 @@ package resources
 import (
 	"fmt"
 
-	"github.com/pingidentity/pingctl/internal/connector"
-	"github.com/pingidentity/pingctl/internal/connector/common"
-	"github.com/pingidentity/pingctl/internal/logger"
+	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingonePasswordPolicyResource{}
+	_ connector.ExportableResource = &PingOnePasswordPolicyResource{}
 )
 
-type PingonePasswordPolicyResource struct {
+type PingOnePasswordPolicyResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingonePasswordPolicyResource
-func PasswordPolicy(clientInfo *connector.PingOneClientInfo) *PingonePasswordPolicyResource {
-	return &PingonePasswordPolicyResource{
+// Utility method for creating a PingOnePasswordPolicyResource
+func PasswordPolicy(clientInfo *connector.PingOneClientInfo) *PingOnePasswordPolicyResource {
+	return &PingOnePasswordPolicyResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingonePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOnePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
@@ -65,6 +65,6 @@ func (r *PingonePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, e
 	return &importBlocks, nil
 }
 
-func (r *PingonePasswordPolicyResource) ResourceType() string {
+func (r *PingOnePasswordPolicyResource) ResourceType() string {
 	return "pingone_password_policy"
 }
