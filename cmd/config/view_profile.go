@@ -9,10 +9,11 @@ import (
 )
 
 const (
-	viewProfileCommandExamples = `  pingcli config view-profile
-  pingcli config view-profile --profile myprofile`
-	viewProfileCommandExamples = `  pingcli config view-profile
-  pingcli config view-profile --profile myprofile`
+	viewProfileCommandExamples = `  View configuration for the currently active profile
+    pingcli config view-profile
+
+  View configuration for a specific profile
+    pingcli config view-profile --profile myprofile`
 )
 
 func NewConfigViewProfileCommand() *cobra.Command {

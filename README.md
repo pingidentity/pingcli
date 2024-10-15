@@ -1,4 +1,4 @@
-# pingcli
+# Ping CLI
 
 The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services.
 
@@ -15,7 +15,7 @@ Start by running the command to create a new profile and answering the prompts.
 ```text
 $ pingcli config add-profile
 Pingcli configuration file '/Users/<me>/.pingcli/config.yaml' does not exist. - No Action (Warning)
-Creating new pingcli configuration file at: /Users/<me>/.pingcli/config.yaml
+Creating new Ping CLI configuration file at: /Users/<me>/.pingcli/config.yaml
 New profile name: : dev
 New profile description: : configuration for development environment
 Set new profile as active: : y
