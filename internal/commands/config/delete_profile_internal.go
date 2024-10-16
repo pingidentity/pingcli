@@ -31,19 +31,10 @@ func RunInternalConfigDeleteProfile(rc io.ReadCloser) (err error) {
 		return nil
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Deleting profile '%s'...", pName),
-		Result:  output.ENUM_RESULT_NIL,
-	})
-
-	if err := profiles.GetMainConfig().DeleteProfile(pName); err != nil {
+	err = deleteProfile(pName)
+	if err != nil {
 		return fmt.Errorf("failed to delete profile: %v", err)
 	}
-
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Profile '%s' deleted.", pName),
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
 
 	return nil
 }
@@ -64,4 +55,22 @@ func readConfigDeleteProfileOptions(rc io.ReadCloser) (pName string, err error) 
 	}
 
 	return pName, nil
+}
+
+func deleteProfile(pName string) (err error) {
+	output.Print(output.Opts{
+		Message: fmt.Sprintf("Deleting profile '%s'...", pName),
+		Result:  output.ENUM_RESULT_NIL,
+	})
+
+	if err = profiles.GetMainConfig().DeleteProfile(pName); err != nil {
+		return err
+	}
+
+	output.Print(output.Opts{
+		Message: fmt.Sprintf("Profile '%s' deleted.", pName),
+		Result:  output.ENUM_RESULT_SUCCESS,
+	})
+
+	return nil
 }
