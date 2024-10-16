@@ -33,7 +33,7 @@ func initFormatOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "f",
-			Usage:     fmt.Sprintf("Specifies the export format.  E.g. `HCL`.\nOptions are: [%s].", strings.Join(customtypes.ExportFormatValidValues(), ", ")),
+			Usage:     fmt.Sprintf("Specifies the export format.\nOptions are: %s.\nExample: `%s`", strings.Join(customtypes.ExportFormatValidValues(), ", "), string(customtypes.ENUM_EXPORT_FORMAT_HCL)),
 			Value:     cobraValue,
 			DefValue:  customtypes.ENUM_EXPORT_FORMAT_HCL,
 		},
@@ -56,7 +56,7 @@ func initServicesOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "s",
-			Usage:     fmt.Sprintf("Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services. Options are: [%s].", strings.Join(customtypes.ExportServicesValidValues(), ", ")),
+			Usage:     fmt.Sprintf("Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services.\nOptions are: %s.\nExample: `%s,%s,%s`", strings.Join(customtypes.ExportServicesValidValues(), ", "), string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO), string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA), string(customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE)),
 			Value:     cobraValue,
 			DefValue:  strings.Join(customtypes.ExportServicesValidValues(), ", "),
 		},
@@ -79,7 +79,7 @@ func initOutputDirectoryOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "d",
-			Usage:     "Specifies the output directory for export.",
+			Usage:     "Specifies the output directory for export. Example: `$HOME/pingcli-export`",
 			Value:     cobraValue,
 			DefValue:  "$(pwd)/export",
 		},
@@ -142,7 +142,7 @@ func initPingOneEnvironmentIDOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:     cobraParamName,
-			Usage:    "The ID of the PingOne environment to export.",
+			Usage:    "The ID of the PingOne environment to export. Must be a valid PingOne UUID.",
 			Value:    cobraValue,
 			DefValue: "",
 		},

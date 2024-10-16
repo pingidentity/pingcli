@@ -25,13 +25,13 @@ const (
     pingcli platform export --services pingone-platform --pingone-client-environment-id 3cf2... --pingone-worker-client-id a719... --pingone-worker-client-secret ey..... --pingone-region-code EU
 
   Export configuration-as-code packages for PingFederate, specifying the PingFederate connection details using basic authentication.
-    pingcli platform export --service pingfederate --pingfederate-username administrator --pingfederate-password 2FederateM0re
+    pingcli platform export --services pingfederate --pingfederate-authentication-type basicAuth --pingfederate-username administrator --pingfederate-password 2FederateM0re --pingfederate-https-host https://pingfederate-admin.bxretail.org
 
   Export configuration-as-code packages for PingFederate, specifying the PingFederate connection details using OAuth 2.0 client credentials.
-    pingcli platform export --service pingfederate --pingfederate-client-id clientID --pingfederate-client-secret clientSecret --pingfederate-token-url https://pingfederate.example.com/as/token.oauth2
+    pingcli platform export --services pingfederate --pingfederate-authentication-type clientCredentialsAuth --pingfederate-client-id clientID --pingfederate-client-secret clientSecret --pingfederate-token-url https://pingfederate-admin.bxretail.org/as/token.oauth2
 
   Export configuration-as-code packages for PingFederate, specifying optional connection properties
-    pingcli platform export --service pingfederate --x-bypass-external-validation=false --ca-certificate-pem-files "/path/to/cert.pem,/path/to/cert2.pem" --insecure-trust-all-tls=false`
+    pingcli platform export --services pingfederate --x-bypass-external-validation=false --ca-certificate-pem-files "/path/to/cert.pem,/path/to/cert2.pem" --insecure-trust-all-tls=false`
 )
 
 func NewExportCommand() *cobra.Command {

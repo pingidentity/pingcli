@@ -74,7 +74,7 @@ func initConfigOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "C",
-			Usage:     "The relative or full path to a custom Ping CLI configuration file.",
+			Usage:     "The relative or full path to a custom Ping CLI configuration file. Example: `$HOME/.pingcli/config.yaml`",
 			Value:     cobraValue,
 			DefValue:  "\"$HOME/.pingcli/config.yaml\"",
 		},
@@ -96,7 +96,7 @@ func initOutputFormatOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "O",
-			Usage:     fmt.Sprintf("Specify the console output format. Options are: %s", strings.Join(customtypes.OutputFormatValidValues(), ", ")),
+			Usage:     fmt.Sprintf("Specify the console output format.\nOptions are: %s.\nExample: `%s`", strings.Join(customtypes.OutputFormatValidValues(), ", "), string(customtypes.ENUM_OUTPUT_FORMAT_JSON)),
 			Value:     cobraValue,
 			DefValue:  customtypes.ENUM_OUTPUT_FORMAT_TEXT,
 		},

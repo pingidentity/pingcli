@@ -25,7 +25,7 @@ func initConfigProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage:     "The name of the profile to update. E.g. `myAwesomeProfile`",
+			Usage:     "The name of the profile to update. Example: `myAwesomeProfile`",
 			Value:     cobraValue,
 			DefValue:  "The active profile",
 		},
