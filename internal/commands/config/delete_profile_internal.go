@@ -16,6 +16,21 @@ func RunInternalConfigDeleteProfile(rc io.ReadCloser) (err error) {
 		return fmt.Errorf("failed to delete profile: %v", err)
 	}
 
+	// TODO: Add auto-accept flag in future release to avoid user confirmation prompt
+	confirmed, err := input.RunPromptConfirm(fmt.Sprintf("Are you sure you want to delete profile '%s'?", pName), rc)
+	if err != nil {
+		return fmt.Errorf("failed to delete profile: %v", err)
+	}
+
+	if !confirmed {
+		output.Print(output.Opts{
+			Message: "Profile deletion cancelled.",
+			Result:  output.ENUM_RESULT_NIL,
+		})
+
+		return nil
+	}
+
 	output.Print(output.Opts{
 		Message: fmt.Sprintf("Deleting profile '%s'...", pName),
 		Result:  output.ENUM_RESULT_NIL,
