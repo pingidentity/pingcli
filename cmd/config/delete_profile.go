@@ -5,13 +5,17 @@ import (
 
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
 
 const (
 	deleteProfileCommandExamples = `  Delete a configuration profile by selecting from the available profiles.
-    pingcli config delete-profile`
+    pingcli config delete-profile
+
+  Delete a configuration profile by specifying the name of an existing configured profile.
+    pingcli config delete-profile --profile MyDeveloperEnv`
 )
 
 func NewConfigDeleteProfileCommand() *cobra.Command {
@@ -24,8 +28,10 @@ func NewConfigDeleteProfileCommand() *cobra.Command {
 The profile to delete will be removed from the CLI configuration file.`,
 		RunE:  configDeleteProfileRunE,
 		Short: "Delete a custom configuration profile.",
-		Use:   "delete-profile",
+		Use:   "delete-profile [flags]",
 	}
+
+	cmd.Flags().AddFlag(options.ConfigDeleteProfileOption.Flag)
 
 	return cmd
 }
