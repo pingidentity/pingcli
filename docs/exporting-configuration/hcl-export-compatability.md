@@ -1,4 +1,4 @@
-# Ping CLI Platform Export Services Support
+# Ping CLI HCL Export Services Support
 
 The platform export command exports configuration-as-code packages for the Ping Platform. The CLI can export
 Terraform HCL to use with released Terraform providers.
@@ -19,23 +19,6 @@ The following describes the CLI's support of each of these Ping platform service
 | PingOne Protect     | :white_check_mark: |  |
 | PingOne SSO         | :white_check_mark: |  |
 | PingOne Verify      | :x: | Coming End 2024 |
-
-The following describes the CLI's support of each of these Ping platform services for native export.
-
-| Service             | Support | Roadmap |
-| ------------------- | ---- | ------- |
-| PingDirectory Software | :x: | TBD |
-| PingFederate Software | :x: | TBD |
-| PingOne Advanced Identity Cloud | :x: | TBD |
-| PingOne Advanced Services PingFederate | :x: | TBD |
-| PingOne Authorize   | :x: | TBD |
-| PingOne Credentials | :x: | TBD |
-| PingOne DaVinci     | :x: | TBD |
-| PingOne MFA         | :x: | TBD |
-| PingOne Platform    | :x: | TBD |
-| PingOne Protect     | :x: | TBD |
-| PingOne SSO         | :x: | TBD |
-| PingOne Verify      | :x: | TBD |
 
 Key:
 * :white_check_mark: - Supported / Released
