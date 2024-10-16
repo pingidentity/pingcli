@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 )
@@ -25,7 +26,7 @@ func TestRequestCmd_Execute(t *testing.T) {
 	err = testutils_cobra.ExecutePingcli(t, "request",
 		"--service", "pingone",
 		"--http-method", "GET",
-		"environments",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, nil)
 
