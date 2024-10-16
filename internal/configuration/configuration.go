@@ -83,7 +83,6 @@ func OptionFromViperKey(viperKey string) (opt options.Option, err error) {
 func InitAllOptions() {
 	configuration_config.InitConfigOptions()
 	configuration_config.InitConfigAddProfileOptions()
-	configuration_config.InitConfigDeleteProfileOptions()
 	configuration_config.InitConfigViewProfileOptions()
 	configuration_config.InitConfigSetActiveProfileOptions()
 	configuration_config.InitConfigSetOptions()
