@@ -39,7 +39,7 @@ const (
 	ENUM_RESULT_FAILURE       Result = "Failure"
 )
 
-func Print(output Opts) {
+func SetColorize() {
 	colorizeOutput, err := profiles.GetOptionValue(options.RootColorOption)
 	if err != nil {
 		color.NoColor = false
@@ -51,6 +51,11 @@ func Print(output Opts) {
 			color.NoColor = !colorizeOutputBool
 		}
 	}
+}
+
+func Print(output Opts) {
+
+	SetColorize()
 
 	outputFormat, err := profiles.GetOptionValue(options.RootOutputFormatOption)
 	if err != nil {
