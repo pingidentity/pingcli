@@ -10,14 +10,18 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-func RunInternalConfigDeleteProfile(rc io.ReadCloser) (err error) {
-	pName, err := readConfigDeleteProfileOptions(rc)
-	if err != nil {
-		return fmt.Errorf("failed to delete profile: %v", err)
+func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error) {
+	var pName string
+	if len(args) == 1 {
+		pName = args[0]
+	} else {
+		pName, err = promptUserToSelectProfile(rc)
+		if err != nil {
+			return fmt.Errorf("failed to delete profile: %v", err)
+		}
 	}
 
-	// TODO: Add auto-accept flag in future release to avoid user confirmation prompt
-	confirmed, err := input.RunPromptConfirm(fmt.Sprintf("Are you sure you want to delete profile '%s'?", pName), rc)
+	confirmed, err := promptUserToConfirm(pName, rc)
 	if err != nil {
 		return fmt.Errorf("failed to delete profile: %v", err)
 	}
@@ -39,22 +43,30 @@ func RunInternalConfigDeleteProfile(rc io.ReadCloser) (err error) {
 	return nil
 }
 
-func readConfigDeleteProfileOptions(rc io.ReadCloser) (pName string, err error) {
-	if !options.ConfigDeleteProfileOption.Flag.Changed {
-		pName, err = input.RunPromptSelect("Select profile to delete: ", profiles.GetMainConfig().ProfileNames(), rc)
-	} else {
-		pName, err = profiles.GetOptionValue(options.ConfigDeleteProfileOption)
-	}
+func promptUserToSelectProfile(rc io.ReadCloser) (pName string, err error) {
+	pName, err = input.RunPromptSelect("Select profile to delete: ", profiles.GetMainConfig().ProfileNames(), rc)
 
 	if err != nil {
 		return pName, err
 	}
 
-	if pName == "" {
-		return pName, fmt.Errorf("unable to determine profile name to delete")
+	return pName, nil
+}
+
+func promptUserToConfirm(pName string, rc io.ReadCloser) (confirmed bool, err error) {
+	autoAccept := "false"
+	if options.ConfigDeleteAutoAcceptOption.Flag.Changed {
+		autoAccept, err = profiles.GetOptionValue(options.ConfigDeleteAutoAcceptOption)
+		if err != nil {
+			return false, err
+		}
 	}
 
-	return pName, nil
+	if autoAccept == "true" {
+		return true, nil
+	}
+
+	return input.RunPromptConfirm(fmt.Sprintf("Are you sure you want to delete profile '%s'?", pName), rc)
 }
 
 func deleteProfile(pName string) (err error) {

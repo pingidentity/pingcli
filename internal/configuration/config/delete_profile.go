@@ -7,25 +7,26 @@ import (
 )
 
 func InitConfigDeleteProfileOptions() {
-	initDeleteProfileOption()
+	initDeleteAutoAcceptOption()
 }
 
-func initDeleteProfileOption() {
-	cobraParamName := "profile"
-	cobraValue := new(customtypes.String)
-	defaultValue := customtypes.String("")
+func initDeleteAutoAcceptOption() {
+	cobraParamName := "yes"
+	cobraValue := new(customtypes.Bool)
+	defaultValue := customtypes.Bool(false)
 
-	options.ConfigDeleteProfileOption = options.Option{
+	options.ConfigDeleteAutoAcceptOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          "", // No environment variable
 		Flag: &pflag.Flag{
-			Name:      cobraParamName,
-			Shorthand: "p",
-			Usage:     "The name of the configuration profile to delete.",
-			Value:     cobraValue,
-			DefValue:  "",
+			Name:        cobraParamName,
+			Shorthand:   "y",
+			Usage:       "Auto-accept the profile deletion confirmation prompt.",
+			Value:       cobraValue,
+			DefValue:    "false",
+			NoOptDefVal: "true", // Make the flag a boolean flag
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
