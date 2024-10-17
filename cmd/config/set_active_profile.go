@@ -19,7 +19,7 @@ const (
 
 func NewConfigSetActiveProfileCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Args:                  common.ExactArgs(1),
+		Args:                  common.RangeArgs(0, 1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               setActiveProfileCommandExamples,
 		Long:                  `Set a custom configuration profile as the in-use profile.`,

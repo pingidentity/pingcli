@@ -8,10 +8,15 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-func RunInternalConfigViewProfile() (err error) {
-	pName, err := readConfigViewProfileOptions()
-	if err != nil {
-		return fmt.Errorf("failed to view profile: %v", err)
+func RunInternalConfigViewProfile(args []string) (err error) {
+	var pName string
+	if len(args) == 1 {
+		pName = args[0]
+	} else {
+		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
+		if err != nil {
+			return fmt.Errorf("failed to view profile: %v", err)
+		}
 	}
 
 	profileStr, err := profiles.GetMainConfig().ProfileToString(pName)
@@ -27,22 +32,4 @@ func RunInternalConfigViewProfile() (err error) {
 	})
 
 	return nil
-}
-
-func readConfigViewProfileOptions() (pName string, err error) {
-	if !options.ConfigViewProfileOption.Flag.Changed {
-		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
-	} else {
-		pName, err = profiles.GetOptionValue(options.ConfigViewProfileOption)
-	}
-
-	if err != nil {
-		return pName, err
-	}
-
-	if pName == "" {
-		return pName, fmt.Errorf("unable to determine profile name to view")
-	}
-
-	return pName, nil
 }
