@@ -4,11 +4,14 @@ import (
 	"slices"
 
 	"github.com/fatih/color"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
 func RunInternalConfigListProfiles() {
+	l := logger.Get()
+
 	profileNames := profiles.GetMainConfig().ProfileNames()
 	activeProfile := profiles.GetMainConfig().ActiveProfile().Name()
 
@@ -29,10 +32,13 @@ func RunInternalConfigListProfiles() {
 
 		description, err := profiles.GetMainConfig().ProfileViperValue(profileName, "description")
 		if err != nil {
+			l.Warn().Msgf("Cannot retrieve profile description for profile %s: %s.", profileName, err)
 			continue
 		}
 
-		listStr += "    " + description + "\n"
+		if description != "" {
+			listStr += "    " + description + "\n"
+		}
 	}
 
 	output.Print(output.Opts{
