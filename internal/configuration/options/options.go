@@ -67,6 +67,9 @@ func Options() []Option {
 
 		ProfileDescriptionOption,
 
+		ConfigProfileOption,
+		ConfigNameOption,
+		ConfigDescriptionOption,
 		ConfigAddProfileDescriptionOption,
 		ConfigAddProfileNameOption,
 		ConfigAddProfileSetActiveOption,
@@ -111,6 +114,10 @@ var (
 
 // 'pingcli config' command options
 var (
+	ConfigProfileOption     Option
+	ConfigNameOption        Option
+	ConfigDescriptionOption Option
+
 	ConfigAddProfileDescriptionOption Option
 	ConfigAddProfileNameOption        Option
 	ConfigAddProfileSetActiveOption   Option

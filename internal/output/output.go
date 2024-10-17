@@ -40,15 +40,15 @@ const (
 )
 
 func Print(output Opts) {
-	disableColorOutput, err := profiles.GetOptionValue(options.RootColorOption)
+	colorizeOutput, err := profiles.GetOptionValue(options.RootColorOption)
 	if err != nil {
 		color.NoColor = false
 	} else {
-		disableColorOutputBool, err := strconv.ParseBool(disableColorOutput)
+		colorizeOutputBool, err := strconv.ParseBool(colorizeOutput)
 		if err != nil {
 			color.NoColor = false
 		} else {
-			color.NoColor = disableColorOutputBool
+			color.NoColor = !colorizeOutputBool
 		}
 	}
 

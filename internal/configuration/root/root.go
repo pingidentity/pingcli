@@ -12,7 +12,6 @@ import (
 )
 
 func InitRootOptions() {
-
 	initActiveProfileOption()
 	initProfileOption()
 	initColorOption()
@@ -49,6 +48,7 @@ func initProfileOption() {
 			Shorthand: "P",
 			Usage:     "The name of a configuration profile to use.",
 			Value:     cobraValue,
+			DefValue:  "",
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
@@ -56,23 +56,23 @@ func initProfileOption() {
 }
 
 func initColorOption() {
-	cobraParamName := "no-color"
+	cobraParamName := "color"
 	cobraValue := new(customtypes.Bool)
-	defaultValue := customtypes.Bool(false)
+	defaultValue := customtypes.Bool(true)
 
 	options.RootColorOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "PINGCLI_NO_COLOR",
+		EnvVar:          "PINGCLI_COLOR",
 		Flag: &pflag.Flag{
-			Name:        cobraParamName,
-			Usage:       "Disable text output in color. (default false)",
-			Value:       cobraValue,
-			NoOptDefVal: "true", // Make this flag a boolean flag
+			Name:     cobraParamName,
+			Usage:    "Show text output in color.",
+			Value:    cobraValue,
+			DefValue: "true",
 		},
 		Type:     options.ENUM_BOOL,
-		ViperKey: "noColor",
+		ViperKey: "color",
 	}
 }
 
@@ -89,9 +89,9 @@ func initConfigOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "C",
-			Usage: "The relative or full path to a custom Ping CLI configuration file. " +
-				"(default $HOME/.pingcli/config.yaml)",
-			Value: cobraValue,
+			Usage:     "The relative or full path to a custom Ping CLI configuration file. Example: `$HOME/.pingcli/config.yaml`",
+			Value:     cobraValue,
+			DefValue:  "\"$HOME/.pingcli/config.yaml\"",
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
@@ -111,14 +111,9 @@ func initOutputFormatOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "O",
-			Usage: fmt.Sprintf(
-				"Specify the console output format. "+
-					"(default %s)"+
-					"\nOptions are: %s.",
-				customtypes.ENUM_OUTPUT_FORMAT_TEXT,
-				strings.Join(customtypes.OutputFormatValidValues(), ", "),
-			),
-			Value: cobraValue,
+			Usage:     fmt.Sprintf("Specify the console output format.\nOptions are: %s.\nExample: `%s`", strings.Join(customtypes.OutputFormatValidValues(), ", "), string(customtypes.ENUM_OUTPUT_FORMAT_JSON)),
+			Value:     cobraValue,
+			DefValue:  customtypes.ENUM_OUTPUT_FORMAT_TEXT,
 		},
 		Type:     options.ENUM_OUTPUT_FORMAT,
 		ViperKey: "outputFormat",

@@ -23,9 +23,9 @@ func initUnsetProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage: "The name of the configuration profile to unset a configuration value from. " +
-				"(default The active profile)",
-			Value: cobraValue,
+			Usage:     "The name of the configuration profile to unset a configuration value from.",
+			Value:     cobraValue,
+			DefValue:  "The active profile",
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key

@@ -6,40 +6,40 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func InitConfigAddProfileOptions() {
-	initAddProfileDescriptionOption()
-	initAddProfileNameOption()
-	initAddProfileSetActiveOption()
+func InitConfigOptions() {
+	initConfigProfileOption()
+	initConfigNameOption()
+	initConfigDescriptionOption()
 }
 
-func initAddProfileDescriptionOption() {
-	cobraParamName := "description"
+func initConfigProfileOption() {
+	cobraParamName := "profile"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
 
-	options.ConfigAddProfileDescriptionOption = options.Option{
+	options.ConfigProfileOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          "", // No environment variable
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
-			Shorthand: "d",
-			Usage:     "The description of the new configuration profile.",
+			Shorthand: "p",
+			Usage:     "The name of the profile to update. Example: `myAwesomeProfile`",
 			Value:     cobraValue,
-			DefValue:  "",
+			DefValue:  "The active profile",
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
 	}
 }
 
-func initAddProfileNameOption() {
+func initConfigNameOption() {
 	cobraParamName := "name"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
 
-	options.ConfigAddProfileNameOption = options.Option{
+	options.ConfigNameOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
@@ -47,7 +47,7 @@ func initAddProfileNameOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "n",
-			Usage:     "The name of the new configuration profile.",
+			Usage:     "The new name for the profile.",
 			Value:     cobraValue,
 			DefValue:  "",
 		},
@@ -56,24 +56,24 @@ func initAddProfileNameOption() {
 	}
 }
 
-func initAddProfileSetActiveOption() {
-	cobraParamName := "set-active"
-	cobraValue := new(customtypes.Bool)
-	defaultValue := customtypes.Bool(false)
+func initConfigDescriptionOption() {
+	cobraParamName := "description"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
 
-	options.ConfigAddProfileSetActiveOption = options.Option{
+	options.ConfigDescriptionOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          "", // No environment variable
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
-			Shorthand: "s",
-			Usage:     "Set the new configuration profile as the active profile.",
+			Shorthand: "d",
+			Usage:     "The new description for the profile.",
 			Value:     cobraValue,
-			DefValue:  "false",
+			DefValue:  "",
 		},
-		Type:     options.ENUM_BOOL,
+		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
 	}
 }
