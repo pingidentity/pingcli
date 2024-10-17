@@ -24,29 +24,10 @@ Profile created. Update additional profile attributes via 'pingcli config set' o
 Profile 'dev' set as active. - Success
 ```
 
-Run `pingcli config view-profile` to generate a set of empty configuration.
+The newly create profile can now be configured via the `pingcli config set` command. General Ping Identity service connection settings are found under the `service` key, and settings relevant to individual commands are found under their command names e.g. `export` and `request`.
 
-```text
-$ pingcli config view-profile
-Profile: dev
-
-color: true
-description: configuration for development environment
-export:
-    format: HCL
-    outputdirectory: /Users/samirgandhi/projects/terraform/UAT/pingcli-uat/export
-    overwrite: false
-    pingone:
-        environmentid: ""
-# additional configuration trimmed
-```
-
-The available settings can be configured by editing the empty fields within the generated `~/.pingcli/config.yaml`. General Ping Identity service connection settings are found under the `service` key, and settings relevant to individual commands are found under their command names e.g. `export` and `request`.
-
-To see descriptions for the settings the `export` command's help option.
-```
-pingcli platform export --help
-```
+See [Configuration Key Documentation](./docs/tool-configuration/configuration-key.md) for more information on configuration keys
+and their purposes.
 
 ## Commands
 
