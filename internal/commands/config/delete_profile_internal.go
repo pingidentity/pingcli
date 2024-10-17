@@ -15,13 +15,13 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 	if len(args) == 1 {
 		pName = args[0]
 	} else {
-		pName, err = promptUserToSelectProfile(rc)
+		pName, err = promptUserToDeleteProfile(rc)
 		if err != nil {
 			return fmt.Errorf("failed to delete profile: %v", err)
 		}
 	}
 
-	confirmed, err := promptUserToConfirm(pName, rc)
+	confirmed, err := promptUserToConfirmDelete(pName, rc)
 	if err != nil {
 		return fmt.Errorf("failed to delete profile: %v", err)
 	}
@@ -43,7 +43,7 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 	return nil
 }
 
-func promptUserToSelectProfile(rc io.ReadCloser) (pName string, err error) {
+func promptUserToDeleteProfile(rc io.ReadCloser) (pName string, err error) {
 	pName, err = input.RunPromptSelect("Select profile to delete: ", profiles.GetMainConfig().ProfileNames(), rc)
 
 	if err != nil {
@@ -53,7 +53,7 @@ func promptUserToSelectProfile(rc io.ReadCloser) (pName string, err error) {
 	return pName, nil
 }
 
-func promptUserToConfirm(pName string, rc io.ReadCloser) (confirmed bool, err error) {
+func promptUserToConfirmDelete(pName string, rc io.ReadCloser) (confirmed bool, err error) {
 	autoAccept := "false"
 	if options.ConfigDeleteAutoAcceptOption.Flag.Changed {
 		autoAccept, err = profiles.GetOptionValue(options.ConfigDeleteAutoAcceptOption)

@@ -74,7 +74,6 @@ func Options() []Option {
 		ConfigAddProfileSetActiveOption,
 		ConfigDeleteAutoAcceptOption,
 		ConfigViewProfileOption,
-		ConfigSetActiveProfileOption,
 		ConfigGetProfileOption,
 		ConfigSetProfileOption,
 		ConfigUnsetProfileOption,
@@ -126,8 +125,6 @@ var (
 	ConfigDeleteAutoAcceptOption Option
 
 	ConfigViewProfileOption Option
-
-	ConfigSetActiveProfileOption Option
 
 	ConfigGetProfileOption Option
 

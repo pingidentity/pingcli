@@ -85,7 +85,6 @@ func InitAllOptions() {
 	configuration_config.InitConfigAddProfileOptions()
 	configuration_config.InitConfigDeleteProfileOptions()
 	configuration_config.InitConfigViewProfileOptions()
-	configuration_config.InitConfigSetActiveProfileOptions()
 	configuration_config.InitConfigSetOptions()
 	configuration_config.InitConfigGetOptions()
 	configuration_config.InitConfigUnsetOptions()
