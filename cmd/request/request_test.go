@@ -84,7 +84,7 @@ func TestRequestCmd_Execute_InvalidService(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--service", "invalid-service",
 		"--http-method", "GET",
-		"environments",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -95,7 +95,7 @@ func TestRequestCmd_Execute_InvalidHTTPMethod(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--service", "pingone",
 		"--http-method", "INVALID",
-		"environments",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -103,6 +103,6 @@ func TestRequestCmd_Execute_InvalidHTTPMethod(t *testing.T) {
 // Test Request Command with Missing Required Service Flag
 func TestRequestCmd_Execute_MissingRequiredServiceFlag(t *testing.T) {
 	expectedErrorPattern := `failed to send custom request: service is required`
-	err := testutils_cobra.ExecutePingcli(t, "request", "environments")
+	err := testutils_cobra.ExecutePingcli(t, "request", fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

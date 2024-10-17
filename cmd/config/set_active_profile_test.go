@@ -15,7 +15,7 @@ func TestConfigSetActiveProfileCmd_Execute(t *testing.T) {
 
 // Test Config set-active-profile Command fails when provided too many arguments
 func TestConfigSetActiveProfileCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute '.*': command accepts 1 arg\(s\), received 2$`
+	expectedErrorPattern := `^failed to execute '.*': command accepts 0 to 1 arg\(s\), received 2$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "extra-arg", "extra-arg2")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
