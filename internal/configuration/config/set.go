@@ -11,7 +11,7 @@ func InitConfigSetOptions() {
 }
 
 func initSetProfileOption() {
-	cobraParamName := "profile"
+	cobraParamName := "profile-name"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
 

@@ -47,7 +47,7 @@ func NewRootCommand() *cobra.Command {
 	)
 
 	cmd.PersistentFlags().AddFlag(options.RootConfigOption.Flag)
-	cmd.PersistentFlags().AddFlag(options.RootActiveProfileOption.Flag)
+	cmd.PersistentFlags().AddFlag(options.RootProfileOption.Flag)
 	cmd.PersistentFlags().AddFlag(options.RootOutputFormatOption.Flag)
 	cmd.PersistentFlags().AddFlag(options.RootColorOption.Flag)
 
@@ -80,7 +80,15 @@ func initViperProfile() {
 	//Configure the main viper instance
 	initMainViper(cfgFile)
 
-	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	userDefinedProfile, err := profiles.GetOptionValue(options.RootProfileOption)
+	if err != nil {
+		output.Print(output.Opts{
+			Message:      "Failed to get user-defined profile",
+			Result:       output.ENUM_RESULT_FAILURE,
+			FatalMessage: err.Error(),
+		})
+	}
+	configFileActiveProfile, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
 		output.Print(output.Opts{
 			Message:      "Failed to get active profile",
@@ -89,12 +97,16 @@ func initViperProfile() {
 		})
 	}
 
-	l.Debug().Msgf("Using configuration profile: %s", profileName)
+	if userDefinedProfile != "" {
+		l.Debug().Msgf("Using configuration profile: %s", userDefinedProfile)
+	} else {
+		l.Debug().Msgf("Using configuration profile: %s", configFileActiveProfile)
+	}
 
 	// Configure the profile viper instance
-	if err := profiles.GetMainConfig().ChangeActiveProfile(profileName); err != nil {
+	if err := profiles.GetMainConfig().ChangeActiveProfile(configFileActiveProfile); err != nil {
 		output.Print(output.Opts{
-			Message:      "Failed to set profile viper",
+			Message:      "Failed to set active profile viper",
 			Result:       output.ENUM_RESULT_FAILURE,
 			FatalMessage: err.Error(),
 		})

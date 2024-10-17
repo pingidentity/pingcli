@@ -10,7 +10,7 @@ func NewPlatformCommand() *cobra.Command {
 		
 When multiple products are configured in the CLI, the platform command can be used to manage one or more products collectively.
 
-The --active-profile command switch can be used to specify the profile of Ping products to be managed.`,
+The --profile command switch can be used to specify the profile of Ping products to be managed.`,
 		Short: "Administer and manage the Ping integrated platform.",
 		Use:   "platform",
 	}

@@ -60,6 +60,7 @@ func Options() []Option {
 		PingFederateAuthenticationTypeOption,
 
 		RootActiveProfileOption,
+		RootProfileOption,
 		RootColorOption,
 		RootConfigOption,
 		RootOutputFormatOption,
@@ -147,6 +148,7 @@ var (
 // Root Command Options
 var (
 	RootActiveProfileOption Option
+	RootProfileOption       Option
 	RootColorOption         Option
 	RootConfigOption        Option
 	RootOutputFormatOption  Option

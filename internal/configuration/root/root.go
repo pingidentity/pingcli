@@ -13,30 +13,45 @@ import (
 
 func InitRootOptions() {
 	initActiveProfileOption()
+	initProfileOption()
 	initColorOption()
 	initConfigOption()
 	initOutputFormatOption()
 }
 
 func initActiveProfileOption() {
-	cobraParamName := "active-profile"
-	cobraValue := new(customtypes.String)
-	defaultValue := customtypes.String("default")
+	defaultValue := customtypes.String("")
 
 	options.RootActiveProfileOption = options.Option{
+		CobraParamName:  "", // No cobra param
+		CobraParamValue: nil,
+		DefaultValue:    &defaultValue,
+		EnvVar:          "",  // No env var
+		Flag:            nil, // No flag
+		Type:            options.ENUM_STRING,
+		ViperKey:        "activeProfile",
+	}
+}
+
+func initProfileOption() {
+	cobraParamName := "profile"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+
+	options.RootProfileOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "PINGCLI_ACTIVE_PROFILE",
+		EnvVar:          "PINGCLI_PROFILE",
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "P",
-			Usage:     "The name of the stored custom configuration profile to use.",
+			Usage:     "The name of a configuration profile to use.",
 			Value:     cobraValue,
-			DefValue:  "default",
+			DefValue:  "",
 		},
 		Type:     options.ENUM_STRING,
-		ViperKey: "activeProfile",
+		ViperKey: "", // No viper key
 	}
 }
 

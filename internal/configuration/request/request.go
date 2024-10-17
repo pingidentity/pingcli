@@ -89,10 +89,10 @@ func initAccessTokenOption() {
 	defaultValue := customtypes.String("")
 
 	options.RequestAccessTokenOption = options.Option{
-		CobraParamName:  "",            // No cobra param name
-		CobraParamValue: nil,           // No cobra param value
-		DefaultValue:    &defaultValue, // No default value
-		EnvVar:          "",            // No environment variable
+		CobraParamName:  "",  // No cobra param name
+		CobraParamValue: nil, // No cobra param value
+		DefaultValue:    &defaultValue,
+		EnvVar:          "", // No environment variable
 		Flag:            nil,
 		Type:            options.ENUM_STRING,
 		ViperKey:        "request.accessToken",
@@ -103,11 +103,11 @@ func initAccessTokenExpiryOption() {
 	defaultValue := customtypes.Int(0)
 
 	options.RequestAccessTokenExpiryOption = options.Option{
-		CobraParamName:  "",            // No cobra param name
-		CobraParamValue: nil,           // No cobra param value
-		DefaultValue:    &defaultValue, // No default value
-		EnvVar:          "",            // No environment variable
-		Flag:            nil,           // No flag
+		CobraParamName:  "",  // No cobra param name
+		CobraParamValue: nil, // No cobra param value
+		DefaultValue:    &defaultValue,
+		EnvVar:          "",  // No environment variable
+		Flag:            nil, // No flag
 		Type:            options.ENUM_INT,
 		ViperKey:        "request.accessTokenExpiry",
 	}

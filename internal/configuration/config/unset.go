@@ -11,7 +11,7 @@ func InitConfigUnsetOptions() {
 }
 
 func initUnsetProfileOption() {
-	cobraParamName := "profile"
+	cobraParamName := "profile-name"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
 
