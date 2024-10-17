@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors (pingone_forms_recaptcha_v2)
+# Terraform Configuration Generation - PingOne Plan Errors (pingone_forms_recaptcha_v2)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/forms_recaptcha_v2#schema)

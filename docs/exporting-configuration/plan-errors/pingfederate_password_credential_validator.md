@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors (pingfederate_password_credential_validator)
+# Terraform Configuration Generation - PingFederate Plan Errors (pingfederate_password_credential_validator)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingfederate/latest/docs/resources/password_credential_validator#schema)

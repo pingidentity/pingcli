@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors
+# Terraform Configuration Generation - PingFederate Plan Errors
 
 The following sections describe the actions that must be taken, per resource, to resolve `terraform plan` errors following configuration generation.
 
@@ -22,4 +22,3 @@ If you encounter an error that is not documented, please [raise a new issue](htt
 - [pingfederate_oauth_client](pingfederate_oauth_client.md)
 - [pingfederate_password_credential_validator](pingfederate_password_credential_validator.md)
 - [pingfederate_pingone_connection](pingfederate_pingone_connection.md)
-- [pingfederate_server_settings](pingfederate_server_settings.md)

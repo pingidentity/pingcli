@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors (pingfederate_idp_adapter)
+# Terraform Configuration Generation - PingFederate Plan Errors (pingfederate_idp_adapter)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingfederate/latest/docs/resources/idp_adapter#schema)

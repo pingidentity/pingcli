@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors (pingone_phone_delivery_settings)
+# Terraform Configuration Generation - PingOne Plan Errors (pingone_phone_delivery_settings)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/phone_delivery_settings#password)
@@ -44,22 +44,4 @@ resource "pingone_phone_delivery_settings" "my_awesome_phone_delivery_settings" 
     }
   }
 }
-```
-
-## Missing Configuration for Required Attribute - TODO
-
-**Cause**: TODO
-
-**Resolution**: Manual modification is required to set the `TODO` value in the generated HCL.
-
-**Example**:
-
-Generated configuration:
-```hcl
-TODO
-```
-
-After manual modification:
-```hcl
-TODO
 ```

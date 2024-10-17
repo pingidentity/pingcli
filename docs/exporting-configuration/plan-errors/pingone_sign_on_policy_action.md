@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors (pingone_sign_on_policy_action)
+# Terraform Configuration Generation - PingOne Plan Errors (pingone_sign_on_policy_action)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/sign_on_policy_action)

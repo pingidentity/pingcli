@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors (pingfederate_data_store)
+# Terraform Configuration Generation - PingFederate Plan Errors (pingfederate_data_store)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingfederate/latest/docs/resources/data_store#nestedatt--ldap_data_store)

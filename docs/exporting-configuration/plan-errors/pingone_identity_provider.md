@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors (pingone_identity_provider)
+# Terraform Configuration Generation - PingOne Plan Errors (pingone_identity_provider)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/identity_provider#schema)

@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors (pingone_gateway)
+# Terraform Configuration Generation - PingOne Plan Errors (pingone_gateway)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/gateway#schema)

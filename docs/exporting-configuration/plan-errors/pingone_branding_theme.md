@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors (pingone_branding_theme)
+# Terraform Configuration Generation - PingOne Plan Errors (pingone_branding_theme)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/branding_theme#schema)

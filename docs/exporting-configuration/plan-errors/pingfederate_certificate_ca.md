@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors (pingfederate_certificate_ca)
+# Terraform Configuration Generation - PingFederate Plan Errors (pingfederate_certificate_ca)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingfederate/latest/docs/resources/certificate_ca#schema)

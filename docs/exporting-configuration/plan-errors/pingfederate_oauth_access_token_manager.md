@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors (pingfederate_oauth_access_token_manager)
+# Terraform Configuration Generation - PingFederate Plan Errors (pingfederate_oauth_access_token_manager)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingfederate/latest/docs/resources/oauth_access_token_manager#schema)

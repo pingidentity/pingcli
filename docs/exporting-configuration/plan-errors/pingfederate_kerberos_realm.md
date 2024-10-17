@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors (pingfederate_kerberos_realm)
+# Terraform Configuration Generation - PingFederate Plan Errors (pingfederate_kerberos_realm)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingfederate/latest/docs/resources/kerberos_realm#schema)

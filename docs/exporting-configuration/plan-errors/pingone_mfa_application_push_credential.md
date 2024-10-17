@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors (pingone_mfa_application_push_credential)
+# Terraform Configuration Generation - PingOne Plan Errors (pingone_mfa_application_push_credential)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/mfa_application_push_credential#schema)

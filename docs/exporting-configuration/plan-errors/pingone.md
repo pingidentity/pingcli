@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors
+# Terraform Configuration Generation - PingOne Plan Errors
 
 The following sections describe the actions that must be taken, per resource, to resolve `terraform plan` errors following configuration generation.
 

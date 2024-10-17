@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingOne Plan Errors (pingone_notification_settings_email)
+# Terraform Configuration Generation - PingOne Plan Errors (pingone_notification_settings_email)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/notification_settings_email#schema)
@@ -13,10 +13,22 @@
 
 Generated configuration:
 ```hcl
-TODO
+resource "pingone_notification_settings_email" "pingone_notification_settings_email" {
+  # ... other configuration parameters
+
+  host     = "smtp-example.bxretail.org"
+  password = null # sensitive
+  username = "test"
+}
 ```
 
-After manual modification:
+After manual modification (`password` is defined):
 ```hcl
-TODO
+resource "pingone_notification_settings_email" "pingone_notification_settings_email" {
+  # ... other configuration parameters
+
+  host     = "smtp-example.bxretail.org"
+  password = var.pingone_notification_settings_email_password
+  username = "test"
+}
 ```

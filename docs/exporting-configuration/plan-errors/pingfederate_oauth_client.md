@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors (pingfederate_oauth_client)
+# Terraform Configuration Generation - PingFederate Plan Errors (pingfederate_oauth_client)
 
 **Documentation**:
 - [Terraform Registry](https://registry.terraform.io/providers/pingidentity/pingfederate/latest/docs/resources/oauth_client#schema)

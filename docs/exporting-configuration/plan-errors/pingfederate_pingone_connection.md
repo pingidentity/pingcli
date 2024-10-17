@@ -1,4 +1,4 @@
-# Ping CLI - Exporting Platform Configuration - PingFederate Plan Errors (pingfederate_pingone_connection)
+# Terraform Configuration Generation - PingFederate Plan Errors (pingfederate_pingone_connection)
 
 **Documentation**:
 - [Terraform Registry - PingFederate pingone_connection](https://registry.terraform.io/providers/pingidentity/pingfederate/latest/docs/resources/pingone_connection#schema)
@@ -22,12 +22,35 @@ resource "pingfederate_pingone_connection" "my_pingone_environment" {
 }
 ```
 
-After manual modification (`credential` is defined):
+After manual modification, using a variable (`credential` is defined):
 ```hcl
 resource "pingfederate_pingone_connection" "my_pingone_environment" {
   # ... other configuration parameters
 
-  credential = var.pingone_credential # see pingone_gateway_credential in the PingOne Terraform provider
+  credential = var.pingone_credential
+  name       = "My PingOne Environment"
+}
+```
+
+After manual modification, using the PingOne Terraform provider (`credential` is defined):
+```hcl
+resource "pingone_gateway" "my_awesome_pingfederate_gateway" {
+  environment_id = pingone_environment.my_environment.id
+  name           = "Advanced Services SSO"
+  enabled        = true
+
+  type = "PING_FEDERATE"
+}
+
+resource "pingone_gateway_credential" "foo" {
+  environment_id = pingone_environment.my_environment.id
+  gateway_id     = pingone_gateway.my_awesome_pingfederate_gateway.id
+}
+
+resource "pingfederate_pingone_connection" "my_pingone_environment" {
+  # ... other configuration parameters
+
+  credential = pingone_gateway_credential.foo.credential
   name       = "My PingOne Environment"
 }
 ```
