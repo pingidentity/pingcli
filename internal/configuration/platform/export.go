@@ -64,7 +64,7 @@ func initServicesOption() {
 				"Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services. "+
 					"(default %s)"+
 					"\nOptions are: %s."+
-					"\nExample: `%s,%s,%s`",
+					"\nExample: '%s,%s,%s'",
 				strings.Join(customtypes.ExportServicesValidValues(), ", "),
 				strings.Join(customtypes.ExportServicesValidValues(), ", "),
 				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO),
@@ -94,7 +94,7 @@ func initOutputDirectoryOption() {
 			Shorthand: "d",
 			Usage: "Specifies the output directory for export. " +
 				"(default $(pwd)/export)" +
-				"\nExample: `$HOME/pingcli-export`",
+				"\nExample: '$HOME/pingcli-export'",
 			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,

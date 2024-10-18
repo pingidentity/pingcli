@@ -32,7 +32,7 @@ func initDataOption() {
 		Flag: &pflag.Flag{
 			Name: cobraParamName,
 			Usage: "The data to send in the request. Use prefix '@' to specify data file path instead of raw data. " +
-				"\nExample: `@data.json`",
+				"\nExample: '@data.json'",
 			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
@@ -56,7 +56,7 @@ func initHTTPMethodOption() {
 			Usage: fmt.Sprintf(
 				"The HTTP method to use for the request. (default %s)"+
 					"\nOptions are: %s."+
-					"\nExample: `%s`",
+					"\nExample: '%s'",
 				customtypes.ENUM_HTTP_METHOD_GET,
 				strings.Join(customtypes.HTTPMethodValidValues(), ", "),
 				customtypes.ENUM_HTTP_METHOD_POST,
@@ -85,7 +85,7 @@ func initServiceOption() {
 			Usage: fmt.Sprintf(
 				"The Ping service (configured in the active profile) to send the custom request to."+
 					"\nOptions are: %s."+
-					"\nExample: `%s`",
+					"\nExample: '%s'",
 				strings.Join(customtypes.RequestServiceValidValues(), ", "),
 				customtypes.ENUM_REQUEST_SERVICE_PINGONE,
 			),

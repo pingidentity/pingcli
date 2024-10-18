@@ -296,7 +296,7 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
 		"--output-directory", outputDir,
 		"--overwrite",
 		"--services", "pingfederate",
-		"--pingfederate-insecure-trust-all-tls=true",
+		"--pingfederate-insecure-trust-all-tls",
 		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
 		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",

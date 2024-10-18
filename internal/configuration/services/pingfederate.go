@@ -39,7 +39,7 @@ func initHTTPSHostOption() {
 		Flag: &pflag.Flag{
 			Name: cobraParamName,
 			Usage: "The PingFederate HTTPS host used to communicate with PingFederate's admin API." +
-				"\nExample: `https://pingfederate-admin.bxretail.org`",
+				"\nExample: 'https://pingfederate-admin.bxretail.org'",
 			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
@@ -156,7 +156,7 @@ func initUsernameOption() {
 			Name: cobraParamName,
 			Usage: "The PingFederate username used to authenticate to the PingFederate admin API when using basic " +
 				"authentication." +
-				"\nExample: `administrator`",
+				"\nExample: 'administrator'",
 			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
@@ -291,7 +291,7 @@ func initScopesOption() {
 				"the OAuth 2.0 client credentials grant type. " +
 				"(default [])" +
 				"\nAccepts a comma-separated string to delimit multiple scopes." +
-				"\nExample: `openid,profile`",
+				"\nExample: 'openid,profil'",
 			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING_SLICE,
@@ -315,7 +315,7 @@ func initPingFederateAuthenticationTypeOption() {
 			Usage: fmt.Sprintf(
 				"The authentication type to use when connecting to the PingFederate admin API."+
 					"\nOptions are: %s."+
-					"\nExample: `%s`",
+					"\nExample: '%s'",
 				strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "),
 				customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 			),
