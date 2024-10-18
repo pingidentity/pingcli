@@ -164,6 +164,7 @@ func (m MainConfig) DeleteProfile(pName string) (err error) {
 }
 
 // Get all profile names from config.yaml configuration file
+// Returns a sorted slice of profile names
 func (m MainConfig) ProfileNames() (profileNames []string) {
 	keySet := make(map[string]struct{})
 	mainViperKeys := m.ViperInstance().AllKeys()
@@ -179,6 +180,8 @@ func (m MainConfig) ProfileNames() (profileNames []string) {
 			profileNames = append(profileNames, pName)
 		}
 	}
+
+	slices.Sort(profileNames)
 
 	return profileNames
 }

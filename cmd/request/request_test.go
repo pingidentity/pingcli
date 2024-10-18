@@ -45,6 +45,9 @@ func TestRequestCmd_Execute(t *testing.T) {
 
 	for index, name := range re.SubexpNames() {
 		if name == captureGroupName {
+			if len(matchData) <= index {
+				t.Fatalf("Failed to capture JSON body: %v", matchData)
+			}
 			bodyJSON := matchData[index]
 
 			// Check for valid JSON
