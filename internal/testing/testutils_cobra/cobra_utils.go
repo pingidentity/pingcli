@@ -17,7 +17,7 @@ func ExecutePingcli(t *testing.T, args ...string) (err error) {
 	// Reset options for testing individual executions of pingcli
 	configuration.InitAllOptions()
 
-	root := cmd.NewRootCommand()
+	root := cmd.NewRootCommand("test-version", "test-commit")
 
 	// Add config location to the root command
 	configFilepath := testutils_viper.CreateConfigFile(t)
@@ -36,7 +36,7 @@ func ExecutePingcli(t *testing.T, args ...string) (err error) {
 func ExecutePingcliCaptureCobraOutput(t *testing.T, args ...string) (output string, err error) {
 	t.Helper()
 
-	root := cmd.NewRootCommand()
+	root := cmd.NewRootCommand("test-version", "test-commit")
 
 	// Add config location to the root command
 	configFilepath := testutils_viper.CreateConfigFile(t)
