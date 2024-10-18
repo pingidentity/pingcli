@@ -23,9 +23,9 @@ func initGetProfileOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "p",
-			Usage:     "The name of the configuration profile used to get the configuration value from.",
-			Value:     cobraValue,
-			DefValue:  "The active profile",
+			Usage: "The name of the configuration profile used to get the configuration value from. " +
+				"(default The active profile)",
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key

@@ -81,19 +81,19 @@ func TestRootCmd_OutputFlagTextVsJSON(t *testing.T) {
 	}
 }
 
-// Test Root Command Executes when provided the --color flag
+// Test Root Command Executes when provided the --no-color flag
 func TestRootCmd_ColorFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "--color=true")
+	err := testutils_cobra.ExecutePingcli(t, "--no-color")
 	testutils.CheckExpectedError(t, err, nil)
 
-	err = testutils_cobra.ExecutePingcli(t, "--color=false")
+	err = testutils_cobra.ExecutePingcli(t, "--no-color=false")
 	testutils.CheckExpectedError(t, err, nil)
 }
 
-// Test Root Command fails when provided an invalid value for the --color flag
+// Test Root Command fails when provided an invalid value for the --no-color flag
 func TestRootCmd_InvalidColorFlag(t *testing.T) {
-	expectedErrorPattern := `^invalid argument "invalid" for "--color" flag: strconv\.ParseBool: parsing "invalid": invalid syntax$`
-	err := testutils_cobra.ExecutePingcli(t, "--color=invalid")
+	expectedErrorPattern := `^invalid argument "invalid" for ".*" flag: strconv\.ParseBool: parsing "invalid": invalid syntax$`
+	err := testutils_cobra.ExecutePingcli(t, "--no-color=invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 

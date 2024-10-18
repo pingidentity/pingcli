@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
@@ -16,7 +17,7 @@ func TestPlatformExportCmd_Execute(t *testing.T) {
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true")
+		"--overwrite")
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -51,7 +52,7 @@ func TestPlatformExportCmd_ServiceFlag(t *testing.T) {
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingone-protect")
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -70,7 +71,7 @@ func TestPlatformExportCmd_ExportFormatFlag(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--format", "HCL",
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingone-protect")
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -88,7 +89,7 @@ func TestPlatformExportCmd_OutputDirectoryFlag(t *testing.T) {
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingone-protect")
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -106,7 +107,7 @@ func TestPlatformExportCmd_OverwriteFlag(t *testing.T) {
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingone-protect")
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -125,7 +126,7 @@ func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T)
 	err = testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--services", "pingone-protect",
-		"--overwrite", "false")
+		"--overwrite=false")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -142,7 +143,7 @@ func TestPlatformExportCmd_OverwriteFlagTrueWithExistingDirectory(t *testing.T) 
 	err = testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--services", "pingone-protect",
-		"--overwrite", "true")
+		"--overwrite")
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -156,7 +157,7 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingone-protect",
 		"--pingone-worker-environment-id", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
 		"--pingone-worker-client-id", os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
@@ -179,7 +180,7 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlags(t *testing.T) {
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
 		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
 		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
@@ -203,7 +204,7 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsInvalid(t *testing.T) {
 	expectedErrorPattern := `^failed to export 'pingfederate' service: failed to export resource .*\. err: .* Request for resource '.*' was not successful\.\s+Response Code: 401 Unauthorized\s+Response Body: {{"resultId":"invalid_credentials","message":"The credentials you provided were not recognized\."}}\s+Error: 401 Unauthorized$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
 		"--pingfederate-username", "Administrator",
 		"--pingfederate-password", "invalid",
@@ -218,7 +219,7 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlags(t *testing.T) 
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
 		"--pingfederate-client-id", os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
 		"--pingfederate-client-secret", os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
@@ -244,7 +245,7 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalid(t *test
 	expectedErrorPattern := `^failed to export 'pingfederate' service: failed to export resource .*\. err: .* Request for resource '.*' was not successful\. Response is nil\. Error: oauth2: "invalid_client" "Invalid client or client credentials\."$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
 		"--pingfederate-client-id", "test",
 		"--pingfederate-client-secret", "invalid",
@@ -261,7 +262,7 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalidTokenURL
 	expectedErrorPattern := `(?s)^failed to export 'pingfederate' service: failed to export resource.*\. err:.*Request for resource '.*' was not successful\. Response is nil\. Error: oauth2: cannot fetch token: 404 Not Found\s+Response: \<!DOCTYPE html\>\s+.*$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
 		"--pingfederate-client-id", os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
 		"--pingfederate-client-secret", os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
@@ -277,9 +278,9 @@ func TestPlatformExportCmd_PingFederateXBypassHeaderFlag(t *testing.T) {
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
-		"--pingfederate-x-bypass-external-validation-header=true",
+		"--pingfederate-x-bypass-external-validation-header",
 		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
 		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",
@@ -293,9 +294,9 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
-		"--pingfederate-insecure-trust-all-tls=true",
+		"--pingfederate-insecure-trust-all-tls",
 		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
 		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		"--pingfederate-authentication-type", "basicAuth",
@@ -310,7 +311,7 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
 	expectedErrorPattern := `^failed to export '.*' service: failed to export resource .*\. err: .* Request for resource '.*' was not successful\. Response is nil\. Error: Get "https.*": tls: failed to verify certificate: x509: certificate signed by unknown authority$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
 		"--pingfederate-insecure-trust-all-tls=false",
 		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
@@ -320,19 +321,21 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test Platform Export command passes with PingFederate --pingfederate-insecure-trust-all-tls=false and --pingfederate-ca-certificate-pem-files set
+// Test Platform Export command passes with PingFederate
+// --pingfederate-insecure-trust-all-tls=false
+// and --pingfederate-ca-certificate-pem-files set
 func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
-		"--overwrite", "true",
+		"--overwrite",
 		"--services", "pingfederate",
 		"--pingfederate-insecure-trust-all-tls=false",
 		"--pingfederate-ca-certificate-pem-files", "testdata/ssl-server-crt.pem",
 		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
 		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		"--pingfederate-authentication-type", "basicAuth",
+		"--pingfederate-authentication-type", customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
 }

@@ -21,11 +21,11 @@ func initDeleteAutoAcceptOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "", // No environment variable
 		Flag: &pflag.Flag{
-			Name:        cobraParamName,
-			Shorthand:   "y",
-			Usage:       "Auto-accept the profile deletion confirmation prompt.",
+			Name:      cobraParamName,
+			Shorthand: "y",
+			Usage: "Auto-accept the profile deletion confirmation prompt. " +
+				"(default false)",
 			Value:       cobraValue,
-			DefValue:    "false",
 			NoOptDefVal: "true", // Make the flag a boolean flag
 		},
 		Type:     options.ENUM_STRING,

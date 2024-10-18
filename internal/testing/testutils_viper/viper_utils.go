@@ -20,7 +20,7 @@ var (
 	defaultConfigFileContentsPattern string = `activeProfile: default
 default:
     description: "default description"
-    color: true
+    noColor: true
     outputFormat: text
     export:
         outputDirectory: %s
@@ -47,7 +47,7 @@ default:
             xBypassExternalValidationHeader: true
 production:
     description: "test profile description"
-    color: true
+    noColor: true
     outputFormat: text
     service:
         pingfederate:

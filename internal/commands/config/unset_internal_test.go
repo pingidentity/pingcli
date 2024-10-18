@@ -13,7 +13,7 @@ import (
 func Test_RunInternalConfigUnset(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	err := RunInternalConfigUnset("color")
+	err := RunInternalConfigUnset("noColor")
 	if err != nil {
 		t.Errorf("RunInternalConfigUnset returned error: %v", err)
 	}
@@ -39,7 +39,7 @@ func Test_RunInternalConfigUnset_DifferentProfile(t *testing.T) {
 	options.ConfigUnsetProfileOption.Flag.Changed = true
 	options.ConfigUnsetProfileOption.CobraParamValue = &profileName
 
-	err := RunInternalConfigUnset("color")
+	err := RunInternalConfigUnset("noColor")
 	if err != nil {
 		t.Errorf("RunInternalConfigUnset returned error: %v", err)
 	}
@@ -57,6 +57,6 @@ func Test_RunInternalConfigUnset_InvalidProfileName(t *testing.T) {
 	options.ConfigUnsetProfileOption.CobraParamValue = &profileName
 
 	expectedErrorPattern := `^failed to unset configuration: invalid profile name: '.*' profile does not exist$`
-	err := RunInternalConfigUnset("color")
+	err := RunInternalConfigUnset("noColor")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

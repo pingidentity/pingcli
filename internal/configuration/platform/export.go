@@ -33,9 +33,13 @@ func initFormatOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "f",
-			Usage:     fmt.Sprintf("Specifies the export format.\nOptions are: %s.\nExample: `%s`", strings.Join(customtypes.ExportFormatValidValues(), ", "), string(customtypes.ENUM_EXPORT_FORMAT_HCL)),
-			Value:     cobraValue,
-			DefValue:  customtypes.ENUM_EXPORT_FORMAT_HCL,
+			Usage: fmt.Sprintf(
+				"Specifies the export format. (default %s)"+
+					"\nOptions are: %s.",
+				customtypes.ENUM_EXPORT_FORMAT_HCL,
+				strings.Join(customtypes.ExportFormatValidValues(), ", "),
+			),
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "export.format",
@@ -56,9 +60,18 @@ func initServicesOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "s",
-			Usage:     fmt.Sprintf("Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services.\nOptions are: %s.\nExample: `%s,%s,%s`", strings.Join(customtypes.ExportServicesValidValues(), ", "), string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO), string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA), string(customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE)),
-			Value:     cobraValue,
-			DefValue:  strings.Join(customtypes.ExportServicesValidValues(), ", "),
+			Usage: fmt.Sprintf(
+				"Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services. "+
+					"(default %s)"+
+					"\nOptions are: %s."+
+					"\nExample: '%s,%s,%s'",
+				strings.Join(customtypes.ExportServicesValidValues(), ", "),
+				strings.Join(customtypes.ExportServicesValidValues(), ", "),
+				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO),
+				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA),
+				string(customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE),
+			),
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_EXPORT_SERVICES,
 		ViperKey: "export.services",
@@ -79,9 +92,10 @@ func initOutputDirectoryOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "d",
-			Usage:     "Specifies the output directory for export. Example: `$HOME/pingcli-export`",
-			Value:     cobraValue,
-			DefValue:  "$(pwd)/export",
+			Usage: "Specifies the output directory for export. " +
+				"(default $(pwd)/export)" +
+				"\nExample: '$HOME/pingcli-export'",
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "export.outputDirectory",
@@ -101,12 +115,34 @@ func initOverwriteOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "o",
-			Usage:     "Overwrite the existing generated exports in output directory.",
-			Value:     cobraValue,
-			DefValue:  "false",
+			Usage: "Overwrite the existing generated exports in output directory. " +
+				"(default false)",
+			Value:       cobraValue,
+			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Type:     options.ENUM_BOOL,
 		ViperKey: "export.overwrite",
+	}
+}
+
+func initPingOneEnvironmentIDOption() {
+	cobraParamName := "pingone-export-environment-id"
+	cobraValue := new(customtypes.UUID)
+	defaultValue := customtypes.UUID("")
+	envVar := "PINGCLI_PINGONE_EXPORT_ENVIRONMENT_ID"
+
+	options.PlatformExportPingOneEnvironmentIDOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The ID of the PingOne environment to export. Must be a valid PingOne UUID.",
+			Value: cobraValue,
+		},
+		Type:     options.ENUM_UUID,
+		ViperKey: "export.pingone.environmentID",
 	}
 }
 
@@ -127,26 +163,4 @@ func getDefaultExportDir() (defaultExportDir *customtypes.String) {
 	}
 
 	return defaultExportDir
-}
-
-func initPingOneEnvironmentIDOption() {
-	cobraParamName := "pingone-export-environment-id"
-	cobraValue := new(customtypes.UUID)
-	defaultValue := customtypes.UUID("")
-	envVar := "PINGCLI_PINGONE_EXPORT_ENVIRONMENT_ID"
-
-	options.PlatformExportPingOneEnvironmentIDOption = options.Option{
-		CobraParamName:  cobraParamName,
-		CobraParamValue: cobraValue,
-		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
-		Flag: &pflag.Flag{
-			Name:     cobraParamName,
-			Usage:    "The ID of the PingOne environment to export. Must be a valid PingOne UUID.",
-			Value:    cobraValue,
-			DefValue: "",
-		},
-		Type:     options.ENUM_UUID,
-		ViperKey: "export.pingone.environmentID",
-	}
 }

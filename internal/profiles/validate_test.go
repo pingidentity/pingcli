@@ -56,7 +56,7 @@ func TestValidateInvalidBool(t *testing.T) {
 default:
     description: "default description"
     pingcli:
-        color: invalid`
+        noColor: invalid`
 
 	testutils_viper.InitVipersCustomFile(t, fileContents)
 

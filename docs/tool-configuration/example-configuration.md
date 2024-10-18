@@ -3,7 +3,7 @@
 ```
 activeprofile: default
 default:
-    color: true
+    noColor: true
     description: Default profile created by pingcli
     export:
         format: HCL
