@@ -291,7 +291,7 @@ func initScopesOption() {
 				"the OAuth 2.0 client credentials grant type. " +
 				"(default [])" +
 				"\nAccepts a comma-separated string to delimit multiple scopes." +
-				"\nExample: 'openid,profil'",
+				"\nExample: 'openid,profile'",
 			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING_SLICE,

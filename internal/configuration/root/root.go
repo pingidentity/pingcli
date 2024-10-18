@@ -12,7 +12,6 @@ import (
 )
 
 func InitRootOptions() {
-
 	initActiveProfileOption()
 	initProfileOption()
 	initColorOption()
