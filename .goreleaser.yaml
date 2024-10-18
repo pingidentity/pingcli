@@ -12,6 +12,13 @@ builds:
     # Default: Project directory name
     binary: pingcli
 
+    # Custom ldflags.
+    #
+    # Default: '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser'.
+    # Templates: allowed.
+    ldflags:
+      - '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
+
     # GOOS list to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
     # Choices for $GOOS are android, darwin, dragonfly, freebsd, illumos, ios, js, linux, netbsd, openbsd, plan9, solaris, wasip1, and windows.

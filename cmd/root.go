@@ -29,13 +29,13 @@ func init() {
 }
 
 // rootCmd represents the base command when called without any subcommands
-func NewRootCommand() *cobra.Command {
+func NewRootCommand(version string, commit string) *cobra.Command {
 	cmd := &cobra.Command{
 		Long:          "A CLI tool for managing the configuration of Ping Identity products.",
 		Short:         "A CLI tool for managing the configuration of Ping Identity products.",
 		SilenceErrors: true, // Upon error in RunE method, let output package in main.go handle error output
 		Use:           "pingcli",
-		Version:       "v2.0.0-alpha.4",
+		Version:       fmt.Sprintf("%s (commit: %s)", version, commit),
 	}
 
 	cmd.AddCommand(
