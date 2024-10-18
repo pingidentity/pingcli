@@ -28,7 +28,7 @@ func RunInternalConfigListProfiles() {
 
 		description, err := profiles.GetMainConfig().ProfileViperValue(profileName, "description")
 		if err != nil {
-			l.Warn().Msgf("Cannot retrieve profile description for profile %s: %s.", profileName, err)
+			l.Warn().Msgf("Cannot retrieve profile description for profile %s: %v", profileName, err)
 			continue
 		}
 
