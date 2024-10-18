@@ -18,7 +18,7 @@ const (
     pingcli config add-profile --name MyDeveloperEnv --description "My awesome new profile for my development environment"
 
   Add a new configuration profile with a guided experience and set it as the active profile.
-    pingcli config add-profile --set-active=true`
+    pingcli config add-profile --set-active`
 )
 
 func NewConfigAddProfileCommand() *cobra.Command {
