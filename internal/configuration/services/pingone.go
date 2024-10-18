@@ -124,7 +124,7 @@ func initRegionCodeOption() {
 			Usage: fmt.Sprintf(
 				"The region code of the PingOne tenant."+
 					"\nOptions are: %s."+
-					"\nExample: `%s`",
+					"\nExample: '%s'",
 				strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "),
 				customtypes.ENUM_PINGONE_REGION_CODE_NA,
 			),
