@@ -180,6 +180,8 @@ func (m MainConfig) ProfileNames() (profileNames []string) {
 		}
 	}
 
+	slices.Sort(profileNames)
+
 	return profileNames
 }
 

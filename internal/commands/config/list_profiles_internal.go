@@ -1,8 +1,6 @@
 package config_internal
 
 import (
-	"slices"
-
 	"github.com/fatih/color"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
@@ -17,10 +15,8 @@ func RunInternalConfigListProfiles() {
 
 	listStr := "Profiles:\n"
 
-	slices.Sort(profileNames)
-
+	// We need to enable/disable colorize before applying the color to the string below.
 	output.SetColorize()
-
 	activeFmt := color.New(color.Bold, color.FgGreen).SprintFunc()
 
 	for _, profileName := range profileNames {
