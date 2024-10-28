@@ -3,7 +3,7 @@ module github.com/pingidentity/pingcli
 go 1.23.2
 
 require (
-	github.com/fatih/color v1.17.0
+	github.com/fatih/color v1.18.0
 	github.com/golangci/golangci-lint v1.61.0
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/manifoldco/promptui v0.9.0
