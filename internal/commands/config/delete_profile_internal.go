@@ -27,10 +27,7 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 	}
 
 	if !confirmed {
-		output.Print(output.Opts{
-			Message: "Profile deletion cancelled.",
-			Result:  output.ENUM_RESULT_NIL,
-		})
+		output.Message("Profile deletion cancelled.", nil)
 
 		return nil
 	}
@@ -70,19 +67,13 @@ func promptUserToConfirmDelete(pName string, rc io.ReadCloser) (confirmed bool, 
 }
 
 func deleteProfile(pName string) (err error) {
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Deleting profile '%s'...", pName),
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(fmt.Sprintf("Deleting profile '%s'...", pName), nil)
 
 	if err = profiles.GetMainConfig().DeleteProfile(pName); err != nil {
 		return err
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Profile '%s' deleted.", pName),
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
+	output.Success(fmt.Sprintf("Profile '%s' deleted.", pName), nil)
 
 	return nil
 }

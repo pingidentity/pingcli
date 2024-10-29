@@ -23,10 +23,7 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 		return fmt.Errorf("failed to add profile: %v", err)
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Adding new profile '%s'...", newProfileName),
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(fmt.Sprintf("Adding new profile '%s'...", newProfileName), nil)
 
 	subViper := viper.New()
 	subViper.Set(options.ProfileDescriptionOption.ViperKey, newDescription)
@@ -35,20 +32,14 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 		return fmt.Errorf("failed to add profile: %v", err)
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetMainConfig().ViperInstance().ConfigFileUsed()),
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
+	output.Success(fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetMainConfig().ViperInstance().ConfigFileUsed()), nil)
 
 	if setActive {
 		if err = profiles.GetMainConfig().ChangeActiveProfile(newProfileName); err != nil {
 			return fmt.Errorf("failed to set active profile: %v", err)
 		}
 
-		output.Print(output.Opts{
-			Message: fmt.Sprintf("Profile '%s' set as active.", newProfileName),
-			Result:  output.ENUM_RESULT_SUCCESS,
-		})
+		output.Success(fmt.Sprintf("Profile '%s' set as active.", newProfileName), nil)
 	}
 
 	return nil

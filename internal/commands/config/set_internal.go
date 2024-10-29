@@ -51,15 +51,8 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: %v", err)
 	}
 
-	output.Print(output.Opts{
-		Message: "Configuration set successfully",
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
-
-	output.Print(output.Opts{
-		Message: yamlStr,
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Success("Configuration set successfully", nil)
+	output.Message(yamlStr, nil)
 
 	return nil
 }

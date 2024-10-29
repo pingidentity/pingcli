@@ -26,10 +26,7 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 
 	profileStr = fmt.Sprintf("Profile: %s\n\n%s", pName, profileStr)
 
-	output.Print(output.Opts{
-		Message: profileStr,
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(profileStr, nil)
 
 	return nil
 }

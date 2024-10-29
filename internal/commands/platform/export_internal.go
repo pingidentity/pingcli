@@ -92,10 +92,7 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		return err
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Export to directory '%s' complete.", outputDir),
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
+	output.Success(fmt.Sprintf("Export to directory '%s' complete.", outputDir), nil)
 
 	return nil
 }
@@ -366,20 +363,14 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (err erro
 	l.Debug().Msgf("Validating export output directory '%s'", outputDir)
 	_, err = os.Stat(outputDir)
 	if err != nil {
-		output.Print(output.Opts{
-			Message: fmt.Sprintf("failed to find 'platform export' output directory. creating new output directory at filepath '%s'", outputDir),
-			Result:  output.ENUM_RESULT_NOACTION_WARN,
-		})
+		output.Warn(fmt.Sprintf("failed to find 'platform export' output directory. creating new output directory at filepath '%s'", outputDir), nil)
 
 		err = os.MkdirAll(outputDir, os.ModePerm)
 		if err != nil {
 			return fmt.Errorf("failed to create 'platform export' output directory '%s': %s", outputDir, err.Error())
 		}
 
-		output.Print(output.Opts{
-			Message: fmt.Sprintf("new 'platform export' output directory '%s' created", outputDir),
-			Result:  output.ENUM_RESULT_SUCCESS,
-		})
+		output.Success(fmt.Sprintf("new 'platform export' output directory '%s' created", outputDir), nil)
 	} else {
 		// Check if the output directory is empty
 		// If not, default behavior is to exit and not overwrite.
@@ -414,10 +405,7 @@ func getPingOneExportEnvID() (err error) {
 			return fmt.Errorf("failed to determine pingone export environment ID.")
 		}
 
-		output.Print(output.Opts{
-			Message: "No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.",
-			Result:  output.ENUM_RESULT_NOACTION_WARN,
-		})
+		output.Warn("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
 	}
 
 	return nil
@@ -483,10 +471,7 @@ func exportConnectors(exportableConnectors *[]connector.Exportable, exportFormat
 
 	// Loop through user defined exportable connectors and export them
 	for _, connector := range *exportableConnectors {
-		output.Print(output.Opts{
-			Message: fmt.Sprintf("Exporting %s service...", connector.ConnectorServiceName()),
-			Result:  output.ENUM_RESULT_NIL,
-		})
+		output.Message(fmt.Sprintf("Exporting %s service...", connector.ConnectorServiceName()), nil)
 
 		err := connector.Export(exportFormat, outputDir, overwriteExport)
 		if err != nil {

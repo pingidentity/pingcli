@@ -16,10 +16,7 @@ func RunInternalConfig(rc io.ReadCloser) (err error) {
 		return fmt.Errorf("failed to update profile. %v", err)
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Updating profile '%s'...", profileName),
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(fmt.Sprintf("Updating profile '%s'...", profileName), nil)
 
 	if err = profiles.GetMainConfig().ChangeProfileName(profileName, newProfileName); err != nil {
 		return fmt.Errorf("failed to update profile '%s' name to: %s. %v", profileName, newProfileName, err)
@@ -29,10 +26,7 @@ func RunInternalConfig(rc io.ReadCloser) (err error) {
 		return fmt.Errorf("failed to update profile '%s' description to: %s. %v", newProfileName, newDescription, err)
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Profile updated. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetMainConfig().ViperInstance().ConfigFileUsed()),
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
+	output.Success(fmt.Sprintf("Profile updated. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetMainConfig().ViperInstance().ConfigFileUsed()), nil)
 
 	return nil
 }

@@ -41,15 +41,8 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 		return fmt.Errorf("failed to unset configuration: %v", err)
 	}
 
-	output.Print(output.Opts{
-		Message: "Configuration unset successfully",
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
-
-	output.Print(output.Opts{
-		Message: yamlStr,
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Success("Configuration unset successfully", nil)
+	output.Message(yamlStr, nil)
 
 	return nil
 }

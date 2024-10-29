@@ -20,19 +20,13 @@ func RunInternalConfigSetActiveProfile(args []string, rc io.ReadCloser) (err err
 		}
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Setting active profile to '%s'...", pName),
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(fmt.Sprintf("Setting active profile to '%s'...", pName), nil)
 
 	if err = profiles.GetMainConfig().ChangeActiveProfile(pName); err != nil {
 		return fmt.Errorf("failed to set active profile: %v", err)
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Active profile set to '%s'", pName),
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
+	output.Success(fmt.Sprintf("Active profile set to '%s'", pName), nil)
 
 	return nil
 }

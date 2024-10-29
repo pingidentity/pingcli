@@ -10,6 +10,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/profiles"
+	"github.com/rs/zerolog"
 )
 
 var (
@@ -21,24 +22,7 @@ var (
 	yellow  = color.New(color.FgYellow).SprintfFunc()
 )
 
-type Result string
-
-type Opts struct {
-	Fields       map[string]interface{}
-	Message      string
-	ErrorMessage string
-	FatalMessage string
-	Result       Result
-}
-
-const (
-	ENUM_RESULT_NIL           Result = ""
-	ENUM_RESULT_SUCCESS       Result = "Success"
-	ENUM_RESULT_NOACTION_OK   Result = "No Action (OK)"
-	ENUM_RESULT_NOACTION_WARN Result = "No Action (Warning)"
-	ENUM_RESULT_FAILURE       Result = "Failure"
-)
-
+// Set the faith color option based on user configuration
 func SetColorize() {
 	colorizeOutput, err := profiles.GetOptionValue(options.RootColorOption)
 	if err != nil {
@@ -53,8 +37,60 @@ func SetColorize() {
 	}
 }
 
-func Print(output Opts) {
+// This function outputs white text to supply information to the user.
+func Message(message string, fields map[string]interface{}) {
+	l := logger.Get()
 
+	print(fmt.Sprintf("INFO: %s", message), fields, white, l.Info())
+}
+
+// This function outputs green text to inform the user of success
+func Success(message string, fields map[string]interface{}) {
+	l := logger.Get()
+
+	print(fmt.Sprintf("SUCCESS: %s", message), fields, green, l.Info())
+}
+
+// This function outputs yellow text to inform the user of a warning
+func Warn(message string, fields map[string]interface{}) {
+	l := logger.Get()
+
+	print(fmt.Sprintf("WARNING: %s", message), fields, yellow, l.Warn())
+}
+
+// This functions is used to inform the user their configuration
+// or input to pingcli has caused an error.
+func UserError(message string, fields map[string]interface{}) {
+	l := logger.Get()
+
+	print(fmt.Sprintf("ERROR: %s", message), fields, red, l.Error())
+}
+
+// This functions is used to inform the user their configuration
+// or input to pingcli has caused an fatal error that exits the program immediately.
+func UserFatal(message string, fields map[string]interface{}) {
+	l := logger.Get()
+
+	print(fmt.Sprintf("FATAL: %s", message), fields, boldRed, l.Fatal())
+}
+
+// This function is used to inform the user a system-level error
+// has occurred. These errors should indicate a bug or bad behavior
+// of the tool.
+func SystemError(message string, fields map[string]interface{}) {
+	l := logger.Get()
+
+	systemMsg := fmt.Sprintf(`FATAL: %s
+		
+This is a bug in the Ping CLI and needs reporting to our team.
+		
+Please raise an issue at https://github.com/pingidentity/pingcli`,
+		message)
+
+	print(systemMsg, fields, boldRed, l.Fatal())
+}
+
+func print(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string, logEvent *zerolog.Event) {
 	SetColorize()
 
 	outputFormat, err := profiles.GetOptionValue(options.RootOutputFormatOption)
@@ -64,107 +100,53 @@ func Print(output Opts) {
 
 	switch outputFormat {
 	case customtypes.ENUM_OUTPUT_FORMAT_TEXT:
-		printText(output)
+		printText(message, fields, colorFunc, logEvent)
 	case customtypes.ENUM_OUTPUT_FORMAT_JSON:
-		printJson(output)
+		printJson(message, fields, logEvent)
 	default:
-		printText(Opts{
-			Message: fmt.Sprintf("Output format %q is not recognized. Defaulting to \"text\" output", outputFormat),
-			Result:  ENUM_RESULT_NOACTION_WARN,
-		})
-		printText(output)
+		l := logger.Get()
+		printText(fmt.Sprintf("Output format %q is not recognized. Defaulting to \"text\" output", outputFormat), nil, yellow, l.Warn())
+		printText(message, fields, colorFunc, logEvent)
 	}
+
 }
 
-func printText(opts Opts) {
-	l := logger.Get()
-
-	var resultFormat string
-	var resultColor func(format string, a ...interface{}) string
-
-	// Determine message color and format based on status
-	switch opts.Result {
-	case ENUM_RESULT_SUCCESS:
-		resultFormat = "%s - %s"
-		resultColor = green
-	case ENUM_RESULT_NOACTION_OK:
-		resultFormat = "%s - %s"
-		resultColor = green
-	case ENUM_RESULT_NOACTION_WARN:
-		resultFormat = "%s - %s"
-		resultColor = yellow
-	case ENUM_RESULT_FAILURE:
-		resultFormat = "%s - %s"
-		resultColor = red
-	case ENUM_RESULT_NIL:
-		resultFormat = "%s%s"
-		resultColor = white
-	default:
-		resultFormat = "%s%s"
-		resultColor = white
-	}
-
-	// Supply the user a formatted message and a result status if any.
-	fmt.Println(resultColor(resultFormat, opts.Message, opts.Result))
-	l.Info().Msg(resultColor(resultFormat, opts.Message, opts.Result))
-
-	// Output and log any additional key/value pairs supplied to the user.
-	if opts.Fields != nil {
+func printText(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string, logEvent *zerolog.Event) {
+	if fields != nil {
 		fmt.Println(cyan("Additional Information:"))
-		for k, v := range opts.Fields {
+		for k, v := range fields {
+			l := logger.Get()
 			switch typedValue := v.(type) {
 			// If the value is a json.RawMessage, print it as a string
 			case json.RawMessage:
 				fmt.Println(cyan("%s: %s", k, typedValue))
-				l.Info().Msgf("%s: %s", k, typedValue)
+				l.Info().Msgf(cyan("%s: %s", k, typedValue))
 			default:
 				fmt.Println(cyan("%s: %v", k, v))
-				l.Info().Msgf("%s: %v", k, v)
+				l.Info().Msgf(cyan("%s: %v", k, v))
 			}
 		}
 	}
 
-	// Inform the user of an error and log the error
-	if opts.ErrorMessage != "" {
-		fmt.Println(red("Error: %s", opts.ErrorMessage))
-		l.Error().Msg(opts.ErrorMessage)
-	}
-
-	// Inform the user of a fatal error and log the fatal error. This exits the program.
-	if opts.FatalMessage != "" {
-		fmt.Println(boldRed("Fatal: %s", opts.FatalMessage))
-		l.Fatal().Msg(opts.FatalMessage)
-	}
-
+	fmt.Println(colorFunc(message))
+	logEvent.Msg(colorFunc(message))
 }
 
-func printJson(opts Opts) {
+func printJson(message string, fields map[string]interface{}, logEvent *zerolog.Event) {
 	l := logger.Get()
 
+	if fields["message"] == nil {
+		fields["message"] = message
+	}
+
 	// Convert the CommandOutput struct to JSON
-	jsonOut, err := json.MarshalIndent(opts, "", "  ")
+	jsonOut, err := json.MarshalIndent(fields, "", "  ")
 	if err != nil {
 		l.Error().Err(err).Msgf("Failed to serialize output as JSON")
+		return
 	}
 
 	// Output the JSON as uncolored string
 	fmt.Println(string(jsonOut))
-
-	switch opts.Result {
-	case ENUM_RESULT_NOACTION_WARN:
-		l.Warn().Msg(string(jsonOut))
-	case ENUM_RESULT_FAILURE:
-		// Log the error if exists
-		if opts.ErrorMessage != "" {
-			l.Error().Msg(opts.ErrorMessage)
-		}
-
-		// Log the fatal error if exists. This exits the program.
-		if opts.FatalMessage != "" {
-			l.Fatal().Msg(opts.FatalMessage)
-		}
-	default: //ENUM_RESULT_SUCCESS, ENUM_RESULT_NIL, ENUM_RESULT_NOACTION_OK
-		l.Info().Msg(string(jsonOut))
-	}
-
+	logEvent.Msg(string(jsonOut))
 }

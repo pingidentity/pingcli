@@ -24,10 +24,7 @@ func RunInternalConfigGet(viperKey string) (err error) {
 		return fmt.Errorf("failed to get configuration: %v", err)
 	}
 
-	output.Print(output.Opts{
-		Message: yamlStr,
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(yamlStr, nil)
 
 	return nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"runtime/debug"
 
 	"github.com/pingidentity/pingcli/cmd"
@@ -31,10 +32,6 @@ func main() {
 
 	err := rootCmd.Execute()
 	if err != nil {
-		output.Print(output.Opts{
-			ErrorMessage: err.Error(),
-			Message:      "Failed to execute pingcli",
-			Result:       output.ENUM_RESULT_FAILURE,
-		})
+		output.UserError(fmt.Sprintf("Failed to execute pingcli: %v", err), nil)
 	}
 }
