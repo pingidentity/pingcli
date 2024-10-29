@@ -120,10 +120,10 @@ func printText(message string, fields map[string]interface{}, colorFunc func(for
 			// If the value is a json.RawMessage, print it as a string
 			case json.RawMessage:
 				fmt.Println(cyan("%s: %s", k, typedValue))
-				l.Info().Msgf(cyan("%s: %s", k, typedValue))
+				l.Info().Msg(cyan("%s: %s", k, typedValue))
 			default:
 				fmt.Println(cyan("%s: %v", k, v))
-				l.Info().Msgf(cyan("%s: %v", k, v))
+				l.Info().Msg(cyan("%s: %v", k, v))
 			}
 		}
 	}
