@@ -81,7 +81,7 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if err != nil {
 		return err
 	}
-	if err := createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
+	if outputDir, err = createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
 		return err
 	}
 
@@ -353,22 +353,41 @@ pingone region - %s`,
 	return nil
 }
 
-func createOrValidateOutputDir(outputDir string, overwriteExport bool) (err error) {
+func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolvedOutputDir string, err error) {
 	l := logger.Get()
+
+	// Check if outputDir is empty
+	if outputDir == "" {
+		return "", fmt.Errorf("Failed to export services. The output directory is not set. Specify the output directory "+
+			"via the '--%s' flag, '%s' environment variable, or key '%s' in the configuration file.",
+			options.PlatformExportOutputDirectoryOption.CobraParamName,
+			options.PlatformExportOutputDirectoryOption.EnvVar,
+			options.PlatformExportOutputDirectoryOption.ViperKey)
+	}
+
+	// Check if path is absolute. If not, make it absolute using the present working directory
+	if !filepath.IsAbs(outputDir) {
+		pwd, err := os.Getwd()
+		if err != nil {
+			return "", fmt.Errorf("failed to get present working directory: %v", err)
+		}
+
+		outputDir = filepath.Join(pwd, outputDir)
+	}
 
 	// Check if outputDir exists
 	// If not, create the directory
 	l.Debug().Msgf("Validating export output directory '%s'", outputDir)
 	_, err = os.Stat(outputDir)
 	if err != nil {
-		output.Warn(fmt.Sprintf("failed to find 'platform export' output directory. creating new output directory at filepath '%s'", outputDir), nil)
+		output.Warn(fmt.Sprintf("Output directory does not exist. Creating the directory at filepath '%s'", outputDir), nil)
 
 		err = os.MkdirAll(outputDir, os.ModePerm)
 		if err != nil {
-			return fmt.Errorf("failed to create 'platform export' output directory '%s': %s", outputDir, err.Error())
+			return "", fmt.Errorf("failed to create output directory '%s': %s", outputDir, err.Error())
 		}
 
-		output.Success(fmt.Sprintf("new 'platform export' output directory '%s' created", outputDir), nil)
+		output.Success(fmt.Sprintf("Output directory '%s' created", outputDir), nil)
 	} else {
 		// Check if the output directory is empty
 		// If not, default behavior is to exit and not overwrite.
@@ -376,16 +395,16 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (err erro
 		if !overwriteExport {
 			dirEntries, err := os.ReadDir(outputDir)
 			if err != nil {
-				return fmt.Errorf("failed to read contents of 'platform export' output directory '%s': %s", outputDir, err.Error())
+				return "", fmt.Errorf("failed to read contents of output directory '%s': %v", outputDir, err)
 			}
 
 			if len(dirEntries) > 0 {
-				return fmt.Errorf("'platform export' output directory '%s' is not empty. Use --overwrite to overwrite existing export data", outputDir)
+				return "", fmt.Errorf("output directory '%s' is not empty. Use --overwrite to overwrite existing export data", outputDir)
 			}
 		}
 	}
 
-	return nil
+	return outputDir, nil
 }
 
 func getPingOneExportEnvID() (err error) {

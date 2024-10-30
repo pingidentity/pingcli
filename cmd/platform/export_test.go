@@ -96,7 +96,7 @@ func TestPlatformExportCmd_OutputDirectoryFlag(t *testing.T) {
 
 // Test Platform Export Command --output-directory flag with invalid directory
 func TestPlatformExportCmd_OutputDirectoryFlagInvalidDirectory(t *testing.T) {
-	expectedErrorPattern := `^failed to create 'platform export' output directory '\/invalid': mkdir \/invalid: .+$`
+	expectedErrorPattern := `^failed to create output directory '\/invalid': mkdir \/invalid: .+$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export", "--output-directory", "/invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -122,7 +122,7 @@ func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T)
 		t.Errorf("Error creating file in output directory: %v", err)
 	}
 
-	expectedErrorPattern := `^'platform export' output directory '[A-Za-z0-9_\-\/]+' is not empty\. Use --overwrite to overwrite existing export data$`
+	expectedErrorPattern := `^output directory '[A-Za-z0-9_\-\/]+' is not empty\. Use --overwrite to overwrite existing export data$`
 	err = testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--services", "pingone-protect",
