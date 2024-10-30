@@ -41,43 +41,42 @@ func SetColorize() {
 func Message(message string, fields map[string]interface{}) {
 	l := logger.Get()
 
-	print(fmt.Sprintf("INFO: %s", message), fields, white, l.Info())
+	print(fmt.Sprintf("INFO: %s", message), fields, white, l.Info)
 }
 
 // This function outputs green text to inform the user of success
 func Success(message string, fields map[string]interface{}) {
 	l := logger.Get()
 
-	print(fmt.Sprintf("SUCCESS: %s", message), fields, green, l.Info())
+	print(fmt.Sprintf("SUCCESS: %s", message), fields, green, l.Info)
 }
 
 // This function outputs yellow text to inform the user of a warning
 func Warn(message string, fields map[string]interface{}) {
 	l := logger.Get()
 
-	print(fmt.Sprintf("WARNING: %s", message), fields, yellow, l.Warn())
+	print(fmt.Sprintf("WARNING: %s", message), fields, yellow, l.Warn)
 }
 
 // This functions is used to inform the user their configuration
 // or input to pingcli has caused an error.
 func UserError(message string, fields map[string]interface{}) {
 	l := logger.Get()
-
-	print(fmt.Sprintf("ERROR: %s", message), fields, red, l.Error())
+	print(fmt.Sprintf("ERROR: %s", message), fields, red, l.Error)
 }
 
 // This functions is used to inform the user their configuration
 // or input to pingcli has caused an fatal error that exits the program immediately.
 func UserFatal(message string, fields map[string]interface{}) {
-	// l.Fatal() exits the program prematurely before the message is printed
-	// pass nil to print the message before exiting
-	print(fmt.Sprintf("FATAL: %s", message), fields, boldRed, nil)
+	l := logger.Get()
+	print(fmt.Sprintf("FATAL: %s", message), fields, boldRed, l.Fatal)
 }
 
 // This function is used to inform the user a system-level error
 // has occurred. These errors should indicate a bug or bad behavior
 // of the tool.
 func SystemError(message string, fields map[string]interface{}) {
+	l := logger.Get()
 	systemMsg := fmt.Sprintf(`FATAL: %s
 		
 This is a bug in the Ping CLI and needs reporting to our team.
@@ -87,10 +86,13 @@ Please raise an issue at https://github.com/pingidentity/pingcli`,
 
 	// l.Fatal() exits the program prematurely before the message is printed
 	// pass nil to print the message before exiting
-	print(systemMsg, fields, boldRed, nil)
+	print(systemMsg, fields, boldRed, l.Fatal)
 }
 
-func print(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string, logEvent *zerolog.Event) {
+func print(message string,
+	fields map[string]interface{},
+	colorFunc func(format string, a ...interface{}) string,
+	logEventFunc func() *zerolog.Event) {
 	SetColorize()
 
 	outputFormat, err := profiles.GetOptionValue(options.RootOutputFormatOption)
@@ -100,18 +102,21 @@ func print(message string, fields map[string]interface{}, colorFunc func(format 
 
 	switch outputFormat {
 	case customtypes.ENUM_OUTPUT_FORMAT_TEXT:
-		printText(message, fields, colorFunc, logEvent)
+		printText(message, fields, colorFunc, logEventFunc)
 	case customtypes.ENUM_OUTPUT_FORMAT_JSON:
-		printJson(message, fields, logEvent)
+		printJson(message, fields, logEventFunc)
 	default:
 		l := logger.Get()
-		printText(fmt.Sprintf("Output format %q is not recognized. Defaulting to \"text\" output", outputFormat), nil, yellow, l.Warn())
-		printText(message, fields, colorFunc, logEvent)
+		printText(fmt.Sprintf("Output format %q is not recognized. Defaulting to \"text\" output", outputFormat), nil, yellow, l.Warn)
+		printText(message, fields, colorFunc, logEventFunc)
 	}
 
 }
 
-func printText(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string, logEvent *zerolog.Event) {
+func printText(message string,
+	fields map[string]interface{},
+	colorFunc func(format string, a ...interface{}) string,
+	logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
 
 	if fields != nil {
@@ -130,14 +135,12 @@ func printText(message string, fields map[string]interface{}, colorFunc func(for
 	}
 
 	fmt.Println(colorFunc(message))
-	if logEvent != nil {
-		logEvent.Msg(colorFunc(message))
-	} else {
-		l.Fatal().Msg(colorFunc(message))
-	}
+	logEventFunc().Msg(colorFunc(message))
 }
 
-func printJson(message string, fields map[string]interface{}, logEvent *zerolog.Event) {
+func printJson(message string,
+	fields map[string]interface{},
+	logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
 
 	if fields["message"] == nil {
@@ -153,9 +156,5 @@ func printJson(message string, fields map[string]interface{}, logEvent *zerolog.
 
 	// Output the JSON as uncolored string
 	fmt.Println(string(jsonOut))
-	if logEvent != nil {
-		logEvent.Msg(string(jsonOut))
-	} else {
-		l.Fatal().Msg(string(jsonOut))
-	}
+	logEventFunc().Msg(string(jsonOut))
 }

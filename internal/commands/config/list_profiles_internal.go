@@ -33,7 +33,7 @@ func RunInternalConfigListProfiles() {
 		}
 
 		if description != "" {
-			listStr += "    " + description + "\n"
+			listStr += "    " + description
 		}
 	}
 
