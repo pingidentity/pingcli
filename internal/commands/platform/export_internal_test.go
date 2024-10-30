@@ -194,7 +194,7 @@ func TestCreateOrValidateOutputDirExistentDirWithFileNoOverwrite(t *testing.T) {
 	}
 	file.Close()
 
-	expectedErrorPattern := `^'platform export' output directory '.*' is not empty\. Use --overwrite to overwrite existing export data$`
+	expectedErrorPattern := `^output directory '.*' is not empty\. Use --overwrite to overwrite existing export data$`
 	_, err = createOrValidateOutputDir(outputDir, false)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
