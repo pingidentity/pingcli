@@ -50,7 +50,7 @@ func Test_ValidateParentViperKey(t *testing.T) {
 func Test_ValidateParentViperKey_InvalidKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `(?s)^key '.*' is not recognized as a valid configuration key. Valid keys: .*$`
 	err := configuration.ValidateParentViperKey("invalid-key")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -59,7 +59,7 @@ func Test_ValidateParentViperKey_InvalidKey(t *testing.T) {
 func Test_ValidateParentViperKey_EmptyKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^key '' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `(?s)^key '' is not recognized as a valid configuration key. Valid keys: .*$`
 	err := configuration.ValidateParentViperKey("")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

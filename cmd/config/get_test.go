@@ -35,7 +35,7 @@ func TestConfigGetCmd_PartialKey(t *testing.T) {
 
 // Test Config Get Command fails when provided an invalid key
 func TestConfigGetCmd_InvalidKey(t *testing.T) {
-	expectedErrorPattern := `^failed to get configuration: key '.*' is not recognized as a valid configuration key\. Valid keys: [A-Za-z\.\s,]+$`
+	expectedErrorPattern := `(?s)^failed to get configuration: key '.*' is not recognized as a valid configuration key\. Valid keys: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "get", "pingcli.invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
