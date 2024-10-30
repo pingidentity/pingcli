@@ -386,7 +386,7 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 
 		err = os.MkdirAll(outputDir, os.ModePerm)
 		if err != nil {
-			return "", fmt.Errorf("failed to create 'platform export' output directory '%s': %s", outputDir, err.Error())
+			return "", fmt.Errorf("failed to create output directory '%s': %s", outputDir, err.Error())
 		}
 
 		output.Success(fmt.Sprintf("Output directory '%s' created", outputDir), nil)
