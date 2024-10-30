@@ -30,10 +30,9 @@ func initAuthenticationWorkerClientIDOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:     cobraParamName,
-			Usage:    "The worker client ID used to authenticate to the PingOne management API.",
-			Value:    cobraValue,
-			DefValue: "",
+			Name:  cobraParamName,
+			Usage: "The worker client ID used to authenticate to the PingOne management API.",
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_UUID,
 		ViperKey: "service.pingone.authentication.worker.clientID",
@@ -52,10 +51,9 @@ func initAuthenticationWorkerClientSecretOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:     cobraParamName,
-			Usage:    "The worker client secret used to authenticate to the PingOne management API.",
-			Value:    cobraValue,
-			DefValue: "",
+			Name:  cobraParamName,
+			Usage: "The worker client secret used to authenticate to the PingOne management API.",
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "service.pingone.authentication.worker.clientSecret",
@@ -74,10 +72,10 @@ func initAuthenticationWorkerEnvironmentIDOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:     cobraParamName,
-			Usage:    "The ID of the PingOne environment that contains the worker client used to authenticate to the PingOne management API.",
-			Value:    cobraValue,
-			DefValue: "",
+			Name: cobraParamName,
+			Usage: "The ID of the PingOne environment that contains the worker client used to authenticate to " +
+				"the PingOne management API.",
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_UUID,
 		ViperKey: "service.pingone.authentication.worker.environmentID",
@@ -96,10 +94,14 @@ func initPingOneAuthenticationTypeOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The authentication type to use to authenticate to the PingOne management API.\nOptions are: %s.\nExample: `%s`", strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "), string(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)),
-			Value:    cobraValue,
-			DefValue: customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER,
+			Name: cobraParamName,
+			Usage: fmt.Sprintf(
+				"The authentication type to use to authenticate to the PingOne management API. (default %s)"+
+					"\nOptions are: %s.",
+				customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER,
+				strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "),
+			),
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_PINGONE_AUTH_TYPE,
 		ViperKey: "service.pingone.authentication.type",
@@ -118,10 +120,15 @@ func initRegionCodeOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:     cobraParamName,
-			Usage:    fmt.Sprintf("The region code of the PingOne tenant.\nOptions are: %s.\nExample: `%s`", strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "), string(customtypes.ENUM_PINGONE_REGION_CODE_NA)),
-			Value:    cobraValue,
-			DefValue: "",
+			Name: cobraParamName,
+			Usage: fmt.Sprintf(
+				"The region code of the PingOne tenant."+
+					"\nOptions are: %s."+
+					"\nExample: '%s'",
+				strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "),
+				customtypes.ENUM_PINGONE_REGION_CODE_NA,
+			),
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_PINGONE_REGION_CODE,
 		ViperKey: "service.pingone.regionCode",

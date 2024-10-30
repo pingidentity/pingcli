@@ -24,15 +24,15 @@ var (
 
 // Set the faith color option based on user configuration
 func SetColorize() {
-	colorizeOutput, err := profiles.GetOptionValue(options.RootColorOption)
+	disableColorOutput, err := profiles.GetOptionValue(options.RootColorOption)
 	if err != nil {
 		color.NoColor = false
 	} else {
-		colorizeOutputBool, err := strconv.ParseBool(colorizeOutput)
+		disableColorOutputBool, err := strconv.ParseBool(disableColorOutput)
 		if err != nil {
 			color.NoColor = false
 		} else {
-			color.NoColor = !colorizeOutputBool
+			color.NoColor = disableColorOutputBool
 		}
 	}
 }

@@ -8,7 +8,7 @@ The following parameters can be configured in Ping CLI's static configuration fi
 | Config File Property | Type | Equivalent Parameter | Purpose |
 |---|---|---|---|
 | activeProfile | ENUM_STRING | | The name of the stored custom configuration profile to use by default. |
-| color | ENUM_BOOL | --color | Show text output in color. |
+| noColor | ENUM_BOOL | --no-color | Disable text output in color. |
 | outputFormat | ENUM_OUTPUT_FORMAT | --output-format / -O | Specify the console output format.<br><br>Options are: json, text.<br><br>Example: `json` |
 
 #### Ping Platform Service Properties

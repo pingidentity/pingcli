@@ -27,7 +27,6 @@ func initAddProfileDescriptionOption() {
 			Shorthand: "d",
 			Usage:     "The description of the new configuration profile.",
 			Value:     cobraValue,
-			DefValue:  "",
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
@@ -49,7 +48,6 @@ func initAddProfileNameOption() {
 			Shorthand: "n",
 			Usage:     "The name of the new configuration profile.",
 			Value:     cobraValue,
-			DefValue:  "",
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
@@ -69,9 +67,10 @@ func initAddProfileSetActiveOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "s",
-			Usage:     "Set the new configuration profile as the active profile.",
-			Value:     cobraValue,
-			DefValue:  "false",
+			Usage: "Set the new configuration profile as the active profile. " +
+				"(default false)",
+			Value:       cobraValue,
+			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Type:     options.ENUM_BOOL,
 		ViperKey: "", // No viper key

@@ -33,7 +33,7 @@ func TestConfigAddProfileCmd_InvalidFlag(t *testing.T) {
 // Test config add profile command fails when provided an invalid value for a flag
 func TestConfigAddProfileCmd_InvalidFlagValue(t *testing.T) {
 	expectedErrorPattern := `^invalid argument ".*" for ".*" flag: strconv\.ParseBool: parsing ".*": invalid syntax$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile", "--set-active", "invalid-value")
+	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile", "--set-active=invalid-value")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -63,6 +63,6 @@ func TestConfigAddProfileCmd_InvalidSetActiveValue(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
 		"--name", "test-profile",
 		"--description", "test description",
-		"--set-active", "invalid-value")
+		"--set-active=invalid-value")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
