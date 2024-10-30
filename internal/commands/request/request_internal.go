@@ -102,6 +102,8 @@ func runInternalPingOneRequest(uri string) (err error) {
 	}
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
+		// Note we don't os.Exit(1) here because pingcli has executed
+		// without issue, despite a failed response to the custom request
 		output.UserError("Failed Custom Request", fields)
 	} else {
 		output.Success("Custom request successful", fields)
