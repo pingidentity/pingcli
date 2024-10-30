@@ -35,7 +35,7 @@ require (
 	github.com/Masterminds/semver/v3 v3.3.0 // indirect
 	github.com/OpenPeeDeeP/depguard/v2 v2.2.0 // indirect
 	github.com/alecthomas/go-check-sumtype v0.2.0 // indirect
-	github.com/alexkohler/nakedret/v2 v2.0.4 // indirect
+	github.com/alexkohler/nakedret/v2 v2.0.5 // indirect
 	github.com/alexkohler/prealloc v1.0.0 // indirect
 	github.com/alingse/asasalint v0.0.11 // indirect
 	github.com/ashanbrown/forbidigo v1.6.0 // indirect
@@ -44,7 +44,7 @@ require (
 	github.com/bkielbasa/cyclop v1.2.3 // indirect
 	github.com/blizzy78/varnamelen v0.8.0 // indirect
 	github.com/bombsimon/wsl/v4 v4.4.1 // indirect
-	github.com/breml/bidichk v0.3.1 // indirect
+	github.com/breml/bidichk v0.3.2 // indirect
 	github.com/breml/errchkjson v0.4.0 // indirect
 	github.com/butuzov/ireturn v0.3.0 // indirect
 	github.com/butuzov/mirror v1.2.0 // indirect
@@ -100,7 +100,7 @@ require (
 	github.com/jjti/go-spancheck v0.6.2 // indirect
 	github.com/julz/importas v0.1.0 // indirect
 	github.com/karamaru-alpha/copyloopvar v1.1.0 // indirect
-	github.com/kisielk/errcheck v1.7.0 // indirect
+	github.com/kisielk/errcheck v1.8.0 // indirect
 	github.com/kisielk/gotool v1.0.0 // indirect
 	github.com/kkHAIKE/contextcheck v1.1.5 // indirect
 	github.com/kulti/thelper v0.6.3 // indirect
@@ -127,7 +127,7 @@ require (
 	github.com/nakabonne/nestif v0.3.1 // indirect
 	github.com/nishanths/exhaustive v0.12.0 // indirect
 	github.com/nishanths/predeclared v0.2.2 // indirect
-	github.com/nunnatsa/ginkgolinter v0.16.2 // indirect
+	github.com/nunnatsa/ginkgolinter v0.17.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.6.0 // indirect
 	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.9.0 // indirect
@@ -137,14 +137,14 @@ require (
 	github.com/polyfloyd/go-errorlint v1.6.0 // indirect
 	github.com/prometheus/client_golang v1.20.5 // indirect
 	github.com/prometheus/client_model v0.6.1 // indirect
-	github.com/prometheus/common v0.60.0 // indirect
+	github.com/prometheus/common v0.60.1 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/quasilyte/go-ruleguard v0.4.3-0.20240823090925-0fe6f58b47b1 // indirect
 	github.com/quasilyte/go-ruleguard/dsl v0.3.22 // indirect
 	github.com/quasilyte/gogrep v0.5.0 // indirect
 	github.com/quasilyte/regex/syntax v0.0.0-20210819130434-b3f0c404a727 // indirect
 	github.com/quasilyte/stdinfo v0.0.0-20220114132959-f7386bf02567 // indirect
-	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/ryancurrah/gomodguard v1.3.5 // indirect
 	github.com/ryanrolds/sqlclosecheck v0.5.1 // indirect
 	github.com/sagikazarmark/locafero v0.6.0 // indirect
@@ -157,7 +157,7 @@ require (
 	github.com/shazow/go-diff v0.0.0-20160112020656-b6b7b6733b8c // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sivchari/containedctx v1.0.3 // indirect
-	github.com/sivchari/tenv v1.10.0 // indirect
+	github.com/sivchari/tenv v1.12.1 // indirect
 	github.com/sonatard/noctx v0.1.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/sourcegraph/go-diff v0.7.0 // indirect
@@ -170,8 +170,8 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/tdakkota/asciicheck v0.2.0 // indirect
 	github.com/tetafro/godot v1.4.18 // indirect
-	github.com/timakin/bodyclose v0.0.0-20240125160201-f835fa56326a // indirect
-	github.com/timonwong/loggercheck v0.10.0 // indirect
+	github.com/timakin/bodyclose v0.0.0-20241017074824-adbc21e6bf36 // indirect
+	github.com/timonwong/loggercheck v0.10.1 // indirect
 	github.com/tomarrell/wrapcheck/v2 v2.9.0 // indirect
 	github.com/tommy-muehle/go-mnd/v2 v2.5.1 // indirect
 	github.com/ultraware/funlen v0.1.0 // indirect
