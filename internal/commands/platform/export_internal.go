@@ -26,7 +26,6 @@ import (
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
-	"github.com/rs/zerolog"
 )
 
 var (
@@ -313,7 +312,9 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 	}
 
 	if pingoneApiClientId == "" || clientSecret == "" || environmentID == "" || regionCode == "" {
-		return fmt.Errorf(`failed to initialize pingone API client. one of worker client ID, worker client secret, pingone region code, and/or worker environment ID is empty. configure these properties via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)`)
+		return fmt.Errorf("failed to initialize pingone API client. one of worker client ID, worker client secret, " +
+			"pingone region code, and/or worker environment ID is empty. configure these properties via parameter flags, " +
+			"environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)")
 	}
 
 	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
@@ -334,22 +335,19 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
-		// If logging level is DEBUG or TRACE, include the worker client secret in the error message
-		var clientSecretErrorMessage string
-		if l.GetLevel() <= zerolog.DebugLevel {
-			clientSecretErrorMessage = fmt.Sprintf("worker client secret - %s", clientSecret)
-		} else {
-			clientSecretErrorMessage = "worker client secret - (use DEBUG or TRACE logging level to view the client secret in the error message)" // #nosec G101
-		}
-		initFailErrFormatMessage := `failed to initialize pingone API client.
-%s
+		return fmt.Errorf(`failed to initialize pingone API client.
+%v
 
 configuration values used for client initialization:
 worker client ID - %s
+worker client secret - %s
 worker environment ID - %s
-pingone region - %s
-%s`
-		return fmt.Errorf(initFailErrFormatMessage, err.Error(), pingoneApiClientId, environmentID, regionCode, clientSecretErrorMessage)
+pingone region - %s`,
+			err,
+			pingoneApiClientId,
+			strings.Repeat("*", len(clientSecret)),
+			environmentID,
+			regionCode)
 	}
 
 	return nil
