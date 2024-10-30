@@ -62,12 +62,12 @@ func ExpandedViperKeys() (keys []string) {
 func ValidateParentViperKey(viperKey string) error {
 	validKeys := ExpandedViperKeys()
 	for _, vKey := range validKeys {
-		if vKey == viperKey {
+		if strings.EqualFold(vKey, viperKey) {
 			return nil
 		}
 	}
 
-	validKeysStr := strings.Join(validKeys, ", ")
+	validKeysStr := "\n- " + strings.Join(validKeys, "\n- ")
 	return fmt.Errorf("key '%s' is not recognized as a valid configuration key. Valid keys: %s", viperKey, validKeysStr)
 }
 

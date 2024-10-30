@@ -41,7 +41,7 @@ func SetColorize() {
 func Message(message string, fields map[string]interface{}) {
 	l := logger.Get()
 
-	print(fmt.Sprintf("INFO: %s", message), fields, white, l.Info)
+	print(message, fields, white, l.Info)
 }
 
 // This function outputs green text to inform the user of success
