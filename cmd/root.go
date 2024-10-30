@@ -98,7 +98,7 @@ func initViperProfile() {
 
 	// Validate the configuration
 	if err := profiles.Validate(); err != nil {
-		output.UserFatal(fmt.Sprintf("Failed to validate Ping CLI configuration: %v", err), nil)
+		output.UserFatal(fmt.Sprintf("%v", err), nil)
 	}
 }
 
@@ -151,7 +151,7 @@ func initMainViper(cfgFile string) {
 		loadMainViperConfig(cfgFile)
 	}
 
-	// For each profile, if a viper key from an option doesn't exist, set it to nil
+	// For each profile, if a viper key from an option doesn't exist, set it to the default value
 	for _, pName := range profiles.GetMainConfig().ProfileNames() {
 		subViper := profiles.GetMainConfig().ViperInstance().Sub(pName)
 		for _, opt := range options.Options() {

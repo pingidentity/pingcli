@@ -2,12 +2,10 @@ package configuration_platform
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/pflag"
 )
 
@@ -81,20 +79,21 @@ func initServicesOption() {
 func initOutputDirectoryOption() {
 	cobraParamName := "output-directory"
 	cobraValue := new(customtypes.String)
-	defaultValue := getDefaultExportDir()
+	defaultValue := customtypes.String("")
 	envVar := "PINGCLI_EXPORT_OUTPUT_DIRECTORY"
 
 	options.PlatformExportOutputDirectoryOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
-		DefaultValue:    defaultValue,
+		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "d",
-			Usage: "Specifies the output directory for export. " +
-				"(default $(pwd)/export)" +
-				"\nExample: '$HOME/pingcli-export'",
+			Usage: "Specifies the output directory for export. Can be an absolute filepath or a relative filepath of" +
+				" the present working directory. " +
+				"\nExample: '/Users/example/pingcli-export'" +
+				"\nExample: 'pingcli-export'",
 			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
@@ -144,23 +143,4 @@ func initPingOneEnvironmentIDOption() {
 		Type:     options.ENUM_UUID,
 		ViperKey: "export.pingone.environmentID",
 	}
-}
-
-func getDefaultExportDir() (defaultExportDir *customtypes.String) {
-	l := logger.Get()
-	pwd, err := os.Getwd()
-	if err != nil {
-		l.Err(err).Msg("Failed to determine current working directory")
-		return nil
-	}
-
-	defaultExportDir = new(customtypes.String)
-
-	err = defaultExportDir.Set(fmt.Sprintf("%s/export", pwd))
-	if err != nil {
-		l.Err(err).Msg("Failed to set default export directory")
-		return nil
-	}
-
-	return defaultExportDir
 }
