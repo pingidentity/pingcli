@@ -117,7 +117,6 @@ func checkCfgFileLocation(cfgFile string) {
 	} else if err != nil {
 		output.SystemError(fmt.Sprintf("Failed to check if configuration file '%s' exists: %v", cfgFile, err), nil)
 	}
-
 }
 
 func createConfigFile(cfgFile string) {
@@ -130,8 +129,8 @@ func createConfigFile(cfgFile string) {
 	}
 
 	tempViper := viper.New()
-	tempViper.Set(options.RootActiveProfileOption.ViperKey, options.RootActiveProfileOption.DefaultValue)
-	tempViper.Set(fmt.Sprintf("%s.%v", options.RootActiveProfileOption.DefaultValue.String(), options.ProfileDescriptionOption.ViperKey), "Default profile created by Ping CLI")
+	tempViper.Set(options.RootActiveProfileOption.ViperKey, "default")
+	tempViper.Set(fmt.Sprintf("default.%v", options.ProfileDescriptionOption.ViperKey), "Default profile created by Ping CLI")
 
 	err = tempViper.WriteConfigAs(cfgFile)
 	if err != nil {
