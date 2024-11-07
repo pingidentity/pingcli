@@ -9,11 +9,12 @@ import (
 )
 
 const (
-	ENUM_EXPORT_SERVICE_PINGONE_PLATFORM string = "pingone-platform"
-	ENUM_EXPORT_SERVICE_PINGONE_SSO      string = "pingone-sso"
-	ENUM_EXPORT_SERVICE_PINGONE_MFA      string = "pingone-mfa"
-	ENUM_EXPORT_SERVICE_PINGONE_PROTECT  string = "pingone-protect"
-	ENUM_EXPORT_SERVICE_PINGFEDERATE     string = "pingfederate"
+	ENUM_EXPORT_SERVICE_PINGONE_PLATFORM  string = "pingone-platform"
+	ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE string = "pingone-authorize"
+	ENUM_EXPORT_SERVICE_PINGONE_SSO       string = "pingone-sso"
+	ENUM_EXPORT_SERVICE_PINGONE_MFA       string = "pingone-mfa"
+	ENUM_EXPORT_SERVICE_PINGONE_PROTECT   string = "pingone-protect"
+	ENUM_EXPORT_SERVICE_PINGFEDERATE      string = "pingfederate"
 )
 
 type ExportServices []string
@@ -64,6 +65,7 @@ func (es ExportServices) ContainsPingOneService() bool {
 
 	pingoneServices := []string{
 		ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE,
 		ENUM_EXPORT_SERVICE_PINGONE_SSO,
 		ENUM_EXPORT_SERVICE_PINGONE_MFA,
 		ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
@@ -100,6 +102,7 @@ func ExportServicesValidValues() []string {
 	allServices := []string{
 		ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE,
 		ENUM_EXPORT_SERVICE_PINGONE_SSO,
 		ENUM_EXPORT_SERVICE_PINGONE_MFA,
 		ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
