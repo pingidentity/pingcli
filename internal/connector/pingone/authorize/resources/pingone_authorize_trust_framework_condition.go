@@ -42,7 +42,7 @@ func (r *PingoneAuthorizeTrustFrameworkConditionResource) ExportAll() (*[]connec
 	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	for _, authorizationCondition := range embedded.GetAuthorizationConditions() {
-		authorizationConditionName, authorizationConditionNameOk := authorizationCondition.GetNameOk()
+		authorizationConditionName, authorizationConditionNameOk := authorizationCondition.GetFullNameOk()
 		authorizationConditionId, authorizationConditionIdOk := authorizationCondition.GetIdOk()
 
 		if authorizationConditionNameOk && authorizationConditionIdOk {

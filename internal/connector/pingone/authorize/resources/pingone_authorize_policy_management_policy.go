@@ -45,7 +45,17 @@ func (r *PingoneAuthorizePolicyManagementPolicyResource) ExportAll() (*[]connect
 		authorizationPolicyName, authorizationPolicyNameOk := authorizationPolicy.GetNameOk()
 		authorizationPolicyId, authorizationPolicyIdOk := authorizationPolicy.GetIdOk()
 
-		if authorizationPolicyNameOk && authorizationPolicyIdOk {
+		exportableEntity := true
+
+		if managedEntity, ok := authorizationPolicy.GetManagedEntityOk(); ok {
+			if restrictions, ok := managedEntity.GetRestrictionsOk(); ok {
+				if restrictions.GetReadOnly() {
+					exportableEntity = false
+				}
+			}
+		}
+
+		if authorizationPolicyNameOk && authorizationPolicyIdOk && exportableEntity {
 			commentData := map[string]string{
 				"Resource Type": r.ResourceType(),
 				"Authorize Policy Management Authorization Policy Name": *authorizationPolicyName,

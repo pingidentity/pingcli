@@ -42,10 +42,20 @@ func (r *PingoneAuthorizeTrustFrameworkAttributeResource) ExportAll() (*[]connec
 	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	for _, authorizationAttribute := range embedded.GetAuthorizationAttributes() {
-		authorizationAttributeName, authorizationAttributeNameOk := authorizationAttribute.GetNameOk()
+		authorizationAttributeName, authorizationAttributeNameOk := authorizationAttribute.GetFullNameOk()
 		authorizationAttributeId, authorizationAttributeIdOk := authorizationAttribute.GetIdOk()
 
-		if authorizationAttributeNameOk && authorizationAttributeIdOk {
+		exportableEntity := true
+
+		if managedEntity, ok := authorizationAttribute.GetManagedEntityOk(); ok {
+			if restrictions, ok := managedEntity.GetRestrictionsOk(); ok {
+				if restrictions.GetReadOnly() {
+					exportableEntity = false
+				}
+			}
+		}
+
+		if authorizationAttributeNameOk && authorizationAttributeIdOk && exportableEntity {
 			commentData := map[string]string{
 				"Resource Type": r.ResourceType(),
 				"Authorize Trust Framework Attribute Name": *authorizationAttributeName,

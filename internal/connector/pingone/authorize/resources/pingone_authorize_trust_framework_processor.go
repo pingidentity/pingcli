@@ -42,7 +42,7 @@ func (r *PingoneAuthorizeTrustFrameworkProcessorResource) ExportAll() (*[]connec
 	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	for _, authorizationProcessor := range embedded.GetAuthorizationProcessors() {
-		authorizationProcessorName, authorizationProcessorNameOk := authorizationProcessor.GetNameOk()
+		authorizationProcessorName, authorizationProcessorNameOk := authorizationProcessor.GetFullNameOk()
 		authorizationProcessorId, authorizationProcessorIdOk := authorizationProcessor.GetIdOk()
 
 		if authorizationProcessorNameOk && authorizationProcessorIdOk {

@@ -54,13 +54,13 @@ func (r *PingoneAuthorizeTrustFrameworkServiceResource) ExportAll() (*[]connecto
 		switch t := authorizationService.GetActualInstance().(type) {
 		case *authorize.AuthorizeEditorDataServicesConnectorServiceDefinitionDTO:
 			authorizationServiceId, authorizationServiceIdOk = t.GetIdOk()
-			authorizationServiceName, authorizationServiceNameOk = t.GetNameOk()
+			authorizationServiceName, authorizationServiceNameOk = t.GetFullNameOk()
 		case *authorize.AuthorizeEditorDataServicesHttpServiceDefinitionDTO:
 			authorizationServiceId, authorizationServiceIdOk = t.GetIdOk()
-			authorizationServiceName, authorizationServiceNameOk = t.GetNameOk()
+			authorizationServiceName, authorizationServiceNameOk = t.GetFullNameOk()
 		case *authorize.AuthorizeEditorDataServicesNoneServiceDefinitionDTO:
 			authorizationServiceId, authorizationServiceIdOk = t.GetIdOk()
-			authorizationServiceName, authorizationServiceNameOk = t.GetNameOk()
+			authorizationServiceName, authorizationServiceNameOk = t.GetFullNameOk()
 		default:
 			continue
 		}
