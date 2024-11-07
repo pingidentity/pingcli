@@ -164,6 +164,7 @@ func (m MainConfig) DeleteProfile(pName string) (err error) {
 }
 
 // Get all profile names from config.yaml configuration file
+// Returns a sorted slice of profile names
 func (m MainConfig) ProfileNames() (profileNames []string) {
 	keySet := make(map[string]struct{})
 	mainViperKeys := m.ViperInstance().AllKeys()
@@ -179,6 +180,8 @@ func (m MainConfig) ProfileNames() (profileNames []string) {
 			profileNames = append(profileNames, pName)
 		}
 	}
+
+	slices.Sort(profileNames)
 
 	return profileNames
 }
@@ -327,12 +330,29 @@ func GetOptionValue(opt options.Option) (pFlagValue string, err error) {
 	if opt.ViperKey != "" && mainConfig != nil {
 		var vValue any
 
-		if opt.ViperKey == options.RootActiveProfileOption.ViperKey {
-			mainViperInstance := mainConfig.ViperInstance()
-			if mainViperInstance != nil {
-				vValue = mainViperInstance.Get(opt.ViperKey)
+		mainViperInstance := mainConfig.ViperInstance()
+		// This recursive call is safe, as options.RootProfileOption.ViperKey is not set
+		definedProfileName, err := GetOptionValue(options.RootProfileOption)
+		if err != nil {
+			return "", err
+		}
+
+		// 3 Cases:
+		// - 1) Viper Key is the ActiveProfile Key, get value from main viper instance
+		// - 2) --profile flag has been set, get value from set profile viper instance
+		// - 3) no --profile flag set, get value from active profile viper instance defined in main viper instance
+
+		if opt.ViperKey == options.RootActiveProfileOption.ViperKey && mainViperInstance != nil {
+			// Case 1
+			vValue = mainViperInstance.Get(opt.ViperKey)
+		} else if definedProfileName != "" {
+			// Case 2
+			profileViperInstance := mainViperInstance.Sub(definedProfileName)
+			if profileViperInstance != nil {
+				vValue = profileViperInstance.Get(opt.ViperKey)
 			}
 		} else {
+			// Case 3
 			activeProfile := mainConfig.ActiveProfile()
 			if activeProfile != nil {
 				profileViperInstance := activeProfile.ViperInstance()

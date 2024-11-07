@@ -26,7 +26,6 @@ import (
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
-	"github.com/rs/zerolog"
 )
 
 var (
@@ -82,7 +81,7 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if err != nil {
 		return err
 	}
-	if err := createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
+	if outputDir, err = createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
 		return err
 	}
 
@@ -92,10 +91,7 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		return err
 	}
 
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Export to directory '%s' complete.", outputDir),
-		Result:  output.ENUM_RESULT_SUCCESS,
-	})
+	output.Success(fmt.Sprintf("Export to directory '%s' complete.", outputDir), nil)
 
 	return nil
 }
@@ -316,7 +312,9 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 	}
 
 	if pingoneApiClientId == "" || clientSecret == "" || environmentID == "" || regionCode == "" {
-		return fmt.Errorf(`failed to initialize pingone API client. one of worker client ID, worker client secret, pingone region code, and/or worker environment ID is empty. configure these properties via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)`)
+		return fmt.Errorf("failed to initialize pingone API client. one of worker client ID, worker client secret, " +
+			"pingone region code, and/or worker environment ID is empty. configure these properties via parameter flags, " +
+			"environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)")
 	}
 
 	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
@@ -337,49 +335,59 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
-		// If logging level is DEBUG or TRACE, include the worker client secret in the error message
-		var clientSecretErrorMessage string
-		if l.GetLevel() <= zerolog.DebugLevel {
-			clientSecretErrorMessage = fmt.Sprintf("worker client secret - %s", clientSecret)
-		} else {
-			clientSecretErrorMessage = "worker client secret - (use DEBUG or TRACE logging level to view the client secret in the error message)" // #nosec G101
-		}
-		initFailErrFormatMessage := `failed to initialize pingone API client.
-%s
+		return fmt.Errorf(`failed to initialize pingone API client.
+%v
 
 configuration values used for client initialization:
 worker client ID - %s
+worker client secret - %s
 worker environment ID - %s
-pingone region - %s
-%s`
-		return fmt.Errorf(initFailErrFormatMessage, err.Error(), pingoneApiClientId, environmentID, regionCode, clientSecretErrorMessage)
+pingone region - %s`,
+			err,
+			pingoneApiClientId,
+			strings.Repeat("*", len(clientSecret)),
+			environmentID,
+			regionCode)
 	}
 
 	return nil
 }
 
-func createOrValidateOutputDir(outputDir string, overwriteExport bool) (err error) {
+func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolvedOutputDir string, err error) {
 	l := logger.Get()
+
+	// Check if outputDir is empty
+	if outputDir == "" {
+		return "", fmt.Errorf("Failed to export services. The output directory is not set. Specify the output directory "+
+			"via the '--%s' flag, '%s' environment variable, or key '%s' in the configuration file.",
+			options.PlatformExportOutputDirectoryOption.CobraParamName,
+			options.PlatformExportOutputDirectoryOption.EnvVar,
+			options.PlatformExportOutputDirectoryOption.ViperKey)
+	}
+
+	// Check if path is absolute. If not, make it absolute using the present working directory
+	if !filepath.IsAbs(outputDir) {
+		pwd, err := os.Getwd()
+		if err != nil {
+			return "", fmt.Errorf("failed to get present working directory: %v", err)
+		}
+
+		outputDir = filepath.Join(pwd, outputDir)
+	}
 
 	// Check if outputDir exists
 	// If not, create the directory
 	l.Debug().Msgf("Validating export output directory '%s'", outputDir)
 	_, err = os.Stat(outputDir)
 	if err != nil {
-		output.Print(output.Opts{
-			Message: fmt.Sprintf("failed to find 'platform export' output directory. creating new output directory at filepath '%s'", outputDir),
-			Result:  output.ENUM_RESULT_NOACTION_WARN,
-		})
+		output.Warn(fmt.Sprintf("Output directory does not exist. Creating the directory at filepath '%s'", outputDir), nil)
 
 		err = os.MkdirAll(outputDir, os.ModePerm)
 		if err != nil {
-			return fmt.Errorf("failed to create 'platform export' output directory '%s': %s", outputDir, err.Error())
+			return "", fmt.Errorf("failed to create output directory '%s': %s", outputDir, err.Error())
 		}
 
-		output.Print(output.Opts{
-			Message: fmt.Sprintf("new 'platform export' output directory '%s' created", outputDir),
-			Result:  output.ENUM_RESULT_SUCCESS,
-		})
+		output.Success(fmt.Sprintf("Output directory '%s' created", outputDir), nil)
 	} else {
 		// Check if the output directory is empty
 		// If not, default behavior is to exit and not overwrite.
@@ -387,16 +395,16 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (err erro
 		if !overwriteExport {
 			dirEntries, err := os.ReadDir(outputDir)
 			if err != nil {
-				return fmt.Errorf("failed to read contents of 'platform export' output directory '%s': %s", outputDir, err.Error())
+				return "", fmt.Errorf("failed to read contents of output directory '%s': %v", outputDir, err)
 			}
 
 			if len(dirEntries) > 0 {
-				return fmt.Errorf("'platform export' output directory '%s' is not empty. Use --overwrite to overwrite existing export data", outputDir)
+				return "", fmt.Errorf("output directory '%s' is not empty. Use --overwrite to overwrite existing export data", outputDir)
 			}
 		}
 	}
 
-	return nil
+	return outputDir, nil
 }
 
 func getPingOneExportEnvID() (err error) {
@@ -414,10 +422,7 @@ func getPingOneExportEnvID() (err error) {
 			return fmt.Errorf("failed to determine pingone export environment ID.")
 		}
 
-		output.Print(output.Opts{
-			Message: "No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.",
-			Result:  output.ENUM_RESULT_NOACTION_WARN,
-		})
+		output.Warn("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
 	}
 
 	return nil
@@ -483,10 +488,7 @@ func exportConnectors(exportableConnectors *[]connector.Exportable, exportFormat
 
 	// Loop through user defined exportable connectors and export them
 	for _, connector := range *exportableConnectors {
-		output.Print(output.Opts{
-			Message: fmt.Sprintf("Exporting %s service...", connector.ConnectorServiceName()),
-			Result:  output.ENUM_RESULT_NIL,
-		})
+		output.Message(fmt.Sprintf("Exporting %s service...", connector.ConnectorServiceName()), nil)
 
 		err := connector.Export(exportFormat, outputDir, overwriteExport)
 		if err != nil {

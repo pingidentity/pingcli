@@ -96,24 +96,17 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return err
 	}
 
+	fields := map[string]any{
+		"response": json.RawMessage(body),
+		"status":   res.StatusCode,
+	}
+
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		output.Print(output.Opts{
-			Message: "Custom request",
-			Result:  output.ENUM_RESULT_FAILURE,
-			Fields: map[string]any{
-				"response": json.RawMessage(body),
-				"status":   res.StatusCode,
-			},
-		})
+		// Note we don't os.Exit(1) here because pingcli has executed
+		// without issue, despite a failed response to the custom request
+		output.UserError("Failed Custom Request", fields)
 	} else {
-		output.Print(output.Opts{
-			Message: "Custom request",
-			Result:  output.ENUM_RESULT_SUCCESS,
-			Fields: map[string]any{
-				"response": json.RawMessage(body),
-				"status":   res.StatusCode,
-			},
-		})
+		output.Success("Custom request successful", fields)
 	}
 
 	return nil
@@ -179,10 +172,7 @@ func pingoneAccessToken() (accessToken string, err error) {
 		}
 	}
 
-	output.Print(output.Opts{
-		Message: "PingOne access token does not exist or is expired, requesting a new token...",
-		Result:  output.ENUM_RESULT_NOACTION_WARN,
-	})
+	output.Warn("PingOne access token does not exist or is expired, requesting a new token...", nil)
 
 	// If no valid access token is available, login and get a new one
 	return pingoneAuth()

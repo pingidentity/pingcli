@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 )
@@ -25,7 +26,7 @@ func TestRequestCmd_Execute(t *testing.T) {
 	err = testutils_cobra.ExecutePingcli(t, "request",
 		"--service", "pingone",
 		"--http-method", "GET",
-		"environments",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, nil)
 
@@ -44,6 +45,9 @@ func TestRequestCmd_Execute(t *testing.T) {
 
 	for index, name := range re.SubexpNames() {
 		if name == captureGroupName {
+			if len(matchData) <= index {
+				t.Fatalf("Failed to capture JSON body: %v", matchData)
+			}
 			bodyJSON := matchData[index]
 
 			// Check for valid JSON
@@ -83,7 +87,7 @@ func TestRequestCmd_Execute_InvalidService(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--service", "invalid-service",
 		"--http-method", "GET",
-		"environments",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -94,7 +98,7 @@ func TestRequestCmd_Execute_InvalidHTTPMethod(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--service", "pingone",
 		"--http-method", "INVALID",
-		"environments",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -102,6 +106,6 @@ func TestRequestCmd_Execute_InvalidHTTPMethod(t *testing.T) {
 // Test Request Command with Missing Required Service Flag
 func TestRequestCmd_Execute_MissingRequiredServiceFlag(t *testing.T) {
 	expectedErrorPattern := `failed to send custom request: service is required`
-	err := testutils_cobra.ExecutePingcli(t, "request", "environments")
+	err := testutils_cobra.ExecutePingcli(t, "request", fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

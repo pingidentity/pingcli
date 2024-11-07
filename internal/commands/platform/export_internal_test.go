@@ -150,7 +150,7 @@ func TestCreateOrValidateOutputDir(t *testing.T) {
 
 	outputDir := os.TempDir() + "/nonexistantdir"
 
-	err := createOrValidateOutputDir(outputDir, false)
+	_, err := createOrValidateOutputDir(outputDir, false)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -160,7 +160,7 @@ func TestCreateOrValidateOutputDirExistentDir(t *testing.T) {
 
 	outputDir := t.TempDir()
 
-	err := createOrValidateOutputDir(outputDir, false)
+	_, err := createOrValidateOutputDir(outputDir, false)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -177,7 +177,7 @@ func TestCreateOrValidateOutputDirExistentDirWithFile(t *testing.T) {
 	}
 	file.Close()
 
-	err = createOrValidateOutputDir(outputDir, true)
+	_, err = createOrValidateOutputDir(outputDir, true)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -194,8 +194,8 @@ func TestCreateOrValidateOutputDirExistentDirWithFileNoOverwrite(t *testing.T) {
 	}
 	file.Close()
 
-	expectedErrorPattern := `^'platform export' output directory '.*' is not empty\. Use --overwrite to overwrite existing export data$`
-	err = createOrValidateOutputDir(outputDir, false)
+	expectedErrorPattern := `^output directory '.*' is not empty\. Use --overwrite to overwrite existing export data$`
+	_, err = createOrValidateOutputDir(outputDir, false)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 

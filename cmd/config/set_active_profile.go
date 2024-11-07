@@ -5,7 +5,6 @@ import (
 
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
-	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -15,21 +14,19 @@ const (
     pingcli config set-active-profile
 
   Set an active profile with a specific profile name.
-    pingcli config set-active-profile --profile myprofile`
+    pingcli config set-active-profile myprofile`
 )
 
 func NewConfigSetActiveProfileCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Args:                  common.ExactArgs(0),
+		Args:                  common.RangeArgs(0, 1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               setActiveProfileCommandExamples,
 		Long:                  `Set a custom configuration profile as the in-use profile.`,
 		RunE:                  configSetActiveProfileRunE,
 		Short:                 "Set a custom configuration profile as the in-use profile.",
-		Use:                   "set-active-profile [flags]",
+		Use:                   "set-active-profile [flags] [profile-name]",
 	}
-
-	cmd.Flags().AddFlag(options.ConfigSetActiveProfileOption.Flag)
 
 	return cmd
 }
@@ -38,7 +35,7 @@ func configSetActiveProfileRunE(cmd *cobra.Command, args []string) error {
 	l := logger.Get()
 	l.Debug().Msgf("Config set-active-profile Subcommand Called.")
 
-	if err := config_internal.RunInternalConfigSetActiveProfile(os.Stdin); err != nil {
+	if err := config_internal.RunInternalConfigSetActiveProfile(args, os.Stdin); err != nil {
 		return err
 	}
 

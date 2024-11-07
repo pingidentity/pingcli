@@ -65,18 +65,18 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 						if roleAssignmentIdOk && roleAssignmentRoleOk {
 							roleAssignmentRoleId, roleAssignmentRoleIdOk := roleAssignmentRole.GetIdOk()
 							if roleAssignmentRoleIdOk {
-								apiRole, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, *roleAssignmentRoleId).Execute()
+								role, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, *roleAssignmentRoleId).Execute()
 								err = common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 								if err != nil {
 									return nil, err
 								}
-								if apiRole != nil {
-									apiRoleName, apiRoleNameOk := apiRole.GetNameOk()
-									if apiRoleNameOk {
+								if role != nil {
+									roleName, roleNameOk := role.GetNameOk()
+									if roleNameOk {
 										commentData := map[string]string{
 											"Resource Type":         r.ResourceType(),
 											"Gateway Name":          *gatewayName,
-											"Role Name":             string(*apiRoleName),
+											"Role Name":             string(*roleName),
 											"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 											"Gateway ID":            *gatewayId,
 											"Role Assignment ID":    *roleAssignmentId,
@@ -84,7 +84,7 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 
 										importBlocks = append(importBlocks, connector.ImportBlock{
 											ResourceType:       r.ResourceType(),
-											ResourceName:       fmt.Sprintf("%s_%s", *gatewayName, *apiRoleName),
+											ResourceName:       fmt.Sprintf("%s_%s_%s", *gatewayName, *roleName, *roleAssignmentId),
 											ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, *gatewayId, *roleAssignmentId),
 											CommentInformation: common.GenerateCommentInformation(commentData),
 										})

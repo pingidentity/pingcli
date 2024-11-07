@@ -26,8 +26,5 @@ Open an issue on the project's GitHub repository's issue tracker:
 
 // Print the feedback message
 func PrintFeedbackMessage() {
-	output.Print(output.Opts{
-		Message: FeedbackMessage,
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(FeedbackMessage, nil)
 }

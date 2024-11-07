@@ -1,6 +1,7 @@
 package request_internal
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -16,7 +17,7 @@ func Test_RunInternalRequest(t *testing.T) {
 
 	t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
 
-	err := RunInternalRequest("environments")
+	err := RunInternalRequest(fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)))
 	testutils.CheckExpectedError(t, err, nil)
 }
 

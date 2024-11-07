@@ -60,21 +60,17 @@ func Options() []Option {
 		PingFederateAuthenticationTypeOption,
 
 		RootActiveProfileOption,
+		RootProfileOption,
 		RootColorOption,
 		RootConfigOption,
 		RootOutputFormatOption,
 
 		ProfileDescriptionOption,
 
-		ConfigProfileOption,
-		ConfigNameOption,
-		ConfigDescriptionOption,
 		ConfigAddProfileDescriptionOption,
 		ConfigAddProfileNameOption,
 		ConfigAddProfileSetActiveOption,
-		ConfigDeleteProfileOption,
-		ConfigViewProfileOption,
-		ConfigSetActiveProfileOption,
+		ConfigDeleteAutoAcceptOption,
 		ConfigGetProfileOption,
 		ConfigSetProfileOption,
 		ConfigUnsetProfileOption,
@@ -115,19 +111,11 @@ var (
 
 // 'pingcli config' command options
 var (
-	ConfigProfileOption     Option
-	ConfigNameOption        Option
-	ConfigDescriptionOption Option
-
 	ConfigAddProfileDescriptionOption Option
 	ConfigAddProfileNameOption        Option
 	ConfigAddProfileSetActiveOption   Option
 
-	ConfigDeleteProfileOption Option
-
-	ConfigViewProfileOption Option
-
-	ConfigSetActiveProfileOption Option
+	ConfigDeleteAutoAcceptOption Option
 
 	ConfigGetProfileOption Option
 
@@ -153,6 +141,7 @@ var (
 // Root Command Options
 var (
 	RootActiveProfileOption Option
+	RootProfileOption       Option
 	RootColorOption         Option
 	RootConfigOption        Option
 	RootOutputFormatOption  Option

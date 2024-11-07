@@ -81,19 +81,19 @@ func TestRootCmd_OutputFlagTextVsJSON(t *testing.T) {
 	}
 }
 
-// Test Root Command Executes when provided the --color flag
+// Test Root Command Executes when provided the --no-color flag
 func TestRootCmd_ColorFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "--color=true")
+	err := testutils_cobra.ExecutePingcli(t, "--no-color")
 	testutils.CheckExpectedError(t, err, nil)
 
-	err = testutils_cobra.ExecutePingcli(t, "--color=false")
+	err = testutils_cobra.ExecutePingcli(t, "--no-color=false")
 	testutils.CheckExpectedError(t, err, nil)
 }
 
-// Test Root Command fails when provided an invalid value for the --color flag
+// Test Root Command fails when provided an invalid value for the --no-color flag
 func TestRootCmd_InvalidColorFlag(t *testing.T) {
-	expectedErrorPattern := `^invalid argument "invalid" for "--color" flag: strconv\.ParseBool: parsing "invalid": invalid syntax$`
-	err := testutils_cobra.ExecutePingcli(t, "--color=invalid")
+	expectedErrorPattern := `^invalid argument "invalid" for ".*" flag: strconv\.ParseBool: parsing "invalid": invalid syntax$`
+	err := testutils_cobra.ExecutePingcli(t, "--no-color=invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -110,15 +110,15 @@ func TestRootCmd_NoValueConfigFlag(t *testing.T) {
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test Root Command Executes when provided the --active-profile flag
-func TestRootCmd_ActiveProfileFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "--active-profile", "default")
+// Test Root Command Executes when provided the --profile flag
+func TestRootCmd_ProfileFlag(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "--profile", "default")
 	testutils.CheckExpectedError(t, err, nil)
 }
 
-// Test Root Command fails when provided no value for the --active-profile flag
-func TestRootCmd_NoValueActiveProfileFlag(t *testing.T) {
-	expectedErrorPattern := `^flag needs an argument: --active-profile$`
-	err := testutils_cobra.ExecutePingcli(t, "--active-profile")
+// Test Root Command fails when provided no value for the --profile flag
+func TestRootCmd_NoValueProfileFlag(t *testing.T) {
+	expectedErrorPattern := `^flag needs an argument: --profile$`
+	err := testutils_cobra.ExecutePingcli(t, "--profile")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

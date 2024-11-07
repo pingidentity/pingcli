@@ -12,7 +12,7 @@ import (
 func Test_ValidateViperKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	err := configuration.ValidateViperKey("color")
+	err := configuration.ValidateViperKey("noColor")
 	if err != nil {
 		t.Errorf("ValidateViperKey returned error: %v", err)
 	}
@@ -50,7 +50,7 @@ func Test_ValidateParentViperKey(t *testing.T) {
 func Test_ValidateParentViperKey_InvalidKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `(?s)^key '.*' is not recognized as a valid configuration key. Valid keys: .*$`
 	err := configuration.ValidateParentViperKey("invalid-key")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -59,7 +59,7 @@ func Test_ValidateParentViperKey_InvalidKey(t *testing.T) {
 func Test_ValidateParentViperKey_EmptyKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^key '' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `(?s)^key '' is not recognized as a valid configuration key. Valid keys: .*$`
 	err := configuration.ValidateParentViperKey("")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -68,12 +68,12 @@ func Test_ValidateParentViperKey_EmptyKey(t *testing.T) {
 func Test_OptionFromViperKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	opt, err := configuration.OptionFromViperKey("color")
+	opt, err := configuration.OptionFromViperKey("noColor")
 	if err != nil {
 		t.Errorf("OptionFromViperKey returned error: %v", err)
 	}
 
-	if opt.ViperKey != "color" {
+	if opt.ViperKey != "noColor" {
 		t.Errorf("OptionFromViperKey returned invalid option: %v", opt)
 	}
 }

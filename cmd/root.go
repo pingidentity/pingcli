@@ -29,13 +29,13 @@ func init() {
 }
 
 // rootCmd represents the base command when called without any subcommands
-func NewRootCommand() *cobra.Command {
+func NewRootCommand(version string, commit string) *cobra.Command {
 	cmd := &cobra.Command{
 		Long:          "A CLI tool for managing the configuration of Ping Identity products.",
 		Short:         "A CLI tool for managing the configuration of Ping Identity products.",
 		SilenceErrors: true, // Upon error in RunE method, let output package in main.go handle error output
 		Use:           "pingcli",
-		Version:       "v2.0.0-alpha.4",
+		Version:       fmt.Sprintf("%s (commit: %s)", version, commit),
 	}
 
 	cmd.AddCommand(
@@ -47,7 +47,7 @@ func NewRootCommand() *cobra.Command {
 	)
 
 	cmd.PersistentFlags().AddFlag(options.RootConfigOption.Flag)
-	cmd.PersistentFlags().AddFlag(options.RootActiveProfileOption.Flag)
+	cmd.PersistentFlags().AddFlag(options.RootProfileOption.Flag)
 	cmd.PersistentFlags().AddFlag(options.RootOutputFormatOption.Flag)
 	cmd.PersistentFlags().AddFlag(options.RootColorOption.Flag)
 
@@ -63,11 +63,7 @@ func initViperProfile() {
 
 	cfgFile, err := profiles.GetOptionValue(options.RootConfigOption)
 	if err != nil {
-		output.Print(output.Opts{
-			Message:      "Failed to get configuration file location",
-			Result:       output.ENUM_RESULT_FAILURE,
-			FatalMessage: err.Error(),
-		})
+		output.SystemError(fmt.Sprintf("Failed to get configuration file location: %v", err), nil)
 	}
 
 	l.Debug().Msgf("Using configuration file location for initialization: %s", cfgFile)
@@ -80,33 +76,29 @@ func initViperProfile() {
 	//Configure the main viper instance
 	initMainViper(cfgFile)
 
-	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	userDefinedProfile, err := profiles.GetOptionValue(options.RootProfileOption)
 	if err != nil {
-		output.Print(output.Opts{
-			Message:      "Failed to get active profile",
-			Result:       output.ENUM_RESULT_FAILURE,
-			FatalMessage: err.Error(),
-		})
+		output.SystemError(fmt.Sprintf("Failed to get user-defined profile: %v", err), nil)
+	}
+	configFileActiveProfile, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Failed to get active profile from configuration file: %v", err), nil)
 	}
 
-	l.Debug().Msgf("Using configuration profile: %s", profileName)
+	if userDefinedProfile != "" {
+		l.Debug().Msgf("Using configuration profile: %s", userDefinedProfile)
+	} else {
+		l.Debug().Msgf("Using configuration profile: %s", configFileActiveProfile)
+	}
 
 	// Configure the profile viper instance
-	if err := profiles.GetMainConfig().ChangeActiveProfile(profileName); err != nil {
-		output.Print(output.Opts{
-			Message:      "Failed to set profile viper",
-			Result:       output.ENUM_RESULT_FAILURE,
-			FatalMessage: err.Error(),
-		})
+	if err := profiles.GetMainConfig().ChangeActiveProfile(configFileActiveProfile); err != nil {
+		output.UserFatal(fmt.Sprintf("Failed to set active profile: %v", err), nil)
 	}
 
 	// Validate the configuration
 	if err := profiles.Validate(); err != nil {
-		output.Print(output.Opts{
-			Message:      "Failed to validate Ping CLI configuration",
-			Result:       output.ENUM_RESULT_FAILURE,
-			FatalMessage: err.Error(),
-		})
+		output.UserFatal(fmt.Sprintf("%v", err), nil)
 	}
 }
 
@@ -116,43 +108,25 @@ func checkCfgFileLocation(cfgFile string) {
 	if os.IsNotExist(err) {
 		// Only create a new configuration file if it is the default configuration file location
 		if cfgFile == options.RootConfigOption.DefaultValue.String() {
-			output.Print(output.Opts{
-				Message: fmt.Sprintf("Ping CLI configuration file '%s' does not exist.", cfgFile),
-				Result:  output.ENUM_RESULT_NOACTION_WARN,
-			})
+			output.Warn(fmt.Sprintf("Ping CLI configuration file '%s' does not exist.", cfgFile), nil)
 
 			createConfigFile(options.RootConfigOption.DefaultValue.String())
 		} else {
-			output.Print(output.Opts{
-				Message:      fmt.Sprintf("Configuration file '%s' does not exist.", cfgFile),
-				Result:       output.ENUM_RESULT_FAILURE,
-				FatalMessage: fmt.Sprintf("Configuration file '%s' does not exist. Use the default configuration file location or specify a valid configuration file location with the --config flag.", cfgFile),
-			})
+			output.UserFatal(fmt.Sprintf("Configuration file '%s' does not exist. Use the default configuration file location or specify a valid configuration file location with the --config flag.", cfgFile), nil)
 		}
 	} else if err != nil {
-		output.Print(output.Opts{
-			Message:      fmt.Sprintf("Failed to check if configuration file '%s' exists", cfgFile),
-			Result:       output.ENUM_RESULT_FAILURE,
-			FatalMessage: err.Error(),
-		})
+		output.SystemError(fmt.Sprintf("Failed to check if configuration file '%s' exists: %v", cfgFile, err), nil)
 	}
 
 }
 
 func createConfigFile(cfgFile string) {
-	output.Print(output.Opts{
-		Message: fmt.Sprintf("Creating new Ping CLI configuration file at: %s", cfgFile),
-		Result:  output.ENUM_RESULT_NIL,
-	})
+	output.Message(fmt.Sprintf("Creating new Ping CLI configuration file at: %s", cfgFile), nil)
 
 	// MkdirAll does nothing if directories already exist. Create needed directories for config file location.
 	err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
 	if err != nil {
-		output.Print(output.Opts{
-			Message:      fmt.Sprintf("Failed to make directories needed for new Ping CLI configuration file: %s", cfgFile),
-			Result:       output.ENUM_RESULT_FAILURE,
-			FatalMessage: err.Error(),
-		})
+		output.SystemError(fmt.Sprintf("Failed to make the directory for the new configuration file '%s': %v", cfgFile, err), nil)
 	}
 
 	tempViper := viper.New()
@@ -161,11 +135,7 @@ func createConfigFile(cfgFile string) {
 
 	err = tempViper.WriteConfigAs(cfgFile)
 	if err != nil {
-		output.Print(output.Opts{
-			Message:      fmt.Sprintf("Failed to create configuration file at: %s", cfgFile),
-			Result:       output.ENUM_RESULT_FAILURE,
-			FatalMessage: err.Error(),
-		})
+		output.SystemError(fmt.Sprintf("Failed to create configuration file '%s': %v", cfgFile, err), nil)
 	}
 }
 
@@ -181,7 +151,7 @@ func initMainViper(cfgFile string) {
 		loadMainViperConfig(cfgFile)
 	}
 
-	// For each profile, if a viper key from an option doesn't exist, set it to nil
+	// For each profile, if a viper key from an option doesn't exist, set it to the default value
 	for _, pName := range profiles.GetMainConfig().ProfileNames() {
 		subViper := profiles.GetMainConfig().ViperInstance().Sub(pName)
 		for _, opt := range options.Options() {
@@ -194,10 +164,7 @@ func initMainViper(cfgFile string) {
 		}
 		err := profiles.GetMainConfig().SaveProfile(pName, subViper)
 		if err != nil {
-			output.Print(output.Opts{
-				Message: fmt.Sprintf("Error: Failed to save profile %s.", pName),
-				Result:  output.ENUM_RESULT_FAILURE,
-			})
+			output.SystemError(fmt.Sprintf("Failed to save profile '%s': %v", pName, err), nil)
 		}
 	}
 }
@@ -211,11 +178,7 @@ func loadMainViperConfig(cfgFile string) {
 
 	// If a config file is found, read it in.
 	if err := mainViper.ReadInConfig(); err != nil {
-		output.Print(output.Opts{
-			Message:      fmt.Sprintf("Failed to read configuration from file: %s", cfgFile),
-			Result:       output.ENUM_RESULT_FAILURE,
-			FatalMessage: err.Error(),
-		})
+		output.SystemError(fmt.Sprintf("Failed to read configuration from file '%s': %v", cfgFile, err), nil)
 	} else {
 		l.Info().Msgf("Using configuration file: %s", mainViper.ConfigFileUsed())
 	}

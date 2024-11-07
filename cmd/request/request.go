@@ -13,9 +13,9 @@ const (
     pingcli request --service pingone environments
 
   Send a custom API request to the configured PingOne tenant, making a GET request to retrieve JSON configuration for a specific environment.
-    pingcli request --service pingone --http-method GET environments/$MY_ENVIRONMENT_ID
+    pingcli request --service pingone --http-method GET --output-format json environments/$MY_ENVIRONMENT_ID
 
-  Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with raw JSON data.
+  Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
     pingcli request --service pingone --http-method POST --data '{"name": "My environment"}' environments
 
   Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with JSON data sourced from a file.

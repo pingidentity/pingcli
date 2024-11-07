@@ -15,12 +15,15 @@ const (
     pingcli config delete-profile
 
   Delete a configuration profile by specifying the name of an existing configured profile.
-    pingcli config delete-profile --profile MyDeveloperEnv`
+    pingcli config delete-profile MyDeveloperEnv
+	
+  Delete a configuration profile by auto-accepting the deletion.
+    pingcli config delete-profile --yes MyDeveloperEnv`
 )
 
 func NewConfigDeleteProfileCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Args:                  common.ExactArgs(0),
+		Args:                  common.RangeArgs(0, 1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               deleteProfileCommandExamples,
 		Long: `Delete an existing custom configuration profile from the CLI.
@@ -28,10 +31,10 @@ func NewConfigDeleteProfileCommand() *cobra.Command {
 The profile to delete will be removed from the CLI configuration file.`,
 		RunE:  configDeleteProfileRunE,
 		Short: "Delete a custom configuration profile.",
-		Use:   "delete-profile [flags]",
+		Use:   "delete-profile [flags] [profile-name]",
 	}
 
-	cmd.Flags().AddFlag(options.ConfigDeleteProfileOption.Flag)
+	cmd.Flags().AddFlag(options.ConfigDeleteAutoAcceptOption.Flag)
 
 	return cmd
 }
@@ -40,7 +43,7 @@ func configDeleteProfileRunE(cmd *cobra.Command, args []string) error {
 	l := logger.Get()
 	l.Debug().Msgf("Config delete-profile Subcommand Called.")
 
-	if err := config_internal.RunInternalConfigDeleteProfile(os.Stdin); err != nil {
+	if err := config_internal.RunInternalConfigDeleteProfile(args, os.Stdin); err != nil {
 		return err
 	}
 

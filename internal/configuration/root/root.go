@@ -13,51 +13,65 @@ import (
 
 func InitRootOptions() {
 	initActiveProfileOption()
+	initProfileOption()
 	initColorOption()
 	initConfigOption()
 	initOutputFormatOption()
 }
 
 func initActiveProfileOption() {
-	cobraParamName := "active-profile"
-	cobraValue := new(customtypes.String)
-	defaultValue := customtypes.String("default")
+	defaultValue := customtypes.String("")
 
 	options.RootActiveProfileOption = options.Option{
+		CobraParamName:  "", // No cobra param
+		CobraParamValue: nil,
+		DefaultValue:    &defaultValue,
+		EnvVar:          "",  // No env var
+		Flag:            nil, // No flag
+		Type:            options.ENUM_STRING,
+		ViperKey:        "activeProfile",
+	}
+}
+
+func initProfileOption() {
+	cobraParamName := "profile"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+
+	options.RootProfileOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "PINGCLI_ACTIVE_PROFILE",
+		EnvVar:          "PINGCLI_PROFILE",
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "P",
-			Usage:     "The name of the stored custom configuration profile to use.",
+			Usage:     "The name of a configuration profile to use.",
 			Value:     cobraValue,
-			DefValue:  "default",
 		},
 		Type:     options.ENUM_STRING,
-		ViperKey: "activeProfile",
+		ViperKey: "", // No viper key
 	}
 }
 
 func initColorOption() {
-	cobraParamName := "color"
+	cobraParamName := "no-color"
 	cobraValue := new(customtypes.Bool)
-	defaultValue := customtypes.Bool(true)
+	defaultValue := customtypes.Bool(false)
 
 	options.RootColorOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          "PINGCLI_COLOR",
+		EnvVar:          "PINGCLI_NO_COLOR",
 		Flag: &pflag.Flag{
-			Name:     cobraParamName,
-			Usage:    "Show text output in color.",
-			Value:    cobraValue,
-			DefValue: "true",
+			Name:        cobraParamName,
+			Usage:       "Disable text output in color. (default false)",
+			Value:       cobraValue,
+			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Type:     options.ENUM_BOOL,
-		ViperKey: "color",
+		ViperKey: "noColor",
 	}
 }
 
@@ -74,9 +88,9 @@ func initConfigOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "C",
-			Usage:     "The relative or full path to a custom Ping CLI configuration file.",
-			Value:     cobraValue,
-			DefValue:  "\"$HOME/.pingcli/config.yaml\"",
+			Usage: "The relative or full path to a custom Ping CLI configuration file. " +
+				"(default $HOME/.pingcli/config.yaml)",
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_STRING,
 		ViperKey: "", // No viper key
@@ -96,9 +110,14 @@ func initOutputFormatOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "O",
-			Usage:     fmt.Sprintf("Specify the console output format. Options are: %s", strings.Join(customtypes.OutputFormatValidValues(), ", ")),
-			Value:     cobraValue,
-			DefValue:  customtypes.ENUM_OUTPUT_FORMAT_TEXT,
+			Usage: fmt.Sprintf(
+				"Specify the console output format. "+
+					"(default %s)"+
+					"\nOptions are: %s.",
+				customtypes.ENUM_OUTPUT_FORMAT_TEXT,
+				strings.Join(customtypes.OutputFormatValidValues(), ", "),
+			),
+			Value: cobraValue,
 		},
 		Type:     options.ENUM_OUTPUT_FORMAT,
 		ViperKey: "outputFormat",

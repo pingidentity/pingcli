@@ -13,9 +13,9 @@ func TestConfigViewProfileCmd_Execute(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
-// Test Config Set Command Executes with --profile flag
+// Test Config Set Command Executes with a defined profile
 func TestConfigViewProfileCmd_Execute_WithProfileFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "--profile", "production")
+	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "production")
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -29,13 +29,13 @@ func TestConfigViewProfileCmd_Execute_InvalidFlag(t *testing.T) {
 // Test Config Set Command fails with non-existent profile
 func TestConfigViewProfileCmd_Execute_NonExistentProfile(t *testing.T) {
 	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*' profile does not exist$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "--profile", "non-existent")
+	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "non-existent")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // Test Config Set Command fails with invalid profile
 func TestConfigViewProfileCmd_Execute_InvalidProfile(t *testing.T) {
 	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "--profile", "(*&*(#))")
+	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "(*&*(#))")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

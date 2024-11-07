@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"text/template"
+	"time"
 
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -51,6 +52,11 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		}
 		defer outputFile.Close()
 
+		err = writeHeader(format, outputFilePath, outputFile)
+		if err != nil {
+			return err
+		}
+
 		for _, importBlock := range *importBlocks {
 			// Sanitize import block "to". Make lowercase, remove special chars, convert space to underscore
 			importBlock.Sanitize()
@@ -59,12 +65,38 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 			case customtypes.ENUM_EXPORT_FORMAT_HCL:
 				err := hclImportBlockTemplate.Execute(outputFile, importBlock)
 				if err != nil {
-					return fmt.Errorf("failed to write import block template to file %q. err: %s", outputFilePath, err.Error())
+					return fmt.Errorf("failed to write import template to file %q. err: %s", outputFilePath, err.Error())
 				}
 			default:
 				return fmt.Errorf("unrecognized export format %q. Must be one of: %s", format, customtypes.ExportFormatValidValues())
 			}
 		}
 	}
+	return nil
+}
+
+func writeHeader(format, outputFilePath string, outputFile *os.File) error {
+	// Parse the HCL header
+	hclImportHeaderTemplate, err := template.New("HCLImportHeader").Parse(connector.HCLImportHeaderTemplate)
+	if err != nil {
+		return fmt.Errorf("failed to parse HCL import header template. err: %s", err.Error())
+	}
+
+	header := struct {
+		DateTime string
+	}{
+		DateTime: time.Now().Format(time.RFC1123),
+	}
+
+	switch format {
+	case customtypes.ENUM_EXPORT_FORMAT_HCL:
+		err := hclImportHeaderTemplate.Execute(outputFile, header)
+		if err != nil {
+			return fmt.Errorf("failed to write import template to file %q. err: %s", outputFilePath, err.Error())
+		}
+	default:
+		return fmt.Errorf("unrecognized export format %q. Must be one of: %s", format, customtypes.ExportFormatValidValues())
+	}
+
 	return nil
 }
