@@ -115,17 +115,15 @@ func printText(message string, fields map[string]interface{}, colorFunc func(for
 	logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
 
-	if fields != nil {
-		for k, v := range fields {
-			switch typedValue := v.(type) {
-			// If the value is a json.RawMessage, print it as a string
-			case json.RawMessage:
-				fmt.Println(cyan("%s: \n%s", k, typedValue))
-				l.Info().Msg(cyan("%s: %s", k, typedValue))
-			default:
-				fmt.Println(cyan("%s: \n%v", k, v))
-				l.Info().Msg(cyan("%s: %v", k, v))
-			}
+	for k, v := range fields {
+		switch typedValue := v.(type) {
+		// If the value is a json.RawMessage, print it as a string
+		case json.RawMessage:
+			fmt.Println(cyan("%s: \n%s", k, typedValue))
+			l.Info().Msg(cyan("%s: %s", k, typedValue))
+		default:
+			fmt.Println(cyan("%s: \n%v", k, v))
+			l.Info().Msg(cyan("%s: %v", k, v))
 		}
 	}
 
