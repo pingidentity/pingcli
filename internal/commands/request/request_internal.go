@@ -242,15 +242,23 @@ func pingoneAuth() (accessToken string, err error) {
 		return "", err
 	}
 
-	// Store access token and expiry
-	profileViper := profiles.GetMainConfig().ActiveProfile().ViperInstance()
-	profileViper.Set(options.RequestAccessTokenOption.ViperKey, pingoneAuthResponse.AccessToken)
-
 	currentTime := time.Now().Unix()
 	tokenExpiry := currentTime + pingoneAuthResponse.ExpiresIn
-	profileViper.Set(options.RequestAccessTokenExpiryOption.ViperKey, tokenExpiry)
 
-	err = profiles.GetMainConfig().SaveProfile(profiles.GetMainConfig().ActiveProfile().Name(), profileViper)
+	// Store access token and expiry
+	pName, err := profiles.GetOptionValue(options.RootProfileOption)
+	if err != nil {
+		return "", err
+	}
+
+	if pName == "" {
+		pName = profiles.GetMainConfig().ActiveProfile().Name()
+	}
+
+	profileViper := profiles.GetMainConfig().ViperInstance().Sub(pName)
+	profileViper.Set(options.RequestAccessTokenOption.ViperKey, pingoneAuthResponse.AccessToken)
+	profileViper.Set(options.RequestAccessTokenExpiryOption.ViperKey, tokenExpiry)
+	err = profiles.GetMainConfig().SaveProfile(pName, profileViper)
 	if err != nil {
 		return "", err
 	}
