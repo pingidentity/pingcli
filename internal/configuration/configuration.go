@@ -28,7 +28,7 @@ func ViperKeys() (keys []string) {
 func ValidateViperKey(viperKey string) error {
 	validKeys := ViperKeys()
 	for _, vKey := range validKeys {
-		if vKey == viperKey {
+		if strings.EqualFold(vKey, viperKey) {
 			return nil
 		}
 	}
