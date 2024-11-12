@@ -89,9 +89,7 @@ Please raise an issue at https://github.com/pingidentity/pingcli`,
 	print(systemMsg, fields, boldRed, l.Fatal)
 }
 
-func print(message string,
-	fields map[string]interface{},
-	colorFunc func(format string, a ...interface{}) string,
+func print(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string,
 	logEventFunc func() *zerolog.Event) {
 	SetColorize()
 
@@ -113,9 +111,7 @@ func print(message string,
 
 }
 
-func printText(message string,
-	fields map[string]interface{},
-	colorFunc func(format string, a ...interface{}) string,
+func printText(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string,
 	logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
 
@@ -138,10 +134,14 @@ func printText(message string,
 	logEventFunc().Msg(colorFunc(message))
 }
 
-func printJson(message string,
-	fields map[string]interface{},
-	logEventFunc func() *zerolog.Event) {
+func printJson(message string, fields map[string]interface{}, logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
+
+	if fields == nil {
+		fields = map[string]interface{}{
+			"message": message,
+		}
+	}
 
 	if fields["message"] == nil {
 		fields["message"] = message
