@@ -70,10 +70,10 @@ func readConfigSetOptions(kvPair string) (pName string, vKey string, vValue stri
 }
 
 func readConfigSetProfileName() (pName string, err error) {
-	if !options.ConfigSetProfileOption.Flag.Changed {
+	if !options.RootProfileOption.Flag.Changed {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 	} else {
-		pName, err = profiles.GetOptionValue(options.ConfigSetProfileOption)
+		pName, err = profiles.GetOptionValue(options.RootProfileOption)
 	}
 
 	if err != nil {

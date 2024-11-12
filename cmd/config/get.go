@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
-	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -31,8 +30,6 @@ func NewConfigGetCommand() *cobra.Command {
 		Short: "Read stored configuration settings for the CLI.",
 		Use:   "get [flags] key",
 	}
-
-	cmd.Flags().AddFlag(options.ConfigGetProfileOption.Flag)
 
 	return cmd
 }

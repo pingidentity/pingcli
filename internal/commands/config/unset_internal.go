@@ -48,10 +48,10 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 }
 
 func readConfigUnsetOptions() (pName string, err error) {
-	if !options.ConfigUnsetProfileOption.Flag.Changed {
+	if !options.RootProfileOption.Flag.Changed {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 	} else {
-		pName, err = profiles.GetOptionValue(options.ConfigUnsetProfileOption)
+		pName, err = profiles.GetOptionValue(options.RootProfileOption)
 	}
 
 	if err != nil {
