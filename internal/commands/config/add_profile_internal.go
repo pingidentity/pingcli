@@ -42,6 +42,11 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 		output.Success(fmt.Sprintf("Profile '%s' set as active.", newProfileName), nil)
 	}
 
+	err = profiles.GetMainConfig().DefaultMissingViperKeys()
+	if err != nil {
+		return fmt.Errorf("failed to add profile: %v", err)
+	}
+
 	return nil
 }
 

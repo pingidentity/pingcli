@@ -150,21 +150,9 @@ func initMainViper(cfgFile string) {
 		loadMainViperConfig(cfgFile)
 	}
 
-	// For each profile, if a viper key from an option doesn't exist, set it to the default value
-	for _, pName := range profiles.GetMainConfig().ProfileNames() {
-		subViper := profiles.GetMainConfig().ViperInstance().Sub(pName)
-		for _, opt := range options.Options() {
-			if opt.ViperKey == "" || opt.ViperKey == options.RootActiveProfileOption.ViperKey {
-				continue
-			}
-			if !subViper.IsSet(opt.ViperKey) {
-				subViper.Set(opt.ViperKey, opt.DefaultValue)
-			}
-		}
-		err := profiles.GetMainConfig().SaveProfile(pName, subViper)
-		if err != nil {
-			output.SystemError(fmt.Sprintf("Failed to save profile '%s': %v", pName, err), nil)
-		}
+	err := profiles.GetMainConfig().DefaultMissingViperKeys()
+	if err != nil {
+		output.SystemError(err.Error(), nil)
 	}
 }
 

@@ -307,6 +307,27 @@ func (m MainConfig) ProfileViperValue(pName, viperKey string) (yamlStr string, e
 	return string(yaml), nil
 }
 
+func (m MainConfig) DefaultMissingViperKeys() (err error) {
+	// For each profile, if a viper key from an option doesn't exist, set it to the default value
+	for _, pName := range m.ProfileNames() {
+		subViper := m.ViperInstance().Sub(pName)
+		for _, opt := range options.Options() {
+			if opt.ViperKey == "" || opt.ViperKey == options.RootActiveProfileOption.ViperKey {
+				continue
+			}
+			if !subViper.IsSet(opt.ViperKey) {
+				subViper.Set(opt.ViperKey, opt.DefaultValue)
+			}
+		}
+		err := m.SaveProfile(pName, subViper)
+		if err != nil {
+			return fmt.Errorf("Failed to save profile '%s': %v", pName, err)
+		}
+	}
+
+	return nil
+}
+
 func (a ActiveProfile) ViperInstance() *viper.Viper {
 	return a.viperInstance
 }
