@@ -38,8 +38,6 @@ func TestRequestCmd_Execute(t *testing.T) {
 		t.Fatalf("Failed to read from pipe: %v", err)
 	}
 
-	t.Log(string(pipeReaderOut))
-
 	// Capture response json body
 	captureGroupName := "BodyJSON"
 	re := regexp.MustCompile(fmt.Sprintf(`(?s)^.*response:\s+(?P<%s>\{.*\}).*$`, captureGroupName))
