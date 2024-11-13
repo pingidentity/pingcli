@@ -252,13 +252,20 @@ func pingoneAuth() (accessToken string, err error) {
 	}
 
 	if pName == "" {
-		pName = profiles.GetMainConfig().ActiveProfile().Name()
+		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
+		if err != nil {
+			return "", err
+		}
 	}
 
-	profileViper := profiles.GetMainConfig().ViperInstance().Sub(pName)
-	profileViper.Set(options.RequestAccessTokenOption.ViperKey, pingoneAuthResponse.AccessToken)
-	profileViper.Set(options.RequestAccessTokenExpiryOption.ViperKey, tokenExpiry)
-	err = profiles.GetMainConfig().SaveProfile(pName, profileViper)
+	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
+	if err != nil {
+		return "", err
+	}
+
+	subViper.Set(options.RequestAccessTokenOption.ViperKey, pingoneAuthResponse.AccessToken)
+	subViper.Set(options.RequestAccessTokenExpiryOption.ViperKey, tokenExpiry)
+	err = profiles.GetMainConfig().SaveProfile(pName, subViper)
 	if err != nil {
 		return "", err
 	}

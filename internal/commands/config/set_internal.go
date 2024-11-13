@@ -27,11 +27,10 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: value for key '%s' is empty. Use 'pingcli config unset %s' to unset the key", vKey, vKey)
 	}
 
-	if err = profiles.GetMainConfig().ValidateExistingProfileName(pName); err != nil {
+	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
+	if err != nil {
 		return fmt.Errorf("failed to set configuration: %v", err)
 	}
-
-	subViper := profiles.GetMainConfig().ViperInstance().Sub(pName)
 
 	opt, err := configuration.OptionFromViperKey(vKey)
 	if err != nil {
