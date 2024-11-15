@@ -4,7 +4,53 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 
 ## Install
 
-<!-- TODO -->
+#### macOS/Linux - Homebrew
+
+Use PingIdentity's Homebrew tap to install Ping CLI
+
+```text
+brew install pingidentity/tap/pingcli
+
+or
+
+brew tap pingidentity/tap
+brew install pingcli
+```
+
+#### Manual Installation - macOS/Linux
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for binary downloads and SHA256 checksum files.
+
+OR
+
+Use the following single-line command to install Ping CLI directly.
+
+```text
+RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
+OS_NAME=$(uname -s); \
+HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
+TAR_FILENAME="pingcli.tar.gz"; \
+curl --location --silent --output "${TAR_FILENAME}" --request GET \
+"https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}.tar.gz"; \
+tar -zxf "${TAR_FILENAME}" pingcli; \
+rm -f "${TAR_FILENAME}"
+```
+
+#### Manual Installation - Windows
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for binary downloads and SHA256 checksum files.
+
+OR
+
+Use the following single-line powershell command to install Ping CLI directly.
+```TEXT
+$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing; `
+$RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
+$RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
+Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_amd64.tar.gz" -OutFile pingcli.tar.gz; `
+tar -zxf pingcli.tar.gz pingcli.exe; `
+Remove-Item pingcli.tar.gz
+```
 
 ## Configure Ping CLI
 
