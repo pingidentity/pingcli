@@ -29,11 +29,10 @@ Use the following single-line command to install Ping CLI directly.
 RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
 OS_NAME=$(uname -s); \
 HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
-TAR_FILENAME="pingcli.tar.gz"; \
-curl --location --silent --output "${TAR_FILENAME}" --request GET \
+curl --location --silent --output pingcli.tar.gz --request GET \
 "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}.tar.gz"; \
-tar -zxf "${TAR_FILENAME}" pingcli; \
-rm -f "${TAR_FILENAME}"
+tar -zxf pingcli.tar.gz pingcli; \
+rm -f pingcli.tar.gz
 ```
 
 #### Manual Installation - Windows
