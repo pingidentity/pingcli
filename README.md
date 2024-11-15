@@ -43,7 +43,7 @@ OR
 
 Use the following single-line powershell command to install Ping CLI directly.
 ```TEXT
-$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing; `
+$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
 $RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
 Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_amd64.tar.gz" -OutFile pingcli.tar.gz; `
