@@ -23,15 +23,15 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 
 OR
 
-Use the following single-line command to install Ping CLI directly.
+Use the following single-line command to install Ping CLI into '/usr/local/bin' directly.
 
 ```text
 RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
 OS_NAME=$(uname -s); \
 HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
-curl --location --silent --output pingcli.tar.gz --request GET \
-"https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}.tar.gz"; \
-tar -zxf pingcli.tar.gz pingcli; \
+URL="https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}.tar.gz"; \
+curl -Ls -o pingcli.tar.gz "${URL}"; \
+tar -zxf pingcli.tar.gz -C /usr/local/bin pingcli; \
 rm -f pingcli.tar.gz
 ```
 
@@ -41,13 +41,16 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 
 OR
 
-Use the following single-line powershell command to install Ping CLI directly.
-```TEXT
+Use the following single-line powershell command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
+```text
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
 $RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
-Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_amd64.tar.gz" -OutFile pingcli.tar.gz; `
-tar -zxf pingcli.tar.gz pingcli.exe; `
+$uname = (uname -m); `
+$HARDWARE_PLATFORM = $uname -replace "aarch64", "arm64" -replace "x86_64", "amd64"; `
+$URL = "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_${HARDWARE_PLATFORM}.tar.gz"
+Invoke-WebRequest -Uri $URL -OutFile pingcli.tar.gz; `
+tar -zxf pingcli.tar.gz -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
 Remove-Item pingcli.tar.gz
 ```
 
