@@ -1,16 +1,15 @@
 module github.com/pingidentity/pingcli
 
 go 1.23.2
-
 require (
 	github.com/fatih/color v1.18.0
 	github.com/golangci/golangci-lint v1.62.0
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/manifoldco/promptui v0.9.0
-	github.com/patrickcping/pingone-go-sdk-v2 v0.12.3
-	github.com/patrickcping/pingone-go-sdk-v2/management v0.43.0
-	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.20.0
-	github.com/patrickcping/pingone-go-sdk-v2/risk v0.16.0
+	github.com/patrickcping/pingone-go-sdk-v2 v0.12.4
+	github.com/patrickcping/pingone-go-sdk-v2/management v0.44.0
+	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.21.0
+	github.com/patrickcping/pingone-go-sdk-v2/risk v0.17.0
 	github.com/pavius/impi v0.0.3
 	github.com/pingidentity/pingfederate-go-client/v1210 v1210.0.3
 	github.com/rs/zerolog v1.33.0
@@ -128,9 +127,9 @@ require (
 	github.com/nishanths/predeclared v0.2.2 // indirect
 	github.com/nunnatsa/ginkgolinter v0.18.2 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.6.0 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.9.0 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/verify v0.7.0 // indirect
+	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.7.0 // indirect
+	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.10.0 // indirect
+	github.com/patrickcping/pingone-go-sdk-v2/verify v0.8.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/polyfloyd/go-errorlint v1.6.0 // indirect
