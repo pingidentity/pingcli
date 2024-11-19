@@ -19,6 +19,13 @@ type PingOneMFAApplicationPushCredentialResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
+type mfaApplicationPushCredentialImportBlockData struct {
+	PushCredentialID          string
+	PushCredentialType        string
+	NativeOIDCApplicationID   string
+	NativeOIDCApplicationName string
+}
+
 // Utility method for creating a PingOneMFAApplicationPushCredentialResource
 func MFAApplicationPushCredential(clientInfo *connector.PingOneClientInfo) *PingOneMFAApplicationPushCredentialResource {
 	return &PingOneMFAApplicationPushCredentialResource{
@@ -26,69 +33,17 @@ func MFAApplicationPushCredential(clientInfo *connector.PingOneClientInfo) *Ping
 	}
 }
 
-func (r *PingOneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	nativeOIDCApplications, err := r.getNativeOIDCApplications()
-	if err != nil {
-		return nil, err
-	}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	importBlocks := []connector.ImportBlock{}
-	for _, nativeOIDCApplication := range nativeOIDCApplications {
-		nativeOIDCApplicationId, nativeOIDCApplicationIdOk := nativeOIDCApplication.GetIdOk()
-		nativeOIDCApplicationName, nativeOIDCApplicationNameOk := nativeOIDCApplication.GetNameOk()
-
-		if nativeOIDCApplicationIdOk && nativeOIDCApplicationNameOk {
-			mfaPushCredentialResponses, err := r.getMFAPushCredentials(nativeOIDCApplicationId)
-			if err != nil {
-				return nil, err
-			}
-
-			for _, mfaPushCredentialResponse := range mfaPushCredentialResponses {
-				mfaPushCredentialResponseType, mfaPushCredentialResponseTypeOk := mfaPushCredentialResponse.GetTypeOk()
-				mfaPushCredentialResponseId, mfaPushCredentialResponseIdOk := mfaPushCredentialResponse.GetIdOk()
-
-				if mfaPushCredentialResponseTypeOk && mfaPushCredentialResponseIdOk {
-					commentData := map[string]string{
-
-						"Export Environment ID":                    r.clientInfo.ExportEnvironmentID,
-						"MFA Push Credential ID":                   *mfaPushCredentialResponseId,
-						"MFA Push Credential Type":                 string(*mfaPushCredentialResponseType),
-						"Native Application (OpenID Connect) ID":   *nativeOIDCApplicationId,
-						"Native Application (OpenID Connect) Name": *nativeOIDCApplicationName,
-						"Resource Type":                            r.ResourceType(),
-					}
-
-					importBlocks = append(importBlocks, connector.ImportBlock{
-						ResourceType:       r.ResourceType(),
-						ResourceName:       fmt.Sprintf("%s_%s", *nativeOIDCApplicationName, *mfaPushCredentialResponseType),
-						ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, *nativeOIDCApplicationId, *mfaPushCredentialResponseId),
-						CommentInformation: common.GenerateCommentInformation(commentData),
-					})
-				}
-			}
-		}
-	}
-
-	return &importBlocks, nil
-}
-
 func (r *PingOneMFAApplicationPushCredentialResource) ResourceType() string {
 	return "pingone_mfa_application_push_credential"
 }
 
-func (r *PingOneMFAApplicationPushCredentialResource) getNativeOIDCApplications() (nativeOIDCApplications []*management.ApplicationOIDC, err error) {
+func (r *PingOneMFAApplicationPushCredentialResource) nativeOIDCApplications() (nativeOIDCApplications []*management.ApplicationOIDC, err error) {
 	nativeOIDCApplications = []*management.ApplicationOIDC{}
 
 	// Fetch all pingone_application resources that could have pingone_mfa_application_push_credentials
-	applicationsPagedIterator := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	entityArrayPagedIterator := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
-	allEmbedded, err := common.GetAllManagementEmbedded(applicationsPagedIterator, "ReadAllApplications", "pingone_application")
+	allEmbedded, err := common.GetAllManagementEmbedded(entityArrayPagedIterator, "ReadAllApplications", "pingone_application")
 	if err != nil {
 		return nil, err
 	}
@@ -96,11 +51,11 @@ func (r *PingOneMFAApplicationPushCredentialResource) getNativeOIDCApplications(
 	// pingone_mfa_application_push_credential are for Native applications only
 	// Native application authenticate with OIDC only
 	for _, embedded := range allEmbedded {
-		for _, app := range embedded.GetApplications() {
-			if app.ApplicationOIDC != nil {
-				appType, appTypeOk := app.ApplicationOIDC.GetTypeOk()
+		for _, readOneApplication200Response := range embedded.GetApplications() {
+			if readOneApplication200Response.ApplicationOIDC != nil {
+				appType, appTypeOk := readOneApplication200Response.ApplicationOIDC.GetTypeOk()
 				if appTypeOk && *appType == management.ENUMAPPLICATIONTYPE_NATIVE_APP {
-					nativeOIDCApplications = append(nativeOIDCApplications, app.ApplicationOIDC)
+					nativeOIDCApplications = append(nativeOIDCApplications, readOneApplication200Response.ApplicationOIDC)
 				}
 			}
 		}
@@ -109,13 +64,13 @@ func (r *PingOneMFAApplicationPushCredentialResource) getNativeOIDCApplications(
 	return nativeOIDCApplications, nil
 }
 
-func (r *PingOneMFAApplicationPushCredentialResource) getMFAPushCredentials(nativeOIDCApplicationId *string) (mfaPushCredentialResponses []mfa.MFAPushCredentialResponse, err error) {
+func (r *PingOneMFAApplicationPushCredentialResource) pushCredentialResponses(nativeOIDCApplicationId *string) (mfaPushCredentialResponses []mfa.MFAPushCredentialResponse, err error) {
 	mfaPushCredentialResponses = []mfa.MFAPushCredentialResponse{}
 
 	// Fetch all pingone_mfa_application_push_credentials resources for the given pingone_application
-	mfaApplicationPushCredentialsPagedIterator := r.clientInfo.ApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *nativeOIDCApplicationId).Execute()
+	entityArrayPagedIterator := r.clientInfo.ApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *nativeOIDCApplicationId).Execute()
 
-	allEmbedded, err := common.GetAllMFAEmbedded(mfaApplicationPushCredentialsPagedIterator, "ReadAllMFAPushCredentials", r.ResourceType())
+	allEmbedded, err := common.GetAllMFAEmbedded(entityArrayPagedIterator, "ReadAllMFAPushCredentials", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -127,4 +82,74 @@ func (r *PingOneMFAApplicationPushCredentialResource) getMFAPushCredentials(nati
 	}
 
 	return mfaPushCredentialResponses, nil
+}
+
+func (r *PingOneMFAApplicationPushCredentialResource) importBlockData() (importBlockData []mfaApplicationPushCredentialImportBlockData, err error) {
+	importBlockData = []mfaApplicationPushCredentialImportBlockData{}
+
+	nativeOIDCApplications, err := r.nativeOIDCApplications()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, nativeOIDCApplication := range nativeOIDCApplications {
+		nativeOIDCApplicationId, nativeOIDCApplicationIdOk := nativeOIDCApplication.GetIdOk()
+		nativeOIDCApplicationName, nativeOIDCApplicationNameOk := nativeOIDCApplication.GetNameOk()
+
+		if nativeOIDCApplicationIdOk && nativeOIDCApplicationNameOk {
+			mfaPushCredentialResponses, err := r.pushCredentialResponses(nativeOIDCApplicationId)
+			if err != nil {
+				return nil, err
+			}
+
+			for _, mfaPushCredentialResponse := range mfaPushCredentialResponses {
+				mfaPushCredentialResponseType, mfaPushCredentialResponseTypeOk := mfaPushCredentialResponse.GetTypeOk()
+				mfaPushCredentialResponseId, mfaPushCredentialResponseIdOk := mfaPushCredentialResponse.GetIdOk()
+				if mfaPushCredentialResponseTypeOk && mfaPushCredentialResponseIdOk {
+					importBlockData = append(importBlockData, mfaApplicationPushCredentialImportBlockData{
+						PushCredentialID:          *mfaPushCredentialResponseId,
+						PushCredentialType:        string(*mfaPushCredentialResponseType),
+						NativeOIDCApplicationID:   *nativeOIDCApplicationId,
+						NativeOIDCApplicationName: *nativeOIDCApplicationName,
+					})
+				}
+			}
+		}
+	}
+
+	return importBlockData, nil
+}
+
+func (r *PingOneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.ImportBlock, error) {
+	l := logger.Get()
+	importBlocks := []connector.ImportBlock{}
+
+	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+
+	importBlockData, err := r.importBlockData()
+	if err != nil {
+		return nil, err
+	}
+
+	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+
+	for _, data := range importBlockData {
+		commentData := map[string]string{
+			"Export Environment ID":                    r.clientInfo.ExportEnvironmentID,
+			"MFA Application Push Credential ID":       data.PushCredentialID,
+			"MFA Application Push Credential Type":     data.PushCredentialType,
+			"Native Application (OpenID Connect) ID":   data.NativeOIDCApplicationID,
+			"Native Application (OpenID Connect) Name": data.NativeOIDCApplicationName,
+			"Resource Type":                            r.ResourceType(),
+		}
+
+		importBlocks = append(importBlocks, connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_%s", data.NativeOIDCApplicationName, data.PushCredentialType),
+			ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, data.NativeOIDCApplicationID, data.PushCredentialID),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		})
+	}
+
+	return &importBlocks, nil
 }

@@ -22,8 +22,13 @@ func MFASettings(clientInfo *connector.PingOneClientInfo) *PingOneMFASettingsRes
 	}
 }
 
+func (r *PingOneMFASettingsResource) ResourceType() string {
+	return "pingone_mfa_settings"
+}
+
 func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	importBlocks := []connector.ImportBlock{}
 
 	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
 
@@ -33,30 +38,24 @@ func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, erro
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
 	if response.StatusCode == 204 {
 		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
 		return &importBlocks, nil
 	}
 
+	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+
 	commentData := map[string]string{
-		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Resource Type":         r.ResourceType(),
 	}
 
 	importBlocks = append(importBlocks, connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       "mfa_settings",
+		ResourceName:       r.ResourceType(),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	})
 
 	return &importBlocks, nil
-}
-
-func (r *PingOneMFASettingsResource) ResourceType() string {
-	return "pingone_mfa_settings"
 }
