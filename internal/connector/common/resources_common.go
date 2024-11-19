@@ -32,64 +32,72 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 	return nil
 }
 
-// Executes the function apiExecuteFunc for the ManagementAPIClient
+// Iterates through the pagedIterator
 // Handles err and response if Client call failed
-// Returns embedded data if not nil
+// // Returns embedded data if not nil
 // Treats nil embedded data as an error
-func GetManagementEmbedded(apiExecuteFunc func() (*management.EntityArray, *http.Response, error), apiFunctionName string, resourceType string) (*management.EntityArrayEmbedded, error) {
-	l := logger.Get()
+func GetAllManagementEmbedded(pagedIterator management.EntityArrayPagedIterator, apiFunctionName string, resourceType string) (allEmbedded []management.EntityArrayEmbedded, err error) {
+	allEmbedded = []management.EntityArrayEmbedded{}
 
-	entityArray, response, err := apiExecuteFunc()
+	for pagedCursor, err := range pagedIterator {
+		err = HandleClientResponse(pagedCursor.HTTPResponse, err, apiFunctionName, resourceType)
+		if err != nil {
+			return nil, err
+		}
 
-	err = HandleClientResponse(response, err, apiFunctionName, resourceType)
-	if err != nil {
-		return nil, err
+		dataNilErr := fmt.Errorf("failed to create resource '%s' import blocks.\n"+
+			"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
+			"response code: %s\n"+
+			"response body: %s",
+			resourceType, resourceType, pagedCursor.HTTPResponse.Status, pagedCursor.HTTPResponse.Body)
+
+		if pagedCursor.EntityArray == nil {
+			return nil, dataNilErr
+		}
+
+		embedded, embeddedOk := pagedCursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return nil, dataNilErr
+		}
+
+		allEmbedded = append(allEmbedded, *embedded)
 	}
 
-	if entityArray == nil {
-		l.Error().Msgf("Returned %s() entityArray is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", resourceType, apiFunctionName)
-	}
-
-	embedded, embeddedOk := entityArray.GetEmbeddedOk()
-	if !embeddedOk {
-		l.Error().Msgf("Returned %s() embedded data is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", resourceType, apiFunctionName)
-	}
-
-	return embedded, nil
+	return allEmbedded, nil
 }
 
 // Executes the function apiExecuteFunc for the MFAAPIClient
 // Handles err and response if Client call failed
 // Returns embedded data if not nil
 // Treats nil embedded data as an error
-func GetMFAEmbedded(apiExecuteFunc func() (*mfa.EntityArray, *http.Response, error), apiFunctionName string, resourceType string) (*mfa.EntityArrayEmbedded, error) {
-	l := logger.Get()
+func GetAllMFAEmbedded(pagedIterator mfa.EntityArrayPagedIterator, apiFunctionName string, resourceType string) (allEmbedded []mfa.EntityArrayEmbedded, err error) {
+	allEmbedded = []mfa.EntityArrayEmbedded{}
 
-	entityArray, response, err := apiExecuteFunc()
+	for pagedCursor, err := range pagedIterator {
+		err = HandleClientResponse(pagedCursor.HTTPResponse, err, apiFunctionName, resourceType)
+		if err != nil {
+			return nil, err
+		}
 
-	err = HandleClientResponse(response, err, apiFunctionName, resourceType)
-	if err != nil {
-		return nil, err
+		dataNilErr := fmt.Errorf("failed to create resource '%s' import blocks.\n"+
+			"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
+			"response code: %s\n"+
+			"response body: %s",
+			resourceType, resourceType, pagedCursor.HTTPResponse.Status, pagedCursor.HTTPResponse.Body)
+
+		if pagedCursor.EntityArray == nil {
+			return nil, dataNilErr
+		}
+
+		embedded, embeddedOk := pagedCursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return nil, dataNilErr
+		}
+
+		allEmbedded = append(allEmbedded, *embedded)
 	}
 
-	if entityArray == nil {
-		l.Error().Msgf("Returned %s() entityArray is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", resourceType, apiFunctionName)
-	}
-
-	embedded, embeddedOk := entityArray.GetEmbeddedOk()
-	if !embeddedOk {
-		l.Error().Msgf("Returned %s() embedded data is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", resourceType, apiFunctionName)
-	}
-
-	return embedded, nil
+	return allEmbedded, nil
 }
 
 // Executes the function apiExecuteFunc for the RiskAPIClient
