@@ -37,6 +37,8 @@ func Options() []Option {
 		PingOneAuthenticationWorkerClientIDOption,
 		PingOneAuthenticationWorkerClientSecretOption,
 		PingOneAuthenticationWorkerEnvironmentIDOption,
+		PingOneAuthenticationServiceHostnameOption,
+		PingOneAPIServiceHostnameOption,
 		PingOneRegionCodeOption,
 
 		PlatformExportExportFormatOption,
@@ -86,6 +88,8 @@ var (
 	PingOneAuthenticationTypeOption                Option
 	PingOneAuthenticationWorkerClientIDOption      Option
 	PingOneAuthenticationWorkerClientSecretOption  Option
+	PingOneAuthenticationServiceHostnameOption     Option
+	PingOneAPIServiceHostnameOption                Option
 	PingOneAuthenticationWorkerEnvironmentIDOption Option
 	PingOneRegionCodeOption                        Option
 )

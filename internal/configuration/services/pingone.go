@@ -14,6 +14,8 @@ func InitPingOneServiceOptions() {
 	initAuthenticationWorkerClientIDOption()
 	initAuthenticationWorkerClientSecretOption()
 	initAuthenticationWorkerEnvironmentIDOption()
+	initAuthenticationServiceHostnameOption()
+	initAPIServiceHostnameOption()
 	initRegionCodeOption()
 
 }
@@ -79,6 +81,48 @@ func initAuthenticationWorkerEnvironmentIDOption() {
 		},
 		Type:     options.ENUM_UUID,
 		ViperKey: "service.pingone.authentication.worker.environmentID",
+	}
+}
+
+func initAuthenticationServiceHostnameOption() {
+	cobraParamName := "pingone-auth-service-hostname"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_PINGONE_AUTH_SERVICE_HOSTNAME"
+
+	options.PingOneAuthenticationServiceHostnameOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "Override the service hostname used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Type:     options.ENUM_STRING,
+		ViperKey: "service.pingone.authentication.hostname",
+	}
+}
+
+func initAPIServiceHostnameOption() {
+	cobraParamName := "pingone-api-service-hostname"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_PINGONE_API_SERVICE_HOSTNAME"
+
+	options.PingOneAPIServiceHostnameOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "Override the service hostname for the PingOne management API.",
+			Value: cobraValue,
+		},
+		Type:     options.ENUM_STRING,
+		ViperKey: "service.pingone.api.hostname",
 	}
 }
 

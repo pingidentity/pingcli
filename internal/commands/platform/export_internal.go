@@ -306,6 +306,14 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 	if err != nil {
 		return err
 	}
+	authServiceHostname, err := profiles.GetOptionValue(options.PingOneAuthenticationServiceHostnameOption)
+	if err != nil {
+		return err
+	}
+	apiServiceHostname, err := profiles.GetOptionValue(options.PingOneAPIServiceHostnameOption)
+	if err != nil {
+		return err
+	}
 	regionCode, err := profiles.GetOptionValue(options.PingOneRegionCodeOption)
 	if err != nil {
 		return err
@@ -333,6 +341,14 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 		UserAgentSuffix: &userAgent,
 	}
 
+	if authServiceHostname != "" {
+		apiConfig.AuthHostnameOverride = &authServiceHostname
+	}
+
+	if apiServiceHostname != "" {
+		apiConfig.APIHostnameOverride = &apiServiceHostname
+	}
+
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
 		return fmt.Errorf(`failed to initialize pingone API client.
@@ -342,12 +358,17 @@ configuration values used for client initialization:
 worker client ID - %s
 worker client secret - %s
 worker environment ID - %s
+auth service hostname override - %s
+api service hostname override - %s
 pingone region - %s`,
 			err,
 			pingoneApiClientId,
 			strings.Repeat("*", len(clientSecret)),
 			environmentID,
-			regionCode)
+			authServiceHostname,
+			apiServiceHostname,
+			regionCode,
+		)
 	}
 
 	return nil

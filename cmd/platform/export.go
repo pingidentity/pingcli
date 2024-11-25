@@ -79,6 +79,8 @@ func initPingOneExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationServiceHostnameOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAPIServiceHostnameOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
 
@@ -87,6 +89,11 @@ func initPingOneExportFlags(cmd *cobra.Command) {
 		options.PingOneAuthenticationWorkerClientIDOption.CobraParamName,
 		options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName,
 		options.PingOneRegionCodeOption.CobraParamName,
+	)
+
+	cmd.MarkFlagsRequiredTogether(
+		options.PingOneAuthenticationServiceHostnameOption.CobraParamName,
+		options.PingOneAPIServiceHostnameOption.CobraParamName,
 	)
 
 }
