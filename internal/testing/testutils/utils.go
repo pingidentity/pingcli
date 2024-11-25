@@ -43,6 +43,8 @@ func GetPingOneClientInfo(t *testing.T) *connector.PingOneClientInfo {
 		clientID := os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar)
 		clientSecret := os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar)
 		environmentId := GetEnvironmentID()
+		authServiceHostname := os.Getenv(options.PingOneAuthenticationServiceHostnameOption.EnvVar)
+		apiServiceHostname := os.Getenv(options.PingOneAPIServiceHostnameOption.EnvVar)
 		regionCode := os.Getenv(options.PingOneRegionCodeOption.EnvVar)
 		sdkRegionCode := management.EnumRegionCode(regionCode)
 
@@ -55,6 +57,14 @@ func GetPingOneClientInfo(t *testing.T) *connector.PingOneClientInfo {
 			ClientSecret:  &clientSecret,
 			EnvironmentID: &environmentId,
 			RegionCode:    &sdkRegionCode,
+		}
+
+		if authServiceHostname != "" {
+			apiConfig.AuthHostnameOverride = &authServiceHostname
+		}
+
+		if apiServiceHostname != "" {
+			apiConfig.APIHostnameOverride = &apiServiceHostname
 		}
 
 		// Make empty context for testing

@@ -113,6 +113,8 @@ func getDefaultConfigFileContents() string {
 		os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
 		os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
 		os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
+		os.Getenv(options.PingOneAuthenticationServiceHostnameOption.EnvVar),
+		os.Getenv(options.PingOneAPIServiceHostnameOption.EnvVar),
 		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar),
 		os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
 		os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
