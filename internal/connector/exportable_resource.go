@@ -40,6 +40,8 @@ func (b *ImportBlock) Sanitize() {
 	b.ResourceName = strings.ReplaceAll(b.ResourceName, " ", "_")
 	// Replace dashes with underscores
 	b.ResourceName = strings.ReplaceAll(b.ResourceName, "-", "_")
+	// Replace period char with underscores
+	b.ResourceName = strings.ReplaceAll(b.ResourceName, ".", "_")
 	// Remove all non-Alphanumeric characters/non-underscores
 	b.ResourceName = regexp.MustCompile(`[^a-zA-Z0-9_]+`).ReplaceAllString(b.ResourceName, "")
 	// Make everything lowercase

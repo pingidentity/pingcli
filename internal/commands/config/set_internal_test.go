@@ -45,8 +45,8 @@ func Test_RunInternalConfigSet_NonExistentProfileName(t *testing.T) {
 		profileName = customtypes.String("non-existent")
 	)
 
-	options.ConfigSetProfileOption.Flag.Changed = true
-	options.ConfigSetProfileOption.CobraParamValue = &profileName
+	options.RootProfileOption.Flag.Changed = true
+	options.RootProfileOption.CobraParamValue = &profileName
 
 	expectedErrorPattern := `^failed to set configuration: invalid profile name: '.*' profile does not exist$`
 	err := RunInternalConfigSet("noColor=true")
@@ -61,8 +61,8 @@ func Test_RunInternalConfigSet_DifferentProfile(t *testing.T) {
 		profileName = customtypes.String("production")
 	)
 
-	options.ConfigSetProfileOption.Flag.Changed = true
-	options.ConfigSetProfileOption.CobraParamValue = &profileName
+	options.RootProfileOption.Flag.Changed = true
+	options.RootProfileOption.CobraParamValue = &profileName
 
 	err := RunInternalConfigSet("noColor=true")
 	if err != nil {
@@ -78,8 +78,8 @@ func Test_RunInternalConfigSet_InvalidProfileName(t *testing.T) {
 		profileName = customtypes.String("*&%*&")
 	)
 
-	options.ConfigSetProfileOption.Flag.Changed = true
-	options.ConfigSetProfileOption.CobraParamValue = &profileName
+	options.RootProfileOption.Flag.Changed = true
+	options.RootProfileOption.CobraParamValue = &profileName
 
 	expectedErrorPattern := `^failed to set configuration: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
 	err := RunInternalConfigSet("noColor=true")

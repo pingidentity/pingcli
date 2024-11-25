@@ -36,8 +36,8 @@ func Test_RunInternalConfigGet_DifferentProfile(t *testing.T) {
 		profileName = customtypes.String("production")
 	)
 
-	options.ConfigGetProfileOption.Flag.Changed = true
-	options.ConfigGetProfileOption.CobraParamValue = &profileName
+	options.RootProfileOption.Flag.Changed = true
+	options.RootProfileOption.CobraParamValue = &profileName
 
 	err := RunInternalConfigGet("service")
 	if err != nil {
@@ -53,8 +53,8 @@ func Test_RunInternalConfigGet_InvalidProfileName(t *testing.T) {
 		profileName = customtypes.String("invalid")
 	)
 
-	options.ConfigGetProfileOption.Flag.Changed = true
-	options.ConfigGetProfileOption.CobraParamValue = &profileName
+	options.RootProfileOption.Flag.Changed = true
+	options.RootProfileOption.CobraParamValue = &profileName
 
 	expectedErrorPattern := `^failed to get configuration: invalid profile name: '.*' profile does not exist$`
 	err := RunInternalConfigGet("service")

@@ -11,24 +11,31 @@ import (
 	"github.com/spf13/viper"
 )
 
-func Validate() error {
+func Validate() (err error) {
 	// Get a slice of all profile names configured in the config.yaml file
 	profileNames := GetMainConfig().ProfileNames()
 
 	// Validate profile names
-	if err := validateProfileNames(profileNames); err != nil {
+	if err = validateProfileNames(profileNames); err != nil {
 		return err
 	}
 
 	// Make sure selected active profile is in the configuration file
-	activeProfile := GetMainConfig().ActiveProfile().Name()
-	if !slices.Contains(profileNames, activeProfile) {
-		return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration file %s", activeProfile, GetMainConfig().ViperInstance().ConfigFileUsed())
+	activeProfileName, err := GetOptionValue(options.RootActiveProfileOption)
+	if err != nil {
+		return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
+	}
+	if !slices.Contains(profileNames, activeProfileName) {
+		return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration "+
+			"file %s", activeProfileName, GetMainConfig().ViperInstance().ConfigFileUsed())
 	}
 
-	// for each profile key, set the profile based on mainViper.Sub() and validate the profile
+	// for each profile key, validate the profile viper
 	for _, pName := range profileNames {
-		subViper := GetMainConfig().ViperInstance().Sub(pName)
+		subViper, err := GetMainConfig().GetProfileViper(pName)
+		if err != nil {
+			return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
+		}
 
 		if err := validateProfileKeys(pName, subViper); err != nil {
 			return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)

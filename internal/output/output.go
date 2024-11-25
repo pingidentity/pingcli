@@ -89,9 +89,7 @@ Please raise an issue at https://github.com/pingidentity/pingcli`,
 	print(systemMsg, fields, boldRed, l.Fatal)
 }
 
-func print(message string,
-	fields map[string]interface{},
-	colorFunc func(format string, a ...interface{}) string,
+func print(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string,
 	logEventFunc func() *zerolog.Event) {
 	SetColorize()
 
@@ -113,24 +111,19 @@ func print(message string,
 
 }
 
-func printText(message string,
-	fields map[string]interface{},
-	colorFunc func(format string, a ...interface{}) string,
+func printText(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string,
 	logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
 
-	if fields != nil {
-		fmt.Println(cyan("Additional Information:"))
-		for k, v := range fields {
-			switch typedValue := v.(type) {
-			// If the value is a json.RawMessage, print it as a string
-			case json.RawMessage:
-				fmt.Println(cyan("%s: %s", k, typedValue))
-				l.Info().Msg(cyan("%s: %s", k, typedValue))
-			default:
-				fmt.Println(cyan("%s: %v", k, v))
-				l.Info().Msg(cyan("%s: %v", k, v))
-			}
+	for k, v := range fields {
+		switch typedValue := v.(type) {
+		// If the value is a json.RawMessage, print it as a string
+		case json.RawMessage:
+			fmt.Println(cyan("%s: \n%s", k, typedValue))
+			l.Info().Msg(cyan("%s: %s", k, typedValue))
+		default:
+			fmt.Println(cyan("%s: \n%v", k, v))
+			l.Info().Msg(cyan("%s: %v", k, v))
 		}
 	}
 
@@ -138,10 +131,14 @@ func printText(message string,
 	logEventFunc().Msg(colorFunc(message))
 }
 
-func printJson(message string,
-	fields map[string]interface{},
-	logEventFunc func() *zerolog.Event) {
+func printJson(message string, fields map[string]interface{}, logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
+
+	if fields == nil {
+		fields = map[string]interface{}{
+			"message": message,
+		}
+	}
 
 	if fields["message"] == nil {
 		fields["message"] = message

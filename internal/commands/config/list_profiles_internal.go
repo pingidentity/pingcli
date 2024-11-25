@@ -1,17 +1,23 @@
 package config_internal
 
 import (
+	"strings"
+
 	"github.com/fatih/color"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-func RunInternalConfigListProfiles() {
+func RunInternalConfigListProfiles() (err error) {
 	l := logger.Get()
 
 	profileNames := profiles.GetMainConfig().ProfileNames()
-	activeProfile := profiles.GetMainConfig().ActiveProfile().Name()
+	activeProfileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil {
+		return err
+	}
 
 	listStr := "Profiles:\n"
 
@@ -20,7 +26,7 @@ func RunInternalConfigListProfiles() {
 	activeFmt := color.New(color.Bold, color.FgGreen).SprintFunc()
 
 	for _, profileName := range profileNames {
-		if profileName == activeProfile {
+		if strings.EqualFold(profileName, activeProfileName) {
 			listStr += "- " + profileName + activeFmt(" (active)") + " \n"
 		} else {
 			listStr += "- " + profileName + "\n"
@@ -38,4 +44,6 @@ func RunInternalConfigListProfiles() {
 	}
 
 	output.Message(listStr, nil)
+
+	return nil
 }

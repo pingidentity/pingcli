@@ -57,6 +57,11 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return err
 	}
 
+	failOption, err := profiles.GetOptionValue(options.RequestFailOption)
+	if err != nil {
+		return err
+	}
+
 	apiURL := fmt.Sprintf("https://api.pingone.%s/v1/%s", topLevelDomain, uri)
 
 	httpMethod, err := profiles.GetOptionValue(options.RequestHTTPMethodOption)
@@ -102,9 +107,10 @@ func runInternalPingOneRequest(uri string) (err error) {
 	}
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		// Note we don't os.Exit(1) here because pingcli has executed
-		// without issue, despite a failed response to the custom request
 		output.UserError("Failed Custom Request", fields)
+		if failOption == "true" {
+			os.Exit(1)
+		}
 	} else {
 		output.Success("Custom request successful", fields)
 	}
@@ -242,15 +248,30 @@ func pingoneAuth() (accessToken string, err error) {
 		return "", err
 	}
 
-	// Store access token and expiry
-	profileViper := profiles.GetMainConfig().ActiveProfile().ViperInstance()
-	profileViper.Set(options.RequestAccessTokenOption.ViperKey, pingoneAuthResponse.AccessToken)
-
 	currentTime := time.Now().Unix()
 	tokenExpiry := currentTime + pingoneAuthResponse.ExpiresIn
-	profileViper.Set(options.RequestAccessTokenExpiryOption.ViperKey, tokenExpiry)
 
-	err = profiles.GetMainConfig().SaveProfile(profiles.GetMainConfig().ActiveProfile().Name(), profileViper)
+	// Store access token and expiry
+	pName, err := profiles.GetOptionValue(options.RootProfileOption)
+	if err != nil {
+		return "", err
+	}
+
+	if pName == "" {
+		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
+	if err != nil {
+		return "", err
+	}
+
+	subViper.Set(options.RequestAccessTokenOption.ViperKey, pingoneAuthResponse.AccessToken)
+	subViper.Set(options.RequestAccessTokenExpiryOption.ViperKey, tokenExpiry)
+	err = profiles.GetMainConfig().SaveProfile(pName, subViper)
 	if err != nil {
 		return "", err
 	}

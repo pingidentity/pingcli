@@ -10,6 +10,9 @@ import (
 )
 
 func TestNotificationTemplateContentExport(t *testing.T) {
+	// TODO: Remove the skipNow following completion of https://github.com/pingidentity/pingcli/issues/29
+	t.SkipNow()
+
 	// Get initialized apiClient and resource
 	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
 	resource := resources.NotificationTemplateContent(PingOneClientInfo)

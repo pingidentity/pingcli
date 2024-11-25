@@ -3,6 +3,7 @@ package request_internal
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -19,6 +20,31 @@ func Test_RunInternalRequest(t *testing.T) {
 
 	err := RunInternalRequest(fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)))
 	testutils.CheckExpectedError(t, err, nil)
+}
+
+// Test RunInternalRequest function with fail
+func Test_RunInternalRequestWithFail(t *testing.T) {
+
+	if os.Getenv("RUN_INTERNAL_FAIL_TEST") == "true" {
+		testutils_viper.InitVipers(t)
+		t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
+		options.RequestFailOption.Flag.Changed = true
+		err := options.RequestFailOption.Flag.Value.Set("true")
+		if err != nil {
+			t.Fatal(err)
+		}
+		_ = RunInternalRequest("environments/failTest")
+		t.Fatal("This should never run due to internal request resulting in os.Exit(1)")
+	} else {
+		cmdName := os.Args[0]
+		cmd := exec.Command(cmdName, "-test.run=Test_RunInternalRequestWithFail")
+		cmd.Env = append(os.Environ(), "RUN_INTERNAL_FAIL_TEST=true")
+		err := cmd.Run()
+		if exitError, ok := err.(*exec.ExitError); ok && !exitError.Success() {
+			return
+		}
+		t.Fatalf("The process did not exit with a non-zero: %s", err)
+	}
 }
 
 // Test RunInternalRequest function with empty service

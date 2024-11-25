@@ -3,6 +3,7 @@ package config_internal
 import (
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
 )
 
@@ -10,5 +11,6 @@ import (
 func Test_RunInternalConfigListProfiles(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	RunInternalConfigListProfiles()
+	err := RunInternalConfigListProfiles()
+	testutils.CheckExpectedError(t, err, nil)
 }

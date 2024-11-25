@@ -60,7 +60,7 @@ func TestConfigSetCmd_CheckViperConfig(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 
 	mainViper := profiles.GetMainConfig().ViperInstance()
-	profileViperKey := profiles.GetMainConfig().ActiveProfile().Name() + "." + viperKey
+	profileViperKey := "default." + viperKey
 
 	viperNewValue := mainViper.GetString(profileViperKey)
 	if viperNewValue != viperNewUUID {

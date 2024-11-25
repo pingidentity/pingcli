@@ -28,7 +28,7 @@ func ViperKeys() (keys []string) {
 func ValidateViperKey(viperKey string) error {
 	validKeys := ViperKeys()
 	for _, vKey := range validKeys {
-		if vKey == viperKey {
+		if strings.EqualFold(vKey, viperKey) {
 			return nil
 		}
 	}
@@ -83,9 +83,6 @@ func OptionFromViperKey(viperKey string) (opt options.Option, err error) {
 func InitAllOptions() {
 	configuration_config.InitConfigAddProfileOptions()
 	configuration_config.InitConfigDeleteProfileOptions()
-	configuration_config.InitConfigSetOptions()
-	configuration_config.InitConfigGetOptions()
-	configuration_config.InitConfigUnsetOptions()
 
 	configuration_platform.InitPlatformExportOptions()
 

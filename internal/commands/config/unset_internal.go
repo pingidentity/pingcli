@@ -19,11 +19,10 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 		return fmt.Errorf("failed to unset configuration: %v", err)
 	}
 
-	if err = profiles.GetMainConfig().ValidateExistingProfileName(pName); err != nil {
+	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
+	if err != nil {
 		return fmt.Errorf("failed to unset configuration: %v", err)
 	}
-
-	subViper := profiles.GetMainConfig().ViperInstance().Sub(pName)
 
 	opt, err := configuration.OptionFromViperKey(viperKey)
 	if err != nil {
@@ -41,17 +40,16 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 		return fmt.Errorf("failed to unset configuration: %v", err)
 	}
 
-	output.Success("Configuration unset successfully", nil)
-	output.Message(yamlStr, nil)
+	output.Success("Configuration unset successfully", map[string]interface{}{"Profile YAML": yamlStr})
 
 	return nil
 }
 
 func readConfigUnsetOptions() (pName string, err error) {
-	if !options.ConfigUnsetProfileOption.Flag.Changed {
+	if !options.RootProfileOption.Flag.Changed {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 	} else {
-		pName, err = profiles.GetOptionValue(options.ConfigUnsetProfileOption)
+		pName, err = profiles.GetOptionValue(options.RootProfileOption)
 	}
 
 	if err != nil {

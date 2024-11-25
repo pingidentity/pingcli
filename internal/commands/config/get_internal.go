@@ -30,10 +30,10 @@ func RunInternalConfigGet(viperKey string) (err error) {
 }
 
 func readConfigGetOptions() (pName string, err error) {
-	if !options.ConfigGetProfileOption.Flag.Changed {
+	if !options.RootProfileOption.Flag.Changed {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 	} else {
-		pName, err = profiles.GetOptionValue(options.ConfigGetProfileOption)
+		pName, err = profiles.GetOptionValue(options.RootProfileOption)
 	}
 
 	if err != nil {

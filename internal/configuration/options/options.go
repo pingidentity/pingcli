@@ -71,15 +71,13 @@ func Options() []Option {
 		ConfigAddProfileNameOption,
 		ConfigAddProfileSetActiveOption,
 		ConfigDeleteAutoAcceptOption,
-		ConfigGetProfileOption,
-		ConfigSetProfileOption,
-		ConfigUnsetProfileOption,
 
 		RequestDataOption,
 		RequestHTTPMethodOption,
 		RequestServiceOption,
 		RequestAccessTokenOption,
 		RequestAccessTokenExpiryOption,
+		RequestFailOption,
 	}
 }
 
@@ -116,12 +114,6 @@ var (
 	ConfigAddProfileSetActiveOption   Option
 
 	ConfigDeleteAutoAcceptOption Option
-
-	ConfigGetProfileOption Option
-
-	ConfigSetProfileOption Option
-
-	ConfigUnsetProfileOption Option
 )
 
 // 'pingcli platform export' command options
@@ -154,4 +146,5 @@ var (
 	RequestServiceOption           Option
 	RequestAccessTokenOption       Option
 	RequestAccessTokenExpiryOption Option
+	RequestFailOption              Option
 )

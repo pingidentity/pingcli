@@ -46,7 +46,7 @@ func TestConfigUnsetCmd_CheckViperConfig(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 
 	mainViper := profiles.GetMainConfig().ViperInstance()
-	profileViperKey := profiles.GetMainConfig().ActiveProfile().Name() + "." + viperKey
+	profileViperKey := "default." + viperKey
 	viperNewValue := mainViper.GetString(profileViperKey)
 	if viperOldValue == viperNewValue {
 		t.Errorf("Expected viper configuration value to be updated. Old: %s, New: %s", viperOldValue, viperNewValue)

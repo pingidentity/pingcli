@@ -30,7 +30,10 @@ func configListProfilesRunE(cmd *cobra.Command, args []string) error {
 	l := logger.Get()
 	l.Debug().Msgf("Config list-profiles Subcommand Called.")
 
-	config_internal.RunInternalConfigListProfiles()
+	err := config_internal.RunInternalConfigListProfiles()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

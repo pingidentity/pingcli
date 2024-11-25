@@ -36,8 +36,8 @@ func Test_RunInternalConfigUnset_DifferentProfile(t *testing.T) {
 		profileName = customtypes.String("production")
 	)
 
-	options.ConfigUnsetProfileOption.Flag.Changed = true
-	options.ConfigUnsetProfileOption.CobraParamValue = &profileName
+	options.RootProfileOption.Flag.Changed = true
+	options.RootProfileOption.CobraParamValue = &profileName
 
 	err := RunInternalConfigUnset("noColor")
 	if err != nil {
@@ -53,8 +53,8 @@ func Test_RunInternalConfigUnset_InvalidProfileName(t *testing.T) {
 		profileName = customtypes.String("invalid")
 	)
 
-	options.ConfigUnsetProfileOption.Flag.Changed = true
-	options.ConfigUnsetProfileOption.CobraParamValue = &profileName
+	options.RootProfileOption.Flag.Changed = true
+	options.RootProfileOption.CobraParamValue = &profileName
 
 	expectedErrorPattern := `^failed to unset configuration: invalid profile name: '.*' profile does not exist$`
 	err := RunInternalConfigUnset("noColor")

@@ -3,7 +3,6 @@ package config
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
-	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -28,8 +27,6 @@ func NewConfigUnsetCommand() *cobra.Command {
 		Short: "Unset stored configuration settings for the CLI.",
 		Use:   "unset [flags] key",
 	}
-
-	cmd.Flags().AddFlag(options.ConfigUnsetProfileOption.Flag)
 
 	return cmd
 }

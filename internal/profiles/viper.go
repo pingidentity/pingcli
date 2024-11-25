@@ -22,14 +22,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type ActiveProfile struct {
-	name          string
-	viperInstance *viper.Viper
-}
-
 type MainConfig struct {
 	viperInstance *viper.Viper
-	activeProfile *ActiveProfile
 }
 
 var (
@@ -40,7 +34,6 @@ var (
 func NewMainConfig() (newMainViper *MainConfig) {
 	newMainViper = &MainConfig{
 		viperInstance: viper.New(),
-		activeProfile: nil,
 	}
 
 	return newMainViper
@@ -53,10 +46,6 @@ func GetMainConfig() *MainConfig {
 
 func (m MainConfig) ViperInstance() *viper.Viper {
 	return m.viperInstance
-}
-
-func (m MainConfig) ActiveProfile() *ActiveProfile {
-	return m.activeProfile
 }
 
 func (m *MainConfig) ChangeActiveProfile(pName string) (err error) {
@@ -80,11 +69,6 @@ func (m *MainConfig) ChangeActiveProfile(pName string) (err error) {
 		return err
 	}
 
-	m.activeProfile = &ActiveProfile{
-		name:          pName,
-		viperInstance: m.ViperInstance().Sub(pName),
-	}
-
 	return nil
 }
 
@@ -103,7 +87,10 @@ func (m MainConfig) ChangeProfileName(oldPName, newPName string) (err error) {
 		return err
 	}
 
-	subViper := m.ViperInstance().Sub(oldPName)
+	subViper, err := m.GetProfileViper(oldPName)
+	if err != nil {
+		return err
+	}
 
 	if err = m.DeleteProfile(oldPName); err != nil {
 		return err
@@ -121,7 +108,11 @@ func (m MainConfig) ChangeProfileDescription(pName, description string) (err err
 		return err
 	}
 
-	subViper := m.ViperInstance().Sub(pName)
+	subViper, err := m.GetProfileViper(pName)
+	if err != nil {
+		return err
+	}
+
 	subViper.Set(options.ProfileDescriptionOption.ViperKey, description)
 
 	if err = m.SaveProfile(pName, subViper); err != nil {
@@ -131,6 +122,19 @@ func (m MainConfig) ChangeProfileDescription(pName, description string) (err err
 	return nil
 }
 
+func (m MainConfig) GetProfileViper(pName string) (subViper *viper.Viper, err error) {
+	if err = m.ValidateExistingProfileName(pName); err != nil {
+		return nil, err
+	}
+
+	subViper = m.ViperInstance().Sub(pName)
+	if subViper == nil {
+		return nil, fmt.Errorf("failed to get profile viper: profile '%s' does not exist", pName)
+	}
+
+	return subViper, nil
+}
+
 // Viper gives no built-in delete or unset method for keys
 // Using this "workaround" described here: https://github.com/spf13/viper/issues/632
 func (m MainConfig) DeleteProfile(pName string) (err error) {
@@ -138,7 +142,12 @@ func (m MainConfig) DeleteProfile(pName string) (err error) {
 		return err
 	}
 
-	if pName == m.ActiveProfile().Name() {
+	activeProfileName, err := GetOptionValue(options.RootActiveProfileOption)
+	if err != nil {
+		return err
+	}
+
+	if strings.EqualFold(activeProfileName, pName) {
 		return fmt.Errorf("'%s' is the active profile and cannot be deleted", pName)
 	}
 
@@ -278,7 +287,10 @@ func (m MainConfig) ProfileToString(pName string) (yamlStr string, err error) {
 		return "", err
 	}
 
-	subViper := m.ViperInstance().Sub(pName)
+	subViper, err := m.GetProfileViper(pName)
+	if err != nil {
+		return "", err
+	}
 
 	yaml, err := yaml.Marshal(subViper.AllSettings())
 	if err != nil {
@@ -293,7 +305,10 @@ func (m MainConfig) ProfileViperValue(pName, viperKey string) (yamlStr string, e
 		return "", err
 	}
 
-	subViper := m.ViperInstance().Sub(pName)
+	subViper, err := m.GetProfileViper(pName)
+	if err != nil {
+		return "", err
+	}
 
 	if !subViper.IsSet(viperKey) {
 		return "", fmt.Errorf("configuration key '%s' is not set in profile '%s'", viperKey, pName)
@@ -307,83 +322,123 @@ func (m MainConfig) ProfileViperValue(pName, viperKey string) (yamlStr string, e
 	return string(yaml), nil
 }
 
-func (a ActiveProfile) ViperInstance() *viper.Viper {
-	return a.viperInstance
-}
+func (m MainConfig) DefaultMissingViperKeys() (err error) {
+	// For each profile, if a viper key from an option doesn't exist, set it to the default value
+	for _, pName := range m.ProfileNames() {
+		subViper, err := m.GetProfileViper(pName)
+		if err != nil {
+			return err
+		}
 
-func (a ActiveProfile) Name() string {
-	return a.name
+		for _, opt := range options.Options() {
+			if opt.ViperKey == "" || opt.ViperKey == options.RootActiveProfileOption.ViperKey {
+				continue
+			}
+			if !subViper.IsSet(opt.ViperKey) {
+				subViper.Set(opt.ViperKey, opt.DefaultValue)
+			}
+		}
+		err = m.SaveProfile(pName, subViper)
+		if err != nil {
+			return fmt.Errorf("Failed to save profile '%s': %v", pName, err)
+		}
+	}
+
+	return nil
 }
 
 func GetOptionValue(opt options.Option) (pFlagValue string, err error) {
-	if opt.CobraParamValue != nil && opt.Flag.Changed {
-		pFlagValue = opt.CobraParamValue.String()
-		return pFlagValue, nil
+	// 1st priority: cobra param flag value
+	cobraParamValue, ok := cobraParamValueFromOption(opt)
+	if ok {
+		return cobraParamValue, nil
 	}
 
+	// 2nd priority: environment variable value
 	pFlagValue = os.Getenv(opt.EnvVar)
 	if pFlagValue != "" {
 		return pFlagValue, nil
 	}
 
-	mainConfig := GetMainConfig()
-	if opt.ViperKey != "" && mainConfig != nil {
-		var vValue any
-
-		mainViperInstance := mainConfig.ViperInstance()
-		// This recursive call is safe, as options.RootProfileOption.ViperKey is not set
-		definedProfileName, err := GetOptionValue(options.RootProfileOption)
-		if err != nil {
-			return "", err
-		}
-
-		// 3 Cases:
-		// - 1) Viper Key is the ActiveProfile Key, get value from main viper instance
-		// - 2) --profile flag has been set, get value from set profile viper instance
-		// - 3) no --profile flag set, get value from active profile viper instance defined in main viper instance
-
-		if opt.ViperKey == options.RootActiveProfileOption.ViperKey && mainViperInstance != nil {
-			// Case 1
-			vValue = mainViperInstance.Get(opt.ViperKey)
-		} else if definedProfileName != "" {
-			// Case 2
-			profileViperInstance := mainViperInstance.Sub(definedProfileName)
-			if profileViperInstance != nil {
-				vValue = profileViperInstance.Get(opt.ViperKey)
-			}
-		} else {
-			// Case 3
-			activeProfile := mainConfig.ActiveProfile()
-			if activeProfile != nil {
-				profileViperInstance := activeProfile.ViperInstance()
-				if profileViperInstance != nil {
-					vValue = profileViperInstance.Get(opt.ViperKey)
-				}
-			}
-		}
-
-		switch typedValue := vValue.(type) {
-		case nil:
-			// Do nothing
-		case string:
-			return typedValue, nil
-		case []string:
-			return strings.Join(typedValue, ","), nil
-		case []any:
-			strSlice := []string{}
-			for _, v := range typedValue {
-				strSlice = append(strSlice, fmt.Sprintf("%v", v))
-			}
-			return strings.Join(strSlice, ","), nil
-		default:
-			return fmt.Sprintf("%v", typedValue), nil
-		}
+	// 3rd priority: viper value
+	viperValue, ok, err := viperValueFromOption(opt)
+	if err != nil {
+		return "", err
+	}
+	if ok {
+		return viperValue, nil
 	}
 
+	// 4th priority: default value
 	if opt.DefaultValue != nil {
 		pFlagValue = opt.DefaultValue.String()
 		return pFlagValue, nil
 	}
 
-	return pFlagValue, fmt.Errorf("failed to get option value: no value found: %v", opt)
+	// This is a error, as it means the option is not configured internally to contain one of the 4 values above.
+	// This should never happen, as all options should at least have a default value.
+	return "", fmt.Errorf("failed to get option value: no value found: %v", opt)
+}
+
+func cobraParamValueFromOption(opt options.Option) (value string, ok bool) {
+	if opt.CobraParamValue != nil && opt.Flag.Changed {
+		return opt.CobraParamValue.String(), true
+	}
+
+	return "", false
+}
+
+func viperValueFromOption(opt options.Option) (value string, ok bool, err error) {
+	mainConfig := GetMainConfig()
+	if opt.ViperKey != "" && mainConfig != nil {
+		var (
+			vValue            any
+			mainViperInstance = mainConfig.ViperInstance()
+		)
+
+		// Case 1: Viper Key is the ActiveProfile Key, get value from main viper instance
+		if opt.ViperKey == options.RootActiveProfileOption.ViperKey && mainViperInstance != nil {
+			vValue = mainViperInstance.Get(opt.ViperKey)
+		} else {
+			// Case 2: --profile flag has been set, get value from set profile viper instance
+			// Case 3: no --profile flag set, get value from active profile viper instance defined in main viper instance
+			// This recursive call is safe, as options.RootProfileOption.ViperKey is not set
+			pName, err := GetOptionValue(options.RootProfileOption)
+			if err != nil {
+				return "", false, err
+			}
+			if pName == "" {
+				pName, err = GetOptionValue(options.RootActiveProfileOption)
+				if err != nil {
+					return "", false, err
+				}
+			}
+
+			subViper, err := mainConfig.GetProfileViper(pName)
+			if err != nil {
+				return "", false, err
+			}
+
+			vValue = subViper.Get(opt.ViperKey)
+		}
+
+		switch typedValue := vValue.(type) {
+		case nil:
+			return "", false, nil
+		case string:
+			return typedValue, true, nil
+		case []string:
+			return strings.Join(typedValue, ","), true, nil
+		case []any:
+			strSlice := []string{}
+			for _, v := range typedValue {
+				strSlice = append(strSlice, fmt.Sprintf("%v", v))
+			}
+			return strings.Join(strSlice, ","), true, nil
+		default:
+			return fmt.Sprintf("%v", typedValue), true, nil
+		}
+	}
+
+	return "", false, nil
 }
