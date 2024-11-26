@@ -289,8 +289,8 @@ github.com/patrickcping/pingone-go-sdk-v2/authorize v0.6.0 h1:nWvkKoo8NuQyjggqNQ
 github.com/patrickcping/pingone-go-sdk-v2/authorize v0.6.0/go.mod h1:D+vbECm13P8SkyvcWN9hjw90Qw9sbqdJTUezb+CRt3o=
 github.com/patrickcping/pingone-go-sdk-v2/credentials v0.9.0 h1:ZxeY871Y8FN0he3SpHte7voVXjcx5R00K/XOsPvxWsg=
 github.com/patrickcping/pingone-go-sdk-v2/credentials v0.9.0/go.mod h1:sUk+JIdeUPPTtbK533QFDYygGcR51QAT9dccHfJEXDI=
-github.com/patrickcping/pingone-go-sdk-v2/management v0.43.0 h1:MedfcWEgPJScxQriXORdBMUylJmk0xxSI1ImTnCpFRY=
-github.com/patrickcping/pingone-go-sdk-v2/management v0.43.0/go.mod h1:5YMhQOKlAzBKK2y0md7GRj8JcBfTYdyMDidLiMxQCjA=
+github.com/patrickcping/pingone-go-sdk-v2/management v0.44.0 h1:NjEaHbefO6YrvxsRWoNGSpEsQN0WFV/LJHO+rQilNzk=
+github.com/patrickcping/pingone-go-sdk-v2/management v0.44.0/go.mod h1:oLB/jjAkn4oEA60nC5/0KAobvcNJbflOWnVaS6lKxv8=
 github.com/patrickcping/pingone-go-sdk-v2/mfa v0.20.0 h1:7u62JJ8nH8jZW79+O7cwrJBsDTMfQ5zllqG7twBeqJk=
 github.com/patrickcping/pingone-go-sdk-v2/mfa v0.20.0/go.mod h1:2fA7oR1PNCE+U1mYlLP9P2kRJLDjh98KqOn4eP8OZIE=
 github.com/patrickcping/pingone-go-sdk-v2/risk v0.16.0 h1:ZDffATzIhUsVlyEWz91DKwe9YD1VBoE3PsjlKiRMovE=

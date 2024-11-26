@@ -1,14 +1,13 @@
 module github.com/pingidentity/pingcli
 
 go 1.23.2
-
 require (
 	github.com/fatih/color v1.18.0
 	github.com/golangci/golangci-lint v1.62.0
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/manifoldco/promptui v0.9.0
 	github.com/patrickcping/pingone-go-sdk-v2 v0.12.3
-	github.com/patrickcping/pingone-go-sdk-v2/management v0.43.0
+	github.com/patrickcping/pingone-go-sdk-v2/management v0.44.0
 	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.20.0
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.16.0
 	github.com/pavius/impi v0.0.3
