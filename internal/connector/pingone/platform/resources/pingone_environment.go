@@ -12,40 +12,59 @@ var (
 )
 
 type PingOneEnvironmentResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneEnvironmentResource
 func Environment(clientInfo *connector.PingOneClientInfo) *PingOneEnvironmentResource {
 	return &PingOneEnvironmentResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
+}
+
+func (r *PingOneEnvironmentResource) ResourceType() string {
+	return "pingone_environment"
 }
 
 func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	err := r.exportEnvironments()
+	if err != nil {
+		return nil, err
+	}
 
-	importBlocks := []connector.ImportBlock{}
+	return r.importBlocks, nil
+}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+func (r *PingOneEnvironmentResource) exportEnvironments() error {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
+	err = common.HandleClientResponse(response, err, "ReadOneEnvironment", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	r.addImportBlock()
+
+	return nil
+}
+
+func (r *PingOneEnvironmentResource) addImportBlock() {
 	commentData := map[string]string{
 		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       "export_environment",
+		ResourceName:       r.ResourceType(),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingOneEnvironmentResource) ResourceType() string {
-	return "pingone_environment"
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

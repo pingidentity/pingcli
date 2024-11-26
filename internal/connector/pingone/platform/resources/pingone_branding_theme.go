@@ -14,62 +14,83 @@ var (
 )
 
 type PingOneBrandingThemeResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneBrandingThemeResource
 func BrandingTheme(clientInfo *connector.PingOneClientInfo) *PingOneBrandingThemeResource {
 	return &PingOneBrandingThemeResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
-}
-
-func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadBrandingThemes"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, theme := range embedded.GetThemes() {
-		themeId, themeIdOk := theme.GetIdOk()
-		themeConfiguration, themeConfigurationOk := theme.GetConfigurationOk()
-		var themeName *string
-		var themeNameOk = false
-		if themeConfigurationOk {
-			themeName, themeNameOk = themeConfiguration.GetNameOk()
-		}
-
-		if themeIdOk && themeConfigurationOk && themeNameOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Branding Theme Name":   *themeName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Branding Theme ID":     *themeId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *themeName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *themeId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
-		}
-	}
-
-	return &importBlocks, nil
 }
 
 func (r *PingOneBrandingThemeResource) ResourceType() string {
 	return "pingone_branding_theme"
+}
+
+func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, error) {
+	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
+
+	err := r.exportBrandingThemes()
+	if err != nil {
+		return nil, err
+	}
+
+	return r.importBlocks, nil
+}
+
+func (r *PingOneBrandingThemeResource) exportBrandingThemes() error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadBrandingThemes", r.ResourceType())
+		if err != nil {
+			return err
+		}
+
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, brandingTheme := range embedded.GetThemes() {
+			brandingThemeId, brandingThemeIdOk := brandingTheme.GetIdOk()
+			brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
+
+			if brandingThemeIdOk && brandingThemeConfigurationOk {
+				brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
+
+				if brandingThemeNameOk {
+					r.addImportBlock(*brandingThemeId, *brandingThemeName)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *PingOneBrandingThemeResource) addImportBlock(brandingThemeId, brandingThemeName string) {
+	commentData := map[string]string{
+		"Branding Theme ID":     brandingThemeId,
+		"Branding Theme Name":   brandingThemeName,
+		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Resource Type":         r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       brandingThemeName,
+		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, brandingThemeId),
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

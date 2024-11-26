@@ -14,92 +14,151 @@ var (
 )
 
 type PingOneAgreementLocalizationRevisionResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneAgreementLocalizationRevisionResource
 func AgreementLocalizationRevision(clientInfo *connector.PingOneClientInfo) *PingOneAgreementLocalizationRevisionResource {
 	return &PingOneAgreementLocalizationRevisionResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
+}
+
+func (r *PingOneAgreementLocalizationRevisionResource) ResourceType() string {
+	return "pingone_agreement_localization_revision"
 }
 
 func (r *PingOneAgreementLocalizationRevisionResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllAgreements"
-
-	agreementEmbedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	err := r.exportAgreementLocalizationRevisions()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	return r.importBlocks, nil
+}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-	for _, agreement := range agreementEmbedded.GetAgreements() {
-		agreementId, agreementIdOk := agreement.GetIdOk()
-		agreementName, agreementNameOk := agreement.GetNameOk()
+func (r *PingOneAgreementLocalizationRevisionResource) exportAgreementLocalizationRevisions() error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
-		if agreementIdOk && agreementNameOk {
-			apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *agreement.Id).Execute
-			apiFunctionName := "ReadAllAgreementLanguages"
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllAgreements", r.ResourceType())
+		if err != nil {
+			return err
+		}
 
-			agreementLanguageEmbedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
-			if err != nil {
-				return nil, err
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, agreement := range embedded.GetAgreements() {
+			agreementId, agreementIdOk := agreement.GetIdOk()
+			agreementName, agreementNameOk := agreement.GetNameOk()
+
+			if agreementIdOk && agreementNameOk {
+				err := r.exportAgreementLocalizationRevisionsByAgreement(*agreementId, *agreementName)
+				if err != nil {
+					return err
+				}
 			}
+		}
+	}
 
-			for _, languageWrapper := range agreementLanguageEmbedded.GetLanguages() {
-				if languageWrapper.AgreementLanguage != nil {
-					agreementLanguage := languageWrapper.AgreementLanguage
+	return nil
+}
 
-					agreementLanguageLocale, agreementLanguageLocaleOk := agreementLanguage.GetLocaleOk()
-					agreementLanguageId, agreementLanguageIdOk := agreementLanguage.GetIdOk()
+func (r *PingOneAgreementLocalizationRevisionResource) exportAgreementLocalizationRevisionsByAgreement(agreementId, agreementName string) error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId).Execute()
 
-					if agreementLanguageLocaleOk && agreementLanguageIdOk {
-						apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.AgreementRevisionsResourcesApi.ReadAllAgreementLanguageRevisions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *agreementId, *agreementLanguageId).Execute
-						apiFunctionName := "ReadAllAgreementLanguageRevisions"
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllAgreementLanguages", r.ResourceType())
+		if err != nil {
+			return err
+		}
 
-						agreementLanguageRevisionEmbedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
-						if err != nil {
-							return nil, err
-						}
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
 
-						for revisionIndex, revision := range agreementLanguageRevisionEmbedded.GetRevisions() {
-							revisionId, revisionIdOk := revision.GetIdOk()
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
 
-							if revisionIdOk {
-								commentData := map[string]string{
-									"Resource Type":                      r.ResourceType(),
-									"Agreement Name":                     *agreementName,
-									"Agreement Language Locale":          *agreementLanguageLocale,
-									"Export Environment ID":              r.clientInfo.ExportEnvironmentID,
-									"Agreement ID":                       *agreementId,
-									"Agreement Language ID":              *agreementLanguageId,
-									"Agreement Localization Revision ID": *revisionId,
-								}
+		for _, languageInner := range embedded.GetLanguages() {
+			if languageInner.AgreementLanguage != nil {
+				agreementLanguageLocale, agreementLanguageLocaleOk := languageInner.AgreementLanguage.GetLocaleOk()
+				agreementLanguageId, agreementLanguageIdOk := languageInner.AgreementLanguage.GetIdOk()
 
-								importBlocks = append(importBlocks, connector.ImportBlock{
-									ResourceType:       r.ResourceType(),
-									ResourceName:       fmt.Sprintf("%s_%s_%d", *agreementName, *agreementLanguageLocale, (revisionIndex + 1)),
-									ResourceID:         fmt.Sprintf("%s/%s/%s/%s", r.clientInfo.ExportEnvironmentID, *agreementId, *agreementLanguageId, *revisionId),
-									CommentInformation: common.GenerateCommentInformation(commentData),
-								})
-							}
-						}
+				if agreementLanguageLocaleOk && agreementLanguageIdOk {
+					err := r.exportAgreementLocalizationRevisionsByAgreementLanguage(agreementId, agreementName, *agreementLanguageId, *agreementLanguageLocale)
+					if err != nil {
+						return err
 					}
 				}
 			}
 		}
 	}
 
-	return &importBlocks, nil
+	return nil
 }
 
-func (r *PingOneAgreementLocalizationRevisionResource) ResourceType() string {
-	return "pingone_agreement_localization_revision"
+func (r *PingOneAgreementLocalizationRevisionResource) exportAgreementLocalizationRevisionsByAgreementLanguage(agreementId, agreementName, agreementLanguageId, agreementLanguageLocale string) error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementRevisionsResourcesApi.ReadAllAgreementLanguageRevisions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId, agreementLanguageId).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllAgreementLanguageRevisions", r.ResourceType())
+		if err != nil {
+			return err
+		}
+
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, revision := range embedded.GetRevisions() {
+			agreementLanguageRevisionId, agreementLanguageRevisionIdOk := revision.GetIdOk()
+
+			if agreementLanguageRevisionIdOk {
+				r.addImportBlock(agreementId, agreementName, agreementLanguageId, agreementLanguageLocale, *agreementLanguageRevisionId)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *PingOneAgreementLocalizationRevisionResource) addImportBlock(agreementId, agreementName, agreementLanguageId, agreementLanguageLocale, agreementLanguageRevisionId string) {
+	commentData := map[string]string{
+		"Agreement ID":                       agreementId,
+		"Agreement Language ID":              agreementLanguageId,
+		"Agreement Language Locale":          agreementLanguageLocale,
+		"Agreement Localization Revision ID": agreementLanguageRevisionId,
+		"Agreement Name":                     agreementName,
+		"Export Environment ID":              r.clientInfo.ExportEnvironmentID,
+		"Resource Type":                      r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_%s_%s", agreementName, agreementLanguageLocale, agreementLanguageRevisionId),
+		ResourceID:         fmt.Sprintf("%s/%s/%s/%s", r.clientInfo.ExportEnvironmentID, agreementId, agreementLanguageId, agreementLanguageRevisionId),
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

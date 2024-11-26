@@ -12,71 +12,62 @@ var (
 )
 
 type PingOneNotificationSettingsEmailResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneNotificationSettingsEmailResource
 func NotificationSettingsEmail(clientInfo *connector.PingOneClientInfo) *PingOneNotificationSettingsEmailResource {
 	return &PingOneNotificationSettingsEmailResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
-}
-
-func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	emailNotificationSettings, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	if emailNotificationSettings == nil {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
-	}
-
-	if response.StatusCode == 204 {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
-	}
-
-	emailNotificationSettingsEnv, emailNotificationSettingsEnvOk := emailNotificationSettings.GetEnvironmentOk()
-	var (
-		emailNotificationSettingsEnvID   *string
-		emailNotificationSettingsEnvIDOk bool
-	)
-
-	if emailNotificationSettingsEnvOk {
-		emailNotificationSettingsEnvID, emailNotificationSettingsEnvIDOk = emailNotificationSettingsEnv.GetIdOk()
-	}
-
-	if !emailNotificationSettingsEnvOk || !emailNotificationSettingsEnvIDOk || emailNotificationSettingsEnvID == nil {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
-	}
-
-	commentData := map[string]string{
-		"Resource Type":         r.ResourceType(),
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-	}
-
-	importBlocks = append(importBlocks, connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       "pingone_notification_settings_email",
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
-
-	return &importBlocks, nil
 }
 
 func (r *PingOneNotificationSettingsEmailResource) ResourceType() string {
 	return "pingone_notification_settings_email"
+}
+
+func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.ImportBlock, error) {
+	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
+
+	err := r.exportNotificationSettingsEmails()
+	if err != nil {
+		return nil, err
+	}
+
+	return r.importBlocks, nil
+}
+
+func (r *PingOneNotificationSettingsEmailResource) exportNotificationSettingsEmails() error {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	err = common.HandleClientResponse(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == 204 {
+		return common.DataNilError(r.ResourceType(), response)
+	}
+
+	r.addImportBlock()
+
+	return nil
+}
+
+func (r *PingOneNotificationSettingsEmailResource) addImportBlock() {
+	commentData := map[string]string{
+		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Resource Type":         r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       r.ResourceType(),
+		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

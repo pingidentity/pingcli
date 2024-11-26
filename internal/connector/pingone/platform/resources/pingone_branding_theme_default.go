@@ -1,9 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
-	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -15,75 +12,85 @@ var (
 )
 
 type PingOneBrandingThemeDefaultResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneBrandingThemeDefaultResource
 func BrandingThemeDefault(clientInfo *connector.PingOneClientInfo) *PingOneBrandingThemeDefaultResource {
 	return &PingOneBrandingThemeDefaultResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
-}
-
-func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadBrandingThemes"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
-
-	foundDefault := false
-	var defaultBrandingTheme management.BrandingTheme
-
-	for _, brandingTheme := range embedded.GetThemes() {
-		if brandingTheme.GetDefault() {
-			foundDefault = true
-			defaultBrandingTheme = brandingTheme
-			break
-		}
-	}
-
-	if !foundDefault {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &[]connector.ImportBlock{}, nil
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	defaultBrandingThemeConfiguration, defaultBrandingThemeConfigurationOk := defaultBrandingTheme.GetConfigurationOk()
-	var (
-		defaultBrandingThemeName   *string
-		defaultBrandingThemeNameOk = false
-	)
-	if defaultBrandingThemeConfigurationOk {
-		defaultBrandingThemeName, defaultBrandingThemeNameOk = defaultBrandingThemeConfiguration.GetNameOk()
-	}
-
-	if defaultBrandingThemeConfigurationOk && defaultBrandingThemeNameOk {
-		commentData := map[string]string{
-			"Resource Type":         r.ResourceType(),
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		}
-
-		importBlocks = append(importBlocks, connector.ImportBlock{
-			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_default_theme", *defaultBrandingThemeName),
-			ResourceID:         r.clientInfo.ExportEnvironmentID,
-			CommentInformation: common.GenerateCommentInformation(commentData),
-		})
-	}
-
-	return &importBlocks, nil
 }
 
 func (r *PingOneBrandingThemeDefaultResource) ResourceType() string {
 	return "pingone_branding_theme_default"
+}
+
+func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
+	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
+
+	err := r.exportBrandingThemeDefault()
+	if err != nil {
+		return nil, err
+	}
+
+	return r.importBlocks, nil
+}
+
+func (r *PingOneBrandingThemeDefaultResource) exportBrandingThemeDefault() error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadBrandingThemes", r.ResourceType())
+		if err != nil {
+			return err
+		}
+
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, brandingTheme := range embedded.GetThemes() {
+			brandingThemeDefault, brandingThemeDefaultOk := brandingTheme.GetDefaultOk()
+
+			if brandingThemeDefaultOk && *brandingThemeDefault {
+				brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
+
+				if brandingThemeConfigurationOk {
+					brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
+
+					if brandingThemeNameOk {
+						r.addImportBlock(*brandingThemeName)
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *PingOneBrandingThemeDefaultResource) addImportBlock(brandingThemeName string) {
+	commentData := map[string]string{
+		"Default Branding Theme Name": brandingThemeName,
+		"Export Environment ID":       r.clientInfo.ExportEnvironmentID,
+		"Resource Type":               r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       brandingThemeName,
+		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

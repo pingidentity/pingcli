@@ -14,32 +14,51 @@ var (
 )
 
 type PingOneKeyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneKeyResource
 func Key(clientInfo *connector.PingOneClientInfo) *PingOneKeyResource {
 	return &PingOneKeyResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
+}
+
+func (r *PingOneKeyResource) ResourceType() string {
+	return "pingone_key"
 }
 
 func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "GetKeys"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	err := r.exportKeys()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	return r.importBlocks, nil
+}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+func (r *PingOneKeyResource) exportKeys() error {
+	// TODO: Implement pagination once supported in the PingOne Go Client SDK
+	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+
+	err = common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	if entityArray == nil {
+		return common.DataNilError(r.ResourceType(), response)
+	}
+
+	embedded, embeddedOk := entityArray.GetEmbeddedOk()
+	if !embeddedOk {
+		return common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, key := range embedded.GetKeys() {
 		keyId, keyIdOk := key.GetIdOk()
@@ -47,26 +66,28 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 		keyUsageType, keyUsageTypeOk := key.GetUsageTypeOk()
 
 		if keyIdOk && keyNameOk && keyUsageTypeOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Key Name":              *keyName,
-				"Key Usage Type":        string(*keyUsageType),
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Key ID":                *keyId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", *keyName, *keyUsageType),
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *keyId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			r.addImportBlock(*keyId, *keyName, string(*keyUsageType))
 		}
 	}
 
-	return &importBlocks, nil
+	return nil
 }
 
-func (r *PingOneKeyResource) ResourceType() string {
-	return "pingone_key"
+func (r *PingOneKeyResource) addImportBlock(keyId, keyName, keyUsageType string) {
+	commentData := map[string]string{
+		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Key ID":                keyId,
+		"Key Name":              keyName,
+		"Key Usage Type":        keyUsageType,
+		"Resource Type":         r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_%s", keyName, keyUsageType),
+		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, keyId),
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }
