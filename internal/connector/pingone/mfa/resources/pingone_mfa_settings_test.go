@@ -17,7 +17,7 @@ func TestMFASettingsExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_mfa_settings",
-			ResourceName: "mfa_settings",
+			ResourceName: "pingone_mfa_settings",
 			ResourceID:   testutils.GetEnvironmentID(),
 		},
 	}

@@ -120,7 +120,10 @@ func (r *PingOneApplicationResourceGrantResource) exportApplicationResourceGrant
 				grantResourceId, grantResourceIdOk := grantResource.GetIdOk()
 
 				if grantResourceIdOk {
-					r.exportApplicationResourceGrantsByResource(appId, appName, *grantId, *grantResourceId)
+					err := r.exportApplicationResourceGrantsByResource(appId, appName, *grantId, *grantResourceId)
+					if err != nil {
+						return err
+					}
 				}
 			}
 		}

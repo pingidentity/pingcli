@@ -1,6 +1,8 @@
 package resources
 
 import (
+	"fmt"
+
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -110,7 +112,7 @@ func (r *PingOneIdentityProviderResource) addImportBlock(idpId, idpName string) 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       idpName,
-		ResourceID:         idpId,
+		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, idpId),
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 

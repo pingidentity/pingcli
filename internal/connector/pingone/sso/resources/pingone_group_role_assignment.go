@@ -142,7 +142,7 @@ func (r *PingOneGroupRoleAssignmentResource) addImportBlock(groupId, groupName, 
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s", groupName, roleName),
+		ResourceName:       fmt.Sprintf("%s_%s_%s", groupName, roleName, groupRoleAssignmentId),
 		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, groupId, groupRoleAssignmentId),
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}

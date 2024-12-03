@@ -95,7 +95,7 @@ func (r *PingOneAgreementLocalizationResource) exportAgreementLocalizationsByAgr
 		}
 
 		for _, languageInner := range embedded.GetLanguages() {
-			if languageInner.AgreementLanguage == nil {
+			if languageInner.AgreementLanguage != nil {
 				agreementLanguageId, agreementLanguageIdOk := languageInner.AgreementLanguage.GetIdOk()
 				agreementLanguageLocale, agreementLanguageLocaleOk := languageInner.AgreementLanguage.GetLocaleOk()
 

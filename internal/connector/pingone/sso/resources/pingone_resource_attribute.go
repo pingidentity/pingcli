@@ -141,8 +141,8 @@ func (r *PingOneResourceAttributeResource) addImportBlock(resourceId, resourceNa
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       resourceName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, resourceAttributeId),
+		ResourceName:       fmt.Sprintf("%s_%s", resourceName, resourceAttributeName),
+		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, resourceId, resourceAttributeId),
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
