@@ -14,72 +14,113 @@ var (
 )
 
 type PingOneSchemaAttributeResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneSchemaAttributeResource
 func SchemaAttribute(clientInfo *connector.PingOneClientInfo) *PingOneSchemaAttributeResource {
 	return &PingOneSchemaAttributeResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
+}
+
+func (r *PingOneSchemaAttributeResource) ResourceType() string {
+	return "pingone_schema_attribute"
 }
 
 func (r *PingOneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteSchemaFunc := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiSchemaFunctionName := "ReadAllSchemas"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteSchemaFunc, apiSchemaFunctionName, r.ResourceType())
+	err := r.exportSchemaAttributes()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	return r.importBlocks, nil
+}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+func (r *PingOneSchemaAttributeResource) exportSchemaAttributes() error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
-	for _, schema := range embedded.GetSchemas() {
-		schemaId, schemaIdOk := schema.GetIdOk()
-		schemaName, schemaNameOk := schema.GetNameOk()
-		if schemaIdOk && schemaNameOk {
-			apiExecuteSchemaAttributeFunc := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemaAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *schemaId).Execute
-			apiSchemaAttributeFunctionName := "ReadAllSchemaAttributes"
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSchemas", r.ResourceType())
+		if err != nil {
+			return err
+		}
 
-			schemaEmbedded, err := common.GetManagementEmbedded(apiExecuteSchemaAttributeFunc, apiSchemaAttributeFunctionName, r.ResourceType())
-			if err != nil {
-				return nil, err
-			}
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
 
-			for _, schemaAttribute := range schemaEmbedded.GetAttributes() {
-				schemaAttributeId, schemaAttributeIdOk := schemaAttribute.SchemaAttribute.GetIdOk()
-				schemaAttributeName, schemaAttributeNameOk := schemaAttribute.SchemaAttribute.GetNameOk()
-				if schemaAttributeIdOk && schemaAttributeNameOk {
-					commentData := map[string]string{
-						"Resource Type":         r.ResourceType(),
-						"Schema Name":           *schemaName,
-						"Schema Attribute Name": *schemaAttributeName,
-						"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-						"Schema ID":             *schemaId,
-						"Schema Attribute ID":   *schemaAttributeId,
-					}
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
 
-					importBlocks = append(importBlocks, connector.ImportBlock{
-						ResourceType:       r.ResourceType(),
-						ResourceName:       fmt.Sprintf("%s_%s", *schemaName, *schemaAttributeName),
-						ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, *schemaId, *schemaAttributeId),
-						CommentInformation: common.GenerateCommentInformation(commentData),
-					})
+		for _, schema := range embedded.GetSchemas() {
+			schemaId, schemaIdOk := schema.GetIdOk()
+			schemaName, schemaNameOk := schema.GetNameOk()
+			if schemaIdOk && schemaNameOk {
+				err := r.exportSchemaAttributesBySchema(*schemaId, *schemaName)
+				if err != nil {
+					return err
 				}
 			}
 		}
 	}
 
-	return &importBlocks, nil
+	return nil
 }
 
-func (r *PingOneSchemaAttributeResource) ResourceType() string {
-	return "pingone_schema_attribute"
+func (r *PingOneSchemaAttributeResource) exportSchemaAttributesBySchema(schemaId, schemaName string) error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemaAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, schemaId).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSchemaAttributes", r.ResourceType())
+		if err != nil {
+			return err
+		}
+
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, schemaAttribute := range embedded.GetAttributes() {
+			schemaAttributeId, schemaAttributeIdOk := schemaAttribute.SchemaAttribute.GetIdOk()
+			schemaAttributeName, schemaAttributeNameOk := schemaAttribute.SchemaAttribute.GetNameOk()
+			if schemaAttributeIdOk && schemaAttributeNameOk {
+				r.addImportBlock(schemaId, schemaName, *schemaAttributeId, *schemaAttributeName)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *PingOneSchemaAttributeResource) addImportBlock(schemaId, schemaName, schemaAttributeId, schemaAttributeName string) {
+	commentData := map[string]string{
+		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Resource Type":         r.ResourceType(),
+		"Schema Attribute ID":   schemaAttributeId,
+		"Schema Attribute Name": schemaAttributeName,
+		"Schema ID":             schemaId,
+		"Schema Name":           schemaName,
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_%s", schemaName, schemaAttributeName),
+		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, schemaId, schemaAttributeId),
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

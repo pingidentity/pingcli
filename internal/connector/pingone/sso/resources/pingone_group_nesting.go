@@ -14,73 +14,115 @@ var (
 )
 
 type PingOneGroupNestingResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneGroupNestingResource
 func GroupNesting(clientInfo *connector.PingOneClientInfo) *PingOneGroupNestingResource {
 	return &PingOneGroupNestingResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
+}
+
+func (r *PingOneGroupNestingResource) ResourceType() string {
+	return "pingone_group_nesting"
 }
 
 func (r *PingOneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllGroups"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	err := r.exportGroupNesting()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	return r.importBlocks, nil
+}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+func (r *PingOneGroupNestingResource) exportGroupNesting() error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
-	for _, parentGroup := range embedded.GetGroups() {
-		parentGroupId, parentGroupIdOk := parentGroup.GetIdOk()
-		parentGroupName, parentGroupNameOk := parentGroup.GetNameOk()
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
+		if err != nil {
+			return err
+		}
 
-		if parentGroupIdOk && parentGroupNameOk {
-			apiGroupNestingExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadGroupNesting(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *parentGroupId).Execute
-			apiGroupNestingFunctionName := "ReadGroupNesting"
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
 
-			embeddedGroupNesting, err := common.GetManagementEmbedded(apiGroupNestingExecuteFunc, apiGroupNestingFunctionName, r.ResourceType())
-			if err != nil {
-				return nil, err
-			}
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
 
-			for _, nestedGroup := range embeddedGroupNesting.GetGroupMemberships() {
-				nestedGroupId, nestedGroupIdOk := nestedGroup.GetIdOk()
-				nestedGroupName, nestedGroupNameOk := nestedGroup.GetNameOk()
-				if nestedGroupIdOk && nestedGroupNameOk {
-					commentData := map[string]string{
-						"Resource Type":         r.ResourceType(),
-						"Parent Group Name":     *parentGroupName,
-						"Nested Group Name":     *nestedGroupName,
-						"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-						"Parent Group ID":       *parentGroupId,
-						"Nested Group ID":       *nestedGroupId,
-					}
+		for _, parentGroup := range embedded.GetGroups() {
+			parentGroupId, parentGroupIdOk := parentGroup.GetIdOk()
+			parentGroupName, parentGroupNameOk := parentGroup.GetNameOk()
 
-					importBlocks = append(importBlocks, connector.ImportBlock{
-						ResourceType:       r.ResourceType(),
-						ResourceName:       fmt.Sprintf("%s_%s", *parentGroupName, *nestedGroupName),
-						ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, *parentGroupId, *nestedGroupId),
-						CommentInformation: common.GenerateCommentInformation(commentData),
-					})
+			if parentGroupIdOk && parentGroupNameOk {
+				err := r.exportGroupNestingByParentGroup(*parentGroupId, *parentGroupName)
+				if err != nil {
+					return err
 				}
 			}
 		}
 	}
 
-	return &importBlocks, nil
+	return nil
 }
 
-func (r *PingOneGroupNestingResource) ResourceType() string {
-	return "pingone_group_nesting"
+func (r *PingOneGroupNestingResource) exportGroupNestingByParentGroup(parentGroupId, parentGroupName string) error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadGroupNesting(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, parentGroupId).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGroupNesting", r.ResourceType())
+		if err != nil {
+			return err
+		}
+
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, nestedGroup := range embedded.GetGroupMemberships() {
+			nestedGroupId, nestedGroupIdOk := nestedGroup.GetIdOk()
+			nestedGroupName, nestedGroupNameOk := nestedGroup.GetNameOk()
+
+			if nestedGroupIdOk && nestedGroupNameOk {
+				r.addImportBlock(parentGroupId, parentGroupName, *nestedGroupId, *nestedGroupName)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *PingOneGroupNestingResource) addImportBlock(parentGroupId, parentGroupName, nestedGroupId, nestedGroupName string) {
+	commentData := map[string]string{
+		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Nested Group ID":       nestedGroupId,
+		"Nested Group Name":     nestedGroupName,
+		"Parent Group ID":       parentGroupId,
+		"Parent Group Name":     parentGroupName,
+		"Resource Type":         r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_%s", parentGroupName, nestedGroupName),
+		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, parentGroupId, nestedGroupId),
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }
