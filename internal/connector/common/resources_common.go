@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/patrickcping/pingone-go-sdk-v2/risk"
@@ -30,6 +31,36 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 	}
 
 	return nil
+}
+
+// Executes the function apiExecuteFunc for the AuthorizeAPIClient
+// Handles err and response if Client call failed
+// Returns embedded data if not nil
+// Treats nil embedded data as an error
+func GetAuthorizeEmbedded(apiExecuteFunc func() (*authorize.EntityArray, *http.Response, error), apiFunctionName string, resourceType string) (*authorize.EntityArrayEmbedded, error) {
+	l := logger.Get()
+
+	entityArray, response, err := apiExecuteFunc()
+
+	err = HandleClientResponse(response, err, apiFunctionName, resourceType)
+	if err != nil {
+		return nil, err
+	}
+
+	if entityArray == nil {
+		l.Error().Msgf("Returned %s() entityArray is nil.", apiFunctionName)
+		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
+		return nil, fmt.Errorf("failed to fetch %s resources via %s()", resourceType, apiFunctionName)
+	}
+
+	embedded, embeddedOk := entityArray.GetEmbeddedOk()
+	if !embeddedOk {
+		l.Error().Msgf("Returned %s() embedded data is nil.", apiFunctionName)
+		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
+		return nil, fmt.Errorf("failed to fetch %s resources via %s()", resourceType, apiFunctionName)
+	}
+
+	return embedded, nil
 }
 
 // Executes the function apiExecuteFunc for the ManagementAPIClient
