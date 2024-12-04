@@ -16,84 +16,124 @@ var (
 )
 
 type PingOneResourceScopePingOneApiResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneResourceScopePingOneApiResource
 func ResourceScopePingOneApi(clientInfo *connector.PingOneClientInfo) *PingOneResourceScopePingOneApiResource {
 	return &PingOneResourceScopePingOneApiResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
+}
+
+func (r *PingOneResourceScopePingOneApiResource) ResourceType() string {
+	return "pingone_resource_scope_pingone_api"
 }
 
 func (r *PingOneResourceScopePingOneApiResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllResources"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	err := r.exportResourceScopePingOneApis()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	return r.importBlocks, nil
+}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+func (r *PingOneResourceScopePingOneApiResource) exportResourceScopePingOneApis() error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
-	for _, resourceInner := range embedded.GetResources() {
-		resource := resourceInner.Resource
-		resourceId, resourceIdOk := resource.GetIdOk()
-		resourceName, resourceNameOk := resource.GetNameOk()
-		resourceType, resourceTypeOk := resource.GetTypeOk()
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResources", r.ResourceType())
+		if err != nil {
+			return err
+		}
 
-		if resourceIdOk && resourceNameOk && resourceTypeOk && *resourceType == management.ENUMRESOURCETYPE_PINGONE_API {
-			apiResourceScopePingOneApisExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *resourceId).Execute
-			apiResourceScopePingOneApisFunctionName := "ReadAllResourceScopes"
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
 
-			embeddedResourceScopePingOneApis, err := common.GetManagementEmbedded(apiResourceScopePingOneApisExecuteFunc, apiResourceScopePingOneApisFunctionName, r.ResourceType())
-			if err != nil {
-				return nil, err
-			}
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
 
-			for _, scopePingOneApi := range embeddedResourceScopePingOneApis.GetScopes() {
-				scopePingOneApiId, scopePingOneApiIdOk := scopePingOneApi.GetIdOk()
-				scopePingOneApiName, scopePingOneApiNameOk := scopePingOneApi.GetNameOk()
+		for _, resourceInner := range embedded.GetResources() {
+			if resourceInner.Resource != nil {
+				resourceId, resourceIdOk := resourceInner.Resource.GetIdOk()
+				resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
+				resourceType, resourceTypeOk := resourceInner.Resource.GetTypeOk()
 
-				// Make sure the scope name is in the form of one of the following four patterns
-				// p1:read:user, p1:update:user, p1:read:user:{suffix}, or p1:update:user:{suffix}
-				// as supported by https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/resource_scope_pingone_api
-				var scopeMatch bool
-				if scopePingOneApiNameOk {
-					re := regexp.MustCompile(`p1:(read|update):user($|(:.+))`)
-					scopeMatch = re.MatchString(*scopePingOneApiName)
-				}
-
-				if scopeMatch && scopePingOneApiIdOk && scopePingOneApiNameOk {
-					commentData := map[string]string{
-						"Resource Type":                r.ResourceType(),
-						"Resource Name":                *resourceName,
-						"Scope PingOneApi Name":        *scopePingOneApiName,
-						"Export Environment ID":        r.clientInfo.ExportEnvironmentID,
-						"Resource Scope PingOneApi ID": *scopePingOneApiId,
+				if resourceIdOk && resourceNameOk && resourceTypeOk && *resourceType == management.ENUMRESOURCETYPE_PINGONE_API {
+					err := r.exportResourceScopePingOneApiByResource(*resourceId, *resourceName)
+					if err != nil {
+						return err
 					}
-
-					importBlocks = append(importBlocks, connector.ImportBlock{
-						ResourceType:       r.ResourceType(),
-						ResourceName:       fmt.Sprintf("%s_%s", *resourceName, *scopePingOneApiName),
-						ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *scopePingOneApiId),
-						CommentInformation: common.GenerateCommentInformation(commentData),
-					})
 				}
 			}
 		}
 	}
 
-	return &importBlocks, nil
+	return nil
 }
 
-func (r *PingOneResourceScopePingOneApiResource) ResourceType() string {
-	return "pingone_resource_scope_pingone_api"
+func (r *PingOneResourceScopePingOneApiResource) exportResourceScopePingOneApiByResource(resourceId, resourceName string) error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResourceScopes", r.ResourceType())
+		if err != nil {
+			return err
+		}
+
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, scopePingOneApi := range embedded.GetScopes() {
+			scopePingOneApiId, scopePingOneApiIdOk := scopePingOneApi.GetIdOk()
+			scopePingOneApiName, scopePingOneApiNameOk := scopePingOneApi.GetNameOk()
+
+			if scopePingOneApiIdOk && scopePingOneApiNameOk {
+				// Make sure the scope name is in the form of one of the following four patterns
+				// p1:read:user, p1:update:user, p1:read:user:{suffix}, or p1:update:user:{suffix}
+				// as supported by https://registry.terraform.io/providers/pingidentity/pingone/latest/docs/resources/resource_scope_pingone_api
+				re := regexp.MustCompile(`^p1:(read|update):user(|:.+)$`)
+
+				if re.MatchString(*scopePingOneApiName) {
+					r.addImportBlock(resourceName, *scopePingOneApiId, *scopePingOneApiName)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *PingOneResourceScopePingOneApiResource) addImportBlock(resourceName, scopePingOneApiId, scopePingOneApiName string) {
+	commentData := map[string]string{
+		"Export Environment ID":           r.clientInfo.ExportEnvironmentID,
+		"PingOne API Resource Name":       resourceName,
+		"PingOne API Resource Scope ID":   scopePingOneApiId,
+		"PingOne API Resource Scope Name": scopePingOneApiName,
+		"Resource Type":                   r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_%s", resourceName, scopePingOneApiName),
+		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, scopePingOneApiId),
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

@@ -17,7 +17,7 @@ func TestFormRecaptchaV2Export(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_forms_recaptcha_v2",
-			ResourceName: "recaptcha_configuration",
+			ResourceName: "pingone_forms_recaptcha_v2",
 			ResourceID:   testutils.GetEnvironmentID(),
 		},
 	}

@@ -18,7 +18,7 @@ func TestPhoneDeliverySettingsExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_phone_delivery_settings",
-			ResourceName: "Test Provider",
+			ResourceName: "provider_custom_eb90b2a5-a801-45b3-8bf4-7d06cb6a5374",
 			ResourceID:   fmt.Sprintf("%s/eb90b2a5-a801-45b3-8bf4-7d06cb6a5374", testutils.GetEnvironmentID()),
 		},
 	}

@@ -12,51 +12,62 @@ var (
 )
 
 type PingOneBrandingSettingsResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneBrandingSettingsResource
 func BrandingSettings(clientInfo *connector.PingOneClientInfo) *PingOneBrandingSettingsResource {
 	return &PingOneBrandingSettingsResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
+}
+
+func (r *PingOneBrandingSettingsResource) ResourceType() string {
+	return "pingone_branding_settings"
 }
 
 func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadBrandingSettings", r.ResourceType())
+	err := r.exportBrandingSettings()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	return r.importBlocks, nil
+}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	if response.StatusCode == 204 {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
+func (r *PingOneBrandingSettingsResource) exportBrandingSettings() error {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	err = common.HandleClientResponse(response, err, "ReadBrandingSettings", r.ResourceType())
+	if err != nil {
+		return err
 	}
 
+	if response.StatusCode == 204 {
+		return common.DataNilError(r.ResourceType(), response)
+	}
+
+	r.addImportBlock()
+
+	return nil
+}
+
+func (r *PingOneBrandingSettingsResource) addImportBlock() {
 	commentData := map[string]string{
 		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       "branding_settings",
+		ResourceName:       r.ResourceType(),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingOneBrandingSettingsResource) ResourceType() string {
-	return "pingone_branding_settings"
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

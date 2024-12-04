@@ -12,51 +12,62 @@ var (
 )
 
 type PingOneMFASettingsResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneMFASettingsResource
 func MFASettings(clientInfo *connector.PingOneClientInfo) *PingOneMFASettingsResource {
 	return &PingOneMFASettingsResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
-}
-
-func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	_, response, err := r.clientInfo.ApiClient.MFAAPIClient.MFASettingsApi.ReadMFASettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadMFASettings", r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	if response.StatusCode == 204 {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &importBlocks, nil
-	}
-
-	commentData := map[string]string{
-		"Resource Type":         r.ResourceType(),
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-	}
-
-	importBlocks = append(importBlocks, connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       "mfa_settings",
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
-
-	return &importBlocks, nil
 }
 
 func (r *PingOneMFASettingsResource) ResourceType() string {
 	return "pingone_mfa_settings"
+}
+
+func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
+	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
+
+	err := r.exportMFASettings()
+	if err != nil {
+		return nil, err
+	}
+
+	return r.importBlocks, nil
+}
+
+func (r *PingOneMFASettingsResource) exportMFASettings() error {
+	_, response, err := r.clientInfo.ApiClient.MFAAPIClient.MFASettingsApi.ReadMFASettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	err = common.HandleClientResponse(response, err, "ReadMFASettings", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == 204 {
+		return common.DataNilError(r.ResourceType(), response)
+	}
+
+	r.addImportBlock()
+
+	return nil
+}
+
+func (r *PingOneMFASettingsResource) addImportBlock() {
+	commentData := map[string]string{
+		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Resource Type":         r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       r.ResourceType(),
+		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

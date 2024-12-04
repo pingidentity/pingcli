@@ -3,7 +3,6 @@ package resources
 import (
 	"fmt"
 
-	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -11,72 +10,85 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingOnePopulationDefaultDefaultResource{}
+	_ connector.ExportableResource = &PingOnePopulationDefaultResource{}
 )
 
-type PingOnePopulationDefaultDefaultResource struct {
-	clientInfo *connector.PingOneClientInfo
+type PingOnePopulationDefaultResource struct {
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
-// Utility method for creating a PingOnePopulationDefaultDefaultResource
-func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultDefaultResource {
-	return &PingOnePopulationDefaultDefaultResource{
-		clientInfo: clientInfo,
+// Utility method for creating a PingOnePopulationDefaultResource
+func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultResource {
+	return &PingOnePopulationDefaultResource{
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
 }
 
-func (r *PingOnePopulationDefaultDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOnePopulationDefaultResource) ResourceType() string {
+	return "pingone_population_default"
+}
+
+func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllPopulations"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	err := r.exportPopulationDefault()
 	if err != nil {
 		return nil, err
 	}
 
-	foundDefault := false
-	var defaultPopulation management.Population
-	for _, population := range embedded.GetPopulations() {
-		if population.GetDefault() {
-			foundDefault = true
-			defaultPopulation = population
-			break
-		}
-	}
-
-	if !foundDefault {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &[]connector.ImportBlock{}, nil
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	defaultPopulationName, defaultPopulationNameOk := defaultPopulation.GetNameOk()
-
-	if defaultPopulationNameOk {
-		commentData := map[string]string{
-			"Resource Type":           r.ResourceType(),
-			"Default Population Name": *defaultPopulationName,
-			"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
-		}
-
-		importBlocks = append(importBlocks, connector.ImportBlock{
-			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_population_default", *defaultPopulationName),
-			ResourceID:         r.clientInfo.ExportEnvironmentID,
-			CommentInformation: common.GenerateCommentInformation(commentData),
-		})
-	}
-
-	return &importBlocks, nil
+	return r.importBlocks, nil
 }
 
-func (r *PingOnePopulationDefaultDefaultResource) ResourceType() string {
-	return "pingone_population_default"
+func (r *PingOnePopulationDefaultResource) exportPopulationDefault() error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPopulations", r.ResourceType())
+		if err != nil {
+			return err
+		}
+
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, population := range embedded.GetPopulations() {
+			populationDefault, populationDefaultOk := population.GetDefaultOk()
+
+			if populationDefaultOk && *populationDefault {
+				populationName, populationNameOk := population.GetNameOk()
+
+				if populationNameOk {
+					r.addImportBlock(*populationName)
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *PingOnePopulationDefaultResource) addImportBlock(populationName string) {
+	commentData := map[string]string{
+		"Default Population Name": populationName,
+		"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
+		"Resource Type":           r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_population_default", populationName),
+		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

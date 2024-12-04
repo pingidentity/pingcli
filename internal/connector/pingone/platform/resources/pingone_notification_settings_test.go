@@ -17,7 +17,7 @@ func TestNotificationSettingsExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_notification_settings",
-			ResourceName: "notification_settings",
+			ResourceName: "pingone_notification_settings",
 			ResourceID:   testutils.GetEnvironmentID(),
 		},
 	}

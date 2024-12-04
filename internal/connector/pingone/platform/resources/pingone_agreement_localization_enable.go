@@ -13,42 +13,50 @@ var (
 )
 
 type PingOneAgreementLocalizationEnableResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneAgreementLocalizationEnableResource
 func AgreementLocalizationEnable(clientInfo *connector.PingOneClientInfo) *PingOneAgreementLocalizationEnableResource {
 	return &PingOneAgreementLocalizationEnableResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
-}
-
-func (r *PingOneAgreementLocalizationEnableResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all pingone_agreement_localization_enable resources...")
-
-	localizationImportBlocks, err := AgreementLocalization(r.clientInfo).ExportAll()
-	if err != nil {
-		return nil, err
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all pingone_agreement_localization_enable resources...")
-
-	for _, importBlock := range *localizationImportBlocks {
-		importBlocks = append(importBlocks, connector.ImportBlock{
-			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_enable", importBlock.ResourceName),
-			ResourceID:         importBlock.ResourceID,
-			CommentInformation: importBlock.CommentInformation,
-		})
-	}
-
-	return &importBlocks, nil
 }
 
 func (r *PingOneAgreementLocalizationEnableResource) ResourceType() string {
 	return "pingone_agreement_localization_enable"
+}
+
+func (r *PingOneAgreementLocalizationEnableResource) ExportAll() (*[]connector.ImportBlock, error) {
+	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
+
+	err := r.exportAgreementLocalizationEnables()
+	if err != nil {
+		return nil, err
+	}
+
+	return r.importBlocks, nil
+}
+
+func (r *PingOneAgreementLocalizationEnableResource) exportAgreementLocalizationEnables() error {
+	agreementLocalizationImportBlocks, err := AgreementLocalization(r.clientInfo).ExportAll()
+	if err != nil {
+		return err
+	}
+
+	for _, importBlock := range *agreementLocalizationImportBlocks {
+		importBlock = connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_enable", importBlock.ResourceName),
+			ResourceID:         importBlock.ResourceID,
+			CommentInformation: importBlock.CommentInformation,
+		}
+
+		*r.importBlocks = append(*r.importBlocks, importBlock)
+	}
+
+	return nil
 }

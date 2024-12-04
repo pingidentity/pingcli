@@ -17,7 +17,7 @@ func TestBrandingSettingsExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_branding_settings",
-			ResourceName: "branding_settings",
+			ResourceName: "pingone_branding_settings",
 			ResourceID:   testutils.GetEnvironmentID(),
 		},
 	}

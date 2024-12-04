@@ -14,57 +14,79 @@ var (
 )
 
 type PingOneKeyRotationPolicyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneKeyRotationPolicyResource
 func KeyRotationPolicy(clientInfo *connector.PingOneClientInfo) *PingOneKeyRotationPolicyResource {
 	return &PingOneKeyRotationPolicyResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
-}
-
-func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "GetKeyRotationPolicies"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, keyRotationPolicy := range embedded.GetKeyRotationPolicies() {
-		keyRotationPolicyId, keyRotationPolicyIdOk := keyRotationPolicy.GetIdOk()
-		keyRotationPolicyName, keyRotationPolicyNameOk := keyRotationPolicy.GetNameOk()
-
-		if keyRotationPolicyIdOk && keyRotationPolicyNameOk {
-			commentData := map[string]string{
-				"Resource Type":            r.ResourceType(),
-				"Key Rotation Policy Name": *keyRotationPolicyName,
-				"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
-				"Key Rotation Policy ID":   *keyRotationPolicyId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *keyRotationPolicyName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *keyRotationPolicyId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
-		}
-	}
-
-	return &importBlocks, nil
 }
 
 func (r *PingOneKeyRotationPolicyResource) ResourceType() string {
 	return "pingone_key_rotation_policy"
+}
+
+func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
+	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
+
+	err := r.exportKeyRotationPolicies()
+	if err != nil {
+		return nil, err
+	}
+
+	return r.importBlocks, nil
+}
+
+func (r *PingOneKeyRotationPolicyResource) exportKeyRotationPolicies() error {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+
+	for cursor, err := range iter {
+		err = common.HandleClientResponse(cursor.HTTPResponse, err, "GetKeyRotationPolicies", r.ResourceType())
+		if err != nil {
+			return err
+		}
+
+		if cursor.EntityArray == nil {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+		}
+
+		for _, keyRotationPolicy := range embedded.GetKeyRotationPolicies() {
+			keyRotationPolicyId, keyRotationPolicyIdOk := keyRotationPolicy.GetIdOk()
+			keyRotationPolicyName, keyRotationPolicyNameOk := keyRotationPolicy.GetNameOk()
+
+			if keyRotationPolicyIdOk && keyRotationPolicyNameOk {
+				r.addImportBlock(*keyRotationPolicyId, *keyRotationPolicyName)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (r *PingOneKeyRotationPolicyResource) addImportBlock(keyRotationPolicyId, keyRotationPolicyName string) {
+	commentData := map[string]string{
+		"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
+		"Key Rotation Policy ID":   keyRotationPolicyId,
+		"Key Rotation Policy Name": keyRotationPolicyName,
+		"Resource Type":            r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       keyRotationPolicyName,
+		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, keyRotationPolicyId),
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	*r.importBlocks = append(*r.importBlocks, importBlock)
 }

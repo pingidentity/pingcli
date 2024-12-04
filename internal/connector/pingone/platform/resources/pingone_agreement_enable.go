@@ -13,42 +13,50 @@ var (
 )
 
 type PingOneAgreementEnableResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo   *connector.PingOneClientInfo
+	importBlocks *[]connector.ImportBlock
 }
 
 // Utility method for creating a PingOneAgreementEnableResource
 func AgreementEnable(clientInfo *connector.PingOneClientInfo) *PingOneAgreementEnableResource {
 	return &PingOneAgreementEnableResource{
-		clientInfo: clientInfo,
+		clientInfo:   clientInfo,
+		importBlocks: &[]connector.ImportBlock{},
 	}
-}
-
-func (r *PingOneAgreementEnableResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all pingone_agreement_enable resources...")
-
-	agreementImportBlocks, err := Agreement(r.clientInfo).ExportAll()
-	if err != nil {
-		return nil, err
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all pingone_agreement_enable resources...")
-
-	for _, importBlock := range *agreementImportBlocks {
-		importBlocks = append(importBlocks, connector.ImportBlock{
-			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_enable", importBlock.ResourceName),
-			ResourceID:         importBlock.ResourceID,
-			CommentInformation: importBlock.CommentInformation,
-		})
-	}
-
-	return &importBlocks, nil
 }
 
 func (r *PingOneAgreementEnableResource) ResourceType() string {
 	return "pingone_agreement_enable"
+}
+
+func (r *PingOneAgreementEnableResource) ExportAll() (*[]connector.ImportBlock, error) {
+	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
+
+	err := r.exportAgreementEnables()
+	if err != nil {
+		return nil, err
+	}
+
+	return r.importBlocks, nil
+}
+
+func (r *PingOneAgreementEnableResource) exportAgreementEnables() error {
+	agreementImportBlocks, err := Agreement(r.clientInfo).ExportAll()
+	if err != nil {
+		return err
+	}
+
+	for _, importBlock := range *agreementImportBlocks {
+		importBlock = connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_enable", importBlock.ResourceName),
+			ResourceID:         importBlock.ResourceID,
+			CommentInformation: importBlock.CommentInformation,
+		}
+
+		*r.importBlocks = append(*r.importBlocks, importBlock)
+	}
+
+	return nil
 }

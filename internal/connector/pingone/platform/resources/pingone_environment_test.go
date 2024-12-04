@@ -17,7 +17,7 @@ func TestEnvironmentExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_environment",
-			ResourceName: "export_environment",
+			ResourceName: "pingone_environment",
 			ResourceID:   testutils.GetEnvironmentID(),
 		},
 	}
