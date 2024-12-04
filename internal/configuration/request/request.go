@@ -15,7 +15,7 @@ func InitRequestOptions() {
 	initServiceOption()
 	initAccessTokenOption()
 	initAccessTokenExpiryOption()
-
+	initFailOption()
 }
 
 func initDataOption() {
@@ -121,5 +121,27 @@ func initAccessTokenExpiryOption() {
 		Flag:            nil, // No flag
 		Type:            options.ENUM_INT,
 		ViperKey:        "request.accessTokenExpiry",
+	}
+}
+
+func initFailOption() {
+	cobraParamName := "fail"
+	cobraValue := new(customtypes.Bool)
+	defaultValue := customtypes.Bool(false)
+
+	options.RequestFailOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		Flag: &pflag.Flag{
+			Name:        cobraParamName,
+			NoOptDefVal: "true",
+			Shorthand:   "f",
+			Usage:       "Return non-zero exit code when HTTP custom request returns a failure status code.",
+			Value:       cobraValue,
+		},
+
+		Type:     options.ENUM_BOOL,
+		ViperKey: "request.fail",
 	}
 }

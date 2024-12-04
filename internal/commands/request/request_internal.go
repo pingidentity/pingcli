@@ -57,6 +57,11 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return err
 	}
 
+	failOption, err := profiles.GetOptionValue(options.RequestFailOption)
+	if err != nil {
+		return err
+	}
+
 	apiURL := fmt.Sprintf("https://api.pingone.%s/v1/%s", topLevelDomain, uri)
 
 	httpMethod, err := profiles.GetOptionValue(options.RequestHTTPMethodOption)
@@ -102,10 +107,10 @@ func runInternalPingOneRequest(uri string) (err error) {
 	}
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		// Note we don't os.Exit(1) here because pingcli has executed
-		// without issue, despite a failed response to the custom request
 		output.UserError("Failed Custom Request", fields)
-
+		if failOption == "true" {
+			os.Exit(1)
+		}
 	} else {
 		output.Success("Custom request successful", fields)
 	}

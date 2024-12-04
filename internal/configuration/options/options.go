@@ -77,6 +77,7 @@ func Options() []Option {
 		RequestServiceOption,
 		RequestAccessTokenOption,
 		RequestAccessTokenExpiryOption,
+		RequestFailOption,
 	}
 }
 
@@ -145,4 +146,5 @@ var (
 	RequestServiceOption           Option
 	RequestAccessTokenOption       Option
 	RequestAccessTokenExpiryOption Option
+	RequestFailOption              Option
 )
