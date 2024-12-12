@@ -55,6 +55,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateCaptchaProvider",
+			resource:      resources.CaptchaProvider(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:     "PingFederateCertificateCA",
 			resource: resources.CertificateCA(PingFederateClientInfo),
 			ignoredErrors: []string{

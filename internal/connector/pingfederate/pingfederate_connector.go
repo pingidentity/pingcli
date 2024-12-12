@@ -47,6 +47,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.AuthenticationPoliciesSettings(&c.clientInfo),
 		resources.AuthenticationPolicyContract(&c.clientInfo),
 		resources.AuthenticationSelector(&c.clientInfo),
+		resources.CaptchaProvider(&c.clientInfo),
 		resources.CertificateCA(&c.clientInfo),
 		resources.DataStore(&c.clientInfo),
 		resources.DefaultURLs(&c.clientInfo),
