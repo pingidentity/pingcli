@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,63 @@ func OAuthAccessTokenManager(clientInfo *connector.PingFederateClientInfo) *Ping
 	}
 }
 
+func (r *PingFederateOAuthAccessTokenManagerResource) ResourceType() string {
+	return "pingfederate_oauth_access_token_manager"
+}
+
 func (r *PingFederateOAuthAccessTokenManagerResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.OauthAccessTokenManagersAPI.GetTokenManagers(r.clientInfo.Context).Execute
-	apiFunctionName := "GetTokenManagers"
-
-	accessTokenManagers, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	tokenManagerData, err := r.getTokenManagerData()
 	if err != nil {
 		return nil, err
 	}
 
-	if accessTokenManagers == nil {
-		l.Error().Msgf("Returned %s() accessTokenManagers is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
-	}
-
-	accessTokenManagersItems, ok := accessTokenManagers.GetItemsOk()
-	if !ok {
-		l.Error().Msgf("Failed to get %s() accessTokenManagers items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, accessTokenManager := range accessTokenManagersItems {
-		accessTokenManagerId, accessTokenManagerIdOk := accessTokenManager.GetIdOk()
-		accessTokenManagerName, accessTokenManagerNameOk := accessTokenManager.GetNameOk()
-
-		if accessTokenManagerIdOk && accessTokenManagerNameOk {
-			commentData := map[string]string{
-				"Resource Type":                            r.ResourceType(),
-				"OAuth Access Token Manager Resource ID":   *accessTokenManagerId,
-				"OAuth Access Token Manager Resource Name": *accessTokenManagerName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *accessTokenManagerName,
-				ResourceID:         *accessTokenManagerId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for tokenManagerId, tokenManagerName := range *tokenManagerData {
+		commentData := map[string]string{
+			"OAuth Access Token Manager Resource ID":   tokenManagerId,
+			"OAuth Access Token Manager Resource Name": tokenManagerName,
+			"Resource Type": r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       tokenManagerName,
+			ResourceID:         tokenManagerId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthAccessTokenManagerResource) ResourceType() string {
-	return "pingfederate_oauth_access_token_manager"
+func (r *PingFederateOAuthAccessTokenManagerResource) getTokenManagerData() (*map[string]string, error) {
+	tokenManagerData := make(map[string]string)
+
+	tokenManagers, response, err := r.clientInfo.ApiClient.OauthAccessTokenManagersAPI.GetTokenManagers(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetTokenManagers", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	tokenManagersItems, ok := tokenManagers.GetItemsOk()
+	if !ok {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
+	for _, tokenManager := range tokenManagersItems {
+		tokenManagerId, tokenManagerIdOk := tokenManager.GetIdOk()
+		tokenManagerName, tokenManagerNameOk := tokenManager.GetNameOk()
+
+		if tokenManagerIdOk && tokenManagerNameOk {
+			tokenManagerData[*tokenManagerId] = *tokenManagerName
+		}
+	}
+
+	return &tokenManagerData, nil
 }

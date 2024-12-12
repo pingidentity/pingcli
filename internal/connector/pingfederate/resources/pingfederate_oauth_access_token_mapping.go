@@ -24,61 +24,62 @@ func OAuthAccessTokenMapping(clientInfo *connector.PingFederateClientInfo) *Ping
 	}
 }
 
+func (r *PingFederateOAuthAccessTokenMappingResource) ResourceType() string {
+	return "pingfederate_oauth_access_token_mapping"
+}
+
 func (r *PingFederateOAuthAccessTokenMappingResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.OauthAccessTokenMappingsAPI.GetMappings(r.clientInfo.Context).Execute
-	apiFunctionName := "GetMappings"
-
-	accessTokenMappings, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	mappingData, err := r.getMappingData()
 	if err != nil {
 		return nil, err
 	}
 
-	if accessTokenMappings == nil {
-		l.Error().Msgf("Returned %s() accessTokenMappings is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, accessTokenMapping := range accessTokenMappings {
-		accessTokenMappingId, accessTokenMappingIdOk := accessTokenMapping.GetIdOk()
-		accessTokenMappingContext, accessTokenMappingContextOk := accessTokenMapping.GetContextOk()
-		var (
-			accessTokenMappingContextType   *string
-			accessTokenMappingContextTypeOk bool
-		)
-		if accessTokenMappingContextOk {
-			accessTokenMappingContextType, accessTokenMappingContextTypeOk = accessTokenMappingContext.GetTypeOk()
+	for mappingId, mappingContextType := range *mappingData {
+		commentData := map[string]string{
+			"OAuth Access Token Mapping Resource ID":  mappingId,
+			"OAuth Access Token Mapping Context Type": mappingContextType,
+			"Resource Type": r.ResourceType(),
 		}
 
-		if accessTokenMappingIdOk && accessTokenMappingContextOk && accessTokenMappingContextTypeOk {
-			commentData := map[string]string{
-				"Resource Type":                           r.ResourceType(),
-				"OAuth Access Token Mapping Resource ID":  *accessTokenMappingId,
-				"OAuth Access Token Mapping Context Type": *accessTokenMappingContextType,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", *accessTokenMappingId, *accessTokenMappingContextType),
-				ResourceID:         *accessTokenMappingId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_%s", mappingId, mappingContextType),
+			ResourceID:         mappingId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthAccessTokenMappingResource) ResourceType() string {
-	return "pingfederate_oauth_access_token_mapping"
+func (r *PingFederateOAuthAccessTokenMappingResource) getMappingData() (*map[string]string, error) {
+	mappingData := make(map[string]string)
+
+	mappings, response, err := r.clientInfo.ApiClient.OauthAccessTokenMappingsAPI.GetMappings(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetMappings", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, mapping := range mappings {
+		mappingId, mappingIdOk := mapping.GetIdOk()
+		mappingContext, mappingContextOk := mapping.GetContextOk()
+
+		if mappingIdOk && mappingContextOk {
+			mappingContextType, mappingContextTypeOk := mappingContext.GetTypeOk()
+
+			if mappingContextTypeOk {
+				mappingData[*mappingId] = *mappingContextType
+			}
+		}
+	}
+
+	return &mappingData, nil
 }

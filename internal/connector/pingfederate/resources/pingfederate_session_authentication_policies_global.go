@@ -22,12 +22,15 @@ func SessionAuthenticationPoliciesGlobal(clientInfo *connector.PingFederateClien
 	}
 }
 
+func (r *PingFederateSessionAuthenticationPoliciesGlobalResource) ResourceType() string {
+	return "pingfederate_session_authentication_policies_global"
+}
+
 func (r *PingFederateSessionAuthenticationPoliciesGlobalResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	sessionAuthenticationPoliciesGlobalId := "pingfederate_session_authentication_policies_global_singleton_id"
 	sessionAuthenticationPoliciesGlobalName := "Session Authentication Policies Global"
@@ -37,16 +40,14 @@ func (r *PingFederateSessionAuthenticationPoliciesGlobalResource) ExportAll() (*
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       sessionAuthenticationPoliciesGlobalName,
 		ResourceID:         sessionAuthenticationPoliciesGlobalId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateSessionAuthenticationPoliciesGlobalResource) ResourceType() string {
-	return "pingfederate_session_authentication_policies_global"
 }

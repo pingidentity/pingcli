@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,63 @@ func AuthenticationPoliciesFragment(clientInfo *connector.PingFederateClientInfo
 	}
 }
 
+func (r *PingFederateAuthenticationPoliciesFragmentResource) ResourceType() string {
+	return "pingfederate_authentication_policies_fragment"
+}
+
 func (r *PingFederateAuthenticationPoliciesFragmentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute
-	apiFunctionName := "GetFragments"
-
-	authnPoliciesFragments, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	fragmentData, err := r.getFragmentData()
 	if err != nil {
 		return nil, err
 	}
 
-	if authnPoliciesFragments == nil {
-		l.Error().Msgf("Returned %s() authnPoliciesFragments is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for fragmentId, fragmentName := range *fragmentData {
+		commentData := map[string]string{
+			"Authentication Policies Fragment Resource ID":   fragmentId,
+			"Authentication Policies Fragment Resource Name": fragmentName,
+			"Resource Type": r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fragmentName,
+			ResourceID:         fragmentId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	authnPoliciesFragmentsItems, ok := authnPoliciesFragments.GetItemsOk()
-	if !ok {
-		l.Error().Msgf("Failed to get %s() authnPoliciesFragment items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	return &importBlocks, nil
+}
+
+func (r *PingFederateAuthenticationPoliciesFragmentResource) getFragmentData() (*map[string]string, error) {
+	fragmentData := make(map[string]string)
+
+	authnPoliciesFragments, response, err := r.clientInfo.ApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetFragments", r.ResourceType())
+	if err != nil {
+		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	authnPoliciesFragmentsItems, authnPoliciesFragmentsItemsOk := authnPoliciesFragments.GetItemsOk()
+	if !authnPoliciesFragmentsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, authnPoliciesFragment := range authnPoliciesFragmentsItems {
 		authnPoliciesFragmentId, authnPoliciesFragmentIdOk := authnPoliciesFragment.GetIdOk()
 		authnPoliciesFragmentName, authnPoliciesFragmentNameOk := authnPoliciesFragment.GetNameOk()
 
 		if authnPoliciesFragmentIdOk && authnPoliciesFragmentNameOk {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Authentication Policies Fragment Resource ID":   *authnPoliciesFragmentId,
-				"Authentication Policies Fragment Resource Name": *authnPoliciesFragmentName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authnPoliciesFragmentName,
-				ResourceID:         *authnPoliciesFragmentId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			fragmentData[*authnPoliciesFragmentId] = *authnPoliciesFragmentName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateAuthenticationPoliciesFragmentResource) ResourceType() string {
-	return "pingfederate_authentication_policies_fragment"
+	return &fragmentData, nil
 }

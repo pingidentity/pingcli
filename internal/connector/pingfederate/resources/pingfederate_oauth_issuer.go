@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,63 @@ func OAuthIssuer(clientInfo *connector.PingFederateClientInfo) *PingFederateOAut
 	}
 }
 
+func (r *PingFederateOAuthIssuerResource) ResourceType() string {
+	return "pingfederate_oauth_issuer"
+}
+
 func (r *PingFederateOAuthIssuerResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.OauthIssuersAPI.GetOauthIssuers(r.clientInfo.Context).Execute
-	apiFunctionName := "GetOauthIssuers"
-
-	issuers, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	oauthIssuerData, err := r.getOAuthIssuerData()
 	if err != nil {
 		return nil, err
 	}
 
-	if issuers == nil {
-		l.Error().Msgf("Returned %s() issuers is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for oauthIssuerId, oauthIssuerName := range *oauthIssuerData {
+		commentData := map[string]string{
+			"OAuth Issuer Resource ID":   oauthIssuerId,
+			"OAuth Issuer Resource Name": oauthIssuerName,
+			"Resource Type":              r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       oauthIssuerName,
+			ResourceID:         oauthIssuerId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	issuersItems, ok := issuers.GetItemsOk()
-	if !ok {
-		l.Error().Msgf("Failed to get %s() issuers items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	return &importBlocks, nil
+}
+
+func (r *PingFederateOAuthIssuerResource) getOAuthIssuerData() (*map[string]string, error) {
+	issuerData := make(map[string]string)
+
+	issuers, response, err := r.clientInfo.ApiClient.OauthIssuersAPI.GetOauthIssuers(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetOauthIssuers", r.ResourceType())
+	if err != nil {
+		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	issuersItems, issuersItemsOk := issuers.GetItemsOk()
+	if !issuersItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, issuer := range issuersItems {
 		issuerId, issuerIdOk := issuer.GetIdOk()
 		issuerName, issuerNameOk := issuer.GetNameOk()
 
 		if issuerIdOk && issuerNameOk {
-			commentData := map[string]string{
-				"Resource Type":              r.ResourceType(),
-				"OAuth Issuer Resource ID":   *issuerId,
-				"OAuth Issuer Resource Name": *issuerName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *issuerName,
-				ResourceID:         *issuerId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			issuerData[*issuerId] = *issuerName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateOAuthIssuerResource) ResourceType() string {
-	return "pingfederate_oauth_issuer"
+	return &issuerData, nil
 }

@@ -24,61 +24,63 @@ func DataStore(clientInfo *connector.PingFederateClientInfo) *PingFederateDataSt
 	}
 }
 
+func (r *PingFederateDataStoreResource) ResourceType() string {
+	return "pingfederate_data_store"
+}
+
 func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute
-	apiFunctionName := "GetDataStores"
-
-	dataStores, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	dataStoreData, err := r.getDataStoreData()
 	if err != nil {
 		return nil, err
 	}
 
-	if dataStores == nil {
-		l.Error().Msgf("Returned %s() dataStores is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for dataStoreId, dataStoreType := range *dataStoreData {
+		commentData := map[string]string{
+			"Data Store Resource ID": dataStoreId,
+			"Data Store Type":        dataStoreType,
+			"Resource Type":          r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_%s", dataStoreId, dataStoreType),
+			ResourceID:         dataStoreId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, error) {
+	dataStoreData := make(map[string]string)
+
+	dataStores, response, err := r.clientInfo.ApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetDataStores", r.ResourceType())
+	if err != nil {
+		return nil, err
 	}
 
 	dataStoresItems, ok := dataStores.GetItemsOk()
 	if !ok {
-		l.Error().Msgf("Failed to get %s() dataStores items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, common.DataNilError(r.ResourceType(), response)
 	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	for _, dataStore := range dataStoresItems {
 		dataStoreId, dataStoreIdOk := dataStore.GetIdOk()
 		dataStoreType, dataStoreTypeOk := dataStore.GetTypeOk()
 
 		if dataStoreIdOk && dataStoreTypeOk {
-			commentData := map[string]string{
-				"Resource Type":          r.ResourceType(),
-				"Data Store Resource ID": *dataStoreId,
-				"Data Store Type":        *dataStoreType,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", *dataStoreId, *dataStoreType),
-				ResourceID:         *dataStoreId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			dataStoreData[*dataStoreId] = *dataStoreType
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateDataStoreResource) ResourceType() string {
-	return "pingfederate_data_store"
+	return &dataStoreData, nil
 }

@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,63 @@ func AuthenticationApiApplication(clientInfo *connector.PingFederateClientInfo) 
 	}
 }
 
+func (r *PingFederateAuthenticationApiApplicationResource) ResourceType() string {
+	return "pingfederate_authentication_api_application"
+}
+
 func (r *PingFederateAuthenticationApiApplicationResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthenticationApiAPI.GetAuthenticationApiApplications(r.clientInfo.Context).Execute
-	apiFunctionName := "GetAuthenticationApiApplications"
-
-	authnApiApplications, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	applicationData, err := r.getApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
-	if authnApiApplications == nil {
-		l.Error().Msgf("Returned %s() authnApiApplications is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for appId, appName := range *applicationData {
+		commentData := map[string]string{
+			"Authentication API Application Resource ID":   appId,
+			"Authentication API Application Resource Name": appName,
+			"Resource Type": r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       appName,
+			ResourceID:         appId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	authnApiApplicationsItems, ok := authnApiApplications.GetItemsOk()
-	if !ok {
-		l.Error().Msgf("Failed to get %s() authnApiApplications items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	return &importBlocks, nil
+}
+
+func (r *PingFederateAuthenticationApiApplicationResource) getApplicationData() (*map[string]string, error) {
+	applicationData := make(map[string]string)
+
+	authnApiApplications, response, err := r.clientInfo.ApiClient.AuthenticationApiAPI.GetAuthenticationApiApplications(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetAuthenticationApiApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	authnApiApplicationsItems, authnApiApplicationsItemsOk := authnApiApplications.GetItemsOk()
+	if !authnApiApplicationsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, authnApiApplication := range authnApiApplicationsItems {
 		authnApiApplicationId, authnApiApplicationIdOk := authnApiApplication.GetIdOk()
 		authnApiApplicationName, authnApiApplicationNameOk := authnApiApplication.GetNameOk()
 
 		if authnApiApplicationIdOk && authnApiApplicationNameOk {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Authentication API Application Resource ID":   *authnApiApplicationId,
-				"Authentication API Application Resource Name": *authnApiApplicationName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authnApiApplicationName,
-				ResourceID:         *authnApiApplicationId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			applicationData[*authnApiApplicationId] = *authnApiApplicationName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateAuthenticationApiApplicationResource) ResourceType() string {
-	return "pingfederate_authentication_api_application"
+	return &applicationData, nil
 }

@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,63 @@ func OpenIDConnectPolicy(clientInfo *connector.PingFederateClientInfo) *PingFede
 	}
 }
 
+func (r *PingFederateOpenIDConnectPolicyResource) ResourceType() string {
+	return "pingfederate_openid_connect_policy"
+}
+
 func (r *PingFederateOpenIDConnectPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.OauthOpenIdConnectAPI.GetOIDCPolicies(r.clientInfo.Context).Execute
-	apiFunctionName := "GetOIDCPolicies"
-
-	openIDConnectPolicies, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	oidcPolicyData, err := r.getOIDCPolicyData()
 	if err != nil {
 		return nil, err
 	}
 
-	if openIDConnectPolicies == nil {
-		l.Error().Msgf("Returned %s() openIDConnectPolicies is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
-	}
-
-	openIDConnectPoliciesItems, ok := openIDConnectPolicies.GetItemsOk()
-	if !ok {
-		l.Error().Msgf("Failed to get %s() openIDConnectPolicies items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, openIDConnectPolicy := range openIDConnectPoliciesItems {
-		openIDConnectPolicyId, openIDConnectPolicyIdOk := openIDConnectPolicy.GetIdOk()
-		openIDConnectPolicyName, openIDConnectPolicyNameOk := openIDConnectPolicy.GetNameOk()
-
-		if openIDConnectPolicyIdOk && openIDConnectPolicyNameOk {
-			commentData := map[string]string{
-				"Resource Type":                       r.ResourceType(),
-				"OpenID Connect Policy Resource ID":   *openIDConnectPolicyId,
-				"OpenID Connect Policy Resource Name": *openIDConnectPolicyName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *openIDConnectPolicyName,
-				ResourceID:         *openIDConnectPolicyId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for oidcPolicyId, oidcPolicyName := range *oidcPolicyData {
+		commentData := map[string]string{
+			"OpenID Connect Policy Resource ID":   oidcPolicyId,
+			"OpenID Connect Policy Resource Name": oidcPolicyName,
+			"Resource Type":                       r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       oidcPolicyName,
+			ResourceID:         oidcPolicyId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOpenIDConnectPolicyResource) ResourceType() string {
-	return "pingfederate_openid_connect_policy"
+func (r *PingFederateOpenIDConnectPolicyResource) getOIDCPolicyData() (*map[string]string, error) {
+	oidcPolicyData := make(map[string]string)
+
+	oidcPolicies, response, err := r.clientInfo.ApiClient.OauthOpenIdConnectAPI.GetOIDCPolicies(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetOIDCPolicies", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	oidcPoliciesItems, ok := oidcPolicies.GetItemsOk()
+	if !ok {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
+	for _, oidcPolicy := range oidcPoliciesItems {
+		oidcPolicyId, oidcPolicyIdOk := oidcPolicy.GetIdOk()
+		oidcPolicyName, oidcPolicyNameOk := oidcPolicy.GetNameOk()
+
+		if oidcPolicyIdOk && oidcPolicyNameOk {
+			oidcPolicyData[*oidcPolicyId] = *oidcPolicyName
+		}
+	}
+
+	return &oidcPolicyData, nil
 }

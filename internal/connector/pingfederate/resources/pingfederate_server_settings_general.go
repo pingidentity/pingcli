@@ -22,12 +22,15 @@ func ServerSettingsGeneral(clientInfo *connector.PingFederateClientInfo) *PingFe
 	}
 }
 
+func (r *PingFederateServerSettingsGeneralResource) ResourceType() string {
+	return "pingfederate_server_settings_general"
+}
+
 func (r *PingFederateServerSettingsGeneralResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	serverSettingsGeneralId := "pingfederate_server_settings_general_singleton_id"
 	serverSettingsGeneralName := "Server Settings General"
@@ -37,16 +40,14 @@ func (r *PingFederateServerSettingsGeneralResource) ExportAll() (*[]connector.Im
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       serverSettingsGeneralName,
 		ResourceID:         serverSettingsGeneralId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateServerSettingsGeneralResource) ResourceType() string {
-	return "pingfederate_server_settings_general"
 }

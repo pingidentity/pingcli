@@ -24,37 +24,58 @@ func CertificateCA(clientInfo *connector.PingFederateClientInfo) *PingFederateCe
 	}
 }
 
+func (r *PingFederateCertificateCAResource) ResourceType() string {
+	return "pingfederate_certificate_ca"
+}
+
 func (r *PingFederateCertificateCAResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute
-	apiFunctionName := "GetTrustedCAs"
-
-	certViews, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	trustedCAData, err := r.getTrustedCAData()
 	if err != nil {
 		return nil, err
 	}
 
-	if certViews == nil {
-		l.Error().Msgf("Returned %s() certViews is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for certViewId, certViewInfo := range *trustedCAData {
+		certViewIssuerDN := certViewInfo[0]
+		certViewSerialNumber := certViewInfo[1]
+
+		commentData := map[string]string{
+			"Certificate CA Issuer DN":     certViewIssuerDN,
+			"Certificate CA Resource ID":   certViewId,
+			"Certificate CA Serial Number": certViewSerialNumber,
+			"Resource Type":                r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_%s", certViewIssuerDN, certViewSerialNumber),
+			ResourceID:         certViewId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingFederateCertificateCAResource) getTrustedCAData() (*map[string][]string, error) {
+	trustedCAData := make(map[string][]string)
+
+	certViews, response, err := r.clientInfo.ApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetTrustedCAs", r.ResourceType())
+	if err != nil {
+		return nil, err
 	}
 
 	certViewsItems, ok := certViews.GetItemsOk()
 	if !ok {
-		l.Error().Msgf("Failed to get %s() certViews items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, common.DataNilError(r.ResourceType(), response)
 	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	for _, certView := range certViewsItems {
 		certViewId, certViewIdOk := certView.GetIdOk()
@@ -62,25 +83,9 @@ func (r *PingFederateCertificateCAResource) ExportAll() (*[]connector.ImportBloc
 		certViewSerialNumber, certViewSerialNumberOk := certView.GetSerialNumberOk()
 
 		if certViewIdOk && certViewIssuerDNOk && certViewSerialNumberOk {
-			commentData := map[string]string{
-				"Resource Type":                r.ResourceType(),
-				"Certificate CA Resource ID":   *certViewId,
-				"Certificate CA Issuer DN":     *certViewIssuerDN,
-				"Certificate CA Serial Number": *certViewSerialNumber,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", *certViewIssuerDN, *certViewSerialNumber),
-				ResourceID:         *certViewId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			trustedCAData[*certViewId] = []string{*certViewIssuerDN, *certViewSerialNumber}
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateCertificateCAResource) ResourceType() string {
-	return "pingfederate_certificate_ca"
+	return &trustedCAData, nil
 }

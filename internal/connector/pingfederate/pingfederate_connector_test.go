@@ -35,11 +35,9 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederateAuthenticationPoliciesFragment",
-			resource: resources.AuthenticationPoliciesFragment(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Reference to undeclared resource",
-			},
+			name:          "PingFederateAuthenticationPoliciesFragment",
+			resource:      resources.AuthenticationPoliciesFragment(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateAuthenticationPoliciesSettings",
@@ -64,11 +62,9 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			},
 		},
 		{
-			name:     "PingFederateDataStore",
-			resource: resources.DataStore(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid attribute configuration",
-			},
+			name:          "PingFederateDataStore",
+			resource:      resources.DataStore(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateDefaultURLs",
@@ -81,12 +77,9 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederateIDPAdapter",
-			resource: resources.IDPAdapter(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Missing Configuration for Required Attribute",
-				"Error: Reference to undeclared resource",
-			},
+			name:          "PingFederateIDPAdapter",
+			resource:      resources.IDPAdapter(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateIDPSPConnection",
@@ -99,11 +92,9 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederateKerberosRealm",
-			resource: resources.KerberosRealm(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid attribute configuration",
-			},
+			name:          "PingFederateKerberosRealm",
+			resource:      resources.KerberosRealm(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateLocalIdentityProfile",
@@ -131,11 +122,9 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederateOAuthClient",
-			resource: resources.OAuthClient(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid attribute configuration",
-			},
+			name:          "PingFederateOAuthClient",
+			resource:      resources.OAuthClient(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateOAuthIssuer",
@@ -158,18 +147,14 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederatePasswordCredentialValidator",
-			resource: resources.PasswordCredentialValidator(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Missing Configuration for Required Attribute",
-			},
+			name:          "PingFederatePasswordCredentialValidator",
+			resource:      resources.PasswordCredentialValidator(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederatePingOneConnection",
-			resource: resources.PingOneConnection(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Missing Configuration for Required Attribute",
-			},
+			name:          "PingFederatePingOneConnection",
+			resource:      resources.PingOneConnection(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateRedirectValidation",

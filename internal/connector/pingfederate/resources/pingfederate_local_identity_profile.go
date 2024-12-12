@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,63 @@ func LocalIdentityProfile(clientInfo *connector.PingFederateClientInfo) *PingFed
 	}
 }
 
+func (r *PingFederateLocalIdentityProfileResource) ResourceType() string {
+	return "pingfederate_local_identity_profile"
+}
+
 func (r *PingFederateLocalIdentityProfileResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.LocalIdentityIdentityProfilesAPI.GetIdentityProfiles(r.clientInfo.Context).Execute
-	apiFunctionName := "GetIdentityProfiles"
-
-	localIdentityProfiles, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	identityProfileData, err := r.getIdentityProfileData()
 	if err != nil {
 		return nil, err
 	}
 
-	if localIdentityProfiles == nil {
-		l.Error().Msgf("Returned %s() localIdentityProfiles is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
-	}
-
-	localIdentityProfilesItems, ok := localIdentityProfiles.GetItemsOk()
-	if !ok {
-		l.Error().Msgf("Failed to get %s() localIdentityProfiles items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
-	}
-
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, localIdentityProfile := range localIdentityProfilesItems {
-		localIdentityProfileId, localIdentityProfileIdOk := localIdentityProfile.GetIdOk()
-		localIdentityProfileName, localIdentityProfileNameOk := localIdentityProfile.GetNameOk()
-
-		if localIdentityProfileIdOk && localIdentityProfileNameOk {
-			commentData := map[string]string{
-				"Resource Type":                        r.ResourceType(),
-				"Local Identity Profile Resource ID":   *localIdentityProfileId,
-				"Local Identity Profile Resource Name": *localIdentityProfileName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *localIdentityProfileName,
-				ResourceID:         *localIdentityProfileId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for identityProfileId, identityProfileName := range *identityProfileData {
+		commentData := map[string]string{
+			"Local Identity Profile Resource ID":   identityProfileId,
+			"Local Identity Profile Resource Name": identityProfileName,
+			"Resource Type":                        r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       identityProfileName,
+			ResourceID:         identityProfileId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateLocalIdentityProfileResource) ResourceType() string {
-	return "pingfederate_local_identity_profile"
+func (r *PingFederateLocalIdentityProfileResource) getIdentityProfileData() (*map[string]string, error) {
+	identityProfileData := make(map[string]string)
+
+	identityProfiles, response, err := r.clientInfo.ApiClient.LocalIdentityIdentityProfilesAPI.GetIdentityProfiles(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetIdentityProfiles", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	identityProfilesItems, ok := identityProfiles.GetItemsOk()
+	if !ok {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
+	for _, identityProfile := range identityProfilesItems {
+		identityProfileId, identityProfileIdOk := identityProfile.GetIdOk()
+		identityProfileName, identityProfileNameOk := identityProfile.GetNameOk()
+
+		if identityProfileIdOk && identityProfileNameOk {
+			identityProfileData[*identityProfileId] = *identityProfileName
+		}
+	}
+
+	return &identityProfileData, nil
 }

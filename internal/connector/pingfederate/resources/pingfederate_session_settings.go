@@ -22,12 +22,15 @@ func SessionSettings(clientInfo *connector.PingFederateClientInfo) *PingFederate
 	}
 }
 
+func (r *PingFederateSessionSettingsResource) ResourceType() string {
+	return "pingfederate_session_settings"
+}
+
 func (r *PingFederateSessionSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	sessionSettingsId := "session_settings_singleton_id"
 	sessionSettingsName := "Session Settings"
@@ -37,16 +40,14 @@ func (r *PingFederateSessionSettingsResource) ExportAll() (*[]connector.ImportBl
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       sessionSettingsName,
 		ResourceID:         sessionSettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateSessionSettingsResource) ResourceType() string {
-	return "pingfederate_session_settings"
 }

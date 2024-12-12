@@ -24,37 +24,58 @@ func SPAuthenticationPolicyContractMapping(clientInfo *connector.PingFederateCli
 	}
 }
 
+func (r *PingFederateSPAuthenticationPolicyContractMappingResource) ResourceType() string {
+	return "pingfederate_sp_authentication_policy_contract_mapping"
+}
+
 func (r *PingFederateSPAuthenticationPolicyContractMappingResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.Context).Execute
-	apiFunctionName := "GetApcToSpAdapterMappings"
-
-	apcToSpAdapterMappings, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	apcToSpAdapterMappingData, err := r.getApcToSpAdapterMappingData()
 	if err != nil {
 		return nil, err
 	}
 
-	if apcToSpAdapterMappings == nil {
-		l.Error().Msgf("Returned %s() apcToSpAdapterMappings is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for apcToSpAdapterMappingId, apcToSpAdapterMappingInfo := range *apcToSpAdapterMappingData {
+		apcToSpAdapterMappingSourceID := apcToSpAdapterMappingInfo[0]
+		apcToSpAdapterMappingTargetID := apcToSpAdapterMappingInfo[1]
+
+		commentData := map[string]string{
+			"Resource Type": r.ResourceType(),
+			"Source Authentication Policy Contract Resource ID":     apcToSpAdapterMappingSourceID,
+			"SP Authentication Policy Contract Mapping Resource ID": apcToSpAdapterMappingId,
+			"Target SP Adapter Resource ID":                         apcToSpAdapterMappingTargetID,
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_to_%s", apcToSpAdapterMappingSourceID, apcToSpAdapterMappingTargetID),
+			ResourceID:         apcToSpAdapterMappingId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	apcToSpAdapterMappingsItems, ok := apcToSpAdapterMappings.GetItemsOk()
-	if !ok {
-		l.Error().Msgf("Failed to get %s() apcToSpAdapterMappings items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	return &importBlocks, nil
+}
+
+func (r *PingFederateSPAuthenticationPolicyContractMappingResource) getApcToSpAdapterMappingData() (*map[string][]string, error) {
+	apcToSpAdapterMappingData := make(map[string][]string)
+
+	apcToSpAdapterMappings, response, err := r.clientInfo.ApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetApcToSpAdapterMappings", r.ResourceType())
+	if err != nil {
+		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	apcToSpAdapterMappingsItems, apcToSpAdapterMappingsItemsOk := apcToSpAdapterMappings.GetItemsOk()
+	if !apcToSpAdapterMappingsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, apcToSpAdapterMapping := range apcToSpAdapterMappingsItems {
 		apcToSpAdapterMappingId, apcToSpAdapterMappingIdOk := apcToSpAdapterMapping.GetIdOk()
@@ -62,25 +83,9 @@ func (r *PingFederateSPAuthenticationPolicyContractMappingResource) ExportAll() 
 		apcToSpAdapterMappingTargetID, apcToSpAdapterMappingTargetIDOk := apcToSpAdapterMapping.GetTargetIdOk()
 
 		if apcToSpAdapterMappingIdOk && apcToSpAdapterMappingSourceIDOk && apcToSpAdapterMappingTargetIDOk {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"SP Authentication Policy Contract Mapping Resource ID": *apcToSpAdapterMappingId,
-				"Source Authentication Policy Contract Resource ID":     *apcToSpAdapterMappingSourceID,
-				"Target SP Adapter Resource ID":                         *apcToSpAdapterMappingTargetID,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_to_%s", *apcToSpAdapterMappingSourceID, *apcToSpAdapterMappingTargetID),
-				ResourceID:         *apcToSpAdapterMappingId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			apcToSpAdapterMappingData[*apcToSpAdapterMappingId] = []string{*apcToSpAdapterMappingSourceID, *apcToSpAdapterMappingTargetID}
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateSPAuthenticationPolicyContractMappingResource) ResourceType() string {
-	return "pingfederate_sp_authentication_policy_contract_mapping"
+	return &apcToSpAdapterMappingData, nil
 }
