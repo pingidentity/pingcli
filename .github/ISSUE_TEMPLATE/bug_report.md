@@ -21,7 +21,7 @@ labels: type/bug,status/needs-triage
 <!--- Check the version you have configured with `pingcli --version`. If you are not running the latest version of the cli, please upgrade because your issue may have already been fixed. -->
 
 ### Affected Command(s)
-<!-- - Please list the impacted commands as a list, for example:
+<!-- Please list the impacted commands as a list, for example:
 * `pingcli config`
 * `pingcli request` -->
 
