@@ -20,10 +20,10 @@ labels: type/bug,status/needs-triage
 ### PingCLI Version
 <!--- Check the version you have configured with `pingcli --version`. If you are not running the latest version of the cli, please upgrade because your issue may have already been fixed. -->
 
-### Affected Function(s)
-<!--- Please list the  as a list, for example: -->
+### Affected Command(s)
+<!-- - Please list the impacted commands as a list, for example:
 * `pingcli config`
-* `pingcli request`
+* `pingcli request` -->
 
 ### Debug Output
 <!--- Please provide your debug output with `PING_LOG_LEVEL=DEBUG` enabled on your relevant command(s) -->
