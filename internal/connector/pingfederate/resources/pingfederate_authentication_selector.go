@@ -66,6 +66,10 @@ func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorDa
 		return nil, err
 	}
 
+	if authnSelectors == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	authnSelectorsItems, authnSelectorsItemsOk := authnSelectors.GetItemsOk()
 	if !authnSelectorsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)

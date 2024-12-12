@@ -66,6 +66,10 @@ func (r *PingFederateOAuthAccessTokenManagerResource) getTokenManagerData() (*ma
 		return nil, err
 	}
 
+	if tokenManagers == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	tokenManagersItems, ok := tokenManagers.GetItemsOk()
 	if !ok {
 		return nil, common.DataNilError(r.ResourceType(), response)

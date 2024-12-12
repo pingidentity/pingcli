@@ -66,6 +66,10 @@ func (r *PingFederateOpenIDConnectPolicyResource) getOIDCPolicyData() (*map[stri
 		return nil, err
 	}
 
+	if oidcPolicies == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	oidcPoliciesItems, ok := oidcPolicies.GetItemsOk()
 	if !ok {
 		return nil, common.DataNilError(r.ResourceType(), response)

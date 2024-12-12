@@ -66,6 +66,10 @@ func (r *PingFederateAuthenticationApiApplicationResource) getApplicationData() 
 		return nil, err
 	}
 
+	if authnApiApplications == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	authnApiApplicationsItems, authnApiApplicationsItemsOk := authnApiApplications.GetItemsOk()
 	if !authnApiApplicationsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)

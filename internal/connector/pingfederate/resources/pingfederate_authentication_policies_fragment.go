@@ -66,6 +66,10 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) getFragmentData() (
 		return nil, err
 	}
 
+	if authnPoliciesFragments == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	authnPoliciesFragmentsItems, authnPoliciesFragmentsItemsOk := authnPoliciesFragments.GetItemsOk()
 	if !authnPoliciesFragmentsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)

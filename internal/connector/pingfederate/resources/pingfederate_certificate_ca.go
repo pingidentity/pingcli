@@ -72,6 +72,10 @@ func (r *PingFederateCertificateCAResource) getTrustedCAData() (*map[string][]st
 		return nil, err
 	}
 
+	if certViews == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	certViewsItems, ok := certViews.GetItemsOk()
 	if !ok {
 		return nil, common.DataNilError(r.ResourceType(), response)

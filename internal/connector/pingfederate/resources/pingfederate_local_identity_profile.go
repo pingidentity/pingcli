@@ -66,6 +66,10 @@ func (r *PingFederateLocalIdentityProfileResource) getIdentityProfileData() (*ma
 		return nil, err
 	}
 
+	if identityProfiles == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	identityProfilesItems, ok := identityProfiles.GetItemsOk()
 	if !ok {
 		return nil, common.DataNilError(r.ResourceType(), response)

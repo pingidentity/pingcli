@@ -68,6 +68,10 @@ func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, 
 		return nil, err
 	}
 
+	if dataStores == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	dataStoresItems, ok := dataStores.GetItemsOk()
 	if !ok {
 		return nil, common.DataNilError(r.ResourceType(), response)

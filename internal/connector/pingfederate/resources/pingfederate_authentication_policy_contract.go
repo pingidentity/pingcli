@@ -66,6 +66,10 @@ func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPoli
 		return nil, err
 	}
 
+	if authnPolicyContracts == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	authnPolicyContractsItems, authnPolicyContractsItemsOk := authnPolicyContracts.GetItemsOk()
 	if !authnPolicyContractsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)

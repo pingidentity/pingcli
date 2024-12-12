@@ -66,6 +66,10 @@ func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (*map[string]
 		return nil, err
 	}
 
+	if kerberosRealms == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	kerberosRealmsItems, ok := kerberosRealms.GetItemsOk()
 	if !ok {
 		return nil, common.DataNilError(r.ResourceType(), response)

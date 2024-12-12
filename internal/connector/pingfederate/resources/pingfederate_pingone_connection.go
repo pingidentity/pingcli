@@ -66,6 +66,10 @@ func (r *PingFederatePingOneConnectionResource) getPingOneConnectionData() (*map
 		return nil, err
 	}
 
+	if pingoneConnections == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	pingoneConnectionsItems, pingoneConnectionsItemsOk := pingoneConnections.GetItemsOk()
 	if !pingoneConnectionsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)

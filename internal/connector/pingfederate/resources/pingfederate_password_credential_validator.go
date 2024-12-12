@@ -66,6 +66,10 @@ func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialV
 		return nil, err
 	}
 
+	if passwordCredentialValidators == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	passwordCredentialValidatorsItems, ok := passwordCredentialValidators.GetItemsOk()
 	if !ok {
 		return nil, common.DataNilError(r.ResourceType(), response)

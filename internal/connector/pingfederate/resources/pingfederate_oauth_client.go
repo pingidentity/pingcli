@@ -66,6 +66,10 @@ func (r *PingFederateOAuthClientResource) getOAuthClientData() (*map[string]stri
 		return nil, err
 	}
 
+	if clients == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	clientsItems, ok := clients.GetItemsOk()
 	if !ok {
 		return nil, common.DataNilError(r.ResourceType(), response)

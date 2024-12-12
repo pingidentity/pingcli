@@ -66,6 +66,10 @@ func (r *PingFederateIDPSPConnectionResource) getSpConnectionData() (*map[string
 		return nil, err
 	}
 
+	if spConnections == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	spConnectionsItems, spConnectionsItemsOk := spConnections.GetItemsOk()
 	if !spConnectionsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)

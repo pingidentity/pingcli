@@ -66,6 +66,10 @@ func (r *PingFederateOAuthIssuerResource) getOAuthIssuerData() (*map[string]stri
 		return nil, err
 	}
 
+	if issuers == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	issuersItems, issuersItemsOk := issuers.GetItemsOk()
 	if !issuersItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)

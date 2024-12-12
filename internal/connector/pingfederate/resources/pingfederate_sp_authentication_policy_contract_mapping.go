@@ -72,6 +72,10 @@ func (r *PingFederateSPAuthenticationPolicyContractMappingResource) getApcToSpAd
 		return nil, err
 	}
 
+	if apcToSpAdapterMappings == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	apcToSpAdapterMappingsItems, apcToSpAdapterMappingsItemsOk := apcToSpAdapterMappings.GetItemsOk()
 	if !apcToSpAdapterMappingsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)

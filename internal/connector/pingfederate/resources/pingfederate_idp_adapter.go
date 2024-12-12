@@ -66,6 +66,10 @@ func (r *PingFederateIDPAdapterResource) getIDPAdapterData() (*map[string]string
 		return nil, err
 	}
 
+	if idpAdapters == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
 	idpAdaptersItems, idpAdaptersItemsOk := idpAdapters.GetItemsOk()
 	if !idpAdaptersItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
