@@ -150,11 +150,12 @@ func TestPlatformTerraformPlan(t *testing.T) {
 				"Error: Missing Configuration for Required Attribute",
 			},
 		},
-		{
-			name:          "NotificationTemplateContent",
-			resource:      resources.NotificationTemplateContent(PingOneClientInfo),
-			ignoredErrors: nil,
-		},
+		// TODO remove this skip dependent upon STAGING-25369
+		// {
+		// 	name:          "NotificationTemplateContent",
+		// 	resource:      resources.NotificationTemplateContent(PingOneClientInfo),
+		// 	ignoredErrors: nil,
+		// },
 		{
 			name:     "PhoneDeliverySettings",
 			resource: resources.PhoneDeliverySettings(PingOneClientInfo),

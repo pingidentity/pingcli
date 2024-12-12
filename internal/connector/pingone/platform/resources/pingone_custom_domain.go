@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneCustomDomainResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneCustomDomainResource
 func CustomDomain(clientInfo *connector.PingOneClientInfo) *PingOneCustomDomainResource {
 	return &PingOneCustomDomainResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportCustomDomains()
+	importBlocks := []connector.ImportBlock{}
+
+	domainData, err := r.getCustomDomainData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for domainId, domainName := range *domainData {
+		commentData := map[string]string{
+			"Custom Domain ID":      domainId,
+			"Custom Domain Name":    domainName,
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       domainName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, domainId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneCustomDomainResource) exportCustomDomains() error {
+func (r *PingOneCustomDomainResource) getCustomDomainData() (*map[string]string, error) {
+	domainData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllDomains", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, customDomain := range embedded.GetCustomDomains() {
@@ -65,28 +85,10 @@ func (r *PingOneCustomDomainResource) exportCustomDomains() error {
 			customDomainId, customDomainIdOk := customDomain.GetIdOk()
 
 			if customDomainIdOk && customDomainNameOk {
-				r.addImportBlock(*customDomainId, *customDomainName)
+				domainData[*customDomainId] = *customDomainName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneCustomDomainResource) addImportBlock(customDomainId, customDomainName string) {
-	commentData := map[string]string{
-		"Custom Domain ID":      customDomainId,
-		"Custom Domain Name":    customDomainName,
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Resource Type":         r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       customDomainName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, customDomainId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &domainData, nil
 }

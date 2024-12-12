@@ -12,15 +12,13 @@ var (
 )
 
 type PingOneMFASettingsResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneMFASettingsResource
 func MFASettings(clientInfo *connector.PingOneClientInfo) *PingOneMFASettingsResource {
 	return &PingOneMFASettingsResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -32,31 +30,13 @@ func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, erro
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportMFASettings()
+	importBlocks := []connector.ImportBlock{}
+
+	err := r.checkMFASettingsData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
-}
-
-func (r *PingOneMFASettingsResource) exportMFASettings() error {
-	_, response, err := r.clientInfo.ApiClient.MFAAPIClient.MFASettingsApi.ReadMFASettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadMFASettings", r.ResourceType())
-	if err != nil {
-		return err
-	}
-
-	if response.StatusCode == 204 {
-		return common.DataNilError(r.ResourceType(), response)
-	}
-
-	r.addImportBlock()
-
-	return nil
-}
-
-func (r *PingOneMFASettingsResource) addImportBlock() {
 	commentData := map[string]string{
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 		"Resource Type":         r.ResourceType(),
@@ -69,5 +49,21 @@ func (r *PingOneMFASettingsResource) addImportBlock() {
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	importBlocks = append(importBlocks, importBlock)
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneMFASettingsResource) checkMFASettingsData() error {
+	_, response, err := r.clientInfo.ApiClient.MFAAPIClient.MFASettingsApi.ReadMFASettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	err = common.HandleClientResponse(response, err, "ReadMFASettings", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == 204 {
+		return common.DataNilError(r.ResourceType(), response)
+	}
+
+	return nil
 }

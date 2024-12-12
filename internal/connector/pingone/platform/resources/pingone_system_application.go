@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneSystemApplicationResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneSystemApplicationResource
 func SystemApplication(clientInfo *connector.PingOneClientInfo) *PingOneSystemApplicationResource {
 	return &PingOneSystemApplicationResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneSystemApplicationResource) ExportAll() (*[]connector.ImportBlock
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportSystemApplications()
+	importBlocks := []connector.ImportBlock{}
+
+	applicationData, err := r.getSystemApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for appId, appName := range *applicationData {
+		commentData := map[string]string{
+			"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
+			"Resource Type":           r.ResourceType(),
+			"System Application ID":   appId,
+			"System Application Name": appName,
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       appName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, appId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneSystemApplicationResource) exportSystemApplications() error {
+func (r *PingOneSystemApplicationResource) getSystemApplicationData() (*map[string]string, error) {
+	applicationData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, app := range embedded.GetApplications() {
@@ -80,28 +100,10 @@ func (r *PingOneSystemApplicationResource) exportSystemApplications() error {
 			}
 
 			if appIdOk && appNameOk {
-				r.addImportBlock(*appId, *appName)
+				applicationData[*appId] = *appName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneSystemApplicationResource) addImportBlock(appId, appName string) {
-	commentData := map[string]string{
-		"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
-		"Resource Type":           r.ResourceType(),
-		"System Application ID":   appId,
-		"System Application Name": appName,
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       appName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, appId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &applicationData, nil
 }

@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneGroupNestingResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneGroupNestingResource
 func GroupNesting(clientInfo *connector.PingOneClientInfo) *PingOneGroupNestingResource {
 	return &PingOneGroupNestingResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,61 @@ func (r *PingOneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, err
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportGroupNesting()
+	importBlocks := []connector.ImportBlock{}
+
+	groupData, err := r.getGroupData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for parentGroupId, parentGroupName := range *groupData {
+		groupNestingData, err := r.getGroupNestingData(parentGroupId)
+		if err != nil {
+			return nil, err
+		}
+
+		for nestedGroupId, nestedGroupName := range *groupNestingData {
+			commentData := map[string]string{
+				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+				"Nested Group ID":       nestedGroupId,
+				"Nested Group Name":     nestedGroupName,
+				"Parent Group ID":       parentGroupId,
+				"Parent Group Name":     parentGroupName,
+				"Resource Type":         r.ResourceType(),
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", parentGroupName, nestedGroupName),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, parentGroupId, nestedGroupId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneGroupNestingResource) exportGroupNesting() error {
+func (r *PingOneGroupNestingResource) getGroupData() (*map[string]string, error) {
+	groupData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, parentGroup := range embedded.GetGroups() {
@@ -65,33 +94,32 @@ func (r *PingOneGroupNestingResource) exportGroupNesting() error {
 			parentGroupName, parentGroupNameOk := parentGroup.GetNameOk()
 
 			if parentGroupIdOk && parentGroupNameOk {
-				err := r.exportGroupNestingByParentGroup(*parentGroupId, *parentGroupName)
-				if err != nil {
-					return err
-				}
+				groupData[*parentGroupId] = *parentGroupName
 			}
 		}
 	}
 
-	return nil
+	return &groupData, nil
 }
 
-func (r *PingOneGroupNestingResource) exportGroupNestingByParentGroup(parentGroupId, parentGroupName string) error {
+func (r *PingOneGroupNestingResource) getGroupNestingData(parentGroupId string) (*map[string]string, error) {
+	groupNestingData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadGroupNesting(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, parentGroupId).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGroupNesting", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, nestedGroup := range embedded.GetGroupMemberships() {
@@ -99,30 +127,10 @@ func (r *PingOneGroupNestingResource) exportGroupNestingByParentGroup(parentGrou
 			nestedGroupName, nestedGroupNameOk := nestedGroup.GetNameOk()
 
 			if nestedGroupIdOk && nestedGroupNameOk {
-				r.addImportBlock(parentGroupId, parentGroupName, *nestedGroupId, *nestedGroupName)
+				groupNestingData[*nestedGroupId] = *nestedGroupName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneGroupNestingResource) addImportBlock(parentGroupId, parentGroupName, nestedGroupId, nestedGroupName string) {
-	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Nested Group ID":       nestedGroupId,
-		"Nested Group Name":     nestedGroupName,
-		"Parent Group ID":       parentGroupId,
-		"Parent Group Name":     parentGroupName,
-		"Resource Type":         r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s", parentGroupName, nestedGroupName),
-		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, parentGroupId, nestedGroupId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &groupNestingData, nil
 }

@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneBrandingThemeDefaultResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneBrandingThemeDefaultResource
 func BrandingThemeDefault(clientInfo *connector.PingOneClientInfo) *PingOneBrandingThemeDefaultResource {
 	return &PingOneBrandingThemeDefaultResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,47 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportBrandingThemeDefault()
+	importBlocks := []connector.ImportBlock{}
+
+	defaultBrandingThemeName, err := r.getDefaultBrandingThemeName()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	commentData := map[string]string{
+		"Default Branding Theme Name": *defaultBrandingThemeName,
+		"Export Environment ID":       r.clientInfo.ExportEnvironmentID,
+		"Resource Type":               r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_default_theme", *defaultBrandingThemeName),
+		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	importBlocks = append(importBlocks, importBlock)
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneBrandingThemeDefaultResource) exportBrandingThemeDefault() error {
+func (r *PingOneBrandingThemeDefaultResource) getDefaultBrandingThemeName() (*string, error) {
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadBrandingThemes", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, brandingTheme := range embedded.GetThemes() {
@@ -70,29 +85,12 @@ func (r *PingOneBrandingThemeDefaultResource) exportBrandingThemeDefault() error
 					brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
 
 					if brandingThemeNameOk {
-						r.addImportBlock(*brandingThemeName)
+						return brandingThemeName, nil
 					}
 				}
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneBrandingThemeDefaultResource) addImportBlock(brandingThemeName string) {
-	commentData := map[string]string{
-		"Default Branding Theme Name": brandingThemeName,
-		"Export Environment ID":       r.clientInfo.ExportEnvironmentID,
-		"Resource Type":               r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_default_theme", brandingThemeName),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return nil, fmt.Errorf("failed to export resource '%s'. No default branding theme found.", r.ResourceType())
 }

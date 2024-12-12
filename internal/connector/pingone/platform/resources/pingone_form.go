@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneFormResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneFormResource
 func Form(clientInfo *connector.PingOneClientInfo) *PingOneFormResource {
 	return &PingOneFormResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportForms()
+	importBlocks := []connector.ImportBlock{}
+
+	formData, err := r.getFormData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for formId, formName := range *formData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Form ID":               formId,
+			"Form Name":             formName,
+			"Resource Type":         r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       formName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, formId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneFormResource) exportForms() error {
+func (r *PingOneFormResource) getFormData() (*map[string]string, error) {
+	formData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.FormManagementApi.ReadAllForms(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllForms", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, form := range embedded.GetForms() {
@@ -65,28 +85,10 @@ func (r *PingOneFormResource) exportForms() error {
 			formName, formNameOk := form.GetNameOk()
 
 			if formIdOk && formNameOk {
-				r.addImportBlock(*formId, *formName)
+				formData[*formId] = *formName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneFormResource) addImportBlock(formId, formName string) {
-	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Form ID":               formId,
-		"Form Name":             formName,
-		"Resource Type":         r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       formName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, formId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &formData, nil
 }

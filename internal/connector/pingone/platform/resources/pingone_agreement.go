@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneAgreementResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneAgreementResource
 func Agreement(clientInfo *connector.PingOneClientInfo) *PingOneAgreementResource {
 	return &PingOneAgreementResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneAgreementResource) ExportAll() (*[]connector.ImportBlock, error)
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportAgreements()
+	importBlocks := []connector.ImportBlock{}
+
+	agreementData, err := r.getAgreementData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for agreementId, agreementName := range *agreementData {
+		commentData := map[string]string{
+			"Agreement ID":          agreementId,
+			"Agreement Name":        agreementName,
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       agreementName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, agreementId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneAgreementResource) exportAgreements() error {
+func (r *PingOneAgreementResource) getAgreementData() (*map[string]string, error) {
+	agreementData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllAgreements", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, agreement := range embedded.GetAgreements() {
@@ -65,28 +85,10 @@ func (r *PingOneAgreementResource) exportAgreements() error {
 			agreementName, agreementNameOk := agreement.GetNameOk()
 
 			if agreementIdOk && agreementNameOk {
-				r.addImportBlock(*agreementId, *agreementName)
+				agreementData[*agreementId] = *agreementName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneAgreementResource) addImportBlock(agreementId, agreementName string) {
-	commentData := map[string]string{
-		"Agreement ID":          agreementId,
-		"Agreement Name":        agreementName,
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Resource Type":         r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       agreementName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, agreementId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &agreementData, nil
 }

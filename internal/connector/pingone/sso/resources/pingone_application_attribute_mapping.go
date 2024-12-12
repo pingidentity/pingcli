@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneApplicationAttributeMappingResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneApplicationAttributeMappingResource
 func ApplicationAttributeMapping(clientInfo *connector.PingOneClientInfo) *PingOneApplicationAttributeMappingResource {
 	return &PingOneApplicationAttributeMappingResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,61 @@ func (r *PingOneApplicationAttributeMappingResource) ExportAll() (*[]connector.I
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportApplicationAttributeMappings()
+	importBlocks := []connector.ImportBlock{}
+
+	applicationData, err := r.getApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for appId, appName := range *applicationData {
+		applicationAttributeMappingData, err := r.getApplicationAttributeMappingData(appId)
+		if err != nil {
+			return nil, err
+		}
+
+		for attributeMappingId, attributeMappingName := range *applicationAttributeMappingData {
+			commentData := map[string]string{
+				"Application ID":         appId,
+				"Application Name":       appName,
+				"Attribute Mapping ID":   attributeMappingId,
+				"Attribute Mapping Name": attributeMappingName,
+				"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+				"Resource Type":          r.ResourceType(),
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", appName, attributeMappingName),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, attributeMappingId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationAttributeMappingResource) exportApplicationAttributeMappings() error {
+func (r *PingOneApplicationAttributeMappingResource) getApplicationData() (*map[string]string, error) {
+	applicationData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, app := range embedded.GetApplications() {
@@ -80,33 +109,32 @@ func (r *PingOneApplicationAttributeMappingResource) exportApplicationAttributeM
 			}
 
 			if appIdOk && appNameOk {
-				err := r.exportApplicationAttributeMappingsByApplication(*appId, *appName)
-				if err != nil {
-					return err
-				}
+				applicationData[*appId] = *appName
 			}
 		}
 	}
 
-	return nil
+	return &applicationData, nil
 }
 
-func (r *PingOneApplicationAttributeMappingResource) exportApplicationAttributeMappingsByApplication(appId, appName string) error {
+func (r *PingOneApplicationAttributeMappingResource) getApplicationAttributeMappingData(appId string) (*map[string]string, error) {
+	applicationAttributeMappingData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationAttributeMappingApi.ReadAllApplicationAttributeMappings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplicationAttributeMappings", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, attributeMapping := range embedded.GetAttributes() {
@@ -115,31 +143,11 @@ func (r *PingOneApplicationAttributeMappingResource) exportApplicationAttributeM
 				attributeMappingName, attributeMappingNameOk := attributeMapping.ApplicationAttributeMapping.GetNameOk()
 
 				if attributeMappingIdOk && attributeMappingNameOk {
-					r.addImportBlock(appId, appName, *attributeMappingId, *attributeMappingName)
+					applicationAttributeMappingData[*attributeMappingId] = *attributeMappingName
 				}
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneApplicationAttributeMappingResource) addImportBlock(appId, appName, attributeMappingId, attributeMappingName string) {
-	commentData := map[string]string{
-		"Application ID":         appId,
-		"Application Name":       appName,
-		"Attribute Mapping ID":   attributeMappingId,
-		"Attribute Mapping Name": attributeMappingName,
-		"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
-		"Resource Type":          r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s", appName, attributeMappingName),
-		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, attributeMappingId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &applicationAttributeMappingData, nil
 }

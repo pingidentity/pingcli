@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneMFAFido2PolicyResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneMFAFido2PolicyResource
 func MFAFido2Policy(clientInfo *connector.PingOneClientInfo) *PingOneMFAFido2PolicyResource {
 	return &PingOneMFAFido2PolicyResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, e
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportFido2Policies()
+	importBlocks := []connector.ImportBlock{}
+
+	fido2PolicyData, err := r.getFido2PolicyData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for fido2PolicyId, fido2PolicyName := range *fido2PolicyData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"FIDO2 Policy ID":       fido2PolicyId,
+			"FIDO2 Policy Name":     fido2PolicyName,
+			"Resource Type":         r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fido2PolicyName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, fido2PolicyId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneMFAFido2PolicyResource) exportFido2Policies() error {
+func (r *PingOneMFAFido2PolicyResource) getFido2PolicyData() (*map[string]string, error) {
+	fido2PolicyData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadFIDO2Policies", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, fido2Policy := range embedded.GetFido2Policies() {
@@ -65,28 +85,10 @@ func (r *PingOneMFAFido2PolicyResource) exportFido2Policies() error {
 			fido2PolicyName, fido2PolicyNameOk := fido2Policy.GetNameOk()
 
 			if fido2PolicyIdOk && fido2PolicyNameOk {
-				r.addImportBlock(*fido2PolicyId, *fido2PolicyName)
+				fido2PolicyData[*fido2PolicyId] = *fido2PolicyName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneMFAFido2PolicyResource) addImportBlock(fido2PolicyId, fido2PolicyName string) {
-	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"FIDO2 Policy ID":       fido2PolicyId,
-		"FIDO2 Policy Name":     fido2PolicyName,
-		"Resource Type":         r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fido2PolicyName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, fido2PolicyId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &fido2PolicyData, nil
 }

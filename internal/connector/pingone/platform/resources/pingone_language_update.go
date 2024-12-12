@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneLanguageUpdateResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneLanguageUpdateResource
 func LanguageUpdate(clientInfo *connector.PingOneClientInfo) *PingOneLanguageUpdateResource {
 	return &PingOneLanguageUpdateResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneLanguageUpdateResource) ExportAll() (*[]connector.ImportBlock, e
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportLanguageUpdates()
+	importBlocks := []connector.ImportBlock{}
+
+	languageData, err := r.getLanguageData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for languageId, languageName := range *languageData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Language ID":           languageId,
+			"Language Name":         languageName,
+			"Resource Type":         r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_update", languageName),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, languageId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneLanguageUpdateResource) exportLanguageUpdates() error {
+func (r *PingOneLanguageUpdateResource) getLanguageData() (*map[string]string, error) {
+	languageData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadLanguages", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, languageInner := range embedded.GetLanguages() {
@@ -77,7 +97,7 @@ func (r *PingOneLanguageUpdateResource) exportLanguageUpdates() error {
 						languageName, languageNameOk := languageInner.Language.GetNameOk()
 
 						if languageIdOk && languageNameOk {
-							r.addImportBlock(*languageId, *languageName)
+							languageData[*languageId] = *languageName
 						}
 					}
 				}
@@ -85,23 +105,5 @@ func (r *PingOneLanguageUpdateResource) exportLanguageUpdates() error {
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneLanguageUpdateResource) addImportBlock(languageId, languageName string) {
-	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Language ID":           languageId,
-		"Language Name":         languageName,
-		"Resource Type":         r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_update", languageName),
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, languageId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &languageData, nil
 }

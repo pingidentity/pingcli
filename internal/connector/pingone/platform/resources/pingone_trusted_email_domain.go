@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneTrustedEmailDomainResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOne Trusted Email Domain Resource
 func TrustedEmailDomain(clientInfo *connector.PingOneClientInfo) *PingOneTrustedEmailDomainResource {
 	return &PingOneTrustedEmailDomainResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneTrustedEmailDomainResource) ExportAll() (*[]connector.ImportBloc
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportTrustedEmailDomains()
+	importBlocks := []connector.ImportBlock{}
+
+	trustedEmailDomainData, err := r.getTrustedEmailDomainData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for trustedEmailDomainId, trustedEmailDomainName := range *trustedEmailDomainData {
+		commentData := map[string]string{
+			"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
+			"Resource Type":             r.ResourceType(),
+			"Trusted Email Domain ID":   trustedEmailDomainId,
+			"Trusted Email Domain Name": trustedEmailDomainName,
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       trustedEmailDomainName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, trustedEmailDomainId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneTrustedEmailDomainResource) exportTrustedEmailDomains() error {
+func (r *PingOneTrustedEmailDomainResource) getTrustedEmailDomainData() (*map[string]string, error) {
+	trustedEmailDomainData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllTrustedEmailDomains", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, emailDomain := range embedded.GetEmailDomains() {
@@ -65,28 +85,10 @@ func (r *PingOneTrustedEmailDomainResource) exportTrustedEmailDomains() error {
 			emailDomainName, emailDomainNameOk := emailDomain.GetDomainNameOk()
 
 			if emailDomainIdOk && emailDomainNameOk {
-				r.addImportBlock(*emailDomainId, *emailDomainName)
+				trustedEmailDomainData[*emailDomainId] = *emailDomainName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneTrustedEmailDomainResource) addImportBlock(emailDomainId, emailDomainName string) {
-	commentData := map[string]string{
-		"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
-		"Resource Type":             r.ResourceType(),
-		"Trusted Email Domain ID":   emailDomainId,
-		"Trusted Email Domain Name": emailDomainName,
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       emailDomainName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, emailDomainId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &trustedEmailDomainData, nil
 }

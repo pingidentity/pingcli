@@ -12,15 +12,13 @@ var (
 )
 
 type PingOneBrandingSettingsResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneBrandingSettingsResource
 func BrandingSettings(clientInfo *connector.PingOneClientInfo) *PingOneBrandingSettingsResource {
 	return &PingOneBrandingSettingsResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -32,31 +30,13 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportBrandingSettings()
+	importBlocks := []connector.ImportBlock{}
+
+	err := r.checkBrandingSettingsData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
-}
-
-func (r *PingOneBrandingSettingsResource) exportBrandingSettings() error {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadBrandingSettings", r.ResourceType())
-	if err != nil {
-		return err
-	}
-
-	if response.StatusCode == 204 {
-		return common.DataNilError(r.ResourceType(), response)
-	}
-
-	r.addImportBlock()
-
-	return nil
-}
-
-func (r *PingOneBrandingSettingsResource) addImportBlock() {
 	commentData := map[string]string{
 		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
@@ -69,5 +49,21 @@ func (r *PingOneBrandingSettingsResource) addImportBlock() {
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	importBlocks = append(importBlocks, importBlock)
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneBrandingSettingsResource) checkBrandingSettingsData() error {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	err = common.HandleClientResponse(response, err, "ReadBrandingSettings", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	if response.StatusCode == 204 {
+		return common.DataNilError(r.ResourceType(), response)
+	}
+
+	return nil
 }

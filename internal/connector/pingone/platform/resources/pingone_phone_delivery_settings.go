@@ -15,15 +15,13 @@ var (
 )
 
 type PingOnePhoneDeliverySettingsResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOnePhoneDeliverySettingsResource
 func PhoneDeliverySettings(clientInfo *connector.PingOneClientInfo) *PingOnePhoneDeliverySettingsResource {
 	return &PingOnePhoneDeliverySettingsResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -35,30 +33,52 @@ func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportB
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportPhoneDeliverySettings()
+	importBlocks := []connector.ImportBlock{}
+
+	phoneDeliverySettingsData, err := r.getPhoneDeliverySettingsData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for phoneDeliverySettingsId, phoneDeliverySettingsName := range *phoneDeliverySettingsData {
+		commentData := map[string]string{
+			"Export Environment ID":        r.clientInfo.ExportEnvironmentID,
+			"Phone Delivery Settings ID":   phoneDeliverySettingsId,
+			"Phone Delivery Settings Name": phoneDeliverySettingsName,
+			"Resource Type":                r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       phoneDeliverySettingsName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, phoneDeliverySettingsId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOnePhoneDeliverySettingsResource) exportPhoneDeliverySettings() error {
+func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (*map[string]string, error) {
+	phoneDeliverySettingsData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPhoneDeliverySettings", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, phoneDeliverySettings := range embedded.GetPhoneDeliverySettings() {
@@ -93,28 +113,10 @@ func (r *PingOnePhoneDeliverySettingsResource) exportPhoneDeliverySettings() err
 			}
 
 			if phoneDeliverySettingsIdOk && phoneDeliverySettingsNameOk {
-				r.addImportBlock(*phoneDeliverySettingsId, phoneDeliverySettingsName)
+				phoneDeliverySettingsData[*phoneDeliverySettingsId] = phoneDeliverySettingsName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOnePhoneDeliverySettingsResource) addImportBlock(phoneDeliverySettingsId, phoneDeliverySettingsName string) {
-	commentData := map[string]string{
-		"Export Environment ID":        r.clientInfo.ExportEnvironmentID,
-		"Phone Delivery Settings ID":   phoneDeliverySettingsId,
-		"Phone Delivery Settings Name": phoneDeliverySettingsName,
-		"Resource Type":                r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       phoneDeliverySettingsName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, phoneDeliverySettingsId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &phoneDeliverySettingsData, nil
 }

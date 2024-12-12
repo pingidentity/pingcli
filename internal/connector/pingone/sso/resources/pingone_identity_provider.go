@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneIdentityProviderResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneIdentityProviderResource
 func IdentityProvider(clientInfo *connector.PingOneClientInfo) *PingOneIdentityProviderResource {
 	return &PingOneIdentityProviderResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -32,33 +30,54 @@ func (r *PingOneIdentityProviderResource) ResourceType() string {
 
 func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
-
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportIdentityProviders()
+	importBlocks := []connector.ImportBlock{}
+
+	identityProviderData, err := r.getIdentityProviderData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for idpId, idpName := range *identityProviderData {
+		commentData := map[string]string{
+			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+			"Identity Provider ID":   idpId,
+			"Identity Provider Name": idpName,
+			"Resource Type":          r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       idpName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, idpId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneIdentityProviderResource) exportIdentityProviders() error {
+func (r *PingOneIdentityProviderResource) getIdentityProviderData() (*map[string]string, error) {
+	identityProviderData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllIdentityProviders", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, idp := range embedded.GetIdentityProviders() {
@@ -93,28 +112,10 @@ func (r *PingOneIdentityProviderResource) exportIdentityProviders() error {
 			}
 
 			if idpIdOk && idpNameOk {
-				r.addImportBlock(*idpId, *idpName)
+				identityProviderData[*idpId] = *idpName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneIdentityProviderResource) addImportBlock(idpId, idpName string) {
-	commentData := map[string]string{
-		"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
-		"Identity Provider ID":   idpId,
-		"Identity Provider Name": idpName,
-		"Resource Type":          r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       idpName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, idpId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &identityProviderData, nil
 }

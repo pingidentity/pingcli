@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneResourceResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneResourceResource
 func Resource(clientInfo *connector.PingOneClientInfo) *PingOneResourceResource {
 	return &PingOneResourceResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneResourceResource) ExportAll() (*[]connector.ImportBlock, error) 
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportResources()
+	importBlocks := []connector.ImportBlock{}
+
+	resourceData, err := r.getResourceData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for resourceId, resourceName := range *resourceData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource ID":           resourceId,
+			"Resource Name":         resourceName,
+			"Resource Type":         r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       resourceName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, resourceId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneResourceResource) exportResources() error {
+func (r *PingOneResourceResource) getResourceData() (*map[string]string, error) {
+	resourceData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResources", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, resourceInner := range embedded.GetResources() {
@@ -66,29 +86,11 @@ func (r *PingOneResourceResource) exportResources() error {
 				resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
 
 				if resourceIdOk && resourceNameOk {
-					r.addImportBlock(*resourceId, *resourceName)
+					resourceData[*resourceId] = *resourceName
 				}
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneResourceResource) addImportBlock(resourceId, resourceName string) {
-	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Resource ID":           resourceId,
-		"Resource Name":         resourceName,
-		"Resource Type":         r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       resourceName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, resourceId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &resourceData, nil
 }

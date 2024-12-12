@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneWebhookResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneWebhookResource
 func Webhook(clientInfo *connector.PingOneClientInfo) *PingOneWebhookResource {
 	return &PingOneWebhookResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportWebhooks()
+	importBlocks := []connector.ImportBlock{}
+
+	subscriptionData, err := r.getSubscriptionData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for subscriptionId, subscriptionName := range *subscriptionData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
+			"Webhook ID":            subscriptionId,
+			"Webhook Name":          subscriptionName,
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       subscriptionName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, subscriptionId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneWebhookResource) exportWebhooks() error {
+func (r *PingOneWebhookResource) getSubscriptionData() (*map[string]string, error) {
+	subscriptionData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSubscriptions", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, subscription := range embedded.GetSubscriptions() {
@@ -65,28 +85,10 @@ func (r *PingOneWebhookResource) exportWebhooks() error {
 			subscriptionName, subscriptionNameOk := subscription.GetNameOk()
 
 			if subscriptionIdOk && subscriptionNameOk {
-				r.addImportBlock(*subscriptionId, *subscriptionName)
+				subscriptionData[*subscriptionId] = *subscriptionName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneWebhookResource) addImportBlock(subscriptionId, subscriptionName string) {
-	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Resource Type":         r.ResourceType(),
-		"Webhook ID":            subscriptionId,
-		"Webhook Name":          subscriptionName,
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       subscriptionName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, subscriptionId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &subscriptionData, nil
 }

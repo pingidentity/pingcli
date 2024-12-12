@@ -15,15 +15,13 @@ var (
 )
 
 type PingOneResourceScopeOpenIdResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneResourceScopeOpenIdResource
 func ResourceScopeOpenId(clientInfo *connector.PingOneClientInfo) *PingOneResourceScopeOpenIdResource {
 	return &PingOneResourceScopeOpenIdResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -35,30 +33,60 @@ func (r *PingOneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlo
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportResourceScopeOpenIds()
+	importBlocks := []connector.ImportBlock{}
+
+	resourceData, err := r.getResourceData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for resourceId, resourceName := range *resourceData {
+		resourceScopeData, err := r.getResourceScopeData(resourceId)
+		if err != nil {
+			return nil, err
+		}
+
+		for resourceScopeId, resourceScopeName := range *resourceScopeData {
+			commentData := map[string]string{
+				"Export Environment ID":              r.clientInfo.ExportEnvironmentID,
+				"OpenID Connect Resource Name":       resourceName,
+				"OpenID Connect Resource Scope ID":   resourceScopeId,
+				"OpenID Connect Resource Scope Name": resourceScopeName,
+				"Resource Type":                      r.ResourceType(),
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", resourceName, resourceScopeName),
+				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, resourceScopeId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneResourceScopeOpenIdResource) exportResourceScopeOpenIds() error {
+func (r *PingOneResourceScopeOpenIdResource) getResourceData() (*map[string]string, error) {
+	resourceData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResources", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, resourceInner := range embedded.GetResources() {
@@ -68,63 +96,44 @@ func (r *PingOneResourceScopeOpenIdResource) exportResourceScopeOpenIds() error 
 				resourceType, resourceTypeOk := resourceInner.Resource.GetTypeOk()
 
 				if resourceIdOk && resourceNameOk && resourceTypeOk && *resourceType == management.ENUMRESOURCETYPE_OPENID_CONNECT {
-					err := r.exportResourceScopeOpenIdByResource(*resourceId, *resourceName)
-					if err != nil {
-						return err
-					}
+					resourceData[*resourceId] = *resourceName
 				}
 			}
 		}
 	}
 
-	return nil
+	return &resourceData, nil
 }
 
-func (r *PingOneResourceScopeOpenIdResource) exportResourceScopeOpenIdByResource(resourceId, resourceName string) error {
+func (r *PingOneResourceScopeOpenIdResource) getResourceScopeData(resourceId string) (*map[string]string, error) {
+	resourceScopeData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResourceScopes", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, scopeOpenId := range embedded.GetScopes() {
 			scopeOpenIdId, scopeOpenIdIdOk := scopeOpenId.GetIdOk()
 			scopeOpenIdName, scopeOpenIdNameOk := scopeOpenId.GetNameOk()
+
 			if scopeOpenIdIdOk && scopeOpenIdNameOk {
-				r.addImportBlock(resourceName, *scopeOpenIdId, *scopeOpenIdName)
+				resourceScopeData[*scopeOpenIdId] = *scopeOpenIdName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneResourceScopeOpenIdResource) addImportBlock(resourceName, scopeOpenIdId, scopeOpenIdName string) {
-	commentData := map[string]string{
-		"Export Environment ID":              r.clientInfo.ExportEnvironmentID,
-		"OpenID Connect Resource Name":       resourceName,
-		"OpenID Connect Resource Scope ID":   scopeOpenIdId,
-		"OpenID Connect Resource Scope Name": scopeOpenIdName,
-		"Resource Type":                      r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s", resourceName, scopeOpenIdName),
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, scopeOpenIdId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &resourceScopeData, nil
 }

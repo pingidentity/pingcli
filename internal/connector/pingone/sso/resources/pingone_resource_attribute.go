@@ -15,15 +15,13 @@ var (
 )
 
 type PingOneResourceAttributeResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneResourceAttributeResource
 func ResourceAttribute(clientInfo *connector.PingOneClientInfo) *PingOneResourceAttributeResource {
 	return &PingOneResourceAttributeResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -35,30 +33,64 @@ func (r *PingOneResourceAttributeResource) ExportAll() (*[]connector.ImportBlock
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportResourceAttributes()
+	importBlocks := []connector.ImportBlock{}
+
+	resourceData, err := r.getResourceData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for resourceId, resourceNameAndType := range *resourceData {
+		resourceName := resourceNameAndType[0]
+		resourceType := resourceNameAndType[1]
+
+		resourceAttributeData, err := r.getResourceAttributeData(resourceId, resourceType)
+		if err != nil {
+			return nil, err
+		}
+
+		for resourceAttributeId, resourceAttributeName := range *resourceAttributeData {
+			commentData := map[string]string{
+				"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
+				"Resource Attribute ID":   resourceAttributeId,
+				"Resource Attribute Name": resourceAttributeName,
+				"Resource ID":             resourceId,
+				"Resource Name":           resourceName,
+				"Resource Type":           r.ResourceType(),
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", resourceName, resourceAttributeName),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, resourceId, resourceAttributeId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneResourceAttributeResource) exportResourceAttributes() error {
+func (r *PingOneResourceAttributeResource) getResourceData() (*map[string][]string, error) {
+	resourceData := make(map[string][]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResources", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, resourceInner := range embedded.GetResources() {
@@ -68,34 +100,33 @@ func (r *PingOneResourceAttributeResource) exportResourceAttributes() error {
 				resourceType, resourceTypeOk := resourceInner.Resource.GetTypeOk()
 
 				if resourceIdOk && resourceNameOk && resourceTypeOk {
-					err := r.exportResourceAttributeByResource(*resourceId, *resourceName, *resourceType)
-					if err != nil {
-						return err
-					}
+					resourceData[*resourceId] = []string{*resourceName, string(*resourceType)}
 				}
 			}
 		}
 	}
 
-	return nil
+	return &resourceData, nil
 }
 
-func (r *PingOneResourceAttributeResource) exportResourceAttributeByResource(resourceId, resourceName string, resourceType management.EnumResourceType) error {
+func (r *PingOneResourceAttributeResource) getResourceAttributeData(resourceId string, resourceType string) (*map[string]string, error) {
+	resourceAttributeData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourceAttributesApi.ReadAllResourceAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResourceAttributes", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, attributeInner := range embedded.GetAttributes() {
@@ -109,7 +140,7 @@ func (r *PingOneResourceAttributeResource) exportResourceAttributeByResource(res
 					// Do not export CORE attributes
 					// There is one exception where a CUSTOM resource can override the sub CORE attribute
 					if *resourceAttributeType == management.ENUMRESOURCEATTRIBUTETYPE_CORE {
-						if resourceType == management.ENUMRESOURCETYPE_CUSTOM {
+						if resourceType == string(management.ENUMRESOURCETYPE_CUSTOM) {
 							// Skip export of all CORE attributes except for the sub attribute for CUSTOM resources
 							if *resourceAttributeName != "sub" {
 								continue
@@ -120,31 +151,11 @@ func (r *PingOneResourceAttributeResource) exportResourceAttributeByResource(res
 						}
 					}
 
-					r.addImportBlock(resourceId, resourceName, *resourceAttributeId, *resourceAttributeName)
+					resourceAttributeData[*resourceAttributeId] = *resourceAttributeName
 				}
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneResourceAttributeResource) addImportBlock(resourceId, resourceName, resourceAttributeId, resourceAttributeName string) {
-	commentData := map[string]string{
-		"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
-		"Resource Attribute ID":   resourceAttributeId,
-		"Resource Attribute Name": resourceAttributeName,
-		"Resource ID":             resourceId,
-		"Resource Name":           resourceName,
-		"Resource Type":           r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s", resourceName, resourceAttributeName),
-		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, resourceId, resourceAttributeId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &resourceAttributeData, nil
 }

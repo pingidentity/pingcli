@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -14,15 +15,13 @@ var (
 )
 
 type PingOneGroupRoleAssignmentResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneGroupRoleAssignmentResource
 func GroupRoleAssignment(clientInfo *connector.PingOneClientInfo) *PingOneGroupRoleAssignmentResource {
 	return &PingOneGroupRoleAssignmentResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +33,66 @@ func (r *PingOneGroupRoleAssignmentResource) ExportAll() (*[]connector.ImportBlo
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportGroupRoleAssignments()
+	importBlocks := []connector.ImportBlock{}
+
+	groupData, err := r.getGroupData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for groupId, groupName := range *groupData {
+		groupRoleAssignmentData, err := r.getGroupRoleAssignmentData(groupId)
+		if err != nil {
+			return nil, err
+		}
+
+		for groupRoleAssignmentId, roleId := range *groupRoleAssignmentData {
+			roleName, err := r.getRoleName(roleId)
+			if err != nil {
+				return nil, err
+			}
+
+			commentData := map[string]string{
+				"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
+				"Group ID":                 groupId,
+				"Group Name":               groupName,
+				"Group Role Assignment ID": groupRoleAssignmentId,
+				"Group Role Name":          string(*roleName),
+				"Resource Type":            r.ResourceType(),
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s_%s", groupName, string(*roleName), groupRoleAssignmentId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, groupId, groupRoleAssignmentId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneGroupRoleAssignmentResource) exportGroupRoleAssignments() error {
+func (r *PingOneGroupRoleAssignmentResource) getGroupData() (*map[string]string, error) {
+	groupData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, group := range embedded.GetGroups() {
@@ -65,33 +100,32 @@ func (r *PingOneGroupRoleAssignmentResource) exportGroupRoleAssignments() error 
 			groupName, groupNameOk := group.GetNameOk()
 
 			if groupIdOk && groupNameOk {
-				err := r.exportGroupRoleAssignmentsByGroup(*groupId, *groupName)
-				if err != nil {
-					return err
-				}
+				groupData[*groupId] = *groupName
 			}
 		}
 	}
 
-	return nil
+	return &groupData, nil
 }
 
-func (r *PingOneGroupRoleAssignmentResource) exportGroupRoleAssignmentsByGroup(groupId string, groupName string) error {
+func (r *PingOneGroupRoleAssignmentResource) getGroupRoleAssignmentData(groupId string) (*map[string]string, error) {
+	groupRoleAssignmentData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupRoleAssignmentsApi.ReadGroupRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, groupId).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGroupRoleAssignments", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, groupRoleAssignment := range embedded.GetRoleAssignments() {
@@ -100,52 +134,30 @@ func (r *PingOneGroupRoleAssignmentResource) exportGroupRoleAssignmentsByGroup(g
 
 			if groupRoleAssignmentIdOk && groupRoleAssignmentRoleOk {
 				groupRoleAssignmentRoleId, groupRoleAssignmentRoleIdOk := groupRoleAssignmentRole.GetIdOk()
+
 				if groupRoleAssignmentRoleIdOk {
-					err := r.exportGroupRoleAssignmentsByRole(groupId, groupName, *groupRoleAssignmentId, *groupRoleAssignmentRoleId)
-					if err != nil {
-						return err
-					}
+					groupRoleAssignmentData[*groupRoleAssignmentId] = *groupRoleAssignmentRoleId
 				}
 			}
 		}
 	}
 
-	return nil
+	return &groupRoleAssignmentData, nil
 }
 
-func (r *PingOneGroupRoleAssignmentResource) exportGroupRoleAssignmentsByRole(groupId, groupName, groupRoleAssignmentId, roleId string) error {
+func (r *PingOneGroupRoleAssignmentResource) getRoleName(roleId string) (*management.EnumRoleName, error) {
 	apiRole, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
 	err = common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if apiRole != nil {
 		apiRoleName, apiRoleNameOk := apiRole.GetNameOk()
 		if apiRoleNameOk {
-			r.addImportBlock(groupId, groupName, groupRoleAssignmentId, string(*apiRoleName))
+			return apiRoleName, nil
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneGroupRoleAssignmentResource) addImportBlock(groupId, groupName, groupRoleAssignmentId, roleName string) {
-	commentData := map[string]string{
-		"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
-		"Group ID":                 groupId,
-		"Group Name":               groupName,
-		"Group Role Assignment ID": groupRoleAssignmentId,
-		"Group Role Name":          roleName,
-		"Resource Type":            r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s_%s", groupName, roleName, groupRoleAssignmentId),
-		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, groupId, groupRoleAssignmentId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return nil, fmt.Errorf("unable to get role name for role ID: %s", roleId)
 }

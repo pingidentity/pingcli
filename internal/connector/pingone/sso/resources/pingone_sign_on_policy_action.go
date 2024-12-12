@@ -15,15 +15,13 @@ var (
 )
 
 type PingOneSignOnPolicyActionResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneSignOnPolicyActionResource
 func SignOnPolicyAction(clientInfo *connector.PingOneClientInfo) *PingOneSignOnPolicyActionResource {
 	return &PingOneSignOnPolicyActionResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -35,30 +33,61 @@ func (r *PingOneSignOnPolicyActionResource) ExportAll() (*[]connector.ImportBloc
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportSignOnPolicyActions()
+	importBlocks := []connector.ImportBlock{}
+
+	signOnPolicyData, err := r.getSignOnPolicyData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for signOnPolicyId, signOnPolicyName := range *signOnPolicyData {
+		signOnPolicyActionData, err := r.getSignOnPolicyActionData(signOnPolicyId)
+		if err != nil {
+			return nil, err
+		}
+
+		for actionId, actionType := range *signOnPolicyActionData {
+			commentData := map[string]string{
+				"Export Environment ID":      r.clientInfo.ExportEnvironmentID,
+				"Resource Type":              r.ResourceType(),
+				"Sign-On Policy Action ID":   actionId,
+				"Sign-On Policy Action Type": actionType,
+				"Sign-On Policy ID":          signOnPolicyId,
+				"Sign-On Policy Name":        signOnPolicyName,
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", signOnPolicyName, actionType),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, signOnPolicyId, actionId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneSignOnPolicyActionResource) exportSignOnPolicyActions() error {
+func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyData() (*map[string]string, error) {
+	signOnPolicyData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SignOnPoliciesApi.ReadAllSignOnPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSignOnPolicies", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, signOnPolicy := range embedded.GetSignOnPolicies() {
@@ -66,33 +95,32 @@ func (r *PingOneSignOnPolicyActionResource) exportSignOnPolicyActions() error {
 			signOnPolicyName, signOnPolicyNameOk := signOnPolicy.GetNameOk()
 
 			if signOnPolicyIdOk && signOnPolicyNameOk {
-				err := r.exportSignOnPolicyActionsBySignOnPolicy(*signOnPolicyId, *signOnPolicyName)
-				if err != nil {
-					return err
-				}
+				signOnPolicyData[*signOnPolicyId] = *signOnPolicyName
 			}
 		}
 	}
 
-	return nil
+	return &signOnPolicyData, nil
 }
 
-func (r *PingOneSignOnPolicyActionResource) exportSignOnPolicyActionsBySignOnPolicy(signOnPolicyId, signOnPolicyName string) error {
+func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyActionData(signOnPolicyId string) (*map[string]string, error) {
+	signOnPolicyActionData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SignOnPolicyActionsApi.ReadAllSignOnPolicyActions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, signOnPolicyId).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSignOnPolicyActions", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, action := range embedded.GetActions() {
@@ -130,30 +158,10 @@ func (r *PingOneSignOnPolicyActionResource) exportSignOnPolicyActionsBySignOnPol
 			}
 
 			if actionIdOk && actionTypeOk {
-				r.addImportBlock(signOnPolicyId, signOnPolicyName, *actionId, string(*actionType))
+				signOnPolicyActionData[*actionId] = string(*actionType)
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneSignOnPolicyActionResource) addImportBlock(signOnPolicyId, signOnPolicyName, actionId, actionType string) {
-	commentData := map[string]string{
-		"Export Environment ID":      r.clientInfo.ExportEnvironmentID,
-		"Resource Type":              r.ResourceType(),
-		"Sign-On Policy Action ID":   actionId,
-		"Sign-On Policy Action Type": actionType,
-		"Sign-On Policy ID":          signOnPolicyId,
-		"Sign-On Policy Name":        signOnPolicyName,
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s", signOnPolicyName, actionType),
-		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, signOnPolicyId, actionId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &signOnPolicyActionData, nil
 }

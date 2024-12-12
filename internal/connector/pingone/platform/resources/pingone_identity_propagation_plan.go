@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneIdentityPropagationPlanResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneIdentityPropagationPlanResource
 func IdentityPropagationPlan(clientInfo *connector.PingOneClientInfo) *PingOneIdentityPropagationPlanResource {
 	return &PingOneIdentityPropagationPlanResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportIdentityPropagationPlans()
+	importBlocks := []connector.ImportBlock{}
+
+	planData, err := r.getIdentityPropagationPlanData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for planId, planName := range *planData {
+		commentData := map[string]string{
+			"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
+			"Identity Propagation Plan ID":   planId,
+			"Identity Propagation Plan Name": planName,
+			"Resource Type":                  r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       planName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, planId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneIdentityPropagationPlanResource) exportIdentityPropagationPlans() error {
+func (r *PingOneIdentityPropagationPlanResource) getIdentityPropagationPlanData() (*map[string]string, error) {
+	identityPropagationPlanData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPlans", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, identityPropagationPlan := range embedded.GetPlans() {
@@ -65,28 +85,10 @@ func (r *PingOneIdentityPropagationPlanResource) exportIdentityPropagationPlans(
 			identityPropagationPlanName, identityPropagationPlanNameOk := identityPropagationPlan.GetNameOk()
 
 			if identityPropagationPlanIdOk && identityPropagationPlanNameOk {
-				r.addImportBlock(*identityPropagationPlanId, *identityPropagationPlanName)
+				identityPropagationPlanData[*identityPropagationPlanId] = *identityPropagationPlanName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneIdentityPropagationPlanResource) addImportBlock(identityPropagationPlanId, identityPropagationPlanName string) {
-	commentData := map[string]string{
-		"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
-		"Identity Propagation Plan ID":   identityPropagationPlanId,
-		"Identity Propagation Plan Name": identityPropagationPlanName,
-		"Resource Type":                  r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       identityPropagationPlanName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, identityPropagationPlanId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &identityPropagationPlanData, nil
 }

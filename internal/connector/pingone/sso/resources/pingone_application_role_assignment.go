@@ -15,15 +15,13 @@ var (
 )
 
 type PingOneApplicationRoleAssignmentResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneApplicationRoleAssignmentResource
 func ApplicationRoleAssignment(clientInfo *connector.PingOneClientInfo) *PingOneApplicationRoleAssignmentResource {
 	return &PingOneApplicationRoleAssignmentResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -35,30 +33,66 @@ func (r *PingOneApplicationRoleAssignmentResource) ExportAll() (*[]connector.Imp
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportApplicationRoleAssignments()
+	importBlocks := []connector.ImportBlock{}
+
+	applicationData, err := r.getApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for appId, appName := range *applicationData {
+		applicationRoleAssignmentData, err := r.getApplicationRoleAssignmentData(appId)
+		if err != nil {
+			return nil, err
+		}
+
+		for roleAssignmentId, roleId := range *applicationRoleAssignmentData {
+			roleName, err := r.getRoleName(roleId)
+			if err != nil {
+				return nil, err
+			}
+
+			commentData := map[string]string{
+				"Application ID":                 appId,
+				"Application Name":               appName,
+				"Application Role Assignment ID": roleAssignmentId,
+				"Application Role Name":          string(*roleName),
+				"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
+				"Resource Type":                  r.ResourceType(),
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s_%s", appName, string(*roleName), roleAssignmentId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, roleAssignmentId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationRoleAssignmentResource) exportApplicationRoleAssignments() error {
+func (r *PingOneApplicationRoleAssignmentResource) getApplicationData() (*map[string]string, error) {
+	applicationData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, app := range embedded.GetApplications() {
@@ -99,86 +133,64 @@ func (r *PingOneApplicationRoleAssignmentResource) exportApplicationRoleAssignme
 					continue
 				}
 
-				err := r.exportApplicationRoleAssignmentsByApplication(*appId, *appName)
-				if err != nil {
-					return err
-				}
+				applicationData[*appId] = *appName
 			}
 		}
 	}
 
-	return nil
+	return &applicationData, nil
 }
 
-func (r *PingOneApplicationRoleAssignmentResource) exportApplicationRoleAssignmentsByApplication(appId, appName string) error {
+func (r *PingOneApplicationRoleAssignmentResource) getApplicationRoleAssignmentData(appId string) (*map[string]string, error) {
+	applicationRoleAssignmentData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationRoleAssignmentsApi.ReadApplicationRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadApplicationRoleAssignments", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, roleAssignment := range embedded.GetRoleAssignments() {
 			roleAssignmentId, roleAssignmentIdOk := roleAssignment.GetIdOk()
 			roleAssignmentRole, roleAssignmentRoleOk := roleAssignment.GetRoleOk()
+
 			if roleAssignmentIdOk && roleAssignmentRoleOk {
 				roleAssignmentRoleId, roleAssignmentRoleIdOk := roleAssignmentRole.GetIdOk()
+
 				if roleAssignmentRoleIdOk {
-					err := r.exportApplicationRoleAssignmentsByRole(appId, appName, *roleAssignmentId, *roleAssignmentRoleId)
-					if err != nil {
-						return err
-					}
+					applicationRoleAssignmentData[*roleAssignmentId] = *roleAssignmentRoleId
 				}
 			}
 		}
 	}
 
-	return nil
+	return &applicationRoleAssignmentData, nil
 }
 
-func (r *PingOneApplicationRoleAssignmentResource) exportApplicationRoleAssignmentsByRole(appId, appName, roleAssignmentId, roleId string) error {
+func (r *PingOneApplicationRoleAssignmentResource) getRoleName(roleId string) (*management.EnumRoleName, error) {
 	apiRole, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
 	err = common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if apiRole != nil {
 		apiRoleName, apiRoleNameOk := apiRole.GetNameOk()
 		if apiRoleNameOk {
-			r.addImportBlock(appId, appName, roleAssignmentId, string(*apiRoleName))
+			return apiRoleName, nil
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneApplicationRoleAssignmentResource) addImportBlock(appId, appName, roleAssignmentId, roleName string) {
-	commentData := map[string]string{
-		"Application ID":                 appId,
-		"Application Name":               appName,
-		"Application Role Assignment ID": roleAssignmentId,
-		"Application Role Name":          roleName,
-		"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
-		"Resource Type":                  r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s_%s", appName, roleName, roleAssignmentId),
-		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, roleAssignmentId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return nil, fmt.Errorf("Unable to get role name for role ID: %s", roleId)
 }

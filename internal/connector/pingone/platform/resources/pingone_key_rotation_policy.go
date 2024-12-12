@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneKeyRotationPolicyResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneKeyRotationPolicyResource
 func KeyRotationPolicy(clientInfo *connector.PingOneClientInfo) *PingOneKeyRotationPolicyResource {
 	return &PingOneKeyRotationPolicyResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,52 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportKeyRotationPolicies()
+	importBlocks := []connector.ImportBlock{}
+
+	keyRotationPolicyData, err := r.getKeyRotationPolicyData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for keyRotationPolicyId, keyRotationPolicyName := range *keyRotationPolicyData {
+		commentData := map[string]string{
+			"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
+			"Key Rotation Policy ID":   keyRotationPolicyId,
+			"Key Rotation Policy Name": keyRotationPolicyName,
+			"Resource Type":            r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       keyRotationPolicyName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, keyRotationPolicyId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneKeyRotationPolicyResource) exportKeyRotationPolicies() error {
+func (r *PingOneKeyRotationPolicyResource) getKeyRotationPolicyData() (*map[string]string, error) {
+	keyRotationPolicyData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "GetKeyRotationPolicies", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, keyRotationPolicy := range embedded.GetKeyRotationPolicies() {
@@ -65,28 +85,10 @@ func (r *PingOneKeyRotationPolicyResource) exportKeyRotationPolicies() error {
 			keyRotationPolicyName, keyRotationPolicyNameOk := keyRotationPolicy.GetNameOk()
 
 			if keyRotationPolicyIdOk && keyRotationPolicyNameOk {
-				r.addImportBlock(*keyRotationPolicyId, *keyRotationPolicyName)
+				keyRotationPolicyData[*keyRotationPolicyId] = *keyRotationPolicyName
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneKeyRotationPolicyResource) addImportBlock(keyRotationPolicyId, keyRotationPolicyName string) {
-	commentData := map[string]string{
-		"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
-		"Key Rotation Policy ID":   keyRotationPolicyId,
-		"Key Rotation Policy Name": keyRotationPolicyName,
-		"Resource Type":            r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       keyRotationPolicyName,
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, keyRotationPolicyId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &keyRotationPolicyData, nil
 }

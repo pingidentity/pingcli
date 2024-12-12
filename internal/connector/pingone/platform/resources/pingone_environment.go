@@ -12,15 +12,13 @@ var (
 )
 
 type PingOneEnvironmentResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneEnvironmentResource
 func Environment(clientInfo *connector.PingOneClientInfo) *PingOneEnvironmentResource {
 	return &PingOneEnvironmentResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -32,28 +30,13 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportEnvironments()
+	importBlocks := []connector.ImportBlock{}
+
+	err := r.checkEnvironmentData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
-}
-
-func (r *PingOneEnvironmentResource) exportEnvironments() error {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-
-	err = common.HandleClientResponse(response, err, "ReadOneEnvironment", r.ResourceType())
-	if err != nil {
-		return err
-	}
-
-	r.addImportBlock()
-
-	return nil
-}
-
-func (r *PingOneEnvironmentResource) addImportBlock() {
 	commentData := map[string]string{
 		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
@@ -66,5 +49,18 @@ func (r *PingOneEnvironmentResource) addImportBlock() {
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	importBlocks = append(importBlocks, importBlock)
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneEnvironmentResource) checkEnvironmentData() error {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+
+	err = common.HandleClientResponse(response, err, "ReadOneEnvironment", r.ResourceType())
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

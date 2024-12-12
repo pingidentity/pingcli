@@ -14,15 +14,13 @@ var (
 )
 
 type PingOneGatewayCredentialResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneGatewayCredentialResource
 func GatewayCredential(clientInfo *connector.PingOneClientInfo) *PingOneGatewayCredentialResource {
 	return &PingOneGatewayCredentialResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,60 @@ func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportGatewayCredentials()
+	importBlocks := []connector.ImportBlock{}
+
+	gatewayData, err := r.getGatewayData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for gatewayId, gatewayName := range *gatewayData {
+		gatewayCredentialData, err := r.getGatewayCredentialData(gatewayId)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, gatewayCredentialId := range *gatewayCredentialData {
+			commentData := map[string]string{
+				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+				"Gateway Credential ID": gatewayCredentialId,
+				"Gateway ID":            gatewayId,
+				"Gateway Name":          gatewayName,
+				"Resource Type":         r.ResourceType(),
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_credential_%s", gatewayName, gatewayCredentialId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, gatewayId, gatewayCredentialId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneGatewayCredentialResource) exportGatewayCredentials() error {
+func (r *PingOneGatewayCredentialResource) getGatewayData() (*map[string]string, error) {
+	gatewayData := make(map[string]string)
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGateways", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, gatewayInner := range embedded.GetGateways() {
@@ -83,62 +111,42 @@ func (r *PingOneGatewayCredentialResource) exportGatewayCredentials() error {
 			}
 
 			if gatewayIdOk && gatewayNameOk {
-				err := r.exportGatewayCredentialsByGateway(*gatewayId, *gatewayName)
-				if err != nil {
-					return err
-				}
+				gatewayData[*gatewayId] = *gatewayName
 			}
 		}
 	}
 
-	return nil
+	return &gatewayData, nil
 }
 
-func (r *PingOneGatewayCredentialResource) exportGatewayCredentialsByGateway(gatewayId, gatewayName string) error {
+func (r *PingOneGatewayCredentialResource) getGatewayCredentialData(gatewayId string) (*[]string, error) {
+	gatewayCredentialData := []string{}
+
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGatewayCredentials", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, gatewayCredential := range embedded.GetCredentials() {
 			gatewayCredentialId, gatewayCredentialIdOk := gatewayCredential.GetIdOk()
 
 			if gatewayCredentialIdOk {
-				r.addImportBlock(gatewayId, gatewayName, *gatewayCredentialId)
+				gatewayCredentialData = append(gatewayCredentialData, *gatewayCredentialId)
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneGatewayCredentialResource) addImportBlock(gatewayId, gatewayName, gatewayCredentialId string) {
-	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Gateway Credential ID": gatewayCredentialId,
-		"Gateway ID":            gatewayId,
-		"Gateway Name":          gatewayName,
-		"Resource Type":         r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_credential_%s", gatewayName, gatewayCredentialId),
-		ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, gatewayId, gatewayCredentialId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &gatewayCredentialData, nil
 }

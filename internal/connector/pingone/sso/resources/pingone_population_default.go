@@ -14,15 +14,13 @@ var (
 )
 
 type PingOnePopulationDefaultResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOnePopulationDefaultResource
 func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultResource {
 	return &PingOnePopulationDefaultResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -34,30 +32,47 @@ func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportPopulationDefault()
+	importBlocks := []connector.ImportBlock{}
+
+	defaultPopulationName, err := r.getDefaultPopulationName()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	commentData := map[string]string{
+		"Default Population Name": *defaultPopulationName,
+		"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
+		"Resource Type":           r.ResourceType(),
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_population_default", *defaultPopulationName),
+		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	importBlocks = append(importBlocks, importBlock)
+
+	return &importBlocks, nil
 }
 
-func (r *PingOnePopulationDefaultResource) exportPopulationDefault() error {
+func (r *PingOnePopulationDefaultResource) getDefaultPopulationName() (*string, error) {
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPopulations", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, population := range embedded.GetPopulations() {
@@ -67,28 +82,11 @@ func (r *PingOnePopulationDefaultResource) exportPopulationDefault() error {
 				populationName, populationNameOk := population.GetNameOk()
 
 				if populationNameOk {
-					r.addImportBlock(*populationName)
+					return populationName, nil
 				}
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOnePopulationDefaultResource) addImportBlock(populationName string) {
-	commentData := map[string]string{
-		"Default Population Name": populationName,
-		"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
-		"Resource Type":           r.ResourceType(),
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_population_default", populationName),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return nil, fmt.Errorf("Unable to find the name of the default population")
 }

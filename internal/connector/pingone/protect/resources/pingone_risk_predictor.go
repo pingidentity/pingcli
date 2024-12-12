@@ -15,15 +15,13 @@ var (
 )
 
 type PingOneRiskPredictorResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneRiskPredictorResource
 func RiskPredictor(clientInfo *connector.PingOneClientInfo) *PingOneRiskPredictorResource {
 	return &PingOneRiskPredictorResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -35,30 +33,56 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportRiskPredictors()
+	importBlocks := []connector.ImportBlock{}
+
+	riskPredictorData, err := r.getRiskPredictorData()
 	if err != nil {
 		return nil, err
 	}
 
-	return r.importBlocks, nil
+	for riskPredictorId, riskPredictorInfo := range *riskPredictorData {
+		riskPredictorName := riskPredictorInfo[0]
+		riskPredictorType := riskPredictorInfo[1]
+
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
+			"Risk Predictor ID":     riskPredictorId,
+			"Risk Predictor Name":   riskPredictorName,
+			"Risk Predictor Type":   riskPredictorType,
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_%s", riskPredictorType, riskPredictorName),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, riskPredictorId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
 }
 
-func (r *PingOneRiskPredictorResource) exportRiskPredictors() error {
+func (r *PingOneRiskPredictorResource) getRiskPredictorData() (*map[string][]string, error) {
+	riskPredictorData := make(map[string][]string)
+
 	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
 		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllRiskPredictors", r.ResourceType())
 		if err != nil {
-			return err
+			return nil, err
 		}
 
 		if cursor.EntityArray == nil {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
 		if !embeddedOk {
-			return common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
+			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
 		for _, riskPredictor := range embedded.GetRiskPredictors() {
@@ -129,29 +153,10 @@ func (r *PingOneRiskPredictorResource) exportRiskPredictors() error {
 			}
 
 			if riskPredictorIdOk && riskPredictorNameOk && riskPredictorTypeOk {
-				r.addImportBlock(*riskPredictorId, *riskPredictorName, string(*riskPredictorType))
+				riskPredictorData[*riskPredictorId] = []string{*riskPredictorName, string(*riskPredictorType)}
 			}
 		}
 	}
 
-	return nil
-}
-
-func (r *PingOneRiskPredictorResource) addImportBlock(riskPredictorId, riskPredictorName, riskPredictorType string) {
-	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-		"Resource Type":         r.ResourceType(),
-		"Risk Predictor ID":     riskPredictorId,
-		"Risk Predictor Name":   riskPredictorName,
-		"Risk Predictor Type":   riskPredictorType,
-	}
-
-	importBlock := connector.ImportBlock{
-		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_%s", riskPredictorType, riskPredictorName),
-		ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, riskPredictorId),
-		CommentInformation: common.GenerateCommentInformation(commentData),
-	}
-
-	*r.importBlocks = append(*r.importBlocks, importBlock)
+	return &riskPredictorData, nil
 }

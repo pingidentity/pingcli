@@ -13,15 +13,13 @@ var (
 )
 
 type PingOneAgreementEnableResource struct {
-	clientInfo   *connector.PingOneClientInfo
-	importBlocks *[]connector.ImportBlock
+	clientInfo *connector.PingOneClientInfo
 }
 
 // Utility method for creating a PingOneAgreementEnableResource
 func AgreementEnable(clientInfo *connector.PingOneClientInfo) *PingOneAgreementEnableResource {
 	return &PingOneAgreementEnableResource{
-		clientInfo:   clientInfo,
-		importBlocks: &[]connector.ImportBlock{},
+		clientInfo: clientInfo,
 	}
 }
 
@@ -33,18 +31,11 @@ func (r *PingOneAgreementEnableResource) ExportAll() (*[]connector.ImportBlock, 
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	err := r.exportAgreementEnables()
-	if err != nil {
-		return nil, err
-	}
+	importBlocks := []connector.ImportBlock{}
 
-	return r.importBlocks, nil
-}
-
-func (r *PingOneAgreementEnableResource) exportAgreementEnables() error {
 	agreementImportBlocks, err := Agreement(r.clientInfo).ExportAll()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	for _, importBlock := range *agreementImportBlocks {
@@ -55,8 +46,8 @@ func (r *PingOneAgreementEnableResource) exportAgreementEnables() error {
 			CommentInformation: importBlock.CommentInformation,
 		}
 
-		*r.importBlocks = append(*r.importBlocks, importBlock)
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	return nil
+	return &importBlocks, nil
 }
