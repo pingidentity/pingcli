@@ -8,32 +8,32 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingFederateServerSettingsResource{}
+	_ connector.ExportableResource = &PingFederateClusterSettingsResource{}
 )
 
-type PingFederateServerSettingsResource struct {
+type PingFederateClusterSettingsResource struct {
 	clientInfo *connector.PingFederateClientInfo
 }
 
-// Utility method for creating a PingFederateServerSettingsResource
-func ServerSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateServerSettingsResource {
-	return &PingFederateServerSettingsResource{
+// Utility method for creating a PingFederateClusterSettingsResource
+func ClusterSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateClusterSettingsResource {
+	return &PingFederateClusterSettingsResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingFederateServerSettingsResource) ResourceType() string {
-	return "pingfederate_server_settings"
+func (r *PingFederateClusterSettingsResource) ResourceType() string {
+	return "pingfederate_cluster_settings"
 }
 
-func (r *PingFederateServerSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingFederateClusterSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
 
-	serverSettingsId := "server_settings_singleton_id"
-	serverSettingsName := "Server Settings"
+	clusterSettingsId := "cluster_settings_singleton_id"
+	clusterSettingsName := "Cluster Settings"
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
@@ -42,8 +42,8 @@ func (r *PingFederateServerSettingsResource) ExportAll() (*[]connector.ImportBlo
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       serverSettingsName,
-		ResourceID:         serverSettingsId,
+		ResourceName:       clusterSettingsName,
+		ResourceID:         clusterSettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 

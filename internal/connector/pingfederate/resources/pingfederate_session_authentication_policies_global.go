@@ -32,7 +32,7 @@ func (r *PingFederateSessionAuthenticationPoliciesGlobalResource) ExportAll() (*
 
 	importBlocks := []connector.ImportBlock{}
 
-	sessionAuthenticationPoliciesGlobalId := "pingfederate_session_authentication_policies_global_singleton_id"
+	sessionAuthenticationPoliciesGlobalId := "session_authentication_policies_global_singleton_id"
 	sessionAuthenticationPoliciesGlobalName := "Session Authentication Policies Global"
 
 	commentData := map[string]string{

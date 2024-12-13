@@ -8,17 +8,17 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestPingFederateServerSettingsGeneralExport(t *testing.T) {
+func TestPingFederateCaptchaProviderSettingsExport(t *testing.T) {
 	// Get initialized apiClient and resource
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ServerSettingsGeneral(PingFederateClientInfo)
+	resource := resources.CaptchaProviderSettings(PingFederateClientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_server_settings_general",
-			ResourceName: "Server Settings General",
-			ResourceID:   "server_settings_general_singleton_id",
+			ResourceType: "pingfederate_captcha_provider_settings",
+			ResourceName: "Captcha Provider Settings",
+			ResourceID:   "captcha_provider_settings_singleton_id",
 		},
 	}
 

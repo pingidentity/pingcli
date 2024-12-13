@@ -32,7 +32,7 @@ func (r *PingFederateServerSettingsGeneralResource) ExportAll() (*[]connector.Im
 
 	importBlocks := []connector.ImportBlock{}
 
-	serverSettingsGeneralId := "pingfederate_server_settings_general_singleton_id"
+	serverSettingsGeneralId := "server_settings_general_singleton_id"
 	serverSettingsGeneralName := "Server Settings General"
 
 	commentData := map[string]string{

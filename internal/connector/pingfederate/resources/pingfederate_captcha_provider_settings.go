@@ -8,32 +8,32 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingFederateServerSettingsResource{}
+	_ connector.ExportableResource = &PingFederateCaptchaProviderSettingsResource{}
 )
 
-type PingFederateServerSettingsResource struct {
+type PingFederateCaptchaProviderSettingsResource struct {
 	clientInfo *connector.PingFederateClientInfo
 }
 
-// Utility method for creating a PingFederateServerSettingsResource
-func ServerSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateServerSettingsResource {
-	return &PingFederateServerSettingsResource{
+// Utility method for creating a PingFederateCaptchaProviderSettingsResource
+func CaptchaProviderSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateCaptchaProviderSettingsResource {
+	return &PingFederateCaptchaProviderSettingsResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingFederateServerSettingsResource) ResourceType() string {
-	return "pingfederate_server_settings"
+func (r *PingFederateCaptchaProviderSettingsResource) ResourceType() string {
+	return "pingfederate_captcha_provider_settings"
 }
 
-func (r *PingFederateServerSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingFederateCaptchaProviderSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
 
-	serverSettingsId := "server_settings_singleton_id"
-	serverSettingsName := "Server Settings"
+	captchaProviderSettingsId := "captcha_provider_settings_singleton_id"
+	captchaProviderSettingsName := "Captcha Provider Settings"
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
@@ -42,8 +42,8 @@ func (r *PingFederateServerSettingsResource) ExportAll() (*[]connector.ImportBlo
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       serverSettingsName,
-		ResourceID:         serverSettingsId,
+		ResourceName:       captchaProviderSettingsName,
+		ResourceID:         captchaProviderSettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 

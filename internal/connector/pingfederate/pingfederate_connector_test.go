@@ -60,10 +60,34 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateCaptchaProviderSettings",
+			resource:      resources.CaptchaProviderSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:     "PingFederateCertificateCA",
 			resource: resources.CertificateCA(PingFederateClientInfo),
 			ignoredErrors: []string{
 				"Error: Invalid Attribute Value Length",
+			},
+		},
+		{
+			name:     "PingFederateCertificatesRevocationOCSPCertificate",
+			resource: resources.CertificatesRevocationOCSPCertificate(PingFederateClientInfo),
+			ignoredErrors: []string{
+				"Error: Missing Configuration for Required Attribute",
+			},
+		},
+		{
+			name:          "PingFederateCertificatesRevocationSettings",
+			resource:      resources.CertificatesRevocationSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:     "PingFederateClusterSettings",
+			resource: resources.ClusterSettings(PingFederateClientInfo),
+			ignoredErrors: []string{
+				"Error: PingFederate API error",
 			},
 		},
 		{

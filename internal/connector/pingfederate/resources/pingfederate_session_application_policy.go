@@ -32,7 +32,7 @@ func (r *PingFederateSessionApplicationPolicyResource) ExportAll() (*[]connector
 
 	importBlocks := []connector.ImportBlock{}
 
-	sessionApplicationPolicyId := "pingfederate_session_application_policy_singleton_id"
+	sessionApplicationPolicyId := "session_application_policy_singleton_id"
 	sessionApplicationPolicyName := "Session Application Policy"
 
 	commentData := map[string]string{

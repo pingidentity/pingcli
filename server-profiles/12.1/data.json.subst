@@ -3884,6 +3884,38 @@
           }
         }
       ]
+    },
+    {
+      "resourceType": "/certificates/revocation/ocspCertificates",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "id": "opcey20sf9djwvk8snv1actzq",
+          "fileData": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURuVENDQW9XZ0F3SUJBZ0lVUzJUQkNkUnpwSzRaemUrSERLakI5RVFTSHFZd0RRWUpLb1pJaHZjTkFRRUxCUUF3WGpFTE1Ba0cKQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWtOUE1ROHdEUVlEVlFRSERBWkVaVzUyWlhJeElqQWdCZ05WQkFvTUdWQnBibWNnU1dSbApiblJwZEhrZ1EyOXljRzl5WVhScGIyNHhEVEFMQmdOVkJBTU1CSFJsYzNRd0hoY05NalF4TWpFeU1qTXlPREkwV2hjTk1qY3dPVEE0Ck1qTXlPREkwV2pCZU1Rc3dDUVlEVlFRR0V3SlZVekVMTUFrR0ExVUVDQXdDUTA4eER6QU5CZ05WQkFjTUJrUmxiblpsY2pFaU1DQUcKQTFVRUNnd1pVR2x1WnlCSlpHVnVkR2wwZVNCRGIzSndiM0poZEdsdmJqRU5NQXNHQTFVRUF3d0VkR1Z6ZERDQ0FTSXdEUVlKS29aSQpodmNOQVFFQkJRQURnZ0VQQURDQ0FRb0NnZ0VCQUpkb0d1cmdEdlNSQkwyY0llVWFDWTNwbzVZRFpuVjFleXVPUVR4UWM2T1QySlMwCis0MGdKYkptZk5yYmNPU3QrMURieHpQK0l4YmxrY3o1NjlWT0M1bGJST24zOHllYU1VMzJYYy80REdTcDFIQ1kvSmZTeWd6LytxcjgKOFlUcU1hSTIxQWJabkFpWTV4MFJ3NTZJRG1KZ2xYYVhlVmJDVUp5N29QVHlBb1lZVDkzREpEazQxWmU1MVVjVG1Vc1RLTjRLM2d2dgpTYVJ1eXE1K2c2RVhCcTdBa2VPbmJQMGJTSHliTjFLRVY1QlhOTnBnazloMEp3M1BFK3FrbS81bllSenhCZjRSQS9BZ2Z2OWVzRzlOCnozWGdEb3dBR0JteHIrclUvbmE3cHdFRXVkTWg2NjhERURlUlZ3aDFaYXBZcEJ0VmN4TUhtZEpQZ0ZKckJsbzZtTUVDQXdFQUFhTlQKTUZFd0hRWURWUjBPQkJZRUZHSmMzWjBqOWtYUHNUbW1iZ0FzWS9QSzJjdXBNQjhHQTFVZEl3UVlNQmFBRkdKYzNaMGo5a1hQc1RtbQpiZ0FzWS9QSzJjdXBNQThHQTFVZEV3RUIvd1FGTUFNQkFmOHdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBSlZCdmNIaGgrMDBnelEwCnBuWkt0Ukp4dkVnK3BHaCtCOUUrNWkyUHNOR3lJQXZBWHc0bWRCY1FaS3hmaVhNMzFaRTJnZTFtUCs0ZGkxMStQS1lOSDJFOTczUEwKSit3R0hlUVoxRVRERzVmbzc5dDBNRzFSekh0R29pclpXN3Y0Qk5VSTZaTTJGakVhQ090WmcxclVoa2RJZnFEeDRDZU5qemIwcmhYSQp6WE5UUzRZNlZseFdBclFud0FncVB0YjVwb0pHM01tLzNmNnVRZy9sMExJS1RZL0dSNnlRc05Da3pUWlFocklwWGo0UnBxblgzUWdECjFJV1RvTW9uN250cDRnQVAvbEFTTTUveG01SnpiNmRtRitob04wNzNnMDJVZVYyVERMemU4MCtLK1hyMUdaZWVVTHVYTnJoT0VYRFIKeXR2dWJlOE9YUFBZNi96Q3BoVmIyMWc9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K"
+        }
+      ]
+    },
+    {
+      "resourceType": "/certificates/revocation/settings",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "ocspSettings": {
+            "requesterAddNonce": false,
+            "actionOnResponderUnavailable": "CONTINUE",
+            "actionOnStatusUnknown": "FAIL",
+            "actionOnUnsuccessfulResponse": "FAIL",
+            "currentUpdateGracePeriod": 5,
+            "nextUpdateGracePeriod": 5,
+            "responseCachePeriod": 48,
+            "responderTimeout": 5,
+            "responderCertReference": {
+              "id": "opcey20sf9djwvk8snv1actzq",
+              "location": "https://localhost:9999/pf-admin-api/v1/certificates/revocation/ocspCertificates/opcey20sf9djwvk8snv1actzq"
+            }
+          }
+        }
+      ]
     }
   ]
 }
