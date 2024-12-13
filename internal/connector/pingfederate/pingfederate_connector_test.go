@@ -131,6 +131,16 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateIdpTokenProcessor",
+			resource:      resources.IdpTokenProcessor(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateIdpToSpAdapterMapping",
+			resource:      resources.IdpToSpAdapterMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateIncomingProxySettings",
 			resource:      resources.IncomingProxySettings(PingFederateClientInfo),
 			ignoredErrors: nil,
@@ -138,6 +148,21 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 		{
 			name:          "PingFederateKerberosRealm",
 			resource:      resources.KerberosRealm(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateKerberosRealmSettings",
+			resource:      resources.KerberosRealmSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateKeypairsOauthOpenidConnect",
+			resource:      resources.KeypairsOauthOpenidConnect(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateKeypairsOauthOpenidConnectAdditionalKeySet",
+			resource:      resources.KeypairsOauthOpenidConnectAdditionalKeySet(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{

@@ -3970,6 +3970,53 @@
           "lastModified": "2024-12-13T18:59:29.324Z"
         }
       ]
+    },
+    {
+      "resourceType": "/idpToSpAdapterMapping",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "attributeSources": [],
+          "attributeContractFulfillment": {
+            "subject": {
+              "source": {
+                "type": "ADAPTER"
+              },
+              "value": "entryUUID"
+            }
+          },
+          "issuanceCriteria": {
+            "conditionalCriteria": []
+          },
+          "id": "ciamHtmlForm|spadapter",
+          "sourceId": "ciamHtmlForm",
+          "targetId": "spadapter"
+        }
+      ]
+    },
+    {
+      "resourceType": "/additionalKeySets",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "id": "testID",
+          "name": "testName",
+          "description": "testDescription",
+          "signingKeys": {
+            "rsaActiveCertRef": {
+              "id": "419x9yg43rlawqwq9v6az997k",
+              "location": "https://localhost:9999/pf-admin-api/v1/keyPairs/signing/419x9yg43rlawqwq9v6az997k"
+            },
+            "rsaPublishX5cParameter": true
+          },
+          "issuers": [
+            {
+              "id": "BmoJwEmyzs4RSNMzVUlCs8qTPC",
+              "location": "https://localhost:9999/pf-admin-api/v1/oauth/issuers/BmoJwEmyzs4RSNMzVUlCs8qTPC"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
