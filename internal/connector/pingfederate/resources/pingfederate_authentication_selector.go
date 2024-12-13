@@ -39,9 +39,9 @@ func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.I
 
 	for authnSelectorId, authnSelectorName := range *authenticationSelectorData {
 		commentData := map[string]string{
-			"Authentication Selector Resource ID":   authnSelectorId,
-			"Authentication Selector Resource Name": authnSelectorName,
-			"Resource Type":                         r.ResourceType(),
+			"Authentication Selector ID":   authnSelectorId,
+			"Authentication Selector Name": authnSelectorName,
+			"Resource Type":                r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

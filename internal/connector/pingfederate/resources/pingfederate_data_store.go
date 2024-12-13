@@ -41,9 +41,9 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 
 	for dataStoreId, dataStoreType := range *dataStoreData {
 		commentData := map[string]string{
-			"Data Store Resource ID": dataStoreId,
-			"Data Store Type":        dataStoreType,
-			"Resource Type":          r.ResourceType(),
+			"Data Store ID":   dataStoreId,
+			"Data Store Type": dataStoreType,
+			"Resource Type":   r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

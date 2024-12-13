@@ -39,9 +39,9 @@ func (r *PingFederateAuthenticationPolicyContractResource) ExportAll() (*[]conne
 
 	for authnPolicyContractId, authnPolicyContractName := range *authenticationPolicyContractData {
 		commentData := map[string]string{
-			"Authentication Policy Contract Resource ID":   authnPolicyContractId,
-			"Authentication Policy Contract Resource Name": authnPolicyContractName,
-			"Resource Type": r.ResourceType(),
+			"Authentication Policy Contract ID":   authnPolicyContractId,
+			"Authentication Policy Contract Name": authnPolicyContractName,
+			"Resource Type":                       r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

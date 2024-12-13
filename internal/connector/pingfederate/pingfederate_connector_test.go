@@ -91,6 +91,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			},
 		},
 		{
+			name:          "PingFederateConfigurationEncryptionKeysRotate",
+			resource:      resources.ConfigurationEncryptionKeysRotate(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateDataStore",
 			resource:      resources.DataStore(PingFederateClientInfo),
 			ignoredErrors: nil,
@@ -106,6 +111,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateIdentityStoreProvisioner",
+			resource:      resources.IdentityStoreProvisioner(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateIDPAdapter",
 			resource:      resources.IDPAdapter(PingFederateClientInfo),
 			ignoredErrors: nil,
@@ -113,6 +123,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 		{
 			name:          "PingFederateIDPSPConnection",
 			resource:      resources.IDPSPConnection(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "PingFederateIdpStsRequestParametersContract",
+			resource:      resources.IdpStsRequestParametersContract(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{

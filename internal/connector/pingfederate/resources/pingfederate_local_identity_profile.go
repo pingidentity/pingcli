@@ -39,9 +39,9 @@ func (r *PingFederateLocalIdentityProfileResource) ExportAll() (*[]connector.Imp
 
 	for identityProfileId, identityProfileName := range *identityProfileData {
 		commentData := map[string]string{
-			"Local Identity Profile Resource ID":   identityProfileId,
-			"Local Identity Profile Resource Name": identityProfileName,
-			"Resource Type":                        r.ResourceType(),
+			"Local Identity Profile ID":   identityProfileId,
+			"Local Identity Profile Name": identityProfileName,
+			"Resource Type":               r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
@@ -70,8 +70,8 @@ func (r *PingFederateLocalIdentityProfileResource) getIdentityProfileData() (*ma
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	identityProfilesItems, ok := identityProfiles.GetItemsOk()
-	if !ok {
+	identityProfilesItems, identityProfilesItemsOk := identityProfiles.GetItemsOk()
+	if !identityProfilesItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 

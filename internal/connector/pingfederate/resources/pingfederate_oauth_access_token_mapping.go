@@ -41,9 +41,9 @@ func (r *PingFederateOAuthAccessTokenMappingResource) ExportAll() (*[]connector.
 
 	for mappingId, mappingContextType := range *mappingData {
 		commentData := map[string]string{
-			"OAuth Access Token Mapping Resource ID":  mappingId,
+			"OAuth Access Token Mapping ID":           mappingId,
 			"OAuth Access Token Mapping Context Type": mappingContextType,
-			"Resource Type": r.ResourceType(),
+			"Resource Type":                           r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

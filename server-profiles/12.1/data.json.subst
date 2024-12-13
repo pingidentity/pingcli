@@ -3916,6 +3916,60 @@
           }
         }
       ]
+    },
+    {
+      "resourceType": "/identityStoreProvisioners",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "id": "ISPTestID",
+          "name": "ISP TestName",
+          "pluginDescriptorRef": {
+            "id": "com.pingidentity.identitystoreprovisioners.sample.SampleIdentityStoreProvisioner",
+            "location": "https://localhost:9999/pf-admin-api/v1/identityStoreProvisioners/descriptors/com.pingidentity.identitystoreprovisioners.sample.SampleIdentityStoreProvisioner"
+          },
+          "configuration": {
+            "tables": [],
+            "fields": [
+              {
+                "name": "Delete user behavior",
+                "value": "Disable User"
+              }
+            ]
+          },
+          "lastModified": "2024-12-13T18:45:28.156Z",
+          "attributeContract": {
+            "coreAttributes": [
+              {
+                "name": "username"
+              }
+            ],
+            "inherited": false
+          },
+          "groupAttributeContract": {
+            "coreAttributes": [
+              {
+                "name": "groupname"
+              }
+            ],
+            "inherited": false
+          }
+        }
+      ]
+    },
+    {
+      "resourceType": "/idp/stsRequestParametersContracts",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "id": "STSTestID",
+          "name": "STS TestName",
+          "parameters": [
+            "test"
+          ],
+          "lastModified": "2024-12-13T18:59:29.324Z"
+        }
+      ]
     }
   ]
 }

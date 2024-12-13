@@ -39,9 +39,9 @@ func (r *PingFederateOAuthClientResource) ExportAll() (*[]connector.ImportBlock,
 
 	for oauthClientId, oauthClientName := range *oauthClientData {
 		commentData := map[string]string{
-			"OAuth Client Resource ID":   oauthClientId,
-			"OAuth Client Resource Name": oauthClientName,
-			"Resource Type":              r.ResourceType(),
+			"OAuth Client ID":   oauthClientId,
+			"OAuth Client Name": oauthClientName,
+			"Resource Type":     r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
@@ -70,8 +70,8 @@ func (r *PingFederateOAuthClientResource) getOAuthClientData() (*map[string]stri
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	clientsItems, ok := clients.GetItemsOk()
-	if !ok {
+	clientsItems, clientsItemsOk := clients.GetItemsOk()
+	if !clientsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 

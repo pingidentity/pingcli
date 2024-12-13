@@ -45,7 +45,7 @@ func (r *PingFederateCertificateCAResource) ExportAll() (*[]connector.ImportBloc
 
 		commentData := map[string]string{
 			"Certificate CA Issuer DN":     certViewIssuerDN,
-			"Certificate CA Resource ID":   certViewId,
+			"Certificate CA ID":            certViewId,
 			"Certificate CA Serial Number": certViewSerialNumber,
 			"Resource Type":                r.ResourceType(),
 		}
@@ -76,8 +76,8 @@ func (r *PingFederateCertificateCAResource) getTrustedCAData() (*map[string][]st
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	certViewsItems, ok := certViews.GetItemsOk()
-	if !ok {
+	certViewsItems, certViewsItemsOk := certViews.GetItemsOk()
+	if !certViewsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 

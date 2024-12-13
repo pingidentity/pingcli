@@ -45,9 +45,9 @@ func (r *PingFederateSPAuthenticationPolicyContractMappingResource) ExportAll() 
 
 		commentData := map[string]string{
 			"Resource Type": r.ResourceType(),
-			"Source Authentication Policy Contract Resource ID":     apcToSpAdapterMappingSourceID,
-			"SP Authentication Policy Contract Mapping Resource ID": apcToSpAdapterMappingId,
-			"Target SP Adapter Resource ID":                         apcToSpAdapterMappingTargetID,
+			"Source Authentication Policy Contract ID":     apcToSpAdapterMappingSourceID,
+			"SP Authentication Policy Contract Mapping ID": apcToSpAdapterMappingId,
+			"Target SP Adapter ID":                         apcToSpAdapterMappingTargetID,
 		}
 
 		importBlock := connector.ImportBlock{

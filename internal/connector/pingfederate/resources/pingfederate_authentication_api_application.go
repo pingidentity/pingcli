@@ -39,9 +39,9 @@ func (r *PingFederateAuthenticationApiApplicationResource) ExportAll() (*[]conne
 
 	for appId, appName := range *applicationData {
 		commentData := map[string]string{
-			"Authentication API Application Resource ID":   appId,
-			"Authentication API Application Resource Name": appName,
-			"Resource Type": r.ResourceType(),
+			"Authentication API Application ID":   appId,
+			"Authentication API Application Name": appName,
+			"Resource Type":                       r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

@@ -39,9 +39,9 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) ExportAll() (*[]con
 
 	for fragmentId, fragmentName := range *fragmentData {
 		commentData := map[string]string{
-			"Authentication Policies Fragment Resource ID":   fragmentId,
-			"Authentication Policies Fragment Resource Name": fragmentName,
-			"Resource Type": r.ResourceType(),
+			"Authentication Policies Fragment ID":   fragmentId,
+			"Authentication Policies Fragment Name": fragmentName,
+			"Resource Type":                         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

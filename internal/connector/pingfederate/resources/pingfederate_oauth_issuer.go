@@ -39,9 +39,9 @@ func (r *PingFederateOAuthIssuerResource) ExportAll() (*[]connector.ImportBlock,
 
 	for oauthIssuerId, oauthIssuerName := range *oauthIssuerData {
 		commentData := map[string]string{
-			"OAuth Issuer Resource ID":   oauthIssuerId,
-			"OAuth Issuer Resource Name": oauthIssuerName,
-			"Resource Type":              r.ResourceType(),
+			"OAuth Issuer ID":   oauthIssuerId,
+			"OAuth Issuer Name": oauthIssuerName,
+			"Resource Type":     r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

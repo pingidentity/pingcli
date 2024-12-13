@@ -39,9 +39,9 @@ func (r *PingFederatePingOneConnectionResource) ExportAll() (*[]connector.Import
 
 	for pingoneConnectionId, pingoneConnectionName := range *pingoneConnectionData {
 		commentData := map[string]string{
-			"PingOne Connection Resource ID":   pingoneConnectionId,
-			"PingOne Connection Resource Name": pingoneConnectionName,
-			"Resource Type":                    r.ResourceType(),
+			"PingOne Connection ID":   pingoneConnectionId,
+			"PingOne Connection Name": pingoneConnectionName,
+			"Resource Type":           r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

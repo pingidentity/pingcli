@@ -39,9 +39,9 @@ func (r *PingFederateIDPAdapterResource) ExportAll() (*[]connector.ImportBlock, 
 
 	for idpAdapterId, idpAdapterName := range *idpAdapterData {
 		commentData := map[string]string{
-			"IDP Adapter Resource ID":   idpAdapterId,
-			"IDP Adapter Resource Name": idpAdapterName,
-			"Resource Type":             r.ResourceType(),
+			"IDP Adapter ID":   idpAdapterId,
+			"IDP Adapter Name": idpAdapterName,
+			"Resource Type":    r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

@@ -39,9 +39,9 @@ func (r *PingFederateIDPSPConnectionResource) ExportAll() (*[]connector.ImportBl
 
 	for spConnectionId, spConnectionName := range *spConnectionData {
 		commentData := map[string]string{
-			"IDP SP Connection Resource ID":   spConnectionId,
-			"IDP SP Connection Resource Name": spConnectionName,
-			"Resource Type":                   r.ResourceType(),
+			"IDP SP Connection ID":   spConnectionId,
+			"IDP SP Connection Name": spConnectionName,
+			"Resource Type":          r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

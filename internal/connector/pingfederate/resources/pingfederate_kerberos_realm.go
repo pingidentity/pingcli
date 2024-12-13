@@ -39,9 +39,9 @@ func (r *PingFederateKerberosRealmResource) ExportAll() (*[]connector.ImportBloc
 
 	for kerberosRealmId, kerberosRealmName := range *kerberosRealmData {
 		commentData := map[string]string{
-			"Kerberos Realm Resource ID":   kerberosRealmId,
-			"Kerberos Realm Resource Name": kerberosRealmName,
-			"Resource Type":                r.ResourceType(),
+			"Kerberos Realm ID":   kerberosRealmId,
+			"Kerberos Realm Name": kerberosRealmName,
+			"Resource Type":       r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
@@ -70,8 +70,8 @@ func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (*map[string]
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	kerberosRealmsItems, ok := kerberosRealms.GetItemsOk()
-	if !ok {
+	kerberosRealmsItems, kerberosRealmsItemsOk := kerberosRealms.GetItemsOk()
+	if !kerberosRealmsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 

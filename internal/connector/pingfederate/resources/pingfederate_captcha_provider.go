@@ -39,9 +39,9 @@ func (r *PingFederateCaptchaProviderResource) ExportAll() (*[]connector.ImportBl
 
 	for captchaProviderId, captchaProviderName := range *captchaProviderData {
 		commentData := map[string]string{
-			"Captcha Provider Resource ID":   captchaProviderId,
-			"Captcha Provider Resource Name": captchaProviderId,
-			"Resource Type":                  r.ResourceType(),
+			"Captcha Provider ID":   captchaProviderId,
+			"Captcha Provider Name": captchaProviderId,
+			"Resource Type":         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{

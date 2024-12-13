@@ -39,9 +39,9 @@ func (r *PingFederateOAuthAccessTokenManagerResource) ExportAll() (*[]connector.
 
 	for tokenManagerId, tokenManagerName := range *tokenManagerData {
 		commentData := map[string]string{
-			"OAuth Access Token Manager Resource ID":   tokenManagerId,
-			"OAuth Access Token Manager Resource Name": tokenManagerName,
-			"Resource Type": r.ResourceType(),
+			"OAuth Access Token Manager ID":   tokenManagerId,
+			"OAuth Access Token Manager Name": tokenManagerName,
+			"Resource Type":                   r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
@@ -70,8 +70,8 @@ func (r *PingFederateOAuthAccessTokenManagerResource) getTokenManagerData() (*ma
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	tokenManagersItems, ok := tokenManagers.GetItemsOk()
-	if !ok {
+	tokenManagersItems, tokenManagersItemsOk := tokenManagers.GetItemsOk()
+	if !tokenManagersItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 

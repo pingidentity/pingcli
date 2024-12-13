@@ -39,9 +39,9 @@ func (r *PingFederatePasswordCredentialValidatorResource) ExportAll() (*[]connec
 
 	for passwordCredentialValidatorId, passwordCredentialValidatorName := range *passwordCredentialValidatorData {
 		commentData := map[string]string{
-			"Password Credential Validator Resource ID":   passwordCredentialValidatorId,
-			"Password Credential Validator Resource Name": passwordCredentialValidatorName,
-			"Resource Type": r.ResourceType(),
+			"Password Credential Validator ID":   passwordCredentialValidatorId,
+			"Password Credential Validator Name": passwordCredentialValidatorName,
+			"Resource Type":                      r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
@@ -70,8 +70,8 @@ func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialV
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	passwordCredentialValidatorsItems, ok := passwordCredentialValidators.GetItemsOk()
-	if !ok {
+	passwordCredentialValidatorsItems, passwordCredentialValidatorsItemsOk := passwordCredentialValidators.GetItemsOk()
+	if !passwordCredentialValidatorsItemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
