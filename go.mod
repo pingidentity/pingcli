@@ -7,9 +7,9 @@ require (
 	github.com/golangci/golangci-lint v1.62.2
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/manifoldco/promptui v0.9.0
-	github.com/patrickcping/pingone-go-sdk-v2 v0.12.4
-	github.com/patrickcping/pingone-go-sdk-v2/management v0.44.0
-	github.com/patrickcping/pingone-go-sdk-v2/risk v0.17.0
+	github.com/patrickcping/pingone-go-sdk-v2 v0.12.5
+	github.com/patrickcping/pingone-go-sdk-v2/management v0.45.0
+	github.com/patrickcping/pingone-go-sdk-v2/risk v0.18.0
 	github.com/pavius/impi v0.0.3
 	github.com/pingidentity/pingfederate-go-client/v1210 v1210.0.5
 	github.com/rs/zerolog v1.33.0
