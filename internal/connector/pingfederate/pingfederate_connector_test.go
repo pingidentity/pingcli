@@ -213,6 +213,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateOAuthAuthenticationPolicyContractMapping",
+			resource:      resources.OAuthAuthenticationPolicyContractMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateOAuthCIBAServerPolicySettings",
 			resource:      resources.OAuthCIBAServerPolicySettings(PingFederateClientInfo),
 			ignoredErrors: nil,

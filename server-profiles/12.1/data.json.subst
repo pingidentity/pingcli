@@ -4029,6 +4029,37 @@
           "validateSignature": false
         }
       ]
+    },
+    {
+      "resourceType": "/oauth/authenticationPolicyContractMappings",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "attributeSources": [],
+          "attributeContractFulfillment": {
+            "USER_NAME": {
+              "source": {
+                "type": "CONTEXT"
+              },
+              "value": "OAuthScopes"
+            },
+            "USER_KEY": {
+              "source": {
+                "type": "AUTHENTICATION_POLICY_CONTRACT"
+              },
+              "value": "subject"
+            }
+          },
+          "issuanceCriteria": {
+            "conditionalCriteria": []
+          },
+          "id": "QGxlec5CX693lBQL",
+          "authenticationPolicyContractRef": {
+            "id": "QGxlec5CX693lBQL",
+            "location": "https://localhost:9999/pf-admin-api/v1/authenticationPolicyContracts/QGxlec5CX693lBQL"
+          }
+        }
+      ]
     }
   ]
 }
