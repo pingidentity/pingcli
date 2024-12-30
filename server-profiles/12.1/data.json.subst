@@ -4162,6 +4162,42 @@
           "targetId": "tokengenerator"
         }
       ]
+    },
+    {
+      "resourceType": "/secretManagers",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "id": "testSecretManager",
+          "name": "Test Secret Manager",
+          "pluginDescriptorRef": {
+            "id": "com.pingidentity.pf.secretmanagers.cyberark.CyberArkCredentialProvider",
+            "location": "https://localhost:9999/pf-admin-api/v1/secretManagers/descriptors/com.pingidentity.pf.secretmanagers.cyberark.CyberArkCredentialProvider"
+          },
+          "configuration": {
+            "tables": [],
+            "fields": [
+              {
+                "name": "APP ID",
+                "value": "testAppId"
+              },
+              {
+                "name": "Connection Port",
+                "value": "18923"
+              },
+              {
+                "name": "Connection Timeout (sec)",
+                "value": "30"
+              },
+              {
+                "name": "Username Retrieval Property Name",
+                "value": "username"
+              }
+            ]
+          },
+          "lastModified": "2024-12-30T22:15:09.275Z"
+        }
+      ]
     }
   ]
 }

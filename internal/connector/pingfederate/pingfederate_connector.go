@@ -95,6 +95,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.ProtocolMetadataLifetimeSettings(&c.clientInfo),
 		resources.ProtocolMetadataSigningSettings(&c.clientInfo),
 		resources.RedirectValidation(&c.clientInfo),
+		resources.SecretManager(&c.clientInfo),
 		resources.ServerSettings(&c.clientInfo),
 		resources.ServerSettingsGeneral(&c.clientInfo),
 		resources.ServerSettingsSystemKeysRotate(&c.clientInfo),

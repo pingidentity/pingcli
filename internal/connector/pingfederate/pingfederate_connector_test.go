@@ -303,6 +303,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateSecretManager",
+			resource:      resources.SecretManager(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:     "PingFederateServerSettings",
 			resource: resources.ServerSettings(PingFederateClientInfo),
 			ignoredErrors: []string{
