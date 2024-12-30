@@ -72,6 +72,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.KeypairsSslServerSettings(&c.clientInfo),
 		resources.LocalIdentityProfile(&c.clientInfo),
 		resources.MetadataUrl(&c.clientInfo),
+		resources.NotificationPublisher(&c.clientInfo),
 		resources.NotificationPublisherSettings(&c.clientInfo),
 		resources.OAuthAccessTokenManager(&c.clientInfo),
 		resources.OAuthAccessTokenMapping(&c.clientInfo),
