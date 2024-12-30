@@ -183,6 +183,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateMetadataUrl",
+			resource:      resources.MetadataUrl(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateNotificationPublishersSettings",
 			resource:      resources.NotificationPublisherSettings(PingFederateClientInfo),
 			ignoredErrors: nil,

@@ -4017,6 +4017,18 @@
           ]
         }
       ]
+    },
+    {
+      "resourceType": "/metadataUrls",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "id": "i8uUHFDebYX7Z7gSfyhZ9yKUA",
+          "name": "Test Metadata URL",
+          "url": "https://www.example.com",
+          "validateSignature": false
+        }
+      ]
     }
   ]
 }
