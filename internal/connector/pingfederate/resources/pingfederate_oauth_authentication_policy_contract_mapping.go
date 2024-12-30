@@ -39,16 +39,15 @@ func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) ExportAll
 		return nil, err
 	}
 
-	for mappingId, mappingApcRefId := range *apcToPersistentGrantMappingData {
+	for _, mappingId := range *apcToPersistentGrantMappingData {
 		commentData := map[string]string{
-			"Authentication Policy Contract ID":         mappingApcRefId,
 			"Authentication Policy Contract Mapping ID": mappingId,
 			"Resource Type": r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_from_%s", mappingId, mappingApcRefId),
+			ResourceName:       fmt.Sprintf("%s_mapping", mappingId),
 			ResourceID:         mappingId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -59,8 +58,8 @@ func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) ExportAll
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) getApcToPersistentGrantMappingData() (*map[string]string, error) {
-	apcToPersistentGrantMappingData := make(map[string]string)
+func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) getApcToPersistentGrantMappingData() (*[]string, error) {
+	apcToPersistentGrantMappingData := []string{}
 
 	apcToPersistentGrantMappings, response, err := r.clientInfo.ApiClient.OauthAuthenticationPolicyContractMappingsAPI.GetApcMappings(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetApcMappings", r.ResourceType())
@@ -79,14 +78,9 @@ func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) getApcToP
 
 	for _, apcToPersistentGrantMapping := range apcToPersistentGrantMappingsItems {
 		apcToPersistentGrantMappingId, apcToPersistentGrantMappingIdOk := apcToPersistentGrantMapping.GetIdOk()
-		apcToPersistentGrantMappingApcRef, apcToPersistentGrantMappingApcRefOk := apcToPersistentGrantMapping.GetAuthenticationPolicyContractRefOk()
 
-		if apcToPersistentGrantMappingIdOk && apcToPersistentGrantMappingApcRefOk {
-			apcToPersistentGrantMappingApcRefId, apcToPersistentGrantMappingApcRefIdOk := apcToPersistentGrantMappingApcRef.GetIdOk()
-
-			if apcToPersistentGrantMappingApcRefIdOk {
-				apcToPersistentGrantMappingData[*apcToPersistentGrantMappingId] = *apcToPersistentGrantMappingApcRefId
-			}
+		if apcToPersistentGrantMappingIdOk {
+			apcToPersistentGrantMappingData = append(apcToPersistentGrantMappingData, *apcToPersistentGrantMappingId)
 		}
 	}
 

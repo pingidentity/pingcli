@@ -17,7 +17,7 @@ func TestPingFederateOAuthAuthenticationPolicyContractMappingExport(t *testing.T
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingfederate_oauth_authentication_policy_contract_mapping",
-			ResourceName: "QGxlec5CX693lBQL_from_QGxlec5CX693lBQL",
+			ResourceName: "QGxlec5CX693lBQL_mapping",
 			ResourceID:   "QGxlec5CX693lBQL",
 		},
 	}
