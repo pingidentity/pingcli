@@ -293,6 +293,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateProtocolMetadataSigningSettings",
+			resource:      resources.ProtocolMetadataSigningSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateRedirectValidation",
 			resource:      resources.RedirectValidation(PingFederateClientInfo),
 			ignoredErrors: nil,

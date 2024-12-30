@@ -93,6 +93,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.PasswordCredentialValidator(&c.clientInfo),
 		resources.PingOneConnection(&c.clientInfo),
 		resources.ProtocolMetadataLifetimeSettings(&c.clientInfo),
+		resources.ProtocolMetadataSigningSettings(&c.clientInfo),
 		resources.RedirectValidation(&c.clientInfo),
 		resources.ServerSettings(&c.clientInfo),
 		resources.ServerSettingsGeneral(&c.clientInfo),
