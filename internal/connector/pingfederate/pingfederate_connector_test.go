@@ -166,6 +166,18 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:     "PingFederateKeypairsSigningKeyRotationSettings",
+			resource: resources.KeypairsSigningKeyRotationSettings(PingFederateClientInfo),
+			ignoredErrors: []string{
+				"Error: Cannot import non-existent remote object",
+			},
+		},
+		{
+			name:          "PingFederateKeypairsSslServerSettings",
+			resource:      resources.KeypairsSslServerSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateLocalIdentityProfile",
 			resource:      resources.LocalIdentityProfile(PingFederateClientInfo),
 			ignoredErrors: nil,

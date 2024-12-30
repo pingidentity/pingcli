@@ -68,6 +68,8 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.KerberosRealmSettings(&c.clientInfo),
 		resources.KeypairsOauthOpenidConnect(&c.clientInfo),
 		resources.KeypairsOauthOpenidConnectAdditionalKeySet(&c.clientInfo),
+		resources.KeypairsSigningKeyRotationSettings(&c.clientInfo),
+		resources.KeypairsSslServerSettings(&c.clientInfo),
 		resources.LocalIdentityProfile(&c.clientInfo),
 		resources.NotificationPublisherSettings(&c.clientInfo),
 		resources.OAuthAccessTokenManager(&c.clientInfo),
