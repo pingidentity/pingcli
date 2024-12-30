@@ -78,6 +78,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.OAuthAccessTokenManagerSettings(&c.clientInfo),
 		resources.OAuthAccessTokenMapping(&c.clientInfo),
 		resources.OAuthAuthenticationPolicyContractMapping(&c.clientInfo),
+		resources.OAuthCibaServerPolicyRequestPolicy(&c.clientInfo),
 		resources.OAuthCIBAServerPolicySettings(&c.clientInfo),
 		resources.OAuthClient(&c.clientInfo),
 		resources.OAuthIssuer(&c.clientInfo),
