@@ -75,6 +75,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.NotificationPublisher(&c.clientInfo),
 		resources.NotificationPublisherSettings(&c.clientInfo),
 		resources.OAuthAccessTokenManager(&c.clientInfo),
+		resources.OAuthAccessTokenManagerSettings(&c.clientInfo),
 		resources.OAuthAccessTokenMapping(&c.clientInfo),
 		resources.OAuthCIBAServerPolicySettings(&c.clientInfo),
 		resources.OAuthClient(&c.clientInfo),

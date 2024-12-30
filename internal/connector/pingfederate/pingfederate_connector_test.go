@@ -203,6 +203,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateOAuthAccessTokenManagerSettings",
+			resource:      resources.OAuthAccessTokenManagerSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateOAuthAccessTokenMapping",
 			resource:      resources.OAuthAccessTokenMapping(PingFederateClientInfo),
 			ignoredErrors: nil,
