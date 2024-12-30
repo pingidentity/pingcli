@@ -263,6 +263,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateOAuthTokenExchangeTokenGeneratorMapping",
+			resource:      resources.OAuthTokenExchangeTokenGeneratorMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateOpenIDConnectPolicy",
 			resource:      resources.OpenIDConnectPolicy(PingFederateClientInfo),
 			ignoredErrors: nil,

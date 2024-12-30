@@ -87,6 +87,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.OAuthIssuer(&c.clientInfo),
 		resources.OAuthServerSettings(&c.clientInfo),
 		resources.OAuthTokenExchangeGeneratorSettings(&c.clientInfo),
+		resources.OAuthTokenExchangeTokenGeneratorMapping(&c.clientInfo),
 		resources.OpenIDConnectPolicy(&c.clientInfo),
 		resources.OpenIDConnectSettings(&c.clientInfo),
 		resources.PasswordCredentialValidator(&c.clientInfo),
