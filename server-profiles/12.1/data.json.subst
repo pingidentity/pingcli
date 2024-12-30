@@ -4108,6 +4108,37 @@
           "lastModified": "2024-12-30T21:10:11.943Z"
         }
       ]
+    },
+    {
+      "resourceType": "/oauth/idpAdapterMappings",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "attributeSources": [],
+          "attributeContractFulfillment": {
+            "USER_NAME": {
+              "source": {
+                "type": "CONTEXT"
+              },
+              "value": "OAuthScopes"
+            },
+            "USER_KEY": {
+              "source": {
+                "type": "ADAPTER"
+              },
+              "value": "subject"
+            }
+          },
+          "issuanceCriteria": {
+            "conditionalCriteria": []
+          },
+          "id": "OTIdPJava",
+          "idpAdapterRef": {
+            "id": "OTIdPJava",
+            "location": "https://localhost:9999/pf-admin-api/v1/idp/adapters/OTIdPJava"
+          }
+        }
+      ]
     }
   ]
 }

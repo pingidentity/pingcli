@@ -243,6 +243,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateOAuthIdpAdapterMapping",
+			resource:      resources.OAuthIdpAdapterMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateOAuthIssuer",
 			resource:      resources.OAuthIssuer(PingFederateClientInfo),
 			ignoredErrors: nil,
