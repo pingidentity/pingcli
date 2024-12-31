@@ -365,6 +365,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateSpAdapter",
+			resource:      resources.SpAdapter(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateSPAuthenticationPolicyContractMapping",
 			resource:      resources.SPAuthenticationPolicyContractMapping(PingFederateClientInfo),
 			ignoredErrors: nil,
