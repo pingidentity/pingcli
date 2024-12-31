@@ -320,6 +320,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateServerSettingsLogging",
+			resource:      resources.ServerSettingsLogging(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateServerSettingsSystemKeysRotate",
 			resource:      resources.ServerSettingsSystemKeysRotate(PingFederateClientInfo),
 			ignoredErrors: nil,
