@@ -330,6 +330,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateServerSettingsWsTrustStsSettings",
+			resource:      resources.ServerSettingsWsTrustStsSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateSessionApplicationPolicy",
 			resource:      resources.SessionApplicationPolicy(PingFederateClientInfo),
 			ignoredErrors: nil,

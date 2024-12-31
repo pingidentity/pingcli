@@ -100,6 +100,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.ServerSettingsGeneral(&c.clientInfo),
 		resources.ServerSettingsLogging(&c.clientInfo),
 		resources.ServerSettingsSystemKeysRotate(&c.clientInfo),
+		resources.ServerSettingsWsTrustStsSettings(&c.clientInfo),
 		resources.SessionApplicationPolicy(&c.clientInfo),
 		resources.SessionAuthenticationPoliciesGlobal(&c.clientInfo),
 		resources.SessionSettings(&c.clientInfo),
