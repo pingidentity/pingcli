@@ -105,6 +105,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.ServiceAuthentication(&c.clientInfo),
 		resources.SessionApplicationPolicy(&c.clientInfo),
 		resources.SessionAuthenticationPoliciesGlobal(&c.clientInfo),
+		resources.SessionAuthenticationPolicy(&c.clientInfo),
 		resources.SessionSettings(&c.clientInfo),
 		resources.SPAuthenticationPolicyContractMapping(&c.clientInfo),
 		resources.VirtualHostNames(&c.clientInfo),
