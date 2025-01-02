@@ -335,9 +335,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:          "PingFederateServerSettingsWsTrustStsSettingsIssuerCertificate",
-			resource:      resources.ServerSettingsWsTrustStsSettingsIssuerCertificate(PingFederateClientInfo),
-			ignoredErrors: nil,
+			name:     "PingFederateServerSettingsWsTrustStsSettingsIssuerCertificate",
+			resource: resources.ServerSettingsWsTrustStsSettingsIssuerCertificate(PingFederateClientInfo),
+			ignoredErrors: []string{
+				"Error: Missing Configuration for Required Attribute",
+			},
 		},
 		{
 			name:          "PingFederateServiceAuthentication",

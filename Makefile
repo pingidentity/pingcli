@@ -33,7 +33,7 @@ starttestcontainer:
 		-p 9999:9999 \
 		--env-file "${HOME}/.pingidentity/config" \
 		-v $$(pwd)/server-profiles/shared-profile:/opt/in \
-		-v $$(pwd)/server-profiles/12.1/data.json.subst:/opt/in/instance/bulk-config/data.json.subst \
+		-v $$(pwd)/server-profiles/12.1/data.json:/opt/in/instance/bulk-config/data.json \
 		pingidentity/pingfederate:latest
 # Wait for the instance to become ready
 	sleep 1

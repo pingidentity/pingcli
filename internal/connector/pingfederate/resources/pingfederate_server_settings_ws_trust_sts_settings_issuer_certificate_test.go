@@ -18,7 +18,7 @@ func TestPingFederateServerSettingsWsTrustStsSettingsIssuerCertificateExport(t *
 		{
 			ResourceType: "pingfederate_server_settings_ws_trust_sts_settings_issuer_certificate",
 			ResourceName: "CN=test, O=Ping Identity Corporation, L=Denver, ST=CO, C=US_430421198347763948001683365009287878912609754790",
-			ResourceID:   "test-ws-trust-issuer-certificate",
+			ResourceID:   "ycrgw3j4ckw91gxdmd479qftb",
 		},
 	}
 
