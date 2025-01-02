@@ -111,6 +111,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.SPAuthenticationPolicyContractMapping(&c.clientInfo),
 		resources.SpIdpConnection(&c.clientInfo),
 		resources.SpTargetUrlMappings(&c.clientInfo),
+		resources.TokenProcessorToTokenGeneratorMapping(&c.clientInfo),
 		resources.VirtualHostNames(&c.clientInfo),
 	}
 

@@ -4291,6 +4291,29 @@
           }
         }
       ]
+    },
+    {
+      "resourceType": "/tokenProcessorToTokenGeneratorMappings",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "attributeSources": [],
+          "attributeContractFulfillment": {
+            "SAML_SUBJECT": {
+              "source": {
+                "type": "CONTEXT"
+              },
+              "value": "ClientIp"
+            }
+          },
+          "issuanceCriteria": {
+            "conditionalCriteria": []
+          },
+          "id": "tokenprocessor|tokengenerator",
+          "sourceId": "tokenprocessor",
+          "targetId": "tokengenerator"
+        }
+      ]
     }
   ]
 }

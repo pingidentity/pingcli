@@ -387,6 +387,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateTokenProcessorToTokenGeneratorMapping",
+			resource:      resources.TokenProcessorToTokenGeneratorMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "PingFederateVirtualHostNames",
 			resource:      resources.VirtualHostNames(PingFederateClientInfo),
 			ignoredErrors: nil,
