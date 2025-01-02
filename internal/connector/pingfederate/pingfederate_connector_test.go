@@ -370,6 +370,11 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PingFederateSPAuthenticationPolicyContractMapping",
+			resource:      resources.SPAuthenticationPolicyContractMapping(PingFederateClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:     "PingFederateSpIdpConnection",
 			resource: resources.SpIdpConnection(PingFederateClientInfo),
 			ignoredErrors: []string{
@@ -377,8 +382,8 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			},
 		},
 		{
-			name:          "PingFederateSPAuthenticationPolicyContractMapping",
-			resource:      resources.SPAuthenticationPolicyContractMapping(PingFederateClientInfo),
+			name:          "PingFederateSpTargetUrlMappings",
+			resource:      resources.SpTargetUrlMappings(PingFederateClientInfo),
 			ignoredErrors: nil,
 		},
 		{
