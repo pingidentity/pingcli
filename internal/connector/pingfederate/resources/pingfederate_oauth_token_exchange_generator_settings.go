@@ -32,8 +32,8 @@ func (r *PingFederateOAuthTokenExchangeGeneratorSettingsResource) ExportAll() (*
 
 	importBlocks := []connector.ImportBlock{}
 
-	oauthTokenExchangeGeneratorSettingsId := "oauth_token_exchange_generator_settings_singleton_id" // #nosec G101
-	oauthTokenExchangeGeneratorSettingsName := "OAuth Token Exchange Generator Settings"            // #nosec G101
+	oauthTokenExchangeGeneratorSettingsId := "oauth_token_exchange_generator_settings_singleton_id" // #nosec G101 // These variables do not contain sensitive token information
+	oauthTokenExchangeGeneratorSettingsName := "OAuth Token Exchange Generator Settings"            // #nosec G101 // These variables do not contain sensitive token information
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
