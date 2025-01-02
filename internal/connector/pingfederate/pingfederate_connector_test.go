@@ -308,11 +308,9 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
-			name:     "PingFederateServerSettings",
-			resource: resources.ServerSettings(PingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid Attribute Value Length",
-			},
+			name:          "PingFederateServerSettings",
+			resource:      resources.ServerSettings(PingFederateClientInfo),
+			ignoredErrors: nil,
 		},
 		{
 			name:          "PingFederateServerSettingsGeneral",
