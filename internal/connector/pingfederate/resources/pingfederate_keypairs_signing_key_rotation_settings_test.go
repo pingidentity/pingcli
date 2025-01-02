@@ -17,8 +17,8 @@ func TestPingFederateKeypairsSigningKeyRotationSettingsExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingfederate_keypairs_signing_key_rotation_settings",
-			ResourceName: "CN=common, O=org, C=US_1696532438981_rotation_settings",
-			ResourceID:   "419x9yg43rlawqwq9v6az997k",
+			ResourceName: "CN=rotationTest, O=pingidentity, L=Denver, ST=CO, C=US_1735851845119_rotation_settings",
+			ResourceID:   "9vgmnd36wykte1l2nm8s8uead",
 		},
 	}
 

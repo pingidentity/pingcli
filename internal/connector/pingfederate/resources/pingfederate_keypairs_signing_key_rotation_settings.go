@@ -82,12 +82,16 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getSigningKeyPa
 	}
 
 	for _, signingKeyPair := range signingKeyPairsItems {
-		signingKeyPairId, signingKeyPairIdOk := signingKeyPair.GetIdOk()
-		signingKeyPairIssuerDN, signingKeyPairIssuerDNOk := signingKeyPair.GetIssuerDNOk()
-		signingKeyPairSerialNumber, signingKeyPairSerialNumberOk := signingKeyPair.GetSerialNumberOk()
+		_, signingKeyPairRotationSettingsOk := signingKeyPair.GetRotationSettingsOk()
 
-		if signingKeyPairIdOk && signingKeyPairIssuerDNOk && signingKeyPairSerialNumberOk {
-			signingKeyPairData[*signingKeyPairId] = []string{*signingKeyPairIssuerDN, *signingKeyPairSerialNumber}
+		if signingKeyPairRotationSettingsOk {
+			signingKeyPairId, signingKeyPairIdOk := signingKeyPair.GetIdOk()
+			signingKeyPairIssuerDN, signingKeyPairIssuerDNOk := signingKeyPair.GetIssuerDNOk()
+			signingKeyPairSerialNumber, signingKeyPairSerialNumberOk := signingKeyPair.GetSerialNumberOk()
+
+			if signingKeyPairIdOk && signingKeyPairIssuerDNOk && signingKeyPairSerialNumberOk {
+				signingKeyPairData[*signingKeyPairId] = []string{*signingKeyPairIssuerDN, *signingKeyPairSerialNumber}
+			}
 		}
 	}
 
