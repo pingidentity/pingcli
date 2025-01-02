@@ -108,6 +108,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.SessionAuthenticationPolicy(&c.clientInfo),
 		resources.SessionSettings(&c.clientInfo),
 		resources.SpAdapter(&c.clientInfo),
+		resources.SpIdpConnection(&c.clientInfo),
 		resources.SPAuthenticationPolicyContractMapping(&c.clientInfo),
 		resources.VirtualHostNames(&c.clientInfo),
 	}

@@ -4229,6 +4229,68 @@
           "authnContextSensitive": false
         }
       ]
+    },
+    {
+      "resourceType": "/sp/idpConnections",
+      "operationType": "SAVE",
+      "items": [
+        {
+          "type": "IDP",
+          "id": "n26SCl49a8lB_ifAaLF_MyUbquv",
+          "name": "testConnection",
+          "entityId": "testPartnerId",
+          "active": true,
+          "contactInfo": {},
+          "loggingMode": "STANDARD",
+          "virtualEntityIds": [],
+          "licenseConnectionGroup": "",
+          "credentials": {
+            "certs": [
+              {
+                "primaryVerificationCert": true,
+                "secondaryVerificationCert": false,
+                "certView": {
+                  "id": "gpmlavn03e4mknkyml4m2ak9q",
+                  "serialNumber": "430421198347763948001683365009287878912609754790",
+                  "subjectDN": "CN=test, O=Ping Identity Corporation, L=Denver, ST=CO, C=US",
+                  "subjectAlternativeNames": [],
+                  "issuerDN": "CN=test, O=Ping Identity Corporation, L=Denver, ST=CO, C=US",
+                  "validFrom": "2024-12-12T23:28:24.000Z",
+                  "expires": "2027-09-08T23:28:24.000Z",
+                  "keyAlgorithm": "RSA",
+                  "keySize": 2048,
+                  "signatureAlgorithm": "SHA256withRSA",
+                  "version": 3,
+                  "sha1Fingerprint": "B1B57BC2A8733287A1A9B65EB60BFFD01EFECEBA",
+                  "sha256Fingerprint": "AA40F0AA0B7A438F15C49FA2A2EBE3B28AAB34A846781211BD170E8D7B06D291",
+                  "status": "VALID"
+                },
+                "x509File": {
+                  "id": "gpmlavn03e4mknkyml4m2ak9q",
+                  "fileData": "-----BEGIN CERTIFICATE-----\nMIIDnTCCAoWgAwIBAgIUS2TBCdRzpK4Zze+HDKjB9EQSHqYwDQYJKoZIhvcNAQELBQAwXjELMAkG\nA1UEBhMCVVMxCzAJBgNVBAgMAkNPMQ8wDQYDVQQHDAZEZW52ZXIxIjAgBgNVBAoMGVBpbmcgSWRl\nbnRpdHkgQ29ycG9yYXRpb24xDTALBgNVBAMMBHRlc3QwHhcNMjQxMjEyMjMyODI0WhcNMjcwOTA4\nMjMyODI0WjBeMQswCQYDVQQGEwJVUzELMAkGA1UECAwCQ08xDzANBgNVBAcMBkRlbnZlcjEiMCAG\nA1UECgwZUGluZyBJZGVudGl0eSBDb3Jwb3JhdGlvbjENMAsGA1UEAwwEdGVzdDCCASIwDQYJKoZI\nhvcNAQEBBQADggEPADCCAQoCggEBAJdoGurgDvSRBL2cIeUaCY3po5YDZnV1eyuOQTxQc6OT2JS0\n+40gJbJmfNrbcOSt+1DbxzP+Ixblkcz569VOC5lbROn38yeaMU32Xc/4DGSp1HCY/JfSygz/+qr8\n8YTqMaI21AbZnAiY5x0Rw56IDmJglXaXeVbCUJy7oPTyAoYYT93DJDk41Ze51UcTmUsTKN4K3gvv\nSaRuyq5+g6EXBq7AkeOnbP0bSHybN1KEV5BXNNpgk9h0Jw3PE+qkm/5nYRzxBf4RA/Agfv9esG9N\nz3XgDowAGBmxr+rU/na7pwEEudMh668DEDeRVwh1ZapYpBtVcxMHmdJPgFJrBlo6mMECAwEAAaNT\nMFEwHQYDVR0OBBYEFGJc3Z0j9kXPsTmmbgAsY/PK2cupMB8GA1UdIwQYMBaAFGJc3Z0j9kXPsTmm\nbgAsY/PK2cupMA8GA1UdEwEB/wQFMAMBAf8wDQYJKoZIhvcNAQELBQADggEBAJVBvcHhh+00gzQ0\npnZKtRJxvEg+pGh+B9E+5i2PsNGyIAvAXw4mdBcQZKxfiXM31ZE2ge1mP+4di11+PKYNH2E973PL\nJ+wGHeQZ1ETDG5fo79t0MG1RzHtGoirZW7v4BNUI6ZM2FjEaCOtZg1rUhkdIfqDx4CeNjzb0rhXI\nzXNTS4Y6VlxWArQnwAgqPtb5poJG3Mm/3f6uQg/l0LIKTY/GR6yQsNCkzTZQhrIpXj4RpqnX3QgD\n1IWToMon7ntp4gAP/lASM5/xm5Jzb6dmF+hoN073g02UeV2TDLze80+K+Xr1GZeeULuXNrhOEXDR\nytvube8OXPPY6/zCphVb21g=\n-----END CERTIFICATE-----\n"
+                },
+                "activeVerificationCert": true,
+                "encryptionCert": false
+              }
+            ]
+          },
+          "modificationDate": "2025-01-02T16:40:14.548Z",
+          "creationDate": "2025-01-02T16:40:14.548Z",
+          "wsTrust": {
+            "attributeContract": {
+              "coreAttributes": [
+                {
+                  "name": "TOKEN_SUBJECT",
+                  "masked": false
+                }
+              ],
+              "extendedAttributes": []
+            },
+            "tokenGeneratorMappings": [],
+            "generateLocalToken": false
+          }
+        }
+      ]
     }
   ]
 }

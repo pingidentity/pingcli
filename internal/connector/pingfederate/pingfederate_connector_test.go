@@ -370,6 +370,13 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:     "PingFederateSpIdpConnection",
+			resource: resources.SpIdpConnection(PingFederateClientInfo),
+			ignoredErrors: []string{
+				"Error: Invalid Object Attribute Type",
+			},
+		},
+		{
 			name:          "PingFederateSPAuthenticationPolicyContractMapping",
 			resource:      resources.SPAuthenticationPolicyContractMapping(PingFederateClientInfo),
 			ignoredErrors: nil,
