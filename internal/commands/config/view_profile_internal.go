@@ -2,8 +2,6 @@ package config_internal
 
 import (
 	"fmt"
-	"slices"
-	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/output"
@@ -29,13 +27,7 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 
 	msgStr := fmt.Sprintf("Configuration for profile '%s':\n", pName)
 
-	// Sort the options list by viper key
-	optList := options.Options()
-	slices.SortFunc(optList, func(opt1, opt2 options.Option) int {
-		return strings.Compare(opt1.ViperKey, opt2.ViperKey)
-	})
-
-	for _, opt := range optList {
+	for _, opt := range options.Options() {
 		if opt.ViperKey == "" {
 			continue
 		}
