@@ -35,8 +35,9 @@ func initDataOption() {
 				"\nExample: '@data.json'",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
 	}
 }
 
@@ -63,8 +64,9 @@ func initHTTPMethodOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_REQUEST_HTTP_METHOD,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_REQUEST_HTTP_METHOD,
+		ViperKey:  "", // No viper key
 	}
 }
 
@@ -91,8 +93,9 @@ func initServiceOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_REQUEST_SERVICE,
-		ViperKey: "request.service",
+		Sensitive: false,
+		Type:      options.ENUM_REQUEST_SERVICE,
+		ViperKey:  "request.service",
 	}
 }
 
@@ -105,6 +108,7 @@ func initAccessTokenOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "", // No environment variable
 		Flag:            nil,
+		Sensitive:       true,
 		Type:            options.ENUM_STRING,
 		ViperKey:        "request.accessToken",
 	}
@@ -119,6 +123,7 @@ func initAccessTokenExpiryOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "",  // No environment variable
 		Flag:            nil, // No flag
+		Sensitive:       false,
 		Type:            options.ENUM_INT,
 		ViperKey:        "request.accessTokenExpiry",
 	}
@@ -140,8 +145,8 @@ func initFailOption() {
 			Usage:       "Return non-zero exit code when HTTP custom request returns a failure status code.",
 			Value:       cobraValue,
 		},
-
-		Type:     options.ENUM_BOOL,
-		ViperKey: "request.fail",
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "request.fail",
 	}
 }

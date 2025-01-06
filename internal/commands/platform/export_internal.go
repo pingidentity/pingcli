@@ -151,11 +151,11 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 
 	switch {
 	case strings.EqualFold(authType, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC):
-		pfUsername, err := profiles.GetOptionValue(options.PingFederateBasicAuthUsernameOption)
+		pfUsername, err := profiles.GetSensitiveOptionValue(options.PingFederateBasicAuthUsernameOption, false)
 		if err != nil {
 			return err
 		}
-		pfPassword, err := profiles.GetOptionValue(options.PingFederateBasicAuthPasswordOption)
+		pfPassword, err := profiles.GetSensitiveOptionValue(options.PingFederateBasicAuthPasswordOption, false)
 		if err != nil {
 			return err
 		}
@@ -169,7 +169,7 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 			Password: pfPassword,
 		})
 	case strings.EqualFold(authType, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_ACCESS_TOKEN):
-		pfAccessToken, err := profiles.GetOptionValue(options.PingFederateAccessTokenAuthAccessTokenOption)
+		pfAccessToken, err := profiles.GetSensitiveOptionValue(options.PingFederateAccessTokenAuthAccessTokenOption, false)
 		if err != nil {
 			return err
 		}
@@ -180,11 +180,11 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 
 		pingfederateContext = context.WithValue(ctx, pingfederateGoClient.ContextAccessToken, pfAccessToken)
 	case strings.EqualFold(authType, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS):
-		pfClientID, err := profiles.GetOptionValue(options.PingFederateClientCredentialsAuthClientIDOption)
+		pfClientID, err := profiles.GetSensitiveOptionValue(options.PingFederateClientCredentialsAuthClientIDOption, false)
 		if err != nil {
 			return err
 		}
-		pfClientSecret, err := profiles.GetOptionValue(options.PingFederateClientCredentialsAuthClientSecretOption)
+		pfClientSecret, err := profiles.GetSensitiveOptionValue(options.PingFederateClientCredentialsAuthClientSecretOption, false)
 		if err != nil {
 			return err
 		}
@@ -294,11 +294,11 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 		return fmt.Errorf("failed to initialize pingone API client. context is nil")
 	}
 
-	pingoneApiClientId, err = profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
+	pingoneApiClientId, err = profiles.GetSensitiveOptionValue(options.PingOneAuthenticationWorkerClientIDOption, false)
 	if err != nil {
 		return err
 	}
-	clientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
+	clientSecret, err := profiles.GetSensitiveOptionValue(options.PingOneAuthenticationWorkerClientSecretOption, false)
 	if err != nil {
 		return err
 	}
@@ -335,19 +335,8 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
-		return fmt.Errorf(`failed to initialize pingone API client.
-%v
-
-configuration values used for client initialization:
-worker client ID - %s
-worker client secret - %s
-worker environment ID - %s
-pingone region - %s`,
-			err,
-			pingoneApiClientId,
-			strings.Repeat("*", len(clientSecret)),
-			environmentID,
-			regionCode)
+		return fmt.Errorf("failed to initialize pingone API client. Check worker client ID, worker client secret,"+
+			" worker environment ID, and pingone region code configuration values. %v", err)
 	}
 
 	return nil

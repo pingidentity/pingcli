@@ -28,7 +28,8 @@ func initDeleteAutoAcceptOption() {
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make the flag a boolean flag
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
 	}
 }

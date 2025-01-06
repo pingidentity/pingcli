@@ -27,6 +27,7 @@ type Option struct {
 	DefaultValue    pflag.Value
 	EnvVar          string
 	Flag            *pflag.Flag
+	Sensitive       bool
 	Type            OptionType
 	ViperKey        string
 }

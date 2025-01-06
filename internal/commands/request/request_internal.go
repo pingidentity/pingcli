@@ -148,7 +148,7 @@ func getTopLevelDomain() (topLevelDomain string, err error) {
 
 func pingoneAccessToken() (accessToken string, err error) {
 	// Check if existing access token is available
-	accessToken, err = profiles.GetOptionValue(options.RequestAccessTokenOption)
+	accessToken, err = profiles.GetSensitiveOptionValue(options.RequestAccessTokenOption, false)
 	if err != nil {
 		return "", err
 	}
@@ -201,11 +201,11 @@ func pingoneAuth() (accessToken string, err error) {
 
 	authURL := fmt.Sprintf("https://auth.pingone.%s/%s/as/token", topLevelDomain, workerEnvId)
 
-	clientId, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
+	clientId, err := profiles.GetSensitiveOptionValue(options.PingOneAuthenticationWorkerClientIDOption, false)
 	if err != nil {
 		return "", err
 	}
-	clientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
+	clientSecret, err := profiles.GetSensitiveOptionValue(options.PingOneAuthenticationWorkerClientSecretOption, false)
 	if err != nil {
 		return "", err
 	}

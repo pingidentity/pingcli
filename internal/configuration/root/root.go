@@ -28,6 +28,7 @@ func initActiveProfileOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "",  // No env var
 		Flag:            nil, // No flag
+		Sensitive:       false,
 		Type:            options.ENUM_STRING,
 		ViperKey:        "activeProfile",
 	}
@@ -49,8 +50,9 @@ func initProfileOption() {
 			Usage:     "The name of a configuration profile to use.",
 			Value:     cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
 	}
 }
 
@@ -70,8 +72,9 @@ func initColorOption() {
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
-		Type:     options.ENUM_BOOL,
-		ViperKey: "noColor",
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "noColor",
 	}
 }
 
@@ -92,8 +95,9 @@ func initConfigOption() {
 				"(default $HOME/.pingcli/config.yaml)",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
 	}
 }
 
@@ -119,8 +123,9 @@ func initOutputFormatOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_OUTPUT_FORMAT,
-		ViperKey: "outputFormat",
+		Sensitive: false,
+		Type:      options.ENUM_OUTPUT_FORMAT,
+		ViperKey:  "outputFormat",
 	}
 }
 
