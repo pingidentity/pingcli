@@ -27,20 +27,15 @@ func RunInternalConfigGet(viperKey string) (err error) {
 			continue
 		}
 
+		vVal, _, err := profiles.ViperValueFromOption(opt)
+		if err != nil {
+			return fmt.Errorf("failed to get configuration: %v", err)
+		}
+
 		if opt.Sensitive {
-			optVal, err := profiles.GetSensitiveOptionValue(opt, true)
-			if err != nil {
-				return fmt.Errorf("failed to get configuration: %v", err)
-			}
-
-			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, optVal)
+			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
 		} else {
-			optVal, err := profiles.GetOptionValue(opt)
-			if err != nil {
-				return fmt.Errorf("failed to get configuration: %v", err)
-			}
-
-			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, optVal)
+			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)
 		}
 	}
 

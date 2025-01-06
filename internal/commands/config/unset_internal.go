@@ -35,21 +35,17 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 		return fmt.Errorf("failed to unset configuration: %v", err)
 	}
 
-	msgStr := "Configuration unset successfully: \n"
+	msgStr := "Configuration unset successfully:\n"
+
+	vVal, _, err := profiles.ViperValueFromOption(opt)
+	if err != nil {
+		return fmt.Errorf("failed to set configuration: %v", err)
+	}
+
 	if opt.Sensitive {
-		optVal, err := profiles.GetSensitiveOptionValue(opt, true)
-		if err != nil {
-			return fmt.Errorf("failed to unset configuration: %v", err)
-		}
-
-		msgStr += fmt.Sprintf("%s=%s\n", viperKey, optVal)
+		msgStr += fmt.Sprintf("%s=%s", viperKey, profiles.MaskValue(vVal))
 	} else {
-		optVal, err := profiles.GetOptionValue(opt)
-		if err != nil {
-			return fmt.Errorf("failed to unset configuration: %v", err)
-		}
-
-		msgStr += fmt.Sprintf("%s=%s\n", viperKey, optVal)
+		msgStr += fmt.Sprintf("%s=%s", viperKey, vVal)
 	}
 
 	output.Success(msgStr, nil)

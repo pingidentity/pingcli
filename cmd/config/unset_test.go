@@ -72,3 +72,23 @@ func TestConfigUnsetCmd_HelpFlag(t *testing.T) {
 	err = testutils_cobra.ExecutePingcli(t, "config", "unset", "-h")
 	testutils.CheckExpectedError(t, err, nil)
 }
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_unsetMaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.PingFederateBasicAuthUsernameOption.ViperKey)
+
+	// Output:
+	// SUCCESS: Configuration unset successfully:
+	// service.pingfederate.authentication.basicAuth.username=
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_unsetUnmaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.RootOutputFormatOption.ViperKey)
+
+	// Output:
+	// SUCCESS: Configuration unset successfully:
+	// outputFormat=text
+}

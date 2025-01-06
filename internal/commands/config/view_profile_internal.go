@@ -21,6 +21,12 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 		}
 	}
 
+	// Validate the profile name
+	err = profiles.GetMainConfig().ValidateExistingProfileName(pName)
+	if err != nil {
+		return fmt.Errorf("failed to view profile: %v", err)
+	}
+
 	msgStr := fmt.Sprintf("Configuration for profile '%s':\n", pName)
 
 	// Sort the options list by viper key
@@ -34,20 +40,15 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 			continue
 		}
 
+		vVal, _, err := profiles.ViperValueFromOption(opt)
+		if err != nil {
+			return fmt.Errorf("failed to view profile: %v", err)
+		}
+
 		if opt.Sensitive {
-			optVal, err := profiles.GetSensitiveOptionValue(opt, true)
-			if err != nil {
-				return fmt.Errorf("failed to view profile: %v", err)
-			}
-
-			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, optVal)
+			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
 		} else {
-			optVal, err := profiles.GetOptionValue(opt)
-			if err != nil {
-				return fmt.Errorf("failed to view profile: %v", err)
-			}
-
-			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, optVal)
+			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)
 		}
 	}
 

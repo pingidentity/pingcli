@@ -62,3 +62,34 @@ func TestConfigGetCmd_NoKey(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "config", "get")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_getEmptyMaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.RequestAccessTokenOption.ViperKey)
+
+	// Output:
+	// Configuration values for profile 'default' and key 'request.accessToken':
+	// request.accessToken=
+	// request.accessTokenExpiry=0
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_getMaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.PingFederateClientCredentialsAuthClientSecretOption.ViperKey)
+
+	// Output:
+	// Configuration values for profile 'default' and key 'service.pingfederate.authentication.clientCredentialsAuth.clientSecret':
+	// service.pingfederate.authentication.clientCredentialsAuth.clientSecret=************** (14 character(s))
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_getUnmaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.RootColorOption.ViperKey)
+
+	// Output:
+	// Configuration values for profile 'default' and key 'noColor':
+	// noColor=true
+}

@@ -347,7 +347,7 @@ func (m MainConfig) DefaultMissingViperKeys() (err error) {
 	return nil
 }
 
-func optionValue(opt options.Option) (pFlagValue string, err error) {
+func GetOptionValue(opt options.Option) (pFlagValue string, err error) {
 	// 1st priority: cobra param flag value
 	cobraParamValue, ok := cobraParamValueFromOption(opt)
 	if ok {
@@ -361,7 +361,7 @@ func optionValue(opt options.Option) (pFlagValue string, err error) {
 	}
 
 	// 3rd priority: viper value
-	viperValue, ok, err := viperValueFromOption(opt)
+	viperValue, ok, err := ViperValueFromOption(opt)
 	if err != nil {
 		return "", err
 	}
@@ -380,41 +380,13 @@ func optionValue(opt options.Option) (pFlagValue string, err error) {
 	return "", fmt.Errorf("failed to get option value: no value found: %v", opt)
 }
 
-func GetOptionValue(opt options.Option) (pFlagValue string, err error) {
-	// The function is not allowed access to sensitive options
-	// as a way to prevent developers from accidentally logging sensitive information
-	// Use the GetSensitiveOptionValue function instead
-	if opt.Sensitive {
-		return "", fmt.Errorf("GetOptionValue called with sensitive option: %v", opt)
+func MaskValue(value string) string {
+	if value == "" {
+		return ""
 	}
 
-	return optionValue(opt)
-}
-
-func GetSensitiveOptionValue(opt options.Option, maskValue bool) (pFlagValue string, err error) {
-	// The function is not allowed access to non-sensitive options
-	// as a way to prevent developers from accidentally using non-sensitive information in a sensitive context
-	// Use the GetOptionValue function instead
-	if !opt.Sensitive {
-		return "", fmt.Errorf("GetSensitiveOptionValue called with non-sensitive option: %v", opt)
-	}
-
-	pFlagValue, err = optionValue(opt)
-	if err != nil {
-		return "", err
-	}
-
-	if maskValue {
-		origLength := len(pFlagValue)
-		if origLength == 0 {
-			return "", nil
-		}
-
-		maskLength := min(origLength, 16)
-		return fmt.Sprintf("%s (%d character(s))", strings.Repeat("*", maskLength), origLength), nil
-	} else {
-		return pFlagValue, nil
-	}
+	maskLength := min(len(value), 16)
+	return fmt.Sprintf("%s (%d character(s))", strings.Repeat("*", maskLength), len(value))
 }
 
 func cobraParamValueFromOption(opt options.Option) (value string, ok bool) {
@@ -425,7 +397,7 @@ func cobraParamValueFromOption(opt options.Option) (value string, ok bool) {
 	return "", false
 }
 
-func viperValueFromOption(opt options.Option) (value string, ok bool, err error) {
+func ViperValueFromOption(opt options.Option) (value string, ok bool, err error) {
 	mainConfig := GetMainConfig()
 	if opt.ViperKey != "" && mainConfig != nil {
 		var (

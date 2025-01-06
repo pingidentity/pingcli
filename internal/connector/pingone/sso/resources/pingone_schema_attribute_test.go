@@ -161,6 +161,11 @@ func TestSchemaAttributeExport(t *testing.T) {
 			ResourceName: "User_username",
 			ResourceID:   fmt.Sprintf("%s/ff3cb03d-4896-4d20-8612-f014c4048d01/77d3f22e-00ca-49d1-98a1-fc0ee48d2542", testutils.GetEnvironmentID()),
 		},
+		{
+			ResourceType: "pingone_schema_attribute",
+			ResourceName: "User_bypassMFA",
+			ResourceID:   fmt.Sprintf("%s/ff3cb03d-4896-4d20-8612-f014c4048d01/355c50dc-0eb6-4c5b-ab36-2b3152e0534c", testutils.GetEnvironmentID()),
+		},
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)

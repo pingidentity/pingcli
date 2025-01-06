@@ -83,3 +83,23 @@ func TestConfigSetCmd_InvalidFlag(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "config", "set", "--invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_setMaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthUsernameOption.ViperKey, "username"))
+
+	// Output:
+	// SUCCESS: Configuration set successfully:
+	// service.pingfederate.authentication.basicAuth.username=******** (8 character(s))
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_setUnmaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.RootColorOption.ViperKey, "true"))
+
+	// Output:
+	// SUCCESS: Configuration set successfully:
+	// noColor=true
+}

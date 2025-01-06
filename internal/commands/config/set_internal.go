@@ -45,21 +45,17 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: %v", err)
 	}
 
-	msgStr := "Configuration set successfully: \n"
+	msgStr := "Configuration set successfully:\n"
+
+	vVal, _, err := profiles.ViperValueFromOption(opt)
+	if err != nil {
+		return fmt.Errorf("failed to set configuration: %v", err)
+	}
+
 	if opt.Sensitive {
-		optVal, err := profiles.GetSensitiveOptionValue(opt, true)
-		if err != nil {
-			return fmt.Errorf("failed to set configuration: %v", err)
-		}
-
-		msgStr += fmt.Sprintf("%s=%s\n", vKey, optVal)
+		msgStr += fmt.Sprintf("%s=%s", vKey, profiles.MaskValue(vVal))
 	} else {
-		optVal, err := profiles.GetOptionValue(opt)
-		if err != nil {
-			return fmt.Errorf("failed to set configuration: %v", err)
-		}
-
-		msgStr += fmt.Sprintf("%s=%s\n", vKey, optVal)
+		msgStr += fmt.Sprintf("%s=%s", vKey, vVal)
 	}
 
 	output.Success(msgStr, nil)
