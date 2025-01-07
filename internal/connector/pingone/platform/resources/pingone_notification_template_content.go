@@ -218,7 +218,7 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateContentData(temp
 				templateContentLocale, templateContentLocaleOk = templateContent.TemplateContentVoice.GetLocaleOk()
 				templateContentVariant = templateContent.TemplateContentVoice.GetVariant()
 			default:
-				l.Warn().Msgf("Template content '%s' for template '%s' is not one of: Push, SMS, Email, or Voice. Skipping export.", *templateContentId, templateName)
+				l.Warn().Msgf("Template content '%v' for template '%s' is not one of: Push, SMS, Email, or Voice. Skipping export.", templateContent, templateName)
 				continue
 			}
 
