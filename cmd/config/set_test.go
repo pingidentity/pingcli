@@ -91,7 +91,7 @@ func Example_setMaskedValue() {
 
 	// Output:
 	// SUCCESS: Configuration set successfully:
-	// service.pingfederate.authentication.basicAuth.username=******** (8 character(s))
+	// service.pingfederate.authentication.basicAuth.username=********
 }
 
 // https://pkg.go.dev/testing#hdr-Examples

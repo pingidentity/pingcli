@@ -164,7 +164,7 @@ func initUsernameOption() {
 				"\nExample: 'administrator'",
 			Value: cobraValue,
 		},
-		Sensitive: true,
+		Sensitive: false,
 		Type:      options.ENUM_STRING,
 		ViperKey:  "service.pingfederate.authentication.basicAuth.username",
 	}
@@ -233,7 +233,7 @@ func initClientIDOption() {
 				"the OAuth 2.0 client credentials grant type.",
 			Value: cobraValue,
 		},
-		Sensitive: true,
+		Sensitive: false,
 		Type:      options.ENUM_STRING,
 		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.clientID",
 	}

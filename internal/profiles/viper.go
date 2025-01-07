@@ -385,8 +385,9 @@ func MaskValue(value string) string {
 		return ""
 	}
 
-	maskLength := min(len(value), 16)
-	return fmt.Sprintf("%s (%d character(s))", strings.Repeat("*", maskLength), len(value))
+	// Mask all values to the same asterisk length
+	// providing no additional information about the value when logged.
+	return strings.Repeat("*", 8)
 }
 
 func cobraParamValueFromOption(opt options.Option) (value string, ok bool) {

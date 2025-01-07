@@ -81,7 +81,7 @@ func Example_getMaskedValue() {
 
 	// Output:
 	// Configuration values for profile 'default' and key 'service.pingfederate.authentication.clientCredentialsAuth.clientSecret':
-	// service.pingfederate.authentication.clientCredentialsAuth.clientSecret=************** (14 character(s))
+	// service.pingfederate.authentication.clientCredentialsAuth.clientSecret=********
 }
 
 // https://pkg.go.dev/testing#hdr-Examples

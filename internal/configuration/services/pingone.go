@@ -34,7 +34,7 @@ func initAuthenticationWorkerClientIDOption() {
 			Usage: "The worker client ID used to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
-		Sensitive: true,
+		Sensitive: false,
 		Type:      options.ENUM_UUID,
 		ViperKey:  "service.pingone.authentication.worker.clientID",
 	}
