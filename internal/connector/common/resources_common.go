@@ -2,7 +2,9 @@ package common
 
 import (
 	"fmt"
+	"maps"
 	"net/http"
+	"slices"
 
 	"github.com/pingidentity/pingcli/internal/logger"
 )
@@ -38,9 +40,13 @@ func DataNilError(resourceType string, response *http.Response) error {
 }
 
 func GenerateCommentInformation(data map[string]string) string {
+	// Get a sorted slice of the keys
+	keys := slices.Sorted(maps.Keys(data))
+
 	commentInformation := "\n"
-	for key, value := range data {
-		commentInformation += fmt.Sprintf("# %s: %s\n", key, value)
+	for _, key := range keys {
+		commentInformation += fmt.Sprintf("# %s: %s\n", key, data[key])
 	}
+
 	return commentInformation
 }

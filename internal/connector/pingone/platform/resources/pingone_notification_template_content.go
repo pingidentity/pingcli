@@ -185,10 +185,6 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateContentData(temp
 			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
 		}
 
-		if templateName == management.ENUMTEMPLATENAME_STRONG_AUTHENTICATION {
-			fmt.Printf("Page data length %d\n", len(embedded.GetContents()))
-		}
-
 		for _, templateContent := range embedded.GetContents() {
 			var (
 				templateContentId               *string
