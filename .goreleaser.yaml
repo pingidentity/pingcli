@@ -19,7 +19,7 @@ builds:
     # Default: '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser'.
     # Templates: allowed.
     ldflags:
-      - '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}'
+      - "-s -w -X main.version={{.Version}} -X main.commit={{.Commit}}"
 
     # GOOS list to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
@@ -96,8 +96,7 @@ checksum:
   disable: false
 
 brews:
-  -
-    # Git author used to commit to the repository.
+  - # Git author used to commit to the repository.
     commit_author:
       name: goreleaserbot
       email: bot@goreleaser.com
@@ -158,3 +157,32 @@ brews:
       name: homebrew-tap
 
       token: "{{ .Env.GORELEASER_HOMEBREW_TAP_GITHUB_PAT}}"
+
+dockers:
+  - image_templates:
+      - &amd64_image "pingidentity/pingcli:{{ .Version }}-amd64"
+    use: buildx
+    dockerfile: Dockerfile
+    goarch: amd64
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--build-arg=RELEASE_VERSION={{ .Version }}"
+  - image_templates:
+      - &arm64_image "pingidentity/pingcli:{{ .Version }}-arm64v8"
+    use: buildx
+    dockerfile: Dockerfile
+    goarm: "8"
+    build_flag_templates:
+      - "--platform=linux/arm64"
+      - "--build-arg=RELEASE_VERSION={{ .Version }}"
+
+docker_manifests:
+  - id: pingcli
+  - name_template: "pingidentity/pingcli:latest"
+    image_templates:
+      - *amd64_image
+      - *arm64_image
+  - name_template: "pingidentity/pingcli:{{ .Version }}"
+    image_templates:
+      - *amd64_image
+      - *arm64_image
