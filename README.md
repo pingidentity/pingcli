@@ -4,6 +4,20 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 
 ## Install
 
+#### Docker
+
+Use the [Ping CLI Docker image](https://hub.docker.com/r/pingidentity/pingcli)
+
+```text
+Pull Image:
+docker pull pingidentity/pingcli:latest
+
+Example Commands:
+docker run <Image ID> <sub commands>
+
+docker run <Image ID> --version
+```
+
 #### macOS/Linux - Homebrew
 
 Use PingIdentity's Homebrew tap to install Ping CLI
