@@ -14,6 +14,15 @@ builds:
     # Default: Project directory name
     binary: pingcli
 
+    # Custom environment variables to be set during the builds.
+    # Invalid environment variables will be ignored.
+    # For more info refer to: https://pkg.go.dev/cmd/go#hdr-Environment_variables
+    #
+    # Default: os.Environ() ++ env config section.
+    # Templates: allowed.
+    env:
+      - CGO_ENABLED=0
+
     # Custom ldflags.
     #
     # Default: '-s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.builtBy=goreleaser'.
@@ -159,30 +168,81 @@ brews:
       token: "{{ .Env.GORELEASER_HOMEBREW_TAP_GITHUB_PAT}}"
 
 dockers:
+  # You can have multiple Docker images.
+  # Templates of the Docker image names.
+  #
+  # Templates: allowed.
   - image_templates:
-      - &amd64_image "pingidentity/pingcli:{{ .Version }}-amd64"
-    use: buildx
-    dockerfile: Dockerfile
+      - "pingidentity/pingcli:{{ .Tag }}-amd64"
+
+    # Docker build flags.
+    #
+    # Templates: allowed.
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--pull"
+
+    # GOARCH of the built binaries/packages that should be used.
+    # Default: 'amd64'.
     goarch: amd64
-    build_flag_templates:
-      - "--platform=linux/arm64"
-      - "--build-arg=RELEASE_VERSION={{ .Version }}"
-  - image_templates:
-      - &arm64_image "pingidentity/pingcli:{{ .Version }}-arm64v8"
+
+    # Set the "backend" for the Docker pipe.
+    #
+    # Valid options are: docker, buildx, podman.
+    #
+    # Podman is a GoReleaser Pro feature and is only available on Linux.
+    #
+    # Default: 'docker'.
     use: buildx
-    dockerfile: Dockerfile
-    goarm: "8"
+
+  # You can have multiple Docker images.
+  # Templates of the Docker image names.
+  #
+  # Templates: allowed.
+  - image_templates:
+      - "pingidentity/pingcli:{{ .Tag }}-arm64"
+
+    # Docker build flags.
+    #
+    # Templates: allowed.
     build_flag_templates:
       - "--platform=linux/arm64"
-      - "--build-arg=RELEASE_VERSION={{ .Version }}"
+      - "--pull"
+
+    # GOARCH of the built binaries/packages that should be used.
+    # Default: 'amd64'.
+    goarch: arm64
+
+    # Set the "backend" for the Docker pipe.
+    #
+    # Valid options are: docker, buildx, podman.
+    #
+    # Podman is a GoReleaser Pro feature and is only available on Linux.
+    #
+    # Default: 'docker'.
+    use: buildx
 
 docker_manifests:
-  - id: pingcli
+  # Name for the manifest.
+  #
+  # Templates: allowed.
   - name_template: "pingidentity/pingcli:latest"
+
+    # Image name to be added to this manifest.
+    #
+    # Templates: allowed.
     image_templates:
-      - *amd64_image
-      - *arm64_image
-  - name_template: "pingidentity/pingcli:{{ .Version }}"
+      - "pingidentity/pingcli:{{ .Tag }}-amd64"
+      - "pingidentity/pingcli:{{ .Tag }}-arm64"
+
+  # Name for the manifest.
+  #
+  # Templates: allowed.
+  - name_template: "pingidentity/pingcli:{{ .Tag }}"
+
+    # Image name to be added to this manifest.
+    #
+    # Templates: allowed.
     image_templates:
-      - *amd64_image
-      - *arm64_image
+      - "pingidentity/pingcli:{{ .Tag }}-amd64"
+      - "pingidentity/pingcli:{{ .Tag }}-arm64"
