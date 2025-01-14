@@ -73,7 +73,7 @@ Remove-Item pingcli.tar.gz
 ### `winget` Installation - Windows
 
 
-Use the following PowerShell to easily install the `yaml` manifests using `winget`
+Use the following PowerShell to easily install the `yaml` manifests locally with `winget`
 ```powershell
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
