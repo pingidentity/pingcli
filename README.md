@@ -8,11 +8,13 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 
 Use the [Ping CLI Docker image](https://hub.docker.com/r/pingidentity/pingcli)
 
-```text
 Pull Image:
+```shell
 docker pull pingidentity/pingcli:latest
+```
 
 Example Commands:
+```shell
 docker run <Image ID> <sub commands>
 
 docker run <Image ID> --version
@@ -22,11 +24,11 @@ docker run <Image ID> --version
 
 Use PingIdentity's Homebrew tap to install Ping CLI
 
-```text
+```shell
 brew install pingidentity/tap/pingcli
-
+```
 or
-
+``` shell
 brew tap pingidentity/tap
 brew install pingcli
 ```
@@ -39,7 +41,7 @@ OR
 
 Use the following single-line command to install Ping CLI into '/usr/local/bin' directly.
 
-```text
+```shell
 RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
 OS_NAME=$(uname -s); \
 HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
@@ -56,8 +58,8 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 OR
 
 Use the following single-line powershell command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
-```text
-$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
+```powershell
+$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
 $RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
 $uname = (uname -m); `
@@ -67,6 +69,30 @@ Invoke-WebRequest -Uri $URL -OutFile pingcli.tar.gz; `
 tar -zxf pingcli.tar.gz -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
 Remove-Item pingcli.tar.gz
 ```
+
+### `winget` Installation - Windows
+
+
+Use the following PowerShell to easily install the `yaml` manifests using `winget`
+```powershell
+$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing; `
+$RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
+$URL = "https://github.com/pingidentity/pingcli/archive/refs/tags/${RELEASE_VERSION}.tar.gz"; `
+$pingcliPath = "${env:LOCALAPPDATA}\Programs\pingcli"; `
+$testPingcliPath = Test-Path "$pingcliPath"; `
+if ($testPingcliPath -eq $false) {New-Item -ItemType "directory" -Path "$pingcliPath" >$null }; `
+$installerManifestYaml = "pingcli-test.pingcli-test.installer.yaml"; `
+$installerManifest = "https://raw.githubusercontent.com/pingidentity/pingcli/refs/heads/main/windows_manifests/${RELEASE_VERSION}/${installerManifestYaml}"; `
+Invoke-WebRequest -Method Get -Uri $installerManifest -OutFile "${pingcliPath}\${installerManifestYaml}" -UseBasicParsing -MaximumRedirection 0; `
+$localeManifestYaml = "pingcli-test.pingcli-test.locale.en-US.yaml"; `
+$localeManifest    = "https://raw.githubusercontent.com/pingidentity/pingcli/refs/heads/main/windows_manifests/${RELEASE_VERSION}/${localeManifestYaml}"; `
+Invoke-WebRequest -Method Get -Uri $localeManifest -OutFile "${pingcliPath}\${localeManifestYaml}" -UseBasicParsing -MaximumRedirection 0; `
+$mainManifestYaml = "pingcli-test.pingcli-test.yaml"; `
+$mainManifest      = "https://raw.githubusercontent.com/pingidentity/pingcli/refs/heads/main/windows_manifests/${RELEASE_VERSION}/${mainManifestYaml}"; `
+Invoke-WebRequest -Method Get -Uri $mainManifest -OutFile "${pingcliPath}\${mainManifestYaml}" -UseBasicParsing -MaximumRedirection 0; `
+winget install -m "${pingcliPath}\"
+```
+
 
 ## Configure Ping CLI
 
