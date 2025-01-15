@@ -70,30 +70,6 @@ tar -zxf pingcli.tar.gz -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
 Remove-Item pingcli.tar.gz
 ```
 
-### `winget` Installation - Windows
-
-
-Use the following PowerShell to easily install the `yaml` manifests locally with `winget`
-```powershell
-$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing; `
-$RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
-$URL = "https://github.com/pingidentity/pingcli/archive/refs/tags/${RELEASE_VERSION}.tar.gz"; `
-$pingcliPath = "${env:LOCALAPPDATA}\Programs\pingcli"; `
-$testPingcliPath = Test-Path "$pingcliPath"; `
-if ($testPingcliPath -eq $false) {New-Item -ItemType "directory" -Path "$pingcliPath" >$null }; `
-$installerManifestYaml = "pingcli-test.pingcli-test.installer.yaml"; `
-$installerManifest = "https://raw.githubusercontent.com/pingidentity/pingcli/refs/heads/main/windows_manifests/${RELEASE_VERSION}/${installerManifestYaml}"; `
-Invoke-WebRequest -Method Get -Uri $installerManifest -OutFile "${pingcliPath}\${installerManifestYaml}" -UseBasicParsing -MaximumRedirection 0; `
-$localeManifestYaml = "pingcli-test.pingcli-test.locale.en-US.yaml"; `
-$localeManifest    = "https://raw.githubusercontent.com/pingidentity/pingcli/refs/heads/main/windows_manifests/${RELEASE_VERSION}/${localeManifestYaml}"; `
-Invoke-WebRequest -Method Get -Uri $localeManifest -OutFile "${pingcliPath}\${localeManifestYaml}" -UseBasicParsing -MaximumRedirection 0; `
-$mainManifestYaml = "pingcli-test.pingcli-test.yaml"; `
-$mainManifest      = "https://raw.githubusercontent.com/pingidentity/pingcli/refs/heads/main/windows_manifests/${RELEASE_VERSION}/${mainManifestYaml}"; `
-Invoke-WebRequest -Method Get -Uri $mainManifest -OutFile "${pingcliPath}\${mainManifestYaml}" -UseBasicParsing -MaximumRedirection 0; `
-winget install -m "${pingcliPath}\"
-```
-
-
 ## Configure Ping CLI
 
 Before using the Ping CLI, you need to configure your Ping Identity Service profile(s). The following steps show the quickest path to configuration.
