@@ -62,12 +62,11 @@ Use the following single-line powershell command to install Ping CLI into '%LOCA
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
 $RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
-$uname = (uname -m); `
-$HARDWARE_PLATFORM = $uname -replace "aarch64", "arm64" -replace "x86_64", "amd64"; `
+$HARDWARE_PLATFORM = $env:PROCESSOR_ARCHITECTURE -replace "ARM", "arm64" -replace "ARM64", "arm64" -replace "x86", "amd64"; `
 $URL = "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_${HARDWARE_PLATFORM}.tar.gz"
-Invoke-WebRequest -Uri $URL -OutFile pingcli.tar.gz; `
-tar -zxf pingcli.tar.gz -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
-Remove-Item pingcli.tar.gz
+Invoke-WebRequest -Uri $URL -OutFile "pingcli.tar.gz"; `
+tar -zxf "pingcli.tar.gz" -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
+Remove-Item "pingcli.tar.gz"
 ```
 
 ## Configure Ping CLI
