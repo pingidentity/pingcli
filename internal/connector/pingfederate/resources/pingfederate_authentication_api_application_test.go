@@ -11,14 +11,10 @@ import (
 )
 
 func Test_PingFederateAuthenticationApiApplication_Export(t *testing.T) {
-	// Get initialized API Client and Resource
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.AuthenticationApiApplication(PingFederateClientInfo)
-
-	// Create a test Authentication API Application
 	testResourceId, testResourceName := createAuthenticationApiApplication(t, PingFederateClientInfo, resource.ResourceType())
 
-	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: resource.ResourceType(),
@@ -35,8 +31,8 @@ func createAuthenticationApiApplication(t *testing.T, clientInfo *connector.Ping
 
 	request := clientInfo.ApiClient.AuthenticationApiAPI.CreateApplication(clientInfo.Context)
 	result := client.AuthnApiApplication{}
-	result.Id = "Test_AuthenticationApiApplication_Id"
-	result.Name = "Test_AuthenticationApiApplication_Name"
+	result.Id = "TestAuthnApiApplicationId"
+	result.Name = "TestAuthnApiApplicationName"
 	result.Url = "https://www.example.com"
 
 	request = request.Body(result)

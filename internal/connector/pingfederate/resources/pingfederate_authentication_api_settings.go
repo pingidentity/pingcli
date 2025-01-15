@@ -31,9 +31,8 @@ func (r *PingFederateAuthenticationApiSettingsResource) ExportAll() (*[]connecto
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	authnApiSettingsId := "authentication_api_settings_singleton_id"
-	authnApiSettingsName := "Authentication API Settings"
+	authenticationApiSettingsId := "authentication_api_settings_singleton_id"
+	authenticationApiSettingsName := "Authentication Api Settings"
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
@@ -42,8 +41,8 @@ func (r *PingFederateAuthenticationApiSettingsResource) ExportAll() (*[]connecto
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       authnApiSettingsName,
-		ResourceID:         authnApiSettingsId,
+		ResourceName:       authenticationApiSettingsName,
+		ResourceID:         authenticationApiSettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
