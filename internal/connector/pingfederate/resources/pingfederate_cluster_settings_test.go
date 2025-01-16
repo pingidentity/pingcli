@@ -8,15 +8,22 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestPingFederateClusterSettingsExport(t *testing.T) {
-	// Get initialized apiClient and resource
+func Test_PingFederateClusterSettings_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.ClusterSettings(PingFederateClientInfo)
 
-	// Defined the expected ImportBlocks for the resource
+	valid, err := resource.ValidPingFederateVersion()
+	if err != nil {
+		t.Fatalf("Failed to validate PingFederate version: %v", err)
+	}
+	if !valid {
+		t.Logf("'%s' Resource is not supported in the version of PingFederate used. Skipping tests for export.", resource.ResourceType())
+		t.SkipNow()
+	}
+
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_cluster_settings",
+			ResourceType: resource.ResourceType(),
 			ResourceName: "Cluster Settings",
 			ResourceID:   "cluster_settings_singleton_id",
 		},

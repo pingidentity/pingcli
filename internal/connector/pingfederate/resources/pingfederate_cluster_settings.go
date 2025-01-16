@@ -1,9 +1,13 @@
 package resources
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"golang.org/x/mod/semver"
 )
 
 // Verify that the resource satisfies the exportable resource interface
@@ -32,6 +36,15 @@ func (r *PingFederateClusterSettingsResource) ExportAll() (*[]connector.ImportBl
 
 	importBlocks := []connector.ImportBlock{}
 
+	valid, err := r.ValidPingFederateVersion()
+	if err != nil {
+		return nil, err
+	}
+	if !valid {
+		l.Warn().Msgf("'%s' Resource is not supported in the version of PingFederate used. Skipping export.", r.ResourceType())
+		return &importBlocks, nil
+	}
+
 	clusterSettingsId := "cluster_settings_singleton_id"
 	clusterSettingsName := "Cluster Settings"
 
@@ -50,4 +63,21 @@ func (r *PingFederateClusterSettingsResource) ExportAll() (*[]connector.ImportBl
 	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
+}
+
+func (r *PingFederateClusterSettingsResource) ValidPingFederateVersion() (bool, error) {
+	versionObj, response, err := r.clientInfo.ApiClient.VersionAPI.GetVersion(r.clientInfo.Context).Execute()
+	err = common.HandleClientResponse(response, err, "GetVersion", r.ResourceType())
+	if err != nil {
+		return false, err
+	}
+
+	version, versionOk := versionObj.GetVersionOk()
+	if !versionOk {
+		return false, common.DataNilError(r.ResourceType(), response)
+	}
+
+	semVer := (*version)[:strings.LastIndex(*version, ".")]
+	compareResult := semver.Compare(fmt.Sprintf("v%s", semVer), "v12.0.0")
+	return compareResult >= 0, nil
 }
