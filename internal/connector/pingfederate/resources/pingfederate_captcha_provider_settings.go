@@ -31,7 +31,6 @@ func (r *PingFederateCaptchaProviderSettingsResource) ExportAll() (*[]connector.
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
 	captchaProviderSettingsId := "captcha_provider_settings_singleton_id"
 	captchaProviderSettingsName := "Captcha Provider Settings"
 
