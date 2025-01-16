@@ -8,15 +8,13 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestPingFederateConfigurationEncryptionKeysRotateExport(t *testing.T) {
-	// Get initialized apiClient and resource
+func Test_PingFederateConfigurationEncryptionKeysRotate_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.ConfigurationEncryptionKeysRotate(PingFederateClientInfo)
 
-	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_configuration_encryption_keys_rotate",
+			ResourceType: resource.ResourceType(),
 			ResourceName: "Configuration Encryption Keys Rotate",
 			ResourceID:   "configuration_encryption_keys_rotate_singleton_id",
 		},
