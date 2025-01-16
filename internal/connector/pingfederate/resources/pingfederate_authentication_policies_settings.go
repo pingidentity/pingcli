@@ -31,9 +31,8 @@ func (r *PingFederateAuthenticationPoliciesSettingsResource) ExportAll() (*[]con
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	authnPoliciesSettingsId := "authentication_policies_settings_singleton_id"
-	authnPoliciesSettingsName := "Authentication Policies Settings"
+	authenticationPoliciesSettingsId := "authentication_policies_settings_singleton_id"
+	authenticationPoliciesSettingsName := "Authentication Policies Settings"
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
@@ -42,8 +41,8 @@ func (r *PingFederateAuthenticationPoliciesSettingsResource) ExportAll() (*[]con
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       authnPoliciesSettingsName,
-		ResourceID:         authnPoliciesSettingsId,
+		ResourceName:       authenticationPoliciesSettingsName,
+		ResourceID:         authenticationPoliciesSettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 

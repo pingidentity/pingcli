@@ -31,23 +31,22 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) ExportAll() (*[]con
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	fragmentData, err := r.getFragmentData()
+	authenticationPoliciesFragmentData, err := r.getAuthenticationPoliciesFragmentData()
 	if err != nil {
 		return nil, err
 	}
 
-	for fragmentId, fragmentName := range *fragmentData {
+	for authenticationPoliciesFragmentId, authenticationPoliciesFragmentName := range *authenticationPoliciesFragmentData {
 		commentData := map[string]string{
-			"Authentication Policies Fragment ID":   fragmentId,
-			"Authentication Policies Fragment Name": fragmentName,
+			"Authentication Policies Fragment ID":   authenticationPoliciesFragmentId,
+			"Authentication Policies Fragment Name": authenticationPoliciesFragmentName,
 			"Resource Type":                         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fragmentName,
-			ResourceID:         fragmentId,
+			ResourceName:       authenticationPoliciesFragmentName,
+			ResourceID:         authenticationPoliciesFragmentId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -57,32 +56,32 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) ExportAll() (*[]con
 	return &importBlocks, nil
 }
 
-func (r *PingFederateAuthenticationPoliciesFragmentResource) getFragmentData() (*map[string]string, error) {
-	fragmentData := make(map[string]string)
+func (r *PingFederateAuthenticationPoliciesFragmentResource) getAuthenticationPoliciesFragmentData() (*map[string]string, error) {
+	authenticationPoliciesFragmentData := make(map[string]string)
 
-	authnPoliciesFragments, response, err := r.clientInfo.ApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.ApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetFragments", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	if authnPoliciesFragments == nil {
+	if apiObj == nil {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	authnPoliciesFragmentsItems, authnPoliciesFragmentsItemsOk := authnPoliciesFragments.GetItemsOk()
-	if !authnPoliciesFragmentsItemsOk {
+	items, itemsOk := apiObj.GetItemsOk()
+	if !itemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	for _, authnPoliciesFragment := range authnPoliciesFragmentsItems {
-		authnPoliciesFragmentId, authnPoliciesFragmentIdOk := authnPoliciesFragment.GetIdOk()
-		authnPoliciesFragmentName, authnPoliciesFragmentNameOk := authnPoliciesFragment.GetNameOk()
+	for _, authenticationPoliciesFragment := range items {
+		authenticationPoliciesFragmentId, authenticationPoliciesFragmentIdOk := authenticationPoliciesFragment.GetIdOk()
+		authenticationPoliciesFragmentName, authenticationPoliciesFragmentNameOk := authenticationPoliciesFragment.GetNameOk()
 
-		if authnPoliciesFragmentIdOk && authnPoliciesFragmentNameOk {
-			fragmentData[*authnPoliciesFragmentId] = *authnPoliciesFragmentName
+		if authenticationPoliciesFragmentIdOk && authenticationPoliciesFragmentNameOk {
+			authenticationPoliciesFragmentData[*authenticationPoliciesFragmentId] = *authenticationPoliciesFragmentName
 		}
 	}
 
-	return &fragmentData, nil
+	return &authenticationPoliciesFragmentData, nil
 }

@@ -8,15 +8,13 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestPingFederateAuthenticationPoliciesExport(t *testing.T) {
-	// Get initialized apiClient and resource
+func Test_PingFederateAuthenticationPolicies_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.AuthenticationPolicies(PingFederateClientInfo)
 
-	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_authentication_policies",
+			ResourceType: resource.ResourceType(),
 			ResourceName: "Authentication Policies",
 			ResourceID:   "authentication_policies_singleton_id",
 		},
