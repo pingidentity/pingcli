@@ -1,13 +1,22 @@
 package testutils
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"fmt"
+	"math/big"
 	"net/http"
 	"os"
 	"regexp"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/patrickcping/pingone-go-sdk-v2/pingone"
@@ -215,4 +224,48 @@ func WriteStringToPipe(str string, t *testing.T) (reader *os.File) {
 	}
 
 	return reader
+}
+
+func CreatePemCertificateCa() (string, error) {
+	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
+	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
+	if err != nil {
+		return "", fmt.Errorf("Failed to generate serial number: %v", err)
+	}
+
+	certificateCA := &x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			Organization:  []string{"Ping Identity Corporation"},
+			Country:       []string{"US"},
+			Province:      []string{"CO"},
+			Locality:      []string{"Denver"},
+			StreetAddress: []string{"1001 17th St"},
+			PostalCode:    []string{"80202"},
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(1, 0, 0),
+		IsCA:                  true,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		BasicConstraintsValid: true,
+	}
+
+	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return "", fmt.Errorf("Failed to generate private key: %v", err)
+	}
+
+	caBytes, err := x509.CreateCertificate(rand.Reader, certificateCA, certificateCA, &caPrivKey.PublicKey, caPrivKey)
+	if err != nil {
+		return "", fmt.Errorf("Failed to create certificate: %v", err)
+	}
+
+	caPEM := new(bytes.Buffer)
+	pem.Encode(caPEM, &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: caBytes,
+	})
+
+	return caPEM.String(), nil
 }

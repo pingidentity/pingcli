@@ -10,50 +10,49 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingFederateCertificateCAResource{}
+	_ connector.ExportableResource = &PingFederateCertificateCaResource{}
 )
 
-type PingFederateCertificateCAResource struct {
+type PingFederateCertificateCaResource struct {
 	clientInfo *connector.PingFederateClientInfo
 }
 
-// Utility method for creating a PingFederateCertificateCAResource
-func CertificateCA(clientInfo *connector.PingFederateClientInfo) *PingFederateCertificateCAResource {
-	return &PingFederateCertificateCAResource{
+// Utility method for creating a PingFederateCertificateCaResource
+func CertificateCa(clientInfo *connector.PingFederateClientInfo) *PingFederateCertificateCaResource {
+	return &PingFederateCertificateCaResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingFederateCertificateCAResource) ResourceType() string {
+func (r *PingFederateCertificateCaResource) ResourceType() string {
 	return "pingfederate_certificate_ca"
 }
 
-func (r *PingFederateCertificateCAResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingFederateCertificateCaResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	trustedCAData, err := r.getTrustedCAData()
+	certificateCaData, err := r.getCertificateCaData()
 	if err != nil {
 		return nil, err
 	}
 
-	for certViewId, certViewInfo := range *trustedCAData {
-		certViewIssuerDN := certViewInfo[0]
-		certViewSerialNumber := certViewInfo[1]
+	for certificateCaId, certificateCaInfo := range *certificateCaData {
+		certificateCaIssuerDn := certificateCaInfo[0]
+		certificateCaSerialNumber := certificateCaInfo[1]
 
 		commentData := map[string]string{
-			"Certificate CA Issuer DN":     certViewIssuerDN,
-			"Certificate CA ID":            certViewId,
-			"Certificate CA Serial Number": certViewSerialNumber,
+			"Certificate Ca ID":            certificateCaId,
+			"Certificate Ca Issuer DN":     certificateCaIssuerDn,
+			"Certificate Ca Serial Number": certificateCaSerialNumber,
 			"Resource Type":                r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s", certViewIssuerDN, certViewSerialNumber),
-			ResourceID:         certViewId,
+			ResourceName:       fmt.Sprintf("%s_%s", certificateCaIssuerDn, certificateCaSerialNumber),
+			ResourceID:         certificateCaId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -63,33 +62,33 @@ func (r *PingFederateCertificateCAResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func (r *PingFederateCertificateCAResource) getTrustedCAData() (*map[string][]string, error) {
-	trustedCAData := make(map[string][]string)
+func (r *PingFederateCertificateCaResource) getCertificateCaData() (*map[string][]string, error) {
+	certificateCaData := make(map[string][]string)
 
-	certViews, response, err := r.clientInfo.ApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.ApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetTrustedCAs", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	if certViews == nil {
+	if apiObj == nil {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	certViewsItems, certViewsItemsOk := certViews.GetItemsOk()
-	if !certViewsItemsOk {
+	items, itemsOk := apiObj.GetItemsOk()
+	if !itemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	for _, certView := range certViewsItems {
-		certViewId, certViewIdOk := certView.GetIdOk()
-		certViewIssuerDN, certViewIssuerDNOk := certView.GetIssuerDNOk()
-		certViewSerialNumber, certViewSerialNumberOk := certView.GetSerialNumberOk()
+	for _, certificateCa := range items {
+		certificateCaId, certificateCaIdOk := certificateCa.GetIdOk()
+		certificateCaIssuerDn, certificateCaIssuerDnOk := certificateCa.GetIssuerDNOk()
+		certificateCaSerialNumber, certificateCaSerialNumberOk := certificateCa.GetSerialNumberOk()
 
-		if certViewIdOk && certViewIssuerDNOk && certViewSerialNumberOk {
-			trustedCAData[*certViewId] = []string{*certViewIssuerDN, *certViewSerialNumber}
+		if certificateCaIdOk && certificateCaIssuerDnOk && certificateCaSerialNumberOk {
+			certificateCaData[*certificateCaId] = []string{*certificateCaIssuerDn, *certificateCaSerialNumber}
 		}
 	}
 
-	return &trustedCAData, nil
+	return &certificateCaData, nil
 }
