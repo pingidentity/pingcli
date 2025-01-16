@@ -13,13 +13,15 @@ import (
 func Test_PingFederateAuthenticationApiApplication_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.AuthenticationApiApplication(PingFederateClientInfo)
-	testResourceId, testResourceName := createAuthenticationApiApplication(t, PingFederateClientInfo, resource.ResourceType())
+
+	authenticationApiApplicationId, authenticationApiApplicationName := createAuthenticationApiApplication(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteAuthenticationApiApplication(t, PingFederateClientInfo, resource.ResourceType(), authenticationApiApplicationId)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: resource.ResourceType(),
-			ResourceName: testResourceName,
-			ResourceID:   testResourceId,
+			ResourceName: authenticationApiApplicationName,
+			ResourceID:   authenticationApiApplicationId,
 		},
 	}
 
@@ -40,8 +42,20 @@ func createAuthenticationApiApplication(t *testing.T, clientInfo *connector.Ping
 	resource, response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test Authentication API Application: %v", err)
+		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
 	return resource.Id, resource.Name
+}
+
+func deleteAuthenticationApiApplication(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+	t.Helper()
+
+	request := clientInfo.ApiClient.AuthenticationApiAPI.DeleteApplication(clientInfo.Context, id)
+
+	response, err := request.Execute()
+	err = common.HandleClientResponse(response, err, "DeleteApplication", resourceType)
+	if err != nil {
+		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+	}
 }

@@ -31,23 +31,22 @@ func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.I
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
 	authenticationSelectorData, err := r.getAuthenticationSelectorData()
 	if err != nil {
 		return nil, err
 	}
 
-	for authnSelectorId, authnSelectorName := range *authenticationSelectorData {
+	for authenticationSelectorId, authenticationSelectorName := range *authenticationSelectorData {
 		commentData := map[string]string{
-			"Authentication Selector ID":   authnSelectorId,
-			"Authentication Selector Name": authnSelectorName,
+			"Authentication Selector ID":   authenticationSelectorId,
+			"Authentication Selector Name": authenticationSelectorName,
 			"Resource Type":                r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       authnSelectorName,
-			ResourceID:         authnSelectorId,
+			ResourceName:       authenticationSelectorName,
+			ResourceID:         authenticationSelectorId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -60,27 +59,27 @@ func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.I
 func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorData() (*map[string]string, error) {
 	authenticationSelectorData := make(map[string]string)
 
-	authnSelectors, response, err := r.clientInfo.ApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.ApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetAuthenticationSelectors", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	if authnSelectors == nil {
+	if apiObj == nil {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	authnSelectorsItems, authnSelectorsItemsOk := authnSelectors.GetItemsOk()
-	if !authnSelectorsItemsOk {
+	items, itemsOk := apiObj.GetItemsOk()
+	if !itemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	for _, authnSelector := range authnSelectorsItems {
-		authnSelectorId, authnSelectorIdOk := authnSelector.GetIdOk()
-		authnSelectorName, authnSelectorNameOk := authnSelector.GetNameOk()
+	for _, authenticationSelector := range items {
+		authenticationSelectorId, authenticationSelectorIdOk := authenticationSelector.GetIdOk()
+		authenticationSelectorName, authenticationSelectorNameOk := authenticationSelector.GetNameOk()
 
-		if authnSelectorIdOk && authnSelectorNameOk {
-			authenticationSelectorData[*authnSelectorId] = *authnSelectorName
+		if authenticationSelectorIdOk && authenticationSelectorNameOk {
+			authenticationSelectorData[*authenticationSelectorId] = *authenticationSelectorName
 		}
 	}
 
