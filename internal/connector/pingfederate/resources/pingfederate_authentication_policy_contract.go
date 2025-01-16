@@ -31,23 +31,22 @@ func (r *PingFederateAuthenticationPolicyContractResource) ExportAll() (*[]conne
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
 	authenticationPolicyContractData, err := r.getAuthenticationPolicyContractData()
 	if err != nil {
 		return nil, err
 	}
 
-	for authnPolicyContractId, authnPolicyContractName := range *authenticationPolicyContractData {
+	for authenticationPolicyContractId, authenticationPolicyContractName := range *authenticationPolicyContractData {
 		commentData := map[string]string{
-			"Authentication Policy Contract ID":   authnPolicyContractId,
-			"Authentication Policy Contract Name": authnPolicyContractName,
+			"Authentication Policy Contract ID":   authenticationPolicyContractId,
+			"Authentication Policy Contract Name": authenticationPolicyContractName,
 			"Resource Type":                       r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       authnPolicyContractName,
-			ResourceID:         authnPolicyContractId,
+			ResourceName:       authenticationPolicyContractName,
+			ResourceID:         authenticationPolicyContractId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -60,27 +59,27 @@ func (r *PingFederateAuthenticationPolicyContractResource) ExportAll() (*[]conne
 func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPolicyContractData() (*map[string]string, error) {
 	authenticationPolicyContractData := make(map[string]string)
 
-	authnPolicyContracts, response, err := r.clientInfo.ApiClient.AuthenticationPolicyContractsAPI.GetAuthenticationPolicyContracts(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.ApiClient.AuthenticationPolicyContractsAPI.GetAuthenticationPolicyContracts(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetAuthenticationPolicyContracts", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	if authnPolicyContracts == nil {
+	if apiObj == nil {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	authnPolicyContractsItems, authnPolicyContractsItemsOk := authnPolicyContracts.GetItemsOk()
-	if !authnPolicyContractsItemsOk {
+	items, itemsOk := apiObj.GetItemsOk()
+	if !itemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	for _, authnPolicyContract := range authnPolicyContractsItems {
-		authnPolicyContractId, authnPolicyContractIdOk := authnPolicyContract.GetIdOk()
-		authnPolicyContractName, authnPolicyContractNameOk := authnPolicyContract.GetNameOk()
+	for _, authenticationPolicyContract := range items {
+		authenticationPolicyContractId, authenticationPolicyContractIdOk := authenticationPolicyContract.GetIdOk()
+		authenticationPolicyContractName, authenticationPolicyContractNameOk := authenticationPolicyContract.GetNameOk()
 
-		if authnPolicyContractIdOk && authnPolicyContractNameOk {
-			authenticationPolicyContractData[*authnPolicyContractId] = *authnPolicyContractName
+		if authenticationPolicyContractIdOk && authenticationPolicyContractNameOk {
+			authenticationPolicyContractData[*authenticationPolicyContractId] = *authenticationPolicyContractName
 		}
 	}
 
