@@ -10,50 +10,49 @@ import (
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingFederateCertificatesRevocationOCSPCertificateResource{}
+	_ connector.ExportableResource = &PingFederateCertificatesRevocationOcspCertificateResource{}
 )
 
-type PingFederateCertificatesRevocationOCSPCertificateResource struct {
+type PingFederateCertificatesRevocationOcspCertificateResource struct {
 	clientInfo *connector.PingFederateClientInfo
 }
 
-// Utility method for creating a PingFederateCertificatesRevocationOCSPCertificateResource
-func CertificatesRevocationOCSPCertificate(clientInfo *connector.PingFederateClientInfo) *PingFederateCertificatesRevocationOCSPCertificateResource {
-	return &PingFederateCertificatesRevocationOCSPCertificateResource{
+// Utility method for creating a PingFederateCertificatesRevocationOcspCertificateResource
+func CertificatesRevocationOcspCertificate(clientInfo *connector.PingFederateClientInfo) *PingFederateCertificatesRevocationOcspCertificateResource {
+	return &PingFederateCertificatesRevocationOcspCertificateResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingFederateCertificatesRevocationOCSPCertificateResource) ResourceType() string {
+func (r *PingFederateCertificatesRevocationOcspCertificateResource) ResourceType() string {
 	return "pingfederate_certificates_revocation_ocsp_certificate"
 }
 
-func (r *PingFederateCertificatesRevocationOCSPCertificateResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingFederateCertificatesRevocationOcspCertificateResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	ocspCertificateData, err := r.getOcspCertificateData()
+	certificatesRevocationOcspCertificateData, err := r.getCertificatesRevocationOcspCertificateData()
 	if err != nil {
 		return nil, err
 	}
 
-	for ocspCertificateId, ocspCertificateInfo := range *ocspCertificateData {
-		ocspCertificateIssuerDN := ocspCertificateInfo[0]
-		ocspCertificateSerialNumber := ocspCertificateInfo[1]
+	for certificatesRevocationOcspCertificateId, certificatesRevocationOcspCertificateInfo := range *certificatesRevocationOcspCertificateData {
+		certificatesRevocationOcspCertificateIssuerDn := certificatesRevocationOcspCertificateInfo[0]
+		certificatesRevocationOcspCertificateSerialNumber := certificatesRevocationOcspCertificateInfo[1]
 
 		commentData := map[string]string{
-			"Certificate Revocation OCSP Certificate ID":            ocspCertificateId,
-			"Certificate Revocation OCSP Certificate Issuer DN":     ocspCertificateIssuerDN,
-			"Certificate Revocation OCSP Certificate Serial Number": ocspCertificateSerialNumber,
+			"Certificates Revocation Ocsp Certificate ID":            certificatesRevocationOcspCertificateId,
+			"Certificates Revocation Ocsp Certificate Issuer DN":     certificatesRevocationOcspCertificateIssuerDn,
+			"Certificates Revocation Ocsp Certificate Serial Number": certificatesRevocationOcspCertificateSerialNumber,
 			"Resource Type": r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s", ocspCertificateIssuerDN, ocspCertificateSerialNumber),
-			ResourceID:         ocspCertificateId,
+			ResourceName:       fmt.Sprintf("%s_%s", certificatesRevocationOcspCertificateIssuerDn, certificatesRevocationOcspCertificateSerialNumber),
+			ResourceID:         certificatesRevocationOcspCertificateId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -63,33 +62,33 @@ func (r *PingFederateCertificatesRevocationOCSPCertificateResource) ExportAll() 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateCertificatesRevocationOCSPCertificateResource) getOcspCertificateData() (*map[string][]string, error) {
-	ocspCertificateData := make(map[string][]string)
+func (r *PingFederateCertificatesRevocationOcspCertificateResource) getCertificatesRevocationOcspCertificateData() (*map[string][]string, error) {
+	certificatesRevocationOcspCertificateData := make(map[string][]string)
 
-	ocspCertificates, response, err := r.clientInfo.ApiClient.CertificatesRevocationAPI.GetOcspCertificates(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.ApiClient.CertificatesRevocationAPI.GetOcspCertificates(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetOcspCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	if ocspCertificates == nil {
+	if apiObj == nil {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	ocspCertificatesItems, ocspCertificatesItemsOk := ocspCertificates.GetItemsOk()
-	if !ocspCertificatesItemsOk {
+	items, itemsOk := apiObj.GetItemsOk()
+	if !itemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	for _, ocspCertificate := range ocspCertificatesItems {
-		ocspCertificateId, ocspCertificateIdOk := ocspCertificate.GetIdOk()
-		ocspCertificateIssuerDN, ocspCertificateIssuerDNOk := ocspCertificate.GetIssuerDNOk()
-		ocspCertificateSerialNumber, ocspCertificateSerialNumberOk := ocspCertificate.GetSerialNumberOk()
+	for _, certificatesRevocationOcspCertificate := range items {
+		certificatesRevocationOcspCertificateId, certificatesRevocationOcspCertificateIdOk := certificatesRevocationOcspCertificate.GetIdOk()
+		certificatesRevocationOcspCertificateIssuerDn, certificatesRevocationOcspCertificateIssuerDnOk := certificatesRevocationOcspCertificate.GetIssuerDNOk()
+		certificatesRevocationOcspCertificateSerialNumber, certificatesRevocationOcspCertificateSerialNumberOk := certificatesRevocationOcspCertificate.GetSerialNumberOk()
 
-		if ocspCertificateIdOk && ocspCertificateIssuerDNOk && ocspCertificateSerialNumberOk {
-			ocspCertificateData[*ocspCertificateId] = []string{*ocspCertificateIssuerDN, *ocspCertificateSerialNumber}
+		if certificatesRevocationOcspCertificateIdOk && certificatesRevocationOcspCertificateIssuerDnOk && certificatesRevocationOcspCertificateSerialNumberOk {
+			certificatesRevocationOcspCertificateData[*certificatesRevocationOcspCertificateId] = []string{*certificatesRevocationOcspCertificateIssuerDn, *certificatesRevocationOcspCertificateSerialNumber}
 		}
 	}
 
-	return &ocspCertificateData, nil
+	return &certificatesRevocationOcspCertificateData, nil
 }
