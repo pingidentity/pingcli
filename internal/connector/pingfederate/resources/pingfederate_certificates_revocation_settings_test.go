@@ -8,15 +8,13 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestPingFederateCertificatesRevocationSettingsExport(t *testing.T) {
-	// Get initialized apiClient and resource
+func Test_PingFederateCertificatesRevocationSettings_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.CertificatesRevocationSettings(PingFederateClientInfo)
 
-	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_certificates_revocation_settings",
+			ResourceType: resource.ResourceType(),
 			ResourceName: "Certificates Revocation Settings",
 			ResourceID:   "certificates_revocation_settings_singleton_id",
 		},

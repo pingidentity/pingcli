@@ -31,7 +31,6 @@ func (r *PingFederateCertificatesRevocationSettingsResource) ExportAll() (*[]con
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
 	certificatesRevocationSettingsId := "certificates_revocation_settings_singleton_id"
 	certificatesRevocationSettingsName := "Certificates Revocation Settings"
 
