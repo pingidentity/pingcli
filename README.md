@@ -57,12 +57,12 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 
 OR
 
-Use the following single-line powershell command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
+Use the following single-line PowerShell 7.4 command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
 ```powershell
-$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing; `
+$latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
 $RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
-$HARDWARE_PLATFORM = $env:PROCESSOR_ARCHITECTURE -replace "ARM", "arm64" -replace "ARM64", "arm64" -replace "x86", "amd64"; `
+$HARDWARE_PLATFORM = $env:PROCESSOR_ARCHITECTURE -replace "ARM", "arm64" -replace "ARM64", "arm64" -replace "x86", "amd64" -replace "AMD64", "amd64" -replace "EM64T", "amd64"; `
 $URL = "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_${HARDWARE_PLATFORM}.tar.gz"
 Invoke-WebRequest -Uri $URL -OutFile "pingcli.tar.gz"; `
 tar -zxf "pingcli.tar.gz" -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
