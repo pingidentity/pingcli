@@ -12,7 +12,7 @@ builds:
     # Can be a path (e.g. `bin/app`) to wrap the binary in a directory.
     #
     # Default: Project directory name
-    binary: pingcli
+    binary: "pingcli"
 
     # Custom environment variables to be set during the builds.
     # Invalid environment variables will be ignored.
@@ -21,7 +21,7 @@ builds:
     # Default: os.Environ() ++ env config section.
     # Templates: allowed.
     env:
-      - CGO_ENABLED=0
+      - "CGO_ENABLED=0"
 
     # GOOS list to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
@@ -29,9 +29,9 @@ builds:
     #
     # Default: [ 'darwin', 'linux', 'windows' ]
     goos:
-      - darwin
-      - linux
-      - windows
+      - "darwin"
+      - "linux"
+      - "windows"
 
     # GOARCH to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
@@ -40,15 +40,15 @@ builds:
     # Default: [ '386', 'amd64', 'arm64' ]
     goarch:
       - "386"
-      - amd64
-      - arm64
+      - "amd64"
+      - "arm64"
 
 release:
   # If set to auto, will mark the release as not ready for production
   # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
   # If set to true, will mark the release as not ready for production.
   # Default is false.
-  prerelease: auto
+  prerelease: "auto"
 
   # If set to false, will NOT mark the release as "latest".
   # This prevents it from being shown at the top of the release list,
@@ -69,7 +69,7 @@ release:
   # - `replace`: replace existing notes
   #
   # Default is `keep-existing`.
-  mode: append
+  mode: "append"
 
 checksum:
   # Algorithm to be used.
@@ -90,7 +90,7 @@ checksum:
   # - blake2b
   #
   # Default: 'sha256'.
-  algorithm: sha256
+  algorithm: "sha256"
 
   # If true, will create one checksum file for each artifact.
   split: true
@@ -101,8 +101,8 @@ checksum:
 brews:
   - # Git author used to commit to the repository.
     commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
+      name: "goreleaserbot"
+      email: "bot@goreleaser.com"
 
     # The project name and current git tag are used in the format string.
     #
@@ -110,7 +110,7 @@ brews:
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
 
     # Directory inside the repository to put the formula.
-    directory: Formula
+    directory: "Formula"
 
     # Caveats for the user of your binary.
     # caveats: "How to use this binary"
@@ -138,7 +138,7 @@ brews:
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     #
     # Templates: allowed.
-    skip_upload: auto
+    skip_upload: "auto"
 
     # So you can `brew test` your formula.
     #
@@ -152,12 +152,12 @@ brews:
       # Repository owner.
       #
       # Templates: allowed.
-      owner: pingidentity
+      owner: "pingidentity"
 
       # Repository name.
       #
       # Templates: allowed.
-      name: homebrew-tap
+      name: "homebrew-tap"
 
       token: "{{ .Env.GORELEASER_HOMEBREW_TAP_GITHUB_PAT}}"
 
@@ -178,7 +178,7 @@ dockers:
 
     # GOARCH of the built binaries/packages that should be used.
     # Default: 'amd64'.
-    goarch: amd64
+    goarch: "amd64"
 
     # Set the "backend" for the Docker pipe.
     #
@@ -187,7 +187,7 @@ dockers:
     # Podman is a GoReleaser Pro feature and is only available on Linux.
     #
     # Default: 'docker'.
-    use: buildx
+    use: "buildx"
 
   # You can have multiple Docker images.
   # Templates of the Docker image names.
@@ -205,7 +205,7 @@ dockers:
 
     # GOARCH of the built binaries/packages that should be used.
     # Default: 'amd64'.
-    goarch: arm64
+    goarch: "arm64"
 
     # Set the "backend" for the Docker pipe.
     #
@@ -214,7 +214,7 @@ dockers:
     # Podman is a GoReleaser Pro feature and is only available on Linux.
     #
     # Default: 'docker'.
-    use: buildx
+    use: "buildx"
 
 docker_manifests:
   # Name for the manifest.
