@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -39,16 +37,16 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 		return nil, err
 	}
 
-	for dataStoreId, dataStoreType := range *dataStoreData {
+	for dataStoreId, dataStoreName := range *dataStoreData {
 		commentData := map[string]string{
 			"Data Store ID":   dataStoreId,
-			"Data Store Type": dataStoreType,
+			"Data Store Name": dataStoreName,
 			"Resource Type":   r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s", dataStoreId, dataStoreType),
+			ResourceName:       dataStoreName,
 			ResourceID:         dataStoreId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -62,22 +60,22 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, error) {
 	dataStoreData := make(map[string]string)
 
-	dataStores, response, err := r.clientInfo.ApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.ApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetDataStores", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	if dataStores == nil {
+	if apiObj == nil {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	dataStoresItems, dataStoresItemsOk := dataStores.GetItemsOk()
-	if !dataStoresItemsOk {
+	items, itemsOk := apiObj.GetItemsOk()
+	if !itemsOk {
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	for _, dataStore := range dataStoresItems {
+	for _, dataStore := range items {
 		dataStoreId, dataStoreIdOk := dataStore.GetIdOk()
 		dataStoreType, dataStoreTypeOk := dataStore.GetTypeOk()
 

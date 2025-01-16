@@ -8,28 +8,19 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestPingFederateDataStoreExport(t *testing.T) {
-	// Get initialized apiClient and resource
+func Test_PingFederateDataStore_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.DataStore(PingFederateClientInfo)
 
-	// Defined the expected ImportBlocks for the resource
+	// Data store already created from data.json
+
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingfederate_data_store",
-			ResourceName: "ProvisionerDS_JDBC",
+			ResourceType: resource.ResourceType(),
+			ResourceName: "JDBC",
 			ResourceID:   "ProvisionerDS",
 		},
-		{
-			ResourceType: "pingfederate_data_store",
-			ResourceName: "LDAP-PingDirectory_LDAP",
-			ResourceID:   "LDAP-PingDirectory",
-		},
-		{
-			ResourceType: "pingfederate_data_store",
-			ResourceName: "pingdirectory_LDAP",
-			ResourceID:   "pingdirectory",
-		},
 	}
+
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
