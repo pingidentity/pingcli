@@ -53,7 +53,7 @@ rm -f pingcli.tar.gz
 
 #### Manual Installation - Linux (apt or yum)
 
-Download the package matching your architecture then run one of the example commands below for installation.
+Download the package matching your architecture and run one of the example commands below for installation.
 
 Example commands:
 
