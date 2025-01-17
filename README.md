@@ -51,6 +51,20 @@ tar -zxf pingcli.tar.gz -C /usr/local/bin pingcli; \
 rm -f pingcli.tar.gz
 ```
 
+#### Manual Installation - Linux (apt or yum)
+
+Download the package matching your architecture then run one of the example commands below for installation.
+
+Example commands:
+
+```shell
+apt-get install pingcli_<version>_linux_arm64.deb
+```
+
+``` shell
+yum install pingcli_<version>_linux_arm64.rpm
+```
+
 #### Manual Installation - Windows
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for binary downloads and SHA256 checksum files.

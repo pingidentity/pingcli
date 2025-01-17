@@ -240,3 +240,87 @@ docker_manifests:
     image_templates:
       - "pingidentity/pingcli:{{ .Tag }}-amd64"
       - "pingidentity/pingcli:{{ .Tag }}-arm64"
+
+nfpms:
+  # note that this is an array of nfpm configs
+  - #
+    # ID of the nfpm config, must be unique.
+    #
+    # Default: 'default'.
+    id: "pingcli"
+
+    # Name of the package.
+    #
+    # Default: ProjectName.
+    # Templates: allowed.
+    package_name: "pingcli"
+
+    # Your app's vendor.
+    vendor: "Ping Identity"
+
+    # Your app's homepage.
+    #
+    # Default: inferred from global metadata.
+    homepage: "https://github.com/pingidentity/pingcli"
+
+    # Your app's maintainer (probably you).
+    #
+    # Default: inferred from global metadata.
+    maintainer: "Ping Identity"
+
+    # Your app's description.
+    #
+    # Default: inferred from global metadata.
+    description: "The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services."
+
+    # Your app's license.
+    #
+    # Default: inferred from global metadata.
+    license: "Apache 2.0"
+
+    # Formats to be generated.
+    formats:
+      - "apk"
+      - "deb"
+      - "rpm"
+      - "termux.deb"
+      - "archlinux"
+
+    # Custom configuration applied only to the RPM packager.
+    rpm:
+      # The package summary.
+      #
+      # Default: first line of the description.
+      summary: "The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services."
+
+      # The packager is used to identify the organization that actually packaged
+      # the software, as opposed to the author of the software.
+      # `maintainer` will be used as fallback if not specified.
+      # This will expand any env var you set in the field, eg packager: ${PACKAGER}
+      packager: "Ping Identity"
+
+    # Custom configuration applied only to the Deb packager.
+    deb:
+      # Additional fields for the control file. Empty fields are ignored.
+      # This will expand any env vars you set in the field values, e.g. Vcs-Browser: ${CI_PROJECT_URL}
+      fields:
+        Bugs: "https://github.com/pingidentity/pingcli/issues"
+
+    apk:
+      # The package is signed if a key_file is set
+      signature:
+        # The name of the signing key. When verifying a package, the signature
+        # is matched to the public key store in /etc/apk/keys/<key_name>.rsa.pub.
+        #
+        # Default: maintainer's email address.
+        # Templates: allowed.
+        key_name: "origin"
+
+    archlinux:
+      # The pkgbase can be used to explicitly specify the name to be used to refer
+      # to a group of packages. See: https://wiki.archlinux.org/title/PKGBUILD#pkgbase.
+      pkgbase: "pingcli"
+
+      # The packager refers to the organization packaging the software, not to be confused
+      # with the maintainer, which is the person who maintains the software.
+      packager: "Ping Identity"
