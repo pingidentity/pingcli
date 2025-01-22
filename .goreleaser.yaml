@@ -1,5 +1,9 @@
 version: 2
 
+# Publish the binaries directly, without any archiving
+archives:
+  - formats: ["binary"]
+
 builds:
   # You can have multiple builds defined as a yaml list
   - #
@@ -42,34 +46,10 @@ builds:
       - "386"
       - "amd64"
       - "arm64"
-
-release:
-  # If set to auto, will mark the release as not ready for production
-  # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
-  # If set to true, will mark the release as not ready for production.
-  # Default is false.
-  prerelease: "auto"
-
-  # If set to false, will NOT mark the release as "latest".
-  # This prevents it from being shown at the top of the release list,
-  # and from being returned when calling https://api.github.com/repos/OWNER/REPO/releases/latest.
-  #
-  # Available only for GitHub.
-  #
-  # Default is true.
-  # Since: v1.20
-  make_latest: true
-
-  # What to do with the release notes in case there the release already exists.
-  #
-  # Valid options are:
-  # - `keep-existing`: keep the existing notes
-  # - `append`: append the current release notes to the existing notes
-  # - `prepend`: prepend the current release notes to the existing notes
-  # - `replace`: replace existing notes
-  #
-  # Default is `keep-existing`.
-  mode: "append"
+    # List of combinations of GOOS + GOARCH + GOARM to ignore.
+    ignore:
+      - goos: "linux"
+        goarch: "386"
 
 checksum:
   # Algorithm to be used.
@@ -93,7 +73,7 @@ checksum:
   algorithm: "sha256"
 
   # If true, will create one checksum file for each artifact.
-  split: true
+  split: false
 
   # Disable the generation/upload of the checksum file.
   disable: false
@@ -283,8 +263,6 @@ nfpms:
       - "apk"
       - "deb"
       - "rpm"
-      - "termux.deb"
-      - "archlinux"
 
     # Custom configuration applied only to the RPM packager.
     rpm:
@@ -316,11 +294,98 @@ nfpms:
         # Templates: allowed.
         key_name: "origin"
 
-    archlinux:
-      # The pkgbase can be used to explicitly specify the name to be used to refer
-      # to a group of packages. See: https://wiki.archlinux.org/title/PKGBUILD#pkgbase.
-      pkgbase: "pingcli"
+release:
+  # If set to auto, will mark the release as not ready for production
+  # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
+  # If set to true, will mark the release as not ready for production.
+  # Default is false.
+  prerelease: "auto"
 
-      # The packager refers to the organization packaging the software, not to be confused
-      # with the maintainer, which is the person who maintains the software.
-      packager: "Ping Identity"
+  # If set to false, will NOT mark the release as "latest".
+  # This prevents it from being shown at the top of the release list,
+  # and from being returned when calling https://api.github.com/repos/OWNER/REPO/releases/latest.
+  #
+  # Available only for GitHub.
+  #
+  # Default is true.
+  # Since: v1.20
+  make_latest: true
+
+  # What to do with the release notes in case there the release already exists.
+  #
+  # Valid options are:
+  # - `keep-existing`: keep the existing notes
+  # - `append`: append the current release notes to the existing notes
+  # - `prepend`: prepend the current release notes to the existing notes
+  # - `replace`: replace existing notes
+  #
+  # Default is `keep-existing`.
+  mode: "append"
+
+signs:
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "checksum"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "checksum"
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "binary"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "binary"
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "package"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "package"
