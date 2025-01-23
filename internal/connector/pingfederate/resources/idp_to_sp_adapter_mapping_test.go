@@ -16,7 +16,16 @@ func Test_PingFederateIdpToSpAdapterMapping_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.IdpToSpAdapterMapping(PingFederateClientInfo)
 
-	idpToSpAdapterMappingId, idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId := createIdpToSpAdapterMapping(t, PingFederateClientInfo, resource.ResourceType())
+	testPCVId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
+	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+
+	testIdpAdapterId, _ := createIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+	defer deleteIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId)
+
+	testSpAdapterId, _ := createSpAdapter(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteSpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testSpAdapterId)
+
+	idpToSpAdapterMappingId, idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId := createIdpToSpAdapterMapping(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId, testSpAdapterId)
 	defer deleteIdpToSpAdapterMapping(t, PingFederateClientInfo, resource.ResourceType(), idpToSpAdapterMappingId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -30,26 +39,22 @@ func Test_PingFederateIdpToSpAdapterMapping_Export(t *testing.T) {
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string, string) {
+func createIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testIdpAdapterId, testSpAdapterId string) (string, string, string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.IdpToSpAdapterMappingAPI.CreateIdpToSpAdapterMapping(clientInfo.Context)
-	result := client.IdpToSpAdapterMapping{}
-	result.Id = utils.Pointer("TestIdpToSpAdapterMappingId")
-	result.SourceId = "TestIdpToSpAdapterMappingSourceId"
-	result.TargetId = "TestIdpToSpAdapterMappingTargetId"
-	result.AttributeContractFulfillment = map[string]client.AttributeFulfillmentValue{}
-	// for key, attributeContractFulfillmentElement := range model.AttributeContractFulfillment.Elements() {
-	// 	attributeContractFulfillmentValue := client.AttributeFulfillmentValue{}
-	// 	attributeContractFulfillmentAttrs := attributeContractFulfillmentElement.(types.Object).Attributes()
-	// 	attributeContractFulfillmentSourceValue := client.SourceTypeIdKey{}
-	// 	attributeContractFulfillmentSourceAttrs := attributeContractFulfillmentAttrs["source"].(types.Object).Attributes()
-	// 	attributeContractFulfillmentSourceValue.Id = attributeContractFulfillmentSourceAttrs["id"].(types.String).ValueStringPointer()
-	// 	attributeContractFulfillmentSourceValue.Type = attributeContractFulfillmentSourceAttrs["type"].(types.String).ValueString()
-	// 	attributeContractFulfillmentValue.Source = attributeContractFulfillmentSourceValue
-	// 	attributeContractFulfillmentValue.Value = attributeContractFulfillmentAttrs["value"].(types.String).ValueString()
-	// 	result.AttributeContractFulfillment[key] = attributeContractFulfillmentValue
-	// }
+	result := client.IdpToSpAdapterMapping{
+		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
+			"subject": {
+				Source: client.SourceTypeIdKey{
+					Type: "NO_MAPPING",
+				},
+			},
+		},
+		Id:       utils.Pointer(testIdpAdapterId + "|" + testSpAdapterId),
+		SourceId: testIdpAdapterId,
+		TargetId: testSpAdapterId,
+	}
 
 	request = request.Body(result)
 

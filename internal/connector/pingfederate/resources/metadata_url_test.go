@@ -33,10 +33,11 @@ func createMetadataUrl(t *testing.T, clientInfo *connector.PingFederateClientInf
 	t.Helper()
 
 	request := clientInfo.ApiClient.MetadataUrlsAPI.AddMetadataUrl(clientInfo.Context)
-	result := client.MetadataUrl{}
-	result.Id = utils.Pointer("TestMetadataUrlId")
-	result.Name = "TestMetadataUrlName"
-	result.Url = "https://www.example.com"
+	result := client.MetadataUrl{
+		Id:   utils.Pointer("TestMetadataUrlId"),
+		Name: "TestMetadataUrlName",
+		Url:  "https://www.example.com",
+	}
 
 	request = request.Body(result)
 

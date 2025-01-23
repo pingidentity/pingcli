@@ -41,7 +41,7 @@ func createServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clien
 	request := clientInfo.ApiClient.ServerSettingsAPI.ImportCertificate(clientInfo.Context)
 	result := client.X509File{
 		FileData: fileData,
-		Id:       utils.Pointer("TestX509FileId"),
+		Id:       utils.Pointer("testx509fileid"),
 	}
 
 	request = request.Body(result)

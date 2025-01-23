@@ -16,7 +16,13 @@ func Test_PingFederateOauthAccessTokenMapping_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.OauthAccessTokenMapping(PingFederateClientInfo)
 
-	oauthAccessTokenMappingId, oauthAccessTokenMappingContextType := createOauthAccessTokenMapping(t, PingFederateClientInfo, resource.ResourceType())
+	testKeyPairId, _, _ := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId)
+
+	testTokenManagerId, _ := createOauthAccessTokenManager(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId)
+	defer deleteOauthAccessTokenManager(t, PingFederateClientInfo, resource.ResourceType(), testTokenManagerId)
+
+	oauthAccessTokenMappingId, oauthAccessTokenMappingContextType := createOauthAccessTokenMapping(t, PingFederateClientInfo, resource.ResourceType(), testTokenManagerId)
 	defer deleteOauthAccessTokenMapping(t, PingFederateClientInfo, resource.ResourceType(), oauthAccessTokenMappingId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -30,29 +36,26 @@ func Test_PingFederateOauthAccessTokenMapping_Export(t *testing.T) {
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createOauthAccessTokenMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createOauthAccessTokenMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testTokenManagerId string) (string, string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.OauthAccessTokenMappingsAPI.CreateMapping(clientInfo.Context)
-	result := client.AccessTokenMapping{}
-	result.Id = utils.Pointer("TestAccessTokenMappingId")
-	result.AccessTokenManagerRef = client.ResourceLink{}
-	result.AccessTokenManagerRef.Id = ""
-	result.AttributeContractFulfillment = map[string]client.AttributeFulfillmentValue{}
-	// for key, attributeContractFulfillmentElement := range model.AttributeContractFulfillment.Elements() {
-	// 	attributeContractFulfillmentValue := client.AttributeFulfillmentValue{}
-	// 	attributeContractFulfillmentAttrs := attributeContractFulfillmentElement.(types.Object).Attributes()
-	// 	attributeContractFulfillmentSourceValue := client.SourceTypeIdKey{}
-	// 	attributeContractFulfillmentSourceAttrs := attributeContractFulfillmentAttrs["source"].(types.Object).Attributes()
-	// 	attributeContractFulfillmentSourceValue.Id = attributeContractFulfillmentSourceAttrs["id"].(types.String).ValueStringPointer()
-	// 	attributeContractFulfillmentSourceValue.Type = attributeContractFulfillmentSourceAttrs["type"].(types.String).ValueString()
-	// 	attributeContractFulfillmentValue.Source = attributeContractFulfillmentSourceValue
-	// 	attributeContractFulfillmentValue.Value = attributeContractFulfillmentAttrs["value"].(types.String).ValueString()
-	// 	result.AttributeContractFulfillment[key] = attributeContractFulfillmentValue
-	// }
-	result.Context = client.AccessTokenMappingContext{}
-	result.Context.ContextRef = client.ResourceLink{}
-	result.Context.ContextRef.Id = ""
+	result := client.AccessTokenMapping{
+		AccessTokenManagerRef: client.ResourceLink{
+			Id: testTokenManagerId,
+		},
+		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
+			"testAttribute": {
+				Source: client.SourceTypeIdKey{
+					Type: "NO_MAPPING",
+				},
+			},
+		},
+		Context: client.AccessTokenMappingContext{
+			Type: "DEFAULT",
+		},
+		Id: utils.Pointer("default|" + testTokenManagerId),
+	}
 
 	request = request.Body(result)
 

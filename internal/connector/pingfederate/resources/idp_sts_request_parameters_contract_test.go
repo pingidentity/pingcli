@@ -32,10 +32,13 @@ func createIdpStsRequestParametersContract(t *testing.T, clientInfo *connector.P
 	t.Helper()
 
 	request := clientInfo.ApiClient.IdpStsRequestParametersContractsAPI.CreateStsRequestParamContract(clientInfo.Context)
-	result := client.StsRequestParametersContract{}
-	result.Id = "TestIdpStsRequestParametersContractId"
-	result.Name = "TestIdpStsRequestParametersContractName"
-	result.Parameters = []string{}
+	result := client.StsRequestParametersContract{
+		Id:   "TestContractId",
+		Name: "TestContractName",
+		Parameters: []string{
+			"TestParamName",
+		},
+	}
 
 	request = request.Body(result)
 

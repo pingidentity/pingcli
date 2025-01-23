@@ -7,6 +7,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
@@ -33,11 +34,18 @@ func createSecretManager(t *testing.T, clientInfo *connector.PingFederateClientI
 
 	request := clientInfo.ApiClient.SecretManagersAPI.CreateSecretManager(clientInfo.Context)
 	result := client.SecretManager{
-		Configuration: client.PluginConfiguration{},
-		Id:            "TestSecretManagerId",
-		Name:          "TestSecretManagerName",
+		Configuration: client.PluginConfiguration{
+			Fields: []client.ConfigField{
+				{
+					Name:  "APP ID",
+					Value: utils.Pointer("TestAppId"),
+				},
+			},
+		},
+		Id:   "TestSecretManagerId",
+		Name: "TestSecretManagerName",
 		PluginDescriptorRef: client.ResourceLink{
-			Id: "",
+			Id: "com.pingidentity.pf.secretmanagers.cyberark.CyberArkCredentialProvider",
 		},
 	}
 

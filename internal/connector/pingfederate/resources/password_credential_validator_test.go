@@ -7,6 +7,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
@@ -33,11 +34,40 @@ func createPasswordCredentialValidator(t *testing.T, clientInfo *connector.PingF
 
 	request := clientInfo.ApiClient.PasswordCredentialValidatorsAPI.CreatePasswordCredentialValidator(clientInfo.Context)
 	result := client.PasswordCredentialValidator{
-		Configuration: client.PluginConfiguration{},
-		Id:            "TestPasswordCredentialValidatorId",
-		Name:          "TestPasswordCredentialValidatorName",
+		Configuration: client.PluginConfiguration{
+			Tables: []client.ConfigTable{
+				{
+					Name: "Users",
+					Rows: []client.ConfigRow{
+						{
+							DefaultRow: utils.Pointer(false),
+							Fields: []client.ConfigField{
+								{
+									Name:  "Username",
+									Value: utils.Pointer("TestUsername"),
+								},
+								{
+									Name:  "Password",
+									Value: utils.Pointer("TestPassword1"),
+								},
+								{
+									Name:  "Confirm Password",
+									Value: utils.Pointer("TestPassword1"),
+								},
+								{
+									Name:  "Relax Password Requirements",
+									Value: utils.Pointer("false"),
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Id:   "TestPCVId",
+		Name: "TestPCVName",
 		PluginDescriptorRef: client.ResourceLink{
-			Id: "",
+			Id: "org.sourceid.saml20.domain.SimpleUsernamePasswordCredentialValidator",
 		},
 	}
 

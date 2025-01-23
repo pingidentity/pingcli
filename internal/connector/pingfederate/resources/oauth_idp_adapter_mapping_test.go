@@ -15,7 +15,13 @@ func Test_PingFederateOauthIdpAdapterMapping_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.OauthIdpAdapterMapping(PingFederateClientInfo)
 
-	oauthIdpAdapterMappingId := createOauthIdpAdapterMapping(t, PingFederateClientInfo, resource.ResourceType())
+	testPCVId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
+	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+
+	testIdpAdapterId, _ := createIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+	defer deleteIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId)
+
+	oauthIdpAdapterMappingId := createOauthIdpAdapterMapping(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId)
 	defer deleteOauthIdpAdapterMapping(t, PingFederateClientInfo, resource.ResourceType(), oauthIdpAdapterMappingId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -29,13 +35,27 @@ func Test_PingFederateOauthIdpAdapterMapping_Export(t *testing.T) {
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createOauthIdpAdapterMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) string {
+func createOauthIdpAdapterMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testIdpAdapterId string) string {
 	t.Helper()
 
 	request := clientInfo.ApiClient.OauthIdpAdapterMappingsAPI.CreateIdpAdapterMapping(clientInfo.Context)
 	result := client.IdpAdapterMapping{
-		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{},
-		Id:                           "TestIdpAdapterMappingId",
+		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
+			"USER_NAME": {
+				Source: client.SourceTypeIdKey{
+					Type: "NO_MAPPING",
+				},
+			},
+			"USER_KEY": {
+				Source: client.SourceTypeIdKey{
+					Type: "NO_MAPPING",
+				},
+			},
+		},
+		Id: testIdpAdapterId,
+		IdpAdapterRef: &client.ResourceLink{
+			Id: testIdpAdapterId,
+		},
 	}
 
 	request = request.Body(result)

@@ -7,6 +7,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
@@ -32,12 +33,24 @@ func createNotificationPublisher(t *testing.T, clientInfo *connector.PingFederat
 	t.Helper()
 
 	request := clientInfo.ApiClient.NotificationPublishersAPI.CreateNotificationPublisher(clientInfo.Context)
-	result := client.NotificationPublisher{}
-	result.Id = "TestNotificationPublisherId"
-	result.Name = "TestNotificationPublisherName"
-	result.Configuration = client.PluginConfiguration{}
-	result.PluginDescriptorRef = client.ResourceLink{
-		Id: "",
+	result := client.NotificationPublisher{
+		Configuration: client.PluginConfiguration{
+			Fields: []client.ConfigField{
+				{
+					Name:  "From Address",
+					Value: utils.Pointer("test@example.com"),
+				},
+				{
+					Name:  "Email Server",
+					Value: utils.Pointer("example.com"),
+				},
+			},
+		},
+		Id:   "TestNotificationPublisherId",
+		Name: "TestNotificationPublisherName",
+		PluginDescriptorRef: client.ResourceLink{
+			Id: "com.pingidentity.email.SmtpNotificationPlugin",
+		},
 	}
 
 	request = request.Body(result)

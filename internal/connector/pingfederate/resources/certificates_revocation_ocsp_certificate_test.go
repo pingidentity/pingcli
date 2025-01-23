@@ -35,7 +35,7 @@ func createCertificatesRevocationOcspCertificate(t *testing.T, clientInfo *conne
 
 	request := clientInfo.ApiClient.CertificatesRevocationAPI.ImportOcspCertificate(clientInfo.Context)
 	result := client.X509File{}
-	result.Id = utils.Pointer("TestX509FileId")
+	result.Id = utils.Pointer("testx509fileid")
 	filedata, err := testutils.CreateX509Certificate()
 	if err != nil {
 		t.Fatalf("Failed to create test pem certificate %s: %v", resourceType, err)

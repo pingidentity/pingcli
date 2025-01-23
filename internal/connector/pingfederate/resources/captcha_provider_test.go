@@ -7,6 +7,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
@@ -32,12 +33,28 @@ func createCaptchaProvider(t *testing.T, clientInfo *connector.PingFederateClien
 	t.Helper()
 
 	request := clientInfo.ApiClient.CaptchaProvidersAPI.CreateCaptchaProvider(clientInfo.Context)
-	result := client.CaptchaProvider{}
-	result.Id = "TestCaptchaProviderId"
-	result.Name = "TestCaptchaProviderName"
-	result.Configuration = client.PluginConfiguration{}
-	result.PluginDescriptorRef = client.ResourceLink{
-		Id: "",
+	result := client.CaptchaProvider{
+		Configuration: client.PluginConfiguration{
+			Fields: []client.ConfigField{
+				{
+					Name:  "Site Key",
+					Value: utils.Pointer("TestSiteKey"),
+				},
+				{
+					Name:  "Secret Key",
+					Value: utils.Pointer("TestSecretKey"),
+				},
+				{
+					Name:  "Pass Score Threshold",
+					Value: utils.Pointer("0.8"),
+				},
+			},
+		},
+		Id:   "TestCaptchaProviderId",
+		Name: "TestCaptchaProviderName",
+		PluginDescriptorRef: client.ResourceLink{
+			Id: "com.pingidentity.captcha.recaptchaV3.ReCaptchaV3Plugin",
+		},
 	}
 
 	request = request.Body(result)

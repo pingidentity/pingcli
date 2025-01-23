@@ -33,9 +33,15 @@ func createAuthenticationPolicyContract(t *testing.T, clientInfo *connector.Ping
 	t.Helper()
 
 	request := clientInfo.ApiClient.AuthenticationPolicyContractsAPI.CreateAuthenticationPolicyContract(clientInfo.Context)
-	result := client.AuthenticationPolicyContract{}
-	result.Id = utils.Pointer("TestAuthenticationPolicyContractId")
-	result.Name = utils.Pointer("TestAuthenticationPolicyContractName")
+	result := client.AuthenticationPolicyContract{
+		CoreAttributes: []client.AuthenticationPolicyContractAttribute{
+			{
+				Name: "subject",
+			},
+		},
+		Id:   utils.Pointer("TestApcId"),
+		Name: utils.Pointer("TestApcName"),
+	}
 
 	request = request.Body(result)
 

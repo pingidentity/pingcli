@@ -15,7 +15,10 @@ func Test_PingFederateOauthAuthenticationPolicyContractMapping_Export(t *testing
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.OauthAuthenticationPolicyContractMapping(PingFederateClientInfo)
 
-	oauthAuthenticationPolicyContractMappingId := createOauthAuthenticationPolicyContractMapping(t, PingFederateClientInfo, resource.ResourceType())
+	testApcId, _ := createAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType(), testApcId)
+
+	oauthAuthenticationPolicyContractMappingId := createOauthAuthenticationPolicyContractMapping(t, PingFederateClientInfo, resource.ResourceType(), testApcId)
 	defer deleteOauthAuthenticationPolicyContractMapping(t, PingFederateClientInfo, resource.ResourceType(), oauthAuthenticationPolicyContractMappingId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -29,16 +32,27 @@ func Test_PingFederateOauthAuthenticationPolicyContractMapping_Export(t *testing
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) string {
+func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testApcId string) string {
 	t.Helper()
 
 	request := clientInfo.ApiClient.OauthAuthenticationPolicyContractMappingsAPI.CreateApcMapping(clientInfo.Context)
 	result := client.ApcToPersistentGrantMapping{
-		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{},
-		AuthenticationPolicyContractRef: client.ResourceLink{
-			Id: "",
+		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
+			"USER_NAME": {
+				Source: client.SourceTypeIdKey{
+					Type: "NO_MAPPING",
+				},
+			},
+			"USER_KEY": {
+				Source: client.SourceTypeIdKey{
+					Type: "NO_MAPPING",
+				},
+			},
 		},
-		Id: "TestApcToPersistentGrantMappingId",
+		AuthenticationPolicyContractRef: client.ResourceLink{
+			Id: testApcId,
+		},
+		Id: "testApcToPersistentGrantMappingId",
 	}
 
 	request = request.Body(result)

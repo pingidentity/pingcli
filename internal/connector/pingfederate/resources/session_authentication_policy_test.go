@@ -16,7 +16,13 @@ func Test_PingFederateSessionAuthenticationPolicy_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.SessionAuthenticationPolicy(PingFederateClientInfo)
 
-	sessionAuthenticationPolicyId, sessionAuthenticationPolicyAuthSourceType, sessionAuthenticationPolicyAuthSourceRefId := createSessionAuthenticationPolicy(t, PingFederateClientInfo, resource.ResourceType())
+	testPCVId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
+	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+
+	testIdpAdapterId, _ := createIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+	defer deleteIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId)
+
+	sessionAuthenticationPolicyId, sessionAuthenticationPolicyAuthSourceType, sessionAuthenticationPolicyAuthSourceRefId := createSessionAuthenticationPolicy(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId)
 	defer deleteSessionAuthenticationPolicy(t, PingFederateClientInfo, resource.ResourceType(), sessionAuthenticationPolicyId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -30,18 +36,18 @@ func Test_PingFederateSessionAuthenticationPolicy_Export(t *testing.T) {
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string, string) {
+func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testIdpAdapterId string) (string, string, string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.SessionAPI.CreateSourcePolicy(clientInfo.Context)
 	result := client.AuthenticationSessionPolicy{
 		AuthenticationSource: client.AuthenticationSource{
 			SourceRef: client.ResourceLink{
-				Id: "",
+				Id: testIdpAdapterId,
 			},
+			Type: "IDP_ADAPTER",
 		},
-		EnableSessions: true,
-		Id:             utils.Pointer("TestSessionAuthenticationPolicyId"),
+		Id: utils.Pointer("TestSessionAuthenticationPolicyId"),
 	}
 
 	request = request.Body(result)

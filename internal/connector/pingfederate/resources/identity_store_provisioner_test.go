@@ -11,11 +11,11 @@ import (
 )
 
 func Test_PingFederateIdentityStoreProvisioner_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.IdentityStoreProvisioner(PingFederateClientInfo)
+	pingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.IdentityStoreProvisioner(pingFederateClientInfo)
 
-	identityStoreProvisionerId, identityStoreProvisionerName := createIdentityStoreProvisioner(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteIdentityStoreProvisioner(t, PingFederateClientInfo, resource.ResourceType(), identityStoreProvisionerId)
+	identityStoreProvisionerId, identityStoreProvisionerName := createIdentityStoreProvisioner(t, pingFederateClientInfo, resource.ResourceType())
+	defer deleteIdentityStoreProvisioner(t, pingFederateClientInfo, resource.ResourceType(), identityStoreProvisionerId)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
@@ -32,12 +32,26 @@ func createIdentityStoreProvisioner(t *testing.T, clientInfo *connector.PingFede
 	t.Helper()
 
 	request := clientInfo.ApiClient.IdentityStoreProvisionersAPI.CreateIdentityStoreProvisioner(clientInfo.Context)
-	result := client.IdentityStoreProvisioner{}
-	result.Id = "TestIdentityStoreProvisionerId"
-	result.Name = "TestIdentityStoreProvisionerName"
-	result.Configuration = client.PluginConfiguration{}
-	result.PluginDescriptorRef = client.ResourceLink{
-		Id: "",
+	result := client.IdentityStoreProvisioner{
+		AttributeContract: &client.IdentityStoreProvisionerAttributeContract{
+			CoreAttributes: []client.Attribute{
+				{
+					Name: "username",
+				},
+			},
+		},
+		GroupAttributeContract: &client.IdentityStoreProvisionerGroupAttributeContract{
+			CoreAttributes: []client.GroupAttribute{
+				{
+					Name: "groupname",
+				},
+			},
+		},
+		Id:   "TestISPId",
+		Name: "TestISPName",
+		PluginDescriptorRef: client.ResourceLink{
+			Id: "com.pingidentity.identitystoreprovisioners.sample.SampleIdentityStoreProvisioner",
+		},
 	}
 
 	request = request.Body(result)

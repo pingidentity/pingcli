@@ -15,7 +15,10 @@ func Test_PingFederateLocalIdentityProfile_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.LocalIdentityProfile(PingFederateClientInfo)
 
-	localIdentityProfileId, localIdentityProfileName := createLocalIdentityProfile(t, PingFederateClientInfo, resource.ResourceType())
+	testApcId, _ := createAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType(), testApcId)
+
+	localIdentityProfileId, localIdentityProfileName := createLocalIdentityProfile(t, PingFederateClientInfo, resource.ResourceType(), testApcId)
 	defer deleteLocalIdentityProfile(t, PingFederateClientInfo, resource.ResourceType(), localIdentityProfileId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -29,15 +32,16 @@ func Test_PingFederateLocalIdentityProfile_Export(t *testing.T) {
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createLocalIdentityProfile(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createLocalIdentityProfile(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testApcId string) (string, string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.LocalIdentityIdentityProfilesAPI.CreateIdentityProfile(clientInfo.Context)
-	result := client.LocalIdentityProfile{}
-	result.Id = utils.Pointer("TestLocalIdentityProfileId")
-	result.Name = "TestLocalIdentityProfileName"
-	result.ApcId = client.ResourceLink{
-		Id: "",
+	result := client.LocalIdentityProfile{
+		ApcId: client.ResourceLink{
+			Id: testApcId,
+		},
+		Id:   utils.Pointer("TestLocalIdentityProfileId"),
+		Name: "TestLocalIdentityProfileName",
 	}
 
 	request = request.Body(result)

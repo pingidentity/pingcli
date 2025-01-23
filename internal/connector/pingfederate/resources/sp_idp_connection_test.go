@@ -32,12 +32,42 @@ func Test_PingFederateSpIdpConnection_Export(t *testing.T) {
 func createSpIdpConnection(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
 	t.Helper()
 
+	filedata, err := testutils.CreateX509Certificate()
+	if err != nil {
+		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+	}
+
 	request := clientInfo.ApiClient.SpIdpConnectionsAPI.CreateConnection(clientInfo.Context)
 	result := client.IdpConnection{
 		Connection: client.Connection{
-			EntityId: "TestEntityId",
-			Id:       utils.Pointer("TestIdpConnectionId"),
-			Name:     "TestIdpConnectionName",
+			Active: utils.Pointer(true),
+			Credentials: &client.ConnectionCredentials{
+				Certs: []client.ConnectionCert{
+					{
+						ActiveVerificationCert: utils.Pointer(true),
+						EncryptionCert:         utils.Pointer(false),
+						X509File: client.X509File{
+							FileData: filedata,
+							Id:       utils.Pointer("testx509fileid"),
+						},
+					},
+				},
+			},
+			EntityId:    "TestEntityId",
+			Id:          utils.Pointer("TestSpIdpConnectionId"),
+			LoggingMode: utils.Pointer("STANDARD"),
+			Name:        "TestSpIdpConnectionName",
+			Type:        utils.Pointer("IDP"),
+		},
+		WsTrust: &client.IdpWsTrust{
+			AttributeContract: client.IdpWsTrustAttributeContract{
+				CoreAttributes: []client.IdpWsTrustAttribute{
+					{
+						Masked: utils.Pointer(false),
+						Name:   "TOKEN_SUBJECT",
+					},
+				},
+			},
 		},
 	}
 

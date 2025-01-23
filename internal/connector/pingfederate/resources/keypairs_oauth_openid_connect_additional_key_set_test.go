@@ -15,7 +15,13 @@ func Test_PingFederateKeypairsOauthOpenidConnectAdditionalKeySet_Export(t *testi
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.KeypairsOauthOpenidConnectAdditionalKeySet(PingFederateClientInfo)
 
-	keypairsOauthOpenidConnectAdditionalKeySetId, keypairsOauthOpenidConnectAdditionalKeySetName := createKeypairsOauthOpenidConnectAdditionalKeySet(t, PingFederateClientInfo, resource.ResourceType())
+	testKeyPairId, _, _ := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId)
+
+	testOauthIssuerId, _ := createOauthIssuer(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteOauthIssuer(t, PingFederateClientInfo, resource.ResourceType(), testOauthIssuerId)
+
+	keypairsOauthOpenidConnectAdditionalKeySetId, keypairsOauthOpenidConnectAdditionalKeySetName := createKeypairsOauthOpenidConnectAdditionalKeySet(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId, testOauthIssuerId)
 	defer deleteKeypairsOauthOpenidConnectAdditionalKeySet(t, PingFederateClientInfo, resource.ResourceType(), keypairsOauthOpenidConnectAdditionalKeySetId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -29,21 +35,24 @@ func Test_PingFederateKeypairsOauthOpenidConnectAdditionalKeySet_Export(t *testi
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testKeyPairId, testOauthIssuerId string) (string, string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.KeyPairsOauthOpenIdConnectAPI.CreateKeySet(clientInfo.Context)
-	result := client.AdditionalKeySet{}
-	result.Id = utils.Pointer("TestAdditionalKeySetId")
-	result.Name = "TestAdditionalKeySetName"
-	result.Issuers = []client.ResourceLink{}
-	// for _, issuersElement := range model.Issuers.Elements() {
-	// 	issuersValue := client.ResourceLink{}
-	// 	issuersAttrs := issuersElement.(types.Object).Attributes()
-	// 	issuersValue.Id = issuersAttrs["id"].(types.String).ValueString()
-	// 	result.Issuers = append(result.Issuers, issuersValue)
-	// }
-	result.SigningKeys = client.SigningKeys{}
+	result := client.AdditionalKeySet{
+		Id: utils.Pointer("TestAdditionalKeySetId"),
+		Issuers: []client.ResourceLink{
+			{
+				Id: testOauthIssuerId,
+			},
+		},
+		Name: "TestAdditionalKeySetName",
+		SigningKeys: client.SigningKeys{
+			RsaActiveCertRef: &client.ResourceLink{
+				Id: testKeyPairId,
+			},
+		},
+	}
 
 	request = request.Body(result)
 

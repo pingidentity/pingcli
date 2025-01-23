@@ -33,11 +33,10 @@ func createOauthClientRegistrationPolicy(t *testing.T, clientInfo *connector.Pin
 
 	request := clientInfo.ApiClient.OauthClientRegistrationPoliciesAPI.CreateDynamicClientRegistrationPolicy(clientInfo.Context)
 	result := client.ClientRegistrationPolicy{
-		Configuration: client.PluginConfiguration{},
-		Id:            "TestClientRegistrationPolicyId",
-		Name:          "TestClientRegistrationPolicyName",
+		Id:   "TestClientRegistrationPolicyId",
+		Name: "TestClientRegistrationPolicyName",
 		PluginDescriptorRef: client.ResourceLink{
-			Id: "",
+			Id: "com.pingidentity.pf.client.registration.ResponseTypesConstraintsPlugin",
 		},
 	}
 

@@ -19,8 +19,8 @@ func Test_PingFederateKeypairsSigningKeyRotationSettings_Export(t *testing.T) {
 	keypairsSigningKeyId, keypairsSigningKeyIssuerDn, keypairsSigningKeySerialNumber := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
 	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), keypairsSigningKeyId)
 
-	keypairsSigningKeyRotationSettingsId := createKeypairsSigningKeyRotationSettings(t, PingFederateClientInfo, resource.ResourceType(), keypairsSigningKeyId)
-	defer deleteKeypairsSigningKeyRotationSettings(t, PingFederateClientInfo, resource.ResourceType(), keypairsSigningKeyRotationSettingsId)
+	createKeypairsSigningKeyRotationSettings(t, PingFederateClientInfo, resource.ResourceType(), keypairsSigningKeyId)
+	defer deleteKeypairsSigningKeyRotationSettings(t, PingFederateClientInfo, resource.ResourceType(), keypairsSigningKeyId)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
@@ -33,24 +33,23 @@ func Test_PingFederateKeypairsSigningKeyRotationSettings_Export(t *testing.T) {
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, keypairsSigningKeyId string) string {
+func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, keypairsSigningKeyId string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.KeyPairsSigningAPI.UpdateRotationSettings(clientInfo.Context, keypairsSigningKeyId)
-	result := client.KeyPairRotationSettings{}
-	result.Id = utils.Pointer("TestKeyPairRotationSettingsId")
-	result.ActivationBufferDays = 10
-	result.CreationBufferDays = 10
+	result := client.KeyPairRotationSettings{
+		ActivationBufferDays: 10,
+		CreationBufferDays:   10,
+		Id:                   utils.Pointer("TestRotationSettingsId"),
+	}
 
 	request = request.Body(result)
 
-	resource, response, err := request.Execute()
+	_, response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "UpdateRotationSettings", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
-
-	return *resource.Id
 }
 
 func deleteKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
@@ -69,14 +68,18 @@ func createKeypairsSigningKey(t *testing.T, clientInfo *connector.PingFederateCl
 	t.Helper()
 
 	request := clientInfo.ApiClient.KeyPairsSigningAPI.CreateSigningKeyPair(clientInfo.Context)
-	result := client.NewKeyPairSettings{}
-	result.Id = utils.Pointer("TestNewKeyPairSettingsId")
-	result.CommonName = "*.pingidentity.com"
-	result.Organization = "Ping Identity Corporation"
-	result.City = utils.Pointer("Denver")
-	result.State = utils.Pointer("CO")
-	result.Country = "US"
-	result.ValidDays = 10
+	result := client.NewKeyPairSettings{
+		City:               utils.Pointer("Denver"),
+		CommonName:         "*.pingidentity.com",
+		Country:            "US",
+		Id:                 utils.Pointer("testkeypairid"),
+		KeyAlgorithm:       "RSA",
+		KeySize:            utils.Pointer(int64(2048)),
+		Organization:       "Ping Identity Corporation",
+		SignatureAlgorithm: utils.Pointer("SHA256withRSA"),
+		State:              utils.Pointer("CO"),
+		ValidDays:          365,
+	}
 
 	request = request.Body(result)
 

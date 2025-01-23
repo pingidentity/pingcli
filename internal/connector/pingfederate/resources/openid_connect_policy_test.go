@@ -7,6 +7,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
@@ -14,7 +15,13 @@ func Test_PingFederateOpenidConnectPolicy_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.OpenidConnectPolicy(PingFederateClientInfo)
 
-	openidConnectPolicyId, openidConnectPolicyName := createOpenidConnectPolicy(t, PingFederateClientInfo, resource.ResourceType())
+	testKeyPairId, _, _ := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId)
+
+	testAccessTokenManagerId, _ := createOauthAccessTokenManager(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId)
+	defer deleteOauthAccessTokenManager(t, PingFederateClientInfo, resource.ResourceType(), testAccessTokenManagerId)
+
+	openidConnectPolicyId, openidConnectPolicyName := createOpenidConnectPolicy(t, PingFederateClientInfo, resource.ResourceType(), testAccessTokenManagerId)
 	defer deleteOpenidConnectPolicy(t, PingFederateClientInfo, resource.ResourceType(), openidConnectPolicyId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -28,18 +35,33 @@ func Test_PingFederateOpenidConnectPolicy_Export(t *testing.T) {
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createOpenidConnectPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createOpenidConnectPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testAccessTokenManagerId string) (string, string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.OauthOpenIdConnectAPI.CreateOIDCPolicy(clientInfo.Context)
 	result := client.OpenIdConnectPolicy{
 		AccessTokenManagerRef: client.ResourceLink{
-			Id: "",
+			Id: testAccessTokenManagerId,
 		},
-		AttributeContract: client.OpenIdConnectAttributeContract{},
-		AttributeMapping:  client.AttributeMapping{},
-		Id:                "TestOpenidConnectPolicyId",
-		Name:              "TestOpenidConnectPolicyName",
+		AttributeContract: client.OpenIdConnectAttributeContract{
+			CoreAttributes: []client.OpenIdConnectAttribute{
+				{
+					MultiValued: utils.Pointer(false),
+					Name:        "sub",
+				},
+			},
+		},
+		AttributeMapping: client.AttributeMapping{
+			AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
+				"sub": {
+					Source: client.SourceTypeIdKey{
+						Type: "NO_MAPPING",
+					},
+				},
+			},
+		},
+		Id:   "TestOIDCPolicyId",
+		Name: "TestOIDCPolicyName",
 	}
 
 	request = request.Body(result)

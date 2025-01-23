@@ -7,6 +7,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
@@ -33,11 +34,22 @@ func createSpAdapter(t *testing.T, clientInfo *connector.PingFederateClientInfo,
 
 	request := clientInfo.ApiClient.SpAdaptersAPI.CreateSpAdapter(clientInfo.Context)
 	result := client.SpAdapter{
-		Configuration: client.PluginConfiguration{},
-		Id:            "TestSpAdapterId",
-		Name:          "TestSpAdapterName",
+		Configuration: client.PluginConfiguration{
+			Fields: []client.ConfigField{
+				{
+					Name:  "Password",
+					Value: utils.Pointer("TestPassword1"),
+				},
+				{
+					Name:  "Confirm Password",
+					Value: utils.Pointer("TestPassword1"),
+				},
+			},
+		},
+		Id:   "TestSpAdapterId",
+		Name: "TestSpAdapterName",
 		PluginDescriptorRef: client.ResourceLink{
-			Id: "",
+			Id: "com.pingidentity.adapters.opentoken.SpAuthnAdapter",
 		},
 	}
 

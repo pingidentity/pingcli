@@ -33,9 +33,14 @@ func createOauthClient(t *testing.T, clientInfo *connector.PingFederateClientInf
 
 	request := clientInfo.ApiClient.OauthClientsAPI.CreateOauthClient(clientInfo.Context)
 	result := client.Client{
-		ClientId:   "TestClientClientId",
-		GrantTypes: []string{},
-		Name:       "TestClientName",
+		ClientId: "TestClientId",
+		GrantTypes: []string{
+			"AUTHORIZATION_CODE",
+		},
+		Name: "TestClientName",
+		RedirectUris: []string{
+			"https://www.example.com",
+		},
 	}
 
 	request = request.Body(result)

@@ -15,7 +15,13 @@ func Test_PingFederateAuthenticationPoliciesFragment_Export(t *testing.T) {
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.AuthenticationPoliciesFragment(PingFederateClientInfo)
 
-	authenticationPoliciesFragmentId, authenticationPoliciesFragmentName := createAuthenticationPoliciesFragment(t, PingFederateClientInfo, resource.ResourceType())
+	passwordCredentialValidatorId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
+	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), passwordCredentialValidatorId)
+
+	idpAdapterId, _ := createIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), passwordCredentialValidatorId)
+	defer deleteIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), idpAdapterId)
+
+	authenticationPoliciesFragmentId, authenticationPoliciesFragmentName := createAuthenticationPoliciesFragment(t, PingFederateClientInfo, resource.ResourceType(), idpAdapterId)
 	defer deleteAuthenticationPoliciesFragment(t, PingFederateClientInfo, resource.ResourceType(), authenticationPoliciesFragmentId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -29,13 +35,51 @@ func Test_PingFederateAuthenticationPoliciesFragment_Export(t *testing.T) {
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, idpAdapterId string) (string, string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.AuthenticationPoliciesAPI.CreateFragment(clientInfo.Context)
-	result := client.AuthenticationPolicyFragment{}
-	result.Id = utils.Pointer("TestAuthenticationPolicyFragmentId")
-	result.Name = utils.Pointer("TestAuthenticationPolicyFragmentName")
+	result := client.AuthenticationPolicyFragment{
+		Id:   utils.Pointer("TestFragmentId"),
+		Name: utils.Pointer("TestFragmentName"),
+		RootNode: &client.AuthenticationPolicyTreeNode{
+			Action: client.PolicyActionAggregation{
+				AuthnSourcePolicyAction: &client.AuthnSourcePolicyAction{
+					PolicyAction: client.PolicyAction{
+						Type: "AUTHN_SOURCE",
+					},
+					AuthenticationSource: client.AuthenticationSource{
+						SourceRef: client.ResourceLink{
+							Id: idpAdapterId,
+						},
+						Type: "IDP_ADAPTER",
+					},
+				},
+			},
+			Children: []client.AuthenticationPolicyTreeNode{
+				{
+					Action: client.PolicyActionAggregation{
+						DonePolicyAction: &client.DonePolicyAction{
+							PolicyAction: client.PolicyAction{
+								Type:    "DONE",
+								Context: utils.Pointer("Fail"),
+							},
+						},
+					},
+				},
+				{
+					Action: client.PolicyActionAggregation{
+						DonePolicyAction: &client.DonePolicyAction{
+							PolicyAction: client.PolicyAction{
+								Type:    "DONE",
+								Context: utils.Pointer("Success"),
+							},
+						},
+					},
+				},
+			},
+		},
+	}
 
 	request = request.Body(result)
 

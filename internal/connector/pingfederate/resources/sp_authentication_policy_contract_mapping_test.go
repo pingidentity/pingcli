@@ -16,7 +16,13 @@ func Test_PingFederateSpAuthenticationPolicyContractMapping_Export(t *testing.T)
 	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
 	resource := resources.SpAuthenticationPolicyContractMapping(PingFederateClientInfo)
 
-	spAuthenticationPolicyContractMappingId, spAuthenticationPolicyContractMappingSourceId, spAuthenticationPolicyContractMappingTargetId := createSpAuthenticationPolicyContractMapping(t, PingFederateClientInfo, resource.ResourceType())
+	testAPCId, _ := createAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType(), testAPCId)
+
+	testSPAdapterId, _ := createSpAdapter(t, PingFederateClientInfo, resource.ResourceType())
+	defer deleteSpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testSPAdapterId)
+
+	spAuthenticationPolicyContractMappingId, spAuthenticationPolicyContractMappingSourceId, spAuthenticationPolicyContractMappingTargetId := createSpAuthenticationPolicyContractMapping(t, PingFederateClientInfo, resource.ResourceType(), testAPCId, testSPAdapterId)
 	defer deleteSpAuthenticationPolicyContractMapping(t, PingFederateClientInfo, resource.ResourceType(), spAuthenticationPolicyContractMappingId)
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -30,15 +36,21 @@ func Test_PingFederateSpAuthenticationPolicyContractMapping_Export(t *testing.T)
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
 }
 
-func createSpAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string, string) {
+func createSpAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testAPCId, testSPAdapterId string) (string, string, string) {
 	t.Helper()
 
 	request := clientInfo.ApiClient.SpAuthenticationPolicyContractMappingsAPI.CreateApcToSpAdapterMapping(clientInfo.Context)
 	result := client.ApcToSpAdapterMapping{
-		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{},
-		Id:                           utils.Pointer("TestApcToSpAdapterMappingId"),
-		SourceId:                     "TestApcToSpAdapterMappingSourceId",
-		TargetId:                     "TestApcToSpAdapterMappingTargetId",
+		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
+			"subject": {
+				Source: client.SourceTypeIdKey{
+					Type: "NO_MAPPING",
+				},
+			},
+		},
+		Id:       utils.Pointer(testAPCId + "|" + testSPAdapterId),
+		SourceId: testAPCId,
+		TargetId: testSPAdapterId,
 	}
 
 	request = request.Body(result)

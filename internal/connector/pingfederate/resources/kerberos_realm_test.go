@@ -33,9 +33,14 @@ func createKerberosRealm(t *testing.T, clientInfo *connector.PingFederateClientI
 	t.Helper()
 
 	request := clientInfo.ApiClient.KerberosRealmsAPI.CreateKerberosRealm(clientInfo.Context)
-	result := client.KerberosRealm{}
-	result.Id = utils.Pointer("TestKerberosRealmId")
-	result.KerberosRealmName = "TestKerberosRealmName"
+	result := client.KerberosRealm{
+		ConnectionType:                     utils.Pointer("LOCAL_VALIDATION"),
+		Id:                                 utils.Pointer("TestKerberosRealmId"),
+		KerberosPassword:                   utils.Pointer("TestPassword1"),
+		KerberosRealmName:                  "TestKerberosRealmName",
+		KerberosUsername:                   utils.Pointer("TestKerberosUser"),
+		RetainPreviousKeysOnPasswordChange: utils.Pointer(true),
+	}
 
 	request = request.Body(result)
 
