@@ -32,7 +32,7 @@ func TestConfigUnsetCmd_TooManyArgs(t *testing.T) {
 
 // Test Config Unset Command Fails when an invalid key is provided
 func TestConfigUnsetCmd_InvalidKey(t *testing.T) {
-	expectedErrorPattern := `^failed to unset configuration: key '.*' is not recognized as a valid configuration key\. Valid keys: [A-Za-z\.\s,]+$`
+	expectedErrorPattern := `^failed to unset configuration: key '.*' is not recognized as a valid configuration key\.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := testutils_cobra.ExecutePingcli(t, "config", "unset", "pingcli.invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

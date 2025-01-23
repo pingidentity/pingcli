@@ -34,7 +34,7 @@ func ValidateViperKey(viperKey string) error {
 	}
 
 	// validKeysStr := strings.Join(validKeys, ", ")
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key. \nUse 'pingcli config list-keys' to view all available keys", viperKey)
+	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", viperKey)
 }
 
 // Return a list of all viper keys from Options
