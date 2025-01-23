@@ -32,7 +32,7 @@ func Test_RunInternalConfigSet_InvalidKey(t *testing.T) {
 func Test_RunInternalConfigSet_InvalidValue(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `(?s)^failed to set configuration: value for key '.*' must be a boolean. Allowed .*: strconv.ParseBool: parsing ".*": invalid syntax$`
+	expectedErrorPattern := `^failed to set configuration: value for key '.*' must be a boolean. Allowed .*: strconv.ParseBool: parsing ".*": invalid syntax$`
 	err := RunInternalConfigSet("noColor=invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

@@ -23,8 +23,7 @@ func Test_RunInternalConfigGet(t *testing.T) {
 func Test_RunInternalConfigGet_InvalidKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `(?s)^failed to get configuration: key '.*' is not recognized as a valid configuration key.
-Use 'pingcli config list-keys' to view all available keys`
+	expectedErrorPattern := `(?s)^failed to get configuration: key '.*' is not recognized as a valid configuration key\.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := RunInternalConfigGet("invalid-key")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
