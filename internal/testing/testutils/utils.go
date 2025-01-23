@@ -226,7 +226,7 @@ func WriteStringToPipe(str string, t *testing.T) (reader *os.File) {
 	return reader
 }
 
-func CreatePemCertificateCa() (string, error) {
+func CreateX509Certificate() (string, error) {
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 	if err != nil {
@@ -242,6 +242,7 @@ func CreatePemCertificateCa() (string, error) {
 			Locality:      []string{"Denver"},
 			StreetAddress: []string{"1001 17th St"},
 			PostalCode:    []string{"80202"},
+			CommonName:    "*.pingidentity.com",
 		},
 		NotBefore:             time.Now(),
 		NotAfter:              time.Now().AddDate(1, 0, 0),
