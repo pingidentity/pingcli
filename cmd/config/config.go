@@ -23,12 +23,13 @@ func NewConfigCommand() *cobra.Command {
 	cmd.AddCommand(
 		NewConfigAddProfileCommand(),
 		NewConfigDeleteProfileCommand(),
-		NewConfigViewProfileCommand(),
+		NewConfigGetCommand(),
+		NewConfigListKeysCommand(),
 		NewConfigListProfilesCommand(),
 		NewConfigSetActiveProfileCommand(),
-		NewConfigGetCommand(),
 		NewConfigSetCommand(),
 		NewConfigUnsetCommand(),
+		NewConfigViewProfileCommand(),
 	)
 
 	return cmd
