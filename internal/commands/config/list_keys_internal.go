@@ -13,43 +13,41 @@ import (
 
 func returnKeysYamlString() (string, error) {
 	var err error
-	validKeys := configuration.ViperKeys()
+	viperKeys := configuration.ViperKeys()
 
-	if len(validKeys) == 0 {
+	if len(viperKeys) == 0 {
 		return "", fmt.Errorf("unable to retrieve valid keys")
 	}
 
-	validKeysJoined := strings.Join(validKeys, " ")
 	// Split the input string into individual keys
-	parts := strings.Split(validKeysJoined, " ")
-	result := make(map[string]interface{})
+	keyMap := make(map[string]interface{})
 
-	// Iterate over each part
-	for _, part := range parts {
+	// Iterate over each viper key
+	for _, viperKey := range viperKeys {
 		// Skip the "activeProfile" key
-		if part == "activeProfile" {
+		if viperKey == "activeProfile" {
 			continue
 		}
 
-		// Create a nested map for each part
-		currentMap := result
-		keys := strings.Split(part, ".")
-		for i, key := range keys {
-			// If it's the last key, set an empty map
-			if i == len(keys)-1 {
-				currentMap[key] = ""
+		// Create a nested map for each yaml key
+		currentMap := keyMap
+		yamlKeys := strings.Split(viperKey, ".")
+		for i, k := range yamlKeys {
+			// If it's the last yaml key, set an empty map
+			if i == len(yamlKeys)-1 {
+				currentMap[k] = ""
 			} else {
 				// Otherwise, create or navigate to the next level
-				if _, exists := currentMap[key]; !exists {
-					currentMap[key] = make(map[string]interface{})
+				if _, exists := currentMap[k]; !exists {
+					currentMap[k] = make(map[string]interface{})
 				}
-				currentMap = currentMap[key].(map[string]interface{})
+				currentMap = currentMap[k].(map[string]interface{})
 			}
 		}
 	}
 
 	// Marshal the result into YAML
-	yamlData, err := yaml.Marshal(result)
+	yamlData, err := yaml.Marshal(keyMap)
 	if err != nil {
 		return "", fmt.Errorf("error marshaling keys to YAML format")
 	}

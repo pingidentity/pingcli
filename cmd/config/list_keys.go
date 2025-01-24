@@ -10,7 +10,8 @@ import (
 
 const (
 	listKeysCommandExamples = `  List all configuration keys stored in the CLI configuration file.
-  pingcli config list-keys --yaml`
+  pingcli config list-keys
+	pingcli config list-keys --yaml`
 )
 
 func NewConfigListKeysCommand() *cobra.Command {
