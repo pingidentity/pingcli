@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	listKeysCommandExamples = `  pingcli config list-keys
+	listKeysCommandExamples = `  List all configuration keys stored in the CLI configuration file.
   pingcli config list-keys --yaml`
 )
 
@@ -18,10 +18,10 @@ func NewConfigListKeysCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               listKeysCommandExamples,
-		Long: "\n" + `View the complete list of available configuration options. These attributes can be saved via the set and unset config subcommands or stored in a profile within the config file.
+		Long: `View the complete list of available configuration options. These attributes can be saved via the set and unset config subcommands or stored in a profile within the config file.
 For details on the configuration options visit: https://github.com/pingidentity/pingcli/blob/main/docs/tool-configuration/configuration-key.md`,
 		RunE:  configListKeysRunE,
-		Short: "List all keys.",
+		Short: "List all configuration keys.",
 		Use:   "list-keys [flags]",
 	}
 

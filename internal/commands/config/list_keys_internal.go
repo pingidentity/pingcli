@@ -1,62 +1,50 @@
 package config_internal
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"gopkg.in/yaml.v3"
 )
 
-func returnKeysYamlString() string {
-	inputString := returnKeysString("", " ")
-	// Split the input by spaces
-	parts := strings.Fields(inputString)
+func returnKeysYamlString() (string, error) {
+	var err error
+	validKeys := configuration.ViperKeys()
 
-	// Create a nested map based on the period (.) separator
+	validKeysJoined := strings.Join(validKeys, " ")
+
+	if len(validKeys) == 0 {
+		return "", fmt.Errorf("unable to retrieve valid keys")
+	}
+
+	// Split the input string into individual keys
+	parts := strings.Split(validKeysJoined, " ")
 	result := make(map[string]interface{})
 
-	// Flag to indicate if activeProfile is processed
-	activeProfileFound := false
-
-	// Iterate through each part
+	// Iterate over each part
 	for _, part := range parts {
-		keys := strings.Split(part, ".")
-
-		// Only treat the first occurrence of activeProfile as the root key
-		if keys[0] == "activeProfile" && !activeProfileFound {
-			// Set activeProfile as the top-level key and initialize it as an empty string
-			result["activeProfile"] = ""
-			activeProfileFound = true
-			continue // Skip further processing for the "activeProfile" key itself
+		// Skip the "activeProfile" key
+		if part == "activeProfile" {
+			continue
 		}
 
-		// Now handle nested elements only under activeProfile
-		if activeProfileFound {
-			// Ensure we create a map for the activeProfile if it's not already created
-			if _, exists := result["activeProfile"].(map[string]interface{}); !exists {
-				result["activeProfile"] = make(map[string]interface{})
-			}
-
-			// Get the map for activeProfile
-			current := result["activeProfile"].(map[string]interface{})
-
-			// Process each key in the current part
-			for i, key := range keys {
-				if i == len(keys)-1 {
-					// Set the value for the last key, which should be an empty string
-					current[key] = ""
-				} else {
-					// Create intermediate maps for nested keys
-					if _, exists := current[key]; !exists {
-						current[key] = make(map[string]interface{})
-					}
-					// Move deeper into the nested map
-					current = current[key].(map[string]interface{})
+		// Create a nested map for each part
+		currentMap := result
+		keys := strings.Split(part, ".")
+		for i, key := range keys {
+			// If it's the last key, set an empty map
+			if i == len(keys)-1 {
+				currentMap[key] = ""
+			} else {
+				// Otherwise, create or navigate to the next level
+				if _, exists := currentMap[key]; !exists {
+					currentMap[key] = make(map[string]interface{})
 				}
+				currentMap = currentMap[key].(map[string]interface{})
 			}
 		}
 	}
@@ -64,40 +52,43 @@ func returnKeysYamlString() string {
 	// Marshal the result into YAML
 	yamlData, err := yaml.Marshal(result)
 	if err != nil {
-		output.Warn("Error marshaling keys to YAML format", nil)
-		return ""
+		return "", fmt.Errorf("error marshaling keys to YAML format")
 	}
 
-	return string(yamlData)
+	return string(yamlData), nil
 }
 
-func returnKeysString(stringPrefix, keyPrefix string) string {
-	var err error
-	l := logger.Get()
+func returnKeysString() (string, error) {
+	// var err error
 	validKeys := configuration.ViperKeys()
 
-	validKeysJoined := strings.Join(validKeys, keyPrefix)
+	validKeysJoined := strings.Join(validKeys, "\n- ")
 
 	if len(validKeys) == 0 {
-		l.Err(err).Msg("Unable to retrieve valid keys.")
-		return ""
+		return "", fmt.Errorf("unable to retrieve valid keys")
 	} else {
-		return stringPrefix + validKeysJoined
+		return "Valid Keys:\n- " + validKeysJoined, nil
 	}
 }
 
 func RunInternalConfigListKeys() (err error) {
-	l := logger.Get()
 	var outputMessageString string
-	if yamlStr, err := profiles.GetOptionValue(options.ConfigListKeysYamlOption); yamlStr == "true" {
-		if err != nil {
-			l.Err(err).Msg("Unable to get list keys option.")
-		}
+	yamlFlagStr, err := profiles.GetOptionValue(options.ConfigListKeysYamlOption)
+	if err != nil {
+		return err
+	}
+	if yamlFlagStr == "true" {
 		// Output the YAML data as a string
-		outputMessageString = returnKeysYamlString()
+		outputMessageString, err = returnKeysYamlString()
+		if err != nil {
+			return err
+		}
 	} else {
-		listKeysStr := "Valid Keys:\n- "
-		outputMessageString = returnKeysString(listKeysStr, "\n- ")
+		// Output data list string
+		outputMessageString, err = returnKeysString()
+		if err != nil {
+			return err
+		}
 	}
 
 	output.Message(outputMessageString, nil)
