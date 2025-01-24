@@ -15,12 +15,11 @@ func returnKeysYamlString() (string, error) {
 	var err error
 	validKeys := configuration.ViperKeys()
 
-	validKeysJoined := strings.Join(validKeys, " ")
-
 	if len(validKeys) == 0 {
 		return "", fmt.Errorf("unable to retrieve valid keys")
 	}
 
+	validKeysJoined := strings.Join(validKeys, " ")
 	// Split the input string into individual keys
 	parts := strings.Split(validKeysJoined, " ")
 	result := make(map[string]interface{})
@@ -62,11 +61,10 @@ func returnKeysString() (string, error) {
 	// var err error
 	validKeys := configuration.ViperKeys()
 
-	validKeysJoined := strings.Join(validKeys, "\n- ")
-
 	if len(validKeys) == 0 {
 		return "", fmt.Errorf("unable to retrieve valid keys")
 	} else {
+		validKeysJoined := strings.Join(validKeys, "\n- ")
 		return "Valid Keys:\n- " + validKeysJoined, nil
 	}
 }

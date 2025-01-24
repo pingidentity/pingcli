@@ -33,7 +33,6 @@ func ValidateViperKey(viperKey string) error {
 		}
 	}
 
-	// validKeysStr := strings.Join(validKeys, ", ")
 	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", viperKey)
 }
 
@@ -67,7 +66,6 @@ func ValidateParentViperKey(viperKey string) error {
 		}
 	}
 
-	// validKeysStr := "\n- " + strings.Join(validKeys, "\n- ")
 	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", viperKey)
 }
 

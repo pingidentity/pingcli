@@ -87,44 +87,44 @@ func Example_listKeysYAMLValue() {
 	// Output:
 	// description: ""
 	// export:
-	// 		format: ""
-	// 		outputDirectory: ""
-	// 		overwrite: ""
-	// 		pingone:
-	// 				environmentID: ""
-	// 		services: ""
+	//        format: ""
+	//        outputDirectory: ""
+	// 		    overwrite: ""
+	// 		    pingone:
+	// 				        environmentID: ""
+	// 		    services: ""
 	// noColor: ""
 	// outputFormat: ""
 	// request:
-	// 		accessToken: ""
-	// 		accessTokenExpiry: ""
-	// 		fail: ""
-	// 		service: ""
+	//         accessToken: ""
+	//         accessTokenExpiry: ""
+	//         fail: ""
+	// 		     service: ""
 	// service:
-	// 		pingfederate:
-	// 				adminAPIPath: ""
-	// 				authentication:
-	// 						accessTokenAuth:
-	// 								accessToken: ""
-	// 						basicAuth:
-	// 								password: ""
-	// 								username: ""
-	// 						clientCredentialsAuth:
-	// 								clientID: ""
-	// 								clientSecret: ""
-	// 								scopes: ""
-	// 								tokenURL: ""
-	// 						type: ""
-	// 				caCertificatePemFiles: ""
-	// 				httpsHost: ""
-	// 				insecureTrustAllTLS: ""
-	// 				xBypassExternalValidationHeader: ""
+	//     pingfederate:
+	// 				     adminAPIPath: ""
+	// 				     authentication:
+	//						         accessTokenAuth:
+	// 								             accessToken: ""
+	// 						 				 basicAuth:
+	// 								             password: ""
+	// 								             username: ""
+	// 						         clientCredentialsAuth:
+	// 								             clientID: ""
+	// 								             clientSecret: ""
+	// 								             scopes: ""
+	// 								             tokenURL: ""
+	// 						         type: ""
+	// 				     caCertificatePemFiles: ""
+	// 				     httpsHost: ""
+	// 				     insecureTrustAllTLS: ""
+	// 				     xBypassExternalValidationHeader: ""
 	// 		pingone:
-	// 				authentication:
-	// 						type: ""
-	// 						worker:
-	// 								clientID: ""
-	// 								clientSecret: ""
-	// 								environmentID: ""
-	// 				regionCode: ""
+	// 				    authentication:
+	// 						        type: ""
+	// 						        worker:
+	// 								            clientID: ""
+	// 								            clientSecret: ""
+	// 								            environmentID: ""
+	// 				    regionCode: ""
 }
