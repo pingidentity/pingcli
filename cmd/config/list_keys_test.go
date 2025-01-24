@@ -89,42 +89,42 @@ func Example_listKeysYAMLValue() {
 	// export:
 	//        format: ""
 	//        outputDirectory: ""
-	// 		    overwrite: ""
-	// 		    pingone:
-	// 				        environmentID: ""
-	// 		    services: ""
+	//            overwrite: ""
+	//            pingone:
+	//                    environmentID: ""
+	//            services: ""
 	// noColor: ""
 	// outputFormat: ""
 	// request:
 	//         accessToken: ""
 	//         accessTokenExpiry: ""
 	//         fail: ""
-	// 		     service: ""
+	//             service: ""
 	// service:
 	//     pingfederate:
-	// 				     adminAPIPath: ""
-	// 				     authentication:
-	//						         accessTokenAuth:
-	// 								             accessToken: ""
-	// 						 				 basicAuth:
-	// 								             password: ""
-	// 								             username: ""
-	// 						         clientCredentialsAuth:
-	// 								             clientID: ""
-	// 								             clientSecret: ""
-	// 								             scopes: ""
-	// 								             tokenURL: ""
-	// 						         type: ""
-	// 				     caCertificatePemFiles: ""
-	// 				     httpsHost: ""
-	// 				     insecureTrustAllTLS: ""
-	// 				     xBypassExternalValidationHeader: ""
-	// 		pingone:
-	// 				    authentication:
-	// 						        type: ""
-	// 						        worker:
-	// 								            clientID: ""
-	// 								            clientSecret: ""
-	// 								            environmentID: ""
-	// 				    regionCode: ""
+	//                     adminAPIPath: ""
+	//                     authentication:
+	//                             accessTokenAuth:
+	//                                     accessToken: ""
+	//                             basicAuth:
+	//                                     password: ""
+	//                                     username: ""
+	//                             clientCredentialsAuth:
+	//                                     clientID: ""
+	//                                     clientSecret: ""
+	//                                     scopes: ""
+	//                                     tokenURL: ""
+	//                             type: ""
+	//                     caCertificatePemFiles: ""
+	//                     httpsHost: ""
+	//                     insecureTrustAllTLS: ""
+	//                     xBypassExternalValidationHeader: ""
+	//         pingone:
+	//                authentication:
+	//                        type: ""
+	//                        worker:
+	//                                clientID: ""
+	//                                clientSecret: ""
+	//                                environmentID: ""
+	//                regionCode: ""
 }
