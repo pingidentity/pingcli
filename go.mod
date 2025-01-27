@@ -7,8 +7,8 @@ require (
 	github.com/golangci/golangci-lint v1.63.2
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/manifoldco/promptui v0.9.0
-	github.com/patrickcping/pingone-go-sdk-v2 v0.12.5
-	github.com/patrickcping/pingone-go-sdk-v2/management v0.45.0
+	github.com/patrickcping/pingone-go-sdk-v2 v0.12.7
+	github.com/patrickcping/pingone-go-sdk-v2/management v0.47.0
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.18.0
 	github.com/pavius/impi v0.0.3
 	github.com/pingidentity/pingfederate-go-client/v1210 v1210.0.5
@@ -134,7 +134,7 @@ require (
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.7.0 // indirect
 	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.10.0 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.21.0 // indirect
+	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.22.0 // indirect
 	github.com/patrickcping/pingone-go-sdk-v2/verify v0.8.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -197,7 +197,7 @@ require (
 	golang.org/x/exp v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20241217172543-b2144cdd0a67 // indirect
 	golang.org/x/mod v0.22.0 // indirect
-	golang.org/x/oauth2 v0.24.0 // indirect
+	golang.org/x/oauth2 v0.25.0 // indirect
 	golang.org/x/sync v0.10.0 // indirect
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0 // indirect
