@@ -205,7 +205,7 @@ provider "pingfederate" {
   token_url       = "%s"
   https_host      = "%s"
   admin_api_path  = "%s"
-  product_version = "12.1"
+  product_version = "12.2"
   insecure_trust_all_tls = true
   x_bypass_external_validation_header = true
 }
