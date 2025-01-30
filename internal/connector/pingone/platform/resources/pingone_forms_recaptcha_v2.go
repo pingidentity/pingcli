@@ -32,9 +32,14 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 
 	importBlocks := []connector.ImportBlock{}
 
-	err := r.checkFormRecaptchaV2Data()
+	ok, err := r.checkFormRecaptchaV2Data()
 	if err != nil {
 		return nil, err
+	}
+
+	if !ok {
+		l.Debug().Msgf("No '%s' resources to export. Skipping...", r.ResourceType())
+		return &importBlocks, nil
 	}
 
 	commentData := map[string]string{
@@ -54,16 +59,16 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 	return &importBlocks, nil
 }
 
-func (r *PingOneFormRecaptchaV2Resource) checkFormRecaptchaV2Data() error {
+func (r *PingOneFormRecaptchaV2Resource) checkFormRecaptchaV2Data() (bool, error) {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	err = common.HandleClientResponse(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if response.StatusCode == 204 {
-		return common.DataNilError(r.ResourceType(), response)
+		return false, nil
 	}
 
-	return nil
+	return true, nil
 }
