@@ -8,11 +8,11 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateDataStore_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.DataStore(PingFederateClientInfo)
+func Test_PingFederateDataStore(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.DataStore(pingfederateClientInfo)
 
-	// The default data store 'ProvisionerDS (sa)' is already created in the PingFederate server
+	// Data store is already configured in the PingFederate instance
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

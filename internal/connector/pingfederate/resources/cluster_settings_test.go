@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateClusterSettings_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ClusterSettings(PingFederateClientInfo)
+func Test_PingFederateClusterSettings(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.ClusterSettings(pingfederateClientInfo)
 
 	valid, err := resource.ValidPingFederateVersion()
 	if err != nil {

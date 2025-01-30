@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateOpenidConnectSettings_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.OpenidConnectSettings(PingFederateClientInfo)
+func Test_PingFederateOpenidConnectSettings(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.OpenidConnectSettings(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

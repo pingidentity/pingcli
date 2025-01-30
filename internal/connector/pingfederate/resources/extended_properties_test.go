@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateExtendedProperties_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ExtendedProperties(PingFederateClientInfo)
+func Test_PingFederateExtendedProperties(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.ExtendedProperties(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateCaptchaProviderSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateCaptchaProviderSettingsResource
-func CaptchaProviderSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateCaptchaProviderSettingsResource {
+func CaptchaProviderSettings(clientInfo *connector.ClientInfo) *PingFederateCaptchaProviderSettingsResource {
 	return &PingFederateCaptchaProviderSettingsResource{
 		clientInfo: clientInfo,
 	}

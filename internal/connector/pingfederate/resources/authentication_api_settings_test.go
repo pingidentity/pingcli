@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateAuthenticationApiSettings_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.AuthenticationApiSettings(PingFederateClientInfo)
+func Test_PingFederateAuthenticationApiSettings(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.AuthenticationApiSettings(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

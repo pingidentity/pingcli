@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateAuthenticationSelectorResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateAuthenticationSelectorResource
-func AuthenticationSelector(clientInfo *connector.PingFederateClientInfo) *PingFederateAuthenticationSelectorResource {
+func AuthenticationSelector(clientInfo *connector.ClientInfo) *PingFederateAuthenticationSelectorResource {
 	return &PingFederateAuthenticationSelectorResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.I
 func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorData() (*map[string]string, error) {
 	authenticationSelectorData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetAuthenticationSelectors", r.ResourceType())
 	if err != nil {
 		return nil, err

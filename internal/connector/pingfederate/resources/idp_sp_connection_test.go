@@ -7,41 +7,71 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateIdpSpConnection_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.IdpSpConnection(PingFederateClientInfo)
+func TestableResource_PingFederateIdpSpConnection(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testPCVId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
-	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: nil,
+					CreateFunc:   createKeypairsSigningKey,
+					DeleteFunc:   deleteKeypairsSigningKey,
+				},
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: nil,
+							CreateFunc:   createPasswordCredentialValidator,
+							DeleteFunc:   deletePasswordCredentialValidator,
+						},
+					},
+					CreateFunc: createIdpTokenProcessor,
+					DeleteFunc: deleteIdpTokenProcessor,
+				},
+			},
+			CreateFunc: createIdpSpConnection,
+			DeleteFunc: deleteIdpSpConnection,
+		},
+	}
+}
 
-	idpTokenProcessorId, _ := createIdpTokenProcessor(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
-	defer deleteIdpTokenProcessor(t, PingFederateClientInfo, resource.ResourceType(), idpTokenProcessorId)
+func Test_PingFederateIdpSpConnection(t *testing.T) {
+	tr := TestableResource_PingFederateIdpSpConnection(t)
 
-	signingKeyPairId, _, _ := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), signingKeyPairId)
-
-	idpSpConnectionId, idpSpConnectionName := createIdpSpConnection(t, PingFederateClientInfo, resource.ResourceType(), idpTokenProcessorId, signingKeyPairId)
-	defer deleteIdpSpConnection(t, PingFederateClientInfo, resource.ResourceType(), idpSpConnectionId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: idpSpConnectionName,
-			ResourceID:   idpSpConnectionId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createIdpSpConnection(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, idpTokenProcessorId, signingKeyPairId string) (string, string) {
+func createIdpSpConnection(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.IdpSpConnectionsAPI.CreateSpConnection(clientInfo.Context)
+	if len(strArgs) != 3 {
+		t.Fatalf("Unexpected number of arguments provided to createIdpSpConnection(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	signingKeyPairId := strArgs[1]
+	idpTokenProcessorId := strArgs[2]
+
+	request := clientInfo.PingFederateApiClient.IdpSpConnectionsAPI.CreateSpConnection(clientInfo.Context)
 	result := client.SpConnection{
 		Connection: client.Connection{
 			Active: utils.Pointer(true),
@@ -99,18 +129,21 @@ func createIdpSpConnection(t *testing.T, clientInfo *connector.PingFederateClien
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateSpConnection", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   *resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deleteIdpSpConnection(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteIdpSpConnection(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.IdpSpConnectionsAPI.DeleteSpConnection(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.IdpSpConnectionsAPI.DeleteSpConnection(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteSpConnection", resourceType)

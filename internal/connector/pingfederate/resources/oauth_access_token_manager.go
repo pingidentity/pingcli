@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateOauthAccessTokenManagerResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOauthAccessTokenManagerResource
-func OauthAccessTokenManager(clientInfo *connector.PingFederateClientInfo) *PingFederateOauthAccessTokenManagerResource {
+func OauthAccessTokenManager(clientInfo *connector.ClientInfo) *PingFederateOauthAccessTokenManagerResource {
 	return &PingFederateOauthAccessTokenManagerResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateOauthAccessTokenManagerResource) ExportAll() (*[]connector.
 func (r *PingFederateOauthAccessTokenManagerResource) getOauthAccessTokenManagerData() (*map[string]string, error) {
 	oauthAccessTokenManagerData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.OauthAccessTokenManagersAPI.GetTokenManagers(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAccessTokenManagersAPI.GetTokenManagers(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetTokenManagers", r.ResourceType())
 	if err != nil {
 		return nil, err

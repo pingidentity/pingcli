@@ -8,38 +8,65 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateOauthAccessTokenMapping_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.OauthAccessTokenMapping(PingFederateClientInfo)
+func TestableResource_PingFederateOauthAccessTokenMapping(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testKeyPairId, _, _ := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: nil,
+							CreateFunc:   createKeypairsSigningKey,
+							DeleteFunc:   deleteKeypairsSigningKey,
+						},
+					},
+					CreateFunc: createOauthAccessTokenManager,
+					DeleteFunc: deleteOauthAccessTokenManager,
+				},
+			},
+			CreateFunc: createOauthAccessTokenMapping,
+			DeleteFunc: deleteOauthAccessTokenMapping,
+		},
+	}
+}
 
-	testTokenManagerId, _ := createOauthAccessTokenManager(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId)
-	defer deleteOauthAccessTokenManager(t, PingFederateClientInfo, resource.ResourceType(), testTokenManagerId)
+func Test_PingFederateOauthAccessTokenMapping(t *testing.T) {
+	tr := TestableResource_PingFederateOauthAccessTokenMapping(t)
 
-	oauthAccessTokenMappingId, oauthAccessTokenMappingContextType := createOauthAccessTokenMapping(t, PingFederateClientInfo, resource.ResourceType(), testTokenManagerId)
-	defer deleteOauthAccessTokenMapping(t, PingFederateClientInfo, resource.ResourceType(), oauthAccessTokenMappingId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s", oauthAccessTokenMappingContextType, oauthAccessTokenMappingId),
-			ResourceID:   oauthAccessTokenMappingId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: fmt.Sprintf("%s_%s", creationInfo[testutils_resource.ENUM_CONTEXT_TYPE], creationInfo[testutils_resource.ENUM_ID]),
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createOauthAccessTokenMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testTokenManagerId string) (string, string) {
+func createOauthAccessTokenMapping(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.OauthAccessTokenMappingsAPI.CreateMapping(clientInfo.Context)
+	if len(strArgs) != 2 {
+		t.Fatalf("Unexpected number of arguments provided to createOauthAccessTokenMapping(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testTokenManagerId := strArgs[1]
+
+	request := clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.CreateMapping(clientInfo.Context)
 	result := client.AccessTokenMapping{
 		AccessTokenManagerRef: client.ResourceLink{
 			Id: testTokenManagerId,
@@ -60,18 +87,21 @@ func createOauthAccessTokenMapping(t *testing.T, clientInfo *connector.PingFeder
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateMapping", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.Context.Type
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:           *resource.Id,
+		testutils_resource.ENUM_CONTEXT_TYPE: resource.Context.Type,
+	}
 }
 
-func deleteOauthAccessTokenMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteOauthAccessTokenMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.OauthAccessTokenMappingsAPI.DeleteMapping(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.DeleteMapping(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteMapping", resourceType)

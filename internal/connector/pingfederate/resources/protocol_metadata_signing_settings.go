@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateProtocolMetadataSigningSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateProtocolMetadataSigningSettingsResource
-func ProtocolMetadataSigningSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateProtocolMetadataSigningSettingsResource {
+func ProtocolMetadataSigningSettings(clientInfo *connector.ClientInfo) *PingFederateProtocolMetadataSigningSettingsResource {
 	return &PingFederateProtocolMetadataSigningSettingsResource{
 		clientInfo: clientInfo,
 	}

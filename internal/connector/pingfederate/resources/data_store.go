@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateDataStoreResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateDataStoreResource
-func DataStore(clientInfo *connector.PingFederateClientInfo) *PingFederateDataStoreResource {
+func DataStore(clientInfo *connector.ClientInfo) *PingFederateDataStoreResource {
 	return &PingFederateDataStoreResource{
 		clientInfo: clientInfo,
 	}
@@ -62,7 +62,7 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, error) {
 	dataStoreData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetDataStores", r.ResourceType())
 	if err != nil {
 		return nil, err

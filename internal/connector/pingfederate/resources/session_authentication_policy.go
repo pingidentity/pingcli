@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateSessionAuthenticationPolicyResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateSessionAuthenticationPolicyResource
-func SessionAuthenticationPolicy(clientInfo *connector.PingFederateClientInfo) *PingFederateSessionAuthenticationPolicyResource {
+func SessionAuthenticationPolicy(clientInfo *connector.ClientInfo) *PingFederateSessionAuthenticationPolicyResource {
 	return &PingFederateSessionAuthenticationPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingFederateSessionAuthenticationPolicyResource) ExportAll() (*[]connec
 func (r *PingFederateSessionAuthenticationPolicyResource) getSessionAuthenticationPolicyData() (*map[string][]string, error) {
 	sessionAuthenticationPolicyData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.SessionAPI.GetSourcePolicies(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.SessionAPI.GetSourcePolicies(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetSourcePolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

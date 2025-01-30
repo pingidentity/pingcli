@@ -7,35 +7,59 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateLocalIdentityProfile_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.LocalIdentityProfile(PingFederateClientInfo)
+func TestableResource_PingFederateLocalIdentityProfile(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testApcId, _ := createAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType(), testApcId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: nil,
+					CreateFunc:   createAuthenticationPolicyContract,
+					DeleteFunc:   deleteAuthenticationPolicyContract,
+				},
+			},
+			CreateFunc: createLocalIdentityProfile,
+			DeleteFunc: deleteLocalIdentityProfile,
+		},
+	}
+}
 
-	localIdentityProfileId, localIdentityProfileName := createLocalIdentityProfile(t, PingFederateClientInfo, resource.ResourceType(), testApcId)
-	defer deleteLocalIdentityProfile(t, PingFederateClientInfo, resource.ResourceType(), localIdentityProfileId)
+func Test_PingFederateLocalIdentityProfile(t *testing.T) {
+	tr := TestableResource_PingFederateLocalIdentityProfile(t)
+
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: localIdentityProfileName,
-			ResourceID:   localIdentityProfileId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createLocalIdentityProfile(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testApcId string) (string, string) {
+func createLocalIdentityProfile(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.LocalIdentityIdentityProfilesAPI.CreateIdentityProfile(clientInfo.Context)
+	if len(strArgs) != 2 {
+		t.Fatalf("Unexpected number of arguments provided to createLocalIdentityProfile(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testApcId := strArgs[1]
+
+	request := clientInfo.PingFederateApiClient.LocalIdentityIdentityProfilesAPI.CreateIdentityProfile(clientInfo.Context)
 	result := client.LocalIdentityProfile{
 		ApcId: client.ResourceLink{
 			Id: testApcId,
@@ -47,18 +71,21 @@ func createLocalIdentityProfile(t *testing.T, clientInfo *connector.PingFederate
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateIdentityProfile", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   *resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deleteLocalIdentityProfile(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteLocalIdentityProfile(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.LocalIdentityIdentityProfilesAPI.DeleteIdentityProfile(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.LocalIdentityIdentityProfilesAPI.DeleteIdentityProfile(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteIdentityProfile", resourceType)

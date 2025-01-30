@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateRedirectValidation_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.RedirectValidation(PingFederateClientInfo)
+func Test_PingFederateRedirectValidation(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.RedirectValidation(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

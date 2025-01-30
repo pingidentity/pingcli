@@ -8,38 +8,65 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateSessionAuthenticationPolicy_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.SessionAuthenticationPolicy(PingFederateClientInfo)
+func TestableResource_PingFederateSessionAuthenticationPolicy(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testPCVId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
-	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: nil,
+							CreateFunc:   createPasswordCredentialValidator,
+							DeleteFunc:   deletePasswordCredentialValidator,
+						},
+					},
+					CreateFunc: createIdpAdapter,
+					DeleteFunc: deleteIdpAdapter,
+				},
+			},
+			CreateFunc: createSessionAuthenticationPolicy,
+			DeleteFunc: deleteSessionAuthenticationPolicy,
+		},
+	}
+}
 
-	testIdpAdapterId, _ := createIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
-	defer deleteIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId)
+func Test_PingFederateSessionAuthenticationPolicy(t *testing.T) {
+	tr := TestableResource_PingFederateSessionAuthenticationPolicy(t)
 
-	sessionAuthenticationPolicyId, sessionAuthenticationPolicyAuthSourceType, sessionAuthenticationPolicyAuthSourceRefId := createSessionAuthenticationPolicy(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId)
-	defer deleteSessionAuthenticationPolicy(t, PingFederateClientInfo, resource.ResourceType(), sessionAuthenticationPolicyId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s_%s", sessionAuthenticationPolicyId, sessionAuthenticationPolicyAuthSourceType, sessionAuthenticationPolicyAuthSourceRefId),
-			ResourceID:   sessionAuthenticationPolicyId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: fmt.Sprintf("%s_%s_%s", creationInfo[testutils_resource.ENUM_ID], creationInfo[testutils_resource.ENUM_TYPE], creationInfo[testutils_resource.ENUM_SOURCE_REF_ID]),
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testIdpAdapterId string) (string, string, string) {
+func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.SessionAPI.CreateSourcePolicy(clientInfo.Context)
+	if len(strArgs) != 2 {
+		t.Fatalf("Unexpected number of arguments provided to createSessionAuthenticationPolicy(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testIdpAdapterId := strArgs[1]
+
+	request := clientInfo.PingFederateApiClient.SessionAPI.CreateSourcePolicy(clientInfo.Context)
 	result := client.AuthenticationSessionPolicy{
 		AuthenticationSource: client.AuthenticationSource{
 			SourceRef: client.ResourceLink{
@@ -53,18 +80,22 @@ func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.PingF
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateSourcePolicy", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.AuthenticationSource.Type, resource.AuthenticationSource.SourceRef.Id
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:            *resource.Id,
+		testutils_resource.ENUM_TYPE:          resource.AuthenticationSource.Type,
+		testutils_resource.ENUM_SOURCE_REF_ID: resource.AuthenticationSource.SourceRef.Id,
+	}
 }
 
-func deleteSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.SessionAPI.DeleteSourcePolicy(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.SessionAPI.DeleteSourcePolicy(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteSourcePolicy", resourceType)

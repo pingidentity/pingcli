@@ -7,37 +7,57 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateSpIdpConnection_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.SpIdpConnection(PingFederateClientInfo)
+func TestableResource_PingFederateSpIdpConnection(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	spIdpConnectionId, spIdpConnectionName := createSpIdpConnection(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteSpIdpConnection(t, PingFederateClientInfo, resource.ResourceType(), spIdpConnectionId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: nil,
+			CreateFunc:   createSpIdpConnection,
+			DeleteFunc:   deleteSpIdpConnection,
+		},
+	}
+}
+
+func Test_PingFederateSpIdpConnection(t *testing.T) {
+	tr := TestableResource_PingFederateSpIdpConnection(t)
+
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: spIdpConnectionName,
-			ResourceID:   spIdpConnectionId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createSpIdpConnection(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
+
+	if len(strArgs) != 1 {
+		t.Fatalf("Unexpected number of arguments provided to createSpIdpConnection(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
 
 	filedata, err := testutils.CreateX509Certificate()
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	request := clientInfo.ApiClient.SpIdpConnectionsAPI.CreateConnection(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.SpIdpConnectionsAPI.CreateConnection(clientInfo.Context)
 	result := client.IdpConnection{
 		Connection: client.Connection{
 			Active: utils.Pointer(true),
@@ -74,18 +94,21 @@ func createSpIdpConnection(t *testing.T, clientInfo *connector.PingFederateClien
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateConnection", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   *resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deleteSpIdpConnection(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.SpIdpConnectionsAPI.DeleteConnection(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.SpIdpConnectionsAPI.DeleteConnection(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteConnection", resourceType)

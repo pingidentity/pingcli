@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateCertificatesRevocationSettings_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.CertificatesRevocationSettings(PingFederateClientInfo)
+func Test_PingFederateCertificatesRevocationSettings(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.CertificatesRevocationSettings(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

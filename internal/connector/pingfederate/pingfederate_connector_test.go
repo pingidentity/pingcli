@@ -3,9 +3,9 @@ package pingfederate_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_terraform"
 )
 
@@ -15,13 +15,17 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 	testutils_terraform.InitPingFederateTerraform(t)
 
 	testCases := []struct {
-		name          string
-		resource      connector.ExportableResource
-		ignoredErrors []string
+		name             string
+		testableResource testutils_resource.TestableResource
+		ignoredErrors    []string
 	}{
 		{
-			name:          "PingFederateAuthenticationApiApplication",
-			resource:      resources.AuthenticationApiApplication(PingFederateClientInfo),
+			name: "PingFederateAuthenticationApiApplication",
+			testableResource: testutils_resource.TestableResource{
+				ClientInfo:         PingFederateClientInfo,
+				ExportableResource: resources.AuthenticationApiApplication(PingFederateClientInfo),
+				TestResource:       resources_test.TestableResource_PingFederateAuthenticationApiApplication(),
+			},
 			ignoredErrors: nil,
 		},
 		{

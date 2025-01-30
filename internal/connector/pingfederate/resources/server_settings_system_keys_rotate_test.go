@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateServerSettingsSystemKeysRotate_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ServerSettingsSystemKeysRotate(PingFederateClientInfo)
+func Test_PingFederateServerSettingsSystemKeysRotate(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.ServerSettingsSystemKeysRotate(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

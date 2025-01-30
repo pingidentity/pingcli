@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateKeypairsSigningKeyRotationSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateKeypairsSigningKeyRotationSettingsResource
-func KeypairsSigningKeyRotationSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateKeypairsSigningKeyRotationSettingsResource {
+func KeypairsSigningKeyRotationSettings(clientInfo *connector.ClientInfo) *PingFederateKeypairsSigningKeyRotationSettingsResource {
 	return &PingFederateKeypairsSigningKeyRotationSettingsResource{
 		clientInfo: clientInfo,
 	}
@@ -66,7 +66,7 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) ExportAll() (*[
 func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getKeypairsSigningKeyData() (*map[string][]string, error) {
 	keypairsSigningKeyData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.KeyPairsSigningAPI.GetSigningKeyPairs(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.KeyPairsSigningAPI.GetSigningKeyPairs(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetSigningKeyPairs", r.ResourceType())
 	if err != nil {
 		return nil, err

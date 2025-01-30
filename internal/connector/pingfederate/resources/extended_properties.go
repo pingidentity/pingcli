@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateExtendedPropertiesResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateExtendedPropertiesResource
-func ExtendedProperties(clientInfo *connector.PingFederateClientInfo) *PingFederateExtendedPropertiesResource {
+func ExtendedProperties(clientInfo *connector.ClientInfo) *PingFederateExtendedPropertiesResource {
 	return &PingFederateExtendedPropertiesResource{
 		clientInfo: clientInfo,
 	}

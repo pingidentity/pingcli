@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateVirtualHostNamesResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateVirtualHostNamesResource
-func VirtualHostNames(clientInfo *connector.PingFederateClientInfo) *PingFederateVirtualHostNamesResource {
+func VirtualHostNames(clientInfo *connector.ClientInfo) *PingFederateVirtualHostNamesResource {
 	return &PingFederateVirtualHostNamesResource{
 		clientInfo: clientInfo,
 	}

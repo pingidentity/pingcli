@@ -7,38 +7,65 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateKeypairsOauthOpenidConnectAdditionalKeySet_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.KeypairsOauthOpenidConnectAdditionalKeySet(PingFederateClientInfo)
+func TestableResource_PingFederateKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testKeyPairId, _, _ := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: nil,
+					CreateFunc:   createOauthIssuer,
+					DeleteFunc:   deleteOauthIssuer,
+				},
+				{
+					Dependencies: nil,
+					CreateFunc:   createKeypairsSigningKey,
+					DeleteFunc:   deleteKeypairsSigningKey,
+				},
+			},
+			CreateFunc: createKeypairsOauthOpenidConnectAdditionalKeySet,
+			DeleteFunc: deleteKeypairsOauthOpenidConnectAdditionalKeySet,
+		},
+	}
+}
 
-	testOauthIssuerId, _ := createOauthIssuer(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteOauthIssuer(t, PingFederateClientInfo, resource.ResourceType(), testOauthIssuerId)
+func Test_PingFederateKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T) {
+	tr := TestableResource_PingFederateKeypairsOauthOpenidConnectAdditionalKeySet(t)
 
-	keypairsOauthOpenidConnectAdditionalKeySetId, keypairsOauthOpenidConnectAdditionalKeySetName := createKeypairsOauthOpenidConnectAdditionalKeySet(t, PingFederateClientInfo, resource.ResourceType(), testKeyPairId, testOauthIssuerId)
-	defer deleteKeypairsOauthOpenidConnectAdditionalKeySet(t, PingFederateClientInfo, resource.ResourceType(), keypairsOauthOpenidConnectAdditionalKeySetId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: keypairsOauthOpenidConnectAdditionalKeySetName,
-			ResourceID:   keypairsOauthOpenidConnectAdditionalKeySetId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testKeyPairId, testOauthIssuerId string) (string, string) {
+func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.KeyPairsOauthOpenIdConnectAPI.CreateKeySet(clientInfo.Context)
+	if len(strArgs) != 3 {
+		t.Fatalf("Unexpected number of arguments provided to createKeypairsOauthOpenidConnectAdditionalKeySet(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testOauthIssuerId := strArgs[1]
+	testKeyPairId := strArgs[2]
+
+	request := clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.CreateKeySet(clientInfo.Context)
 	result := client.AdditionalKeySet{
 		Id: utils.Pointer("TestAdditionalKeySetId"),
 		Issuers: []client.ResourceLink{
@@ -57,18 +84,21 @@ func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateKeySet", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   *resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deleteKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.KeyPairsOauthOpenIdConnectAPI.DeleteKeySet(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.DeleteKeySet(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteKeySet", resourceType)

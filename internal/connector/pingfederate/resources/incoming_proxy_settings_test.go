@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateIncomingProxySettings_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.IncomingProxySettings(PingFederateClientInfo)
+func Test_PingFederateIncomingProxySettings(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.IncomingProxySettings(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

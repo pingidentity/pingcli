@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateKeypairsOauthOpenidConnectResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateKeypairsOauthOpenidConnectResource
-func KeypairsOauthOpenidConnect(clientInfo *connector.PingFederateClientInfo) *PingFederateKeypairsOauthOpenidConnectResource {
+func KeypairsOauthOpenidConnect(clientInfo *connector.ClientInfo) *PingFederateKeypairsOauthOpenidConnectResource {
 	return &PingFederateKeypairsOauthOpenidConnectResource{
 		clientInfo: clientInfo,
 	}

@@ -16,11 +16,11 @@ var (
 )
 
 type PingFederateClusterSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateClusterSettingsResource
-func ClusterSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateClusterSettingsResource {
+func ClusterSettings(clientInfo *connector.ClientInfo) *PingFederateClusterSettingsResource {
 	return &PingFederateClusterSettingsResource{
 		clientInfo: clientInfo,
 	}
@@ -66,7 +66,7 @@ func (r *PingFederateClusterSettingsResource) ExportAll() (*[]connector.ImportBl
 }
 
 func (r *PingFederateClusterSettingsResource) ValidPingFederateVersion() (bool, error) {
-	versionObj, response, err := r.clientInfo.ApiClient.VersionAPI.GetVersion(r.clientInfo.Context).Execute()
+	versionObj, response, err := r.clientInfo.PingFederateApiClient.VersionAPI.GetVersion(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetVersion", r.ResourceType())
 	if err != nil {
 		return false, err

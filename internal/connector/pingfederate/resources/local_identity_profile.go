@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateLocalIdentityProfileResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateLocalIdentityProfileResource
-func LocalIdentityProfile(clientInfo *connector.PingFederateClientInfo) *PingFederateLocalIdentityProfileResource {
+func LocalIdentityProfile(clientInfo *connector.ClientInfo) *PingFederateLocalIdentityProfileResource {
 	return &PingFederateLocalIdentityProfileResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateLocalIdentityProfileResource) ExportAll() (*[]connector.Imp
 func (r *PingFederateLocalIdentityProfileResource) getLocalIdentityProfileData() (*map[string]string, error) {
 	localIdentityProfileData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.LocalIdentityIdentityProfilesAPI.GetIdentityProfiles(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.LocalIdentityIdentityProfilesAPI.GetIdentityProfiles(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetIdentityProfiles", r.ResourceType())
 	if err != nil {
 		return nil, err

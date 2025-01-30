@@ -7,32 +7,52 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateAuthenticationSelector_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.AuthenticationSelector(PingFederateClientInfo)
+func TestableResource_PingFederateAuthenticationSelector(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	authenticationSelectorId, authenticationSelectorName := createAuthenticationSelector(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteAuthenticationSelector(t, PingFederateClientInfo, resource.ResourceType(), authenticationSelectorId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: nil,
+			CreateFunc:   createAuthenticationSelector,
+			DeleteFunc:   deleteAuthenticationSelector,
+		},
+	}
+}
+
+func Test_PingFederateAuthenticationSelector(t *testing.T) {
+	tr := TestableResource_PingFederateAuthenticationSelector(t)
+
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: authenticationSelectorName,
-			ResourceID:   authenticationSelectorId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createAuthenticationSelector(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.AuthenticationSelectorsAPI.CreateAuthenticationSelector(clientInfo.Context)
+	if len(strArgs) != 1 {
+		t.Fatalf("Unexpected number of arguments provided to createAuthenticationSelector(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+
+	request := clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.CreateAuthenticationSelector(clientInfo.Context)
 	result := client.AuthenticationSelector{
 		Configuration: client.PluginConfiguration{
 			Fields: []client.ConfigField{
@@ -68,18 +88,21 @@ func createAuthenticationSelector(t *testing.T, clientInfo *connector.PingFedera
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateAuthenticationSelector", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deleteAuthenticationSelector(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.AuthenticationSelectorsAPI.DeleteAuthenticationSelector(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.DeleteAuthenticationSelector(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteAuthenticationSelector", resourceType)

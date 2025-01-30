@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateConfigurationEncryptionKeysRotateResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateConfigurationEncryptionKeysRotateResource
-func ConfigurationEncryptionKeysRotate(clientInfo *connector.PingFederateClientInfo) *PingFederateConfigurationEncryptionKeysRotateResource {
+func ConfigurationEncryptionKeysRotate(clientInfo *connector.ClientInfo) *PingFederateConfigurationEncryptionKeysRotateResource {
 	return &PingFederateConfigurationEncryptionKeysRotateResource{
 		clientInfo: clientInfo,
 	}

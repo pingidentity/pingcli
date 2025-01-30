@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateDefaultUrls_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.DefaultUrls(PingFederateClientInfo)
+func Test_PingFederateDefaultUrls(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.DefaultUrls(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

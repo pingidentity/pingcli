@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateSpAuthenticationPolicyContractMappingResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateSpAuthenticationPolicyContractMappingResource
-func SpAuthenticationPolicyContractMapping(clientInfo *connector.PingFederateClientInfo) *PingFederateSpAuthenticationPolicyContractMappingResource {
+func SpAuthenticationPolicyContractMapping(clientInfo *connector.ClientInfo) *PingFederateSpAuthenticationPolicyContractMappingResource {
 	return &PingFederateSpAuthenticationPolicyContractMappingResource{
 		clientInfo: clientInfo,
 	}
@@ -66,7 +66,7 @@ func (r *PingFederateSpAuthenticationPolicyContractMappingResource) ExportAll() 
 func (r *PingFederateSpAuthenticationPolicyContractMappingResource) getSpAuthenticationPolicyContractMappingData() (*map[string][]string, error) {
 	spAuthenticationPolicyContractMappingData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetApcToSpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err

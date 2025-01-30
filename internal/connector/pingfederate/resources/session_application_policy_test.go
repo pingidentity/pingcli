@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateSessionApplicationPolicy_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.SessionApplicationPolicy(PingFederateClientInfo)
+func Test_PingFederateSessionApplicationPolicy(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.SessionApplicationPolicy(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateCertificatesRevocationSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateCertificatesRevocationSettingsResource
-func CertificatesRevocationSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateCertificatesRevocationSettingsResource {
+func CertificatesRevocationSettings(clientInfo *connector.ClientInfo) *PingFederateCertificatesRevocationSettingsResource {
 	return &PingFederateCertificatesRevocationSettingsResource{
 		clientInfo: clientInfo,
 	}

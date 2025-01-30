@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateCaptchaProviderResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateCaptchaProviderResource
-func CaptchaProvider(clientInfo *connector.PingFederateClientInfo) *PingFederateCaptchaProviderResource {
+func CaptchaProvider(clientInfo *connector.ClientInfo) *PingFederateCaptchaProviderResource {
 	return &PingFederateCaptchaProviderResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateCaptchaProviderResource) ExportAll() (*[]connector.ImportBl
 func (r *PingFederateCaptchaProviderResource) getCaptchaProviderData() (*map[string]string, error) {
 	captchaProviderData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.CaptchaProvidersAPI.GetCaptchaProviders(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.CaptchaProvidersAPI.GetCaptchaProviders(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetCaptchaProviders", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -17,16 +17,12 @@ type ImportBlock struct {
 	ResourceID         string
 }
 
-type PingOneClientInfo struct {
-	ApiClient           *pingoneGoClient.Client
-	ApiClientId         *string
-	Context             context.Context
-	ExportEnvironmentID string
-}
-
-type PingFederateClientInfo struct {
-	ApiClient *pingfederateGoClient.APIClient
-	Context   context.Context
+type ClientInfo struct {
+	ApiClientId           *string
+	Context               context.Context
+	ExportEnvironmentID   *string
+	PingFederateApiClient *pingfederateGoClient.APIClient
+	PingOneApiClient      *pingoneGoClient.Client
 }
 
 // A connector that allows exporting configuration

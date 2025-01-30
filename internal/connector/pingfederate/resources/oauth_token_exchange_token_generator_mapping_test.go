@@ -8,47 +8,83 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateOauthTokenExchangeTokenGeneratorMapping_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.OauthTokenExchangeTokenGeneratorMapping(PingFederateClientInfo)
+func TestableResource_PingFederateOauthTokenExchangeTokenGeneratorMapping(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testPCVId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
-	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: []testutils_resource.TestResource{
+								{
+									Dependencies: nil,
+									CreateFunc:   createPasswordCredentialValidator,
+									DeleteFunc:   deletePasswordCredentialValidator,
+								},
+							},
+							CreateFunc: createIdpTokenProcessor,
+							DeleteFunc: deleteIdpTokenProcessor,
+						},
+					},
+					CreateFunc: createOauthTokenExchangeProcessorPolicy,
+					DeleteFunc: deleteOauthTokenExchangeProcessorPolicy,
+				},
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: nil,
+							CreateFunc:   createKeypairsSigningKey,
+							DeleteFunc:   deleteKeypairsSigningKey,
+						},
+					},
+					CreateFunc: createSpTokenGenerator,
+					DeleteFunc: deleteSpTokenGenerator,
+				},
+			},
+			CreateFunc: createOauthTokenExchangeTokenGeneratorMapping,
+			DeleteFunc: deleteOauthTokenExchangeTokenGeneratorMapping,
+		},
+	}
+}
 
-	testTokenProcessorId, _ := createIdpTokenProcessor(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
-	defer deleteIdpTokenProcessor(t, PingFederateClientInfo, resource.ResourceType(), testTokenProcessorId)
+func Test_PingFederateOauthTokenExchangeTokenGeneratorMapping(t *testing.T) {
+	tr := TestableResource_PingFederateOauthTokenExchangeTokenGeneratorMapping(t)
 
-	testProcessorPolicyId := createOauthTokenExchangeProcessorPolicy(t, PingFederateClientInfo, resource.ResourceType(), testTokenProcessorId)
-	defer deleteOauthTokenExchangeProcessorPolicy(t, PingFederateClientInfo, resource.ResourceType(), testProcessorPolicyId)
-
-	testSigningKeyPairId, _, _ := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), testSigningKeyPairId)
-
-	testTokenGeneratorId := createSpTokenGenerator(t, PingFederateClientInfo, resource.ResourceType(), testSigningKeyPairId)
-	defer deleteSpTokenGenerator(t, PingFederateClientInfo, resource.ResourceType(), testTokenGeneratorId)
-
-	oauthTokenExchangeTokenGeneratorMappingId, oauthTokenExchangeTokenGeneratorMappingSourceId, oauthTokenExchangeTokenGeneratorMappingTargetId := createOauthTokenExchangeTokenGeneratorMapping(t, PingFederateClientInfo, resource.ResourceType(), testProcessorPolicyId, testTokenGeneratorId)
-	defer deleteOauthTokenExchangeTokenGeneratorMapping(t, PingFederateClientInfo, resource.ResourceType(), oauthTokenExchangeTokenGeneratorMappingId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_to_%s", oauthTokenExchangeTokenGeneratorMappingSourceId, oauthTokenExchangeTokenGeneratorMappingTargetId),
-			ResourceID:   oauthTokenExchangeTokenGeneratorMappingId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: fmt.Sprintf("%s_to_%s", creationInfo[testutils_resource.ENUM_SOURCE_ID], creationInfo[testutils_resource.ENUM_TARGET_ID]),
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testProcessorPolicyId, testTokenGeneratorId string) (string, string, string) {
+func createOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.CreateTokenGeneratorMapping(clientInfo.Context)
+	if len(strArgs) != 3 {
+		t.Fatalf("Unexpected number of arguments provided to createOauthTokenExchangeTokenGeneratorMapping(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testProcessorPolicyId := strArgs[1]
+	testTokenGeneratorId := strArgs[2]
+
+	request := clientInfo.PingFederateApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.CreateTokenGeneratorMapping(clientInfo.Context)
 	result := client.ProcessorPolicyToGeneratorMapping{
 		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
 			"SAML_SUBJECT": {
@@ -65,18 +101,22 @@ func createOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *con
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateTokenGeneratorMapping", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.SourceId, resource.TargetId
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:        *resource.Id,
+		testutils_resource.ENUM_SOURCE_ID: testProcessorPolicyId,
+		testutils_resource.ENUM_TARGET_ID: testTokenGeneratorId,
+	}
 }
 
-func deleteOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.DeleteTokenGeneratorMappingById(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.DeleteTokenGeneratorMappingById(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteTokenGeneratorMappingById", resourceType)
@@ -85,10 +125,16 @@ func deleteOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *con
 	}
 }
 
-func createOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testTokenProcessorId string) string {
+func createOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.OauthTokenExchangeProcessorAPI.CreateOauthTokenExchangeProcessorPolicy(clientInfo.Context)
+	if len(strArgs) != 2 {
+		t.Fatalf("Unexpected number of arguments provided to createOauthTokenExchangeProcessorPolicy(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testTokenProcessorId := strArgs[1]
+
+	request := clientInfo.PingFederateApiClient.OauthTokenExchangeProcessorAPI.CreateOauthTokenExchangeProcessorPolicy(clientInfo.Context)
 	result := client.TokenExchangeProcessorPolicy{
 		ActorTokenRequired: utils.Pointer(false),
 		AttributeContract: client.TokenExchangeProcessorAttributeContract{
@@ -125,13 +171,15 @@ func createOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return resource.Id
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID: resource.Id,
+	}
 }
 
-func deleteOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.OauthTokenExchangeProcessorAPI.DeleteOauthTokenExchangeProcessorPolicyy(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.OauthTokenExchangeProcessorAPI.DeleteOauthTokenExchangeProcessorPolicyy(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteOauthTokenExchangeProcessorPolicy", resourceType)
@@ -140,10 +188,16 @@ func deleteOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector
 	}
 }
 
-func createSpTokenGenerator(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testSigningKeyPairId string) string {
+func createSpTokenGenerator(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.SpTokenGeneratorsAPI.CreateTokenGenerator(clientInfo.Context)
+	if len(strArgs) != 2 {
+		t.Fatalf("Unexpected number of arguments provided to createSpTokenGenerator(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testSigningKeyPairId := strArgs[1]
+
+	request := clientInfo.PingFederateApiClient.SpTokenGeneratorsAPI.CreateTokenGenerator(clientInfo.Context)
 	result := client.TokenGenerator{
 		AttributeContract: &client.TokenGeneratorAttributeContract{
 			CoreAttributes: []client.TokenGeneratorAttribute{
@@ -195,13 +249,15 @@ func createSpTokenGenerator(t *testing.T, clientInfo *connector.PingFederateClie
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return resource.Id
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID: resource.Id,
+	}
 }
 
-func deleteSpTokenGenerator(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteSpTokenGenerator(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.SpTokenGeneratorsAPI.DeleteTokenGenerator(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.SpTokenGeneratorsAPI.DeleteTokenGenerator(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteTokenGenerator", resourceType)

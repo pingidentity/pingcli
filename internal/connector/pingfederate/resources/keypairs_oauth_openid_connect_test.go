@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateKeypairsOauthOpenidConnect_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.KeypairsOauthOpenidConnect(PingFederateClientInfo)
+func Test_PingFederateKeypairsOauthOpenidConnect(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.KeypairsOauthOpenidConnect(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

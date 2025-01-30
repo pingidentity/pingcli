@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateKerberosRealmResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateKerberosRealmResource
-func KerberosRealm(clientInfo *connector.PingFederateClientInfo) *PingFederateKerberosRealmResource {
+func KerberosRealm(clientInfo *connector.ClientInfo) *PingFederateKerberosRealmResource {
 	return &PingFederateKerberosRealmResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateKerberosRealmResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (*map[string]string, error) {
 	kerberosRealmData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.KerberosRealmsAPI.GetKerberosRealms(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.KerberosRealmsAPI.GetKerberosRealms(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetKerberosRealms", r.ResourceType())
 	if err != nil {
 		return nil, err

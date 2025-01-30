@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateAuthenticationApiApplicationResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateAuthenticationApiApplicationResource
-func AuthenticationApiApplication(clientInfo *connector.PingFederateClientInfo) *PingFederateAuthenticationApiApplicationResource {
+func AuthenticationApiApplication(clientInfo *connector.ClientInfo) *PingFederateAuthenticationApiApplicationResource {
 	return &PingFederateAuthenticationApiApplicationResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateAuthenticationApiApplicationResource) ExportAll() (*[]conne
 func (r *PingFederateAuthenticationApiApplicationResource) getAuthenticationApiApplicationData() (*map[string]string, error) {
 	authenticationApiApplicationData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.AuthenticationApiAPI.GetAuthenticationApiApplications(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationApiAPI.GetAuthenticationApiApplications(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetAuthenticationApiApplications", r.ResourceType())
 	if err != nil {
 		return nil, err

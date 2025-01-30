@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateAuthenticationPolicyContractResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateAuthenticationPolicyContractResource
-func AuthenticationPolicyContract(clientInfo *connector.PingFederateClientInfo) *PingFederateAuthenticationPolicyContractResource {
+func AuthenticationPolicyContract(clientInfo *connector.ClientInfo) *PingFederateAuthenticationPolicyContractResource {
 	return &PingFederateAuthenticationPolicyContractResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateAuthenticationPolicyContractResource) ExportAll() (*[]conne
 func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPolicyContractData() (*map[string]string, error) {
 	authenticationPolicyContractData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.AuthenticationPolicyContractsAPI.GetAuthenticationPolicyContracts(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationPolicyContractsAPI.GetAuthenticationPolicyContracts(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetAuthenticationPolicyContracts", r.ResourceType())
 	if err != nil {
 		return nil, err

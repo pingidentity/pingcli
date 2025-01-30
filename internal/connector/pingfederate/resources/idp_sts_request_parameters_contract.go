@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateIdpStsRequestParametersContractResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateIdpStsRequestParametersContractResource
-func IdpStsRequestParametersContract(clientInfo *connector.PingFederateClientInfo) *PingFederateIdpStsRequestParametersContractResource {
+func IdpStsRequestParametersContract(clientInfo *connector.ClientInfo) *PingFederateIdpStsRequestParametersContractResource {
 	return &PingFederateIdpStsRequestParametersContractResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateIdpStsRequestParametersContractResource) ExportAll() (*[]co
 func (r *PingFederateIdpStsRequestParametersContractResource) getIdpStsRequestParametersContractData() (*map[string]string, error) {
 	idpStsRequestParametersContractData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.IdpStsRequestParametersContractsAPI.GetStsRequestParamContracts(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpStsRequestParametersContractsAPI.GetStsRequestParamContracts(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetStsRequestParamContracts", r.ResourceType())
 	if err != nil {
 		return nil, err

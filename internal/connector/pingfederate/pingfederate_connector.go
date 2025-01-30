@@ -21,15 +21,15 @@ var (
 )
 
 type PingFederateConnector struct {
-	clientInfo connector.PingFederateClientInfo
+	clientInfo connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateConnector
 func PFConnector(ctx context.Context, apiClient *pingfederateGoClient.APIClient) *PingFederateConnector {
 	return &PingFederateConnector{
-		clientInfo: connector.PingFederateClientInfo{
-			ApiClient: apiClient,
-			Context:   ctx,
+		clientInfo: connector.ClientInfo{
+			PingFederateApiClient: apiClient,
+			Context:               ctx,
 		},
 	}
 }

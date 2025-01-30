@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateOpenidConnectSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOpenidConnectSettingsResource
-func OpenidConnectSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateOpenidConnectSettingsResource {
+func OpenidConnectSettings(clientInfo *connector.ClientInfo) *PingFederateOpenidConnectSettingsResource {
 	return &PingFederateOpenidConnectSettingsResource{
 		clientInfo: clientInfo,
 	}

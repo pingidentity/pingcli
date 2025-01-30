@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateNotificationPublisherSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateNotificationPublisherSettingsResource
-func NotificationPublisherSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateNotificationPublisherSettingsResource {
+func NotificationPublisherSettings(clientInfo *connector.ClientInfo) *PingFederateNotificationPublisherSettingsResource {
 	return &PingFederateNotificationPublisherSettingsResource{
 		clientInfo: clientInfo,
 	}

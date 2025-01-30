@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateServerSettingsSystemKeysRotateResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateServerSettingsSystemKeysRotateResource
-func ServerSettingsSystemKeysRotate(clientInfo *connector.PingFederateClientInfo) *PingFederateServerSettingsSystemKeysRotateResource {
+func ServerSettingsSystemKeysRotate(clientInfo *connector.ClientInfo) *PingFederateServerSettingsSystemKeysRotateResource {
 	return &PingFederateServerSettingsSystemKeysRotateResource{
 		clientInfo: clientInfo,
 	}

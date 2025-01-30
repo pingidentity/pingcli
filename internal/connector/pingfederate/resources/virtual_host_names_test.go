@@ -8,9 +8,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func Test_PingFederateVirtualHostNames_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.VirtualHostNames(PingFederateClientInfo)
+func Test_PingFederateVirtualHostNames(t *testing.T) {
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	resource := resources.VirtualHostNames(pingfederateClientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

@@ -8,41 +8,71 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateIdpToSpAdapterMapping_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.IdpToSpAdapterMapping(PingFederateClientInfo)
+func TestableResource_PingFederateIdpToSpAdapterMapping(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testPCVId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
-	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: nil,
+							CreateFunc:   createPasswordCredentialValidator,
+							DeleteFunc:   deletePasswordCredentialValidator,
+						},
+					},
+					CreateFunc: createIdpAdapter,
+					DeleteFunc: deleteIdpAdapter,
+				},
+				{
+					Dependencies: nil,
+					CreateFunc:   createSpAdapter,
+					DeleteFunc:   deleteSpAdapter,
+				},
+			},
+			CreateFunc: createIdpToSpAdapterMapping,
+			DeleteFunc: deleteIdpToSpAdapterMapping,
+		},
+	}
+}
 
-	testIdpAdapterId, _ := createIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
-	defer deleteIdpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId)
+func Test_PingFederateIdpToSpAdapterMapping(t *testing.T) {
+	tr := TestableResource_PingFederateIdpToSpAdapterMapping(t)
 
-	testSpAdapterId, _ := createSpAdapter(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteSpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testSpAdapterId)
-
-	idpToSpAdapterMappingId, idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId := createIdpToSpAdapterMapping(t, PingFederateClientInfo, resource.ResourceType(), testIdpAdapterId, testSpAdapterId)
-	defer deleteIdpToSpAdapterMapping(t, PingFederateClientInfo, resource.ResourceType(), idpToSpAdapterMappingId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_to_%s", idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId),
-			ResourceID:   idpToSpAdapterMappingId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: fmt.Sprintf("%s_to_%s", creationInfo[testutils_resource.ENUM_SOURCE_ID], creationInfo[testutils_resource.ENUM_TARGET_ID]),
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testIdpAdapterId, testSpAdapterId string) (string, string, string) {
+func createIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.IdpToSpAdapterMappingAPI.CreateIdpToSpAdapterMapping(clientInfo.Context)
+	if len(strArgs) != 3 {
+		t.Fatalf("Unexpected number of arguments provided to createIdpToSpAdapterMapping(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testIdpAdapterId := strArgs[1]
+	testSpAdapterId := strArgs[2]
+
+	request := clientInfo.PingFederateApiClient.IdpToSpAdapterMappingAPI.CreateIdpToSpAdapterMapping(clientInfo.Context)
 	result := client.IdpToSpAdapterMapping{
 		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
 			"subject": {
@@ -59,18 +89,22 @@ func createIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.PingFederat
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateIdpToSpAdapterMapping", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.SourceId, resource.TargetId
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:        *resource.Id,
+		testutils_resource.ENUM_SOURCE_ID: result.SourceId,
+		testutils_resource.ENUM_TARGET_ID: result.TargetId,
+	}
 }
 
-func deleteIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.IdpToSpAdapterMappingAPI.DeleteIdpToSpAdapterMappingsById(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.IdpToSpAdapterMappingAPI.DeleteIdpToSpAdapterMappingsById(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteIdpToSpAdapterMappingsById", resourceType)

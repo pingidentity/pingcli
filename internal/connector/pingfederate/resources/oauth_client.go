@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateOauthClientResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOauthClientResource
-func OauthClient(clientInfo *connector.PingFederateClientInfo) *PingFederateOauthClientResource {
+func OauthClient(clientInfo *connector.ClientInfo) *PingFederateOauthClientResource {
 	return &PingFederateOauthClientResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateOauthClientResource) ExportAll() (*[]connector.ImportBlock,
 func (r *PingFederateOauthClientResource) getOauthClientData() (*map[string]string, error) {
 	oauthClientData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.OauthClientsAPI.GetOauthClients(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthClientsAPI.GetOauthClients(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetOauthClients", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateOauthClientRegistrationPolicyResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOauthClientRegistrationPolicyResource
-func OauthClientRegistrationPolicy(clientInfo *connector.PingFederateClientInfo) *PingFederateOauthClientRegistrationPolicyResource {
+func OauthClientRegistrationPolicy(clientInfo *connector.ClientInfo) *PingFederateOauthClientRegistrationPolicyResource {
 	return &PingFederateOauthClientRegistrationPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateOauthClientRegistrationPolicyResource) ExportAll() (*[]conn
 func (r *PingFederateOauthClientRegistrationPolicyResource) getOauthClientRegistrationPolicyData() (*map[string]string, error) {
 	oauthClientRegistrationPolicyData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.OauthClientRegistrationPoliciesAPI.GetDynamicClientRegistrationPolicies(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthClientRegistrationPoliciesAPI.GetDynamicClientRegistrationPolicies(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetDynamicClientRegistrationPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -8,38 +8,65 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateSpAuthenticationPolicyContractMapping_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.SpAuthenticationPolicyContractMapping(PingFederateClientInfo)
+func TestableResource_PingFederateSpAuthenticationPolicyContractMapping(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testAPCId, _ := createAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteAuthenticationPolicyContract(t, PingFederateClientInfo, resource.ResourceType(), testAPCId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: nil,
+					CreateFunc:   createAuthenticationPolicyContract,
+					DeleteFunc:   deleteAuthenticationPolicyContract,
+				},
+				{
+					Dependencies: nil,
+					CreateFunc:   createSpAdapter,
+					DeleteFunc:   deleteSpAdapter,
+				},
+			},
+			CreateFunc: createSpAuthenticationPolicyContractMapping,
+			DeleteFunc: deleteSpAuthenticationPolicyContractMapping,
+		},
+	}
+}
 
-	testSPAdapterId, _ := createSpAdapter(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteSpAdapter(t, PingFederateClientInfo, resource.ResourceType(), testSPAdapterId)
+func Test_PingFederateSpAuthenticationPolicyContractMapping(t *testing.T) {
+	tr := TestableResource_PingFederateSpAuthenticationPolicyContractMapping(t)
 
-	spAuthenticationPolicyContractMappingId, spAuthenticationPolicyContractMappingSourceId, spAuthenticationPolicyContractMappingTargetId := createSpAuthenticationPolicyContractMapping(t, PingFederateClientInfo, resource.ResourceType(), testAPCId, testSPAdapterId)
-	defer deleteSpAuthenticationPolicyContractMapping(t, PingFederateClientInfo, resource.ResourceType(), spAuthenticationPolicyContractMappingId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_to_%s", spAuthenticationPolicyContractMappingSourceId, spAuthenticationPolicyContractMappingTargetId),
-			ResourceID:   spAuthenticationPolicyContractMappingId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: fmt.Sprintf("%s_to_%s", creationInfo[testutils_resource.ENUM_SOURCE_ID], creationInfo[testutils_resource.ENUM_TARGET_ID]),
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createSpAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testAPCId, testSPAdapterId string) (string, string, string) {
+func createSpAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.SpAuthenticationPolicyContractMappingsAPI.CreateApcToSpAdapterMapping(clientInfo.Context)
+	if len(strArgs) != 3 {
+		t.Fatalf("Unexpected number of arguments provided to createSpAuthenticationPolicyContractMapping(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testAPCId := strArgs[1]
+	testSPAdapterId := strArgs[2]
+
+	request := clientInfo.PingFederateApiClient.SpAuthenticationPolicyContractMappingsAPI.CreateApcToSpAdapterMapping(clientInfo.Context)
 	result := client.ApcToSpAdapterMapping{
 		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
 			"subject": {
@@ -56,18 +83,22 @@ func createSpAuthenticationPolicyContractMapping(t *testing.T, clientInfo *conne
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateApcToSpAdapterMapping", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.SourceId, resource.TargetId
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:        *resource.Id,
+		testutils_resource.ENUM_SOURCE_ID: resource.SourceId,
+		testutils_resource.ENUM_TARGET_ID: resource.TargetId,
+	}
 }
 
-func deleteSpAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteSpAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.SpAuthenticationPolicyContractMappingsAPI.DeleteApcToSpAdapterMappingById(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.SpAuthenticationPolicyContractMappingsAPI.DeleteApcToSpAdapterMappingById(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteApcToSpAdapterMappingById", resourceType)

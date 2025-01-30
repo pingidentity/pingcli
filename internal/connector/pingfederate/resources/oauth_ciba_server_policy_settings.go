@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateOauthCibaServerPolicySettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOauthCibaServerPolicySettingsResource
-func OauthCibaServerPolicySettings(clientInfo *connector.PingFederateClientInfo) *PingFederateOauthCibaServerPolicySettingsResource {
+func OauthCibaServerPolicySettings(clientInfo *connector.ClientInfo) *PingFederateOauthCibaServerPolicySettingsResource {
 	return &PingFederateOauthCibaServerPolicySettingsResource{
 		clientInfo: clientInfo,
 	}

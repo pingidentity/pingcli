@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederatePingoneConnectionResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederatePingoneConnectionResource
-func PingoneConnection(clientInfo *connector.PingFederateClientInfo) *PingFederatePingoneConnectionResource {
+func PingoneConnection(clientInfo *connector.ClientInfo) *PingFederatePingoneConnectionResource {
 	return &PingFederatePingoneConnectionResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederatePingoneConnectionResource) ExportAll() (*[]connector.Import
 func (r *PingFederatePingoneConnectionResource) getPingoneConnectionData() (*map[string]string, error) {
 	pingoneConnectionData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.PingOneConnectionsAPI.GetPingOneConnections(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.PingOneConnectionsAPI.GetPingOneConnections(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetPingOneConnections", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateIdpTokenProcessorResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateIdpTokenProcessorResource
-func IdpTokenProcessor(clientInfo *connector.PingFederateClientInfo) *PingFederateIdpTokenProcessorResource {
+func IdpTokenProcessor(clientInfo *connector.ClientInfo) *PingFederateIdpTokenProcessorResource {
 	return &PingFederateIdpTokenProcessorResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateIdpTokenProcessorResource) ExportAll() (*[]connector.Import
 func (r *PingFederateIdpTokenProcessorResource) getIdpTokenProcessorData() (*map[string]string, error) {
 	idpTokenProcessorData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.IdpTokenProcessorsAPI.GetTokenProcessors(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpTokenProcessorsAPI.GetTokenProcessors(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetTokenProcessors", r.ResourceType())
 	if err != nil {
 		return nil, err

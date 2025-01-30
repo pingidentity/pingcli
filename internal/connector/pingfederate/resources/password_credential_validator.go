@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederatePasswordCredentialValidatorResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederatePasswordCredentialValidatorResource
-func PasswordCredentialValidator(clientInfo *connector.PingFederateClientInfo) *PingFederatePasswordCredentialValidatorResource {
+func PasswordCredentialValidator(clientInfo *connector.ClientInfo) *PingFederatePasswordCredentialValidatorResource {
 	return &PingFederatePasswordCredentialValidatorResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederatePasswordCredentialValidatorResource) ExportAll() (*[]connec
 func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialValidatorData() (*map[string]string, error) {
 	passwordCredentialValidatorData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.PasswordCredentialValidatorsAPI.GetPasswordCredentialValidators(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.PasswordCredentialValidatorsAPI.GetPasswordCredentialValidators(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetPasswordCredentialValidators", r.ResourceType())
 	if err != nil {
 		return nil, err

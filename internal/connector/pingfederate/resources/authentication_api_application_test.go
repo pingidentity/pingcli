@@ -7,35 +7,56 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateAuthenticationApiApplication_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.AuthenticationApiApplication(PingFederateClientInfo)
+func TestableResource_PingFederateAuthenticationApiApplication(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	authenticationApiApplicationId, authenticationApiApplicationName := createAuthenticationApiApplication(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteAuthenticationApiApplication(t, PingFederateClientInfo, resource.ResourceType(), authenticationApiApplicationId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: nil,
+			CreateFunc:   createAuthenticationApiApplication,
+			DeleteFunc:   deleteAuthenticationApiApplication,
+		},
+	}
+}
+
+func Test_PingFederateAuthenticationApiApplication(t *testing.T) {
+	tr := TestableResource_PingFederateAuthenticationApiApplication(t)
+
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: authenticationApiApplicationName,
-			ResourceID:   authenticationApiApplicationId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createAuthenticationApiApplication(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createAuthenticationApiApplication(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.AuthenticationApiAPI.CreateApplication(clientInfo.Context)
-	result := client.AuthnApiApplication{}
-	result.Id = "TestAuthnApiApplicationId"
-	result.Name = "TestAuthnApiApplicationName"
-	result.Url = "https://www.example.com"
+	if len(strArgs) != 1 {
+		t.Fatalf("Unexpected number of arguments provided to createAuthenticationApiApplication(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+
+	request := clientInfo.PingFederateApiClient.AuthenticationApiAPI.CreateApplication(clientInfo.Context)
+	result := client.AuthnApiApplication{
+		Id:   "TestAuthnApiApplicationId",
+		Name: "TestAuthnApiApplicationName",
+		Url:  "https://www.example.com",
+	}
 
 	request = request.Body(result)
 
@@ -45,13 +66,16 @@ func createAuthenticationApiApplication(t *testing.T, clientInfo *connector.Ping
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deleteAuthenticationApiApplication(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteAuthenticationApiApplication(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.AuthenticationApiAPI.DeleteApplication(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.AuthenticationApiAPI.DeleteApplication(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteApplication", resourceType)

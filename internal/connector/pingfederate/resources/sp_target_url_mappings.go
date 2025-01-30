@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateSpTargetUrlMappingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateSpTargetUrlMappingsResource
-func SpTargetUrlMappings(clientInfo *connector.PingFederateClientInfo) *PingFederateSpTargetUrlMappingsResource {
+func SpTargetUrlMappings(clientInfo *connector.ClientInfo) *PingFederateSpTargetUrlMappingsResource {
 	return &PingFederateSpTargetUrlMappingsResource{
 		clientInfo: clientInfo,
 	}

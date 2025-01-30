@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateTokenProcessorToTokenGeneratorMappingResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateTokenProcessorToTokenGeneratorMappingResource
-func TokenProcessorToTokenGeneratorMapping(clientInfo *connector.PingFederateClientInfo) *PingFederateTokenProcessorToTokenGeneratorMappingResource {
+func TokenProcessorToTokenGeneratorMapping(clientInfo *connector.ClientInfo) *PingFederateTokenProcessorToTokenGeneratorMappingResource {
 	return &PingFederateTokenProcessorToTokenGeneratorMappingResource{
 		clientInfo: clientInfo,
 	}
@@ -66,7 +66,7 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) ExportAll() 
 func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenProcessorToTokenGeneratorMappingData() (*map[string][]string, error) {
 	tokenProcessorToTokenGeneratorMappingData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.TokenProcessorToTokenGeneratorMappingsAPI.GetTokenToTokenMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.GetTokenToTokenMappings(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetTokenToTokenMappings", r.ResourceType())
 	if err != nil {
 		return nil, err

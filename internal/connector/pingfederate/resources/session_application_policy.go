@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateSessionApplicationPolicyResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateSessionApplicationPolicyResource
-func SessionApplicationPolicy(clientInfo *connector.PingFederateClientInfo) *PingFederateSessionApplicationPolicyResource {
+func SessionApplicationPolicy(clientInfo *connector.ClientInfo) *PingFederateSessionApplicationPolicyResource {
 	return &PingFederateSessionApplicationPolicyResource{
 		clientInfo: clientInfo,
 	}

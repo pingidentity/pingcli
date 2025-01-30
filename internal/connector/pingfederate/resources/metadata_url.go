@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateMetadataUrlResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateMetadataUrlResource
-func MetadataUrl(clientInfo *connector.PingFederateClientInfo) *PingFederateMetadataUrlResource {
+func MetadataUrl(clientInfo *connector.ClientInfo) *PingFederateMetadataUrlResource {
 	return &PingFederateMetadataUrlResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateMetadataUrlResource) ExportAll() (*[]connector.ImportBlock,
 func (r *PingFederateMetadataUrlResource) getMetadataUrlData() (*map[string]string, error) {
 	metadataUrlData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.MetadataUrlsAPI.GetMetadataUrls(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.MetadataUrlsAPI.GetMetadataUrls(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetMetadataUrls", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateServerSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateServerSettingsResource
-func ServerSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateServerSettingsResource {
+func ServerSettings(clientInfo *connector.ClientInfo) *PingFederateServerSettingsResource {
 	return &PingFederateServerSettingsResource{
 		clientInfo: clientInfo,
 	}

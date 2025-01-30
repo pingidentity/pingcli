@@ -8,44 +8,77 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateTokenProcessorToTokenGeneratorMapping_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.TokenProcessorToTokenGeneratorMapping(PingFederateClientInfo)
+func TestableResource_PingFederateTokenProcessorToTokenGeneratorMapping(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	testPCVId, _ := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
-	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: nil,
+							CreateFunc:   createPasswordCredentialValidator,
+							DeleteFunc:   deletePasswordCredentialValidator,
+						},
+					},
+					CreateFunc: createIdpTokenProcessor,
+					DeleteFunc: deleteIdpTokenProcessor,
+				},
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: nil,
+							CreateFunc:   createKeypairsSigningKey,
+							DeleteFunc:   deleteKeypairsSigningKey,
+						},
+					},
+					CreateFunc: createSpTokenGenerator,
+					DeleteFunc: deleteSpTokenGenerator,
+				},
+			},
+			CreateFunc: createTokenProcessorToTokenGeneratorMapping,
+			DeleteFunc: deleteTokenProcessorToTokenGeneratorMapping,
+		},
+	}
+}
 
-	testTokenProcessorId, _ := createIdpTokenProcessor(t, PingFederateClientInfo, resource.ResourceType(), testPCVId)
-	defer deleteIdpTokenProcessor(t, PingFederateClientInfo, resource.ResourceType(), testTokenProcessorId)
+func Test_PingFederateTokenProcessorToTokenGeneratorMapping(t *testing.T) {
+	tr := TestableResource_PingFederateTokenProcessorToTokenGeneratorMapping(t)
 
-	testSigningKeyPairId, _, _ := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), testSigningKeyPairId)
-
-	testTokenGeneratorId := createSpTokenGenerator(t, PingFederateClientInfo, resource.ResourceType(), testSigningKeyPairId)
-	defer deleteSpTokenGenerator(t, PingFederateClientInfo, resource.ResourceType(), testTokenGeneratorId)
-
-	tokenProcessorToTokenGeneratorMappingId, tokenProcessorToTokenGeneratorMappingSourceId, tokenProcessorToTokenGeneratorMappingTargetId := createTokenProcessorToTokenGeneratorMapping(t, PingFederateClientInfo, resource.ResourceType(), testTokenProcessorId, testTokenGeneratorId)
-	defer deleteTokenProcessorToTokenGeneratorMapping(t, PingFederateClientInfo, resource.ResourceType(), tokenProcessorToTokenGeneratorMappingId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_to_%s", tokenProcessorToTokenGeneratorMappingSourceId, tokenProcessorToTokenGeneratorMappingTargetId),
-			ResourceID:   tokenProcessorToTokenGeneratorMappingId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: fmt.Sprintf("%s_to_%s", creationInfo[testutils_resource.ENUM_SOURCE_ID], creationInfo[testutils_resource.ENUM_TARGET_ID]),
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, testTokenProcessorId, testTokenGeneratorId string) (string, string, string) {
+func createTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.TokenProcessorToTokenGeneratorMappingsAPI.CreateTokenToTokenMapping(clientInfo.Context)
+	if len(strArgs) != 3 {
+		t.Fatalf("Unexpected number of arguments provided to createTokenProcessorToTokenGeneratorMapping(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	testTokenProcessorId := strArgs[1]
+	testTokenGeneratorId := strArgs[2]
+
+	request := clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.CreateTokenToTokenMapping(clientInfo.Context)
 	result := client.TokenToTokenMapping{
 		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
 			"SAML_SUBJECT": {
@@ -62,18 +95,22 @@ func createTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *conne
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateTokenToTokenMapping", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.SourceId, resource.TargetId
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:        *resource.Id,
+		testutils_resource.ENUM_SOURCE_ID: resource.SourceId,
+		testutils_resource.ENUM_TARGET_ID: resource.TargetId,
+	}
 }
 
-func deleteTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.TokenProcessorToTokenGeneratorMappingsAPI.DeleteTokenToTokenMappingById(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.DeleteTokenToTokenMappingById(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteTokenToTokenMappingById", resourceType)

@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateSpAdapterResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateSpAdapterResource
-func SpAdapter(clientInfo *connector.PingFederateClientInfo) *PingFederateSpAdapterResource {
+func SpAdapter(clientInfo *connector.ClientInfo) *PingFederateSpAdapterResource {
 	return &PingFederateSpAdapterResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateSpAdapterResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingFederateSpAdapterResource) getSpAdapterData() (*map[string]string, error) {
 	spAdapterData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.SpAdaptersAPI.GetSpAdapters(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.SpAdaptersAPI.GetSpAdapters(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetSpAdapters", r.ResourceType())
 	if err != nil {
 		return nil, err

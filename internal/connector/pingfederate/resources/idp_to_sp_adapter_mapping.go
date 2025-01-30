@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateIdpToSpAdapterMappingResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateIdpToSpAdapterMappingResource
-func IdpToSpAdapterMapping(clientInfo *connector.PingFederateClientInfo) *PingFederateIdpToSpAdapterMappingResource {
+func IdpToSpAdapterMapping(clientInfo *connector.ClientInfo) *PingFederateIdpToSpAdapterMappingResource {
 	return &PingFederateIdpToSpAdapterMappingResource{
 		clientInfo: clientInfo,
 	}
@@ -52,7 +52,7 @@ func (r *PingFederateIdpToSpAdapterMappingResource) ExportAll() (*[]connector.Im
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_to_%s", idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId),
+			ResourceName:       fmt.Sprintf("%s_%s", idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId),
 			ResourceID:         idpToSpAdapterMappingId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -66,7 +66,7 @@ func (r *PingFederateIdpToSpAdapterMappingResource) ExportAll() (*[]connector.Im
 func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData() (*map[string][]string, error) {
 	idpToSpAdapterMappingData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.IdpToSpAdapterMappingAPI.GetIdpToSpAdapterMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpToSpAdapterMappingAPI.GetIdpToSpAdapterMappings(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetIdpToSpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err

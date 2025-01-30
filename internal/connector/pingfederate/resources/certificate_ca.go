@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateCertificateCaResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateCertificateCaResource
-func CertificateCa(clientInfo *connector.PingFederateClientInfo) *PingFederateCertificateCaResource {
+func CertificateCa(clientInfo *connector.ClientInfo) *PingFederateCertificateCaResource {
 	return &PingFederateCertificateCaResource{
 		clientInfo: clientInfo,
 	}
@@ -66,7 +66,7 @@ func (r *PingFederateCertificateCaResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingFederateCertificateCaResource) getCertificateCaData() (*map[string][]string, error) {
 	certificateCaData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetTrustedCAs", r.ResourceType())
 	if err != nil {
 		return nil, err

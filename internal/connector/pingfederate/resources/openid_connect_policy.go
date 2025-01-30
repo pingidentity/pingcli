@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateOpenidConnectPolicyResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOpenidConnectPolicyResource
-func OpenidConnectPolicy(clientInfo *connector.PingFederateClientInfo) *PingFederateOpenidConnectPolicyResource {
+func OpenidConnectPolicy(clientInfo *connector.ClientInfo) *PingFederateOpenidConnectPolicyResource {
 	return &PingFederateOpenidConnectPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateOpenidConnectPolicyResource) ExportAll() (*[]connector.Impo
 func (r *PingFederateOpenidConnectPolicyResource) getOpenidConnectPolicyData() (*map[string]string, error) {
 	openidConnectPolicyData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.OauthOpenIdConnectAPI.GetOIDCPolicies(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthOpenIdConnectAPI.GetOIDCPolicies(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetOIDCPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

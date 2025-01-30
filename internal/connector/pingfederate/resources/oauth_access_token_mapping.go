@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateOauthAccessTokenMappingResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOauthAccessTokenMappingResource
-func OauthAccessTokenMapping(clientInfo *connector.PingFederateClientInfo) *PingFederateOauthAccessTokenMappingResource {
+func OauthAccessTokenMapping(clientInfo *connector.ClientInfo) *PingFederateOauthAccessTokenMappingResource {
 	return &PingFederateOauthAccessTokenMappingResource{
 		clientInfo: clientInfo,
 	}
@@ -62,7 +62,7 @@ func (r *PingFederateOauthAccessTokenMappingResource) ExportAll() (*[]connector.
 func (r *PingFederateOauthAccessTokenMappingResource) getOauthAccessTokenMappingData() (*map[string]string, error) {
 	oauthAccessTokenMappingData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.OauthAccessTokenMappingsAPI.GetMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.GetMappings(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetMappings", r.ResourceType())
 	if err != nil {
 		return nil, err

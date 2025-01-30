@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource
-func KeypairsOauthOpenidConnectAdditionalKeySet(clientInfo *connector.PingFederateClientInfo) *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource {
+func KeypairsOauthOpenidConnectAdditionalKeySet(clientInfo *connector.ClientInfo) *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource {
 	return &PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) ExportA
 func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) getKeypairsOauthOpenidConnectAdditionalKeySetData() (*map[string]string, error) {
 	keypairsOauthOpenidConnectAdditionalKeySetData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.KeyPairsOauthOpenIdConnectAPI.GetKeySets(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.GetKeySets(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetKeySets", r.ResourceType())
 	if err != nil {
 		return nil, err

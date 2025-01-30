@@ -7,31 +7,51 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateOauthClientRegistrationPolicy_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.OauthClientRegistrationPolicy(PingFederateClientInfo)
+func TestableResource_PingFederateOauthClientRegistrationPolicy(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	oauthClientRegistrationPolicyId, oauthClientRegistrationPolicyName := createOauthClientRegistrationPolicy(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteOauthClientRegistrationPolicy(t, PingFederateClientInfo, resource.ResourceType(), oauthClientRegistrationPolicyId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: nil,
+			CreateFunc:   createOauthClientRegistrationPolicy,
+			DeleteFunc:   deleteOauthClientRegistrationPolicy,
+		},
+	}
+}
+
+func Test_PingFederateOauthClientRegistrationPolicy(t *testing.T) {
+	tr := TestableResource_PingFederateOauthClientRegistrationPolicy(t)
+
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: oauthClientRegistrationPolicyName,
-			ResourceID:   oauthClientRegistrationPolicyId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createOauthClientRegistrationPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createOauthClientRegistrationPolicy(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.OauthClientRegistrationPoliciesAPI.CreateDynamicClientRegistrationPolicy(clientInfo.Context)
+	if len(strArgs) != 1 {
+		t.Fatalf("Unexpected number of arguments provided to createOauthClientRegistrationPolicy(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+
+	request := clientInfo.PingFederateApiClient.OauthClientRegistrationPoliciesAPI.CreateDynamicClientRegistrationPolicy(clientInfo.Context)
 	result := client.ClientRegistrationPolicy{
 		Id:   "TestClientRegistrationPolicyId",
 		Name: "TestClientRegistrationPolicyName",
@@ -43,18 +63,21 @@ func createOauthClientRegistrationPolicy(t *testing.T, clientInfo *connector.Pin
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateDynamicClientRegistrationPolicy", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deleteOauthClientRegistrationPolicy(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteOauthClientRegistrationPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.OauthClientRegistrationPoliciesAPI.DeleteDynamicClientRegistrationPolicy(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.OauthClientRegistrationPoliciesAPI.DeleteDynamicClientRegistrationPolicy(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteDynamicClientRegistrationPolicy", resourceType)

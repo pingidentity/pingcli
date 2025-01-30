@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateDefaultUrlsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateDefaultUrlsResource
-func DefaultUrls(clientInfo *connector.PingFederateClientInfo) *PingFederateDefaultUrlsResource {
+func DefaultUrls(clientInfo *connector.ClientInfo) *PingFederateDefaultUrlsResource {
 	return &PingFederateDefaultUrlsResource{
 		clientInfo: clientInfo,
 	}

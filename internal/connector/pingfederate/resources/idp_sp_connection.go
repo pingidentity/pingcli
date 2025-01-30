@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateIdpSpConnectionResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateIdpSpConnectionResource
-func IdpSpConnection(clientInfo *connector.PingFederateClientInfo) *PingFederateIdpSpConnectionResource {
+func IdpSpConnection(clientInfo *connector.ClientInfo) *PingFederateIdpSpConnectionResource {
 	return &PingFederateIdpSpConnectionResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateIdpSpConnectionResource) ExportAll() (*[]connector.ImportBl
 func (r *PingFederateIdpSpConnectionResource) getIdpSpConnectionData() (*map[string]string, error) {
 	idpSpConnectionData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.IdpSpConnectionsAPI.GetSpConnections(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpSpConnectionsAPI.GetSpConnections(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetSpConnections", r.ResourceType())
 	if err != nil {
 		return nil, err

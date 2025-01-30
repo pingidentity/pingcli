@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateIdentityStoreProvisionerResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateIdentityStoreProvisionerResource
-func IdentityStoreProvisioner(clientInfo *connector.PingFederateClientInfo) *PingFederateIdentityStoreProvisionerResource {
+func IdentityStoreProvisioner(clientInfo *connector.ClientInfo) *PingFederateIdentityStoreProvisionerResource {
 	return &PingFederateIdentityStoreProvisionerResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateIdentityStoreProvisionerResource) ExportAll() (*[]connector
 func (r *PingFederateIdentityStoreProvisionerResource) getIdentityStoreProvisionerData() (*map[string]string, error) {
 	identityStoreProvisionerData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.IdentityStoreProvisionersAPI.GetIdentityStoreProvisioners(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdentityStoreProvisionersAPI.GetIdentityStoreProvisioners(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetIdentityStoreProvisioners", r.ResourceType())
 	if err != nil {
 		return nil, err

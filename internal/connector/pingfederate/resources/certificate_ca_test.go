@@ -8,55 +8,81 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateCertificateCa_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.CertificateCa(PingFederateClientInfo)
+func TestableResource_PingFederateCertificateCa(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	certificateCaId, certificateCaIssuerDn, certificateCaSerialNumber := createCertificateCa(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteCertificateCa(t, PingFederateClientInfo, resource.ResourceType(), certificateCaId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: nil,
+			CreateFunc:   createCertificateCa,
+			DeleteFunc:   deleteCertificateCa,
+		},
+	}
+}
+
+func Test_PingFederateCertificateCa(t *testing.T) {
+	tr := TestableResource_PingFederateCertificateCa(t)
+
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s", certificateCaIssuerDn, certificateCaSerialNumber),
-			ResourceID:   certificateCaId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: fmt.Sprintf("%s_%s", creationInfo[testutils_resource.ENUM_ISSUER_DN], creationInfo[testutils_resource.ENUM_SERIAL_NUMBER]),
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createCertificateCa(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string, string) {
+func createCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.CertificatesCaAPI.ImportTrustedCA(clientInfo.Context)
-	result := client.X509File{}
-	result.Id = utils.Pointer("testx509fileid")
+	if len(strArgs) != 1 {
+		t.Fatalf("Unexpected number of arguments provided to createCertificateCa(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+
 	filedata, err := testutils.CreateX509Certificate()
 	if err != nil {
 		t.Fatalf("Failed to create test pem certificate %s: %v", resourceType, err)
 	}
-	result.FileData = filedata
+
+	request := clientInfo.PingFederateApiClient.CertificatesCaAPI.ImportTrustedCA(clientInfo.Context)
+	result := client.X509File{
+		FileData: filedata,
+		Id:       utils.Pointer("testx509fileid"),
+	}
 
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "ImportTrustedCA", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, *resource.IssuerDN, *resource.SerialNumber
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:            *resource.Id,
+		testutils_resource.ENUM_ISSUER_DN:     *resource.IssuerDN,
+		testutils_resource.ENUM_SERIAL_NUMBER: *resource.SerialNumber,
+	}
 }
 
-func deleteCertificateCa(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.CertificatesCaAPI.DeleteTrustedCA(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.CertificatesCaAPI.DeleteTrustedCA(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteTrustedCA", resourceType)

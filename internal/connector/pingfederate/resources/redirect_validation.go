@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateRedirectValidationResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateRedirectValidationResource
-func RedirectValidation(clientInfo *connector.PingFederateClientInfo) *PingFederateRedirectValidationResource {
+func RedirectValidation(clientInfo *connector.ClientInfo) *PingFederateRedirectValidationResource {
 	return &PingFederateRedirectValidationResource{
 		clientInfo: clientInfo,
 	}

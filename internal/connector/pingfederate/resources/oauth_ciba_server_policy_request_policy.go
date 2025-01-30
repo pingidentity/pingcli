@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateOauthCibaServerPolicyRequestPolicyResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOauthCibaServerPolicyRequestPolicyResource
-func OauthCibaServerPolicyRequestPolicy(clientInfo *connector.PingFederateClientInfo) *PingFederateOauthCibaServerPolicyRequestPolicyResource {
+func OauthCibaServerPolicyRequestPolicy(clientInfo *connector.ClientInfo) *PingFederateOauthCibaServerPolicyRequestPolicyResource {
 	return &PingFederateOauthCibaServerPolicyRequestPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) ExportAll() (*[
 func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) getOauthCibaServerPolicyRequestPolicyData() (*map[string]string, error) {
 	oauthCibaServerPolicyRequestPolicyData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.OauthCibaServerPolicyAPI.GetCibaServerPolicies(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthCibaServerPolicyAPI.GetCibaServerPolicies(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetCibaServerPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

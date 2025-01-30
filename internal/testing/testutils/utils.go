@@ -27,10 +27,12 @@ import (
 )
 
 var (
-	envIdOnce         sync.Once
-	apiClientOnce     sync.Once
-	PingOneClientInfo *connector.PingOneClientInfo
-	environmentId     string
+	envIdOnce              sync.Once
+	pingOneClientOnce      sync.Once
+	pingFederateClientOnce sync.Once
+	pingOneClientInfo      *connector.ClientInfo
+	pingFederateClientInfo *connector.ClientInfo
+	environmentId          string
 )
 
 func GetEnvironmentID() string {
@@ -42,10 +44,10 @@ func GetEnvironmentID() string {
 }
 
 // Utility method to initialize a PingOne SDK client for testing
-func GetPingOneClientInfo(t *testing.T) *connector.PingOneClientInfo {
+func GetPingOneClientInfo(t *testing.T) *connector.ClientInfo {
 	t.Helper()
 
-	apiClientOnce.Do(func() {
+	pingOneClientOnce.Do(func() {
 		configuration.InitAllOptions()
 		// Grab environment vars for initializing the API client.
 		// These are set in GitHub Actions.
@@ -75,53 +77,57 @@ func GetPingOneClientInfo(t *testing.T) *connector.PingOneClientInfo {
 			t.Fatal(err.Error())
 		}
 
-		PingOneClientInfo = &connector.PingOneClientInfo{
+		pingOneClientInfo = &connector.ClientInfo{
 			Context:             ctx,
-			ApiClient:           client,
+			PingOneApiClient:    client,
 			ApiClientId:         &clientID,
-			ExportEnvironmentID: environmentId,
+			ExportEnvironmentID: &environmentId,
 		}
 	})
 
-	return PingOneClientInfo
+	return pingOneClientInfo
 }
 
-func GetPingFederateClientInfo(t *testing.T) *connector.PingFederateClientInfo {
+func GetPingFederateClientInfo(t *testing.T) *connector.ClientInfo {
 	t.Helper()
 
-	configuration.InitAllOptions()
+	pingFederateClientOnce.Do(func() {
+		configuration.InitAllOptions()
 
-	httpsHost := os.Getenv(options.PingFederateHTTPSHostOption.EnvVar)
-	adminApiPath := os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar)
-	pfUsername := os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar)
-	pfPassword := os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar)
+		httpsHost := os.Getenv(options.PingFederateHTTPSHostOption.EnvVar)
+		adminApiPath := os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar)
+		pfUsername := os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar)
+		pfPassword := os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar)
 
-	if httpsHost == "" || adminApiPath == "" || pfUsername == "" || pfPassword == "" {
-		t.Fatalf("Unable to retrieve env var value for one or more of httpsHost, adminApiPath, pfUsername, pfPassword.")
-	}
+		if httpsHost == "" || adminApiPath == "" || pfUsername == "" || pfPassword == "" {
+			t.Fatalf("Unable to retrieve env var value for one or more of httpsHost, adminApiPath, pfUsername, pfPassword.")
+		}
 
-	pfClientConfig := pingfederateGoClient.NewConfiguration()
-	pfClientConfig.DefaultHeader["X-Xsrf-Header"] = "PingFederate"
-	pfClientConfig.Servers = pingfederateGoClient.ServerConfigurations{
-		{
-			URL: httpsHost + adminApiPath,
-		},
-	}
-	httpClient := &http.Client{Transport: &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true, //#nosec G402 -- This is a test
-		}}}
-	pfClientConfig.HTTPClient = httpClient
+		pfClientConfig := pingfederateGoClient.NewConfiguration()
+		pfClientConfig.DefaultHeader["X-Xsrf-Header"] = "PingFederate"
+		pfClientConfig.Servers = pingfederateGoClient.ServerConfigurations{
+			{
+				URL: httpsHost + adminApiPath,
+			},
+		}
+		httpClient := &http.Client{Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true, //#nosec G402 -- This is a test
+			}}}
+		pfClientConfig.HTTPClient = httpClient
 
-	apiClient := pingfederateGoClient.NewAPIClient(pfClientConfig)
+		apiClient := pingfederateGoClient.NewAPIClient(pfClientConfig)
 
-	return &connector.PingFederateClientInfo{
-		ApiClient: apiClient,
-		Context: context.WithValue(context.Background(), pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
-			UserName: pfUsername,
-			Password: pfPassword,
-		}),
-	}
+		pingFederateClientInfo = &connector.ClientInfo{
+			PingFederateApiClient: apiClient,
+			Context: context.WithValue(context.Background(), pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
+				UserName: pfUsername,
+				Password: pfPassword,
+			}),
+		}
+	})
+
+	return pingFederateClientInfo
 }
 
 func ValidateImportBlocks(t *testing.T, resource connector.ExportableResource, expectedImportBlocks *[]connector.ImportBlock) {

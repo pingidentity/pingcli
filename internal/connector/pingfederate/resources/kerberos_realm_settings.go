@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateKerberosRealmSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateKerberosRealmSettingsResource
-func KerberosRealmSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateKerberosRealmSettingsResource {
+func KerberosRealmSettings(clientInfo *connector.ClientInfo) *PingFederateKerberosRealmSettingsResource {
 	return &PingFederateKerberosRealmSettingsResource{
 		clientInfo: clientInfo,
 	}

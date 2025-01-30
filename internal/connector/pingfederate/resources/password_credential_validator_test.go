@@ -7,32 +7,52 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederatePasswordCredentialValidator_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.PasswordCredentialValidator(PingFederateClientInfo)
+func TestableResource_PingFederatePasswordCredentialValidator(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	passwordCredentialValidatorId, passwordCredentialValidatorName := createPasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType())
-	defer deletePasswordCredentialValidator(t, PingFederateClientInfo, resource.ResourceType(), passwordCredentialValidatorId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: nil,
+			CreateFunc:   createPasswordCredentialValidator,
+			DeleteFunc:   deletePasswordCredentialValidator,
+		},
+	}
+}
+
+func Test_PingFederatePasswordCredentialValidator(t *testing.T) {
+	tr := TestableResource_PingFederatePasswordCredentialValidator(t)
+
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: passwordCredentialValidatorName,
-			ResourceID:   passwordCredentialValidatorId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createPasswordCredentialValidator(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string) {
+func createPasswordCredentialValidator(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.PasswordCredentialValidatorsAPI.CreatePasswordCredentialValidator(clientInfo.Context)
+	if len(strArgs) != 1 {
+		t.Fatalf("Unexpected number of arguments provided to createPasswordCredentialValidator(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+
+	request := clientInfo.PingFederateApiClient.PasswordCredentialValidatorsAPI.CreatePasswordCredentialValidator(clientInfo.Context)
 	result := client.PasswordCredentialValidator{
 		Configuration: client.PluginConfiguration{
 			Tables: []client.ConfigTable{
@@ -74,18 +94,21 @@ func createPasswordCredentialValidator(t *testing.T, clientInfo *connector.PingF
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreatePasswordCredentialValidator", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deletePasswordCredentialValidator(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deletePasswordCredentialValidator(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.PasswordCredentialValidatorsAPI.DeletePasswordCredentialValidator(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.PasswordCredentialValidatorsAPI.DeletePasswordCredentialValidator(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeletePasswordCredentialValidator", resourceType)

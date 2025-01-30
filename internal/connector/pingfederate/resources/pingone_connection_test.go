@@ -8,38 +8,65 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederatePingoneConnection_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	pingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.PingoneConnection(PingFederateClientInfo)
+func TestableResource_PingFederatePingoneConnection(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	gatewayId := createPingOnePingFederateGateway(t, pingOneClientInfo, resource.ResourceType())
-	defer deletePingOnePingFederateGateway(t, pingOneClientInfo, resource.ResourceType(), gatewayId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: []testutils_resource.TestResource{
+						{
+							Dependencies: nil,
+							CreateFunc:   createPingOnePingFederateGateway,
+							DeleteFunc:   deletePingOnePingFederateGateway,
+						},
+					},
+					CreateFunc: createPingOnePingFederateGatewayCredential,
+					DeleteFunc: nil,
+				},
+			},
+			CreateFunc: createPingoneConnection,
+			DeleteFunc: deletePingoneConnection,
+		},
+	}
+}
 
-	gatewayCredential := createPingOnePingFederateGatewayCredential(t, pingOneClientInfo, resource.ResourceType(), gatewayId)
+func Test_PingFederatePingoneConnection(t *testing.T) {
+	tr := TestableResource_PingFederatePingoneConnection(t)
 
-	pingoneConnectionId, pingoneConnectionName := createPingoneConnection(t, PingFederateClientInfo, resource.ResourceType(), gatewayCredential)
-	defer deletePingoneConnection(t, PingFederateClientInfo, resource.ResourceType(), pingoneConnectionId)
+	creationInfo := tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: pingoneConnectionName,
-			ResourceID:   pingoneConnectionId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createPingoneConnection(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, credential string) (string, string) {
+func createPingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.PingOneConnectionsAPI.CreatePingOneConnection(clientInfo.Context)
+	if len(strArgs) != 2 {
+		t.Fatalf("Unexpected number of arguments provided to createPingoneConnection(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	credential := strArgs[1]
+
+	request := clientInfo.PingFederateApiClient.PingOneConnectionsAPI.CreatePingOneConnection(clientInfo.Context)
 	result := client.PingOneConnection{
 		Credential: &credential,
 		Id:         utils.Pointer("TestPingoneConnectionId"),
@@ -49,18 +76,21 @@ func createPingoneConnection(t *testing.T, clientInfo *connector.PingFederateCli
 	request = request.Body(result)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreatePingOneConnection", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, resource.Name
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:   *resource.Id,
+		testutils_resource.ENUM_NAME: resource.Name,
+	}
 }
 
-func deletePingoneConnection(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deletePingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.PingOneConnectionsAPI.DeletePingOneConnection(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.PingOneConnectionsAPI.DeletePingOneConnection(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeletePingOneConnection", resourceType)
@@ -69,8 +99,13 @@ func deletePingoneConnection(t *testing.T, clientInfo *connector.PingFederateCli
 	}
 }
 
-func createPingOnePingFederateGateway(t *testing.T, pingOneClientInfo *connector.PingOneClientInfo, resourceType string) string {
+func createPingOnePingFederateGateway(t *testing.T, pingOneClientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
+
+	if len(strArgs) != 1 {
+		t.Fatalf("Unexpected number of arguments provided to createPingoneConnection(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
 
 	result := management.CreateGatewayRequest{
 		Gateway: &management.Gateway{
@@ -80,7 +115,7 @@ func createPingOnePingFederateGateway(t *testing.T, pingOneClientInfo *connector
 		},
 	}
 
-	createGateway201Response, response, err := pingOneClientInfo.ApiClient.ManagementAPIClient.GatewaysApi.CreateGateway(pingOneClientInfo.Context, testutils.GetEnvironmentID()).CreateGatewayRequest(result).Execute()
+	createGateway201Response, response, err := pingOneClientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.CreateGateway(pingOneClientInfo.Context, testutils.GetEnvironmentID()).CreateGatewayRequest(result).Execute()
 	err = common.HandleClientResponse(response, err, "CreateGateway", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
@@ -95,23 +130,31 @@ func createPingOnePingFederateGateway(t *testing.T, pingOneClientInfo *connector
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *gatewayId
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID: *gatewayId,
+	}
 }
 
-func deletePingOnePingFederateGateway(t *testing.T, pingOneClientInfo *connector.PingOneClientInfo, resourceType, gatewayId string) {
+func deletePingOnePingFederateGateway(t *testing.T, pingOneClientInfo *connector.ClientInfo, resourceType, gatewayId string) {
 	t.Helper()
 
-	response, err := pingOneClientInfo.ApiClient.ManagementAPIClient.GatewaysApi.DeleteGateway(pingOneClientInfo.Context, testutils.GetEnvironmentID(), gatewayId).Execute()
+	response, err := pingOneClientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.DeleteGateway(pingOneClientInfo.Context, testutils.GetEnvironmentID(), gatewayId).Execute()
 	err = common.HandleClientResponse(response, err, "DeleteGateway", resourceType)
 	if err != nil {
 		t.Errorf("Failed to delete test %s: %v", resourceType, err)
 	}
 }
 
-func createPingOnePingFederateGatewayCredential(t *testing.T, pingOneClientInfo *connector.PingOneClientInfo, resourceType, gatewayId string) string {
+func createPingOnePingFederateGatewayCredential(t *testing.T, pingOneClientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	gatewayCredential, response, err := pingOneClientInfo.ApiClient.ManagementAPIClient.GatewayCredentialsApi.CreateGatewayCredential(pingOneClientInfo.Context, testutils.GetEnvironmentID(), gatewayId).Execute()
+	if len(strArgs) != 2 {
+		t.Fatalf("Unexpected number of arguments provided to createPingoneConnection(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	gatewayId := strArgs[1]
+
+	gatewayCredential, response, err := pingOneClientInfo.PingOneApiClient.ManagementAPIClient.GatewayCredentialsApi.CreateGatewayCredential(pingOneClientInfo.Context, testutils.GetEnvironmentID(), gatewayId).Execute()
 	err = common.HandleClientResponse(response, err, "CreateGatewayCredential", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
@@ -126,5 +169,7 @@ func createPingOnePingFederateGatewayCredential(t *testing.T, pingOneClientInfo 
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *credential
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_CREDENTIAL: *credential,
+	}
 }

@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateSecretManagerResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateSecretManagerResource
-func SecretManager(clientInfo *connector.PingFederateClientInfo) *PingFederateSecretManagerResource {
+func SecretManager(clientInfo *connector.ClientInfo) *PingFederateSecretManagerResource {
 	return &PingFederateSecretManagerResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateSecretManagerResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingFederateSecretManagerResource) getSecretManagerData() (*map[string]string, error) {
 	secretManagerData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.SecretManagersAPI.GetSecretManagers(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.SecretManagersAPI.GetSecretManagers(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetSecretManagers", r.ResourceType())
 	if err != nil {
 		return nil, err

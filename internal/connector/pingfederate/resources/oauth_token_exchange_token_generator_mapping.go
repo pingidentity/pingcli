@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateOauthTokenExchangeTokenGeneratorMappingResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOauthTokenExchangeTokenGeneratorMappingResource
-func OauthTokenExchangeTokenGeneratorMapping(clientInfo *connector.PingFederateClientInfo) *PingFederateOauthTokenExchangeTokenGeneratorMappingResource {
+func OauthTokenExchangeTokenGeneratorMapping(clientInfo *connector.ClientInfo) *PingFederateOauthTokenExchangeTokenGeneratorMappingResource {
 	return &PingFederateOauthTokenExchangeTokenGeneratorMappingResource{
 		clientInfo: clientInfo,
 	}
@@ -52,7 +52,7 @@ func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) ExportAll(
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_to_%s", oauthTokenExchangeTokenGeneratorMappingSourceId, oauthTokenExchangeTokenGeneratorMappingTargetId),
+			ResourceName:       fmt.Sprintf("%s_%s", oauthTokenExchangeTokenGeneratorMappingSourceId, oauthTokenExchangeTokenGeneratorMappingTargetId),
 			ResourceID:         oauthTokenExchangeTokenGeneratorMappingId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -66,7 +66,7 @@ func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) ExportAll(
 func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) getOauthTokenExchangeTokenGeneratorMappingData() (*map[string][]string, error) {
 	oauthTokenExchangeTokenGeneratorMappingData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.GetTokenGeneratorMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.GetTokenGeneratorMappings(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetTokenGeneratorMappings", r.ResourceType())
 	if err != nil {
 		return nil, err

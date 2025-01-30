@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource
-func ServerSettingsWsTrustStsSettingsIssuerCertificate(clientInfo *connector.PingFederateClientInfo) *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource {
+func ServerSettingsWsTrustStsSettingsIssuerCertificate(clientInfo *connector.ClientInfo) *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource {
 	return &PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource{
 		clientInfo: clientInfo,
 	}
@@ -66,7 +66,7 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) getServerSettingsWsTrustStsSettingsIssuerCertificateData() (*map[string][]string, error) {
 	serverSettingsWsTrustStsSettingsIssuerCertificateData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.ServerSettingsAPI.GetCerts(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.ServerSettingsAPI.GetCerts(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetCerts", r.ResourceType())
 	if err != nil {
 		return nil, err

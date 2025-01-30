@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateProtocolMetadataLifetimeSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateProtocolMetadataLifetimeSettingsResource
-func ProtocolMetadataLifetimeSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateProtocolMetadataLifetimeSettingsResource {
+func ProtocolMetadataLifetimeSettings(clientInfo *connector.ClientInfo) *PingFederateProtocolMetadataLifetimeSettingsResource {
 	return &PingFederateProtocolMetadataLifetimeSettingsResource{
 		clientInfo: clientInfo,
 	}

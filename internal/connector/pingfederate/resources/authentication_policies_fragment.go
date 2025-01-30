@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateAuthenticationPoliciesFragmentResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateAuthenticationPoliciesFragmentResource
-func AuthenticationPoliciesFragment(clientInfo *connector.PingFederateClientInfo) *PingFederateAuthenticationPoliciesFragmentResource {
+func AuthenticationPoliciesFragment(clientInfo *connector.ClientInfo) *PingFederateAuthenticationPoliciesFragmentResource {
 	return &PingFederateAuthenticationPoliciesFragmentResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) ExportAll() (*[]con
 func (r *PingFederateAuthenticationPoliciesFragmentResource) getAuthenticationPoliciesFragmentData() (*map[string]string, error) {
 	authenticationPoliciesFragmentData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetFragments", r.ResourceType())
 	if err != nil {
 		return nil, err

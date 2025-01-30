@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateIncomingProxySettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateIncomingProxySettingsResource
-func IncomingProxySettings(clientInfo *connector.PingFederateClientInfo) *PingFederateIncomingProxySettingsResource {
+func IncomingProxySettings(clientInfo *connector.ClientInfo) *PingFederateIncomingProxySettingsResource {
 	return &PingFederateIncomingProxySettingsResource{
 		clientInfo: clientInfo,
 	}

@@ -8,35 +8,59 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func Test_PingFederateKeypairsSigningKeyRotationSettings_Export(t *testing.T) {
-	PingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.KeypairsSigningKeyRotationSettings(PingFederateClientInfo)
+func TestableResource_PingFederateKeypairsSigningKeyRotationSettings(t *testing.T) *testutils_resource.TestableResource {
+	t.Helper()
 
-	keypairsSigningKeyId, keypairsSigningKeyIssuerDn, keypairsSigningKeySerialNumber := createKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType())
-	defer deleteKeypairsSigningKey(t, PingFederateClientInfo, resource.ResourceType(), keypairsSigningKeyId)
+	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	return &testutils_resource.TestableResource{
+		ClientInfo:         pingfederateClientInfo,
+		ExportableResource: resources.AuthenticationApiApplication(pingfederateClientInfo),
+		TestResource: testutils_resource.TestResource{
+			Dependencies: []testutils_resource.TestResource{
+				{
+					Dependencies: nil,
+					CreateFunc:   createKeypairsSigningKey,
+					DeleteFunc:   deleteKeypairsSigningKey,
+				},
+			},
+			CreateFunc: createKeypairsSigningKeyRotationSettings,
+			DeleteFunc: deleteKeypairsSigningKeyRotationSettings,
+		},
+	}
+}
 
-	createKeypairsSigningKeyRotationSettings(t, PingFederateClientInfo, resource.ResourceType(), keypairsSigningKeyId)
-	defer deleteKeypairsSigningKeyRotationSettings(t, PingFederateClientInfo, resource.ResourceType(), keypairsSigningKeyId)
+func Test_PingFederateKeypairsSigningKeyRotationSettings(t *testing.T) {
+	tr := TestableResource_PingFederateKeypairsSigningKeyRotationSettings(t)
+
+	_ = tr.CreateResource(t, tr.TestResource)
+	defer tr.DeleteResource(t, tr.TestResource)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: resource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s_rotation_settings", keypairsSigningKeyIssuerDn, keypairsSigningKeySerialNumber),
-			ResourceID:   keypairsSigningKeyId,
+			ResourceType: tr.ExportableResource.ResourceType(),
+			ResourceName: fmt.Sprintf("%s_%s_rotation_settings", tr.TestResource.Dependencies[0].CreationInfo[testutils_resource.ENUM_ISSUER_DN], tr.TestResource.Dependencies[0].CreationInfo[testutils_resource.ENUM_SERIAL_NUMBER]),
+			ResourceID:   tr.TestResource.Dependencies[0].CreationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
 }
 
-func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, keypairsSigningKeyId string) {
+func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.KeyPairsSigningAPI.UpdateRotationSettings(clientInfo.Context, keypairsSigningKeyId)
+	if len(strArgs) != 2 {
+		t.Fatalf("Unexpected number of arguments provided to createKeypairsSigningKeyRotationSettings(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+	keyPairId := strArgs[1]
+
+	request := clientInfo.PingFederateApiClient.KeyPairsSigningAPI.UpdateRotationSettings(clientInfo.Context, keyPairId)
 	result := client.KeyPairRotationSettings{
 		ActivationBufferDays: 10,
 		CreationBufferDays:   10,
@@ -46,16 +70,21 @@ func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 	request = request.Body(result)
 
 	_, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "UpdateRotationSettings", resourceType)
+	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
+
+	// Deletion of this resource is referenced by the keyPairId
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID: keyPairId,
+	}
 }
 
-func deleteKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.KeyPairsSigningAPI.DeleteKeyPairRotationSettings(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.KeyPairsSigningAPI.DeleteKeyPairRotationSettings(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteKeyPairRotationSettings", resourceType)
@@ -64,10 +93,15 @@ func deleteKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 	}
 }
 
-func createKeypairsSigningKey(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType string) (string, string, string) {
+func createKeypairsSigningKey(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	request := clientInfo.ApiClient.KeyPairsSigningAPI.CreateSigningKeyPair(clientInfo.Context)
+	if len(strArgs) != 1 {
+		t.Fatalf("Unexpected number of arguments provided to createIdpAdapter(): %v", strArgs)
+	}
+	resourceType := strArgs[0]
+
+	request := clientInfo.PingFederateApiClient.KeyPairsSigningAPI.CreateSigningKeyPair(clientInfo.Context)
 	result := client.NewKeyPairSettings{
 		City:               utils.Pointer("Denver"),
 		CommonName:         "*.pingidentity.com",
@@ -89,13 +123,17 @@ func createKeypairsSigningKey(t *testing.T, clientInfo *connector.PingFederateCl
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	return *resource.Id, *resource.IssuerDN, *resource.SerialNumber
+	return testutils_resource.ResourceCreationInfo{
+		testutils_resource.ENUM_ID:            *resource.Id,
+		testutils_resource.ENUM_ISSUER_DN:     *resource.IssuerDN,
+		testutils_resource.ENUM_SERIAL_NUMBER: *resource.SerialNumber,
+	}
 }
 
-func deleteKeypairsSigningKey(t *testing.T, clientInfo *connector.PingFederateClientInfo, resourceType, id string) {
+func deleteKeypairsSigningKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.ApiClient.KeyPairsSigningAPI.DeleteSigningKeyPair(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.KeyPairsSigningAPI.DeleteSigningKeyPair(clientInfo.Context, id)
 
 	response, err := request.Execute()
 	err = common.HandleClientResponse(response, err, "DeleteSigningKeyPair", resourceType)

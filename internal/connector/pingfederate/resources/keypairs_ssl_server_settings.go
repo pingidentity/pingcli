@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateKeypairsSslServerSettingsResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateKeypairsSslServerSettingsResource
-func KeypairsSslServerSettings(clientInfo *connector.PingFederateClientInfo) *PingFederateKeypairsSslServerSettingsResource {
+func KeypairsSslServerSettings(clientInfo *connector.ClientInfo) *PingFederateKeypairsSslServerSettingsResource {
 	return &PingFederateKeypairsSslServerSettingsResource{
 		clientInfo: clientInfo,
 	}

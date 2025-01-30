@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateNotificationPublisherResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateNotificationPublisherResource
-func NotificationPublisher(clientInfo *connector.PingFederateClientInfo) *PingFederateNotificationPublisherResource {
+func NotificationPublisher(clientInfo *connector.ClientInfo) *PingFederateNotificationPublisherResource {
 	return &PingFederateNotificationPublisherResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingFederateNotificationPublisherResource) ExportAll() (*[]connector.Im
 func (r *PingFederateNotificationPublisherResource) getNotificationPublisherData() (*map[string]string, error) {
 	notificationPublisherData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.ApiClient.NotificationPublishersAPI.GetNotificationPublishers(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.NotificationPublishersAPI.GetNotificationPublishers(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetNotificationPublishers", r.ResourceType())
 	if err != nil {
 		return nil, err

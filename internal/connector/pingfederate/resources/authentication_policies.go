@@ -12,11 +12,11 @@ var (
 )
 
 type PingFederateAuthenticationPoliciesResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateAuthenticationPoliciesResource
-func AuthenticationPolicies(clientInfo *connector.PingFederateClientInfo) *PingFederateAuthenticationPoliciesResource {
+func AuthenticationPolicies(clientInfo *connector.ClientInfo) *PingFederateAuthenticationPoliciesResource {
 	return &PingFederateAuthenticationPoliciesResource{
 		clientInfo: clientInfo,
 	}

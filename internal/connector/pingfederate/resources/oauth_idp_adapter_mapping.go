@@ -14,11 +14,11 @@ var (
 )
 
 type PingFederateOauthIdpAdapterMappingResource struct {
-	clientInfo *connector.PingFederateClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateOauthIdpAdapterMappingResource
-func OauthIdpAdapterMapping(clientInfo *connector.PingFederateClientInfo) *PingFederateOauthIdpAdapterMappingResource {
+func OauthIdpAdapterMapping(clientInfo *connector.ClientInfo) *PingFederateOauthIdpAdapterMappingResource {
 	return &PingFederateOauthIdpAdapterMappingResource{
 		clientInfo: clientInfo,
 	}
@@ -61,7 +61,7 @@ func (r *PingFederateOauthIdpAdapterMappingResource) ExportAll() (*[]connector.I
 func (r *PingFederateOauthIdpAdapterMappingResource) getOauthIdpAdapterMappingData() (*[]string, error) {
 	oauthIdpAdapterMappingData := []string{}
 
-	apiObj, response, err := r.clientInfo.ApiClient.OauthIdpAdapterMappingsAPI.GetIdpAdapterMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthIdpAdapterMappingsAPI.GetIdpAdapterMappings(r.clientInfo.Context).Execute()
 	err = common.HandleClientResponse(response, err, "GetIdpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
