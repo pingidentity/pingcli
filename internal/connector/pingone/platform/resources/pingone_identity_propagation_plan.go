@@ -66,9 +66,12 @@ func (r *PingOneIdentityPropagationPlanResource) getIdentityPropagationPlanData(
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPlans", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPlans", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {

@@ -61,9 +61,12 @@ func (r *PingFederateOAuthCibaServerPolicyRequestPolicyResource) getRequestPolic
 	requestPolicyData := make(map[string]string)
 
 	requestPolicies, response, err := r.clientInfo.ApiClient.OauthCibaServerPolicyAPI.GetCibaServerPolicies(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetCibaServerPolicies", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetCibaServerPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if requestPolicies == nil {

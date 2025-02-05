@@ -81,9 +81,12 @@ func (r *PingOneGroupRoleAssignmentResource) getGroupData() (*map[string]string,
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -114,9 +117,12 @@ func (r *PingOneGroupRoleAssignmentResource) getGroupRoleAssignmentData(groupId 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupRoleAssignmentsApi.ReadGroupRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, groupId).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGroupRoleAssignments", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGroupRoleAssignments", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -147,9 +153,12 @@ func (r *PingOneGroupRoleAssignmentResource) getGroupRoleAssignmentData(groupId 
 
 func (r *PingOneGroupRoleAssignmentResource) getRoleName(roleId string) (*management.EnumRoleName, error) {
 	apiRole, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
-	err = common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
+	ok, err := common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiRole != nil {

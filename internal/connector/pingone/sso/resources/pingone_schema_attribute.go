@@ -75,9 +75,12 @@ func (r *PingOneSchemaAttributeResource) getSchemaData() (*map[string]string, er
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSchemas", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSchemas", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -107,9 +110,12 @@ func (r *PingOneSchemaAttributeResource) getSchemaAttributeData(schemaId string)
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemaAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, schemaId).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSchemaAttributes", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSchemaAttributes", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {

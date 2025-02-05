@@ -61,9 +61,12 @@ func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialV
 	passwordCredentialValidatorData := make(map[string]string)
 
 	passwordCredentialValidators, response, err := r.clientInfo.ApiClient.PasswordCredentialValidatorsAPI.GetPasswordCredentialValidators(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetPasswordCredentialValidators", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetPasswordCredentialValidators", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if passwordCredentialValidators == nil {

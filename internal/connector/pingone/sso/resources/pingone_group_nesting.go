@@ -75,9 +75,12 @@ func (r *PingOneGroupNestingResource) getGroupData() (*map[string]string, error)
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -108,9 +111,12 @@ func (r *PingOneGroupNestingResource) getGroupNestingData(parentGroupId string) 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadGroupNesting(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, parentGroupId).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGroupNesting", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGroupNesting", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {

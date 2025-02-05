@@ -67,9 +67,12 @@ func (r *PingFederateOAuthTokenExchangeTokenGeneratorMappingResource) getProcess
 	processorPolicyToGeneratorMappingData := make(map[string][]string)
 
 	processorPolicyToGeneratorMappings, response, err := r.clientInfo.ApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.GetTokenGeneratorMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTokenGeneratorMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTokenGeneratorMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if processorPolicyToGeneratorMappings == nil {

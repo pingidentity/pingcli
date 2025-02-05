@@ -81,9 +81,12 @@ func (r *PingOneApplicationRoleAssignmentResource) getApplicationData() (*map[st
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -147,9 +150,12 @@ func (r *PingOneApplicationRoleAssignmentResource) getApplicationRoleAssignmentD
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationRoleAssignmentsApi.ReadApplicationRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadApplicationRoleAssignments", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadApplicationRoleAssignments", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -180,9 +186,12 @@ func (r *PingOneApplicationRoleAssignmentResource) getApplicationRoleAssignmentD
 
 func (r *PingOneApplicationRoleAssignmentResource) getRoleName(roleId string) (*management.EnumRoleName, error) {
 	apiRole, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
-	err = common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
+	ok, err := common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiRole != nil {

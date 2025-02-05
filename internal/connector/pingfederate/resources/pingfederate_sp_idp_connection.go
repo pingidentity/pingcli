@@ -61,9 +61,12 @@ func (r *PingFederateSpIdpConnectionResource) getIdpConnectionData() (*map[strin
 	idpConnectionData := make(map[string]string)
 
 	idpConnections, response, err := r.clientInfo.ApiClient.SpIdpConnectionsAPI.GetConnections(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetConnections", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetConnections", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if idpConnections == nil {

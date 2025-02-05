@@ -56,9 +56,12 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 
 func (r *PingOneBrandingSettingsResource) checkBrandingSettingsData() error {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadBrandingSettings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "ReadBrandingSettings", r.ResourceType())
 	if err != nil {
 		return err
+	}
+	if !ok {
+		return nil
 	}
 
 	if response.StatusCode == 204 {

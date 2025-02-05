@@ -62,9 +62,12 @@ func (r *PingFederateOAuthIdpAdapterMappingResource) getIdpAdapterMappingData() 
 	idpAdapterMappingData := []string{}
 
 	idpAdapterMappings, response, err := r.clientInfo.ApiClient.OauthIdpAdapterMappingsAPI.GetIdpAdapterMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdpAdapterMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if idpAdapterMappings == nil {

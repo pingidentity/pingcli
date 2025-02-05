@@ -56,9 +56,12 @@ func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, erro
 
 func (r *PingOneMFASettingsResource) checkMFASettingsData() error {
 	_, response, err := r.clientInfo.ApiClient.MFAAPIClient.MFASettingsApi.ReadMFASettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadMFASettings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "ReadMFASettings", r.ResourceType())
 	if err != nil {
 		return err
+	}
+	if !ok {
+		return nil
 	}
 
 	if response.StatusCode == 204 {

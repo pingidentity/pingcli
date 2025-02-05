@@ -12,7 +12,6 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/logger"
-	"github.com/pingidentity/pingcli/internal/output"
 )
 
 func WriteFiles(exportableResources []connector.ExportableResource, format, outputDir string, overwriteExport bool) error {
@@ -27,8 +26,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 	for _, exportableResource := range exportableResources {
 		importBlocks, err := exportableResource.ExportAll()
 		if err != nil {
-			output.Warn(fmt.Sprintf("Failed to export resource %s. err: %v", exportableResource.ResourceType(), err), nil)
-			continue
+			return fmt.Errorf("failed to export resource %s. err: %s", exportableResource.ResourceType(), err.Error())
 		}
 
 		if len(*importBlocks) == 0 {

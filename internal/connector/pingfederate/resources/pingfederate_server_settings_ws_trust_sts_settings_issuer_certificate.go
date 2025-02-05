@@ -67,9 +67,12 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 	issuerCertsData := make(map[string][]string)
 
 	issuerCerts, response, err := r.clientInfo.ApiClient.ServerSettingsAPI.GetCerts(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetCerts", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetCerts", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if issuerCerts == nil {

@@ -103,9 +103,12 @@ func (r *PingOneNotificationTemplateContentResource) getEnabledLocales() (*map[s
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadLanguages", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadLanguages", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -153,9 +156,12 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateNames() (*[]mana
 		}
 
 		// Handle all other errors or bad responses
-		err = common.HandleClientResponse(response, err, "ReadOneTemplate", r.ResourceType())
+		ok, err := common.HandleClientResponse(response, err, "ReadOneTemplate", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		templateNames = append(templateNames, templateName)
@@ -171,9 +177,12 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateContentData(temp
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadAllTemplateContents(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, templateName).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllTemplateContents", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllTemplateContents", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {

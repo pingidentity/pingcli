@@ -81,9 +81,12 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayData() (*map[string]str
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGateways", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGateways", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -121,9 +124,12 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gate
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.ReadGatewayRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGatewayRoleAssignments", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGatewayRoleAssignments", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -153,9 +159,12 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gate
 
 func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId string) (*management.EnumRoleName, error) {
 	role, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
-	err = common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
+	ok, err := common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if role != nil {

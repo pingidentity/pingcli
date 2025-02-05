@@ -61,9 +61,12 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 
 func (r *PingOneFormRecaptchaV2Resource) checkFormRecaptchaV2Data() (bool, error) {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
 	if err != nil {
 		return false, err
+	}
+	if !ok {
+		return false, nil
 	}
 
 	if response.StatusCode == 204 {

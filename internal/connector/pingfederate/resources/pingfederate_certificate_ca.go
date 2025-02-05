@@ -67,9 +67,12 @@ func (r *PingFederateCertificateCAResource) getTrustedCAData() (*map[string][]st
 	trustedCAData := make(map[string][]string)
 
 	certViews, response, err := r.clientInfo.ApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTrustedCAs", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTrustedCAs", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if certViews == nil {

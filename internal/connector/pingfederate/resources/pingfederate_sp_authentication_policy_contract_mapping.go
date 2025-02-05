@@ -67,9 +67,12 @@ func (r *PingFederateSPAuthenticationPolicyContractMappingResource) getApcToSpAd
 	apcToSpAdapterMappingData := make(map[string][]string)
 
 	apcToSpAdapterMappings, response, err := r.clientInfo.ApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetApcToSpAdapterMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetApcToSpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apcToSpAdapterMappings == nil {

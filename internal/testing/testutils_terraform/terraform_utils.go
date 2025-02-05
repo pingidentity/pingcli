@@ -200,13 +200,13 @@ func InitPingFederateTerraform(t *testing.T) {
 }
 
 provider "pingfederate" {
-  username								= "%s"
-  password								= "%s"
-  https_host							= "%s"
-  admin_api_path						= "%s"
-  product_version						= "12.2"
-  insecure_trust_all_tls				= true
-  x_bypass_external_validation_header	= true
+  username = "%s"
+  password = "%s"
+  https_host = "%s"
+  admin_api_path = "%s"
+  product_version = "12.2"
+  insecure_trust_all_tls = true
+  x_bypass_external_validation_header = true
 }
 `,
 		os.Getenv("PINGCLI_PINGFEDERATE_PROVIDER_VERSION"),

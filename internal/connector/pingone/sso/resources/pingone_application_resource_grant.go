@@ -80,9 +80,12 @@ func (r *PingOneApplicationResourceGrantResource) getApplicationData() (*map[str
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -131,9 +134,12 @@ func (r *PingOneApplicationResourceGrantResource) getApplicationGrantData(appId 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationResourceGrantsApi.ReadAllApplicationGrants(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplicationGrants", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplicationGrants", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {
@@ -164,9 +170,12 @@ func (r *PingOneApplicationResourceGrantResource) getApplicationGrantData(appId 
 
 func (r *PingOneApplicationResourceGrantResource) getGrantResourceName(grantResourceId string) (*string, error) {
 	resource, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, grantResourceId).Execute()
-	err = common.HandleClientResponse(response, err, "ReadOneResource", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "ReadOneResource", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if resource != nil {

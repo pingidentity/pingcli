@@ -67,9 +67,12 @@ func (r *PingFederateSessionAuthenticationPolicyResource) getAuthenticationSessi
 	authenticationSessionPolicyData := make(map[string][]string)
 
 	authenticationSessionPolicies, response, err := r.clientInfo.ApiClient.SessionAPI.GetSourcePolicies(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetSourcePolicies", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetSourcePolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if authenticationSessionPolicies == nil {

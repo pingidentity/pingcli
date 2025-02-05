@@ -61,9 +61,12 @@ func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPoli
 	authenticationPolicyContractData := make(map[string]string)
 
 	authnPolicyContracts, response, err := r.clientInfo.ApiClient.AuthenticationPolicyContractsAPI.GetAuthenticationPolicyContracts(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetAuthenticationPolicyContracts", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationPolicyContracts", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if authnPolicyContracts == nil {

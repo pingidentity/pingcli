@@ -63,9 +63,12 @@ func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, 
 	dataStoreData := make(map[string]string)
 
 	dataStores, response, err := r.clientInfo.ApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetDataStores", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetDataStores", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if dataStores == nil {

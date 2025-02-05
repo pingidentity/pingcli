@@ -61,9 +61,12 @@ func (r *PingFederateOpenIDConnectPolicyResource) getOIDCPolicyData() (*map[stri
 	oidcPolicyData := make(map[string]string)
 
 	oidcPolicies, response, err := r.clientInfo.ApiClient.OauthOpenIdConnectAPI.GetOIDCPolicies(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetOIDCPolicies", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetOIDCPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if oidcPolicies == nil {

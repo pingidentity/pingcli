@@ -61,9 +61,12 @@ func (r *PingFederateNotificationPublisherResource) getNotificationPublisherData
 	notificationPublisherData := make(map[string]string)
 
 	notificationPublishers, response, err := r.clientInfo.ApiClient.NotificationPublishersAPI.GetNotificationPublishers(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetNotificationPublishers", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetNotificationPublishers", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if notificationPublishers == nil {

@@ -61,9 +61,12 @@ func (r *PingFederatePingOneConnectionResource) getPingOneConnectionData() (*map
 	pingoneConnectionData := make(map[string]string)
 
 	pingoneConnections, response, err := r.clientInfo.ApiClient.PingOneConnectionsAPI.GetPingOneConnections(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetPingOneConnections", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetPingOneConnections", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if pingoneConnections == nil {

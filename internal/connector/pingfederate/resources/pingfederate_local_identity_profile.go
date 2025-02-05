@@ -61,9 +61,12 @@ func (r *PingFederateLocalIdentityProfileResource) getIdentityProfileData() (*ma
 	identityProfileData := make(map[string]string)
 
 	identityProfiles, response, err := r.clientInfo.ApiClient.LocalIdentityIdentityProfilesAPI.GetIdentityProfiles(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdentityProfiles", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdentityProfiles", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if identityProfiles == nil {

@@ -61,9 +61,12 @@ func (r *PingFederateIdpTokenProcessorResource) getTokenProcessorData() (*map[st
 	tokenProcessorData := make(map[string]string)
 
 	tokenProcessors, response, err := r.clientInfo.ApiClient.IdpTokenProcessorsAPI.GetTokenProcessors(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTokenProcessors", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTokenProcessors", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if tokenProcessors == nil {

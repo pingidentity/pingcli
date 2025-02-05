@@ -61,9 +61,12 @@ func (r *PingFederateOAuthClientRegistrationPolicyResource) getClientRegistratio
 	clientRegistrationPolicyData := make(map[string]string)
 
 	clientRegistrationPolicies, response, err := r.clientInfo.ApiClient.OauthClientRegistrationPoliciesAPI.GetDynamicClientRegistrationPolicies(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetDynamicClientRegistrationPolicies", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetDynamicClientRegistrationPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if clientRegistrationPolicies == nil {
