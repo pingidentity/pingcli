@@ -7,6 +7,7 @@ import (
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +33,14 @@ The profile to delete will be removed from the CLI configuration file.`,
 		RunE:  configDeleteProfileRunE,
 		Short: "Delete a custom configuration profile.",
 		Use:   "delete-profile [flags] [profile-name]",
+		// Auto-completion function to return all valid profile names
+		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+			profileNames := profiles.GetMainConfig().ProfileNames()
+			if len(args) != 0 {
+				return nil, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+			}
+			return profileNames, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+		},
 	}
 
 	cmd.Flags().AddFlag(options.ConfigDeleteAutoAcceptOption.Flag)

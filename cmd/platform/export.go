@@ -4,6 +4,7 @@ import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	platform_internal "github.com/pingidentity/pingcli/internal/commands/platform"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -16,7 +17,7 @@ const (
     pingcli platform export --output-directory /path/to/my/directory --overwrite
 
   Export configuration-as-code packages for all configured products, specifying the export format as Terraform HCL.
-    pingcli platform export --export-format HCL
+    pingcli platform export --format HCL
 
   Export configuration-as-code packages for PingOne (core platform and SSO services).
     pingcli platform export --services pingone-platform,pingone-sso
@@ -69,7 +70,19 @@ func exportRunE(cmd *cobra.Command, args []string) error {
 
 func initGeneralExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PlatformExportExportFormatOption.Flag)
+	// auto-completion
+	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		validExportFormats := customtypes.ExportFormatValidValues()
+		return validExportFormats, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	})
+
 	cmd.Flags().AddFlag(options.PlatformExportServiceOption.Flag)
+	// auto-completion
+	cmd.RegisterFlagCompletionFunc("services", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		validServices := customtypes.ExportServicesValidValues()
+		return validServices, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	})
+
 	cmd.Flags().AddFlag(options.PlatformExportOutputDirectoryOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportOverwriteOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportPingOneEnvironmentIDOption.Flag)
@@ -79,8 +92,20 @@ func initPingOneExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
+
 	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
+	// auto-completion
+	cmd.RegisterFlagCompletionFunc("pingone-region-code", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		validRegionCodes := customtypes.PingOneRegionCodeValidValues()
+		return validRegionCodes, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	})
+
 	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
+	// auto-completion
+	cmd.RegisterFlagCompletionFunc("pingone-authentication-type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		validPingOneAuthTypes := customtypes.PingOneAuthenticationTypeValidValues()
+		return validPingOneAuthTypes, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	})
 
 	cmd.MarkFlagsRequiredTogether(
 		options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName,
@@ -102,7 +127,13 @@ func initPingFederateGeneralFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingFederateXBypassExternalValidationHeaderOption.Flag)
 	cmd.Flags().AddFlag(options.PingFederateCACertificatePemFilesOption.Flag)
 	cmd.Flags().AddFlag(options.PingFederateInsecureTrustAllTLSOption.Flag)
+
 	cmd.Flags().AddFlag(options.PingFederateAuthenticationTypeOption.Flag)
+	// auto-completion
+	cmd.RegisterFlagCompletionFunc("pingfederate-authentication-type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		validPingFedAuthTypes := customtypes.PingFederateAuthenticationTypeValidValues()
+		return validPingFedAuthTypes, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	})
 }
 
 func initPingFederateBasicAuthFlags(cmd *cobra.Command) {

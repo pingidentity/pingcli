@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -16,6 +17,9 @@ const (
 )
 
 func NewConfigSetCommand() *cobra.Command {
+	// Get viper keys for auto-completion in ValidArgs
+	viperKeys := configuration.ViperKeys()
+
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
@@ -23,9 +27,10 @@ func NewConfigSetCommand() *cobra.Command {
 		Long: "Set stored configuration settings for the CLI.\n\n" +
 			"The `--profile` parameter can be used to set configuration settings for a specified custom configuration profile.\n" +
 			"Where `--profile` is not specified, configuration settings will be set for the currently active profile.",
-		RunE:  configSetRunE,
-		Short: "Set stored configuration settings for the CLI.",
-		Use:   "set [flags] key=value",
+		RunE:      configSetRunE,
+		Short:     "Set stored configuration settings for the CLI.",
+		Use:       "set [flags] key=value",
+		ValidArgs: viperKeys,
 	}
 
 	return cmd
