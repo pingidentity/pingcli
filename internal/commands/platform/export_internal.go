@@ -408,7 +408,7 @@ func getPingOneExportEnvID() (err error) {
 			return err
 		}
 		if pingoneExportEnvID == "" {
-			return fmt.Errorf("failed to determine pingone export environment ID.")
+			return fmt.Errorf("failed to determine pingone export environment ID")
 		}
 
 		output.Warn("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)

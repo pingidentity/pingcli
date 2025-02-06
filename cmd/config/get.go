@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -11,14 +12,17 @@ const (
 	configGetCommandExamples = `  Read all the configuration settings for the PingOne service in the active (or default) profile.
     pingcli config get pingone
 
-  Read the color setting for the profile named 'myProfile'.
-    pingcli config get --profile myProfile color
+  Read the noColor setting for the profile named 'myProfile'.
+    pingcli config get --profile myProfile noColor
 
   Read the worker ID used to authenticate to the PingOne service management API.
     pingcli config get service.pingone.authentication.worker.environmentID`
 )
 
 func NewConfigGetCommand() *cobra.Command {
+	// Get viper keys for auto-completion in ValidArgs
+	viperKeys := configuration.ViperKeys()
+
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
@@ -26,9 +30,10 @@ func NewConfigGetCommand() *cobra.Command {
 		Long: "Read stored configuration settings for the CLI.\n\n" +
 			"The `--profile` parameter can be used to read configuration settings for a specified custom configuration profile.\n" +
 			"Where `--profile` is not specified, configuration settings will be read for the currently active profile.",
-		RunE:  configGetRunE,
-		Short: "Read stored configuration settings for the CLI.",
-		Use:   "get [flags] key",
+		RunE:      configGetRunE,
+		Short:     "Read stored configuration settings for the CLI.",
+		Use:       "get [flags] key",
+		ValidArgs: viperKeys,
 	}
 
 	return cmd

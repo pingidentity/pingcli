@@ -4,6 +4,7 @@ import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	request_internal "github.com/pingidentity/pingcli/internal/commands/request"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -39,9 +40,32 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 		Use:   "request [flags] API_URI",
 	}
 
+	// --http-method, -m
 	cmd.Flags().AddFlag(options.RequestHTTPMethodOption.Flag)
+	// auto-completion
+	cmd.RegisterFlagCompletionFunc("http-method", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		validHTTPMethods := customtypes.HTTPMethodValidValues()
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+		}
+		return validHTTPMethods, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	})
+
+	// --service, -s
 	cmd.Flags().AddFlag(options.RequestServiceOption.Flag)
+	// auto-completion
+	cmd.RegisterFlagCompletionFunc("service", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		validServices := customtypes.RequestServiceValidValues()
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+		}
+		return validServices, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
+	})
+
+	// --data
 	cmd.Flags().AddFlag(options.RequestDataOption.Flag)
+
+	// --fail, -f
 	cmd.Flags().AddFlag(options.RequestFailOption.Flag)
 
 	return cmd
