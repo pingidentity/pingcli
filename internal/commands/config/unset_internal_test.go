@@ -23,7 +23,7 @@ func Test_RunInternalConfigUnset(t *testing.T) {
 func Test_RunInternalConfigUnset_InvalidKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^failed to unset configuration: key '.*' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `^failed to unset configuration: key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := RunInternalConfigUnset("invalid-key")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

@@ -1,5 +1,9 @@
 version: 2
 
+# Publish the binaries directly, without any archiving
+archives:
+  - formats: ["binary"]
+
 builds:
   # You can have multiple builds defined as a yaml list
   - #
@@ -12,7 +16,7 @@ builds:
     # Can be a path (e.g. `bin/app`) to wrap the binary in a directory.
     #
     # Default: Project directory name
-    binary: pingcli
+    binary: "pingcli"
 
     # Custom environment variables to be set during the builds.
     # Invalid environment variables will be ignored.
@@ -21,7 +25,7 @@ builds:
     # Default: os.Environ() ++ env config section.
     # Templates: allowed.
     env:
-      - CGO_ENABLED=0
+      - "CGO_ENABLED=0"
 
     # GOOS list to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
@@ -29,9 +33,9 @@ builds:
     #
     # Default: [ 'darwin', 'linux', 'windows' ]
     goos:
-      - darwin
-      - linux
-      - windows
+      - "darwin"
+      - "linux"
+      - "windows"
 
     # GOARCH to build for.
     # For more info refer to: https://golang.org/doc/install/source#environment
@@ -39,36 +43,13 @@ builds:
     #
     # Default: [ '386', 'amd64', 'arm64' ]
     goarch:
-      - amd64
-      - arm64
-
-release:
-  # If set to auto, will mark the release as not ready for production
-  # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
-  # If set to true, will mark the release as not ready for production.
-  # Default is false.
-  prerelease: auto
-
-  # If set to false, will NOT mark the release as "latest".
-  # This prevents it from being shown at the top of the release list,
-  # and from being returned when calling https://api.github.com/repos/OWNER/REPO/releases/latest.
-  #
-  # Available only for GitHub.
-  #
-  # Default is true.
-  # Since: v1.20
-  make_latest: true
-
-  # What to do with the release notes in case there the release already exists.
-  #
-  # Valid options are:
-  # - `keep-existing`: keep the existing notes
-  # - `append`: append the current release notes to the existing notes
-  # - `prepend`: prepend the current release notes to the existing notes
-  # - `replace`: replace existing notes
-  #
-  # Default is `keep-existing`.
-  mode: append
+      - "386"
+      - "amd64"
+      - "arm64"
+    # List of combinations of GOOS + GOARCH + GOARM to ignore.
+    ignore:
+      - goos: "linux"
+        goarch: "386"
 
 checksum:
   # Algorithm to be used.
@@ -89,10 +70,10 @@ checksum:
   # - blake2b
   #
   # Default: 'sha256'.
-  algorithm: sha256
+  algorithm: "sha256"
 
   # If true, will create one checksum file for each artifact.
-  split: true
+  split: false
 
   # Disable the generation/upload of the checksum file.
   disable: false
@@ -100,8 +81,8 @@ checksum:
 brews:
   - # Git author used to commit to the repository.
     commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
+      name: "goreleaserbot"
+      email: "bot@goreleaser.com"
 
     # The project name and current git tag are used in the format string.
     #
@@ -109,7 +90,7 @@ brews:
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
 
     # Directory inside the repository to put the formula.
-    directory: Formula
+    directory: "Formula"
 
     # Caveats for the user of your binary.
     # caveats: "How to use this binary"
@@ -137,7 +118,7 @@ brews:
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
     #
     # Templates: allowed.
-    skip_upload: auto
+    skip_upload: "auto"
 
     # So you can `brew test` your formula.
     #
@@ -151,12 +132,12 @@ brews:
       # Repository owner.
       #
       # Templates: allowed.
-      owner: pingidentity
+      owner: "pingidentity"
 
       # Repository name.
       #
       # Templates: allowed.
-      name: homebrew-tap
+      name: "homebrew-tap"
 
       token: "{{ .Env.GORELEASER_HOMEBREW_TAP_GITHUB_PAT}}"
 
@@ -177,7 +158,7 @@ dockers:
 
     # GOARCH of the built binaries/packages that should be used.
     # Default: 'amd64'.
-    goarch: amd64
+    goarch: "amd64"
 
     # Set the "backend" for the Docker pipe.
     #
@@ -186,7 +167,7 @@ dockers:
     # Podman is a GoReleaser Pro feature and is only available on Linux.
     #
     # Default: 'docker'.
-    use: buildx
+    use: "buildx"
 
   # You can have multiple Docker images.
   # Templates of the Docker image names.
@@ -204,7 +185,7 @@ dockers:
 
     # GOARCH of the built binaries/packages that should be used.
     # Default: 'amd64'.
-    goarch: arm64
+    goarch: "arm64"
 
     # Set the "backend" for the Docker pipe.
     #
@@ -213,7 +194,7 @@ dockers:
     # Podman is a GoReleaser Pro feature and is only available on Linux.
     #
     # Default: 'docker'.
-    use: buildx
+    use: "buildx"
 
 docker_manifests:
   # Name for the manifest.
@@ -239,3 +220,172 @@ docker_manifests:
     image_templates:
       - "pingidentity/pingcli:{{ .Tag }}-amd64"
       - "pingidentity/pingcli:{{ .Tag }}-arm64"
+
+nfpms:
+  # note that this is an array of nfpm configs
+  - #
+    # ID of the nfpm config, must be unique.
+    #
+    # Default: 'default'.
+    id: "pingcli"
+
+    # Name of the package.
+    #
+    # Default: ProjectName.
+    # Templates: allowed.
+    package_name: "pingcli"
+
+    # Your app's vendor.
+    vendor: "Ping Identity"
+
+    # Your app's homepage.
+    #
+    # Default: inferred from global metadata.
+    homepage: "https://github.com/pingidentity/pingcli"
+
+    # Your app's maintainer (probably you).
+    #
+    # Default: inferred from global metadata.
+    maintainer: "Ping Identity"
+
+    # Your app's description.
+    #
+    # Default: inferred from global metadata.
+    description: "The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services."
+
+    # Your app's license.
+    #
+    # Default: inferred from global metadata.
+    license: "Apache 2.0"
+
+    # Formats to be generated.
+    formats:
+      - "apk"
+      - "deb"
+      - "rpm"
+
+    # Custom configuration applied only to the RPM packager.
+    rpm:
+      # The package summary.
+      #
+      # Default: first line of the description.
+      summary: "The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services."
+
+      # The packager is used to identify the organization that actually packaged
+      # the software, as opposed to the author of the software.
+      # `maintainer` will be used as fallback if not specified.
+      # This will expand any env var you set in the field, eg packager: ${PACKAGER}
+      packager: "Ping Identity"
+
+    # Custom configuration applied only to the Deb packager.
+    deb:
+      # Additional fields for the control file. Empty fields are ignored.
+      # This will expand any env vars you set in the field values, e.g. Vcs-Browser: ${CI_PROJECT_URL}
+      fields:
+        Bugs: "https://github.com/pingidentity/pingcli/issues"
+
+    apk:
+      # The package is signed if a key_file is set
+      signature:
+        # The name of the signing key. When verifying a package, the signature
+        # is matched to the public key store in /etc/apk/keys/<key_name>.rsa.pub.
+        #
+        # Default: maintainer's email address.
+        # Templates: allowed.
+        key_name: "origin"
+
+release:
+  # If set to auto, will mark the release as not ready for production
+  # in case there is an indicator for this in the tag e.g. v1.0.0-rc1
+  # If set to true, will mark the release as not ready for production.
+  # Default is false.
+  prerelease: "auto"
+
+  # If set to false, will NOT mark the release as "latest".
+  # This prevents it from being shown at the top of the release list,
+  # and from being returned when calling https://api.github.com/repos/OWNER/REPO/releases/latest.
+  #
+  # Available only for GitHub.
+  #
+  # Default is true.
+  # Since: v1.20
+  make_latest: true
+
+  # What to do with the release notes in case there the release already exists.
+  #
+  # Valid options are:
+  # - `keep-existing`: keep the existing notes
+  # - `append`: append the current release notes to the existing notes
+  # - `prepend`: prepend the current release notes to the existing notes
+  # - `replace`: replace existing notes
+  #
+  # Default is `keep-existing`.
+  mode: "append"
+
+signs:
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "checksum"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "checksum"
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "binary"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "binary"
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "package"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "package"

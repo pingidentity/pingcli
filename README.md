@@ -4,68 +4,159 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 
 ## Install
 
-#### Docker
+### Docker
 
 Use the [Ping CLI Docker image](https://hub.docker.com/r/pingidentity/pingcli)
 
-```text
 Pull Image:
+```shell
 docker pull pingidentity/pingcli:latest
+```
 
 Example Commands:
+```shell
 docker run <Image ID> <sub commands>
 
 docker run <Image ID> --version
 ```
 
-#### macOS/Linux - Homebrew
+### macOS
+
+##### Homebrew
 
 Use PingIdentity's Homebrew tap to install Ping CLI
 
-```text
+```shell
 brew install pingidentity/tap/pingcli
-
-or
-
+```
+OR
+``` shell
 brew tap pingidentity/tap
 brew install pingcli
 ```
 
-#### Manual Installation - macOS/Linux
+##### Manual Installation
 
-See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for binary downloads and SHA256 checksum files.
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
 
 OR
 
 Use the following single-line command to install Ping CLI into '/usr/local/bin' directly.
 
-```text
+```shell
 RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
 OS_NAME=$(uname -s); \
 HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
-URL="https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}.tar.gz"; \
-curl -Ls -o pingcli.tar.gz "${URL}"; \
-tar -zxf pingcli.tar.gz -C /usr/local/bin pingcli; \
-rm -f pingcli.tar.gz
+URL="https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}"; \
+curl -Ls -o pingcli "${URL}"; \
+mv pingcli /usr/local/bin/pingcli;
 ```
 
-#### Manual Installation - Windows
+### Linux
 
-See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for binary downloads and SHA256 checksum files.
+##### Homebrew
+
+Use PingIdentity's Homebrew tap to install Ping CLI
+
+```shell
+brew install pingidentity/tap/pingcli
+```
+OR
+``` shell
+brew tap pingidentity/tap
+brew install pingcli
+```
+
+##### Alpine (.apk)
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for Alpine (.apk) package downloads. To verify package downloads, see the [Verify Section](#verify).
+
+```shell
+apk add --allow-untrusted pingcli_<version>_linux_amd64.apk
+apk add --allow-untrusted pingcli_<version>_linux_arm64.apk
+```
+
+##### Debian/Ubuntu (.deb)
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for Debian (.deb) package downloads. To verify package downloads, see the [Verify Section](#verify).
+
+```shell
+apt-get install pingcli_<version>_linux_amd64.deb
+apt-get install pingcli_<version>_linux_arm64.deb
+```
+
+##### CentOS/Fedora/RHEL (.rpm)
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for RPM (.rpm) package downloads. To verify package downloads, see the [Verify Section](#verify).
+
+```shell
+yum install pingcli_<version>_linux_amd64.rpm
+yum install pingcli_<version>_linux_arm64.rpm
+dnf install pingcli_<version>_linux_amd64.rpm
+dnf install pingcli_<version>_linux_arm64.rpm
+```
+
+##### Manual Installation
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
 
 OR
 
-Use the following single-line powershell command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
-```text
+Use the following single-line command to install Ping CLI into '/usr/local/bin' directly.
+
+```shell
+RELEASE_VERSION=$(basename $(curl -Ls -o /dev/null -w %{url_effective} https://github.com/pingidentity/pingcli/releases/latest)); \
+OS_NAME=$(uname -s); \
+HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
+URL="https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}"; \
+curl -Ls -o pingcli "${URL}"; \
+mv pingcli /usr/local/bin/pingcli;
+```
+
+### Windows
+
+##### Manual Installation
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
+
+OR
+
+Use the following single-line PowerShell 7.4 command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
+```powershell
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
 $RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
-$uname = (uname -m); `
-$HARDWARE_PLATFORM = $uname -replace "aarch64", "arm64" -replace "x86_64", "amd64"; `
-$URL = "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_${HARDWARE_PLATFORM}.tar.gz"
-Invoke-WebRequest -Uri $URL -OutFile pingcli.tar.gz; `
-tar -zxf pingcli.tar.gz -C "${env:LOCALAPPDATA}\Programs" pingcli.exe; `
-Remove-Item pingcli.tar.gz
+$HARDWARE_PLATFORM = $env:PROCESSOR_ARCHITECTURE -replace "ARM64", "arm64" -replace "x86", "386" -replace "AMD64", "amd64" -replace "EM64T", "amd64"; `
+$URL = "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_${HARDWARE_PLATFORM}"
+Invoke-WebRequest -Uri $URL -OutFile "pingcli.exe"; `
+Move-Item -Path pingcli.exe -Destination "${env:LOCALAPPDATA}\Programs"
+```
+
+## Verify
+
+### Checksums
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for the checksums.txt file. The checksums are in the format of SHA256.
+
+### GPG Signatures
+
+See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for the artifact downloads and signature files.
+
+##### Add our public GPG Key via OpenPGP Public Key Server
+
+```shell
+gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
+```
+
+##### Add our public GPG Key via MIT PGP Public Key Server
+```shell
+gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
+```
+
+##### Verify Artifact via Signature File
+
+```shell 
+gpg --verify <artifact-name>.sig <artifact-name>
 ```
 
 ## Configure Ping CLI

@@ -22,7 +22,7 @@ func Test_ValidateViperKey(t *testing.T) {
 func Test_ValidateViperKey_InvalidKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := configuration.ValidateViperKey("invalid-key")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -31,7 +31,7 @@ func Test_ValidateViperKey_InvalidKey(t *testing.T) {
 func Test_ValidateViperKey_EmptyKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^key '' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `^key '' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := configuration.ValidateViperKey("")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -50,7 +50,7 @@ func Test_ValidateParentViperKey(t *testing.T) {
 func Test_ValidateParentViperKey_InvalidKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `(?s)^key '.*' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := configuration.ValidateParentViperKey("invalid-key")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -59,7 +59,7 @@ func Test_ValidateParentViperKey_InvalidKey(t *testing.T) {
 func Test_ValidateParentViperKey_EmptyKey(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `(?s)^key '' is not recognized as a valid configuration key. Valid keys: .*$`
+	expectedErrorPattern := `^key '' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := configuration.ValidateParentViperKey("")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

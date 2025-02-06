@@ -77,6 +77,7 @@ func Options() []Option {
 		ConfigAddProfileNameOption,
 		ConfigAddProfileSetActiveOption,
 		ConfigDeleteAutoAcceptOption,
+		ConfigListKeysYamlOption,
 
 		RequestDataOption,
 		RequestHTTPMethodOption,
@@ -125,6 +126,8 @@ var (
 	ConfigAddProfileDescriptionOption Option
 	ConfigAddProfileNameOption        Option
 	ConfigAddProfileSetActiveOption   Option
+
+	ConfigListKeysYamlOption Option
 
 	ConfigDeleteAutoAcceptOption Option
 )
