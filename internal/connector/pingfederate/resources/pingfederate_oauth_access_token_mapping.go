@@ -63,9 +63,12 @@ func (r *PingFederateOAuthAccessTokenMappingResource) getMappingData() (*map[str
 	mappingData := make(map[string]string)
 
 	mappings, response, err := r.clientInfo.ApiClient.OauthAccessTokenMappingsAPI.GetMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	for _, mapping := range mappings {

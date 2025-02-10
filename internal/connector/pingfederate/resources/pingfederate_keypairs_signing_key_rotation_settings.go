@@ -67,9 +67,12 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getSigningKeyPa
 	signingKeyPairData := make(map[string][]string)
 
 	signingKeyPairs, response, err := r.clientInfo.ApiClient.KeyPairsSigningAPI.GetSigningKeyPairs(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetSigningKeyPairs", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetSigningKeyPairs", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if signingKeyPairs == nil {

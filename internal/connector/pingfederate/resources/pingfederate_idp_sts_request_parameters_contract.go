@@ -61,9 +61,12 @@ func (r *PingFederateIdpStsRequestParametersContractResource) getStsRequestParam
 	stsRequestParamContractData := make(map[string]string)
 
 	stsRequestParamContracts, response, err := r.clientInfo.ApiClient.IdpStsRequestParametersContractsAPI.GetStsRequestParamContracts(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetStsRequestParamContracts", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetStsRequestParamContracts", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if stsRequestParamContracts == nil {

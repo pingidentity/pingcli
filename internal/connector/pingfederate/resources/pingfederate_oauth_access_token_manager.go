@@ -61,9 +61,12 @@ func (r *PingFederateOAuthAccessTokenManagerResource) getTokenManagerData() (*ma
 	tokenManagerData := make(map[string]string)
 
 	tokenManagers, response, err := r.clientInfo.ApiClient.OauthAccessTokenManagersAPI.GetTokenManagers(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTokenManagers", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTokenManagers", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if tokenManagers == nil {

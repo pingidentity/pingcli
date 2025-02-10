@@ -61,9 +61,12 @@ func (r *PingFederateOAuthIssuerResource) getOAuthIssuerData() (*map[string]stri
 	issuerData := make(map[string]string)
 
 	issuers, response, err := r.clientInfo.ApiClient.OauthIssuersAPI.GetOauthIssuers(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetOauthIssuers", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetOauthIssuers", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if issuers == nil {

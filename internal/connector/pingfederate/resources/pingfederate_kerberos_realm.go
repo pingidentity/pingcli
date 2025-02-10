@@ -61,9 +61,12 @@ func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (*map[string]
 	kerberosRealmData := make(map[string]string)
 
 	kerberosRealms, response, err := r.clientInfo.ApiClient.KerberosRealmsAPI.GetKerberosRealms(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetKerberosRealms", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetKerberosRealms", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if kerberosRealms == nil {

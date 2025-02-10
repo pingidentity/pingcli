@@ -61,9 +61,12 @@ func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) getKeyS
 	keySetData := make(map[string]string)
 
 	keySets, response, err := r.clientInfo.ApiClient.KeyPairsOauthOpenIdConnectAPI.GetKeySets(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetKeySets", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetKeySets", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if keySets == nil {

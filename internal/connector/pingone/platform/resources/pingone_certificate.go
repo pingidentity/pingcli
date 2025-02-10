@@ -65,9 +65,12 @@ func (r *PingOneCertificateResource) getCertificateData() (*map[string]string, e
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
 	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "GetCertificates", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if entityArray == nil {

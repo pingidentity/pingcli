@@ -61,9 +61,12 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) getFragmentData() (
 	fragmentData := make(map[string]string)
 
 	authnPoliciesFragments, response, err := r.clientInfo.ApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetFragments", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetFragments", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if authnPoliciesFragments == nil {

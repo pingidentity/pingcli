@@ -70,9 +70,12 @@ func (r *PingOneKeyResource) getKeyData() (*map[string][]string, error) {
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
 	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
-	err = common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if entityArray == nil {

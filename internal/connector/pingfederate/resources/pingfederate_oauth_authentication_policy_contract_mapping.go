@@ -62,9 +62,12 @@ func (r *PingFederateOAuthAuthenticationPolicyContractMappingResource) getApcToP
 	apcToPersistentGrantMappingData := []string{}
 
 	apcToPersistentGrantMappings, response, err := r.clientInfo.ApiClient.OauthAuthenticationPolicyContractMappingsAPI.GetApcMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetApcMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetApcMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apcToPersistentGrantMappings == nil {

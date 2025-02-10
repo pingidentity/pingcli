@@ -56,9 +56,12 @@ func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.Imp
 
 func (r *PingOneNotificationSettingsEmailResource) checkNotificationSettingsEmailData() error {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
 	if err != nil {
 		return err
+	}
+	if !ok {
+		return nil
 	}
 
 	if response.StatusCode == 204 {

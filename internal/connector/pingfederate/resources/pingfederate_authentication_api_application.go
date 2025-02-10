@@ -61,9 +61,12 @@ func (r *PingFederateAuthenticationApiApplicationResource) getApplicationData() 
 	applicationData := make(map[string]string)
 
 	authnApiApplications, response, err := r.clientInfo.ApiClient.AuthenticationApiAPI.GetAuthenticationApiApplications(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetAuthenticationApiApplications", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationApiApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if authnApiApplications == nil {

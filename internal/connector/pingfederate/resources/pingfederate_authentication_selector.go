@@ -61,9 +61,12 @@ func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorDa
 	authenticationSelectorData := make(map[string]string)
 
 	authnSelectors, response, err := r.clientInfo.ApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetAuthenticationSelectors", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationSelectors", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if authnSelectors == nil {

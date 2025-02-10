@@ -71,9 +71,12 @@ func (r *PingOneRiskPredictorResource) getRiskPredictorData() (*map[string][]str
 	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllRiskPredictors", r.ResourceType())
+		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllRiskPredictors", r.ResourceType())
 		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, nil
 		}
 
 		if cursor.EntityArray == nil {

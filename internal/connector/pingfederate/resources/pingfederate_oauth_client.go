@@ -61,9 +61,12 @@ func (r *PingFederateOAuthClientResource) getOAuthClientData() (*map[string]stri
 	oauthClientData := make(map[string]string)
 
 	clients, response, err := r.clientInfo.ApiClient.OauthClientsAPI.GetOauthClients(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetOauthClients", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetOauthClients", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if clients == nil {

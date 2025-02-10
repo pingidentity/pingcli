@@ -61,9 +61,12 @@ func (r *PingFederateMetadataUrlResource) getMetadataUrlData() (*map[string]stri
 	metadataUrlData := make(map[string]string)
 
 	metadataUrls, response, err := r.clientInfo.ApiClient.MetadataUrlsAPI.GetMetadataUrls(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetMetadataUrls", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetMetadataUrls", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if metadataUrls == nil {

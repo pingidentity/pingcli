@@ -67,9 +67,12 @@ func (r *PingFederateCertificatesRevocationOCSPCertificateResource) getOcspCerti
 	ocspCertificateData := make(map[string][]string)
 
 	ocspCertificates, response, err := r.clientInfo.ApiClient.CertificatesRevocationAPI.GetOcspCertificates(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetOcspCertificates", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetOcspCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if ocspCertificates == nil {

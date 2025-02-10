@@ -430,9 +430,12 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 	}
 
 	environment, response, err := pingoneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(ctx, pingoneExportEnvID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadOneEnvironment", "pingone_environment")
+	ok, err := common.HandleClientResponse(response, err, "ReadOneEnvironment", "pingone_environment")
 	if err != nil {
 		return err
+	}
+	if !ok {
+		return fmt.Errorf("failed to validate pingone environment ID '%s'.", pingoneExportEnvID)
 	}
 
 	if environment == nil {

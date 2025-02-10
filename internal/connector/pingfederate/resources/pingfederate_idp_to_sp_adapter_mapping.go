@@ -63,9 +63,12 @@ func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData
 	idpToSpAdapterMappingData := make(map[string]string)
 
 	idpToSpAdapterMappings, response, err := r.clientInfo.ApiClient.IdpToSpAdapterMappingAPI.GetIdpToSpAdapterMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdpToSpAdapterMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdpToSpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if idpToSpAdapterMappings == nil {

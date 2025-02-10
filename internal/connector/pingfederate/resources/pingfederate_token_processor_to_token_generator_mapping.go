@@ -67,9 +67,12 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenToTo
 	tokenToTokenMappingsData := make(map[string][]string)
 
 	tokenToTokenMappings, response, err := r.clientInfo.ApiClient.TokenProcessorToTokenGeneratorMappingsAPI.GetTokenToTokenMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTokenToTokenMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTokenToTokenMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if tokenToTokenMappings == nil {

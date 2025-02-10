@@ -61,9 +61,12 @@ func (r *PingFederateSecretManagerResource) getSecretManagerData() (*map[string]
 	secretManagerData := make(map[string]string)
 
 	secretManagers, response, err := r.clientInfo.ApiClient.SecretManagersAPI.GetSecretManagers(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetSecretManagers", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetSecretManagers", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if secretManagers == nil {

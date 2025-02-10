@@ -61,9 +61,12 @@ func (r *PingFederateIdentityStoreProvisionerResource) getIdentityStoreProvision
 	identityStoreProvisionerData := make(map[string]string)
 
 	identityStoreProvisioners, response, err := r.clientInfo.ApiClient.IdentityStoreProvisionersAPI.GetIdentityStoreProvisioners(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdentityStoreProvisioners", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdentityStoreProvisioners", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if identityStoreProvisioners == nil {

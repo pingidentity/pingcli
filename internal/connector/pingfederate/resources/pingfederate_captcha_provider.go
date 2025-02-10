@@ -61,9 +61,12 @@ func (r *PingFederateCaptchaProviderResource) getCaptchaProviderData() (*map[str
 	captchaProviderData := make(map[string]string)
 
 	captchaProviders, response, err := r.clientInfo.ApiClient.CaptchaProvidersAPI.GetCaptchaProviders(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetCaptchaProviders", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetCaptchaProviders", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if captchaProviders == nil {
