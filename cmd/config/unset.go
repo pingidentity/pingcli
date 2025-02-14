@@ -17,9 +17,6 @@ const (
 )
 
 func NewConfigUnsetCommand() *cobra.Command {
-	// Get viper keys for auto-completion in ValidArgs
-	viperKeys := configuration.ViperKeys()
-
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
@@ -30,7 +27,7 @@ func NewConfigUnsetCommand() *cobra.Command {
 		RunE:      configUnsetRunE,
 		Short:     "Unset stored configuration settings for the CLI.",
 		Use:       "unset [flags] key",
-		ValidArgs: viperKeys,
+		ValidArgs: configuration.ViperKeys(),
 	}
 
 	return cmd

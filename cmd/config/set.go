@@ -17,9 +17,6 @@ const (
 )
 
 func NewConfigSetCommand() *cobra.Command {
-	// Get viper keys for auto-completion in ValidArgs
-	viperKeys := configuration.ViperKeys()
-
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
@@ -30,7 +27,7 @@ func NewConfigSetCommand() *cobra.Command {
 		RunE:      configSetRunE,
 		Short:     "Set stored configuration settings for the CLI.",
 		Use:       "set [flags] key=value",
-		ValidArgs: viperKeys,
+		ValidArgs: configuration.ViperKeys(),
 	}
 
 	return cmd

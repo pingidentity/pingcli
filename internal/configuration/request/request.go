@@ -11,6 +11,7 @@ import (
 
 func InitRequestOptions() {
 	initDataOption()
+	initDataRawOption()
 	initHTTPMethodOption()
 	initServiceOption()
 	initAccessTokenOption()
@@ -31,8 +32,31 @@ func initDataOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name: cobraParamName,
-			Usage: "The data to send in the request. Use prefix '@' to specify data file path instead of raw data. " +
-				"\nExample: '@data.json'",
+			Usage: "The file containing data to send in the request. " +
+				"\nExample: './data.json'",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
+	}
+}
+
+func initDataRawOption() {
+	cobraParamName := "data-raw"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_REQUEST_DATA_RAW"
+
+	options.RequestDataRawOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name: cobraParamName,
+			Usage: "The raw data to send in the request. " +
+				"\nExample: '{\"name\": \"My environment\"}'",
 			Value: cobraValue,
 		},
 		Sensitive: false,

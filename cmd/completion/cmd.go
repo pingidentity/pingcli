@@ -48,6 +48,21 @@ PowerShell:
 `
 )
 
+func completionCmdRunE(cmd *cobra.Command, args []string) error {
+	switch args[0] {
+	case "bash":
+		_ = cmd.Root().GenBashCompletionV2(cmd.OutOrStdout(), true)
+	case "zsh":
+		_ = cmd.Root().GenZshCompletion(cmd.OutOrStdout())
+	case "fish":
+		_ = cmd.Root().GenFishCompletion(cmd.OutOrStdout(), true)
+	case "powershell":
+		_ = cmd.Root().GenPowerShellCompletion(cmd.OutOrStdout())
+	}
+
+	return nil
+}
+
 func Command() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:       "completion [SHELL]",
@@ -55,20 +70,7 @@ func Command() *cobra.Command {
 		Long:      fmt.Sprintf(desc, "pingcli"),
 		ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
 		Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			switch args[0] {
-			case "bash":
-				_ = cmd.Root().GenBashCompletionV2(cmd.OutOrStdout(), true)
-			case "zsh":
-				_ = cmd.Root().GenZshCompletion(cmd.OutOrStdout())
-			case "fish":
-				_ = cmd.Root().GenFishCompletion(cmd.OutOrStdout(), true)
-			case "powershell":
-				_ = cmd.Root().GenPowerShellCompletion(cmd.OutOrStdout())
-			}
-
-			return nil
-		},
+		RunE:      completionCmdRunE,
 	}
 	return cmd
 }

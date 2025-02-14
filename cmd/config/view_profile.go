@@ -2,9 +2,9 @@ package config
 
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
+	autocompletion_config_args "github.com/pingidentity/pingcli/internal/autocompletion/config"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/logger"
-	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
 )
 
@@ -26,13 +26,7 @@ func NewConfigViewProfileCommand() *cobra.Command {
 		Short:                 "View the stored configuration of a custom configuration profile.",
 		Use:                   "view-profile [flags] [profile-name]",
 		// Auto-completion function to return all valid profile names
-		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-			profileNames := profiles.GetMainConfig().ProfileNames()
-			if len(args) != 0 {
-				return nil, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-			}
-			return profileNames, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-		},
+		ValidArgsFunction: autocompletion_config_args.ViewProfile,
 	}
 
 	return cmd

@@ -10,9 +10,9 @@ import (
 	"github.com/pingidentity/pingcli/cmd/feedback"
 	"github.com/pingidentity/pingcli/cmd/platform"
 	"github.com/pingidentity/pingcli/cmd/request"
+	autocompletion_root_flags "github.com/pingidentity/pingcli/internal/autocompletion"
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
@@ -28,6 +28,10 @@ func init() {
 
 	l.Debug().Msgf("Initializing Root command...")
 	cobra.OnInitialize(initViperProfile)
+}
+
+func returnRootSystemError(err error) {
+	output.SystemError(fmt.Sprintf("Unable to register auto completion for pingcli flag: %v", err), nil)
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -56,13 +60,10 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	// --profile, -P
 	cmd.PersistentFlags().AddFlag(options.RootProfileOption.Flag)
 	// auto-completion
-	cmd.RegisterFlagCompletionFunc("profile", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validProfileNames := profiles.GetMainConfig().ProfileNames()
-		if len(args) != 0 {
-			return nil, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-		}
-		return validProfileNames, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
+	err := cmd.RegisterFlagCompletionFunc("profile", autocompletion_root_flags.Profile)
+	if err != nil {
+		returnRootSystemError(err)
+	}
 
 	// --no-color
 	cmd.PersistentFlags().AddFlag(options.RootColorOption.Flag)
@@ -70,13 +71,10 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	// --output-format, -O
 	cmd.PersistentFlags().AddFlag(options.RootOutputFormatOption.Flag)
 	// auto-completion
-	cmd.RegisterFlagCompletionFunc("output-format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validOutputFormats := customtypes.OutputFormatValidValues()
-		if len(args) != 0 {
-			return nil, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-		}
-		return validOutputFormats, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
+	err = cmd.RegisterFlagCompletionFunc("output-format", autocompletion_root_flags.OutputFormat)
+	if err != nil {
+		returnRootSystemError(err)
+	}
 
 	// Make sure cobra is outputting to stdout and stderr
 	cmd.SetOut(os.Stdout)

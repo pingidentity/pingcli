@@ -1,11 +1,14 @@
 package request
 
 import (
+	"fmt"
+
 	"github.com/pingidentity/pingcli/cmd/common"
+	autocompletion_request_flags "github.com/pingidentity/pingcli/internal/autocompletion/request"
 	request_internal "github.com/pingidentity/pingcli/internal/commands/request"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/spf13/cobra"
 )
 
@@ -15,16 +18,20 @@ const (
 
   Send a custom API request to the configured PingOne tenant, making a GET request to retrieve JSON configuration for a specific environment.
     pingcli request --service pingone --http-method GET --output-format json environments/$MY_ENVIRONMENT_ID
+	
+	Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with JSON data sourced from a file.
+		pingcli request --service pingone --http-method POST --data @./my-environment.json environments
 
-  Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
-    pingcli request --service pingone --http-method POST --data '{"name": "My environment"}' environments
-
-  Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with JSON data sourced from a file.
-    pingcli request --service pingone --http-method POST --data @./my-environment.json environments
+		Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
+		pingcli request --service pingone --http-method POST --data-raw '{"name": "My environment"}' environments
 
   Send a custom API request to the configured PingOne tenant, making a DELETE request to remove an application attribute mapping.
     pingcli request --service pingone --http-method DELETE environments/$MY_ENVIRONMENT_ID/applications/$MY_APPLICATION_ID/attributes/$MY_ATTRIBUTE_MAPPING_ID`
 )
+
+func returnServiceSystemError(err error) {
+	output.SystemError(fmt.Sprintf("Unable to register auto completion for service flag: %v", err), nil)
+}
 
 func NewRequestCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -40,33 +47,36 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 		Use:   "request [flags] API_URI",
 	}
 
+	// --data
+	// auto-completion
+	cmd.Flags().AddFlag(options.RequestDataOption.Flag)
+	err := cmd.RegisterFlagCompletionFunc("data", autocompletion_request_flags.Data)
+	if err != nil {
+		returnServiceSystemError(err)
+	}
+
+	// --data-raw
+	cmd.Flags().AddFlag(options.RequestDataRawOption.Flag)
+
+	// --fail, -f
+	cmd.Flags().AddFlag(options.RequestFailOption.Flag)
+
 	// --http-method, -m
 	cmd.Flags().AddFlag(options.RequestHTTPMethodOption.Flag)
 	// auto-completion
-	cmd.RegisterFlagCompletionFunc("http-method", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validHTTPMethods := customtypes.HTTPMethodValidValues()
-		if len(args) != 0 {
-			return nil, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-		}
-		return validHTTPMethods, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
+	err = cmd.RegisterFlagCompletionFunc("http-method", autocompletion_request_flags.HTTPMethod)
+	if err != nil {
+		returnServiceSystemError(err)
+	}
 
 	// --service, -s
 	cmd.Flags().AddFlag(options.RequestServiceOption.Flag)
 	// auto-completion
-	cmd.RegisterFlagCompletionFunc("service", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validServices := customtypes.RequestServiceValidValues()
-		if len(args) != 0 {
-			return nil, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-		}
-		return validServices, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
+	err = cmd.RegisterFlagCompletionFunc("service", autocompletion_request_flags.Service)
 
-	// --data
-	cmd.Flags().AddFlag(options.RequestDataOption.Flag)
-
-	// --fail, -f
-	cmd.Flags().AddFlag(options.RequestFailOption.Flag)
+	if err != nil {
+		returnServiceSystemError(err)
+	}
 
 	return cmd
 }

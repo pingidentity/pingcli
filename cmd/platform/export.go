@@ -1,11 +1,14 @@
 package platform
 
 import (
+	"fmt"
+
 	"github.com/pingidentity/pingcli/cmd/common"
+	autocompletion_export_flags "github.com/pingidentity/pingcli/internal/autocompletion/platform"
 	platform_internal "github.com/pingidentity/pingcli/internal/commands/platform"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/spf13/cobra"
 )
 
@@ -34,6 +37,10 @@ const (
   Export configuration-as-code packages for PingFederate, specifying optional connection properties
     pingcli platform export --services pingfederate --x-bypass-external-validation=false --ca-certificate-pem-files "/path/to/cert.pem,/path/to/cert2.pem" --insecure-trust-all-tls=false`
 )
+
+func returnExportSystemError(err error) {
+	output.SystemError(fmt.Sprintf("Unable to register auto completion for export flag: %v", err), nil)
+}
 
 func NewExportCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -71,17 +78,17 @@ func exportRunE(cmd *cobra.Command, args []string) error {
 func initGeneralExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PlatformExportExportFormatOption.Flag)
 	// auto-completion
-	cmd.RegisterFlagCompletionFunc("format", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validExportFormats := customtypes.ExportFormatValidValues()
-		return validExportFormats, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
+	err := cmd.RegisterFlagCompletionFunc("format", autocompletion_export_flags.Format)
+	if err != nil {
+		returnExportSystemError(err)
+	}
 
 	cmd.Flags().AddFlag(options.PlatformExportServiceOption.Flag)
 	// auto-completion
-	cmd.RegisterFlagCompletionFunc("services", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validServices := customtypes.ExportServicesValidValues()
-		return validServices, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
+	err = cmd.RegisterFlagCompletionFunc("services", autocompletion_export_flags.Services)
+	if err != nil {
+		returnExportSystemError(err)
+	}
 
 	cmd.Flags().AddFlag(options.PlatformExportOutputDirectoryOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportOverwriteOption.Flag)
@@ -93,19 +100,19 @@ func initPingOneExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
 
-	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
-	// auto-completion
-	cmd.RegisterFlagCompletionFunc("pingone-region-code", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validRegionCodes := customtypes.PingOneRegionCodeValidValues()
-		return validRegionCodes, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
-
 	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
 	// auto-completion
-	cmd.RegisterFlagCompletionFunc("pingone-authentication-type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validPingOneAuthTypes := customtypes.PingOneAuthenticationTypeValidValues()
-		return validPingOneAuthTypes, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
+	err := cmd.RegisterFlagCompletionFunc("pingone-authentication-type", autocompletion_export_flags.PingOneAuthenticationType)
+	if err != nil {
+		returnExportSystemError(err)
+	}
+
+	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
+	// auto-completion
+	err = cmd.RegisterFlagCompletionFunc("pingone-region-code", autocompletion_export_flags.PingOneRegionCode)
+	if err != nil {
+		returnExportSystemError(err)
+	}
 
 	cmd.MarkFlagsRequiredTogether(
 		options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName,
@@ -130,10 +137,10 @@ func initPingFederateGeneralFlags(cmd *cobra.Command) {
 
 	cmd.Flags().AddFlag(options.PingFederateAuthenticationTypeOption.Flag)
 	// auto-completion
-	cmd.RegisterFlagCompletionFunc("pingfederate-authentication-type", func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-		validPingFedAuthTypes := customtypes.PingFederateAuthenticationTypeValidValues()
-		return validPingFedAuthTypes, cobra.ShellCompDirectiveNoSpace | cobra.ShellCompDirectiveNoFileComp
-	})
+	err := cmd.RegisterFlagCompletionFunc("pingfederate-authentication-type", autocompletion_export_flags.PingFederateAuthenticationType)
+	if err != nil {
+		returnExportSystemError(err)
+	}
 }
 
 func initPingFederateBasicAuthFlags(cmd *cobra.Command) {
