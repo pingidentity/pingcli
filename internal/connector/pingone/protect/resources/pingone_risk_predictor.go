@@ -35,7 +35,7 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 
 	importBlocks := []connector.ImportBlock{}
 
-	riskPredictorData, err := getRiskPredictorData(r.clientInfo, r.ResourceType())
+	riskPredictorData, err := r.getRiskPredictorData()
 	if err != nil {
 		return nil, err
 	}
@@ -65,11 +65,11 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 	return &importBlocks, nil
 }
 
-func getRiskPredictorData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string][]string, error) {
+func (r *PingOneRiskPredictorResource) getRiskPredictorData() (map[string][]string, error) {
 	riskPredictorData := make(map[string][]string)
 
-	iter := clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	riskPredictors, err := common.GetRiskAPIObjectsFromIterator[risk.RiskPredictor](iter, "ReadAllRiskPredictors", "GetRiskPredictors", resourceType)
+	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	riskPredictors, err := common.GetRiskAPIObjectsFromIterator[risk.RiskPredictor](iter, "ReadAllRiskPredictors", "GetRiskPredictors", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
