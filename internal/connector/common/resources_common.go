@@ -9,6 +9,7 @@ import (
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
+	"github.com/patrickcping/pingone-go-sdk-v2/risk"
 	"github.com/pingidentity/pingcli/internal/output"
 )
 
@@ -132,6 +133,44 @@ func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPaged
 }
 
 func GetMfaAPIObjectsFromIterator[T any](iter mfa.EntityArrayPagedIterator, clientFuncName, extractionFuncName, resourceType string) ([]T, error) {
+	apiObjects := []T{}
+
+	for cursor, err := range iter {
+		ok, err := HandleClientResponse(cursor.HTTPResponse, err, clientFuncName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
+		if !ok {
+			return nil, nil
+		}
+
+		nilErr := dataNilError(resourceType, cursor.HTTPResponse)
+
+		if cursor.EntityArray == nil {
+			return nil, nilErr
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return nil, nilErr
+		}
+
+		reflectValues := reflect.ValueOf(embedded).MethodByName(extractionFuncName).Call(nil)
+		for _, rValue := range reflectValues {
+			apiObject, apiObjectOk := rValue.Interface().(T)
+			if !apiObjectOk {
+				output.SystemError(fmt.Sprintf("Failed to cast reflect value to %s", resourceType), nil)
+			}
+
+			apiObjects = append(apiObjects, apiObject)
+		}
+	}
+
+	return apiObjects, nil
+}
+
+func GetRiskAPIObjectsFromIterator[T any](iter risk.EntityArrayPagedIterator, clientFuncName, extractionFuncName, resourceType string) ([]T, error) {
 	apiObjects := []T{}
 
 	for cursor, err := range iter {
