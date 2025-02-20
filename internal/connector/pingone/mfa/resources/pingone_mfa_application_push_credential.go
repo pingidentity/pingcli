@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
+	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -35,18 +36,18 @@ func (r *PingOneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.
 
 	importBlocks := []connector.ImportBlock{}
 
-	appData, err := r.getApplicationData()
+	applicationData, err := getOIDCApplicationData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for appId, appName := range *appData {
-		pushCredData, err := r.getPushCredentialData(appId)
+	for appId, appName := range applicationData {
+		pushCredData, err := getPushCredentialData(r.clientInfo, r.ResourceType(), appId)
 		if err != nil {
 			return nil, err
 		}
 
-		for pushCredId, pushCredType := range *pushCredData {
+		for pushCredId, pushCredType := range pushCredData {
 			commentData := map[string]string{
 				"Export Environment ID":                r.clientInfo.ExportEnvironmentID,
 				"MFA Application Push Credential ID":   pushCredId,
@@ -70,81 +71,50 @@ func (r *PingOneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.
 	return &importBlocks, nil
 }
 
-func (r *PingOneMFAApplicationPushCredentialResource) getApplicationData() (*map[string]string, error) {
-	appData := make(map[string]string)
+func getOIDCApplicationData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+	applicationData := make(map[string]string)
 
-	// Fetch all pingone_application resources that could have pingone_mfa_application_push_credentials
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	applications, err := common.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", resourceType)
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", "pingone_application")
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, application := range applications {
+		// MFa application push credentials are only for OIDC Native Apps
+		if application.ApplicationOIDC != nil {
+			applicationId, applicationIdOk := application.ApplicationOIDC.GetIdOk()
+			applicationName, applicationNameOk := application.ApplicationOIDC.GetNameOk()
+			applicationType, applicationTypeOk := application.ApplicationOIDC.GetTypeOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, app := range embedded.GetApplications() {
-			// MFa application push credentials are only for OIDC Native Apps
-			if app.ApplicationOIDC != nil {
-				appId, appIdOk := app.ApplicationOIDC.GetIdOk()
-				appName, appNameOk := app.ApplicationOIDC.GetNameOk()
-				appType, appTypeOk := app.ApplicationOIDC.GetTypeOk()
-
-				if appIdOk && appNameOk && appTypeOk {
-					if *appType == management.ENUMAPPLICATIONTYPE_NATIVE_APP {
-						appData[*appId] = *appName
-					}
+			if applicationIdOk && applicationNameOk && applicationTypeOk {
+				if *applicationType == management.ENUMAPPLICATIONTYPE_NATIVE_APP {
+					applicationData[*applicationId] = *applicationName
 				}
 			}
 		}
 	}
 
-	return &appData, nil
+	return applicationData, nil
 }
 
-func (r *PingOneMFAApplicationPushCredentialResource) getPushCredentialData(appId string) (*map[string]string, error) {
-	pushCredData := make(map[string]string)
+func getPushCredentialData(clientInfo *connector.PingOneClientInfo, resourceType, applicationId string) (map[string]string, error) {
+	mfaPushCredentialData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	iter := clientInfo.ApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(clientInfo.Context, clientInfo.ExportEnvironmentID, applicationId).Execute()
+	mfaPushCredentials, err := common.GetMfaAPIObjectsFromIterator[mfa.MFAPushCredentialResponse](iter, "ReadAllMFAPushCredentials", "GetPushCredentials", resourceType)
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllMFAPushCredentials", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, mfaPushCredential := range mfaPushCredentials {
+		mfaPushCredentialId, mfaPushCredentialIdOk := mfaPushCredential.GetIdOk()
+		mfaPushCredentialType, mfaPushCredentialTypeOk := mfaPushCredential.GetTypeOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, pushCred := range embedded.GetPushCredentials() {
-			pushCredId, pushCredIdOk := pushCred.GetIdOk()
-			pushCredType, pushCredTypeOk := pushCred.GetTypeOk()
-
-			if pushCredIdOk && pushCredTypeOk {
-				pushCredData[*pushCredId] = string(*pushCredType)
-			}
+		if mfaPushCredentialIdOk && mfaPushCredentialTypeOk {
+			mfaPushCredentialData[*mfaPushCredentialId] = string(*mfaPushCredentialType)
 		}
 	}
 
-	return &pushCredData, nil
+	return mfaPushCredentialData, nil
 }

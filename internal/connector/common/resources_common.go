@@ -8,6 +8,7 @@ import (
 	"slices"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
+	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/pingidentity/pingcli/internal/output"
 )
 
@@ -28,7 +29,7 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 	}
 
 	if response == nil {
-		return false, fmt.Errorf("%s Request for resource '%s' was not successful. Response is nil.", apiFunctionName, resourceType)
+		return false, fmt.Errorf("%s Request for resource '%s' was not successful. Response is nil", apiFunctionName, resourceType)
 	}
 	defer response.Body.Close()
 
@@ -100,7 +101,45 @@ func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPaged
 		if err != nil {
 			return nil, err
 		}
-		// A warning was given when handling the client response. Return nil embeddeds to skip export of resource
+		// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
+		if !ok {
+			return nil, nil
+		}
+
+		nilErr := dataNilError(resourceType, cursor.HTTPResponse)
+
+		if cursor.EntityArray == nil {
+			return nil, nilErr
+		}
+
+		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
+		if !embeddedOk {
+			return nil, nilErr
+		}
+
+		reflectValues := reflect.ValueOf(embedded).MethodByName(extractionFuncName).Call(nil)
+		for _, rValue := range reflectValues {
+			apiObject, apiObjectOk := rValue.Interface().(T)
+			if !apiObjectOk {
+				output.SystemError(fmt.Sprintf("Failed to cast reflect value to %s", resourceType), nil)
+			}
+
+			apiObjects = append(apiObjects, apiObject)
+		}
+	}
+
+	return apiObjects, nil
+}
+
+func GetMfaAPIObjectsFromIterator[T any](iter mfa.EntityArrayPagedIterator, clientFuncName, extractionFuncName, resourceType string) ([]T, error) {
+	apiObjects := []T{}
+
+	for cursor, err := range iter {
+		ok, err := HandleClientResponse(cursor.HTTPResponse, err, clientFuncName, resourceType)
+		if err != nil {
+			return nil, err
+		}
+		// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
 		if !ok {
 			return nil, nil
 		}
