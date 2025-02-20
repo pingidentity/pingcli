@@ -82,5 +82,5 @@ func getDefaultBrandingThemeName(clientInfo *connector.PingOneClientInfo, resour
 		}
 	}
 
-	return "", fmt.Errorf("failed to export resource '%s'. No default branding theme found.", resourceType)
+	return "", fmt.Errorf("failed to export resource '%s'. No default branding theme found", resourceType)
 }

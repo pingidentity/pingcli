@@ -118,5 +118,5 @@ func getRoleAssignmentRoleName(clientInfo *connector.PingOneClientInfo, resource
 		}
 	}
 
-	return nil, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'.", resourceType, roleId)
+	return nil, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'", resourceType, roleId)
 }
