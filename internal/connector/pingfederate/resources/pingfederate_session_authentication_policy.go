@@ -39,7 +39,7 @@ func (r *PingFederateSessionAuthenticationPolicyResource) ExportAll() (*[]connec
 		return nil, err
 	}
 
-	for policyId, policyInfo := range *authenticationSessionPolicyData {
+	for policyId, policyInfo := range authenticationSessionPolicyData {
 		authSourceType := policyInfo[0]
 		authSourceRefId := policyInfo[1]
 
@@ -63,7 +63,7 @@ func (r *PingFederateSessionAuthenticationPolicyResource) ExportAll() (*[]connec
 	return &importBlocks, nil
 }
 
-func (r *PingFederateSessionAuthenticationPolicyResource) getAuthenticationSessionPolicyData() (*map[string][]string, error) {
+func (r *PingFederateSessionAuthenticationPolicyResource) getAuthenticationSessionPolicyData() (map[string][]string, error) {
 	authenticationSessionPolicyData := make(map[string][]string)
 
 	authenticationSessionPolicies, response, err := r.clientInfo.ApiClient.SessionAPI.GetSourcePolicies(r.clientInfo.Context).Execute()
@@ -102,5 +102,5 @@ func (r *PingFederateSessionAuthenticationPolicyResource) getAuthenticationSessi
 		}
 	}
 
-	return &authenticationSessionPolicyData, nil
+	return authenticationSessionPolicyData, nil
 }

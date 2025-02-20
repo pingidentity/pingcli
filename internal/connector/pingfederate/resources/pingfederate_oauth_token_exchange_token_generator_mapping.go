@@ -39,7 +39,7 @@ func (r *PingFederateOAuthTokenExchangeTokenGeneratorMappingResource) ExportAll(
 		return nil, err
 	}
 
-	for mappingId, mappingInfo := range *processorPolicyToGeneratorMappingData {
+	for mappingId, mappingInfo := range processorPolicyToGeneratorMappingData {
 		sourceId := mappingInfo[0]
 		targetId := mappingInfo[1]
 
@@ -63,7 +63,7 @@ func (r *PingFederateOAuthTokenExchangeTokenGeneratorMappingResource) ExportAll(
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthTokenExchangeTokenGeneratorMappingResource) getProcessorPolicyToGeneratorMappingData() (*map[string][]string, error) {
+func (r *PingFederateOAuthTokenExchangeTokenGeneratorMappingResource) getProcessorPolicyToGeneratorMappingData() (map[string][]string, error) {
 	processorPolicyToGeneratorMappingData := make(map[string][]string)
 
 	processorPolicyToGeneratorMappings, response, err := r.clientInfo.ApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.GetTokenGeneratorMappings(r.clientInfo.Context).Execute()
@@ -94,5 +94,5 @@ func (r *PingFederateOAuthTokenExchangeTokenGeneratorMappingResource) getProcess
 		}
 	}
 
-	return &processorPolicyToGeneratorMappingData, nil
+	return processorPolicyToGeneratorMappingData, nil
 }

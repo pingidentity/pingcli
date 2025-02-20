@@ -39,7 +39,7 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 		return nil, err
 	}
 
-	for dataStoreId, dataStoreType := range *dataStoreData {
+	for dataStoreId, dataStoreType := range dataStoreData {
 		commentData := map[string]string{
 			"Data Store ID":   dataStoreId,
 			"Data Store Type": dataStoreType,
@@ -59,7 +59,7 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 	return &importBlocks, nil
 }
 
-func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, error) {
+func (r *PingFederateDataStoreResource) getDataStoreData() (map[string]string, error) {
 	dataStoreData := make(map[string]string)
 
 	dataStores, response, err := r.clientInfo.ApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
@@ -89,5 +89,5 @@ func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, 
 		}
 	}
 
-	return &dataStoreData, nil
+	return dataStoreData, nil
 }

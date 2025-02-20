@@ -37,7 +37,7 @@ func (r *PingFederateNotificationPublisherResource) ExportAll() (*[]connector.Im
 		return nil, err
 	}
 
-	for notificationPublisherId, notificationPublisherName := range *notificationPublisherData {
+	for notificationPublisherId, notificationPublisherName := range notificationPublisherData {
 		commentData := map[string]string{
 			"Notification Publisher ID":   notificationPublisherId,
 			"Notification Publisher Name": notificationPublisherName,
@@ -57,7 +57,7 @@ func (r *PingFederateNotificationPublisherResource) ExportAll() (*[]connector.Im
 	return &importBlocks, nil
 }
 
-func (r *PingFederateNotificationPublisherResource) getNotificationPublisherData() (*map[string]string, error) {
+func (r *PingFederateNotificationPublisherResource) getNotificationPublisherData() (map[string]string, error) {
 	notificationPublisherData := make(map[string]string)
 
 	notificationPublishers, response, err := r.clientInfo.ApiClient.NotificationPublishersAPI.GetNotificationPublishers(r.clientInfo.Context).Execute()
@@ -87,5 +87,5 @@ func (r *PingFederateNotificationPublisherResource) getNotificationPublisherData
 		}
 	}
 
-	return &notificationPublisherData, nil
+	return notificationPublisherData, nil
 }

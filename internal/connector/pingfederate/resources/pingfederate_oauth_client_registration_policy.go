@@ -37,7 +37,7 @@ func (r *PingFederateOAuthClientRegistrationPolicyResource) ExportAll() (*[]conn
 		return nil, err
 	}
 
-	for clientRegistrationPolicyId, clientRegistrationPolicyName := range *clientRegistrationPolicyData {
+	for clientRegistrationPolicyId, clientRegistrationPolicyName := range clientRegistrationPolicyData {
 		commentData := map[string]string{
 			"OAuth Client Registration Policy ID":   clientRegistrationPolicyId,
 			"OAuth Client Registration Policy Name": clientRegistrationPolicyName,
@@ -57,7 +57,7 @@ func (r *PingFederateOAuthClientRegistrationPolicyResource) ExportAll() (*[]conn
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthClientRegistrationPolicyResource) getClientRegistrationPolicyData() (*map[string]string, error) {
+func (r *PingFederateOAuthClientRegistrationPolicyResource) getClientRegistrationPolicyData() (map[string]string, error) {
 	clientRegistrationPolicyData := make(map[string]string)
 
 	clientRegistrationPolicies, response, err := r.clientInfo.ApiClient.OauthClientRegistrationPoliciesAPI.GetDynamicClientRegistrationPolicies(r.clientInfo.Context).Execute()
@@ -87,5 +87,5 @@ func (r *PingFederateOAuthClientRegistrationPolicyResource) getClientRegistratio
 		}
 	}
 
-	return &clientRegistrationPolicyData, nil
+	return clientRegistrationPolicyData, nil
 }

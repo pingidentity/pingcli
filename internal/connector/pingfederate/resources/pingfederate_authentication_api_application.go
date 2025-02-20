@@ -37,7 +37,7 @@ func (r *PingFederateAuthenticationApiApplicationResource) ExportAll() (*[]conne
 		return nil, err
 	}
 
-	for appId, appName := range *applicationData {
+	for appId, appName := range applicationData {
 		commentData := map[string]string{
 			"Authentication API Application ID":   appId,
 			"Authentication API Application Name": appName,
@@ -57,7 +57,7 @@ func (r *PingFederateAuthenticationApiApplicationResource) ExportAll() (*[]conne
 	return &importBlocks, nil
 }
 
-func (r *PingFederateAuthenticationApiApplicationResource) getApplicationData() (*map[string]string, error) {
+func (r *PingFederateAuthenticationApiApplicationResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
 	authnApiApplications, response, err := r.clientInfo.ApiClient.AuthenticationApiAPI.GetAuthenticationApiApplications(r.clientInfo.Context).Execute()
@@ -87,5 +87,5 @@ func (r *PingFederateAuthenticationApiApplicationResource) getApplicationData() 
 		}
 	}
 
-	return &applicationData, nil
+	return applicationData, nil
 }

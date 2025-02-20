@@ -39,7 +39,7 @@ func (r *PingFederateSPAuthenticationPolicyContractMappingResource) ExportAll() 
 		return nil, err
 	}
 
-	for apcToSpAdapterMappingId, apcToSpAdapterMappingInfo := range *apcToSpAdapterMappingData {
+	for apcToSpAdapterMappingId, apcToSpAdapterMappingInfo := range apcToSpAdapterMappingData {
 		apcToSpAdapterMappingSourceID := apcToSpAdapterMappingInfo[0]
 		apcToSpAdapterMappingTargetID := apcToSpAdapterMappingInfo[1]
 
@@ -63,7 +63,7 @@ func (r *PingFederateSPAuthenticationPolicyContractMappingResource) ExportAll() 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateSPAuthenticationPolicyContractMappingResource) getApcToSpAdapterMappingData() (*map[string][]string, error) {
+func (r *PingFederateSPAuthenticationPolicyContractMappingResource) getApcToSpAdapterMappingData() (map[string][]string, error) {
 	apcToSpAdapterMappingData := make(map[string][]string)
 
 	apcToSpAdapterMappings, response, err := r.clientInfo.ApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.Context).Execute()
@@ -94,5 +94,5 @@ func (r *PingFederateSPAuthenticationPolicyContractMappingResource) getApcToSpAd
 		}
 	}
 
-	return &apcToSpAdapterMappingData, nil
+	return apcToSpAdapterMappingData, nil
 }

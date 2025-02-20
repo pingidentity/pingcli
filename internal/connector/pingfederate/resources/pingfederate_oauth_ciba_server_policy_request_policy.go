@@ -37,7 +37,7 @@ func (r *PingFederateOAuthCibaServerPolicyRequestPolicyResource) ExportAll() (*[
 		return nil, err
 	}
 
-	for requestPolicyId, requestPolicyName := range *oauthClientData {
+	for requestPolicyId, requestPolicyName := range oauthClientData {
 		commentData := map[string]string{
 			"OAuth CIBA Server Policy Request Policy ID":   requestPolicyId,
 			"OAuth CIBA Server Policy Request Policy Name": requestPolicyName,
@@ -57,7 +57,7 @@ func (r *PingFederateOAuthCibaServerPolicyRequestPolicyResource) ExportAll() (*[
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOAuthCibaServerPolicyRequestPolicyResource) getRequestPolicyData() (*map[string]string, error) {
+func (r *PingFederateOAuthCibaServerPolicyRequestPolicyResource) getRequestPolicyData() (map[string]string, error) {
 	requestPolicyData := make(map[string]string)
 
 	requestPolicies, response, err := r.clientInfo.ApiClient.OauthCibaServerPolicyAPI.GetCibaServerPolicies(r.clientInfo.Context).Execute()
@@ -87,5 +87,5 @@ func (r *PingFederateOAuthCibaServerPolicyRequestPolicyResource) getRequestPolic
 		}
 	}
 
-	return &requestPolicyData, nil
+	return requestPolicyData, nil
 }

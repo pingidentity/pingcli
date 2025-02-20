@@ -37,7 +37,7 @@ func (r *PingFederateSpAdapterResource) ExportAll() (*[]connector.ImportBlock, e
 		return nil, err
 	}
 
-	for spAdapterId, spAdapterName := range *spAdaptersData {
+	for spAdapterId, spAdapterName := range spAdaptersData {
 		commentData := map[string]string{
 			"Resource Type":   r.ResourceType(),
 			"SP Adapter ID":   spAdapterId,
@@ -57,7 +57,7 @@ func (r *PingFederateSpAdapterResource) ExportAll() (*[]connector.ImportBlock, e
 	return &importBlocks, nil
 }
 
-func (r *PingFederateSpAdapterResource) getSpAdaptersData() (*map[string]string, error) {
+func (r *PingFederateSpAdapterResource) getSpAdaptersData() (map[string]string, error) {
 	spAdaptersData := make(map[string]string)
 
 	spAdapters, response, err := r.clientInfo.ApiClient.SpAdaptersAPI.GetSpAdapters(r.clientInfo.Context).Execute()
@@ -87,5 +87,5 @@ func (r *PingFederateSpAdapterResource) getSpAdaptersData() (*map[string]string,
 		}
 	}
 
-	return &spAdaptersData, nil
+	return spAdaptersData, nil
 }

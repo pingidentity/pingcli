@@ -39,7 +39,7 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) ExportAll() 
 		return nil, err
 	}
 
-	for tokenToTokenMappingId, tokenToTokenMappingInfo := range *tokenToTokenMappingsData {
+	for tokenToTokenMappingId, tokenToTokenMappingInfo := range tokenToTokenMappingsData {
 		tokenToTokenMappingSourceId := tokenToTokenMappingInfo[0]
 		tokenToTokenMappingTargetId := tokenToTokenMappingInfo[1]
 
@@ -63,7 +63,7 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) ExportAll() 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenToTokenMappingsData() (*map[string][]string, error) {
+func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenToTokenMappingsData() (map[string][]string, error) {
 	tokenToTokenMappingsData := make(map[string][]string)
 
 	tokenToTokenMappings, response, err := r.clientInfo.ApiClient.TokenProcessorToTokenGeneratorMappingsAPI.GetTokenToTokenMappings(r.clientInfo.Context).Execute()
@@ -94,5 +94,5 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenToTo
 		}
 	}
 
-	return &tokenToTokenMappingsData, nil
+	return tokenToTokenMappingsData, nil
 }

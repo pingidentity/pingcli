@@ -39,7 +39,7 @@ func (r *PingFederateIdpToSpAdapterMappingResource) ExportAll() (*[]connector.Im
 		return nil, err
 	}
 
-	for idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId := range *idpToSpAdapterMappingData {
+	for idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId := range idpToSpAdapterMappingData {
 		commentData := map[string]string{
 			"IDP To SP Adapter Mapping IDP ID": idpToSpAdapterMappingSourceId,
 			"IDP To SP Adapter Mapping SP ID":  idpToSpAdapterMappingTargetId,
@@ -59,7 +59,7 @@ func (r *PingFederateIdpToSpAdapterMappingResource) ExportAll() (*[]connector.Im
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData() (*map[string]string, error) {
+func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData() (map[string]string, error) {
 	idpToSpAdapterMappingData := make(map[string]string)
 
 	idpToSpAdapterMappings, response, err := r.clientInfo.ApiClient.IdpToSpAdapterMappingAPI.GetIdpToSpAdapterMappings(r.clientInfo.Context).Execute()
@@ -89,5 +89,5 @@ func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData
 		}
 	}
 
-	return &idpToSpAdapterMappingData, nil
+	return idpToSpAdapterMappingData, nil
 }

@@ -37,7 +37,7 @@ func (r *PingFederateOpenIDConnectPolicyResource) ExportAll() (*[]connector.Impo
 		return nil, err
 	}
 
-	for oidcPolicyId, oidcPolicyName := range *oidcPolicyData {
+	for oidcPolicyId, oidcPolicyName := range oidcPolicyData {
 		commentData := map[string]string{
 			"OpenID Connect Policy ID":   oidcPolicyId,
 			"OpenID Connect Policy Name": oidcPolicyName,
@@ -57,7 +57,7 @@ func (r *PingFederateOpenIDConnectPolicyResource) ExportAll() (*[]connector.Impo
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOpenIDConnectPolicyResource) getOIDCPolicyData() (*map[string]string, error) {
+func (r *PingFederateOpenIDConnectPolicyResource) getOIDCPolicyData() (map[string]string, error) {
 	oidcPolicyData := make(map[string]string)
 
 	oidcPolicies, response, err := r.clientInfo.ApiClient.OauthOpenIdConnectAPI.GetOIDCPolicies(r.clientInfo.Context).Execute()
@@ -87,5 +87,5 @@ func (r *PingFederateOpenIDConnectPolicyResource) getOIDCPolicyData() (*map[stri
 		}
 	}
 
-	return &oidcPolicyData, nil
+	return oidcPolicyData, nil
 }
