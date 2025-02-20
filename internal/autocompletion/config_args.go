@@ -1,4 +1,4 @@
-package autocompletion_config_args
+package autocompletion
 
 import (
 	"fmt"
@@ -9,15 +9,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func ViewProfile(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	profileNames := profiles.GetMainConfig().ProfileNames()
-	if len(args) != 0 {
-		return nil, cobra.ShellCompDirectiveNoFileComp
-	}
-	return profileNames, cobra.ShellCompDirectiveNoFileComp
+func ConfigViewProfileFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return profiles.GetMainConfig().ProfileNames(), cobra.ShellCompDirectiveNoFileComp
 }
 
-func ReturnNonActiveProfiles(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func ConfigReturnNonActiveProfilesFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	profileNames := profiles.GetMainConfig().ProfileNames()
 	if len(args) != 0 {
 		return nil, cobra.ShellCompDirectiveNoFileComp

@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/pingidentity/pingcli/cmd/common"
-	autocompletion_config_args "github.com/pingidentity/pingcli/internal/autocompletion/config"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -33,7 +33,7 @@ The profile to delete will be removed from the CLI configuration file.`,
 		RunE:              configDeleteProfileRunE,
 		Short:             "Delete a custom configuration profile.",
 		Use:               "delete-profile [flags] [profile-name]",
-		ValidArgsFunction: autocompletion_config_args.ReturnNonActiveProfiles,
+		ValidArgsFunction: autocompletion.ConfigReturnNonActiveProfilesFunc,
 	}
 
 	cmd.Flags().AddFlag(options.ConfigDeleteAutoAcceptOption.Flag)

@@ -288,23 +288,18 @@ func getData() (data string, err error) {
 		return data, nil
 	}
 
+	// get data from file
 	data, err = profiles.GetOptionValue(options.RequestDataOption)
 	if err != nil {
 		return "", err
 	}
-
-	// if data string first character is '@', read from file
 	if data != "" {
-		if strings.HasPrefix(data, "@") {
-			filePath := strings.TrimPrefix(data, "@")
-
-			contents, err := os.ReadFile(filePath)
-			if err != nil {
-				return "", err
-			}
-
-			data = string(contents)
+		contents, err := os.ReadFile(data)
+		if err != nil {
+			return "", err
 		}
+
+		return string(contents), nil
 	}
 
 	return data, nil

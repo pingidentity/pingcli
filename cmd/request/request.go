@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pingidentity/pingcli/cmd/common"
-	autocompletion_request_flags "github.com/pingidentity/pingcli/internal/autocompletion/request"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	request_internal "github.com/pingidentity/pingcli/internal/commands/request"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -28,10 +28,6 @@ const (
   Send a custom API request to the configured PingOne tenant, making a DELETE request to remove an application attribute mapping.
     pingcli request --service pingone --http-method DELETE environments/$MY_ENVIRONMENT_ID/applications/$MY_APPLICATION_ID/attributes/$MY_ATTRIBUTE_MAPPING_ID`
 )
-
-func returnServiceSystemError(err error) {
-	output.SystemError(fmt.Sprintf("Unable to register auto completion for service flag: %v", err), nil)
-}
 
 func NewRequestCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -59,18 +55,17 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 	// --http-method, -m
 	cmd.Flags().AddFlag(options.RequestHTTPMethodOption.Flag)
 	// auto-completion
-	err := cmd.RegisterFlagCompletionFunc("http-method", autocompletion_request_flags.HTTPMethod)
+	err := cmd.RegisterFlagCompletionFunc(options.RequestHTTPMethodOption.CobraParamName, autocompletion.RequestHTTPMethodFunc)
 	if err != nil {
-		returnServiceSystemError(err)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for request flag %s: %v", options.RequestHTTPMethodOption.CobraParamName, err), nil)
 	}
 
 	// --service, -s
 	cmd.Flags().AddFlag(options.RequestServiceOption.Flag)
 	// auto-completion
-	err = cmd.RegisterFlagCompletionFunc("service", autocompletion_request_flags.Service)
-
+	err = cmd.RegisterFlagCompletionFunc(options.RequestServiceOption.CobraParamName, autocompletion.RequestServiceFunc)
 	if err != nil {
-		returnServiceSystemError(err)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for request flag %s: %v", options.RequestHTTPMethodOption.CobraParamName, err), nil)
 	}
 
 	return cmd
