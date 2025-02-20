@@ -35,7 +35,7 @@ func (r *PingOneTrustedEmailDomainResource) ExportAll() (*[]connector.ImportBloc
 
 	importBlocks := []connector.ImportBlock{}
 
-	trustedEmailDomainData, err := getTrustedEmailDomainData(r.clientInfo, r.ResourceType())
+	trustedEmailDomainData, err := r.getTrustedEmailDomainData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneTrustedEmailDomainResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func getTrustedEmailDomainData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneTrustedEmailDomainResource) getTrustedEmailDomainData() (map[string]string, error) {
 	trustedEmailDomainData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	trustedEmailDomains, err := common.GetManagementAPIObjectsFromIterator[management.EmailDomain](iter, "ReadAllTrustedEmailDomains", "GetEmailDomains", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	trustedEmailDomains, err := common.GetManagementAPIObjectsFromIterator[management.EmailDomain](iter, "ReadAllTrustedEmailDomains", "GetEmailDomains", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

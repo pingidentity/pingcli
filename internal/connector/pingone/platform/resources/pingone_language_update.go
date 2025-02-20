@@ -35,12 +35,12 @@ func (r *PingOneLanguageUpdateResource) ExportAll() (*[]connector.ImportBlock, e
 
 	importBlocks := []connector.ImportBlock{}
 
-	languageData, err := getLanguageUpdateData(r.clientInfo, r.ResourceType())
+	languageUpdateData, err := r.getLanguageUpdateData()
 	if err != nil {
 		return nil, err
 	}
 
-	for languageId, languageName := range languageData {
+	for languageId, languageName := range languageUpdateData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Language ID":           languageId,
@@ -61,11 +61,11 @@ func (r *PingOneLanguageUpdateResource) ExportAll() (*[]connector.ImportBlock, e
 	return &importBlocks, nil
 }
 
-func getLanguageUpdateData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
-	languageData := make(map[string]string)
+func (r *PingOneLanguageUpdateResource) getLanguageUpdateData() (map[string]string, error) {
+	languageUpdateData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -87,12 +87,12 @@ func getLanguageUpdateData(clientInfo *connector.PingOneClientInfo, resourceType
 					languageName, languageNameOk := languageInner.Language.GetNameOk()
 
 					if languageIdOk && languageNameOk {
-						languageData[*languageId] = *languageName
+						languageUpdateData[*languageId] = *languageName
 					}
 				}
 			}
 		}
 	}
 
-	return languageData, nil
+	return languageUpdateData, nil
 }

@@ -35,12 +35,12 @@ func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 
 	importBlocks := []connector.ImportBlock{}
 
-	domainData, err := getCustomDomainData(r.clientInfo, r.ResourceType())
+	domainData, err := r.getCustomDomainData()
 	if err != nil {
 		return nil, err
 	}
 
-	for domainId, domainName := range *domainData {
+	for domainId, domainName := range domainData {
 		commentData := map[string]string{
 			"Custom Domain ID":      domainId,
 			"Custom Domain Name":    domainName,
@@ -61,11 +61,11 @@ func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 	return &importBlocks, nil
 }
 
-func getCustomDomainData(clientInfo *connector.PingOneClientInfo, resourceType string) (*map[string]string, error) {
+func (r *PingOneCustomDomainResource) getCustomDomainData() (map[string]string, error) {
 	domainData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	customDomains, err := common.GetManagementAPIObjectsFromIterator[management.CustomDomain](iter, "ReadAllDomains", "GetCustomDomains", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	customDomains, err := common.GetManagementAPIObjectsFromIterator[management.CustomDomain](iter, "ReadAllDomains", "GetCustomDomains", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -79,5 +79,5 @@ func getCustomDomainData(clientInfo *connector.PingOneClientInfo, resourceType s
 		}
 	}
 
-	return &domainData, nil
+	return domainData, nil
 }

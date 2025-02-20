@@ -35,7 +35,7 @@ func (r *PingOneGatewayResource) ExportAll() (*[]connector.ImportBlock, error) {
 
 	importBlocks := []connector.ImportBlock{}
 
-	gatewayData, err := getGatewayData(r.clientInfo, r.ResourceType())
+	gatewayData, err := r.getGatewayData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneGatewayResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func getGatewayData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneGatewayResource) getGatewayData() (map[string]string, error) {
 	gatewayData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	gateways, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	gateways, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

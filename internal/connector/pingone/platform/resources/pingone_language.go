@@ -35,7 +35,7 @@ func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) 
 
 	importBlocks := []connector.ImportBlock{}
 
-	languageData, err := getLanguageData(r.clientInfo, r.ResourceType())
+	languageData, err := r.getLanguageData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) 
 	return &importBlocks, nil
 }
 
-func getLanguageData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneLanguageResource) getLanguageData() (map[string]string, error) {
 	languageData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

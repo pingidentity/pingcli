@@ -35,7 +35,7 @@ func (r *PingOneSystemApplicationResource) ExportAll() (*[]connector.ImportBlock
 
 	importBlocks := []connector.ImportBlock{}
 
-	applicationData, err := getSystemApplicationData(r.clientInfo, r.ResourceType())
+	applicationData, err := r.getSystemApplicationData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneSystemApplicationResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func getSystemApplicationData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneSystemApplicationResource) getSystemApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	applications, err := common.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := common.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

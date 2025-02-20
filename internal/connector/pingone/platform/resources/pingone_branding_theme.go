@@ -35,7 +35,7 @@ func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, er
 
 	importBlocks := []connector.ImportBlock{}
 
-	brandingThemeData, err := getBrandingThemeData(r.clientInfo, r.ResourceType())
+	brandingThemeData, err := r.getBrandingThemeData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, er
 	return &importBlocks, nil
 }
 
-func getBrandingThemeData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneBrandingThemeResource) getBrandingThemeData() (map[string]string, error) {
 	brandingThemeData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	brandingThemes, err := common.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	brandingThemes, err := common.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

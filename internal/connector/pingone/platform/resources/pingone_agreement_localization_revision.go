@@ -35,19 +35,19 @@ func (r *PingOneAgreementLocalizationRevisionResource) ExportAll() (*[]connector
 
 	importBlocks := []connector.ImportBlock{}
 
-	agreementData, err := getAgreementData(r.clientInfo, r.ResourceType())
+	agreementData, err := r.getAgreementData()
 	if err != nil {
 		return nil, err
 	}
 
 	for agreementId, agreementName := range agreementData {
-		agreementLocalizationData, err := getAgreementLocalizationData(r.clientInfo, r.ResourceType(), agreementId)
+		agreementLocalizationData, err := r.getAgreementLanguageData(agreementId)
 		if err != nil {
 			return nil, err
 		}
 
 		for agreementLocalizationId, agreementLocalizationLocale := range agreementLocalizationData {
-			agreementLocalizationRevisionData, err := getAgreementLocalizationRevisionData(r.clientInfo, r.ResourceType(), agreementId, agreementLocalizationId)
+			agreementLocalizationRevisionData, err := r.getAgreementLocalizationRevisionData(agreementId, agreementLocalizationId)
 			if err != nil {
 				return nil, err
 			}
@@ -78,11 +78,55 @@ func (r *PingOneAgreementLocalizationRevisionResource) ExportAll() (*[]connector
 	return &importBlocks, nil
 }
 
-func getAgreementLocalizationRevisionData(clientInfo *connector.PingOneClientInfo, resourceType, agreementId, agreementLocalizationId string) ([]string, error) {
+func (r *PingOneAgreementLocalizationRevisionResource) getAgreementData() (map[string]string, error) {
+	agreementData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	agreements, err := common.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, agreement := range agreements {
+		agreementId, agreementIdOk := agreement.GetIdOk()
+		agreementName, agreementNameOk := agreement.GetNameOk()
+
+		if agreementIdOk && agreementNameOk {
+			agreementData[*agreementId] = *agreementName
+		}
+	}
+
+	return agreementData, nil
+}
+
+func (r *PingOneAgreementLocalizationRevisionResource) getAgreementLanguageData(agreementId string) (map[string]string, error) {
+	agreementLanguageData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId).Execute()
+	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadAllAgreementLanguages", "GetLanguages", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, languageInner := range languageInners {
+		if languageInner.AgreementLanguage != nil {
+			agreementLanguageLocale, agreementLanguageLocaleOk := languageInner.AgreementLanguage.GetLocaleOk()
+			agreementLanguageId, agreementLanguageIdOk := languageInner.AgreementLanguage.GetIdOk()
+
+			if agreementLanguageLocaleOk && agreementLanguageIdOk {
+				agreementLanguageData[*agreementLanguageId] = *agreementLanguageLocale
+			}
+		}
+	}
+
+	return agreementLanguageData, nil
+}
+
+func (r *PingOneAgreementLocalizationRevisionResource) getAgreementLocalizationRevisionData(agreementId, agreementLocalizationId string) ([]string, error) {
 	agreementLocalizationRevisionData := []string{}
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.AgreementRevisionsResourcesApi.ReadAllAgreementLanguageRevisions(clientInfo.Context, clientInfo.ExportEnvironmentID, agreementId, agreementLocalizationId).Execute()
-	agreementLocalizationRevisions, err := common.GetManagementAPIObjectsFromIterator[management.AgreementLanguageRevision](iter, "ReadAllAgreementLanguageRevisions", "GetRevisions", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementRevisionsResourcesApi.ReadAllAgreementLanguageRevisions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId, agreementLocalizationId).Execute()
+	agreementLocalizationRevisions, err := common.GetManagementAPIObjectsFromIterator[management.AgreementLanguageRevision](iter, "ReadAllAgreementLanguageRevisions", "GetRevisions", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

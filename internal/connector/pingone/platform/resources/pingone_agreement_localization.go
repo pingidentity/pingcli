@@ -35,13 +35,13 @@ func (r *PingOneAgreementLocalizationResource) ExportAll() (*[]connector.ImportB
 
 	importBlocks := []connector.ImportBlock{}
 
-	agreementData, err := getAgreementData(r.clientInfo, r.ResourceType())
+	agreementData, err := r.getAgreementData()
 	if err != nil {
 		return nil, err
 	}
 
 	for agreementId, agreementName := range agreementData {
-		agreementLocalizationData, err := getAgreementLocalizationData(r.clientInfo, r.ResourceType(), agreementId)
+		agreementLocalizationData, err := r.getAgreementLocalizationData(agreementId)
 		if err != nil {
 			return nil, err
 		}
@@ -70,19 +70,40 @@ func (r *PingOneAgreementLocalizationResource) ExportAll() (*[]connector.ImportB
 	return &importBlocks, nil
 }
 
-func getAgreementLocalizationData(clientInfo *connector.PingOneClientInfo, resourceType, agreementId string) (map[string]string, error) {
-	agreementLocalizationData := make(map[string]string)
+func (r *PingOneAgreementLocalizationResource) getAgreementData() (map[string]string, error) {
+	agreementData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(clientInfo.Context, clientInfo.ExportEnvironmentID, agreementId).Execute()
-	agreementLocalizations, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadAllAgreementLanguages", "GetLanguages", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	agreements, err := common.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, agreementLocalization := range agreementLocalizations {
-		if agreementLocalization.AgreementLanguage != nil {
-			agreementLocalizationId, agreementLocalizationIdOk := agreementLocalization.AgreementLanguage.GetIdOk()
-			agreementLocalizationLocale, agreementLocalizationLocaleOk := agreementLocalization.AgreementLanguage.GetLocaleOk()
+	for _, agreement := range agreements {
+		agreementId, agreementIdOk := agreement.GetIdOk()
+		agreementName, agreementNameOk := agreement.GetNameOk()
+
+		if agreementIdOk && agreementNameOk {
+			agreementData[*agreementId] = *agreementName
+		}
+	}
+
+	return agreementData, nil
+}
+
+func (r *PingOneAgreementLocalizationResource) getAgreementLocalizationData(agreementId string) (map[string]string, error) {
+	agreementLocalizationData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId).Execute()
+	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadAllAgreementLanguages", "GetLanguages", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, languageInner := range languageInners {
+		if languageInner.AgreementLanguage != nil {
+			agreementLocalizationId, agreementLocalizationIdOk := languageInner.AgreementLanguage.GetIdOk()
+			agreementLocalizationLocale, agreementLocalizationLocaleOk := languageInner.AgreementLanguage.GetLocaleOk()
 
 			if agreementLocalizationIdOk && agreementLocalizationLocaleOk {
 				agreementLocalizationData[*agreementLocalizationId] = *agreementLocalizationLocale

@@ -35,7 +35,7 @@ func (r *PingOneNotificationPolicyResource) ExportAll() (*[]connector.ImportBloc
 
 	importBlocks := []connector.ImportBlock{}
 
-	notificationPolicyData, err := getNotificationPolicyData(r.clientInfo, r.ResourceType())
+	notificationPolicyData, err := r.getNotificationPolicyData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneNotificationPolicyResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func getNotificationPolicyData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneNotificationPolicyResource) getNotificationPolicyData() (map[string]string, error) {
 	notificationPolicyData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.NotificationsPoliciesApi.ReadAllNotificationsPolicies(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	notificationPolicies, err := common.GetManagementAPIObjectsFromIterator[management.NotificationsPolicy](iter, "ReadAllNotificationsPolicies", "GetNotificationsPolicies", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsPoliciesApi.ReadAllNotificationsPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	notificationPolicies, err := common.GetManagementAPIObjectsFromIterator[management.NotificationsPolicy](iter, "ReadAllNotificationsPolicies", "GetNotificationsPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

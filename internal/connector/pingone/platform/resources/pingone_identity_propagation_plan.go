@@ -35,7 +35,7 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 
 	importBlocks := []connector.ImportBlock{}
 
-	planData, err := getIdentityPropagationPlanData(r.clientInfo, r.ResourceType())
+	planData, err := r.getIdentityPropagationPlanData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 	return &importBlocks, nil
 }
 
-func getIdentityPropagationPlanData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneIdentityPropagationPlanResource) getIdentityPropagationPlanData() (map[string]string, error) {
 	identityPropagationPlanData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	identityPropagationPlans, err := common.GetManagementAPIObjectsFromIterator[management.IdentityPropagationPlan](iter, "ReadAllPlans", "GetPlans", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	identityPropagationPlans, err := common.GetManagementAPIObjectsFromIterator[management.IdentityPropagationPlan](iter, "ReadAllPlans", "GetPlans", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

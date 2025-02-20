@@ -35,7 +35,7 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 
 	importBlocks := []connector.ImportBlock{}
 
-	subscriptionData, err := getSubscriptionData(r.clientInfo, r.ResourceType())
+	subscriptionData, err := r.getSubscriptionData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func getSubscriptionData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneWebhookResource) getSubscriptionData() (map[string]string, error) {
 	subscriptionData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	subscriptions, err := common.GetManagementAPIObjectsFromIterator[management.Subscription](iter, "ReadAllSubscriptions", "GetSubscriptions", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	subscriptions, err := common.GetManagementAPIObjectsFromIterator[management.Subscription](iter, "ReadAllSubscriptions", "GetSubscriptions", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

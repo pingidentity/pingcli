@@ -35,23 +35,24 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 
 	importBlocks := []connector.ImportBlock{}
 
-	gatewayData, err := getGatewayData(r.clientInfo, r.ResourceType())
+	gatewayData, err := r.getGatewayData()
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO: Only PingFederate Connections have role assignments
-
 	for gatewayId, gatewayName := range gatewayData {
-		gatewayRoleAssignmentData, err := getGatewayRoleAssignmentData(r.clientInfo, r.ResourceType(), gatewayId)
+		gatewayRoleAssignmentData, err := r.getGatewayRoleAssignmentData(gatewayId)
 		if err != nil {
 			return nil, err
 		}
 
 		for roleAssignmentId, roleId := range gatewayRoleAssignmentData {
-			roleName, err := getRoleAssignmentRoleName(r.clientInfo, r.ResourceType(), roleId)
+			roleName, err := r.getRoleAssignmentRoleName(roleId)
 			if err != nil {
 				return nil, err
+			}
+			if roleName == nil {
+				continue
 			}
 
 			commentData := map[string]string{
@@ -77,11 +78,39 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 	return &importBlocks, nil
 }
 
-func getGatewayRoleAssignmentData(clientInfo *connector.PingOneClientInfo, resourceType, gatewayId string) (map[string]string, error) {
+func (r *PingOneGatewayRoleAssignmentResource) getGatewayData() (map[string]string, error) {
+	gatewayData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	gatewayInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, gatewayInner := range gatewayInners {
+		// Only PingFederate Connections have role assignments
+		if gatewayInner.Gateway != nil {
+			gatewayType, gatewayTypeOk := gatewayInner.Gateway.GetTypeOk()
+
+			if gatewayTypeOk && *gatewayType == management.ENUMGATEWAYTYPE_PING_FEDERATE {
+				gatewayId, gatewayIdOk := gatewayInner.Gateway.GetIdOk()
+				gatewayName, gatewayNameOk := gatewayInner.Gateway.GetNameOk()
+
+				if gatewayIdOk && gatewayNameOk {
+					gatewayData[*gatewayId] = *gatewayName
+				}
+			}
+		}
+	}
+
+	return gatewayData, nil
+}
+
+func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gatewayId string) (map[string]string, error) {
 	gatewayRoleAssignmentData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.ReadGatewayRoleAssignments(clientInfo.Context, clientInfo.ExportEnvironmentID, gatewayId).Execute()
-	gatewayRoleAssignments, err := common.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGatewayRoleAssignments", "GetRoleAssignments", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.ReadGatewayRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
+	gatewayRoleAssignments, err := common.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGatewayRoleAssignments", "GetRoleAssignments", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -101,9 +130,9 @@ func getGatewayRoleAssignmentData(clientInfo *connector.PingOneClientInfo, resou
 	return gatewayRoleAssignmentData, nil
 }
 
-func getRoleAssignmentRoleName(clientInfo *connector.PingOneClientInfo, resourceType, roleId string) (*management.EnumRoleName, error) {
-	role, resp, err := clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(clientInfo.Context, roleId).Execute()
-	ok, err := common.CheckSingletonResource(resp, err, "ReadOneRole", resourceType)
+func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId string) (*management.EnumRoleName, error) {
+	role, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
+	ok, err := common.CheckSingletonResource(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -118,5 +147,5 @@ func getRoleAssignmentRoleName(clientInfo *connector.PingOneClientInfo, resource
 		}
 	}
 
-	return nil, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'", resourceType, roleId)
+	return nil, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'", r.ResourceType(), roleId)
 }

@@ -35,7 +35,7 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 
 	importBlocks := []connector.ImportBlock{}
 
-	keyRotationPolicyData, err := getKeyRotationPolicyData(r.clientInfo, r.ResourceType())
+	keyRotationPolicyData, err := r.getKeyRotationPolicyData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func getKeyRotationPolicyData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneKeyRotationPolicyResource) getKeyRotationPolicyData() (map[string]string, error) {
 	keyRotationPolicyData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	keyRotationPolicies, err := common.GetManagementAPIObjectsFromIterator[management.KeyRotationPolicy](iter, "GetKeyRotationPolicies", "GetKeyRotationPolicies", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	keyRotationPolicies, err := common.GetManagementAPIObjectsFromIterator[management.KeyRotationPolicy](iter, "GetKeyRotationPolicies", "GetKeyRotationPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

@@ -35,20 +35,23 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 
 	importBlocks := []connector.ImportBlock{}
 
-	defaultBrandingThemeName, err := getDefaultBrandingThemeName(r.clientInfo, r.ResourceType())
+	defaultBrandingThemeName, err := r.getDefaultBrandingThemeName()
 	if err != nil {
 		return nil, err
 	}
+	if defaultBrandingThemeName == nil {
+		return &importBlocks, nil
+	}
 
 	commentData := map[string]string{
-		"Default Branding Theme Name": defaultBrandingThemeName,
+		"Default Branding Theme Name": *defaultBrandingThemeName,
 		"Export Environment ID":       r.clientInfo.ExportEnvironmentID,
 		"Resource Type":               r.ResourceType(),
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_default_theme", defaultBrandingThemeName),
+		ResourceName:       fmt.Sprintf("%s_default_theme", *defaultBrandingThemeName),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
@@ -58,11 +61,11 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 	return &importBlocks, nil
 }
 
-func getDefaultBrandingThemeName(clientInfo *connector.PingOneClientInfo, resourceType string) (string, error) {
-	iter := clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	brandingThemes, err := common.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", resourceType)
+func (r *PingOneBrandingThemeDefaultResource) getDefaultBrandingThemeName() (*string, error) {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	brandingThemes, err := common.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", r.ResourceType())
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	for _, brandingTheme := range brandingThemes {
@@ -75,12 +78,12 @@ func getDefaultBrandingThemeName(clientInfo *connector.PingOneClientInfo, resour
 				brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
 
 				if brandingThemeNameOk {
-					return *brandingThemeName, nil
+					return brandingThemeName, nil
 				}
 			}
 
 		}
 	}
 
-	return "", fmt.Errorf("failed to export resource '%s'. No default branding theme found", resourceType)
+	return nil, fmt.Errorf("failed to export resource '%s'. No default branding theme found", r.ResourceType())
 }

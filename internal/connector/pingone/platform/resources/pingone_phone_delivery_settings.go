@@ -35,7 +35,7 @@ func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportB
 
 	importBlocks := []connector.ImportBlock{}
 
-	phoneDeliverySettingsData, err := getPhoneDeliverySettingsData(r.clientInfo, r.ResourceType())
+	phoneDeliverySettingsData, err := r.getPhoneDeliverySettingsData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportB
 	return &importBlocks, nil
 }
 
-func getPhoneDeliverySettingsData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (map[string]string, error) {
 	phoneDeliverySettingsData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	phoneDeliverySettings, err := common.GetManagementAPIObjectsFromIterator[management.NotificationsSettingsPhoneDeliverySettings](iter, "ReadAllPhoneDeliverySettings", "GetPhoneDeliverySettings", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	phoneDeliverySettings, err := common.GetManagementAPIObjectsFromIterator[management.NotificationsSettingsPhoneDeliverySettings](iter, "ReadAllPhoneDeliverySettings", "GetPhoneDeliverySettings", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

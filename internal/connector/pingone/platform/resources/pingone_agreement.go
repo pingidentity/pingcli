@@ -35,7 +35,7 @@ func (r *PingOneAgreementResource) ExportAll() (*[]connector.ImportBlock, error)
 
 	importBlocks := []connector.ImportBlock{}
 
-	agreementData, err := getAgreementData(r.clientInfo, r.ResourceType())
+	agreementData, err := r.getAgreementData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneAgreementResource) ExportAll() (*[]connector.ImportBlock, error)
 	return &importBlocks, nil
 }
 
-func getAgreementData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneAgreementResource) getAgreementData() (map[string]string, error) {
 	agreementData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	agreements, err := common.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	agreements, err := common.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

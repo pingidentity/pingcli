@@ -34,7 +34,7 @@ func (r *PingOneCertificateResource) ExportAll() (*[]connector.ImportBlock, erro
 
 	importBlocks := []connector.ImportBlock{}
 
-	certificateData, err := getCertificateData(r.clientInfo, r.ResourceType())
+	certificateData, err := r.getCertificateData()
 	if err != nil {
 		return nil, err
 	}
@@ -60,12 +60,12 @@ func (r *PingOneCertificateResource) ExportAll() (*[]connector.ImportBlock, erro
 	return &importBlocks, nil
 }
 
-func getCertificateData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneCertificateResource) getCertificateData() (map[string]string, error) {
 	certificateData := make(map[string]string)
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
-	entityArray, response, err := clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	ok, err := common.HandleClientResponse(response, err, "GetCertificates", resourceType)
+	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -74,12 +74,12 @@ func getCertificateData(clientInfo *connector.PingOneClientInfo, resourceType st
 	}
 
 	if entityArray == nil {
-		return nil, common.DataNilError(resourceType, response)
+		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
 	embedded, embeddedOk := entityArray.GetEmbeddedOk()
 	if !embeddedOk {
-		return nil, common.DataNilError(resourceType, response)
+		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
 	for _, certificate := range embedded.GetCertificates() {

@@ -35,7 +35,7 @@ func (r *PingOneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
 
 	importBlocks := []connector.ImportBlock{}
 
-	formData, err := getFormData(r.clientInfo, r.ResourceType())
+	formData, err := r.getFormData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func getFormData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneFormResource) getFormData() (map[string]string, error) {
 	formData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.FormManagementApi.ReadAllForms(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	forms, err := common.GetManagementAPIObjectsFromIterator[management.Form](iter, "ReadAllForms", "GetForms", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.FormManagementApi.ReadAllForms(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	forms, err := common.GetManagementAPIObjectsFromIterator[management.Form](iter, "ReadAllForms", "GetForms", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

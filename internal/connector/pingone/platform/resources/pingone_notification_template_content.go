@@ -45,18 +45,18 @@ func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.I
 
 	importBlocks := []connector.ImportBlock{}
 
-	enabledLocales, err := getEnabledLocales(r.clientInfo, r.ResourceType())
+	enabledLocales, err := r.getEnabledLocales()
 	if err != nil {
 		return nil, err
 	}
 
-	templateNames, err := getTemplateNames(r.clientInfo, r.ResourceType())
+	templateNames, err := r.getTemplateNames()
 	if err != nil {
 		return nil, err
 	}
 
 	for _, templateName := range templateNames {
-		templateContentData, err := getTemplateContentData(r.clientInfo, r.ResourceType(), templateName)
+		templateContentData, err := r.getTemplateContentData(templateName)
 		if err != nil {
 			return nil, err
 		}
@@ -98,11 +98,11 @@ func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.I
 	return &importBlocks, nil
 }
 
-func getEnabledLocales(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]bool, error) {
+func (r *PingOneNotificationTemplateContentResource) getEnabledLocales() (map[string]bool, error) {
 	enabledLocales := make(map[string]bool)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -121,11 +121,11 @@ func getEnabledLocales(clientInfo *connector.PingOneClientInfo, resourceType str
 	return enabledLocales, nil
 }
 
-func getTemplateNames(clientInfo *connector.PingOneClientInfo, resourceType string) ([]management.EnumTemplateName, error) {
+func (r *PingOneNotificationTemplateContentResource) getTemplateNames() ([]management.EnumTemplateName, error) {
 	templateNames := []management.EnumTemplateName{}
 
 	for _, templateName := range management.AllowedEnumTemplateNameEnumValues {
-		_, response, err := clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadOneTemplate(clientInfo.Context, clientInfo.ExportEnvironmentID, templateName).Execute()
+		_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadOneTemplate(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, templateName).Execute()
 		// When PingOne services are not enabled in an environment,
 		// the response code for the templates related to that service is
 		// 400 Bad Request - "CONSTRAINT_VIOLATION"
@@ -142,7 +142,7 @@ func getTemplateNames(clientInfo *connector.PingOneClientInfo, resourceType stri
 		}
 
 		// Handle all other errors or bad responses
-		ok, err := common.HandleClientResponse(response, err, "ReadOneTemplate", resourceType)
+		ok, err := common.HandleClientResponse(response, err, "ReadOneTemplate", r.ResourceType())
 		if err != nil {
 			return nil, err
 		}
@@ -156,11 +156,11 @@ func getTemplateNames(clientInfo *connector.PingOneClientInfo, resourceType stri
 	return templateNames, nil
 }
 
-func getTemplateContentData(clientInfo *connector.PingOneClientInfo, resourceType string, templateName management.EnumTemplateName) ([]NotificationTemplateContentData, error) {
+func (r *PingOneNotificationTemplateContentResource) getTemplateContentData(templateName management.EnumTemplateName) ([]NotificationTemplateContentData, error) {
 	templateContentData := []NotificationTemplateContentData{}
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadAllTemplateContents(clientInfo.Context, clientInfo.ExportEnvironmentID, templateName).Execute()
-	templateContents, err := common.GetManagementAPIObjectsFromIterator[management.TemplateContent](iter, "ReadAllTemplateContents", "GetContents", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadAllTemplateContents(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, templateName).Execute()
+	templateContents, err := common.GetManagementAPIObjectsFromIterator[management.TemplateContent](iter, "ReadAllTemplateContents", "GetContents", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
