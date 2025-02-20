@@ -32,9 +32,12 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 
 	importBlocks := []connector.ImportBlock{}
 
-	err := r.checkEnvironmentData()
+	ok, err := checkEnvironmentData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return &importBlocks, nil
 	}
 
 	commentData := map[string]string{
@@ -54,16 +57,7 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 	return &importBlocks, nil
 }
 
-func (r *PingOneEnvironmentResource) checkEnvironmentData() error {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-
-	ok, err := common.HandleClientResponse(response, err, "ReadOneEnvironment", r.ResourceType())
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return nil
-	}
-
-	return nil
+func checkEnvironmentData(clientInfo *connector.PingOneClientInfo, resourceType string) (bool, error) {
+	_, response, err := clientInfo.ApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadOneEnvironment", resourceType)
 }

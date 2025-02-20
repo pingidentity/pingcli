@@ -35,19 +35,21 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 
 	importBlocks := []connector.ImportBlock{}
 
-	gatewayData, err := r.getGatewayData()
+	gatewayData, err := getGatewayData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for gatewayId, gatewayName := range *gatewayData {
-		gatewayRoleAssignmentData, err := r.getGatewayRoleAssignmentData(gatewayId)
+	//TODO: Only PingFederate Connections have role assignments
+
+	for gatewayId, gatewayName := range gatewayData {
+		gatewayRoleAssignmentData, err := getGatewayRoleAssignmentData(r.clientInfo, r.ResourceType(), gatewayId)
 		if err != nil {
 			return nil, err
 		}
 
-		for roleAssignmentId, roleId := range *gatewayRoleAssignmentData {
-			roleName, err := r.getRoleAssignmentRoleName(roleId)
+		for roleAssignmentId, roleId := range gatewayRoleAssignmentData {
+			roleName, err := getRoleAssignmentRoleName(r.clientInfo, r.ResourceType(), roleId)
 			if err != nil {
 				return nil, err
 			}
@@ -75,91 +77,33 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 	return &importBlocks, nil
 }
 
-func (r *PingOneGatewayRoleAssignmentResource) getGatewayData() (*map[string]string, error) {
-	gatewayData := make(map[string]string)
-
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGateways", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
-
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, gatewayInner := range embedded.GetGateways() {
-			// Only PingFederate Connections have role assignments
-			if gatewayInner.Gateway != nil {
-				gatewayType, gatewayTypeOk := gatewayInner.Gateway.GetTypeOk()
-
-				if gatewayTypeOk && *gatewayType == management.ENUMGATEWAYTYPE_PING_FEDERATE {
-					gatewayId, gatewayIdOk := gatewayInner.Gateway.GetIdOk()
-					gatewayName, gatewayNameOk := gatewayInner.Gateway.GetNameOk()
-
-					if gatewayIdOk && gatewayNameOk {
-						gatewayData[*gatewayId] = *gatewayName
-					}
-				}
-			}
-		}
-	}
-
-	return &gatewayData, nil
-}
-
-func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gatewayId string) (*map[string]string, error) {
+func getGatewayRoleAssignmentData(clientInfo *connector.PingOneClientInfo, resourceType, gatewayId string) (map[string]string, error) {
 	gatewayRoleAssignmentData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.ReadGatewayRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
+	iter := clientInfo.ApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.ReadGatewayRoleAssignments(clientInfo.Context, clientInfo.ExportEnvironmentID, gatewayId).Execute()
+	gatewayRoleAssignments, err := common.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGatewayRoleAssignments", "GetRoleAssignments", resourceType)
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGatewayRoleAssignments", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, roleAssignment := range gatewayRoleAssignments {
+		roleAssignmentId, roleAssignmentIdOk := roleAssignment.GetIdOk()
+		roleAssignmentRole, roleAssignmentRoleOk := roleAssignment.GetRoleOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, roleAssignment := range embedded.GetRoleAssignments() {
-			roleAssignmentId, roleAssignmentIdOk := roleAssignment.GetIdOk()
-			roleAssignmentRole, roleAssignmentRoleOk := roleAssignment.GetRoleOk()
-
-			if roleAssignmentIdOk && roleAssignmentRoleOk {
-				roleAssignmentRoleId, roleAssignmentRoleIdOk := roleAssignmentRole.GetIdOk()
-				if roleAssignmentRoleIdOk {
-					gatewayRoleAssignmentData[*roleAssignmentId] = *roleAssignmentRoleId
-				}
+		if roleAssignmentIdOk && roleAssignmentRoleOk {
+			roleAssignmentRoleId, roleAssignmentRoleIdOk := roleAssignmentRole.GetIdOk()
+			if roleAssignmentRoleIdOk {
+				gatewayRoleAssignmentData[*roleAssignmentId] = *roleAssignmentRoleId
 			}
 		}
 	}
 
-	return &gatewayRoleAssignmentData, nil
+	return gatewayRoleAssignmentData, nil
 }
 
-func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId string) (*management.EnumRoleName, error) {
-	role, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
-	ok, err := common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
+func getRoleAssignmentRoleName(clientInfo *connector.PingOneClientInfo, resourceType, roleId string) (*management.EnumRoleName, error) {
+	role, resp, err := clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(clientInfo.Context, roleId).Execute()
+	ok, err := common.CheckSingletonResource(resp, err, "ReadOneRole", resourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -174,5 +118,5 @@ func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId 
 		}
 	}
 
-	return nil, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'.", r.ResourceType(), roleId)
+	return nil, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'.", resourceType, roleId)
 }

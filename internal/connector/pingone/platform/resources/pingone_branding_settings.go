@@ -32,9 +32,12 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 
 	importBlocks := []connector.ImportBlock{}
 
-	err := r.checkBrandingSettingsData()
+	ok, err := checkBrandingSettingsData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return &importBlocks, nil
 	}
 
 	commentData := map[string]string{
@@ -54,19 +57,7 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 	return &importBlocks, nil
 }
 
-func (r *PingOneBrandingSettingsResource) checkBrandingSettingsData() error {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	ok, err := common.HandleClientResponse(response, err, "ReadBrandingSettings", r.ResourceType())
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return nil
-	}
-
-	if response.StatusCode == 204 {
-		return common.DataNilError(r.ResourceType(), response)
-	}
-
-	return nil
+func checkBrandingSettingsData(clientInfo *connector.PingOneClientInfo, resourceType string) (bool, error) {
+	_, response, err := clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadBrandingSettings", resourceType)
 }

@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -34,12 +35,12 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 
 	importBlocks := []connector.ImportBlock{}
 
-	planData, err := r.getIdentityPropagationPlanData()
+	planData, err := getIdentityPropagationPlanData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for planId, planName := range *planData {
+	for planId, planName := range planData {
 		commentData := map[string]string{
 			"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
 			"Identity Propagation Plan ID":   planId,
@@ -60,38 +61,23 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 	return &importBlocks, nil
 }
 
-func (r *PingOneIdentityPropagationPlanResource) getIdentityPropagationPlanData() (*map[string]string, error) {
+func getIdentityPropagationPlanData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
 	identityPropagationPlanData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	identityPropagationPlans, err := common.GetManagementAPIObjectsFromIterator[management.IdentityPropagationPlan](iter, "ReadAllPlans", "GetPlans", resourceType)
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPlans", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, identityPropagationPlan := range identityPropagationPlans {
+		identityPropagationPlanId, identityPropagationPlanIdOk := identityPropagationPlan.GetIdOk()
+		identityPropagationPlanName, identityPropagationPlanNameOk := identityPropagationPlan.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, identityPropagationPlan := range embedded.GetPlans() {
-			identityPropagationPlanId, identityPropagationPlanIdOk := identityPropagationPlan.GetIdOk()
-			identityPropagationPlanName, identityPropagationPlanNameOk := identityPropagationPlan.GetNameOk()
-
-			if identityPropagationPlanIdOk && identityPropagationPlanNameOk {
-				identityPropagationPlanData[*identityPropagationPlanId] = *identityPropagationPlanName
-			}
+		if identityPropagationPlanIdOk && identityPropagationPlanNameOk {
+			identityPropagationPlanData[*identityPropagationPlanId] = *identityPropagationPlanName
 		}
 	}
 
-	return &identityPropagationPlanData, nil
+	return identityPropagationPlanData, nil
 }

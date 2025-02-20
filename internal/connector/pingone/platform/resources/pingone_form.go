@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -34,12 +35,12 @@ func (r *PingOneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
 
 	importBlocks := []connector.ImportBlock{}
 
-	formData, err := r.getFormData()
+	formData, err := getFormData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for formId, formName := range *formData {
+	for formId, formName := range formData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Form ID":               formId,
@@ -60,38 +61,23 @@ func (r *PingOneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func (r *PingOneFormResource) getFormData() (*map[string]string, error) {
+func getFormData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
 	formData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.FormManagementApi.ReadAllForms(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := clientInfo.ApiClient.ManagementAPIClient.FormManagementApi.ReadAllForms(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	forms, err := common.GetManagementAPIObjectsFromIterator[management.Form](iter, "ReadAllForms", "GetForms", resourceType)
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllForms", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, form := range forms {
+		formId, formIdOk := form.GetIdOk()
+		formName, formNameOk := form.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, form := range embedded.GetForms() {
-			formId, formIdOk := form.GetIdOk()
-			formName, formNameOk := form.GetNameOk()
-
-			if formIdOk && formNameOk {
-				formData[*formId] = *formName
-			}
+		if formIdOk && formNameOk {
+			formData[*formId] = *formName
 		}
 	}
 
-	return &formData, nil
+	return formData, nil
 }

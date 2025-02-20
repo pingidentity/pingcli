@@ -34,12 +34,12 @@ func (r *PingOneCertificateResource) ExportAll() (*[]connector.ImportBlock, erro
 
 	importBlocks := []connector.ImportBlock{}
 
-	certificateData, err := r.getCertificateData()
+	certificateData, err := getCertificateData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for certificateId, certificateName := range *certificateData {
+	for certificateId, certificateName := range certificateData {
 		commentData := map[string]string{
 			"Certificate ID":        certificateId,
 			"Certificate Name":      certificateName,
@@ -60,12 +60,12 @@ func (r *PingOneCertificateResource) ExportAll() (*[]connector.ImportBlock, erro
 	return &importBlocks, nil
 }
 
-func (r *PingOneCertificateResource) getCertificateData() (*map[string]string, error) {
+func getCertificateData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
 	certificateData := make(map[string]string)
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
-	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	ok, err := common.HandleClientResponse(response, err, "GetCertificates", r.ResourceType())
+	entityArray, response, err := clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetCertificates", resourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -74,12 +74,20 @@ func (r *PingOneCertificateResource) getCertificateData() (*map[string]string, e
 	}
 
 	if entityArray == nil {
-		return nil, common.DataNilError(r.ResourceType(), response)
+		return nil, fmt.Errorf("failed to export resource '%s'.\n"+
+			"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
+			"response code: %s\n"+
+			"response body: %s",
+			resourceType, resourceType, response.Status, response.Body)
 	}
 
 	embedded, embeddedOk := entityArray.GetEmbeddedOk()
 	if !embeddedOk {
-		return nil, common.DataNilError(r.ResourceType(), response)
+		return nil, fmt.Errorf("failed to export resource '%s'.\n"+
+			"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
+			"response code: %s\n"+
+			"response body: %s",
+			resourceType, resourceType, response.Status, response.Body)
 	}
 
 	for _, certificate := range embedded.GetCertificates() {
@@ -91,5 +99,5 @@ func (r *PingOneCertificateResource) getCertificateData() (*map[string]string, e
 		}
 	}
 
-	return &certificateData, nil
+	return certificateData, nil
 }

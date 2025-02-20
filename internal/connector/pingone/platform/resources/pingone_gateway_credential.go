@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -34,18 +35,18 @@ func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 
 	importBlocks := []connector.ImportBlock{}
 
-	gatewayData, err := r.getGatewayData()
+	gatewayData, err := getGatewayData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for gatewayId, gatewayName := range *gatewayData {
-		gatewayCredentialData, err := r.getGatewayCredentialData(gatewayId)
+	for gatewayId, gatewayName := range gatewayData {
+		gatewayCredentialData, err := getGatewayCredentialData(r.clientInfo, r.ResourceType(), gatewayId)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, gatewayCredentialId := range *gatewayCredentialData {
+		for _, gatewayCredentialId := range gatewayCredentialData {
 			commentData := map[string]string{
 				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 				"Gateway Credential ID": gatewayCredentialId,
@@ -68,91 +69,22 @@ func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func (r *PingOneGatewayCredentialResource) getGatewayData() (*map[string]string, error) {
-	gatewayData := make(map[string]string)
-
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGateways", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
-
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, gatewayInner := range embedded.GetGateways() {
-			var (
-				gatewayId     *string
-				gatewayIdOk   bool
-				gatewayName   *string
-				gatewayNameOk bool
-			)
-
-			switch {
-			case gatewayInner.Gateway != nil:
-				gatewayId, gatewayIdOk = gatewayInner.Gateway.GetIdOk()
-				gatewayName, gatewayNameOk = gatewayInner.Gateway.GetNameOk()
-			case gatewayInner.GatewayTypeLDAP != nil:
-				gatewayId, gatewayIdOk = gatewayInner.GatewayTypeLDAP.GetIdOk()
-				gatewayName, gatewayNameOk = gatewayInner.GatewayTypeLDAP.GetNameOk()
-			case gatewayInner.GatewayTypeRADIUS != nil:
-				gatewayId, gatewayIdOk = gatewayInner.GatewayTypeRADIUS.GetIdOk()
-				gatewayName, gatewayNameOk = gatewayInner.GatewayTypeRADIUS.GetNameOk()
-			default:
-				continue
-			}
-
-			if gatewayIdOk && gatewayNameOk {
-				gatewayData[*gatewayId] = *gatewayName
-			}
-		}
-	}
-
-	return &gatewayData, nil
-}
-
-func (r *PingOneGatewayCredentialResource) getGatewayCredentialData(gatewayId string) (*[]string, error) {
+func getGatewayCredentialData(clientInfo *connector.PingOneClientInfo, resourceType, gatewayId string) ([]string, error) {
 	gatewayCredentialData := []string{}
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
+	iter := clientInfo.ApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(clientInfo.Context, clientInfo.ExportEnvironmentID, gatewayId).Execute()
+	gatewayCredentials, err := common.GetManagementAPIObjectsFromIterator[management.GatewayCredential](iter, "ReadAllGatewayCredentials", "GetGatewayCredentials", resourceType)
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGatewayCredentials", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, gatewayCredential := range gatewayCredentials {
+		gatewayCredentialId, gatewayCredentialIdOk := gatewayCredential.GetIdOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, gatewayCredential := range embedded.GetCredentials() {
-			gatewayCredentialId, gatewayCredentialIdOk := gatewayCredential.GetIdOk()
-
-			if gatewayCredentialIdOk {
-				gatewayCredentialData = append(gatewayCredentialData, *gatewayCredentialId)
-			}
+		if gatewayCredentialIdOk {
+			gatewayCredentialData = append(gatewayCredentialData, *gatewayCredentialId)
 		}
 	}
 
-	return &gatewayCredentialData, nil
+	return gatewayCredentialData, nil
 }

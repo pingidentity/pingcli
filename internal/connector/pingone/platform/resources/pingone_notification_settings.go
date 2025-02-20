@@ -32,9 +32,12 @@ func (r *PingOneNotificationSettingsResource) ExportAll() (*[]connector.ImportBl
 
 	importBlocks := []connector.ImportBlock{}
 
-	err := r.checkNotificationSettingsData()
+	ok, err := checkNotificationSettingsData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return &importBlocks, nil
 	}
 
 	commentData := map[string]string{
@@ -54,19 +57,7 @@ func (r *PingOneNotificationSettingsResource) ExportAll() (*[]connector.ImportBl
 	return &importBlocks, nil
 }
 
-func (r *PingOneNotificationSettingsResource) checkNotificationSettingsData() error {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsApi.ReadNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	ok, err := common.HandleClientResponse(response, err, "ReadNotificationsSettings", r.ResourceType())
-	if err != nil {
-		return err
-	}
-	if !ok {
-		return nil
-	}
-
-	if response.StatusCode == 204 {
-		return common.DataNilError(r.ResourceType(), response)
-	}
-
-	return nil
+func checkNotificationSettingsData(clientInfo *connector.PingOneClientInfo, resourceType string) (bool, error) {
+	_, response, err := clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsApi.ReadNotificationsSettings(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadNotificationsSettings", resourceType)
 }

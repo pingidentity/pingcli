@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -34,12 +35,12 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 
 	importBlocks := []connector.ImportBlock{}
 
-	keyRotationPolicyData, err := r.getKeyRotationPolicyData()
+	keyRotationPolicyData, err := getKeyRotationPolicyData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for keyRotationPolicyId, keyRotationPolicyName := range *keyRotationPolicyData {
+	for keyRotationPolicyId, keyRotationPolicyName := range keyRotationPolicyData {
 		commentData := map[string]string{
 			"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
 			"Key Rotation Policy ID":   keyRotationPolicyId,
@@ -60,38 +61,23 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func (r *PingOneKeyRotationPolicyResource) getKeyRotationPolicyData() (*map[string]string, error) {
+func getKeyRotationPolicyData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
 	keyRotationPolicyData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	keyRotationPolicies, err := common.GetManagementAPIObjectsFromIterator[management.KeyRotationPolicy](iter, "GetKeyRotationPolicies", "GetKeyRotationPolicies", resourceType)
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "GetKeyRotationPolicies", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, keyRotationPolicy := range keyRotationPolicies {
+		keyRotationPolicyId, keyRotationPolicyIdOk := keyRotationPolicy.GetIdOk()
+		keyRotationPolicyName, keyRotationPolicyNameOk := keyRotationPolicy.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, keyRotationPolicy := range embedded.GetKeyRotationPolicies() {
-			keyRotationPolicyId, keyRotationPolicyIdOk := keyRotationPolicy.GetIdOk()
-			keyRotationPolicyName, keyRotationPolicyNameOk := keyRotationPolicy.GetNameOk()
-
-			if keyRotationPolicyIdOk && keyRotationPolicyNameOk {
-				keyRotationPolicyData[*keyRotationPolicyId] = *keyRotationPolicyName
-			}
+		if keyRotationPolicyIdOk && keyRotationPolicyNameOk {
+			keyRotationPolicyData[*keyRotationPolicyId] = *keyRotationPolicyName
 		}
 	}
 
-	return &keyRotationPolicyData, nil
+	return keyRotationPolicyData, nil
 }

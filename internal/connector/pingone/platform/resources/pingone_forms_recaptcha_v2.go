@@ -32,13 +32,11 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 
 	importBlocks := []connector.ImportBlock{}
 
-	ok, err := r.checkFormRecaptchaV2Data()
+	ok, err := checkFormRecaptchaV2Data(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
-
 	if !ok {
-		l.Debug().Msgf("No '%s' resources to export. Skipping...", r.ResourceType())
 		return &importBlocks, nil
 	}
 
@@ -59,19 +57,7 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 	return &importBlocks, nil
 }
 
-func (r *PingOneFormRecaptchaV2Resource) checkFormRecaptchaV2Data() (bool, error) {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	ok, err := common.HandleClientResponse(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
-	if err != nil {
-		return false, err
-	}
-	if !ok {
-		return false, nil
-	}
-
-	if response.StatusCode == 204 {
-		return false, nil
-	}
-
-	return true, nil
+func checkFormRecaptchaV2Data(clientInfo *connector.PingOneClientInfo, resourceType string) (bool, error) {
+	_, response, err := clientInfo.ApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadRecaptchaConfiguration", resourceType)
 }

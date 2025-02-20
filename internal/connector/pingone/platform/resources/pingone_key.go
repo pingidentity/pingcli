@@ -34,12 +34,12 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 
 	importBlocks := []connector.ImportBlock{}
 
-	keyData, err := r.getKeyData()
+	keyData, err := getKeyData(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for keyId, keyNameAndType := range *keyData {
+	for keyId, keyNameAndType := range keyData {
 		keyName := keyNameAndType[0]
 		keyType := keyNameAndType[1]
 
@@ -64,13 +64,13 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func (r *PingOneKeyResource) getKeyData() (*map[string][]string, error) {
+func getKeyData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string][]string, error) {
 	keyData := make(map[string][]string)
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
-	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	entityArray, response, err := clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
 
-	ok, err := common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetKeys", resourceType)
 	if err != nil {
 		return nil, err
 	}
@@ -79,12 +79,20 @@ func (r *PingOneKeyResource) getKeyData() (*map[string][]string, error) {
 	}
 
 	if entityArray == nil {
-		return nil, common.DataNilError(r.ResourceType(), response)
+		return nil, fmt.Errorf("failed to export resource '%s'.\n"+
+			"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
+			"response code: %s\n"+
+			"response body: %s",
+			resourceType, resourceType, response.Status, response.Body)
 	}
 
 	embedded, embeddedOk := entityArray.GetEmbeddedOk()
 	if !embeddedOk {
-		return nil, common.DataNilError(r.ResourceType(), response)
+		return nil, fmt.Errorf("failed to export resource '%s'.\n"+
+			"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
+			"response code: %s\n"+
+			"response body: %s",
+			resourceType, resourceType, response.Status, response.Body)
 	}
 
 	for _, key := range embedded.GetKeys() {
@@ -97,5 +105,5 @@ func (r *PingOneKeyResource) getKeyData() (*map[string][]string, error) {
 		}
 	}
 
-	return &keyData, nil
+	return keyData, nil
 }

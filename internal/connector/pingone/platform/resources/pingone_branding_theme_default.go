@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -34,20 +35,20 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 
 	importBlocks := []connector.ImportBlock{}
 
-	defaultBrandingThemeName, err := r.getDefaultBrandingThemeName()
+	defaultBrandingThemeName, err := getDefaultBrandingThemeName(r.clientInfo, r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
 	commentData := map[string]string{
-		"Default Branding Theme Name": *defaultBrandingThemeName,
+		"Default Branding Theme Name": defaultBrandingThemeName,
 		"Export Environment ID":       r.clientInfo.ExportEnvironmentID,
 		"Resource Type":               r.ResourceType(),
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       fmt.Sprintf("%s_default_theme", *defaultBrandingThemeName),
+		ResourceName:       fmt.Sprintf("%s_default_theme", defaultBrandingThemeName),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
@@ -57,43 +58,29 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 	return &importBlocks, nil
 }
 
-func (r *PingOneBrandingThemeDefaultResource) getDefaultBrandingThemeName() (*string, error) {
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+func getDefaultBrandingThemeName(clientInfo *connector.PingOneClientInfo, resourceType string) (string, error) {
+	iter := clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
+	brandingThemes, err := common.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", resourceType)
+	if err != nil {
+		return "", err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadBrandingThemes", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, brandingTheme := range brandingThemes {
+		brandingThemeDefault, brandingThemeDefaultOk := brandingTheme.GetDefaultOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+		if brandingThemeDefaultOk && *brandingThemeDefault {
+			brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
 
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+			if brandingThemeConfigurationOk {
+				brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
 
-		for _, brandingTheme := range embedded.GetThemes() {
-			brandingThemeDefault, brandingThemeDefaultOk := brandingTheme.GetDefaultOk()
-
-			if brandingThemeDefaultOk && *brandingThemeDefault {
-				brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
-
-				if brandingThemeConfigurationOk {
-					brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
-
-					if brandingThemeNameOk {
-						return brandingThemeName, nil
-					}
+				if brandingThemeNameOk {
+					return *brandingThemeName, nil
 				}
 			}
+
 		}
 	}
 
-	return nil, fmt.Errorf("failed to export resource '%s'. No default branding theme found.", r.ResourceType())
+	return "", fmt.Errorf("failed to export resource '%s'. No default branding theme found.", resourceType)
 }
