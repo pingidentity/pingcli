@@ -32,7 +32,7 @@ func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, erro
 
 	importBlocks := []connector.ImportBlock{}
 
-	ok, err := checkMFASettingsData(r.clientInfo, r.ResourceType())
+	ok, err := r.checkMFASettingsData()
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, erro
 	return &importBlocks, nil
 }
 
-func checkMFASettingsData(clientInfo *connector.PingOneClientInfo, resourceType string) (bool, error) {
-	_, response, err := clientInfo.ApiClient.MFAAPIClient.MFASettingsApi.ReadMFASettings(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	return common.CheckSingletonResource(response, err, "ReadMFASettings", resourceType)
+func (r *PingOneMFASettingsResource) checkMFASettingsData() (bool, error) {
+	_, response, err := r.clientInfo.ApiClient.MFAAPIClient.MFASettingsApi.ReadMFASettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadMFASettings", r.ResourceType())
 }

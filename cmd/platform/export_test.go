@@ -197,6 +197,23 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsRequiredTogether(t *testing
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
+// Test Platform Export Command fails when provided invalid PingOne Client Credential flags
+func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
+	outputDir := t.TempDir()
+
+	expectedErrorPattern := `^test$`
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--output-directory", outputDir,
+		"--overwrite",
+		"--services", "pingone-protect",
+		"--pingone-worker-environment-id", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
+		"--pingone-worker-client-id", os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
+		"--pingone-worker-client-secret", "invalid",
+		"--pingone-region-code", os.Getenv(options.PingOneRegionCodeOption.EnvVar),
+	)
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
 // Test Platform Export Command fails when provided invalid PingFederate Basic Auth flags
 func TestPlatformExportCmd_PingFederateBasicAuthFlagsInvalid(t *testing.T) {
 	outputDir := t.TempDir()

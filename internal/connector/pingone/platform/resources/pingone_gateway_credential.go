@@ -73,7 +73,7 @@ func getGatewayCredentialData(clientInfo *connector.PingOneClientInfo, resourceT
 	gatewayCredentialData := []string{}
 
 	iter := clientInfo.ApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(clientInfo.Context, clientInfo.ExportEnvironmentID, gatewayId).Execute()
-	gatewayCredentials, err := common.GetManagementAPIObjectsFromIterator[management.GatewayCredential](iter, "ReadAllGatewayCredentials", "GetGatewayCredentials", resourceType)
+	gatewayCredentials, err := common.GetManagementAPIObjectsFromIterator[management.GatewayCredential](iter, "ReadAllGatewayCredentials", "GetCredentials", resourceType)
 	if err != nil {
 		return nil, err
 	}

@@ -118,15 +118,12 @@ func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPaged
 			return nil, nilErr
 		}
 
-		reflectValues := reflect.ValueOf(embedded).MethodByName(extractionFuncName).Call(nil)
-		for _, rValue := range reflectValues {
-			apiObject, apiObjectOk := rValue.Interface().(T)
-			if !apiObjectOk {
-				output.SystemError(fmt.Sprintf("Failed to cast reflect value to %s", resourceType), nil)
-			}
-
-			apiObjects = append(apiObjects, apiObject)
+		apiObject, err := getAPIObjectFromEmbedded[T](reflect.ValueOf(embedded), extractionFuncName, resourceType)
+		if err != nil {
+			output.SystemError(err.Error(), nil)
 		}
+
+		apiObjects = append(apiObjects, apiObject...)
 	}
 
 	return apiObjects, nil
@@ -156,15 +153,12 @@ func GetMfaAPIObjectsFromIterator[T any](iter mfa.EntityArrayPagedIterator, clie
 			return nil, nilErr
 		}
 
-		reflectValues := reflect.ValueOf(embedded).MethodByName(extractionFuncName).Call(nil)
-		for _, rValue := range reflectValues {
-			apiObject, apiObjectOk := rValue.Interface().(T)
-			if !apiObjectOk {
-				output.SystemError(fmt.Sprintf("Failed to cast reflect value to %s", resourceType), nil)
-			}
-
-			apiObjects = append(apiObjects, apiObject)
+		apiObject, err := getAPIObjectFromEmbedded[T](reflect.ValueOf(embedded), extractionFuncName, resourceType)
+		if err != nil {
+			output.SystemError(err.Error(), nil)
 		}
+
+		apiObjects = append(apiObjects, apiObject...)
 	}
 
 	return apiObjects, nil
@@ -194,16 +188,37 @@ func GetRiskAPIObjectsFromIterator[T any](iter risk.EntityArrayPagedIterator, cl
 			return nil, nilErr
 		}
 
-		reflectValues := reflect.ValueOf(embedded).MethodByName(extractionFuncName).Call(nil)
-		for _, rValue := range reflectValues {
-			apiObject, apiObjectOk := rValue.Interface().(T)
-			if !apiObjectOk {
-				output.SystemError(fmt.Sprintf("Failed to cast reflect value to %s", resourceType), nil)
-			}
-
-			apiObjects = append(apiObjects, apiObject)
+		apiObject, err := getAPIObjectFromEmbedded[T](reflect.ValueOf(embedded), extractionFuncName, resourceType)
+		if err != nil {
+			output.SystemError(err.Error(), nil)
 		}
+
+		apiObjects = append(apiObjects, apiObject...)
 	}
 
 	return apiObjects, nil
+}
+
+func getAPIObjectFromEmbedded[T any](embedded reflect.Value, extractionFuncName, resourceType string) ([]T, error) {
+	embeddedExtractionFunc := embedded.MethodByName(extractionFuncName)
+	if !embeddedExtractionFunc.IsValid() {
+		return nil, fmt.Errorf("failed to find extraction function '%s' for resource '%s'", extractionFuncName, resourceType)
+	}
+
+	reflectValues := embeddedExtractionFunc.Call(nil)
+	if len(reflectValues) == 0 {
+		return nil, fmt.Errorf("failed to get reflect value from embedded. embedded is empty")
+	}
+
+	rInterface := reflectValues[0].Interface()
+	if rInterface == nil {
+		return []T{}, nil
+	}
+
+	apiObject, apiObjectOk := rInterface.([]T)
+	if !apiObjectOk {
+		return nil, fmt.Errorf("failed to cast reflect value to %s", resourceType)
+	}
+
+	return apiObject, nil
 }

@@ -36,13 +36,13 @@ func (r *PingOneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.
 
 	importBlocks := []connector.ImportBlock{}
 
-	applicationData, err := getOIDCApplicationData(r.clientInfo, r.ResourceType())
+	applicationData, err := r.getOIDCApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
 	for appId, appName := range applicationData {
-		pushCredData, err := getPushCredentialData(r.clientInfo, r.ResourceType(), appId)
+		pushCredData, err := r.getPushCredentialData(appId)
 		if err != nil {
 			return nil, err
 		}
@@ -71,11 +71,11 @@ func (r *PingOneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.
 	return &importBlocks, nil
 }
 
-func getOIDCApplicationData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneMFAApplicationPushCredentialResource) getOIDCApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	applications, err := common.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", resourceType)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := common.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -98,11 +98,11 @@ func getOIDCApplicationData(clientInfo *connector.PingOneClientInfo, resourceTyp
 	return applicationData, nil
 }
 
-func getPushCredentialData(clientInfo *connector.PingOneClientInfo, resourceType, applicationId string) (map[string]string, error) {
+func (r *PingOneMFAApplicationPushCredentialResource) getPushCredentialData(applicationId string) (map[string]string, error) {
 	mfaPushCredentialData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(clientInfo.Context, clientInfo.ExportEnvironmentID, applicationId).Execute()
-	mfaPushCredentials, err := common.GetMfaAPIObjectsFromIterator[mfa.MFAPushCredentialResponse](iter, "ReadAllMFAPushCredentials", "GetPushCredentials", resourceType)
+	iter := r.clientInfo.ApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, applicationId).Execute()
+	mfaPushCredentials, err := common.GetMfaAPIObjectsFromIterator[mfa.MFAPushCredentialResponse](iter, "ReadAllMFAPushCredentials", "GetPushCredentials", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

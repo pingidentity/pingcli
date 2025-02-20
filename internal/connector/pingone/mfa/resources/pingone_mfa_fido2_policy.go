@@ -35,7 +35,7 @@ func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, e
 
 	importBlocks := []connector.ImportBlock{}
 
-	fido2PolicyData, err := getFido2PolicyData(r.clientInfo, r.ResourceType())
+	fido2PolicyData, err := r.getFido2PolicyData()
 	if err != nil {
 		return nil, err
 	}
@@ -61,11 +61,11 @@ func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, e
 	return &importBlocks, nil
 }
 
-func getFido2PolicyData(clientInfo *connector.PingOneClientInfo, resourceType string) (map[string]string, error) {
+func (r *PingOneMFAFido2PolicyResource) getFido2PolicyData() (map[string]string, error) {
 	fido2PolicyData := make(map[string]string)
 
-	iter := clientInfo.ApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(clientInfo.Context, clientInfo.ExportEnvironmentID).Execute()
-	fido2Policies, err := common.GetMfaAPIObjectsFromIterator[mfa.FIDO2Policy](iter, "ReadFIDO2Policies", "GetFido2Policies", resourceType)
+	iter := r.clientInfo.ApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	fido2Policies, err := common.GetMfaAPIObjectsFromIterator[mfa.FIDO2Policy](iter, "ReadFIDO2Policies", "GetFido2Policies", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
