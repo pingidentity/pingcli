@@ -4,7 +4,6 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
-	"github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
 // Verify that the resource satisfies the exportable resource interface
@@ -32,15 +31,6 @@ func (r *PingFederateOAuthTokenExchangeGeneratorSettingsResource) ExportAll() (*
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	settings, response, err := r.clientInfo.ApiClient.OauthTokenExchangeGeneratorAPI.GetOauthTokenExchangeSettings(r.clientInfo.Context).Execute()
-	_ = response
-	_ = err
-	json, err := settings.MarshalJSON()
-	strJson := string(json)
-	_ = strJson
-
-	t := configurationapi.TokenExchangeGeneratorSettings{}
 
 	oauthTokenExchangeGeneratorSettingsId := "oauth_token_exchange_generator_settings_singleton_id" // #nosec G101 // These variables do not contain sensitive token information
 	oauthTokenExchangeGeneratorSettingsName := "OAuth Token Exchange Generator Settings"            // #nosec G101 // These variables do not contain sensitive token information

@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -59,34 +60,19 @@ func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock
 
 func (r *PingOnePopulationDefaultResource) getDefaultPopulationName() (*string, error) {
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	populations, err := common.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPopulations", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, population := range populations {
+		populationDefault, populationDefaultOk := population.GetDefaultOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+		if populationDefaultOk && *populationDefault {
+			populationName, populationNameOk := population.GetNameOk()
 
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, population := range embedded.GetPopulations() {
-			populationDefault, populationDefaultOk := population.GetDefaultOk()
-
-			if populationDefaultOk && *populationDefault {
-				populationName, populationNameOk := population.GetNameOk()
-
-				if populationNameOk {
-					return populationName, nil
-				}
+			if populationNameOk {
+				return populationName, nil
 			}
 		}
 	}

@@ -54,9 +54,9 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 	return true, nil
 }
 
-func dataNilError(resourceType string, response *http.Response) error {
+func DataNilError(resourceType string, response *http.Response) error {
 	return fmt.Errorf("failed to export resource '%s'.\n"+
-		"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
+		"API Client request for resource '%s' was not successful. response data is nil.\n"+
 		"response code: %s\n"+
 		"response body: %s",
 		resourceType, resourceType, response.Status, response.Body)
@@ -107,7 +107,7 @@ func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPaged
 			return nil, nil
 		}
 
-		nilErr := dataNilError(resourceType, cursor.HTTPResponse)
+		nilErr := DataNilError(resourceType, cursor.HTTPResponse)
 
 		if cursor.EntityArray == nil {
 			return nil, nilErr
@@ -145,7 +145,7 @@ func GetMfaAPIObjectsFromIterator[T any](iter mfa.EntityArrayPagedIterator, clie
 			return nil, nil
 		}
 
-		nilErr := dataNilError(resourceType, cursor.HTTPResponse)
+		nilErr := DataNilError(resourceType, cursor.HTTPResponse)
 
 		if cursor.EntityArray == nil {
 			return nil, nilErr
@@ -183,7 +183,7 @@ func GetRiskAPIObjectsFromIterator[T any](iter risk.EntityArrayPagedIterator, cl
 			return nil, nil
 		}
 
-		nilErr := dataNilError(resourceType, cursor.HTTPResponse)
+		nilErr := DataNilError(resourceType, cursor.HTTPResponse)
 
 		if cursor.EntityArray == nil {
 			return nil, nilErr

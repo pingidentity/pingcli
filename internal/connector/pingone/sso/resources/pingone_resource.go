@@ -3,6 +3,7 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -39,7 +40,7 @@ func (r *PingOneResourceResource) ExportAll() (*[]connector.ImportBlock, error) 
 		return nil, err
 	}
 
-	for resourceId, resourceName := range *resourceData {
+	for resourceId, resourceName := range resourceData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Resource ID":           resourceId,
@@ -60,40 +61,25 @@ func (r *PingOneResourceResource) ExportAll() (*[]connector.ImportBlock, error) 
 	return &importBlocks, nil
 }
 
-func (r *PingOneResourceResource) getResourceData() (*map[string]string, error) {
+func (r *PingOneResourceResource) getResourceData() (map[string]string, error) {
 	resourceData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	resourceInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResources", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			return nil, nil
-		}
+	for _, resourceInner := range resourceInners {
+		if resourceInner.Resource != nil {
+			resourceId, resourceIdOk := resourceInner.Resource.GetIdOk()
+			resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, resourceInner := range embedded.GetResources() {
-			if resourceInner.Resource != nil {
-				resourceId, resourceIdOk := resourceInner.Resource.GetIdOk()
-				resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
-
-				if resourceIdOk && resourceNameOk {
-					resourceData[*resourceId] = *resourceName
-				}
+			if resourceIdOk && resourceNameOk {
+				resourceData[*resourceId] = *resourceName
 			}
 		}
 	}
 
-	return &resourceData, nil
+	return resourceData, nil
 }

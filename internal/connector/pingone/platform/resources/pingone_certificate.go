@@ -74,20 +74,12 @@ func getCertificateData(clientInfo *connector.PingOneClientInfo, resourceType st
 	}
 
 	if entityArray == nil {
-		return nil, fmt.Errorf("failed to export resource '%s'.\n"+
-			"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
-			"response code: %s\n"+
-			"response body: %s",
-			resourceType, resourceType, response.Status, response.Body)
+		return nil, common.DataNilError(resourceType, response)
 	}
 
 	embedded, embeddedOk := entityArray.GetEmbeddedOk()
 	if !embeddedOk {
-		return nil, fmt.Errorf("failed to export resource '%s'.\n"+
-			"PingOne API request for resource '%s' was not successful. response data is nil.\n"+
-			"response code: %s\n"+
-			"response body: %s",
-			resourceType, resourceType, response.Status, response.Body)
+		return nil, common.DataNilError(resourceType, response)
 	}
 
 	for _, certificate := range embedded.GetCertificates() {
