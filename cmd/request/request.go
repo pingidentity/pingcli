@@ -48,12 +48,7 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 	}
 
 	// --data
-	// auto-completion
 	cmd.Flags().AddFlag(options.RequestDataOption.Flag)
-	err := cmd.RegisterFlagCompletionFunc("data", autocompletion_request_flags.Data)
-	if err != nil {
-		returnServiceSystemError(err)
-	}
 
 	// --data-raw
 	cmd.Flags().AddFlag(options.RequestDataRawOption.Flag)
@@ -64,7 +59,7 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 	// --http-method, -m
 	cmd.Flags().AddFlag(options.RequestHTTPMethodOption.Flag)
 	// auto-completion
-	err = cmd.RegisterFlagCompletionFunc("http-method", autocompletion_request_flags.HTTPMethod)
+	err := cmd.RegisterFlagCompletionFunc("http-method", autocompletion_request_flags.HTTPMethod)
 	if err != nil {
 		returnServiceSystemError(err)
 	}

@@ -1,4 +1,4 @@
-package autocompletion_root_flags
+package autocompletion
 
 import (
 	"github.com/pingidentity/pingcli/internal/customtypes"
