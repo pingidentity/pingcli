@@ -325,7 +325,7 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
 func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
 	outputDir := t.TempDir()
 
-	expectedErrorPattern := `^to initialize PingFederate Go Client. Check authentication type and credentials$`
+	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--overwrite",
