@@ -131,7 +131,7 @@ func (r *PingOneApplicationSecretResource) checkApplicationSecretData(appId stri
 	if err != nil || response.StatusCode >= 300 || response.StatusCode < 200 {
 		output.Warn("Failed to read secret for application", map[string]interface{}{
 			"Application ID":    appId,
-			"API function name": "ReadApplicationSecret",
+			"API Function Name": "ReadApplicationSecret",
 			"Response Code":     response.Status,
 			"Response Body":     response.Body,
 		})

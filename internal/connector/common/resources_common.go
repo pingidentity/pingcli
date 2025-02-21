@@ -17,9 +17,9 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 	if err != nil {
 		// Only warn the user on client error and skip export of resource
 		output.Warn("API client error.", map[string]interface{}{
-			"api_function": apiFunctionName,
-			"error":        err,
-			"resource":     resourceType,
+			"API Function Name": apiFunctionName,
+			"Resource Type":     resourceType,
+			"Client Error":      err,
 		})
 
 		return false, nil
@@ -33,10 +33,10 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 	// When the client returns forbidden, warn user and skip export of resource
 	if response.StatusCode == 403 {
 		output.Warn("API client 403 forbidden response.", map[string]interface{}{
-			"api_function":  apiFunctionName,
-			"resource":      resourceType,
-			"response_code": response.StatusCode,
-			"response_body": response.Body,
+			"API Function Name": apiFunctionName,
+			"Resource Type":     resourceType,
+			"Response Code":     response.StatusCode,
+			"Response Body":     response.Body,
 		})
 
 		return false, nil
