@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
@@ -26,6 +27,8 @@ func NewConfigSetActiveProfileCommand() *cobra.Command {
 		RunE:                  configSetActiveProfileRunE,
 		Short:                 "Set a custom configuration profile as the in-use profile.",
 		Use:                   "set-active-profile [flags] [profile-name]",
+		// Auto-completion function to return all valid profile names
+		ValidArgsFunction: autocompletion.ConfigReturnNonActiveProfilesFunc,
 	}
 
 	return cmd

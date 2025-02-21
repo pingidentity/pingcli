@@ -80,6 +80,7 @@ func Options() []Option {
 		ConfigListKeysYamlOption,
 
 		RequestDataOption,
+		RequestDataRawOption,
 		RequestHTTPMethodOption,
 		RequestServiceOption,
 		RequestAccessTokenOption,
@@ -158,6 +159,7 @@ var (
 // 'pingcli request' command options
 var (
 	RequestDataOption              Option
+	RequestDataRawOption           Option
 	RequestHTTPMethodOption        Option
 	RequestServiceOption           Option
 	RequestAccessTokenOption       Option

@@ -182,6 +182,8 @@ The newly create profile can now be configured via the `pingcli config set` comm
 See [Configuration Key Documentation](./docs/tool-configuration/configuration-key.md) for more information on configuration keys
 and their purposes.
 
+See [Autocompletion Documentation](./docs/autocompletion/autocompletion.md) for information on loading autocompletion for select command flags.
+
 ## Commands
 
 Ping CLI commands have the following structure:

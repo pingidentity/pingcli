@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
@@ -24,6 +25,8 @@ func NewConfigViewProfileCommand() *cobra.Command {
 		RunE:                  configViewProfileRunE,
 		Short:                 "View the stored configuration of a custom configuration profile.",
 		Use:                   "view-profile [flags] [profile-name]",
+		// Auto-completion function to return all valid profile names
+		ValidArgsFunction: autocompletion.ConfigViewProfileFunc,
 	}
 
 	return cmd
