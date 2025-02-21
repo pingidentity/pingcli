@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (m
 	phoneDeliverySettingsData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	phoneDeliverySettings, err := common.GetManagementAPIObjectsFromIterator[management.NotificationsSettingsPhoneDeliverySettings](iter, "ReadAllPhoneDeliverySettings", "GetPhoneDeliverySettings", r.ResourceType())
+	phoneDeliverySettings, err := pingone.GetManagementAPIObjectsFromIterator[management.NotificationsSettingsPhoneDeliverySettings](iter, "ReadAllPhoneDeliverySettings", "GetPhoneDeliverySettings", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

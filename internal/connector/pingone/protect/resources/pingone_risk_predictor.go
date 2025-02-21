@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/risk"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -69,7 +70,7 @@ func (r *PingOneRiskPredictorResource) getRiskPredictorData() (map[string][]stri
 	riskPredictorData := make(map[string][]string)
 
 	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	riskPredictors, err := common.GetRiskAPIObjectsFromIterator[risk.RiskPredictor](iter, "ReadAllRiskPredictors", "GetRiskPredictors", r.ResourceType())
+	riskPredictors, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPredictor](iter, "ReadAllRiskPredictors", "GetRiskPredictors", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

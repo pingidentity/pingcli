@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -59,5 +60,5 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 
 func (r *PingOneBrandingSettingsResource) checkBrandingSettingsData() (bool, error) {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	return common.CheckSingletonResource(response, err, "ReadBrandingSettings", r.ResourceType())
+	return pingone.CheckSingletonResource(response, err, "ReadBrandingSettings", r.ResourceType())
 }

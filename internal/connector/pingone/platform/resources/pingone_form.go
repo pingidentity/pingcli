@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOneFormResource) getFormData() (map[string]string, error) {
 	formData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.FormManagementApi.ReadAllForms(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	forms, err := common.GetManagementAPIObjectsFromIterator[management.Form](iter, "ReadAllForms", "GetForms", r.ResourceType())
+	forms, err := pingone.GetManagementAPIObjectsFromIterator[management.Form](iter, "ReadAllForms", "GetForms", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

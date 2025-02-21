@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOneWebhookResource) getSubscriptionData() (map[string]string, error
 	subscriptionData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	subscriptions, err := common.GetManagementAPIObjectsFromIterator[management.Subscription](iter, "ReadAllSubscriptions", "GetSubscriptions", r.ResourceType())
+	subscriptions, err := pingone.GetManagementAPIObjectsFromIterator[management.Subscription](iter, "ReadAllSubscriptions", "GetSubscriptions", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

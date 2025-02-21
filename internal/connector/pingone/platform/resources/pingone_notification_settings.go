@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -59,5 +60,5 @@ func (r *PingOneNotificationSettingsResource) ExportAll() (*[]connector.ImportBl
 
 func (r *PingOneNotificationSettingsResource) checkNotificationSettingsData() (bool, error) {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsApi.ReadNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	return common.CheckSingletonResource(response, err, "ReadNotificationsSettings", r.ResourceType())
+	return pingone.CheckSingletonResource(response, err, "ReadNotificationsSettings", r.ResourceType())
 }

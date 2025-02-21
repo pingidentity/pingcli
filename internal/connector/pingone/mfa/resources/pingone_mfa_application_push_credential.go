@@ -7,6 +7,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -75,7 +76,7 @@ func (r *PingOneMFAApplicationPushCredentialResource) getOIDCApplicationData() (
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	applications, err := common.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -102,7 +103,7 @@ func (r *PingOneMFAApplicationPushCredentialResource) getPushCredentialData(appl
 	mfaPushCredentialData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, applicationId).Execute()
-	mfaPushCredentials, err := common.GetMfaAPIObjectsFromIterator[mfa.MFAPushCredentialResponse](iter, "ReadAllMFAPushCredentials", "GetPushCredentials", r.ResourceType())
+	mfaPushCredentials, err := pingone.GetMfaAPIObjectsFromIterator[mfa.MFAPushCredentialResponse](iter, "ReadAllMFAPushCredentials", "GetPushCredentials", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -82,7 +83,7 @@ func (r *PingOneGroupRoleAssignmentResource) getGroupData() (map[string]string, 
 	groupData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	groups, err := common.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
+	groups, err := pingone.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func (r *PingOneGroupRoleAssignmentResource) getGroupRoleAssignmentData(groupId 
 	groupRoleAssignmentData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupRoleAssignmentsApi.ReadGroupRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, groupId).Execute()
-	roleAssignments, err := common.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGroupRoleAssignments", "GetRoleAssignments", r.ResourceType())
+	roleAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGroupRoleAssignments", "GetRoleAssignments", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

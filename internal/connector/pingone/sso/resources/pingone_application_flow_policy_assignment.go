@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -82,7 +83,7 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) getApplicationData() (m
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	applications, err := common.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +122,7 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyAssignment
 	flowPolicyAssignmentData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationFlowPolicyAssignmentsApi.ReadAllFlowPolicyAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
-	flowPolicyAssignments, err := common.GetManagementAPIObjectsFromIterator[management.FlowPolicyAssignment](iter, "ReadAllFlowPolicyAssignments", "GetFlowPolicyAssignments", r.ResourceType())
+	flowPolicyAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.FlowPolicyAssignment](iter, "ReadAllFlowPolicyAssignments", "GetFlowPolicyAssignments", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -161,5 +162,5 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyName(flowP
 		}
 	}
 
-	return "", false, fmt.Errorf("Unable to get Flow Policy Name for Flow Policy ID: %s", flowPolicyId)
+	return "", false, fmt.Errorf("unable to get Flow Policy Name for Flow Policy ID: %s", flowPolicyId)
 }

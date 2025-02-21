@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -77,7 +78,7 @@ func (r *PingOneResourceAttributeResource) getResourceData() (map[string][]strin
 	resourceData := make(map[string][]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	resourceInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
+	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +102,7 @@ func (r *PingOneResourceAttributeResource) getResourceAttributeData(resourceId s
 	resourceAttributeData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourceAttributesApi.ReadAllResourceAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
-	attributeInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllResourceAttributes", "GetAttributes", r.ResourceType())
+	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllResourceAttributes", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/risk"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOneRiskPolicyResource) getRiskPolicySetData() (map[string]string, e
 	riskPolicySetData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskPoliciesApi.ReadRiskPolicySets(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	riskPolicySets, err := common.GetRiskAPIObjectsFromIterator[risk.RiskPolicySet](iter, "ReadRiskPolicySets", "GetRiskPolicySets", r.ResourceType())
+	riskPolicySets, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPolicySet](iter, "ReadRiskPolicySets", "GetRiskPolicySets", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

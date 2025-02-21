@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -74,7 +75,7 @@ func (r *PingOneSchemaAttributeResource) getSchemaData() (map[string]string, err
 	schemaData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	schemas, err := common.GetManagementAPIObjectsFromIterator[management.Schema](iter, "ReadAllSchemas", "GetSchemas", r.ResourceType())
+	schemas, err := pingone.GetManagementAPIObjectsFromIterator[management.Schema](iter, "ReadAllSchemas", "GetSchemas", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +95,7 @@ func (r *PingOneSchemaAttributeResource) getSchemaAttributeData(schemaId string)
 	schemaAttributeData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemaAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, schemaId).Execute()
-	attributeInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllSchemaAttributes", "GetAttributes", r.ResourceType())
+	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllSchemaAttributes", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

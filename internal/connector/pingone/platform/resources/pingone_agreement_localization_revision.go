@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -82,7 +83,7 @@ func (r *PingOneAgreementLocalizationRevisionResource) getAgreementData() (map[s
 	agreementData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	agreements, err := common.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
+	agreements, err := pingone.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +104,7 @@ func (r *PingOneAgreementLocalizationRevisionResource) getAgreementLanguageData(
 	agreementLanguageData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId).Execute()
-	languageInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadAllAgreementLanguages", "GetLanguages", r.ResourceType())
+	languageInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadAllAgreementLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +127,7 @@ func (r *PingOneAgreementLocalizationRevisionResource) getAgreementLocalizationR
 	agreementLocalizationRevisionData := []string{}
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementRevisionsResourcesApi.ReadAllAgreementLanguageRevisions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId, agreementLocalizationId).Execute()
-	agreementLocalizationRevisions, err := common.GetManagementAPIObjectsFromIterator[management.AgreementLanguageRevision](iter, "ReadAllAgreementLanguageRevisions", "GetRevisions", r.ResourceType())
+	agreementLocalizationRevisions, err := pingone.GetManagementAPIObjectsFromIterator[management.AgreementLanguageRevision](iter, "ReadAllAgreementLanguageRevisions", "GetRevisions", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

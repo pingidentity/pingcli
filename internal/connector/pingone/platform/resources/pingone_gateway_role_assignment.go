@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -82,7 +83,7 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayData() (map[string]stri
 	gatewayData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	gatewayInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
+	gatewayInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +111,7 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gate
 	gatewayRoleAssignmentData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.ReadGatewayRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
-	gatewayRoleAssignments, err := common.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGatewayRoleAssignments", "GetRoleAssignments", r.ResourceType())
+	gatewayRoleAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGatewayRoleAssignments", "GetRoleAssignments", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +133,7 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gate
 
 func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId string) (*management.EnumRoleName, error) {
 	role, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
-	ok, err := common.CheckSingletonResource(resp, err, "ReadOneRole", r.ResourceType())
+	ok, err := pingone.CheckSingletonResource(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

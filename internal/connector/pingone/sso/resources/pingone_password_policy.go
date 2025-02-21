@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOnePasswordPolicyResource) getPasswordPolicyData() (map[string]stri
 	passwordPolicyData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.PasswordPoliciesApi.ReadAllPasswordPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	passwordPolicies, err := common.GetManagementAPIObjectsFromIterator[management.PasswordPolicy](iter, "ReadAllPasswordPolicies", "GetPasswordPolicies", r.ResourceType())
+	passwordPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.PasswordPolicy](iter, "ReadAllPasswordPolicies", "GetPasswordPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -74,7 +75,7 @@ func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderData() (ma
 	identityProviderData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	identityProviders, err := common.GetManagementAPIObjectsFromIterator[management.IdentityProvider](iter, "ReadAllIdentityProviders", "GetIdentityProviders", r.ResourceType())
+	identityProviders, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityProvider](iter, "ReadAllIdentityProviders", "GetIdentityProviders", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +123,7 @@ func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderAttributeD
 	identityProviderAttributeData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProviderAttributesApi.ReadAllIdentityProviderAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, idpId).Execute()
-	attributeInners, err := common.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllIdentityProviderAttributes", "GetAttributes", r.ResourceType())
+	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllIdentityProviderAttributes", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

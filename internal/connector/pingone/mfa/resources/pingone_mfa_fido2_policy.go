@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOneMFAFido2PolicyResource) getFido2PolicyData() (map[string]string,
 	fido2PolicyData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	fido2Policies, err := common.GetMfaAPIObjectsFromIterator[mfa.FIDO2Policy](iter, "ReadFIDO2Policies", "GetFido2Policies", r.ResourceType())
+	fido2Policies, err := pingone.GetMfaAPIObjectsFromIterator[mfa.FIDO2Policy](iter, "ReadFIDO2Policies", "GetFido2Policies", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

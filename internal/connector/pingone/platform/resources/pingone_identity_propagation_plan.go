@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOneIdentityPropagationPlanResource) getIdentityPropagationPlanData(
 	identityPropagationPlanData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	identityPropagationPlans, err := common.GetManagementAPIObjectsFromIterator[management.IdentityPropagationPlan](iter, "ReadAllPlans", "GetPlans", r.ResourceType())
+	identityPropagationPlans, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityPropagationPlan](iter, "ReadAllPlans", "GetPlans", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

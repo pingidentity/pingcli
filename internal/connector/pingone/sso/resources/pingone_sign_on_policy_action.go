@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -74,7 +75,7 @@ func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyData() (map[string]st
 	signOnPolicyData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SignOnPoliciesApi.ReadAllSignOnPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	signOnPolicies, err := common.GetManagementAPIObjectsFromIterator[management.SignOnPolicy](iter, "ReadAllSignOnPolicies", "GetSignOnPolicies", r.ResourceType())
+	signOnPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.SignOnPolicy](iter, "ReadAllSignOnPolicies", "GetSignOnPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyActionData(signOnPoli
 	signOnPolicyActionData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SignOnPolicyActionsApi.ReadAllSignOnPolicyActions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, signOnPolicyId).Execute()
-	signOnPolicyActions, err := common.GetManagementAPIObjectsFromIterator[management.SignOnPolicyAction](iter, "ReadAllSignOnPolicyActions", "GetActions", r.ResourceType())
+	signOnPolicyActions, err := pingone.GetManagementAPIObjectsFromIterator[management.SignOnPolicyAction](iter, "ReadAllSignOnPolicyActions", "GetActions", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOneCustomDomainResource) getCustomDomainData() (map[string]string, 
 	domainData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	customDomains, err := common.GetManagementAPIObjectsFromIterator[management.CustomDomain](iter, "ReadAllDomains", "GetCustomDomains", r.ResourceType())
+	customDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.CustomDomain](iter, "ReadAllDomains", "GetCustomDomains", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

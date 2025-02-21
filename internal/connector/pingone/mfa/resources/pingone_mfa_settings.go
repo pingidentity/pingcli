@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -59,5 +60,5 @@ func (r *PingOneMFASettingsResource) ExportAll() (*[]connector.ImportBlock, erro
 
 func (r *PingOneMFASettingsResource) checkMFASettingsData() (bool, error) {
 	_, response, err := r.clientInfo.ApiClient.MFAAPIClient.MFASettingsApi.ReadMFASettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	return common.CheckSingletonResource(response, err, "ReadMFASettings", r.ResourceType())
+	return pingone.CheckSingletonResource(response, err, "ReadMFASettings", r.ResourceType())
 }

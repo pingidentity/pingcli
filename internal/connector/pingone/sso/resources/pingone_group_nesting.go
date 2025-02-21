@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -74,7 +75,7 @@ func (r *PingOneGroupNestingResource) getGroupData() (map[string]string, error) 
 	groupData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	groups, err := common.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
+	groups, err := pingone.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +96,7 @@ func (r *PingOneGroupNestingResource) getGroupNestingData(parentGroupId string) 
 	groupNestingData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadGroupNesting(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, parentGroupId).Execute()
-	groupNestings, err := common.GetManagementAPIObjectsFromIterator[management.GroupMembership](iter, "ReadGroupNesting", "GetGroupMemberships", r.ResourceType())
+	groupNestings, err := pingone.GetManagementAPIObjectsFromIterator[management.GroupMembership](iter, "ReadGroupNesting", "GetGroupMemberships", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

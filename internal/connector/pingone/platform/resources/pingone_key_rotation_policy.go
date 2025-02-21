@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -65,7 +66,7 @@ func (r *PingOneKeyRotationPolicyResource) getKeyRotationPolicyData() (map[strin
 	keyRotationPolicyData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	keyRotationPolicies, err := common.GetManagementAPIObjectsFromIterator[management.KeyRotationPolicy](iter, "GetKeyRotationPolicies", "GetKeyRotationPolicies", r.ResourceType())
+	keyRotationPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.KeyRotationPolicy](iter, "GetKeyRotationPolicies", "GetKeyRotationPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
