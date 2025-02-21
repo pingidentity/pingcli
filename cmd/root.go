@@ -30,10 +30,6 @@ func init() {
 	cobra.OnInitialize(initViperProfile)
 }
 
-func returnRootSystemError(err error) {
-	output.SystemError(fmt.Sprintf("Unable to register auto completion for pingcli flag: %v", err), nil)
-}
-
 // rootCmd represents the base command when called without any subcommands
 func NewRootCommand(version string, commit string) *cobra.Command {
 	cmd := &cobra.Command{
@@ -60,9 +56,9 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	// --profile, -P
 	cmd.PersistentFlags().AddFlag(options.RootProfileOption.Flag)
 	// auto-completion
-	err := cmd.RegisterFlagCompletionFunc("profile", autocompletion_root_flags.Profile)
+	err := cmd.RegisterFlagCompletionFunc(options.RootActiveProfileOption.CobraParamName, autocompletion_root_flags.Profile)
 	if err != nil {
-		returnRootSystemError(err)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for pingcli global flag %s: %v", options.RootActiveProfileOption.CobraParamName, err), nil)
 	}
 
 	// --no-color
@@ -71,9 +67,9 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	// --output-format, -O
 	cmd.PersistentFlags().AddFlag(options.RootOutputFormatOption.Flag)
 	// auto-completion
-	err = cmd.RegisterFlagCompletionFunc("output-format", autocompletion_root_flags.OutputFormat)
+	err = cmd.RegisterFlagCompletionFunc(options.RootOutputFormatOption.CobraParamName, autocompletion_root_flags.OutputFormat)
 	if err != nil {
-		returnRootSystemError(err)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for pingcli global flag %s: %v", options.RootOutputFormatOption.CobraParamName, err), nil)
 	}
 
 	// Make sure cobra is outputting to stdout and stderr
