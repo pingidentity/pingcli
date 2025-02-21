@@ -18,12 +18,12 @@ const (
 
   Send a custom API request to the configured PingOne tenant, making a GET request to retrieve JSON configuration for a specific environment.
     pingcli request --service pingone --http-method GET --output-format json environments/$MY_ENVIRONMENT_ID
-	
-  Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with JSON data sourced from a file.
-		pingcli request --service pingone --http-method POST --data ./my-environment.json environments
 
+  Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with JSON data sourced from a file.
+    pingcli request --service pingone --http-method POST --data ./my-environment.json environments
+	
   Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
-		pingcli request --service pingone --http-method POST --data-raw '{"name": "My environment"}' environments
+    pingcli request --service pingone --http-method POST --data-raw '{"name": "My environment"}' environments
 
   Send a custom API request to the configured PingOne tenant, making a DELETE request to remove an application attribute mapping.
     pingcli request --service pingone --http-method DELETE environments/$MY_ENVIRONMENT_ID/applications/$MY_APPLICATION_ID/attributes/$MY_ATTRIBUTE_MAPPING_ID`
