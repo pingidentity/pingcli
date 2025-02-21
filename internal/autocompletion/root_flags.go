@@ -6,10 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func ProfileFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func RootProfileFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	return profiles.GetMainConfig().ProfileNames(), cobra.ShellCompDirectiveNoFileComp
 }
 
-func OutputFormatFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+func RootOutputFormatFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	return customtypes.OutputFormatValidValues(), cobra.ShellCompDirectiveNoFileComp
 }

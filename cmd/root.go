@@ -10,7 +10,7 @@ import (
 	"github.com/pingidentity/pingcli/cmd/feedback"
 	"github.com/pingidentity/pingcli/cmd/platform"
 	"github.com/pingidentity/pingcli/cmd/request"
-	autocompletion_root_flags "github.com/pingidentity/pingcli/internal/autocompletion"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -56,9 +56,9 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	// --profile, -P
 	cmd.PersistentFlags().AddFlag(options.RootProfileOption.Flag)
 	// auto-completion
-	err := cmd.RegisterFlagCompletionFunc(options.RootActiveProfileOption.CobraParamName, autocompletion_root_flags.ProfileFunc)
+	err := cmd.RegisterFlagCompletionFunc(options.RootProfileOption.CobraParamName, autocompletion.RootProfileFunc)
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Unable to register auto completion for pingcli global flag %s: %v", options.RootActiveProfileOption.CobraParamName, err), nil)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for pingcli global flag %s: %v", options.RootProfileOption.CobraParamName, err), nil)
 	}
 
 	// --no-color
@@ -67,7 +67,7 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	// --output-format, -O
 	cmd.PersistentFlags().AddFlag(options.RootOutputFormatOption.Flag)
 	// auto-completion
-	err = cmd.RegisterFlagCompletionFunc(options.RootOutputFormatOption.CobraParamName, autocompletion_root_flags.OutputFormatFunc)
+	err = cmd.RegisterFlagCompletionFunc(options.RootOutputFormatOption.CobraParamName, autocompletion.RootOutputFormatFunc)
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Unable to register auto completion for pingcli global flag %s: %v", options.RootOutputFormatOption.CobraParamName, err), nil)
 	}
