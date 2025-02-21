@@ -22,7 +22,7 @@ const (
 	Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with JSON data sourced from a file.
 		pingcli request --service pingone --http-method POST --data ./my-environment.json environments
 
-		Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
+	Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
 		pingcli request --service pingone --http-method POST --data-raw '{"name": "My environment"}' environments
 
   Send a custom API request to the configured PingOne tenant, making a DELETE request to remove an application attribute mapping.
@@ -65,7 +65,7 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 	// auto-completion
 	err = cmd.RegisterFlagCompletionFunc(options.RequestServiceOption.CobraParamName, autocompletion.RequestServiceFunc)
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Unable to register auto completion for request flag %s: %v", options.RequestHTTPMethodOption.CobraParamName, err), nil)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for request flag %s: %v", options.RequestServiceOption.CobraParamName, err), nil)
 	}
 
 	return cmd
