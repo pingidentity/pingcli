@@ -1,95 +1,114 @@
 package resources
 
-import (
-	"fmt"
+// import (
+// 	"fmt"
 
-	"github.com/pingidentity/pingcli/internal/connector"
-	"github.com/pingidentity/pingcli/internal/connector/common"
-	"github.com/pingidentity/pingcli/internal/logger"
-)
+// 	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
+// 	"github.com/pingidentity/pingcli/internal/connector"
+// 	"github.com/pingidentity/pingcli/internal/connector/common"
+// 	"github.com/pingidentity/pingcli/internal/connector/pingone"
+// 	"github.com/pingidentity/pingcli/internal/logger"
+// )
 
-// Verify that the resource satisfies the exportable resource interface
-var (
-	_ connector.ExportableResource = &PingoneAuthorizeAPIServiceDeploymentResource{}
-)
+// // Verify that the resource satisfies the exportable resource interface
+// var (
+// 	_ connector.ExportableResource = &PingoneAuthorizeAPIServiceDeploymentResource{}
+// )
 
-type PingoneAuthorizeAPIServiceDeploymentResource struct {
-	clientInfo *connector.PingOneClientInfo
-}
+// type PingoneAuthorizeAPIServiceDeploymentResource struct {
+// 	clientInfo *connector.PingOneClientInfo
+// }
 
-// Utility method for creating a PingoneAuthorizeAPIServiceDeploymentResource
-func AuthorizeAPIServiceDeployment(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeAPIServiceDeploymentResource {
-	return &PingoneAuthorizeAPIServiceDeploymentResource{
-		clientInfo: clientInfo,
-	}
-}
+// // Utility method for creating a PingoneAuthorizeAPIServiceDeploymentResource
+// func AuthorizeAPIServiceDeployment(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeAPIServiceDeploymentResource {
+// 	return &PingoneAuthorizeAPIServiceDeploymentResource{
+// 		clientInfo: clientInfo,
+// 	}
+// }
 
-func (r *PingoneAuthorizeAPIServiceDeploymentResource) ExportAll() (*[]connector.ImportBlock, error) {
-	l := logger.Get()
+// func (r *PingoneAuthorizeAPIServiceDeploymentResource) ExportAll() (*[]connector.ImportBlock, error) {
+// 	l := logger.Get()
+// 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+// 	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllAPIServers"
+// 	apiServiceData, err := r.getAPIServiceData()
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
+// 	for apiServiceId, apiServiceName := range apiServiceData {
+// 		apiServiceDeploymentData, err := r.getAPIServiceDeploymentData(apiServiceId)
+// 		if err != nil {
+// 			return nil, err
+// 		}
 
-	importBlocks := []connector.ImportBlock{}
+// 		for apiServiceDeploymentId, apiServiceDeploymentName := range apiServiceDeploymentData {
+// 			commentData := map[string]string{
+// 				"API Service ID":              apiServiceId,
+// 				"API Service Name":            apiServiceName,
+// 				"API Service Deployment ID":   apiServiceDeploymentId,
+// 				"API Service Deployment Name": apiServiceDeploymentName,
+// 				"Export Environment ID":       r.clientInfo.ExportEnvironmentID,
+// 				"Resource Type":               r.ResourceType(),
+// 			}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+// 			importBlock := connector.ImportBlock{
+// 				ResourceType:       r.ResourceType(),
+// 				ResourceName:       fmt.Sprintf("%s_%s", apiServiceName, apiServiceDeploymentId),
+// 				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, apiServiceId, apiServiceDeploymentId),
+// 				CommentInformation: common.GenerateCommentInformation(commentData),
+// 			}
 
-	for _, apiServer := range embedded.GetApiServers() {
-		var (
-			apiServerId     *string
-			apiServerIdOk   bool
-			apiServerName   *string
-			apiServerNameOk bool
-		)
+// 			importBlocks = append(importBlocks, importBlock)
+// 		}
+// 	}
 
-		apiServerId, apiServerIdOk = apiServer.GetIdOk()
-		apiServerName, apiServerNameOk = apiServer.GetNameOk()
+// 	return &importBlocks, nil
+// }
 
-		if apiServerIdOk && apiServerNameOk {
+// func (r *PingoneAuthorizeAPIServiceDeploymentResource) getAPIServiceData() (map[string]string, error) {
+// 	apiServiceData := make(map[string]string)
 
-			_, response, err := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServerDeploymentApi.ReadDeploymentStatus(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *apiServerId).Execute()
-			err = common.HandleClientResponse(response, err, "ReadDeploymentStatus", r.ResourceType())
-			if err != nil {
-				return nil, err
-			}
+// 	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+// 	apiServices, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServer](iter, "ReadAllAPIServers", "GetAPIServers", r.ResourceType())
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-			importBlocks := []connector.ImportBlock{}
+// 	for _, apiService := range apiServices {
+// 		apiServiceId, apiServiceIdOk := apiService.GetIdOk()
+// 		apiServiceName, apiServiceNameOk := apiService.GetNameOk()
 
-			l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+// 		if apiServiceIdOk && apiServiceNameOk {
+// 			apiServiceData[*apiServiceId] = *apiServiceName
+// 		}
+// 	}
 
-			if response.StatusCode == 204 {
-				l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-				return &importBlocks, nil
-			}
+// 	return apiServiceData, nil
+// }
 
-			commentData := map[string]string{
-				"Resource Type":              r.ResourceType(),
-				"Authorize API Service Name": *apiServerName,
-				"Authorize API Service ID":   *apiServerId,
-				"Export Environment ID":      r.clientInfo.ExportEnvironmentID,
-			}
+// func (r *PingoneAuthorizeAPIServiceDeploymentResource) getAPIServiceDeploymentData(apiServiceId string) (map[string]string, error) {
+// 	apiServiceDeploymentData := make(map[string]string)
 
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *apiServerName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *apiServerId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+// 	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServerDeploymentApi.ReadDeploymentStatus(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, apiServiceId).Execute()
+// 	apiServiceDeployments, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServerDeployment](iter, "ReadAPIServiceDeployments", "GetRolePermissions", r.ResourceType())
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-			return &importBlocks, nil
-		}
-	}
+// 	for _, apiServiceDeployment := range apiServiceDeployments {
+// 		apiServiceDeploymentId, apiServiceDeploymentIdOk := apiServiceDeployment.GetIdOk()
+// 		apiServiceDeploymentName, apiServiceDeploymentNameOk := apiServiceDeployment.GetNameOk()
 
-	return &importBlocks, nil
-}
+// 		if apiServiceDeploymentIdOk && apiServiceDeploymentNameOk {
+// 			apiServiceDeploymentData[*apiServiceDeploymentId] = *apiServiceDeploymentName
+// 		}
+// 	}
 
-func (r *PingoneAuthorizeAPIServiceDeploymentResource) ResourceType() string {
-	return "pingone_authorize_api_service_deployment"
-}
+// 	return apiServiceDeploymentData, nil
+// }
+
+// func (r *PingoneAuthorizeAPIServiceDeploymentResource) ResourceType() string {
+// 	return "pingone_authorize_api_service_deployment"
+// }

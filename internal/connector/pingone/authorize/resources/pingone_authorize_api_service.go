@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -26,43 +28,55 @@ func AuthorizeAPIService(clientInfo *connector.PingOneClientInfo) *PingoneAuthor
 
 func (r *PingoneAuthorizeAPIServiceResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllAPIServers"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	APIServerData, err := r.getAPIServerData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, apiServer := range embedded.GetApiServers() {
-		apiServerName, apiServerNameOk := apiServer.GetNameOk()
-		apiServerId, apiServerIdOk := apiServer.GetIdOk()
-
-		if apiServerNameOk && apiServerIdOk {
-			commentData := map[string]string{
-				"Resource Type":              r.ResourceType(),
-				"Authorize API Service Name": *apiServerName,
-				"Export Environment ID":      r.clientInfo.ExportEnvironmentID,
-				"Authorize API Service ID":   *apiServerId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *apiServerName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *apiServerId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for apiServerId, apiServerName := range APIServerData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"API Server ID":         apiServerId,
+			"API Server Name":       apiServerName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       apiServerName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, apiServerId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
+}
+
+func (r *PingoneAuthorizeAPIServiceResource) getAPIServerData() (map[string]string, error) {
+	apiServerData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	apiServers, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServer](iter, "ReadAllAPIServers", "GetApiServers", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, apiServer := range apiServers {
+		apiServerId, apiServerIdOk := apiServer.GetIdOk()
+		apiServerName, apiServerNameOk := apiServer.GetNameOk()
+
+		if apiServerIdOk && apiServerNameOk {
+			apiServerData[*apiServerId] = *apiServerName
+		}
+	}
+
+	return apiServerData, nil
 }
 
 func (r *PingoneAuthorizeAPIServiceResource) ResourceType() string {

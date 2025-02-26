@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -26,43 +28,55 @@ func AuthorizePolicyManagementStatement(clientInfo *connector.PingOneClientInfo)
 
 func (r *PingoneAuthorizePolicyManagementStatementResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorStatementsApi.ListStatements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ListStatements"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	editorStatementData, err := r.getEditorStatementData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, authorizationStatement := range embedded.GetAuthorizationStatements() {
-		authorizationStatementName, authorizationStatementNameOk := authorizationStatement.GetNameOk()
-		authorizationStatementId, authorizationStatementIdOk := authorizationStatement.GetIdOk()
-
-		if authorizationStatementNameOk && authorizationStatementIdOk {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Authorize Policy Management Authorization Statement Name": *authorizationStatementName,
-				"Export Environment ID":                                  r.clientInfo.ExportEnvironmentID,
-				"Authorize Policy Management Authorization Statement ID": *authorizationStatementId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authorizationStatementName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *authorizationStatementId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for editorStatementId, editorStatementName := range editorStatementData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Editor Statement ID":   editorStatementId,
+			"Editor Statement Name": editorStatementName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       editorStatementName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, editorStatementId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
+}
+
+func (r *PingoneAuthorizePolicyManagementStatementResource) getEditorStatementData() (map[string]string, error) {
+	editorStatementData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorStatementsApi.ListStatements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	editorStatements, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.AuthorizeEditorDataStatementsReferenceableStatementDTO](iter, "ListStatements", "GetAuthorizationStatements", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, editorStatement := range editorStatements {
+		editorStatementId, editorStatementIdOk := editorStatement.GetIdOk()
+		editorStatementName, editorStatementNameOk := editorStatement.GetNameOk()
+
+		if editorStatementIdOk && editorStatementNameOk {
+			editorStatementData[*editorStatementId] = *editorStatementName
+		}
+	}
+
+	return editorStatementData, nil
 }
 
 func (r *PingoneAuthorizePolicyManagementStatementResource) ResourceType() string {

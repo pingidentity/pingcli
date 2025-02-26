@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -26,55 +28,68 @@ func AuthorizePolicyManagementPolicy(clientInfo *connector.PingOneClientInfo) *P
 
 func (r *PingoneAuthorizePolicyManagementPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorPoliciesApi.ListRootPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ListRootPolicies"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	editorPolicyData, err := r.getEditorPolicyData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, authorizationPolicy := range embedded.GetAuthorizationPolicies() {
-		authorizationPolicyName, authorizationPolicyNameOk := authorizationPolicy.GetNameOk()
-		authorizationPolicyId, authorizationPolicyIdOk := authorizationPolicy.GetIdOk()
-
-		exportableEntity := true
-
-		if managedEntity, ok := authorizationPolicy.GetManagedEntityOk(); ok {
-			if restrictions, ok := managedEntity.GetRestrictionsOk(); ok {
-				if restrictions.GetReadOnly() {
-					exportableEntity = false
-				}
-			}
+	for editorPolicyId, editorPolicyName := range editorPolicyData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Editor Policy ID":      editorPolicyId,
+			"Editor Policy Name":    editorPolicyName,
+			"Resource Type":         r.ResourceType(),
 		}
 
-		if authorizationPolicyNameOk && authorizationPolicyIdOk && exportableEntity {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Authorize Policy Management Authorization Policy Name": *authorizationPolicyName,
-				"Export Environment ID":                                 r.clientInfo.ExportEnvironmentID,
-				"Authorize Policy Management Authorization Policy ID":   *authorizationPolicyId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authorizationPolicyName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *authorizationPolicyId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       editorPolicyName,
+			ResourceID:         fmt.Sprintf("%s", r.clientInfo.ExportEnvironmentID),
+			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
+func (r *PingoneAuthorizePolicyManagementPolicyResource) getEditorPolicyData() (map[string]string, error) {
+	editorPolicyData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorPoliciesApi.ListRootPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	editorPolicys, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.AuthorizeEditorDataPoliciesReferenceablePolicyDTO](iter, "ListRootPolicies", "GetAuthorizationPolicies", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, editorPolicy := range editorPolicys {
+
+		if me, ok := editorPolicy.GetManagedEntityOk(); ok {
+			if restrictions, ok := me.GetRestrictionsOk(); ok {
+				if readOnly, ok := restrictions.GetReadOnlyOk(); ok {
+					if *readOnly {
+						continue
+					}
+				}
+			}
+		}
+
+		editorPolicyId, editorPolicyIdOk := editorPolicy.GetIdOk()
+		editorPolicyName, editorPolicyNameOk := editorPolicy.GetNameOk()
+
+		if editorPolicyIdOk && editorPolicyNameOk {
+			editorPolicyData[*editorPolicyId] = *editorPolicyName
+		}
+	}
+
+	return editorPolicyData, nil
+}
+
 func (r *PingoneAuthorizePolicyManagementPolicyResource) ResourceType() string {
-	return "pingone_authorize_policy_management_policy"
+	return "pingone_authorize_policy_management_root_policy"
 }

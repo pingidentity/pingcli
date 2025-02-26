@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -26,43 +28,56 @@ func AuthorizeTrustFrameworkProcessor(clientInfo *connector.PingOneClientInfo) *
 
 func (r *PingoneAuthorizeTrustFrameworkProcessorResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorProcessorsApi.ListProcessors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ListProcessors"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	editorProcessorData, err := r.getEditorProcessorData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, authorizationProcessor := range embedded.GetAuthorizationProcessors() {
-		authorizationProcessorName, authorizationProcessorNameOk := authorizationProcessor.GetFullNameOk()
-		authorizationProcessorId, authorizationProcessorIdOk := authorizationProcessor.GetIdOk()
-
-		if authorizationProcessorNameOk && authorizationProcessorIdOk {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Authorize Trust Framework Processor Name": *authorizationProcessorName,
-				"Export Environment ID":                    r.clientInfo.ExportEnvironmentID,
-				"Authorize Trust Framework Processor ID":   *authorizationProcessorId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authorizationProcessorName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *authorizationProcessorId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for editorProcessorId, editorProcessorName := range editorProcessorData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Editor Processor ID":   editorProcessorId,
+			"Editor Processor Name": editorProcessorName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       editorProcessorName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, editorProcessorId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
+}
+
+func (r *PingoneAuthorizeTrustFrameworkProcessorResource) getEditorProcessorData() (map[string]string, error) {
+	editorProcessorData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorProcessorsApi.ListProcessors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	editorProcessors, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.AuthorizeEditorDataDefinitionsProcessorDefinitionDTO](iter, "ListProcessors", "GetAuthorizationProcessors", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, editorProcessor := range editorProcessors {
+
+		editorProcessorId, editorProcessorIdOk := editorProcessor.GetIdOk()
+		editorProcessorName, editorProcessorNameOk := editorProcessor.GetFullNameOk()
+
+		if editorProcessorIdOk && editorProcessorNameOk {
+			editorProcessorData[*editorProcessorId] = *editorProcessorName
+		}
+	}
+
+	return editorProcessorData, nil
 }
 
 func (r *PingoneAuthorizeTrustFrameworkProcessorResource) ResourceType() string {

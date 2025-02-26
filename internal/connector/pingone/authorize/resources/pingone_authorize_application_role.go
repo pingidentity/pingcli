@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -26,43 +28,55 @@ func AuthorizeApplicationRole(clientInfo *connector.PingOneClientInfo) *PingoneA
 
 func (r *PingoneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadApplicationRoles"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	ApplicationRoleData, err := r.getApplicationRoleData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, appRole := range embedded.GetRoles() {
-		appRoleName, appRoleNameOk := appRole.GetNameOk()
-		appRoleId, appRoleIdOk := appRole.GetIdOk()
-
-		if appRoleNameOk && appRoleIdOk {
-			commentData := map[string]string{
-				"Resource Type":                   r.ResourceType(),
-				"Authorize Application Role Name": *appRoleName,
-				"Export Environment ID":           r.clientInfo.ExportEnvironmentID,
-				"Authorize Application Role ID":   *appRoleId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *appRoleName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *appRoleId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for applicationRoleId, applicationRoleName := range ApplicationRoleData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Application Role ID":   applicationRoleId,
+			"Application Role Name": applicationRoleName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       applicationRoleName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, applicationRoleId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
+}
+
+func (r *PingoneAuthorizeApplicationRoleResource) getApplicationRoleData() (map[string]string, error) {
+	applicationRoleData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ApplicationRolesApi", "GetRoles", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, applicationRole := range applicationRoles {
+		applicationRoleId, applicationRoleIdOk := applicationRole.GetIdOk()
+		applicationRoleName, applicationRoleNameOk := applicationRole.GetNameOk()
+
+		if applicationRoleIdOk && applicationRoleNameOk {
+			applicationRoleData[*applicationRoleId] = *applicationRoleName
+		}
+	}
+
+	return applicationRoleData, nil
 }
 
 func (r *PingoneAuthorizeApplicationRoleResource) ResourceType() string {

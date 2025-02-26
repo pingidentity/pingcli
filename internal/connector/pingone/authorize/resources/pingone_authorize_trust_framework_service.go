@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -27,62 +28,74 @@ func AuthorizeTrustFrameworkService(clientInfo *connector.PingOneClientInfo) *Pi
 
 func (r *PingoneAuthorizeTrustFrameworkServiceResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorServicesApi.ListServices(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ListServices"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	editorServiceData, err := r.getEditorServiceData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for editorServiceId, editorServiceName := range editorServiceData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Editor Service ID":     editorServiceId,
+			"Editor Service Name":   editorServiceName,
+			"Resource Type":         r.ResourceType(),
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       editorServiceName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, editorServiceId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
 
-	for _, authorizationService := range embedded.GetAuthorizationServices() {
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingoneAuthorizeTrustFrameworkServiceResource) getEditorServiceData() (map[string]string, error) {
+	editorServiceData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorServicesApi.ListServices(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	editorServices, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.AuthorizeEditorDataDefinitionsServiceDefinitionDTO](iter, "ListServices", "GetAuthorizationServices", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, editorService := range editorServices {
 
 		var (
-			authorizationServiceId     *string
-			authorizationServiceIdOk   bool
-			authorizationServiceName   *string
-			authorizationServiceNameOk bool
+			editorServiceId     *string
+			editorServiceIdOk   bool
+			editorServiceName   *string
+			editorServiceNameOk bool
 		)
 
-		switch t := authorizationService.GetActualInstance().(type) {
+		switch t := editorService.GetActualInstance().(type) {
 		case *authorize.AuthorizeEditorDataServicesConnectorServiceDefinitionDTO:
-			authorizationServiceId, authorizationServiceIdOk = t.GetIdOk()
-			authorizationServiceName, authorizationServiceNameOk = t.GetFullNameOk()
+			editorServiceId, editorServiceIdOk = t.GetIdOk()
+			editorServiceName, editorServiceNameOk = t.GetFullNameOk()
 		case *authorize.AuthorizeEditorDataServicesHttpServiceDefinitionDTO:
-			authorizationServiceId, authorizationServiceIdOk = t.GetIdOk()
-			authorizationServiceName, authorizationServiceNameOk = t.GetFullNameOk()
+			editorServiceId, editorServiceIdOk = t.GetIdOk()
+			editorServiceName, editorServiceNameOk = t.GetFullNameOk()
 		case *authorize.AuthorizeEditorDataServicesNoneServiceDefinitionDTO:
-			authorizationServiceId, authorizationServiceIdOk = t.GetIdOk()
-			authorizationServiceName, authorizationServiceNameOk = t.GetFullNameOk()
+			editorServiceId, editorServiceIdOk = t.GetIdOk()
+			editorServiceName, editorServiceNameOk = t.GetFullNameOk()
 		default:
 			continue
 		}
 
-		if authorizationServiceNameOk && authorizationServiceIdOk {
-			commentData := map[string]string{
-				"Resource Type":                          r.ResourceType(),
-				"Authorize Trust Framework Service Name": *authorizationServiceName,
-				"Export Environment ID":                  r.clientInfo.ExportEnvironmentID,
-				"Authorize Trust Framework Service ID":   *authorizationServiceId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authorizationServiceName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *authorizationServiceId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+		if editorServiceIdOk && editorServiceNameOk {
+			editorServiceData[*editorServiceId] = *editorServiceName
 		}
 	}
 
-	return &importBlocks, nil
+	return editorServiceData, nil
 }
 
 func (r *PingoneAuthorizeTrustFrameworkServiceResource) ResourceType() string {

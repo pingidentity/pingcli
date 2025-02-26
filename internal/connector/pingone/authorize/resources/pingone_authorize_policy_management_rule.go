@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -26,43 +28,56 @@ func AuthorizePolicyManagementRule(clientInfo *connector.PingOneClientInfo) *Pin
 
 func (r *PingoneAuthorizePolicyManagementRuleResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorRulesApi.ListRules(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ListRules"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	editorRuleData, err := r.getEditorRuleData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, authorizationRule := range embedded.GetAuthorizationRules() {
-		authorizationRuleName, authorizationRuleNameOk := authorizationRule.GetNameOk()
-		authorizationRuleId, authorizationRuleIdOk := authorizationRule.GetIdOk()
-
-		if authorizationRuleNameOk && authorizationRuleIdOk {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Authorize Policy Management Authorization Rule Name": *authorizationRuleName,
-				"Export Environment ID":                               r.clientInfo.ExportEnvironmentID,
-				"Authorize Policy Management Authorization Rule ID":   *authorizationRuleId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authorizationRuleName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *authorizationRuleId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for editorRuleId, editorRuleName := range editorRuleData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Editor Rule ID":        editorRuleId,
+			"Editor Rule Name":      editorRuleName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       editorRuleName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, editorRuleId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
+}
+
+func (r *PingoneAuthorizePolicyManagementRuleResource) getEditorRuleData() (map[string]string, error) {
+	editorRuleData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorRulesApi.ListRules(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	editorRules, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.AuthorizeEditorDataRulesReferenceableRuleDTO](iter, "ListRules", "GetAuthorizationRules", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, editorRule := range editorRules {
+
+		editorRuleId, editorRuleIdOk := editorRule.GetIdOk()
+		editorRuleName, editorRuleNameOk := editorRule.GetNameOk()
+
+		if editorRuleIdOk && editorRuleNameOk {
+			editorRuleData[*editorRuleId] = *editorRuleName
+		}
+	}
+
+	return editorRuleData, nil
 }
 
 func (r *PingoneAuthorizePolicyManagementRuleResource) ResourceType() string {

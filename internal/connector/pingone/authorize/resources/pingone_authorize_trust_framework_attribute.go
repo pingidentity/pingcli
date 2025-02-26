@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -26,53 +28,66 @@ func AuthorizeTrustFrameworkAttribute(clientInfo *connector.PingOneClientInfo) *
 
 func (r *PingoneAuthorizeTrustFrameworkAttributeResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorAttributesApi.ListAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ListAttributes"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	editorAttributeData, err := r.getEditorAttributeData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for editorAttributeId, editorAttributeName := range editorAttributeData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Editor Attribute ID":   editorAttributeId,
+			"Editor Attribute Name": editorAttributeName,
+			"Resource Type":         r.ResourceType(),
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       editorAttributeName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, editorAttributeId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
 
-	for _, authorizationAttribute := range embedded.GetAuthorizationAttributes() {
-		authorizationAttributeName, authorizationAttributeNameOk := authorizationAttribute.GetFullNameOk()
-		authorizationAttributeId, authorizationAttributeIdOk := authorizationAttribute.GetIdOk()
+		importBlocks = append(importBlocks, importBlock)
+	}
 
-		exportableEntity := true
+	return &importBlocks, nil
+}
 
-		if managedEntity, ok := authorizationAttribute.GetManagedEntityOk(); ok {
-			if restrictions, ok := managedEntity.GetRestrictionsOk(); ok {
-				if restrictions.GetReadOnly() {
-					exportableEntity = false
+func (r *PingoneAuthorizeTrustFrameworkAttributeResource) getEditorAttributeData() (map[string]string, error) {
+	editorAttributeData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.AuthorizeEditorAttributesApi.ListAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	editorAttributes, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.AuthorizeEditorDataDefinitionsAttributeDefinitionDTO](iter, "ListAttributes", "GetAuthorizationAttributes", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, editorAttribute := range editorAttributes {
+
+		if me, ok := editorAttribute.GetManagedEntityOk(); ok {
+			if restrictions, ok := me.GetRestrictionsOk(); ok {
+				if readOnly, ok := restrictions.GetReadOnlyOk(); ok {
+					if *readOnly {
+						continue
+					}
 				}
 			}
 		}
 
-		if authorizationAttributeNameOk && authorizationAttributeIdOk && exportableEntity {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Authorize Trust Framework Attribute Name": *authorizationAttributeName,
-				"Export Environment ID":                    r.clientInfo.ExportEnvironmentID,
-				"Authorize Trust Framework Attribute ID":   *authorizationAttributeId,
-			}
+		editorAttributeId, editorAttributeIdOk := editorAttribute.GetIdOk()
+		editorAttributeName, editorAttributeNameOk := editorAttribute.GetFullNameOk()
 
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authorizationAttributeName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *authorizationAttributeId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+		if editorAttributeIdOk && editorAttributeNameOk {
+			editorAttributeData[*editorAttributeId] = *editorAttributeName
 		}
 	}
 
-	return &importBlocks, nil
+	return editorAttributeData, nil
 }
 
 func (r *PingoneAuthorizeTrustFrameworkAttributeResource) ResourceType() string {

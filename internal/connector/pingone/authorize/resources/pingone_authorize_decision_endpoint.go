@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -26,43 +28,55 @@ func AuthorizeDecisionEndpoint(clientInfo *connector.PingOneClientInfo) *Pingone
 
 func (r *PingoneAuthorizeDecisionEndpointResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthorizeAPIClient.PolicyDecisionManagementApi.ReadAllDecisionEndpoints(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllDecisionEndpoints"
-
-	embedded, err := common.GetAuthorizeEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	DecisionEndpointData, err := r.getDecisionEndpointData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, decisionEndpoint := range embedded.GetDecisionEndpoints() {
-		decisionEndpointName, decisionEndpointNameOk := decisionEndpoint.GetNameOk()
-		decisionEndpointId, decisionEndpointIdOk := decisionEndpoint.GetIdOk()
-
-		if decisionEndpointNameOk && decisionEndpointIdOk {
-			commentData := map[string]string{
-				"Resource Type":                    r.ResourceType(),
-				"Authorize Decision Endpoint Name": *decisionEndpointName,
-				"Export Environment ID":            r.clientInfo.ExportEnvironmentID,
-				"Authorize Decision Endpoint ID":   *decisionEndpointId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *decisionEndpointName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *decisionEndpointId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for decisionEndpointId, decisionEndpointName := range DecisionEndpointData {
+		commentData := map[string]string{
+			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+			"Decision Endpoint ID":   decisionEndpointId,
+			"Decision Endpoint Name": decisionEndpointName,
+			"Resource Type":          r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       decisionEndpointName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, decisionEndpointId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
+}
+
+func (r *PingoneAuthorizeDecisionEndpointResource) getDecisionEndpointData() (map[string]string, error) {
+	decisionEndpointData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.PolicyDecisionManagementApi.ReadAllDecisionEndpoints(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	decisionEndpoints, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.DecisionEndpoint](iter, "ReadAllDecisionEndpoints", "GetDecisionEndpoints", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, decisionEndpoint := range decisionEndpoints {
+		decisionEndpointId, decisionEndpointIdOk := decisionEndpoint.GetIdOk()
+		decisionEndpointName, decisionEndpointNameOk := decisionEndpoint.GetNameOk()
+
+		if decisionEndpointIdOk && decisionEndpointNameOk {
+			decisionEndpointData[*decisionEndpointId] = *decisionEndpointName
+		}
+	}
+
+	return decisionEndpointData, nil
 }
 
 func (r *PingoneAuthorizeDecisionEndpointResource) ResourceType() string {
