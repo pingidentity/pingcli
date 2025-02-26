@@ -19,7 +19,7 @@ const (
     pingcli config get service.pingone.authentication.worker.environmentID
 	
   Read the unmasked value for the request access token.
-    pingcli config get request.accessToken --unmask-values`
+    pingcli config get --unmask-values request.accessToken`
 )
 
 func NewConfigGetCommand() *cobra.Command {

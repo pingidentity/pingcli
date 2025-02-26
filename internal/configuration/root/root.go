@@ -139,6 +139,7 @@ func initUnmaskSecretValuesOption() {
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
+		EnvVar:          "", // No EnvVar
 		Flag: &pflag.Flag{
 			Name:        cobraParamName,
 			Shorthand:   "U",
@@ -148,6 +149,7 @@ func initUnmaskSecretValuesOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
+		ViperKey:  "", // No ViperKey
 	}
 }
 

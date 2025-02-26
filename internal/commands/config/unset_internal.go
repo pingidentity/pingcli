@@ -2,7 +2,7 @@ package config_internal
 
 import (
 	"fmt"
-	"strconv"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -40,23 +40,15 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 
 	vVal, _, err := profiles.ViperValueFromOption(opt)
 	if err != nil {
-		return fmt.Errorf("failed to set configuration: %v", err)
+		return fmt.Errorf("failed to unset configuration: %v", err)
 	}
 
-	var unmaskValues bool
 	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
 	if err != nil {
-		unmaskValues = false
-	} else {
-		unmaskValuesBool, err := strconv.ParseBool(unmaskOptionVal)
-		if err != nil {
-			unmaskValues = false
-		} else {
-			unmaskValues = unmaskValuesBool
-		}
+		unmaskOptionVal = "false"
 	}
 
-	if opt.Sensitive && !unmaskValues {
+	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
 		msgStr += fmt.Sprintf("%s=%s", viperKey, profiles.MaskValue(vVal))
 	} else {
 		msgStr += fmt.Sprintf("%s=%s", viperKey, vVal)
