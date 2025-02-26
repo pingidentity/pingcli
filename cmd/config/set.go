@@ -16,7 +16,7 @@ const (
     pingcli config set --profile myProfile service.pingone.regionCode=AP
 
   Set the PingFederate basic authentication password with unmasked output
-    pingcli config set --profile myProfile service.pingfederate.authentication.basicAuth.password=1234 --unmask-values`
+    pingcli config set --profile myProfile --unmask-values service.pingfederate.authentication.basicAuth.password=1234`
 )
 
 func NewConfigSetCommand() *cobra.Command {
