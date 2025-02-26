@@ -49,41 +49,6 @@ func TestAuthorizeTerraformPlan(t *testing.T) {
 			resource:      resources.AuthorizeDecisionEndpoint(PingOneClientInfo),
 			ignoredErrors: nil,
 		},
-		{
-			name:          "AuthorizePolicyManagementPolicy",
-			resource:      resources.AuthorizePolicyManagementPolicy(PingOneClientInfo),
-			ignoredErrors: nil,
-		},
-		{
-			name:          "AuthorizePolicyManagementRule",
-			resource:      resources.AuthorizePolicyManagementRule(PingOneClientInfo),
-			ignoredErrors: nil,
-		},
-		{
-			name:          "AuthorizePolicyManagementStatement",
-			resource:      resources.AuthorizePolicyManagementStatement(PingOneClientInfo),
-			ignoredErrors: nil,
-		},
-		{
-			name:          "AuthorizeTrustFrameworkAttribute",
-			resource:      resources.AuthorizeTrustFrameworkAttribute(PingOneClientInfo),
-			ignoredErrors: nil,
-		},
-		{
-			name:          "AuthorizeTrustFrameworkCondition",
-			resource:      resources.AuthorizeTrustFrameworkCondition(PingOneClientInfo),
-			ignoredErrors: nil,
-		},
-		{
-			name:          "AuthorizeTrustFrameworkProcessor",
-			resource:      resources.AuthorizeTrustFrameworkProcessor(PingOneClientInfo),
-			ignoredErrors: nil,
-		},
-		{
-			name:          "AuthorizeTrustFrameworkService",
-			resource:      resources.AuthorizeTrustFrameworkService(PingOneClientInfo),
-			ignoredErrors: nil,
-		},
 	}
 
 	for _, tc := range testCases {

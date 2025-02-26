@@ -48,13 +48,6 @@ func (c *PingoneAuthorizeConnector) Export(format, outputDir string, overwriteEx
 		resources.AuthorizeApplicationRole(&c.clientInfo),
 		resources.AuthorizeApplicationRolePermission(&c.clientInfo),
 		resources.AuthorizeDecisionEndpoint(&c.clientInfo),
-		resources.AuthorizePolicyManagementPolicy(&c.clientInfo),
-		resources.AuthorizePolicyManagementRule(&c.clientInfo),
-		resources.AuthorizePolicyManagementStatement(&c.clientInfo),
-		resources.AuthorizeTrustFrameworkAttribute(&c.clientInfo),
-		resources.AuthorizeTrustFrameworkCondition(&c.clientInfo),
-		resources.AuthorizeTrustFrameworkProcessor(&c.clientInfo),
-		resources.AuthorizeTrustFrameworkService(&c.clientInfo),
 	}
 
 	return common.WriteFiles(exportableResources, format, outputDir, overwriteExport)
