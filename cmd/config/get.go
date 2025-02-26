@@ -16,7 +16,10 @@ const (
     pingcli config get --profile myProfile noColor
 
   Read the worker ID used to authenticate to the PingOne service management API.
-    pingcli config get service.pingone.authentication.worker.environmentID`
+    pingcli config get service.pingone.authentication.worker.environmentID
+	
+  Read the unmasked value for the request access token.
+    pingcli config get request.accessToken --unmask-values`
 )
 
 func NewConfigGetCommand() *cobra.Command {

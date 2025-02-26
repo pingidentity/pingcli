@@ -13,7 +13,10 @@ const (
     pingcli config view-profile
 
   View configuration for a specific profile
-    pingcli config view-profile myprofile`
+    pingcli config view-profile myprofile
+  
+  View configuration for a specific profile with unmasked values
+    pingcli config view-profile --unmask-values`
 )
 
 func NewConfigViewProfileCommand() *cobra.Command {

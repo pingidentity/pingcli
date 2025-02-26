@@ -17,6 +17,7 @@ func InitRootOptions() {
 	initColorOption()
 	initConfigOption()
 	initOutputFormatOption()
+	initUnmaskSecretValuesOption()
 }
 
 func initActiveProfileOption() {
@@ -126,6 +127,27 @@ func initOutputFormatOption() {
 		Sensitive: false,
 		Type:      options.ENUM_OUTPUT_FORMAT,
 		ViperKey:  "outputFormat",
+	}
+}
+
+func initUnmaskSecretValuesOption() {
+	cobraParamName := "unmask-values"
+	cobraValue := new(customtypes.Bool)
+	defaultValue := customtypes.Bool(false)
+
+	options.ConfigUnmaskSecretValueOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		Flag: &pflag.Flag{
+			Name:        cobraParamName,
+			Shorthand:   "U",
+			Usage:       "Unmask secret values. (default false)",
+			Value:       cobraValue,
+			NoOptDefVal: "true", // Make this flag a boolean flag
+		},
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
 	}
 }
 

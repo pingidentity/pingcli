@@ -2,6 +2,7 @@ package config_internal
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
@@ -52,7 +53,20 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: %v", err)
 	}
 
-	if opt.Sensitive {
+	var unmaskValues bool
+	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
+	if err != nil {
+		unmaskValues = false
+	} else {
+		unmaskValuesBool, err := strconv.ParseBool(unmaskOptionVal)
+		if err != nil {
+			unmaskValues = false
+		} else {
+			unmaskValues = unmaskValuesBool
+		}
+	}
+
+	if opt.Sensitive && !unmaskValues {
 		msgStr += fmt.Sprintf("%s=%s", vKey, profiles.MaskValue(vVal))
 	} else {
 		msgStr += fmt.Sprintf("%s=%s", vKey, vVal)

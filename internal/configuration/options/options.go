@@ -78,6 +78,7 @@ func Options() []Option {
 		ConfigAddProfileSetActiveOption,
 		ConfigDeleteAutoAcceptOption,
 		ConfigListKeysYamlOption,
+		ConfigUnmaskSecretValueOption,
 
 		RequestDataOption,
 		RequestDataRawOption,
@@ -131,6 +132,8 @@ var (
 	ConfigListKeysYamlOption Option
 
 	ConfigDeleteAutoAcceptOption Option
+
+	ConfigUnmaskSecretValueOption Option
 )
 
 // 'pingcli platform export' command options

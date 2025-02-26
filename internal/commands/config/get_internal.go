@@ -2,6 +2,7 @@ package config_internal
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
@@ -32,7 +33,20 @@ func RunInternalConfigGet(viperKey string) (err error) {
 			return fmt.Errorf("failed to get configuration: %v", err)
 		}
 
-		if opt.Sensitive {
+		var unmaskValues bool
+		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
+		if err != nil {
+			unmaskValues = false
+		} else {
+			unmaskValuesBool, err := strconv.ParseBool(unmaskOptionVal)
+			if err != nil {
+				unmaskValues = false
+			} else {
+				unmaskValues = unmaskValuesBool
+			}
+		}
+
+		if opt.Sensitive && !unmaskValues {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
 		} else {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)
