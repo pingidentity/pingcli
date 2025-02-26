@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,70 @@ func IDPAdapter(clientInfo *connector.PingFederateClientInfo) *PingFederateIDPAd
 	}
 }
 
+func (r *PingFederateIDPAdapterResource) ResourceType() string {
+	return "pingfederate_idp_adapter"
+}
+
 func (r *PingFederateIDPAdapterResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.IdpAdaptersAPI.GetIdpAdapters(r.clientInfo.Context).Execute
-	apiFunctionName := "GetIdpAdapters"
-
-	idpAdapters, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	idpAdapterData, err := r.getIDPAdapterData()
 	if err != nil {
 		return nil, err
 	}
 
-	if idpAdapters == nil {
-		l.Error().Msgf("Returned %s() idpAdapters is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for idpAdapterId, idpAdapterName := range idpAdapterData {
+		commentData := map[string]string{
+			"IDP Adapter ID":   idpAdapterId,
+			"IDP Adapter Name": idpAdapterName,
+			"Resource Type":    r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       idpAdapterName,
+			ResourceID:         idpAdapterId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	idpAdaptersItems, ok := idpAdapters.GetItemsOk()
+	return &importBlocks, nil
+}
+
+func (r *PingFederateIDPAdapterResource) getIDPAdapterData() (map[string]string, error) {
+	idpAdapterData := make(map[string]string)
+
+	idpAdapters, response, err := r.clientInfo.ApiClient.IdpAdaptersAPI.GetIdpAdapters(r.clientInfo.Context).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetIdpAdapters", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 	if !ok {
-		l.Error().Msgf("Failed to get %s() idpAdapters items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, nil
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	if idpAdapters == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	idpAdaptersItems, idpAdaptersItemsOk := idpAdapters.GetItemsOk()
+	if !idpAdaptersItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, idpAdapter := range idpAdaptersItems {
 		idpAdapterId, idpAdapterIdOk := idpAdapter.GetIdOk()
 		idpAdapterName, idpAdapterNameOk := idpAdapter.GetNameOk()
 
 		if idpAdapterIdOk && idpAdapterNameOk {
-			commentData := map[string]string{
-				"Resource Type":             r.ResourceType(),
-				"IDP Adapter Resource ID":   *idpAdapterId,
-				"IDP Adapter Resource Name": *idpAdapterName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *idpAdapterName,
-				ResourceID:         *idpAdapterId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			idpAdapterData[*idpAdapterId] = *idpAdapterName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateIDPAdapterResource) ResourceType() string {
-	return "pingfederate_idp_adapter"
+	return idpAdapterData, nil
 }

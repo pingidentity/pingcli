@@ -3,9 +3,12 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
 )
 
 // Verify that the resource satisfies the exportable resource interface
@@ -24,24 +27,61 @@ func ApplicationSecret(clientInfo *connector.PingOneClientInfo) *PingOneApplicat
 	}
 }
 
+func (r *PingOneApplicationSecretResource) ResourceType() string {
+	return "pingone_application_secret"
+}
+
 func (r *PingOneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllApplications"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	applicationData, err := r.getApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for appId, appName := range applicationData {
+		ok, err := r.checkApplicationSecretData(appId)
+		if err != nil {
+			return nil, err
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		if !ok {
+			continue
+		}
 
-	for _, app := range embedded.GetApplications() {
+		commentData := map[string]string{
+			"Application ID":        appId,
+			"Application Name":      appName,
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_secret", appName),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, appId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneApplicationSecretResource) getApplicationData() (map[string]string, error) {
+	applicationData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, app := range applications {
 		var (
 			appId     *string
 			appIdOk   bool
@@ -64,52 +104,39 @@ func (r *PingOneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock
 		}
 
 		if appIdOk && appNameOk {
-			// The platform enforces that worker apps cannot read their own secret
-			// Make sure we can read the secret before adding it to the import blocks
-			_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *appId).Execute()
-
-			// If the appId is the same as the worker ID, make sure the API response is a 403 and ignore the error
-			if *appId == *r.clientInfo.ApiClientId {
-				if response.StatusCode == 403 {
-					continue
-				} else {
-					return nil, fmt.Errorf("ReadApplicationSecret: Expected response code 403 - worker apps cannot read their own secret, actual response code: %d", response.StatusCode)
-				}
-			}
-
-			// Use output package to warn the user of any errors or non-200 response codes
-			// Expected behavior in this case is to skip the resource, and continue exporting the other resources
-			defer response.Body.Close()
-
-			if err != nil {
-				l.Warn().Err(err).Msgf("Failed to read secret for application %s. %s Response Code: %s\nResponse Body: %s", *appName, apiFunctionName, response.Status, response.Body)
-				continue
-			}
-
-			if response.StatusCode >= 300 {
-				l.Warn().Msgf("Failed to read secret for application %s. %s Response Code: %s\nResponse Body: %s", *appName, apiFunctionName, response.Status, response.Body)
-				continue
-			}
-
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Application Name":      *appName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Application ID":        *appId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_secret", *appName),
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *appId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			applicationData[*appId] = *appName
 		}
 	}
 
-	return &importBlocks, nil
+	return applicationData, nil
 }
 
-func (r *PingOneApplicationSecretResource) ResourceType() string {
-	return "pingone_application_secret"
+func (r *PingOneApplicationSecretResource) checkApplicationSecretData(appId string) (bool, error) {
+	// The platform enforces that worker apps cannot read their own secret
+	// Make sure we can read the secret before adding it to the import blocks
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	defer response.Body.Close()
+
+	// If the appId is the same as the worker ID, make sure the API response is a 403 and ignore the error
+	if appId == *r.clientInfo.ApiClientId {
+		if response.StatusCode == 403 {
+			return false, nil
+		} else {
+			return false, fmt.Errorf("error: Expected 403 Forbidden response - worker apps cannot read their own secret\n%s Response Code: %s\nResponse Body: %s", "ReadApplicationSecret", response.Status, response.Body)
+		}
+	}
+
+	// Use output package to warn the user of any errors or non-200 response codes
+	// Expected behavior in this case is to skip the resource, and continue exporting the other resources
+	if err != nil || response.StatusCode >= 300 || response.StatusCode < 200 {
+		output.Warn("Failed to read secret for application", map[string]interface{}{
+			"Application ID":    appId,
+			"API Function Name": "ReadApplicationSecret",
+			"Response Code":     response.Status,
+			"Response Body":     response.Body,
+		})
+		return false, nil
+	}
+
+	return true, nil
 }

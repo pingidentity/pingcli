@@ -18,7 +18,7 @@ func TestPingFederateServerSettingsGeneralExport(t *testing.T) {
 		{
 			ResourceType: "pingfederate_server_settings_general",
 			ResourceName: "Server Settings General",
-			ResourceID:   "pingfederate_server_settings_general_singleton_id",
+			ResourceID:   "server_settings_general_singleton_id",
 		},
 	}
 

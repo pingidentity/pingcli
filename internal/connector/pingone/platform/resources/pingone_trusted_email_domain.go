@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,47 +26,59 @@ func TrustedEmailDomain(clientInfo *connector.PingOneClientInfo) *PingOneTrusted
 	}
 }
 
+func (r *PingOneTrustedEmailDomainResource) ResourceType() string {
+	return "pingone_trusted_email_domain"
+}
+
 func (r *PingOneTrustedEmailDomainResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllTrustedEmailDomains"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	trustedEmailDomainData, err := r.getTrustedEmailDomainData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, emailDomain := range embedded.GetEmailDomains() {
-		emailDomainId, emailDomainIdOk := emailDomain.GetIdOk()
-		emailDomainName, emailDomainNameOk := emailDomain.GetDomainNameOk()
-
-		if emailDomainIdOk && emailDomainNameOk {
-			commentData := map[string]string{
-				"Resource Type":             r.ResourceType(),
-				"Trusted Email Domain Name": *emailDomainName,
-				"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
-				"Trusted Email Domain ID":   *emailDomainId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *emailDomainName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *emailDomainId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for trustedEmailDomainId, trustedEmailDomainName := range trustedEmailDomainData {
+		commentData := map[string]string{
+			"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
+			"Resource Type":             r.ResourceType(),
+			"Trusted Email Domain ID":   trustedEmailDomainId,
+			"Trusted Email Domain Name": trustedEmailDomainName,
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       trustedEmailDomainName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, trustedEmailDomainId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneTrustedEmailDomainResource) ResourceType() string {
-	return "pingone_trusted_email_domain"
+func (r *PingOneTrustedEmailDomainResource) getTrustedEmailDomainData() (map[string]string, error) {
+	trustedEmailDomainData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	trustedEmailDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomain](iter, "ReadAllTrustedEmailDomains", "GetEmailDomains", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, trustedEmailDomain := range trustedEmailDomains {
+		trustedEmailDomainId, trustedEmailDomainIdOk := trustedEmailDomain.GetIdOk()
+		trustedEmailDomainName, trustedEmailDomainNameOk := trustedEmailDomain.GetDomainNameOk()
+
+		if trustedEmailDomainIdOk && trustedEmailDomainNameOk {
+			trustedEmailDomainData[*trustedEmailDomainId] = *trustedEmailDomainName
+		}
+	}
+
+	return trustedEmailDomainData, nil
 }

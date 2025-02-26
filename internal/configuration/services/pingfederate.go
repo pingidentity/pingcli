@@ -42,8 +42,9 @@ func initHTTPSHostOption() {
 				"\nExample: 'https://pingfederate-admin.bxretail.org'",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingfederate.httpsHost",
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingfederate.httpsHost",
 	}
 }
 
@@ -64,8 +65,9 @@ func initAdminAPIPathOption() {
 				"(default /pf-admin-api/v1)",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingfederate.adminAPIPath",
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingfederate.adminAPIPath",
 	}
 }
 
@@ -88,8 +90,9 @@ func initXBypassExternalValidationHeaderOption() {
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
-		Type:     options.ENUM_BOOL,
-		ViperKey: "service.pingfederate.xBypassExternalValidationHeader",
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "service.pingfederate.xBypassExternalValidationHeader",
 	}
 }
 
@@ -112,8 +115,9 @@ func initCACertificatePemFilesOption() {
 				"\nAccepts a comma-separated string to delimit multiple PEM files.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING_SLICE,
-		ViperKey: "service.pingfederate.caCertificatePemFiles",
+		Sensitive: false,
+		Type:      options.ENUM_STRING_SLICE,
+		ViperKey:  "service.pingfederate.caCertificatePemFiles",
 	}
 }
 
@@ -136,8 +140,9 @@ func initInsecureTrustAllTLSOption() {
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
-		Type:     options.ENUM_BOOL,
-		ViperKey: "service.pingfederate.insecureTrustAllTLS",
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "service.pingfederate.insecureTrustAllTLS",
 	}
 }
 
@@ -159,8 +164,9 @@ func initUsernameOption() {
 				"\nExample: 'administrator'",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingfederate.authentication.basicAuth.username",
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingfederate.authentication.basicAuth.username",
 	}
 }
 
@@ -181,8 +187,9 @@ func initPasswordOption() {
 				"authentication.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingfederate.authentication.basicAuth.password",
+		Sensitive: true,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingfederate.authentication.basicAuth.password",
 	}
 }
 
@@ -203,8 +210,9 @@ func initAccessTokenOption() {
 				"custom OAuth 2.0 token method.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingfederate.authentication.accessTokenAuth.accessToken",
+		Sensitive: true,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingfederate.authentication.accessTokenAuth.accessToken",
 	}
 }
 
@@ -225,8 +233,9 @@ func initClientIDOption() {
 				"the OAuth 2.0 client credentials grant type.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingfederate.authentication.clientCredentialsAuth.clientID",
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.clientID",
 	}
 }
 
@@ -247,8 +256,9 @@ func initClientSecretOption() {
 				"using the OAuth 2.0 client credentials grant type.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingfederate.authentication.clientCredentialsAuth.clientSecret",
+		Sensitive: true,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.clientSecret",
 	}
 }
 
@@ -269,8 +279,9 @@ func initTokenURLOption() {
 				"the OAuth 2.0 client credentials grant type.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingfederate.authentication.clientCredentialsAuth.tokenURL",
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.tokenURL",
 	}
 }
 
@@ -294,8 +305,9 @@ func initScopesOption() {
 				"\nExample: 'openid,profile'",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING_SLICE,
-		ViperKey: "service.pingfederate.authentication.clientCredentialsAuth.scopes",
+		Sensitive: false,
+		Type:      options.ENUM_STRING_SLICE,
+		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.scopes",
 	}
 }
 
@@ -321,7 +333,8 @@ func initPingFederateAuthenticationTypeOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_PINGFEDERATE_AUTH_TYPE,
-		ViperKey: "service.pingfederate.authentication.type",
+		Sensitive: false,
+		Type:      options.ENUM_PINGFEDERATE_AUTH_TYPE,
+		ViperKey:  "service.pingfederate.authentication.type",
 	}
 }

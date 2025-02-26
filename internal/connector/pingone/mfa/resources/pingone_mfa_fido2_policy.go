@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,47 +26,59 @@ func MFAFido2Policy(clientInfo *connector.PingOneClientInfo) *PingOneMFAFido2Pol
 	}
 }
 
+func (r *PingOneMFAFido2PolicyResource) ResourceType() string {
+	return "pingone_mfa_fido2_policy"
+}
+
 func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadFIDO2Policies"
-
-	embedded, err := common.GetMFAEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	fido2PolicyData, err := r.getFido2PolicyData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, fido2Policy := range embedded.GetFido2Policies() {
-		fido2PolicyName, fido2PolicyNameOk := fido2Policy.GetNameOk()
-		fido2PolicyId, fido2PolicyIdOk := fido2Policy.GetIdOk()
-
-		if fido2PolicyNameOk && fido2PolicyIdOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"FIDO2 Policy Name":     *fido2PolicyName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"FIDO2 Policy ID":       *fido2PolicyId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *fido2PolicyName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *fido2PolicyId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for fido2PolicyId, fido2PolicyName := range fido2PolicyData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"FIDO2 Policy ID":       fido2PolicyId,
+			"FIDO2 Policy Name":     fido2PolicyName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fido2PolicyName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, fido2PolicyId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneMFAFido2PolicyResource) ResourceType() string {
-	return "pingone_mfa_fido2_policy"
+func (r *PingOneMFAFido2PolicyResource) getFido2PolicyData() (map[string]string, error) {
+	fido2PolicyData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	fido2Policies, err := pingone.GetMfaAPIObjectsFromIterator[mfa.FIDO2Policy](iter, "ReadFIDO2Policies", "GetFido2Policies", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fido2Policy := range fido2Policies {
+		fido2PolicyId, fido2PolicyIdOk := fido2Policy.GetIdOk()
+		fido2PolicyName, fido2PolicyNameOk := fido2Policy.GetNameOk()
+
+		if fido2PolicyIdOk && fido2PolicyNameOk {
+			fido2PolicyData[*fido2PolicyId] = *fido2PolicyName
+		}
+	}
+
+	return fido2PolicyData, nil
 }

@@ -22,12 +22,15 @@ func IncomingProxySettings(clientInfo *connector.PingFederateClientInfo) *PingFe
 	}
 }
 
+func (r *PingFederateIncomingProxySettingsResource) ResourceType() string {
+	return "pingfederate_incoming_proxy_settings"
+}
+
 func (r *PingFederateIncomingProxySettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	incomingProxySettingsId := "incoming_proxy_settings_singleton_id"
 	incomingProxySettingsName := "Incoming Proxy Settings"
@@ -37,16 +40,14 @@ func (r *PingFederateIncomingProxySettingsResource) ExportAll() (*[]connector.Im
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       incomingProxySettingsName,
 		ResourceID:         incomingProxySettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateIncomingProxySettingsResource) ResourceType() string {
-	return "pingfederate_incoming_proxy_settings"
 }

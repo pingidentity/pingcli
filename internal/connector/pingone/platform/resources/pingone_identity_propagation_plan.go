@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,47 +26,59 @@ func IdentityPropagationPlan(clientInfo *connector.PingOneClientInfo) *PingOneId
 	}
 }
 
+func (r *PingOneIdentityPropagationPlanResource) ResourceType() string {
+	return "pingone_identity_propagation_plan"
+}
+
 func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllPlans"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	planData, err := r.getIdentityPropagationPlanData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, identityPropagationPlan := range embedded.GetPlans() {
-		identityPropagationPlanId, identityPropagationPlanIdOk := identityPropagationPlan.GetIdOk()
-		identityPropagationPlanName, identityPropagationPlanNameOk := identityPropagationPlan.GetNameOk()
-
-		if identityPropagationPlanIdOk && identityPropagationPlanNameOk {
-			commentData := map[string]string{
-				"Resource Type":                  r.ResourceType(),
-				"Identity Propagation Plan Name": *identityPropagationPlanName,
-				"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
-				"Identity Propagation Plan ID":   *identityPropagationPlanId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *identityPropagationPlanName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *identityPropagationPlanId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for planId, planName := range planData {
+		commentData := map[string]string{
+			"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
+			"Identity Propagation Plan ID":   planId,
+			"Identity Propagation Plan Name": planName,
+			"Resource Type":                  r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       planName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, planId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneIdentityPropagationPlanResource) ResourceType() string {
-	return "pingone_identity_propagation_plan"
+func (r *PingOneIdentityPropagationPlanResource) getIdentityPropagationPlanData() (map[string]string, error) {
+	identityPropagationPlanData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	identityPropagationPlans, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityPropagationPlan](iter, "ReadAllPlans", "GetPlans", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, identityPropagationPlan := range identityPropagationPlans {
+		identityPropagationPlanId, identityPropagationPlanIdOk := identityPropagationPlan.GetIdOk()
+		identityPropagationPlanName, identityPropagationPlanNameOk := identityPropagationPlan.GetNameOk()
+
+		if identityPropagationPlanIdOk && identityPropagationPlanNameOk {
+			identityPropagationPlanData[*identityPropagationPlanId] = *identityPropagationPlanName
+		}
+	}
+
+	return identityPropagationPlanData, nil
 }

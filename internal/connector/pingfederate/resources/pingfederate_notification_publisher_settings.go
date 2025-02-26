@@ -22,12 +22,15 @@ func NotificationPublisherSettings(clientInfo *connector.PingFederateClientInfo)
 	}
 }
 
+func (r *PingFederateNotificationPublisherSettingsResource) ResourceType() string {
+	return "pingfederate_notification_publisher_settings"
+}
+
 func (r *PingFederateNotificationPublisherSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	notificationPublisherSettingsId := "notification_publisher_settings_singleton_id"
 	notificationPublisherSettingsName := "Notification Publisher Settings"
@@ -37,16 +40,14 @@ func (r *PingFederateNotificationPublisherSettingsResource) ExportAll() (*[]conn
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       notificationPublisherSettingsName,
 		ResourceID:         notificationPublisherSettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateNotificationPublisherSettingsResource) ResourceType() string {
-	return "pingfederate_notification_publisher_settings"
 }

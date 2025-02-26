@@ -1,10 +1,14 @@
 package platform
 
 import (
+	"fmt"
+
 	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	platform_internal "github.com/pingidentity/pingcli/internal/commands/platform"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/spf13/cobra"
 )
 
@@ -16,7 +20,7 @@ const (
     pingcli platform export --output-directory /path/to/my/directory --overwrite
 
   Export configuration-as-code packages for all configured products, specifying the export format as Terraform HCL.
-    pingcli platform export --export-format HCL
+    pingcli platform export --format HCL
 
   Export configuration-as-code packages for PingOne (core platform and SSO services).
     pingcli platform export --services pingone-platform,pingone-sso
@@ -56,6 +60,22 @@ func NewExportCommand() *cobra.Command {
 	initPingFederateAccessTokenFlags(cmd)
 	initPingFederateClientCredentialsFlags(cmd)
 
+	// auto-completion
+	err := cmd.RegisterFlagCompletionFunc(options.PlatformExportExportFormatOption.CobraParamName, autocompletion.PlatformExportFormatFunc)
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag %s: %v", options.PlatformExportExportFormatOption.CobraParamName, err), nil)
+	}
+
+	err = cmd.RegisterFlagCompletionFunc(options.PlatformExportServiceOption.CobraParamName, autocompletion.PlatformExportServicesFunc)
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag %s: %v", options.PlatformExportServiceOption.CobraParamName, err), nil)
+	}
+
+	err = cmd.RegisterFlagCompletionFunc(options.PingOneAuthenticationTypeOption.CobraParamName, autocompletion.PlatformExportPingOneAuthenticationTypeFunc)
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag %s: %v", options.PingOneAuthenticationTypeOption.CobraParamName, err), nil)
+	}
+
 	return cmd
 }
 
@@ -79,8 +99,8 @@ func initPingOneExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
 
 	cmd.MarkFlagsRequiredTogether(
 		options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName,

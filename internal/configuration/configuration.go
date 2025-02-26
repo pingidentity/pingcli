@@ -33,8 +33,7 @@ func ValidateViperKey(viperKey string) error {
 		}
 	}
 
-	validKeysStr := strings.Join(validKeys, ", ")
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key. Valid keys: %s", viperKey, validKeysStr)
+	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", viperKey)
 }
 
 // Return a list of all viper keys from Options
@@ -67,8 +66,7 @@ func ValidateParentViperKey(viperKey string) error {
 		}
 	}
 
-	validKeysStr := "\n- " + strings.Join(validKeys, "\n- ")
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key. Valid keys: %s", viperKey, validKeysStr)
+	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", viperKey)
 }
 
 func OptionFromViperKey(viperKey string) (opt options.Option, err error) {
@@ -83,6 +81,7 @@ func OptionFromViperKey(viperKey string) (opt options.Option, err error) {
 func InitAllOptions() {
 	configuration_config.InitConfigAddProfileOptions()
 	configuration_config.InitConfigDeleteProfileOptions()
+	configuration_config.InitConfigListKeyOptions()
 
 	configuration_platform.InitPlatformExportOptions()
 

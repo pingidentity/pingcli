@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,47 +26,59 @@ func CustomDomain(clientInfo *connector.PingOneClientInfo) *PingOneCustomDomainR
 	}
 }
 
+func (r *PingOneCustomDomainResource) ResourceType() string {
+	return "pingone_custom_domain"
+}
+
 func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllDomains"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	domainData, err := r.getCustomDomainData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, customDomain := range embedded.GetCustomDomains() {
-		customDomainName, customDomainNameOk := customDomain.GetDomainNameOk()
-		customDomainId, customDomainIdOk := customDomain.GetIdOk()
-
-		if customDomainIdOk && customDomainNameOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Custom Domain Name":    *customDomainName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Custom Domain ID":      *customDomainId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *customDomainName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *customDomainId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for domainId, domainName := range domainData {
+		commentData := map[string]string{
+			"Custom Domain ID":      domainId,
+			"Custom Domain Name":    domainName,
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       domainName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, domainId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneCustomDomainResource) ResourceType() string {
-	return "pingone_custom_domain"
+func (r *PingOneCustomDomainResource) getCustomDomainData() (map[string]string, error) {
+	domainData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	customDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.CustomDomain](iter, "ReadAllDomains", "GetCustomDomains", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, customDomain := range customDomains {
+		customDomainName, customDomainNameOk := customDomain.GetDomainNameOk()
+		customDomainId, customDomainIdOk := customDomain.GetIdOk()
+
+		if customDomainIdOk && customDomainNameOk {
+			domainData[*customDomainId] = *customDomainName
+		}
+	}
+
+	return domainData, nil
 }

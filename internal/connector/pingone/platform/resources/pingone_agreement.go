@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,46 +26,59 @@ func Agreement(clientInfo *connector.PingOneClientInfo) *PingOneAgreementResourc
 	}
 }
 
+func (r *PingOneAgreementResource) ResourceType() string {
+	return "pingone_agreement"
+}
+
 func (r *PingOneAgreementResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllAgreements"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	agreementData, err := r.getAgreementData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-	for _, agreement := range embedded.GetAgreements() {
-		agreementId, agreementIdOk := agreement.GetIdOk()
-		agreementName, agreementNameOk := agreement.GetNameOk()
-
+	for agreementId, agreementName := range agreementData {
 		commentData := map[string]string{
-			"Resource Type":           r.ResourceType(),
-			"Agreement Resource Name": *agreementName,
-			"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
-			"Agreement Resource ID":   *agreementId,
+			"Agreement ID":          agreementId,
+			"Agreement Name":        agreementName,
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
 		}
 
-		if agreementIdOk && agreementNameOk {
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *agreementName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *agreementId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       agreementName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, agreementId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneAgreementResource) ResourceType() string {
-	return "pingone_agreement"
+func (r *PingOneAgreementResource) getAgreementData() (map[string]string, error) {
+	agreementData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	agreements, err := pingone.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, agreement := range agreements {
+		agreementId, agreementIdOk := agreement.GetIdOk()
+		agreementName, agreementNameOk := agreement.GetNameOk()
+
+		if agreementIdOk && agreementNameOk {
+			agreementData[*agreementId] = *agreementName
+		}
+	}
+
+	return agreementData, nil
 }

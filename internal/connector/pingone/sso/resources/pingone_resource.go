@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,48 +26,61 @@ func Resource(clientInfo *connector.PingOneClientInfo) *PingOneResourceResource 
 	}
 }
 
+func (r *PingOneResourceResource) ResourceType() string {
+	return "pingone_resource"
+}
+
 func (r *PingOneResourceResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllResources"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	resourceData, err := r.getResourceData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, resourceInner := range embedded.GetResources() {
-		resource := resourceInner.Resource
-		resourceId, resourceIdOk := resource.GetIdOk()
-		resourceName, resourceNameOk := resource.GetNameOk()
-
-		if resourceIdOk && resourceNameOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Resource Name":         *resourceName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Resource ID":           *resourceId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *resourceName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *resourceId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for resourceId, resourceName := range resourceData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource ID":           resourceId,
+			"Resource Name":         resourceName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       resourceName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, resourceId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneResourceResource) ResourceType() string {
-	return "pingone_resource"
+func (r *PingOneResourceResource) getResourceData() (map[string]string, error) {
+	resourceData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, resourceInner := range resourceInners {
+		if resourceInner.Resource != nil {
+			resourceId, resourceIdOk := resourceInner.Resource.GetIdOk()
+			resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
+
+			if resourceIdOk && resourceNameOk {
+				resourceData[*resourceId] = *resourceName
+			}
+		}
+	}
+
+	return resourceData, nil
 }

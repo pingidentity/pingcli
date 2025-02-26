@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,24 +26,52 @@ func Application(clientInfo *connector.PingOneClientInfo) *PingOneApplicationRes
 	}
 }
 
+func (r *PingOneApplicationResource) ResourceType() string {
+	return "pingone_application"
+}
+
 func (r *PingOneApplicationResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteApplicationsFunc := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiApplicationFunctionName := "ReadAllApplications"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteApplicationsFunc, apiApplicationFunctionName, r.ResourceType())
+	applicationData, err := r.getApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for appId, appName := range applicationData {
+		commentData := map[string]string{
+			"Application ID":        appId,
+			"Application Name":      appName,
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       appName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, appId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
 
-	for _, app := range embedded.GetApplications() {
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneApplicationResource) getApplicationData() (map[string]string, error) {
+	applicationData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, app := range applications {
 		var (
 			appId     *string
 			appIdOk   bool
@@ -64,25 +94,9 @@ func (r *PingOneApplicationResource) ExportAll() (*[]connector.ImportBlock, erro
 		}
 
 		if appIdOk && appNameOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Application Name":      *appName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Application ID":        *appId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *appName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *appId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			applicationData[*appId] = *appName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingOneApplicationResource) ResourceType() string {
-	return "pingone_application"
+	return applicationData, nil
 }

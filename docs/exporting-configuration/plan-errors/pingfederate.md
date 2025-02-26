@@ -15,6 +15,7 @@ If you encounter an error that is not documented, please [raise a new issue](htt
 ## Resource Plan Errors
 
 - [pingfederate_certificate_ca](pingfederate_certificate_ca.md)
+- [pingfederate_certificates_revocation_ocsp_certificate](pingfederate_certificates_revocation_ocsp_certificate.md)
 - [pingfederate_data_store](pingfederate_data_store.md)
 - [pingfederate_idp_adapter](pingfederate_idp_adapter.md)
 - [pingfederate_kerberos_realm](pingfederate_kerberos_realm.md)
@@ -22,3 +23,4 @@ If you encounter an error that is not documented, please [raise a new issue](htt
 - [pingfederate_oauth_client](pingfederate_oauth_client.md)
 - [pingfederate_password_credential_validator](pingfederate_password_credential_validator.md)
 - [pingfederate_pingone_connection](pingfederate_pingone_connection.md)
+- [pingfederate_server_settings_ws_trust_sts_settings_issuer_certificate](pingfederate_server_settings_ws_trust_sts_settings_issuer_certificate.md)

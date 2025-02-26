@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,24 +26,69 @@ func ApplicationResourceGrant(clientInfo *connector.PingOneClientInfo) *PingOneA
 	}
 }
 
+func (r *PingOneApplicationResourceGrantResource) ResourceType() string {
+	return "pingone_application_resource_grant"
+}
+
 func (r *PingOneApplicationResourceGrantResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteApplicationsFunc := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiApplicationFunctionName := "ReadAllApplications"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteApplicationsFunc, apiApplicationFunctionName, r.ResourceType())
+	applicationData, err := r.getApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for appId, appName := range applicationData {
+		applicationGrantData, err := r.getApplicationGrantData(appId)
+		if err != nil {
+			return nil, err
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		for grantId, grantResourceId := range applicationGrantData {
+			resourceName, resourceNameOk, err := r.getGrantResourceName(grantResourceId)
+			if err != nil {
+				return nil, err
+			}
+			if !resourceNameOk {
+				continue
+			}
 
-	for _, app := range embedded.GetApplications() {
+			commentData := map[string]string{
+				"Application ID":                appId,
+				"Application Name":              appName,
+				"Application Resource Grant ID": grantId,
+				"Application Resource Name":     resourceName,
+				"Export Environment ID":         r.clientInfo.ExportEnvironmentID,
+				"Resource Type":                 r.ResourceType(),
+			}
+
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", appName, resourceName),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, grantId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneApplicationResourceGrantResource) getApplicationData() (map[string]string, error) {
+	applicationData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, app := range applications {
 		var (
 			appId     *string
 			appIdOk   bool
@@ -64,62 +111,54 @@ func (r *PingOneApplicationResourceGrantResource) ExportAll() (*[]connector.Impo
 		}
 
 		if appIdOk && appNameOk {
-			apiExecutePoliciesFunc := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationResourceGrantsApi.ReadAllApplicationGrants(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *appId).Execute
-			apiApplicationGrantFunctionName := "ReadAllApplicationGrants"
+			applicationData[*appId] = *appName
+		}
+	}
 
-			applicationEmbedded, err := common.GetManagementEmbedded(apiExecutePoliciesFunc, apiApplicationGrantFunctionName, r.ResourceType())
-			if err != nil {
-				return nil, err
-			}
+	return applicationData, nil
+}
 
-			for _, grant := range applicationEmbedded.GetGrants() {
-				grantId, grantIdOk := grant.GetIdOk()
-				grantResource, grantResourceOk := grant.GetResourceOk()
+func (r *PingOneApplicationResourceGrantResource) getApplicationGrantData(appId string) (map[string]string, error) {
+	applicationGrantData := make(map[string]string)
 
-				var (
-					grantResourceId   *string
-					grantResourceIdOk bool
-				)
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationResourceGrantsApi.ReadAllApplicationGrants(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	applicationGrants, err := pingone.GetManagementAPIObjectsFromIterator[management.ApplicationResourceGrant](iter, "ReadAllApplicationGrants", "GetGrants", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-				if grantResourceOk {
-					grantResourceId, grantResourceIdOk = grantResource.GetIdOk()
-				}
+	for _, grant := range applicationGrants {
+		grantId, grantIdOk := grant.GetIdOk()
+		grantResource, grantResourceOk := grant.GetResourceOk()
 
-				if grantIdOk && grantResourceOk && grantResourceIdOk {
-					resource, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *grantResourceId).Execute()
-					err = common.HandleClientResponse(response, err, "ReadOneResource", r.ResourceType())
-					if err != nil {
-						return nil, err
-					}
+		if grantIdOk && grantResourceOk {
+			grantResourceId, grantResourceIdOk := grantResource.GetIdOk()
 
-					if resource != nil {
-						resourceName, resourceNameOk := resource.GetNameOk()
-						if resourceNameOk {
-							commentData := map[string]string{
-								"Resource Type":         r.ResourceType(),
-								"Application Name":      *appName,
-								"Resource Name":         *resourceName,
-								"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-								"Application ID":        *appId,
-								"Resource Grant ID":     *grantId,
-							}
-
-							importBlocks = append(importBlocks, connector.ImportBlock{
-								ResourceType:       r.ResourceType(),
-								ResourceName:       fmt.Sprintf("%s_%s", *appName, *resourceName),
-								ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, *appId, *grantId),
-								CommentInformation: common.GenerateCommentInformation(commentData),
-							})
-						}
-					}
-				}
+			if grantResourceIdOk {
+				applicationGrantData[*grantId] = *grantResourceId
 			}
 		}
 	}
 
-	return &importBlocks, nil
+	return applicationGrantData, nil
 }
 
-func (r *PingOneApplicationResourceGrantResource) ResourceType() string {
-	return "pingone_application_resource_grant"
+func (r *PingOneApplicationResourceGrantResource) getGrantResourceName(grantResourceId string) (string, bool, error) {
+	resource, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, grantResourceId).Execute()
+	ok, err := common.HandleClientResponse(response, err, "ReadOneResource", r.ResourceType())
+	if err != nil {
+		return "", false, err
+	}
+	if !ok {
+		return "", false, nil
+	}
+
+	if resource != nil {
+		resourceName, resourceNameOk := resource.GetNameOk()
+		if resourceNameOk {
+			return *resourceName, true, nil
+		}
+	}
+
+	return "", false, fmt.Errorf("unable to get resource name for grant resource ID: %s", grantResourceId)
 }

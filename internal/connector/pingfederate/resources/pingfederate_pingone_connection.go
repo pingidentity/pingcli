@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,70 @@ func PingOneConnection(clientInfo *connector.PingFederateClientInfo) *PingFedera
 	}
 }
 
+func (r *PingFederatePingOneConnectionResource) ResourceType() string {
+	return "pingfederate_pingone_connection"
+}
+
 func (r *PingFederatePingOneConnectionResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.PingOneConnectionsAPI.GetPingOneConnections(r.clientInfo.Context).Execute
-	apiFunctionName := "GetPingOneConnections"
-
-	pingoneConnections, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	pingoneConnectionData, err := r.getPingOneConnectionData()
 	if err != nil {
 		return nil, err
 	}
 
-	if pingoneConnections == nil {
-		l.Error().Msgf("Returned %s() pingoneConnections is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for pingoneConnectionId, pingoneConnectionName := range pingoneConnectionData {
+		commentData := map[string]string{
+			"PingOne Connection ID":   pingoneConnectionId,
+			"PingOne Connection Name": pingoneConnectionName,
+			"Resource Type":           r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       pingoneConnectionName,
+			ResourceID:         pingoneConnectionId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	pingoneConnectionsItems, ok := pingoneConnections.GetItemsOk()
+	return &importBlocks, nil
+}
+
+func (r *PingFederatePingOneConnectionResource) getPingOneConnectionData() (map[string]string, error) {
+	pingoneConnectionData := make(map[string]string)
+
+	pingoneConnections, response, err := r.clientInfo.ApiClient.PingOneConnectionsAPI.GetPingOneConnections(r.clientInfo.Context).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetPingOneConnections", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 	if !ok {
-		l.Error().Msgf("Failed to get %s() pingoneConnections items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, nil
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	if pingoneConnections == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	pingoneConnectionsItems, pingoneConnectionsItemsOk := pingoneConnections.GetItemsOk()
+	if !pingoneConnectionsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, pingoneConnection := range pingoneConnectionsItems {
 		pingoneConnectionId, pingoneConnectionIdOk := pingoneConnection.GetIdOk()
 		pingoneConnectionName, pingoneConnectionNameOk := pingoneConnection.GetNameOk()
 
 		if pingoneConnectionIdOk && pingoneConnectionNameOk {
-			commentData := map[string]string{
-				"Resource Type":                    r.ResourceType(),
-				"PingOne Connection Resource ID":   *pingoneConnectionId,
-				"PingOne Connection Resource Name": *pingoneConnectionName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *pingoneConnectionName,
-				ResourceID:         *pingoneConnectionId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			pingoneConnectionData[*pingoneConnectionId] = *pingoneConnectionName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederatePingOneConnectionResource) ResourceType() string {
-	return "pingfederate_pingone_connection"
+	return pingoneConnectionData, nil
 }

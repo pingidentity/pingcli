@@ -361,7 +361,7 @@ func GetOptionValue(opt options.Option) (pFlagValue string, err error) {
 	}
 
 	// 3rd priority: viper value
-	viperValue, ok, err := viperValueFromOption(opt)
+	viperValue, ok, err := ViperValueFromOption(opt)
 	if err != nil {
 		return "", err
 	}
@@ -380,6 +380,16 @@ func GetOptionValue(opt options.Option) (pFlagValue string, err error) {
 	return "", fmt.Errorf("failed to get option value: no value found: %v", opt)
 }
 
+func MaskValue(value string) string {
+	if value == "" {
+		return ""
+	}
+
+	// Mask all values to the same asterisk length
+	// providing no additional information about the value when logged.
+	return strings.Repeat("*", 8)
+}
+
 func cobraParamValueFromOption(opt options.Option) (value string, ok bool) {
 	if opt.CobraParamValue != nil && opt.Flag.Changed {
 		return opt.CobraParamValue.String(), true
@@ -388,7 +398,7 @@ func cobraParamValueFromOption(opt options.Option) (value string, ok bool) {
 	return "", false
 }
 
-func viperValueFromOption(opt options.Option) (value string, ok bool, err error) {
+func ViperValueFromOption(opt options.Option) (value string, ok bool, err error) {
 	mainConfig := GetMainConfig()
 	if opt.ViperKey != "" && mainConfig != nil {
 		var (

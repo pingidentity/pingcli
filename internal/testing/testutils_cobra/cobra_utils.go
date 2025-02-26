@@ -36,6 +36,9 @@ func ExecutePingcli(t *testing.T, args ...string) (err error) {
 func ExecutePingcliCaptureCobraOutput(t *testing.T, args ...string) (output string, err error) {
 	t.Helper()
 
+	// Reset options for testing individual executions of pingcli
+	configuration.InitAllOptions()
+
 	root := cmd.NewRootCommand("test-version", "test-commit")
 
 	// Add config location to the root command

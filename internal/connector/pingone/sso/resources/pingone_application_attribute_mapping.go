@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,24 +26,61 @@ func ApplicationAttributeMapping(clientInfo *connector.PingOneClientInfo) *PingO
 	}
 }
 
+func (r *PingOneApplicationAttributeMappingResource) ResourceType() string {
+	return "pingone_application_attribute_mapping"
+}
+
 func (r *PingOneApplicationAttributeMappingResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteApplicationsFunc := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiApplicationFunctionName := "ReadAllApplications"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteApplicationsFunc, apiApplicationFunctionName, r.ResourceType())
+	applicationData, err := r.getApplicationData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for appId, appName := range applicationData {
+		applicationAttributeMappingData, err := r.getApplicationAttributeMappingData(appId)
+		if err != nil {
+			return nil, err
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		for attributeMappingId, attributeMappingName := range applicationAttributeMappingData {
+			commentData := map[string]string{
+				"Application ID":         appId,
+				"Application Name":       appName,
+				"Attribute Mapping ID":   attributeMappingId,
+				"Attribute Mapping Name": attributeMappingName,
+				"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+				"Resource Type":          r.ResourceType(),
+			}
 
-	for _, app := range embedded.GetApplications() {
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", appName, attributeMappingName),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, attributeMappingId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneApplicationAttributeMappingResource) getApplicationData() (map[string]string, error) {
+	applicationData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, app := range applications {
 		var (
 			appId     *string
 			appIdOk   bool
@@ -61,46 +100,32 @@ func (r *PingOneApplicationAttributeMappingResource) ExportAll() (*[]connector.I
 		}
 
 		if appIdOk && appNameOk {
-			apiExecuteAttributeMappingFunc := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationAttributeMappingApi.ReadAllApplicationAttributeMappings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *appId).Execute
-			apiAttributeMappingFunctionName := "ReadAllApplicationAttributeMappings"
+			applicationData[*appId] = *appName
+		}
+	}
 
-			attributeMappingsEmbedded, err := common.GetManagementEmbedded(apiExecuteAttributeMappingFunc, apiAttributeMappingFunctionName, r.ResourceType())
-			if err != nil {
-				return nil, err
-			}
+	return applicationData, nil
+}
 
-			for _, attributeMapping := range attributeMappingsEmbedded.GetAttributes() {
-				if attributeMapping.ApplicationAttributeMapping == nil {
-					continue
-				}
+func (r *PingOneApplicationAttributeMappingResource) getApplicationAttributeMappingData(appId string) (map[string]string, error) {
+	applicationAttributeMappingData := make(map[string]string)
 
-				attributeMappingId, attributeMappingIdOk := attributeMapping.ApplicationAttributeMapping.GetIdOk()
-				attributeMappingName, attributeMappingNameOk := attributeMapping.ApplicationAttributeMapping.GetNameOk()
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationAttributeMappingApi.ReadAllApplicationAttributeMappings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	attributeMappingInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllApplicationAttributeMappings", "GetAttributes", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-				if attributeMappingIdOk && attributeMappingNameOk {
-					commentData := map[string]string{
-						"Resource Type":          r.ResourceType(),
-						"Application Name":       *appName,
-						"Attribute Mapping Name": *attributeMappingName,
-						"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
-						"Application ID":         *appId,
-						"Attribute Mapping ID":   *attributeMappingId,
-					}
+	for _, attributeMappingInner := range attributeMappingInners {
+		if attributeMappingInner.ApplicationAttributeMapping != nil {
+			attributeMappingId, attributeMappingIdOk := attributeMappingInner.ApplicationAttributeMapping.GetIdOk()
+			attributeMappingName, attributeMappingNameOk := attributeMappingInner.ApplicationAttributeMapping.GetNameOk()
 
-					importBlocks = append(importBlocks, connector.ImportBlock{
-						ResourceType:       r.ResourceType(),
-						ResourceName:       fmt.Sprintf("%s_%s", *appName, *attributeMappingName),
-						ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, *appId, *attributeMappingId),
-						CommentInformation: common.GenerateCommentInformation(commentData),
-					})
-				}
+			if attributeMappingIdOk && attributeMappingNameOk {
+				applicationAttributeMappingData[*attributeMappingId] = *attributeMappingName
 			}
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingOneApplicationAttributeMappingResource) ResourceType() string {
-	return "pingone_application_attribute_mapping"
+	return applicationAttributeMappingData, nil
 }

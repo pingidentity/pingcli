@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 	"text/template"
 	"time"
 
@@ -32,6 +34,11 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 			l.Debug().Msgf("Nothing exported for resource %s. Skipping import file generation...", exportableResource.ResourceType())
 			continue
 		}
+
+		// Sort import blocks by ResourceName
+		slices.SortFunc(*importBlocks, func(i, j connector.ImportBlock) int {
+			return strings.Compare(i.ResourceName, j.ResourceName)
+		})
 
 		l.Debug().Msgf("Generating import file for %s resource...", exportableResource.ResourceType())
 

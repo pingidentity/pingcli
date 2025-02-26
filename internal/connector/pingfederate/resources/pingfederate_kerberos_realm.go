@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,70 @@ func KerberosRealm(clientInfo *connector.PingFederateClientInfo) *PingFederateKe
 	}
 }
 
+func (r *PingFederateKerberosRealmResource) ResourceType() string {
+	return "pingfederate_kerberos_realm"
+}
+
 func (r *PingFederateKerberosRealmResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.KerberosRealmsAPI.GetKerberosRealms(r.clientInfo.Context).Execute
-	apiFunctionName := "GetKerberosRealms"
-
-	kerberosRealms, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	kerberosRealmData, err := r.getKerberosRealmData()
 	if err != nil {
 		return nil, err
 	}
 
-	if kerberosRealms == nil {
-		l.Error().Msgf("Returned %s() kerberosRealms is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for kerberosRealmId, kerberosRealmName := range kerberosRealmData {
+		commentData := map[string]string{
+			"Kerberos Realm ID":   kerberosRealmId,
+			"Kerberos Realm Name": kerberosRealmName,
+			"Resource Type":       r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       kerberosRealmName,
+			ResourceID:         kerberosRealmId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	kerberosRealmsItems, ok := kerberosRealms.GetItemsOk()
+	return &importBlocks, nil
+}
+
+func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (map[string]string, error) {
+	kerberosRealmData := make(map[string]string)
+
+	kerberosRealms, response, err := r.clientInfo.ApiClient.KerberosRealmsAPI.GetKerberosRealms(r.clientInfo.Context).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetKerberosRealms", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 	if !ok {
-		l.Error().Msgf("Failed to get %s() kerberosRealms items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, nil
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	if kerberosRealms == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	kerberosRealmsItems, kerberosRealmsItemsOk := kerberosRealms.GetItemsOk()
+	if !kerberosRealmsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, kerberosRealm := range kerberosRealmsItems {
 		kerberosRealmId, kerberosRealmIdOk := kerberosRealm.GetIdOk()
 		kerberosRealmName, kerberosRealmNameOk := kerberosRealm.GetKerberosRealmNameOk()
 
 		if kerberosRealmIdOk && kerberosRealmNameOk {
-			commentData := map[string]string{
-				"Resource Type":                r.ResourceType(),
-				"Kerberos Realm Resource ID":   *kerberosRealmId,
-				"Kerberos Realm Resource Name": *kerberosRealmName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *kerberosRealmName,
-				ResourceID:         *kerberosRealmId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			kerberosRealmData[*kerberosRealmId] = *kerberosRealmName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateKerberosRealmResource) ResourceType() string {
-	return "pingfederate_kerberos_realm"
+	return kerberosRealmData, nil
 }

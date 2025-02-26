@@ -2,6 +2,7 @@ package config_internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -19,12 +20,26 @@ func RunInternalConfigGet(viperKey string) (err error) {
 		return fmt.Errorf("failed to get configuration: %v", err)
 	}
 
-	yamlStr, err := profiles.GetMainConfig().ProfileViperValue(pName, viperKey)
-	if err != nil {
-		return fmt.Errorf("failed to get configuration: %v", err)
+	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", pName, viperKey)
+
+	for _, opt := range options.Options() {
+		if opt.ViperKey == "" || !strings.Contains(opt.ViperKey, viperKey) {
+			continue
+		}
+
+		vVal, _, err := profiles.ViperValueFromOption(opt)
+		if err != nil {
+			return fmt.Errorf("failed to get configuration: %v", err)
+		}
+
+		if opt.Sensitive {
+			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
+		} else {
+			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)
+		}
 	}
 
-	output.Message(yamlStr, nil)
+	output.Message(msgStr, nil)
 
 	return nil
 }
@@ -37,11 +52,11 @@ func readConfigGetOptions() (pName string, err error) {
 	}
 
 	if err != nil {
-		return pName, err
+		return "", err
 	}
 
 	if pName == "" {
-		return pName, fmt.Errorf("unable to determine profile to get configuration from")
+		return "", fmt.Errorf("unable to determine profile to get configuration from")
 	}
 
 	return pName, nil

@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,64 +26,89 @@ func TrustedEmailAddress(clientInfo *connector.PingOneClientInfo) *PingOneTruste
 	}
 }
 
+func (r *PingOneTrustedEmailAddressResource) ResourceType() string {
+	return "pingone_trusted_email_address"
+}
+
 func (r *PingOneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllTrustedEmailDomains"
-
-	emailDomainEmbedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	trustedEmailDomainData, err := r.getTrustedEmailDomainData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for trustedEmailDomainId, trustedEmailDomainName := range trustedEmailDomainData {
+		trustedEmailAddressData, err := r.getTrustedEmailAddressData(trustedEmailDomainId)
+		if err != nil {
+			return nil, err
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, trustedEmailDomain := range emailDomainEmbedded.GetEmailDomains() {
-		trustedEmailDomainId, trustedEmailDomainIdOk := trustedEmailDomain.GetIdOk()
-		trustedEmailDomainName, trustedEmailDomainNameOk := trustedEmailDomain.GetDomainNameOk()
-
-		if trustedEmailDomainIdOk && trustedEmailDomainNameOk {
-			apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailAddressesApi.ReadAllTrustedEmailAddresses(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *trustedEmailDomainId).Execute
-			apiFunctionName := "ReadAllTrustedEmailAddresses"
-
-			trustedEmailAddressEmbedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
-			if err != nil {
-				return nil, err
+		for trustedEmailId, trustedEmailAddress := range trustedEmailAddressData {
+			commentData := map[string]string{
+				"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
+				"Resource Type":             r.ResourceType(),
+				"Trusted Email Address":     trustedEmailAddress,
+				"Trusted Email Address ID":  trustedEmailId,
+				"Trusted Email Domain ID":   trustedEmailDomainId,
+				"Trusted Email Domain Name": trustedEmailDomainName,
 			}
 
-			for _, trustedEmail := range trustedEmailAddressEmbedded.GetTrustedEmails() {
-				trustedEmailAddress, trustedEmailAddressOk := trustedEmail.GetEmailAddressOk()
-				trustedEmailId, trustedEmailIdOk := trustedEmail.GetIdOk()
-
-				if trustedEmailAddressOk && trustedEmailIdOk {
-					commentData := map[string]string{
-						"Resource Type":             r.ResourceType(),
-						"Trusted Email Domain Name": *trustedEmailDomainName,
-						"Trusted Email Address":     *trustedEmailAddress,
-						"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
-						"Trusted Email Domain ID":   *trustedEmailDomainId,
-						"Trusted Email Address ID":  *trustedEmailId,
-					}
-
-					importBlocks = append(importBlocks, connector.ImportBlock{
-						ResourceType:       r.ResourceType(),
-						ResourceName:       fmt.Sprintf("%s_%s", *trustedEmailDomainName, *trustedEmailAddress),
-						ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, *trustedEmailDomainId, *trustedEmailId),
-						CommentInformation: common.GenerateCommentInformation(commentData),
-					})
-				}
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", trustedEmailDomainName, trustedEmailAddress),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, trustedEmailDomainId, trustedEmailId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
+
+			importBlocks = append(importBlocks, importBlock)
 		}
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneTrustedEmailAddressResource) ResourceType() string {
-	return "pingone_trusted_email_address"
+func (r *PingOneTrustedEmailAddressResource) getTrustedEmailDomainData() (map[string]string, error) {
+	trustedEmailDomainData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	trustedEmailDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomain](iter, "ReadAllTrustedEmailDomains", "GetEmailDomains", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, trustedEmailDomain := range trustedEmailDomains {
+		trustedEmailDomainId, trustedEmailDomainIdOk := trustedEmailDomain.GetIdOk()
+		trustedEmailDomainName, trustedEmailDomainNameOk := trustedEmailDomain.GetDomainNameOk()
+
+		if trustedEmailDomainIdOk && trustedEmailDomainNameOk {
+			trustedEmailDomainData[*trustedEmailDomainId] = *trustedEmailDomainName
+		}
+	}
+
+	return trustedEmailDomainData, nil
+}
+
+func (r *PingOneTrustedEmailAddressResource) getTrustedEmailAddressData(trustedEmailDomainId string) (map[string]string, error) {
+	trustedEmailAddressData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailAddressesApi.ReadAllTrustedEmailAddresses(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, trustedEmailDomainId).Execute()
+	trustedEmailAddresses, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomainTrustedEmail](iter, "ReadAllTrustedEmailAddresses", "GetTrustedEmails", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, trustedEmail := range trustedEmailAddresses {
+		trustedEmailAddress, trustedEmailAddressOk := trustedEmail.GetEmailAddressOk()
+		trustedEmailId, trustedEmailIdOk := trustedEmail.GetIdOk()
+
+		if trustedEmailAddressOk && trustedEmailIdOk {
+			trustedEmailAddressData[*trustedEmailId] = *trustedEmailAddress
+		}
+	}
+
+	return trustedEmailAddressData, nil
 }

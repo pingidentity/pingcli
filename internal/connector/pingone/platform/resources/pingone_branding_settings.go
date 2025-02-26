@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -22,23 +23,21 @@ func BrandingSettings(clientInfo *connector.PingOneClientInfo) *PingOneBrandingS
 	}
 }
 
+func (r *PingOneBrandingSettingsResource) ResourceType() string {
+	return "pingone_branding_settings"
+}
+
 func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadBrandingSettings", r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	if response.StatusCode == 204 {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
+	ok, err := r.checkBrandingSettingsData()
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
 		return &importBlocks, nil
 	}
 
@@ -47,16 +46,19 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       "branding_settings",
+		ResourceName:       r.ResourceType(),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneBrandingSettingsResource) ResourceType() string {
-	return "pingone_branding_settings"
+func (r *PingOneBrandingSettingsResource) checkBrandingSettingsData() (bool, error) {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	return pingone.CheckSingletonResource(response, err, "ReadBrandingSettings", r.ResourceType())
 }

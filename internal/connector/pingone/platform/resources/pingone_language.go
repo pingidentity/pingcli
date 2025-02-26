@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,57 +26,67 @@ func Language(clientInfo *connector.PingOneClientInfo) *PingOneLanguageResource 
 	}
 }
 
+func (r *PingOneLanguageResource) ResourceType() string {
+	return "pingone_language"
+}
+
 func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadLanguages"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	languageData, err := r.getLanguageData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, languageInner := range embedded.GetLanguages() {
-		if languageInner.Language != nil {
-			language := languageInner.Language
-
-			// If language is not customer added, skip it
-			languageCustomerAdded, languageCustomerAddedOk := language.GetCustomerAddedOk()
-			if languageCustomerAddedOk && !*languageCustomerAdded {
-				continue
-			}
-
-			languageId, languageIdOk := language.GetIdOk()
-			languageName, languageNameOk := language.GetNameOk()
-
-			if languageIdOk && languageNameOk && languageCustomerAddedOk {
-				commentData := map[string]string{
-					"Resource Type":         r.ResourceType(),
-					"Language Name":         *languageName,
-					"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-					"Language ID":           *languageId,
-				}
-
-				importBlocks = append(importBlocks, connector.ImportBlock{
-					ResourceType:       r.ResourceType(),
-					ResourceName:       *languageName,
-					ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *languageId),
-					CommentInformation: common.GenerateCommentInformation(commentData),
-				})
-			}
+	for languageId, languageName := range languageData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Language ID":           languageId,
+			"Language Name":         languageName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       languageName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, languageId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneLanguageResource) ResourceType() string {
-	return "pingone_language"
+func (r *PingOneLanguageResource) getLanguageData() (map[string]string, error) {
+	languageData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	languageInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, languageInner := range languageInners {
+		if languageInner.Language != nil {
+			// If language is not customer added, skip it
+			languageCustomerAdded, languageCustomerAddedOk := languageInner.Language.GetCustomerAddedOk()
+			if !languageCustomerAddedOk || !*languageCustomerAdded {
+				continue
+			}
+
+			languageId, languageIdOk := languageInner.Language.GetIdOk()
+			languageName, languageNameOk := languageInner.Language.GetNameOk()
+
+			if languageIdOk && languageNameOk {
+				languageData[*languageId] = *languageName
+			}
+		}
+	}
+
+	return languageData, nil
 }

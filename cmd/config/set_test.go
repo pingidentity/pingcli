@@ -32,7 +32,7 @@ func TestConfigSetCmd_TooManyArgs(t *testing.T) {
 
 // Test Config Set Command Fails when an invalid key is provided
 func TestConfigSetCmd_InvalidKey(t *testing.T) {
-	expectedErrorPattern := `^failed to set configuration: key 'pingcli\.invalid' is not recognized as a valid configuration key\. Valid keys: [A-Za-z\.\s,]+$`
+	expectedErrorPattern := `^failed to set configuration: key 'pingcli\.invalid' is not recognized as a valid configuration key\.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := testutils_cobra.ExecutePingcli(t, "config", "set", "pingcli.invalid=true")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -82,4 +82,24 @@ func TestConfigSetCmd_InvalidFlag(t *testing.T) {
 	expectedErrorPattern := `^unknown flag: --invalid$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "set", "--invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_setMaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.ViperKey, "1234"))
+
+	// Output:
+	// SUCCESS: Configuration set successfully:
+	// service.pingfederate.authentication.basicAuth.password=********
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_setUnmaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.RootColorOption.ViperKey, "true"))
+
+	// Output:
+	// SUCCESS: Configuration set successfully:
+	// noColor=true
 }

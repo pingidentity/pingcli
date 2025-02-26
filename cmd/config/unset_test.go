@@ -32,7 +32,7 @@ func TestConfigUnsetCmd_TooManyArgs(t *testing.T) {
 
 // Test Config Unset Command Fails when an invalid key is provided
 func TestConfigUnsetCmd_InvalidKey(t *testing.T) {
-	expectedErrorPattern := `^failed to unset configuration: key '.*' is not recognized as a valid configuration key\. Valid keys: [A-Za-z\.\s,]+$`
+	expectedErrorPattern := `^failed to unset configuration: key '.*' is not recognized as a valid configuration key\.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := testutils_cobra.ExecutePingcli(t, "config", "unset", "pingcli.invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -71,4 +71,24 @@ func TestConfigUnsetCmd_HelpFlag(t *testing.T) {
 
 	err = testutils_cobra.ExecutePingcli(t, "config", "unset", "-h")
 	testutils.CheckExpectedError(t, err, nil)
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_unsetMaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.PingFederateBasicAuthUsernameOption.ViperKey)
+
+	// Output:
+	// SUCCESS: Configuration unset successfully:
+	// service.pingfederate.authentication.basicAuth.username=
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_unsetUnmaskedValue() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.RootOutputFormatOption.ViperKey)
+
+	// Output:
+	// SUCCESS: Configuration unset successfully:
+	// outputFormat=text
 }

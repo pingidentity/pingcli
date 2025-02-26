@@ -2,12 +2,23 @@ package resources
 
 import (
 	"fmt"
+	"io"
+	"strings"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
 )
+
+type NotificationTemplateContentData struct {
+	TemplateContentId             string
+	TemplateContentDeliveryMethod string
+	TemplateContentLocale         string
+	TemplateContentVariant        string
+}
 
 // Verify that the resource satisfies the exportable resource interface
 var (
@@ -25,142 +36,182 @@ func NotificationTemplateContent(clientInfo *connector.PingOneClientInfo) *PingO
 	}
 }
 
+func (r *PingOneNotificationTemplateContentResource) ResourceType() string {
+	return "pingone_notification_template_content"
+}
+
 func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	// Get all enabled language locales
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadLanguages"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	enabledLocales, err := r.getEnabledLocales()
 	if err != nil {
 		return nil, err
 	}
 
-	enabledLocales := map[string]bool{}
-	for _, languageInner := range embedded.GetLanguages() {
-		if languageInner.Language != nil {
-			language := languageInner.Language
-
-			languageEnabled, languageEnabledOk := language.GetEnabledOk()
-			languageLocale, languageLocaleOk := language.GetLocaleOk()
-
-			if languageEnabledOk && languageLocaleOk && *languageEnabled {
-				enabledLocales[*languageLocale] = true
-			}
-		}
+	templateNames, err := r.getTemplateNames()
+	if err != nil {
+		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	// This is weird... the provider mentions many possible template types,
-	// but pingone console and the API only support the following types:
-	validTemplateNames := []management.EnumTemplateName{
-		management.ENUMTEMPLATENAME_DEVICE_PAIRING,
-		management.ENUMTEMPLATENAME_EMAIL_VERIFICATION_ADMIN,
-		management.ENUMTEMPLATENAME_EMAIL_VERIFICATION_USER,
-		management.ENUMTEMPLATENAME_GENERAL,
-		management.ENUMTEMPLATENAME_NEW_DEVICE_PAIRED,
-		management.ENUMTEMPLATENAME_STRONG_AUTHENTICATION,
-		management.ENUMTEMPLATENAME_TRANSACTION,
-		management.ENUMTEMPLATENAME_VERIFICATION_CODE_TEMPLATE,
-	}
-
-	// TODO: When the above hard-coded values are fixed, use the following
-	// for _, templateNameEnum := range management.AllowedEnumTemplateNameEnumValues {
-	for _, templateNameEnum := range validTemplateNames {
-		apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadAllTemplateContents(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, templateNameEnum).Execute
-		apiFunctionName := "ReadAllTemplateContents"
-
-		embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	for _, templateName := range templateNames {
+		templateContentData, err := r.getTemplateContentData(templateName)
 		if err != nil {
 			return nil, err
 		}
 
-		for _, templateContents := range embedded.GetContents() {
-			var (
-				templateContentsId       *string
-				templateContentsIdOk     bool
-				templateDeliveryMethod   *management.EnumTemplateContentDeliveryMethod
-				templateDeliveryMethodOk bool
-				templateLocale           *string
-				templateLocaleOk         bool
-				templateVariant          *string
-				templateVariantOk        bool
-			)
+		for _, templateContentInfo := range templateContentData {
+			templateContentId := templateContentInfo.TemplateContentId
+			templateContentDeliveryMethod := templateContentInfo.TemplateContentDeliveryMethod
+			templateContentLocale := templateContentInfo.TemplateContentLocale
+			templateContentVariant := templateContentInfo.TemplateContentVariant
 
-			switch {
-			case templateContents.TemplateContentEmail != nil:
-				templateContentsId, templateContentsIdOk = templateContents.TemplateContentEmail.GetIdOk()
-				templateDeliveryMethod, templateDeliveryMethodOk = templateContents.TemplateContentEmail.GetDeliveryMethodOk()
-				templateLocale, templateLocaleOk = templateContents.TemplateContentEmail.GetLocaleOk()
-				templateVariant, templateVariantOk = templateContents.TemplateContentEmail.GetVariantOk()
-			case templateContents.TemplateContentPush != nil:
-				templateContentsId, templateContentsIdOk = templateContents.TemplateContentPush.GetIdOk()
-				templateDeliveryMethod, templateDeliveryMethodOk = templateContents.TemplateContentPush.GetDeliveryMethodOk()
-				templateLocale, templateLocaleOk = templateContents.TemplateContentPush.GetLocaleOk()
-				templateVariant, templateVariantOk = templateContents.TemplateContentPush.GetVariantOk()
-			case templateContents.TemplateContentSMS != nil:
-				templateContentsId, templateContentsIdOk = templateContents.TemplateContentSMS.GetIdOk()
-				templateDeliveryMethod, templateDeliveryMethodOk = templateContents.TemplateContentSMS.GetDeliveryMethodOk()
-				templateLocale, templateLocaleOk = templateContents.TemplateContentSMS.GetLocaleOk()
-				templateVariant, templateVariantOk = templateContents.TemplateContentSMS.GetVariantOk()
-			case templateContents.TemplateContentVoice != nil:
-				templateContentsId, templateContentsIdOk = templateContents.TemplateContentVoice.GetIdOk()
-				templateDeliveryMethod, templateDeliveryMethodOk = templateContents.TemplateContentVoice.GetDeliveryMethodOk()
-				templateLocale, templateLocaleOk = templateContents.TemplateContentVoice.GetLocaleOk()
-				templateVariant, templateVariantOk = templateContents.TemplateContentVoice.GetVariantOk()
-			default:
-				continue
-			}
-
-			// If the template content locale is not enabled, skip it
-			if templateLocaleOk && !enabledLocales[*templateLocale] {
-				continue
-			}
-
-			// This variable handles the case where template type, locale,
-			// and delivery method are the same across two content instances
-			// Append it to the ResourceName if present from SDK
-			if templateVariantOk {
-				*templateVariant = "_" + *templateVariant
-			} else {
-				emptyString := ""
-				templateVariant = &emptyString
-			}
-
-			if templateContentsIdOk && templateDeliveryMethodOk && templateLocaleOk {
+			// Only export template content if the locale is enabled
+			if enabledLocales[templateContentLocale] {
 				commentData := map[string]string{
-					"Resource Type":            r.ResourceType(),
-					"Template Name":            string(templateNameEnum),
-					"Template Delivery Method": string(*templateDeliveryMethod),
-					"Template Locale":          string(*templateLocale),
-					"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
-					"Template Contents ID":     string(*templateContentsId),
+					"Resource Type":                    r.ResourceType(),
+					"Template Name":                    string(templateName),
+					"Template Content Delivery Method": templateContentDeliveryMethod,
+					"Template Content Locale":          templateContentLocale,
+					"Export Environment ID":            r.clientInfo.ExportEnvironmentID,
+					"Template Content ID":              templateContentId,
 				}
 
-				if templateVariantOk {
-					commentData["Template Variant"] = *templateVariant
+				if templateContentVariant != "" {
+					commentData["Template Content Variant"] = templateContentVariant
+					templateContentVariant = fmt.Sprintf("_%s", templateContentVariant)
 				}
 
-				importBlocks = append(importBlocks, connector.ImportBlock{
+				importBlock := connector.ImportBlock{
 					ResourceType:       r.ResourceType(),
-					ResourceName:       fmt.Sprintf("%s_%s_%s%s", templateNameEnum, *templateDeliveryMethod, *templateLocale, *templateVariant),
-					ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, templateNameEnum, *templateContentsId),
+					ResourceName:       fmt.Sprintf("%s_%s_%s%s", string(templateName), templateContentDeliveryMethod, templateContentLocale, templateContentVariant),
+					ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, string(templateName), templateContentId),
 					CommentInformation: common.GenerateCommentInformation(commentData),
-				})
+				}
+
+				importBlocks = append(importBlocks, importBlock)
 			}
 		}
-
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneNotificationTemplateContentResource) ResourceType() string {
-	return "pingone_notification_template_content"
+func (r *PingOneNotificationTemplateContentResource) getEnabledLocales() (map[string]bool, error) {
+	enabledLocales := make(map[string]bool)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	languageInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, languageInner := range languageInners {
+		if languageInner.Language != nil {
+			languageLocale, languageLocaleOk := languageInner.Language.GetLocaleOk()
+			languageEnabled, languageEnabledOk := languageInner.Language.GetEnabledOk()
+
+			if languageLocaleOk && languageEnabledOk && *languageEnabled {
+				enabledLocales[*languageLocale] = true
+			}
+		}
+	}
+
+	return enabledLocales, nil
+}
+
+func (r *PingOneNotificationTemplateContentResource) getTemplateNames() ([]management.EnumTemplateName, error) {
+	templateNames := []management.EnumTemplateName{}
+
+	for _, templateName := range management.AllowedEnumTemplateNameEnumValues {
+		_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadOneTemplate(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, templateName).Execute()
+		// When PingOne services are not enabled in an environment,
+		// the response code for the templates related to that service is
+		// 400 Bad Request - "CONSTRAINT_VIOLATION"
+		if err != nil && response.StatusCode == 400 && response.Status == "400 Bad Request" {
+			defer response.Body.Close()
+			body, err := io.ReadAll(response.Body)
+			if err != nil {
+				return nil, err
+			}
+
+			if strings.Contains(string(body), "CONSTRAINT_VIOLATION") {
+				continue
+			}
+		}
+
+		// Handle all other errors or bad responses
+		ok, err := common.HandleClientResponse(response, err, "ReadOneTemplate", r.ResourceType())
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			return nil, nil
+		}
+
+		templateNames = append(templateNames, templateName)
+	}
+
+	return templateNames, nil
+}
+
+func (r *PingOneNotificationTemplateContentResource) getTemplateContentData(templateName management.EnumTemplateName) ([]NotificationTemplateContentData, error) {
+	templateContentData := []NotificationTemplateContentData{}
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadAllTemplateContents(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, templateName).Execute()
+	templateContents, err := pingone.GetManagementAPIObjectsFromIterator[management.TemplateContent](iter, "ReadAllTemplateContents", "GetContents", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, templateContent := range templateContents {
+		var (
+			templateContentId               *string
+			templateContentIdOk             bool
+			templateContentDeliveryMethod   *management.EnumTemplateContentDeliveryMethod
+			templateContentDeliveryMethodOk bool
+			templateContentLocale           *string
+			templateContentLocaleOk         bool
+			templateContentVariant          string
+		)
+
+		switch {
+		case templateContent.TemplateContentPush != nil:
+			templateContentId, templateContentIdOk = templateContent.TemplateContentPush.GetIdOk()
+			templateContentDeliveryMethod, templateContentDeliveryMethodOk = templateContent.TemplateContentPush.GetDeliveryMethodOk()
+			templateContentLocale, templateContentLocaleOk = templateContent.TemplateContentPush.GetLocaleOk()
+			templateContentVariant = templateContent.TemplateContentPush.GetVariant()
+		case templateContent.TemplateContentSMS != nil:
+			templateContentId, templateContentIdOk = templateContent.TemplateContentSMS.GetIdOk()
+			templateContentDeliveryMethod, templateContentDeliveryMethodOk = templateContent.TemplateContentSMS.GetDeliveryMethodOk()
+			templateContentLocale, templateContentLocaleOk = templateContent.TemplateContentSMS.GetLocaleOk()
+			templateContentVariant = templateContent.TemplateContentSMS.GetVariant()
+		case templateContent.TemplateContentEmail != nil:
+			templateContentId, templateContentIdOk = templateContent.TemplateContentEmail.GetIdOk()
+			templateContentDeliveryMethod, templateContentDeliveryMethodOk = templateContent.TemplateContentEmail.GetDeliveryMethodOk()
+			templateContentLocale, templateContentLocaleOk = templateContent.TemplateContentEmail.GetLocaleOk()
+			templateContentVariant = templateContent.TemplateContentEmail.GetVariant()
+		case templateContent.TemplateContentVoice != nil:
+			templateContentId, templateContentIdOk = templateContent.TemplateContentVoice.GetIdOk()
+			templateContentDeliveryMethod, templateContentDeliveryMethodOk = templateContent.TemplateContentVoice.GetDeliveryMethodOk()
+			templateContentLocale, templateContentLocaleOk = templateContent.TemplateContentVoice.GetLocaleOk()
+			templateContentVariant = templateContent.TemplateContentVoice.GetVariant()
+		default:
+			output.Warn(fmt.Sprintf("Template content '%v' for template '%s' is not one of: Push, SMS, Email, or Voice. Skipping export.", templateContent, templateName), nil)
+			continue
+		}
+
+		if templateContentIdOk && templateContentDeliveryMethodOk && templateContentLocaleOk {
+			templateContentData = append(templateContentData, NotificationTemplateContentData{
+				TemplateContentId:             *templateContentId,
+				TemplateContentDeliveryMethod: string(*templateContentDeliveryMethod),
+				TemplateContentLocale:         *templateContentLocale,
+				TemplateContentVariant:        templateContentVariant,
+			})
+		}
+	}
+
+	return templateContentData, nil
 }

@@ -19,14 +19,32 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 		}
 	}
 
-	profileStr, err := profiles.GetMainConfig().ProfileToString(pName)
+	// Validate the profile name
+	err = profiles.GetMainConfig().ValidateExistingProfileName(pName)
 	if err != nil {
 		return fmt.Errorf("failed to view profile: %v", err)
 	}
 
-	profileStr = fmt.Sprintf("Profile: %s\n\n%s", pName, profileStr)
+	msgStr := fmt.Sprintf("Configuration for profile '%s':\n", pName)
 
-	output.Message(profileStr, nil)
+	for _, opt := range options.Options() {
+		if opt.ViperKey == "" {
+			continue
+		}
+
+		vVal, _, err := profiles.ViperValueFromOption(opt)
+		if err != nil {
+			return fmt.Errorf("failed to view profile: %v", err)
+		}
+
+		if opt.Sensitive {
+			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
+		} else {
+			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)
+		}
+	}
+
+	output.Message(msgStr, nil)
 
 	return nil
 }
