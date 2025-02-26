@@ -43,7 +43,7 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) ExportAll() (*[]conn
 			return nil, err
 		}
 
-		for appRolePermissionId, _ := range appRolePermissionData {
+		for appRolePermissionId := range appRolePermissionData {
 			commentData := map[string]string{
 				"Application Role ID":            appRoleId,
 				"Application Role Name":          appRoleName,
@@ -70,7 +70,7 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRoleDa
 	applicationRoleData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ApplicationRolesApi", "GetRoles", r.ResourceType())
+	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
@@ -91,13 +91,24 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRolePe
 	applicationRolePermissionData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolePermissionsApi.ReadApplicationRolePermissions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appRoleId).Execute()
-	applicationRolePermissions, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRolePermission](iter, "ReadApplicationRolePermissions", "GetRolePermissions", r.ResourceType())
+	applicationRolePermissions, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.EntityArrayEmbeddedPermissionsInner](iter, "ReadApplicationRolePermissions", "GetPermissions", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
 	for _, applicationRolePermission := range applicationRolePermissions {
-		applicationRolePermissionId, applicationRolePermissionIdOk := applicationRolePermission.GetIdOk()
+
+		var (
+			applicationRolePermissionId   *string
+			applicationRolePermissionIdOk bool
+		)
+
+		switch t := applicationRolePermission.GetActualInstance().(type) {
+		case *authorize.ApplicationRolePermission:
+			applicationRolePermissionId, applicationRolePermissionIdOk = t.GetIdOk()
+		default:
+			continue
+		}
 
 		if applicationRolePermissionIdOk {
 			applicationRolePermissionData[*applicationRolePermissionId] = *applicationRolePermissionId
