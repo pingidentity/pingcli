@@ -431,8 +431,8 @@ github.com/otiai10/mint v1.3.0/go.mod h1:F5AjcsTsWUqX+Na9fpHb52P8pcRX2CI6A3ctIT9
 github.com/otiai10/mint v1.3.1/go.mod h1:/yxELlJQ0ufhjUwhshSj+wFjZ78CnZ48/1wtmBH1OTc=
 github.com/patrickcping/pingone-go-sdk-v2 v0.12.9 h1:EznRTRLzpgHeqkBtXHBrwjIMlfLamqOurODgIKNyoBY=
 github.com/patrickcping/pingone-go-sdk-v2 v0.12.9/go.mod h1:ZA09d5Rw6Mp7MBT7iJageVfzU1k6yjEjsQCLpIlFyRQ=
-github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.1-0.20250218183914-e9ec95e476b9 h1:O+LMmb6pH7VKVRV3nZbWadMuBoAq7FhEAi/9s09dhEw=
-github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.1-0.20250218183914-e9ec95e476b9/go.mod h1:2PDrgC1ufXk2IDIk4JQHx6r34r2xpkbnzKIpXFv8gYs=
+github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.0 h1:gEPzZToJlBcJh2Ft12dP1GCSGzsNFQFEHS7Bql86RQk=
+github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.0/go.mod h1:2PDrgC1ufXk2IDIk4JQHx6r34r2xpkbnzKIpXFv8gYs=
 github.com/patrickcping/pingone-go-sdk-v2/credentials v0.11.0 h1:pLiiBkROks/40vhFWJEcr/tiIEqqYdP4FWsHtfCLdIs=
 github.com/patrickcping/pingone-go-sdk-v2/credentials v0.11.0/go.mod h1:yRGf7+tsB3/AQYsNjIIs4ScJhR885mvDYMgwHiQeMl0=
 github.com/patrickcping/pingone-go-sdk-v2/management v0.49.0 h1:F1zE2PhxgZCu08TObPylcnXzKqdbaAXkDODWegTE7WM=

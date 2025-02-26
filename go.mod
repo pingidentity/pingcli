@@ -7,8 +7,6 @@ tool (
 	github.com/pavius/impi
 )
 
-replace github.com/patrickcping/pingone-go-sdk-v2/authorize => github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.1-0.20250218183914-e9ec95e476b9
-
 require (
 	github.com/fatih/color v1.18.0
 	github.com/hashicorp/go-uuid v1.0.3
