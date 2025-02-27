@@ -36,6 +36,11 @@ func TestAuthorizeDecisionEndpointExport(t *testing.T) {
 			ResourceName: "CLI",
 			ResourceID:   fmt.Sprintf("%s/6f4cf36d-fdc1-445c-a1df-37c8e3305eaf", testutils.GetEnvironmentID()),
 		},
+		{
+			ResourceType: "pingone_authorize_decision_endpoint",
+			ResourceName: "Test API Service",
+			ResourceID:   fmt.Sprintf("%s/20c01743-084f-4129-b304-42ce6a5edf4f", testutils.GetEnvironmentID()),
+		},
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)

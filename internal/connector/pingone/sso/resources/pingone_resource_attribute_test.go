@@ -18,6 +18,11 @@ func TestResourceAttributeExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_resource_attribute",
+			ResourceName: "authorize-api-service_sub",
+			ResourceID:   fmt.Sprintf("%s/3c6001a0-6110-4934-9d34-fa8c4a2894c2/3f79ad4f-588a-4652-bad8-d64d405bef8a", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_resource_attribute",
 			ResourceName: "test_sub",
 			ResourceID:   fmt.Sprintf("%s/4b9ef858-62ce-4bd0-9186-997b8527529d/c82b24b9-7ea3-4de4-8840-50b6c3cb1387", testutils.GetEnvironmentID()),
 		},
