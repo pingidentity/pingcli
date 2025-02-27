@@ -18,8 +18,8 @@ func TestAuthorizeAPIServiceExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_authorize_api_service",
-			ResourceName: "Test Authorize API Service",
-			ResourceID:   fmt.Sprintf("%s/5ae2227f-cb5b-47c3-bb40-440db09a98e6", testutils.GetEnvironmentID()),
+			ResourceName: "Test API Service",
+			ResourceID:   fmt.Sprintf("%s/cee5d5a9-49aa-478d-816e-ec47a2b5aede", testutils.GetEnvironmentID()),
 		},
 	}
 

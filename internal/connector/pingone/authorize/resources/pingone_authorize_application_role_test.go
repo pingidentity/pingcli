@@ -18,8 +18,8 @@ func TestAuthorizeApplicationRoleExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_authorize_application_role",
-			ResourceName: "Test Authorize Application Role",
-			ResourceID:   fmt.Sprintf("%s/5ae2227f-cb5b-47c3-bb40-440db09a98e6", testutils.GetEnvironmentID()),
+			ResourceName: "test-role",
+			ResourceID:   fmt.Sprintf("%s/f45cbcc7-2406-470b-93bc-ff477da0b8f7", testutils.GetEnvironmentID()),
 		},
 	}
 

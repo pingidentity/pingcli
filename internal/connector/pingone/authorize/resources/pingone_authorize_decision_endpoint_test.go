@@ -18,8 +18,23 @@ func TestAuthorizeDecisionEndpointExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_authorize_decision_endpoint",
-			ResourceName: "Test Authorize Decision Endpoint",
-			ResourceID:   fmt.Sprintf("%s/5ae2227f-cb5b-47c3-bb40-440db09a98e6", testutils.GetEnvironmentID()),
+			ResourceName: "DEV",
+			ResourceID:   fmt.Sprintf("%s/f8660b46-b96e-457c-8d8f-8ee455e4baa3", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_authorize_decision_endpoint",
+			ResourceName: "PROD",
+			ResourceID:   fmt.Sprintf("%s/07a4f450-d99f-439f-834a-46b8332a3e31", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_authorize_decision_endpoint",
+			ResourceName: "TEST",
+			ResourceID:   fmt.Sprintf("%s/3368886d-7d57-4aa8-a8f6-7d24dffa4b3c", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_authorize_decision_endpoint",
+			ResourceName: "CLI",
+			ResourceID:   fmt.Sprintf("%s/6f4cf36d-fdc1-445c-a1df-37c8e3305eaf", testutils.GetEnvironmentID()),
 		},
 	}
 
