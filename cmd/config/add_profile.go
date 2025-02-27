@@ -15,7 +15,7 @@ const (
     pingcli config add-profile
 
   Add a new configuration profile with a specific name and description.
-    pingcli config add-profile --name MyDeveloperEnv --description "My awesome new profile for my development environment"
+    pingcli config add-profile --name myprofile --description "My awesome new profile for my development environment"
 
   Add a new configuration profile with a guided experience and set it as the active profile.
     pingcli config add-profile --set-active`

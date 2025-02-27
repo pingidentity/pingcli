@@ -16,10 +16,10 @@ const (
     pingcli config delete-profile
 
   Delete a configuration profile by specifying the name of an existing configured profile.
-    pingcli config delete-profile MyDeveloperEnv
+    pingcli config delete-profile myprofile
 	
   Delete a configuration profile by auto-accepting the deletion.
-    pingcli config delete-profile --yes MyDeveloperEnv`
+    pingcli config delete-profile --yes myprofile`
 )
 
 func NewConfigDeleteProfileCommand() *cobra.Command {

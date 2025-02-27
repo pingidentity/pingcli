@@ -260,9 +260,9 @@ func (m MainConfig) ValidateProfileNameFormat(pName string) (err error) {
 		return fmt.Errorf("invalid profile name: profile name cannot be empty")
 	}
 
-	re := regexp.MustCompile(`^[a-zA-Z0-9\_\-]+$`)
+	re := regexp.MustCompile(`^[a-z0-9\_\-]+$`)
 	if !re.MatchString(pName) {
-		return fmt.Errorf("invalid profile name: '%s'. name must contain only alphanumeric characters, underscores, and dashes", pName)
+		return fmt.Errorf("invalid profile name: '%s'. name must be lowercase and contain only alphanumeric characters, underscores, and dashes", pName)
 	}
 
 	return nil

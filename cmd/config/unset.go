@@ -12,8 +12,8 @@ const (
 	configUnsetCommandExamples = `  Unset the color setting for the currently active profile.
     pingcli config unset color
 
-  Unset the PingOne tenant region code setting for the profile named 'myProfile'.
-    pingcli config unset --profile myProfile service.pingone.regionCode`
+  Unset the PingOne tenant region code setting for the profile named 'myprofile'.
+    pingcli config unset --profile myprofile service.pingone.regionCode`
 )
 
 func NewConfigUnsetCommand() *cobra.Command {

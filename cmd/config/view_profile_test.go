@@ -40,7 +40,7 @@ func TestConfigViewProfileCmd_Execute_NonExistentProfile(t *testing.T) {
 
 // Test Config Set Command fails with invalid profile
 func TestConfigViewProfileCmd_Execute_InvalidProfile(t *testing.T) {
-	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*'\. name must be lowercase and contain only alphanumeric characters, underscores, and dashes$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "(*&*(#))")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

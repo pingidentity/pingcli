@@ -12,8 +12,8 @@ const (
 	configGetCommandExamples = `  Read all the configuration settings for the PingOne service in the active (or default) profile.
     pingcli config get pingone
 
-  Read the noColor setting for the profile named 'myProfile'.
-    pingcli config get --profile myProfile noColor
+  Read the noColor setting for the profile named 'myprofile'.
+    pingcli config get --profile myprofile noColor
 
   Read the worker ID used to authenticate to the PingOne service management API.
     pingcli config get service.pingone.authentication.worker.environmentID
