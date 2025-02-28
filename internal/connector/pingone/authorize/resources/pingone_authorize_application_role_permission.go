@@ -43,18 +43,19 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) ExportAll() (*[]conn
 			return nil, err
 		}
 
-		for appRolePermissionId := range appRolePermissionData {
+		for appRolePermissionId, appRolePermissionKey := range appRolePermissionData {
 			commentData := map[string]string{
-				"Application Role ID":            appRoleId,
-				"Application Role Name":          appRoleName,
-				"Application Role Permission ID": appRolePermissionId,
-				"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
-				"Resource Type":                  r.ResourceType(),
+				"Application Role ID":             appRoleId,
+				"Application Role Name":           appRoleName,
+				"Application Role Permission ID":  appRolePermissionId,
+				"Application Role Permission Key": appRolePermissionKey,
+				"Export Environment ID":           r.clientInfo.ExportEnvironmentID,
+				"Resource Type":                   r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", appRoleName, appRolePermissionId),
+				ResourceName:       fmt.Sprintf("%s_%s", appRoleName, appRolePermissionKey),
 				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appRoleId, appRolePermissionId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
@@ -99,19 +100,22 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRolePe
 	for _, applicationRolePermission := range applicationRolePermissions {
 
 		var (
-			applicationRolePermissionId   *string
-			applicationRolePermissionIdOk bool
+			applicationRolePermissionId    *string
+			applicationRolePermissionIdOk  bool
+			applicationRolePermissionKey   *string
+			applicationRolePermissionKeyOk bool
 		)
 
 		switch t := applicationRolePermission.GetActualInstance().(type) {
 		case *authorize.ApplicationRolePermission:
 			applicationRolePermissionId, applicationRolePermissionIdOk = t.GetIdOk()
+			applicationRolePermissionKey, applicationRolePermissionKeyOk = t.GetKeyOk()
 		default:
 			continue
 		}
 
-		if applicationRolePermissionIdOk {
-			applicationRolePermissionData[*applicationRolePermissionId] = *applicationRolePermissionId
+		if applicationRolePermissionIdOk && applicationRolePermissionKeyOk {
+			applicationRolePermissionData[*applicationRolePermissionId] = *applicationRolePermissionKey
 		}
 	}
 
