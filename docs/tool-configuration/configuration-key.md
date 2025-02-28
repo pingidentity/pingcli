@@ -28,6 +28,8 @@ The following parameters can be configured in Ping CLI's static configuration fi
 | service.pingfederate.httpsHost | ENUM_STRING | --pingfederate-https-host | The PingFederate HTTPS host used to communicate with PingFederate's admin API.<br><br>Example: `https://pingfederate-admin.bxretail.org` |
 | service.pingfederate.insecureTrustAllTLS | ENUM_BOOL | --pingfederate-insecure-trust-all-tls | Trust any certificate when connecting to the PingFederate server admin API.<br><br>This is insecure and should not be enabled outside of testing. |
 | service.pingfederate.xBypassExternalValidationHeader | ENUM_BOOL | --pingfederate-x-bypass-external-validation-header | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). |
+| service.pingone.api.hostname | ENUM_STRING | --pingone-api-service-hostname | Override the service hostname for the PingOne management API. |
+| service.pingone.authentication.hostname | ENUM_STRING | --pingone-auth-service-hostname | Override the service hostname used to authenticate to the PingOne management API. |
 | service.pingone.authentication.type | ENUM_PINGONE_AUTH_TYPE | --pingone-authentication-type | The authentication type to use to authenticate to the PingOne management API.<br><br>Options are: worker.<br><br>Example: `worker` |
 | service.pingone.authentication.worker.clientID | ENUM_UUID | --pingone-worker-client-id | The worker client ID used to authenticate to the PingOne management API. |
 | service.pingone.authentication.worker.clientSecret | ENUM_STRING | --pingone-worker-client-secret | The worker client secret used to authenticate to the PingOne management API. |
