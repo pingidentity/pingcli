@@ -43,18 +43,19 @@ func (r *PingoneAuthorizeApplicationResourcePermissionResource) ExportAll() (*[]
 			return nil, err
 		}
 
-		for appResourcePermissionId := range appResourcePermissionData {
+		for appResourcePermissionId, appResourcePermissionKey := range appResourcePermissionData {
 			commentData := map[string]string{
-				"Application Resource ID":            appResourceId,
-				"Application Resource Name":          appResourceName,
-				"Application Resource Permission ID": appResourcePermissionId,
-				"Export Environment ID":              r.clientInfo.ExportEnvironmentID,
-				"Resource Type":                      r.ResourceType(),
+				"Application Resource ID":             appResourceId,
+				"Application Resource Name":           appResourceName,
+				"Application Resource Permission ID":  appResourcePermissionId,
+				"Application Resource Permission Key": appResourcePermissionKey,
+				"Export Environment ID":               r.clientInfo.ExportEnvironmentID,
+				"Resource Type":                       r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", appResourceName, appResourcePermissionId),
+				ResourceName:       fmt.Sprintf("%s", appResourcePermissionKey),
 				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appResourceId, appResourcePermissionId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
@@ -99,18 +100,27 @@ func (r *PingoneAuthorizeApplicationResourcePermissionResource) getApplicationRe
 	for _, applicationResourcePermission := range applicationResourcePermissions {
 
 		var (
-			applicationResourcePermissionId   *string
-			applicationResourcePermissionIdOk bool
+			applicationResourcePermissionId    *string
+			applicationResourcePermissionIdOk  bool
+			applicationResourcePermissionKey   *string
+			applicationResourcePermissionKeyOk bool
 		)
 
 		switch t := applicationResourcePermission.GetActualInstance().(type) {
 		case *authorize.ApplicationResourcePermission:
 			applicationResourcePermissionId, applicationResourcePermissionIdOk = t.GetIdOk()
+		case *authorize.ApplicationRolePermission:
+			applicationResourcePermissionId, applicationResourcePermissionIdOk = t.GetIdOk()
+			applicationResourcePermissionKey, applicationResourcePermissionKeyOk = t.GetKeyOk()
 		default:
 			continue
 		}
 
-		if applicationResourcePermissionIdOk {
+		if applicationResourcePermissionIdOk && applicationResourcePermissionKeyOk {
+			applicationResourcePermissionData[*applicationResourcePermissionId] = *applicationResourcePermissionKey
+		}
+
+		if applicationResourcePermissionIdOk && !applicationResourcePermissionKeyOk {
 			applicationResourcePermissionData[*applicationResourcePermissionId] = *applicationResourcePermissionId
 		}
 	}
