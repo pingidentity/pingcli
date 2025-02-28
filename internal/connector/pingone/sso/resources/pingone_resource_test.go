@@ -41,6 +41,11 @@ func TestResourceExport(t *testing.T) {
 			ResourceName: "openid",
 			ResourceID:   fmt.Sprintf("%s/8c428665-3e68-4f3c-997d-16a97f8cbe80", testutils.GetEnvironmentID()),
 		},
+		{
+			ResourceType: "pingone_resource",
+			ResourceName: "Undeployed Test API Service",
+			ResourceID:   fmt.Sprintf("%s/a35fe5ea-084c-4245-80f1-85f9eaf4f063", testutils.GetEnvironmentID()),
+		},
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
