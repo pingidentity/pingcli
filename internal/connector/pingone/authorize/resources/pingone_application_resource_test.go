@@ -19,7 +19,7 @@ func TestApplicationResourceExport(t *testing.T) {
 		{
 			ResourceType: "pingone_application_resource",
 			ResourceName: "authorize-api-service_test-permission1",
-			ResourceID:   fmt.Sprintf("%s/62b8a221-a530-44f4-ad02-cdb0d3b1395f", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/3c6001a0-6110-4934-9d34-fa8c4a2894c2/62b8a221-a530-44f4-ad02-cdb0d3b1395f", testutils.GetEnvironmentID()),
 		},
 	}
 
