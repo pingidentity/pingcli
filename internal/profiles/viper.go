@@ -219,14 +219,19 @@ func (m MainConfig) SaveProfile(pName string, subViper *viper.Viper) (err error)
 	return nil
 }
 
-// The profile name format must be valid
 // The profile name must exist
 func (m MainConfig) ValidateExistingProfileName(pName string) (err error) {
-	if err := m.ValidateProfileNameFormat(pName); err != nil {
-		return err
+	if pName == "" {
+		return fmt.Errorf("invalid profile name: profile name cannot be empty")
 	}
 
 	pNames := m.ProfileNames()
+
+	// Iterate over the profileNames and convert each to lowercase
+	for i := range pNames {
+		pNames[i] = strings.ToLower(pNames[i])
+	}
+
 	if !slices.ContainsFunc(pNames, func(n string) bool {
 		return strings.EqualFold(n, pName)
 	}) {
