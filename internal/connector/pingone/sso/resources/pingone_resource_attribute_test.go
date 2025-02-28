@@ -159,7 +159,7 @@ func TestResourceAttributeExport(t *testing.T) {
 		{
 			ResourceType: "pingone_resource_attribute",
 			ResourceName: "Undeployed Test API Service_sub",
-			ResourceID:   fmt.Sprintf("%s/3c6001a0-6110-4934-9d34-fa8c4a2894c2/be2a2418-127a-4d60-9c04-88a5a568e25c", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/a35fe5ea-084c-4245-80f1-85f9eaf4f063/be2a2418-127a-4d60-9c04-88a5a568e25c", testutils.GetEnvironmentID()),
 		},
 	}
 
