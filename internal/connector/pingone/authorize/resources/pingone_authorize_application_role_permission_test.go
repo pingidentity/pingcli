@@ -23,7 +23,7 @@ func TestAuthorizeApplicationRolePermissionExport(t *testing.T) {
 		},
 		{
 			ResourceType: "pingone_authorize_application_role_permission",
-			ResourceName: "test-role_test_permission1action1",
+			ResourceName: "test-role_test_permission1action2",
 			ResourceID:   fmt.Sprintf("%s/f45cbcc7-2406-470b-93bc-ff477da0b8f7/05717cf9-3ce4-443a-8154-1986fe984780", testutils.GetEnvironmentID()),
 		},
 	}
