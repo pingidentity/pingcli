@@ -27,8 +27,11 @@ default:
     service:
         pingone:
             regionCode: %s
-            authentication:
-                type: worker
+            api:
+				hostname: %s
+			authentication:
+                hostname: %s
+				type: worker
                 worker:
                     clientid: %s
                     clientsecret: %s
@@ -110,11 +113,11 @@ func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		os.Getenv(options.PingOneRegionCodeOption.EnvVar),
+		os.Getenv(options.PingOneAuthenticationServiceHostnameOption.EnvVar),
+		os.Getenv(options.PingOneAPIServiceHostnameOption.EnvVar),
 		os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
 		os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
 		os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		os.Getenv(options.PingOneAuthenticationServiceHostnameOption.EnvVar),
-		os.Getenv(options.PingOneAPIServiceHostnameOption.EnvVar),
 		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar),
 		os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
 		os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
