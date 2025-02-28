@@ -43,7 +43,7 @@ func (c *PingoneAuthorizeConnector) Export(format, outputDir string, overwriteEx
 
 	exportableResources := []connector.ExportableResource{
 		resources.AuthorizeAPIService(&c.clientInfo),
-		// resources.AuthorizeAPIServiceDeployment(&c.clientInfo),
+		resources.AuthorizeAPIServiceDeployment(&c.clientInfo),
 		resources.AuthorizeAPIServiceOperation(&c.clientInfo),
 		resources.ApplicationResource(&c.clientInfo),
 		resources.AuthorizeApplicationResourcePermission(&c.clientInfo),
