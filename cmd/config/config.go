@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/spf13/cobra"
 )
 
@@ -23,13 +24,16 @@ func NewConfigCommand() *cobra.Command {
 	cmd.AddCommand(
 		NewConfigAddProfileCommand(),
 		NewConfigDeleteProfileCommand(),
-		NewConfigViewProfileCommand(),
+		NewConfigGetCommand(),
+		NewConfigListKeysCommand(),
 		NewConfigListProfilesCommand(),
 		NewConfigSetActiveProfileCommand(),
-		NewConfigGetCommand(),
 		NewConfigSetCommand(),
 		NewConfigUnsetCommand(),
+		NewConfigViewProfileCommand(),
 	)
+
+	cmd.PersistentFlags().AddFlag(options.ConfigUnmaskSecretValueOption.Flag)
 
 	return cmd
 }

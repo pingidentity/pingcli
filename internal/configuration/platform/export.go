@@ -39,8 +39,9 @@ func initFormatOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "export.format",
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "export.format",
 	}
 }
 
@@ -71,8 +72,9 @@ func initServicesOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_EXPORT_SERVICES,
-		ViperKey: "export.services",
+		Sensitive: false,
+		Type:      options.ENUM_EXPORT_SERVICES,
+		ViperKey:  "export.services",
 	}
 }
 
@@ -96,8 +98,9 @@ func initOutputDirectoryOption() {
 				"\nExample: 'pingcli-export'",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "export.outputDirectory",
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "export.outputDirectory",
 	}
 }
 
@@ -119,8 +122,9 @@ func initOverwriteOption() {
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
-		Type:     options.ENUM_BOOL,
-		ViperKey: "export.overwrite",
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "export.overwrite",
 	}
 }
 
@@ -140,7 +144,8 @@ func initPingOneEnvironmentIDOption() {
 			Usage: "The ID of the PingOne environment to export. Must be a valid PingOne UUID.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_UUID,
-		ViperKey: "export.pingone.environmentID",
+		Sensitive: false,
+		Type:      options.ENUM_UUID,
+		ViperKey:  "export.pingone.environmentID",
 	}
 }

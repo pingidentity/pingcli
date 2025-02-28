@@ -22,12 +22,15 @@ func ExtendedProperties(clientInfo *connector.PingFederateClientInfo) *PingFeder
 	}
 }
 
+func (r *PingFederateExtendedPropertiesResource) ResourceType() string {
+	return "pingfederate_extended_properties"
+}
+
 func (r *PingFederateExtendedPropertiesResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	extendedPropertiesId := "extended_properties_singleton_id"
 	extendedPropertiesName := "Extended Properties"
@@ -37,16 +40,14 @@ func (r *PingFederateExtendedPropertiesResource) ExportAll() (*[]connector.Impor
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       extendedPropertiesName,
 		ResourceID:         extendedPropertiesId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateExtendedPropertiesResource) ResourceType() string {
-	return "pingfederate_extended_properties"
 }

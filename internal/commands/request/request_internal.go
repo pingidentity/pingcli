@@ -280,25 +280,26 @@ func pingoneAuth() (accessToken string, err error) {
 }
 
 func getData() (data string, err error) {
+	data, err = profiles.GetOptionValue(options.RequestDataRawOption)
+	if err != nil {
+		return "", err
+	}
+	if data != "" {
+		return data, nil
+	}
+
+	// get data from file
 	data, err = profiles.GetOptionValue(options.RequestDataOption)
 	if err != nil {
 		return "", err
 	}
-
-	if data == "" {
-		return "", nil
-	}
-
-	// if data string first character is '@', read from file
-	if strings.HasPrefix(data, "@") {
-		filePath := strings.TrimPrefix(data, "@")
-
-		contents, err := os.ReadFile(filePath)
+	if data != "" {
+		contents, err := os.ReadFile(data)
 		if err != nil {
 			return "", err
 		}
 
-		data = string(contents)
+		return string(contents), nil
 	}
 
 	return data, nil

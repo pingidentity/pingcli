@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,28 +26,56 @@ func Gateway(clientInfo *connector.PingOneClientInfo) *PingOneGatewayResource {
 	}
 }
 
+func (r *PingOneGatewayResource) ResourceType() string {
+	return "pingone_gateway"
+}
+
 func (r *PingOneGatewayResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllGateways"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	gatewayData, err := r.getGatewayData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for gatewayId, gatewayName := range gatewayData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Gateway ID":            gatewayId,
+			"Gateway Name":          gatewayName,
+			"Resource Type":         r.ResourceType(),
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       gatewayName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, gatewayId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
 
-	for _, gatewayInner := range embedded.GetGateways() {
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneGatewayResource) getGatewayData() (map[string]string, error) {
+	gatewayData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	gateways, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, gatewayInner := range gateways {
 		var (
 			gatewayId     *string
-			gatewayName   *string
 			gatewayIdOk   bool
+			gatewayName   *string
 			gatewayNameOk bool
 		)
 
@@ -64,25 +94,9 @@ func (r *PingOneGatewayResource) ExportAll() (*[]connector.ImportBlock, error) {
 		}
 
 		if gatewayIdOk && gatewayNameOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Gateway Name":          *gatewayName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Gateway ID":            *gatewayId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *gatewayName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *gatewayId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			gatewayData[*gatewayId] = *gatewayName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingOneGatewayResource) ResourceType() string {
-	return "pingone_gateway"
+	return gatewayData, nil
 }

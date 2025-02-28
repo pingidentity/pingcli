@@ -22,14 +22,17 @@ func SessionApplicationPolicy(clientInfo *connector.PingFederateClientInfo) *Pin
 	}
 }
 
+func (r *PingFederateSessionApplicationPolicyResource) ResourceType() string {
+	return "pingfederate_session_application_policy"
+}
+
 func (r *PingFederateSessionApplicationPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	sessionApplicationPolicyId := "pingfederate_session_application_policy_singleton_id"
+	sessionApplicationPolicyId := "session_application_policy_singleton_id"
 	sessionApplicationPolicyName := "Session Application Policy"
 
 	commentData := map[string]string{
@@ -37,16 +40,14 @@ func (r *PingFederateSessionApplicationPolicyResource) ExportAll() (*[]connector
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       sessionApplicationPolicyName,
 		ResourceID:         sessionApplicationPolicyId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateSessionApplicationPolicyResource) ResourceType() string {
-	return "pingfederate_session_application_policy"
 }

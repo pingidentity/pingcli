@@ -2,6 +2,7 @@ package config_internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -35,12 +36,25 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 		return fmt.Errorf("failed to unset configuration: %v", err)
 	}
 
-	yamlStr, err := profiles.GetMainConfig().ProfileToString(pName)
+	msgStr := "Configuration unset successfully:\n"
+
+	vVal, _, err := profiles.ViperValueFromOption(opt)
 	if err != nil {
 		return fmt.Errorf("failed to unset configuration: %v", err)
 	}
 
-	output.Success("Configuration unset successfully", map[string]interface{}{"Profile YAML": yamlStr})
+	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
+	if err != nil {
+		unmaskOptionVal = "false"
+	}
+
+	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
+		msgStr += fmt.Sprintf("%s=%s", viperKey, profiles.MaskValue(vVal))
+	} else {
+		msgStr += fmt.Sprintf("%s=%s", viperKey, vVal)
+	}
+
+	output.Success(msgStr, nil)
 
 	return nil
 }

@@ -36,8 +36,9 @@ func initAuthenticationWorkerClientIDOption() {
 			Usage: "The worker client ID used to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_UUID,
-		ViperKey: "service.pingone.authentication.worker.clientID",
+		Sensitive: false,
+		Type:      options.ENUM_UUID,
+		ViperKey:  "service.pingone.authentication.worker.clientID",
 	}
 }
 
@@ -57,8 +58,9 @@ func initAuthenticationWorkerClientSecretOption() {
 			Usage: "The worker client secret used to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "service.pingone.authentication.worker.clientSecret",
+		Sensitive: true,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "service.pingone.authentication.worker.clientSecret",
 	}
 }
 
@@ -79,8 +81,9 @@ func initAuthenticationWorkerEnvironmentIDOption() {
 				"the PingOne management API.",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_UUID,
-		ViperKey: "service.pingone.authentication.worker.environmentID",
+		Sensitive: false,
+		Type:      options.ENUM_UUID,
+		ViperKey:  "service.pingone.authentication.worker.environmentID",
 	}
 }
 
@@ -147,8 +150,9 @@ func initPingOneAuthenticationTypeOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_PINGONE_AUTH_TYPE,
-		ViperKey: "service.pingone.authentication.type",
+		Sensitive: false,
+		Type:      options.ENUM_PINGONE_AUTH_TYPE,
+		ViperKey:  "service.pingone.authentication.type",
 	}
 }
 
@@ -174,7 +178,8 @@ func initRegionCodeOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_PINGONE_REGION_CODE,
-		ViperKey: "service.pingone.regionCode",
+		Sensitive: false,
+		Type:      options.ENUM_PINGONE_REGION_CODE,
+		ViperKey:  "service.pingone.regionCode",
 	}
 }

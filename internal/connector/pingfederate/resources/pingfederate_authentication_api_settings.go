@@ -22,12 +22,15 @@ func AuthenticationApiSettings(clientInfo *connector.PingFederateClientInfo) *Pi
 	}
 }
 
+func (r *PingFederateAuthenticationApiSettingsResource) ResourceType() string {
+	return "pingfederate_authentication_api_settings"
+}
+
 func (r *PingFederateAuthenticationApiSettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	authnApiSettingsId := "authentication_api_settings_singleton_id"
 	authnApiSettingsName := "Authentication API Settings"
@@ -37,16 +40,14 @@ func (r *PingFederateAuthenticationApiSettingsResource) ExportAll() (*[]connecto
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       authnApiSettingsName,
 		ResourceID:         authnApiSettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateAuthenticationApiSettingsResource) ResourceType() string {
-	return "pingfederate_authentication_api_settings"
 }

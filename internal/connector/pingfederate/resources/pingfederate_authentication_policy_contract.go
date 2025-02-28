@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,70 @@ func AuthenticationPolicyContract(clientInfo *connector.PingFederateClientInfo) 
 	}
 }
 
+func (r *PingFederateAuthenticationPolicyContractResource) ResourceType() string {
+	return "pingfederate_authentication_policy_contract"
+}
+
 func (r *PingFederateAuthenticationPolicyContractResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthenticationPolicyContractsAPI.GetAuthenticationPolicyContracts(r.clientInfo.Context).Execute
-	apiFunctionName := "GetAuthenticationPolicyContracts"
-
-	authnPolicyContracts, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	authenticationPolicyContractData, err := r.getAuthenticationPolicyContractData()
 	if err != nil {
 		return nil, err
 	}
 
-	if authnPolicyContracts == nil {
-		l.Error().Msgf("Returned %s() authnPolicyContracts is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for authnPolicyContractId, authnPolicyContractName := range authenticationPolicyContractData {
+		commentData := map[string]string{
+			"Authentication Policy Contract ID":   authnPolicyContractId,
+			"Authentication Policy Contract Name": authnPolicyContractName,
+			"Resource Type":                       r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       authnPolicyContractName,
+			ResourceID:         authnPolicyContractId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	authnPolicyContractsItems, ok := authnPolicyContracts.GetItemsOk()
+	return &importBlocks, nil
+}
+
+func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPolicyContractData() (map[string]string, error) {
+	authenticationPolicyContractData := make(map[string]string)
+
+	authnPolicyContracts, response, err := r.clientInfo.ApiClient.AuthenticationPolicyContractsAPI.GetAuthenticationPolicyContracts(r.clientInfo.Context).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationPolicyContracts", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 	if !ok {
-		l.Error().Msgf("Failed to get %s() authnPolicyContracts items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, nil
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	if authnPolicyContracts == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	authnPolicyContractsItems, authnPolicyContractsItemsOk := authnPolicyContracts.GetItemsOk()
+	if !authnPolicyContractsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, authnPolicyContract := range authnPolicyContractsItems {
 		authnPolicyContractId, authnPolicyContractIdOk := authnPolicyContract.GetIdOk()
 		authnPolicyContractName, authnPolicyContractNameOk := authnPolicyContract.GetNameOk()
 
 		if authnPolicyContractIdOk && authnPolicyContractNameOk {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Authentication Policy Contract Resource ID":   *authnPolicyContractId,
-				"Authentication Policy Contract Resource Name": *authnPolicyContractName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authnPolicyContractName,
-				ResourceID:         *authnPolicyContractId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			authenticationPolicyContractData[*authnPolicyContractId] = *authnPolicyContractName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateAuthenticationPolicyContractResource) ResourceType() string {
-	return "pingfederate_authentication_policy_contract"
+	return authenticationPolicyContractData, nil
 }

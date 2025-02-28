@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,47 +26,59 @@ func MFADevicePolicy(clientInfo *connector.PingOneClientInfo) *PingOneMFADeviceP
 	}
 }
 
+func (r *PingOneMFADevicePolicyResource) ResourceType() string {
+	return "pingone_mfa_device_policy"
+}
+
 func (r *PingOneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.MFAAPIClient.DeviceAuthenticationPolicyApi.ReadDeviceAuthenticationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadDeviceAuthenticationPolicies"
-
-	embedded, err := common.GetMFAEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	deviceAuthPolicyData, err := r.getDeviceAuthPolicyData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, deviceAuthenticationPolicy := range embedded.GetDeviceAuthenticationPolicies() {
-		deviceAuthenticationPolicyName, deviceAuthenticationPolicyNameOk := deviceAuthenticationPolicy.GetNameOk()
-		deviceAuthenticationPolicyId, deviceAuthenticationPolicyIdOk := deviceAuthenticationPolicy.GetIdOk()
-
-		if deviceAuthenticationPolicyNameOk && deviceAuthenticationPolicyIdOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"MFA Policy Name":       *deviceAuthenticationPolicyName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"MFA Policy ID":         *deviceAuthenticationPolicyId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *deviceAuthenticationPolicyName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *deviceAuthenticationPolicyId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for devicePolicyId, devicePolicyName := range deviceAuthPolicyData {
+		commentData := map[string]string{
+			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+			"MFA Device Policy ID":   devicePolicyId,
+			"MFA Device Policy Name": devicePolicyName,
+			"Resource Type":          r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       devicePolicyName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, devicePolicyId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneMFADevicePolicyResource) ResourceType() string {
-	return "pingone_mfa_device_policy"
+func (r *PingOneMFADevicePolicyResource) getDeviceAuthPolicyData() (map[string]string, error) {
+	deviceAuthPolicyData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.MFAAPIClient.DeviceAuthenticationPolicyApi.ReadDeviceAuthenticationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	deviceAuthPolicies, err := pingone.GetMfaAPIObjectsFromIterator[mfa.DeviceAuthenticationPolicy](iter, "ReadDeviceAuthenticationPolicies", "GetDeviceAuthenticationPolicies", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, devicePolicy := range deviceAuthPolicies {
+		devicePolicyId, devicePolicyIdOk := devicePolicy.GetIdOk()
+		devicePolicyName, devicePolicyNameOk := devicePolicy.GetNameOk()
+
+		if devicePolicyIdOk && devicePolicyNameOk {
+			deviceAuthPolicyData[*devicePolicyId] = *devicePolicyName
+		}
+	}
+
+	return deviceAuthPolicyData, nil
 }

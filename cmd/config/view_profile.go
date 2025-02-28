@@ -2,6 +2,7 @@ package config
 
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
@@ -12,7 +13,10 @@ const (
     pingcli config view-profile
 
   View configuration for a specific profile
-    pingcli config view-profile myprofile`
+    pingcli config view-profile myprofile
+  
+  View configuration for a specific profile with unmasked values
+    pingcli config --unmask-values view-profile myprofile`
 )
 
 func NewConfigViewProfileCommand() *cobra.Command {
@@ -24,6 +28,8 @@ func NewConfigViewProfileCommand() *cobra.Command {
 		RunE:                  configViewProfileRunE,
 		Short:                 "View the stored configuration of a custom configuration profile.",
 		Use:                   "view-profile [flags] [profile-name]",
+		// Auto-completion function to return all valid profile names
+		ValidArgsFunction: autocompletion.ConfigViewProfileFunc,
 	}
 
 	return cmd

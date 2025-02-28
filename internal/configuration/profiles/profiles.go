@@ -16,6 +16,7 @@ func initDescriptionOption() {
 		DefaultValue:    new(customtypes.String),
 		EnvVar:          "",  // No environment variable
 		Flag:            nil, // No flag
+		Sensitive:       false,
 		Type:            options.ENUM_STRING,
 		ViperKey:        "description",
 	}

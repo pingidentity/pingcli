@@ -23,32 +23,31 @@ func AgreementEnable(clientInfo *connector.PingOneClientInfo) *PingOneAgreementE
 	}
 }
 
+func (r *PingOneAgreementEnableResource) ResourceType() string {
+	return "pingone_agreement_enable"
+}
+
 func (r *PingOneAgreementEnableResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all pingone_agreement_enable resources...")
+	importBlocks := []connector.ImportBlock{}
 
 	agreementImportBlocks, err := Agreement(r.clientInfo).ExportAll()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all pingone_agreement_enable resources...")
-
 	for _, importBlock := range *agreementImportBlocks {
-		importBlocks = append(importBlocks, connector.ImportBlock{
+		importBlock = connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       fmt.Sprintf("%s_enable", importBlock.ResourceName),
 			ResourceID:         importBlock.ResourceID,
 			CommentInformation: importBlock.CommentInformation,
-		})
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
-}
-
-func (r *PingOneAgreementEnableResource) ResourceType() string {
-	return "pingone_agreement_enable"
 }

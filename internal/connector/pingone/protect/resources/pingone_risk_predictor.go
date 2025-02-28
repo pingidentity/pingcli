@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/risk"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -25,31 +26,61 @@ func RiskPredictor(clientInfo *connector.PingOneClientInfo) *PingOneRiskPredicto
 	}
 }
 
+func (r *PingOneRiskPredictorResource) ResourceType() string {
+	return "pingone_risk_predictor"
+}
+
 func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllRiskPredictors"
-
-	embedded, err := common.GetProtectEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	riskPredictorData, err := r.getRiskPredictorData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for riskPredictorId, riskPredictorInfo := range riskPredictorData {
+		riskPredictorName := riskPredictorInfo[0]
+		riskPredictorType := riskPredictorInfo[1]
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
+			"Risk Predictor ID":     riskPredictorId,
+			"Risk Predictor Name":   riskPredictorName,
+			"Risk Predictor Type":   riskPredictorType,
+		}
 
-	for _, riskPredictor := range embedded.GetRiskPredictors() {
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       fmt.Sprintf("%s_%s", riskPredictorType, riskPredictorName),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, riskPredictorId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneRiskPredictorResource) getRiskPredictorData() (map[string][]string, error) {
+	riskPredictorData := make(map[string][]string)
+
+	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	riskPredictors, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPredictor](iter, "ReadAllRiskPredictors", "GetRiskPredictors", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, riskPredictor := range riskPredictors {
 		var (
-			riskPredictorId   *string
-			riskPredictorIdOk bool
-
+			riskPredictorId     *string
+			riskPredictorIdOk   bool
 			riskPredictorName   *string
 			riskPredictorNameOk bool
-
 			riskPredictorType   *risk.EnumPredictorType
 			riskPredictorTypeOk bool
 		)
@@ -112,26 +143,9 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 		}
 
 		if riskPredictorIdOk && riskPredictorNameOk && riskPredictorTypeOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Risk Predictor Type":   string(*riskPredictorType),
-				"Risk Predictor Name":   *riskPredictorName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Risk Predictor ID":     *riskPredictorId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", *riskPredictorType, *riskPredictorName),
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *riskPredictorId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			riskPredictorData[*riskPredictorId] = []string{*riskPredictorName, string(*riskPredictorType)}
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingOneRiskPredictorResource) ResourceType() string {
-	return "pingone_risk_predictor"
+	return riskPredictorData, nil
 }

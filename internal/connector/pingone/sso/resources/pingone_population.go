@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,47 +26,59 @@ func Population(clientInfo *connector.PingOneClientInfo) *PingOnePopulationResou
 	}
 }
 
+func (r *PingOnePopulationResource) ResourceType() string {
+	return "pingone_population"
+}
+
 func (r *PingOnePopulationResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllPopulations"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	populationData, err := r.getPopulationData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, population := range embedded.GetPopulations() {
-		populationId, populationIdOk := population.GetIdOk()
-		populationName, populationNameOk := population.GetNameOk()
-
-		if populationIdOk && populationNameOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Population Name":       *populationName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Population ID":         *populationId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *populationName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *populationId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+	for populationId, populationName := range populationData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Population ID":         populationId,
+			"Population Name":       populationName,
+			"Resource Type":         r.ResourceType(),
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       populationName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, populationId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOnePopulationResource) ResourceType() string {
-	return "pingone_population"
+func (r *PingOnePopulationResource) getPopulationData() (map[string]string, error) {
+	populationData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	populations, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, population := range populations {
+		populationId, populationIdOk := population.GetIdOk()
+		populationName, populationNameOk := population.GetNameOk()
+
+		if populationIdOk && populationNameOk {
+			populationData[*populationId] = *populationName
+		}
+	}
+
+	return populationData, nil
 }

@@ -6,77 +6,77 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingOnePopulationDefaultDefaultResource{}
+	_ connector.ExportableResource = &PingOnePopulationDefaultResource{}
 )
 
-type PingOnePopulationDefaultDefaultResource struct {
+type PingOnePopulationDefaultResource struct {
 	clientInfo *connector.PingOneClientInfo
 }
 
-// Utility method for creating a PingOnePopulationDefaultDefaultResource
-func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultDefaultResource {
-	return &PingOnePopulationDefaultDefaultResource{
+// Utility method for creating a PingOnePopulationDefaultResource
+func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultResource {
+	return &PingOnePopulationDefaultResource{
 		clientInfo: clientInfo,
 	}
 }
 
-func (r *PingOnePopulationDefaultDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
+func (r *PingOnePopulationDefaultResource) ResourceType() string {
+	return "pingone_population_default"
+}
+
+func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllPopulations"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	defaultPopulationName, err := r.getDefaultPopulationName()
 	if err != nil {
 		return nil, err
 	}
 
-	foundDefault := false
-	var defaultPopulation management.Population
-	for _, population := range embedded.GetPopulations() {
-		if population.GetDefault() {
-			foundDefault = true
-			defaultPopulation = population
-			break
-		}
+	commentData := map[string]string{
+		"Default Population Name": *defaultPopulationName,
+		"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
+		"Resource Type":           r.ResourceType(),
 	}
 
-	if !foundDefault {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
-		return &[]connector.ImportBlock{}, nil
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       fmt.Sprintf("%s_population_default", *defaultPopulationName),
+		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	defaultPopulationName, defaultPopulationNameOk := defaultPopulation.GetNameOk()
-
-	if defaultPopulationNameOk {
-		commentData := map[string]string{
-			"Resource Type":           r.ResourceType(),
-			"Default Population Name": *defaultPopulationName,
-			"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
-		}
-
-		importBlocks = append(importBlocks, connector.ImportBlock{
-			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_population_default", *defaultPopulationName),
-			ResourceID:         r.clientInfo.ExportEnvironmentID,
-			CommentInformation: common.GenerateCommentInformation(commentData),
-		})
-	}
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
 }
 
-func (r *PingOnePopulationDefaultDefaultResource) ResourceType() string {
-	return "pingone_population_default"
+func (r *PingOnePopulationDefaultResource) getDefaultPopulationName() (*string, error) {
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	populations, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, population := range populations {
+		populationDefault, populationDefaultOk := population.GetDefaultOk()
+
+		if populationDefaultOk && *populationDefault {
+			populationName, populationNameOk := population.GetNameOk()
+
+			if populationNameOk {
+				return populationName, nil
+			}
+		}
+	}
+
+	return nil, fmt.Errorf("unable to find the name of the default population")
 }

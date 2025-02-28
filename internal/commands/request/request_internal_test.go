@@ -171,7 +171,7 @@ func Test_getData(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
 	expectedData := "{data: 'json'}"
-	t.Setenv(options.RequestDataOption.EnvVar, expectedData)
+	t.Setenv(options.RequestDataRawOption.EnvVar, expectedData)
 
 	data, err := getData()
 	testutils.CheckExpectedError(t, err, nil)
@@ -185,7 +185,7 @@ func Test_getData(t *testing.T) {
 func Test_getData_EmptyData(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	t.Setenv(options.RequestDataOption.EnvVar, "")
+	t.Setenv(options.RequestDataRawOption.EnvVar, "")
 
 	data, err := getData()
 	testutils.CheckExpectedError(t, err, nil)
@@ -207,7 +207,7 @@ func Test_getData_FileInput(t *testing.T) {
 		t.Fatalf("failed to write test file: %v", err)
 	}
 
-	t.Setenv(options.RequestDataOption.EnvVar, "@"+testFile)
+	t.Setenv(options.RequestDataOption.EnvVar, testFile)
 
 	data, err := getData()
 	testutils.CheckExpectedError(t, err, nil)
@@ -221,7 +221,7 @@ func Test_getData_FileInput(t *testing.T) {
 func Test_getData_NonExistentFileInput(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	t.Setenv(options.RequestDataOption.EnvVar, "@non_existent_file.json")
+	t.Setenv(options.RequestDataOption.EnvVar, "non_existent_file.json")
 
 	_, err := getData()
 	expectedErrorPattern := `^open .*: no such file or directory$`

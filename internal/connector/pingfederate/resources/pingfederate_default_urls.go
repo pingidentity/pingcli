@@ -22,12 +22,15 @@ func DefaultURLs(clientInfo *connector.PingFederateClientInfo) *PingFederateDefa
 	}
 }
 
+func (r *PingFederateDefaultURLsResource) ResourceType() string {
+	return "pingfederate_default_urls"
+}
+
 func (r *PingFederateDefaultURLsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	defaultURLsId := "default_urls_singleton_id"
 	defaultURLsName := "Default URLs"
@@ -37,16 +40,14 @@ func (r *PingFederateDefaultURLsResource) ExportAll() (*[]connector.ImportBlock,
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       defaultURLsName,
 		ResourceID:         defaultURLsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateDefaultURLsResource) ResourceType() string {
-	return "pingfederate_default_urls"
 }

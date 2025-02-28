@@ -28,8 +28,9 @@ func initAddProfileDescriptionOption() {
 			Usage:     "The description of the new configuration profile.",
 			Value:     cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
 	}
 }
 
@@ -49,8 +50,9 @@ func initAddProfileNameOption() {
 			Usage:     "The name of the new configuration profile.",
 			Value:     cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
 	}
 }
 
@@ -72,7 +74,8 @@ func initAddProfileSetActiveOption() {
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
-		Type:     options.ENUM_BOOL,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "", // No viper key
 	}
 }

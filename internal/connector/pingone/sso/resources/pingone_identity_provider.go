@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,24 +26,52 @@ func IdentityProvider(clientInfo *connector.PingOneClientInfo) *PingOneIdentityP
 	}
 }
 
+func (r *PingOneIdentityProviderResource) ResourceType() string {
+	return "pingone_identity_provider"
+}
+
 func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteIdentityProvidersFunc := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiIdentityProviderFunctionName := "ReadAllIdentityProviders"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteIdentityProvidersFunc, apiIdentityProviderFunctionName, r.ResourceType())
+	identityProviderData, err := r.getIdentityProviderData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for idpId, idpName := range identityProviderData {
+		commentData := map[string]string{
+			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+			"Identity Provider ID":   idpId,
+			"Identity Provider Name": idpName,
+			"Resource Type":          r.ResourceType(),
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       idpName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, idpId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
 
-	for _, idp := range embedded.GetIdentityProviders() {
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingOneIdentityProviderResource) getIdentityProviderData() (map[string]string, error) {
+	identityProviderData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	identityProviders, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityProvider](iter, "ReadAllIdentityProviders", "GetIdentityProviders", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, idp := range identityProviders {
 		var (
 			idpId     *string
 			idpIdOk   bool
@@ -73,25 +103,9 @@ func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock,
 		}
 
 		if idpIdOk && idpNameOk {
-			commentData := map[string]string{
-				"Resource Type":          r.ResourceType(),
-				"Identity Provider Name": *idpName,
-				"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
-				"Identity Provider ID":   *idpId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *idpName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *idpId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			identityProviderData[*idpId] = *idpName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingOneIdentityProviderResource) ResourceType() string {
-	return "pingone_identity_provider"
+	return identityProviderData, nil
 }

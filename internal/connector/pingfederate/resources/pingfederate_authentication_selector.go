@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,70 @@ func AuthenticationSelector(clientInfo *connector.PingFederateClientInfo) *PingF
 	}
 }
 
+func (r *PingFederateAuthenticationSelectorResource) ResourceType() string {
+	return "pingfederate_authentication_selector"
+}
+
 func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute
-	apiFunctionName := "GetAuthenticationSelectors"
-
-	authnSelectors, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	authenticationSelectorData, err := r.getAuthenticationSelectorData()
 	if err != nil {
 		return nil, err
 	}
 
-	if authnSelectors == nil {
-		l.Error().Msgf("Returned %s() authnSelectors is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for authnSelectorId, authnSelectorName := range authenticationSelectorData {
+		commentData := map[string]string{
+			"Authentication Selector ID":   authnSelectorId,
+			"Authentication Selector Name": authnSelectorName,
+			"Resource Type":                r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       authnSelectorName,
+			ResourceID:         authnSelectorId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	authnSelectorsItems, ok := authnSelectors.GetItemsOk()
+	return &importBlocks, nil
+}
+
+func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorData() (map[string]string, error) {
+	authenticationSelectorData := make(map[string]string)
+
+	authnSelectors, response, err := r.clientInfo.ApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationSelectors", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 	if !ok {
-		l.Error().Msgf("Failed to get %s() authnSelectors items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, nil
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	if authnSelectors == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	authnSelectorsItems, authnSelectorsItemsOk := authnSelectors.GetItemsOk()
+	if !authnSelectorsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, authnSelector := range authnSelectorsItems {
 		authnSelectorId, authnSelectorIdOk := authnSelector.GetIdOk()
 		authnSelectorName, authnSelectorNameOk := authnSelector.GetNameOk()
 
 		if authnSelectorIdOk && authnSelectorNameOk {
-			commentData := map[string]string{
-				"Resource Type":                         r.ResourceType(),
-				"Authentication Selector Resource ID":   *authnSelectorId,
-				"Authentication Selector Resource Name": *authnSelectorName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *authnSelectorName,
-				ResourceID:         *authnSelectorId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			authenticationSelectorData[*authnSelectorId] = *authnSelectorName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederateAuthenticationSelectorResource) ResourceType() string {
-	return "pingfederate_authentication_selector"
+	return authenticationSelectorData, nil
 }

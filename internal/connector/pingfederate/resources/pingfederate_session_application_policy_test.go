@@ -18,7 +18,7 @@ func TestPingFederateSessionApplicationPolicyExport(t *testing.T) {
 		{
 			ResourceType: "pingfederate_session_application_policy",
 			ResourceName: "Session Application Policy",
-			ResourceID:   "pingfederate_session_application_policy_singleton_id",
+			ResourceID:   "session_application_policy_singleton_id",
 		},
 	}
 

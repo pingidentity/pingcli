@@ -18,7 +18,7 @@ func TestPingFederateSessionAuthenticationPoliciesGlobalExport(t *testing.T) {
 		{
 			ResourceType: "pingfederate_session_authentication_policies_global",
 			ResourceName: "Session Authentication Policies Global",
-			ResourceID:   "pingfederate_session_authentication_policies_global_singleton_id",
+			ResourceID:   "session_authentication_policies_global_singleton_id",
 		},
 	}
 

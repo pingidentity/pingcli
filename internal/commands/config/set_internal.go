@@ -45,12 +45,25 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: %v", err)
 	}
 
-	yamlStr, err := profiles.GetMainConfig().ProfileToString(pName)
+	msgStr := "Configuration set successfully:\n"
+
+	vVal, _, err := profiles.ViperValueFromOption(opt)
 	if err != nil {
 		return fmt.Errorf("failed to set configuration: %v", err)
 	}
 
-	output.Success("Configuration set successfully", map[string]interface{}{"Profile YAML": yamlStr})
+	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
+	if err != nil {
+		unmaskOptionVal = "false"
+	}
+
+	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
+		msgStr += fmt.Sprintf("%s=%s", vKey, profiles.MaskValue(vVal))
+	} else {
+		msgStr += fmt.Sprintf("%s=%s", vKey, vVal)
+	}
+
+	output.Success(msgStr, nil)
 
 	return nil
 }

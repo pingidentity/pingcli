@@ -22,12 +22,15 @@ func OAuthCIBAServerPolicySettings(clientInfo *connector.PingFederateClientInfo)
 	}
 }
 
+func (r *PingFederateOAuthCIBAServerPolicySettingsResource) ResourceType() string {
+	return "pingfederate_oauth_ciba_server_policy_settings"
+}
+
 func (r *PingFederateOAuthCIBAServerPolicySettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	oAuthCIBAServerPolicySettingsId := "oauth_ciba_server_policy_settings_singleton_id"
 	oAuthCIBAServerPolicySettingsName := "OAuth CIBA Server Policy Settings"
@@ -37,16 +40,14 @@ func (r *PingFederateOAuthCIBAServerPolicySettingsResource) ExportAll() (*[]conn
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       oAuthCIBAServerPolicySettingsName,
 		ResourceID:         oAuthCIBAServerPolicySettingsId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateOAuthCIBAServerPolicySettingsResource) ResourceType() string {
-	return "pingfederate_oauth_ciba_server_policy_settings"
 }

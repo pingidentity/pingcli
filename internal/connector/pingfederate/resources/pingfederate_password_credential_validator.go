@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -24,61 +22,70 @@ func PasswordCredentialValidator(clientInfo *connector.PingFederateClientInfo) *
 	}
 }
 
+func (r *PingFederatePasswordCredentialValidatorResource) ResourceType() string {
+	return "pingfederate_password_credential_validator"
+}
+
 func (r *PingFederatePasswordCredentialValidatorResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.PasswordCredentialValidatorsAPI.GetPasswordCredentialValidators(r.clientInfo.Context).Execute
-	apiFunctionName := "GetPasswordCredentialValidators"
-
-	passwordCredentialValidators, response, err := apiExecuteFunc()
-
-	err = common.HandleClientResponse(response, err, apiFunctionName, r.ResourceType())
+	passwordCredentialValidatorData, err := r.getPasswordCredentialValidatorData()
 	if err != nil {
 		return nil, err
 	}
 
-	if passwordCredentialValidators == nil {
-		l.Error().Msgf("Returned %s() passwordCredentialValidators is nil.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+	for passwordCredentialValidatorId, passwordCredentialValidatorName := range passwordCredentialValidatorData {
+		commentData := map[string]string{
+			"Password Credential Validator ID":   passwordCredentialValidatorId,
+			"Password Credential Validator Name": passwordCredentialValidatorName,
+			"Resource Type":                      r.ResourceType(),
+		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       passwordCredentialValidatorName,
+			ResourceID:         passwordCredentialValidatorId,
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
-	passwordCredentialValidatorsItems, ok := passwordCredentialValidators.GetItemsOk()
+	return &importBlocks, nil
+}
+
+func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialValidatorData() (map[string]string, error) {
+	passwordCredentialValidatorData := make(map[string]string)
+
+	passwordCredentialValidators, response, err := r.clientInfo.ApiClient.PasswordCredentialValidatorsAPI.GetPasswordCredentialValidators(r.clientInfo.Context).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetPasswordCredentialValidators", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 	if !ok {
-		l.Error().Msgf("Failed to get %s() passwordCredentialValidators items.", apiFunctionName)
-		l.Error().Msgf("%s Response Code: %s\nResponse Body: %s", apiFunctionName, response.Status, response.Body)
-		return nil, fmt.Errorf("failed to fetch %s resources via %s()", r.ResourceType(), apiFunctionName)
+		return nil, nil
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	if passwordCredentialValidators == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	passwordCredentialValidatorsItems, passwordCredentialValidatorsItemsOk := passwordCredentialValidators.GetItemsOk()
+	if !passwordCredentialValidatorsItemsOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
 
 	for _, passwordCredentialValidator := range passwordCredentialValidatorsItems {
 		passwordCredentialValidatorId, passwordCredentialValidatorIdOk := passwordCredentialValidator.GetIdOk()
 		passwordCredentialValidatorName, passwordCredentialValidatorNameOk := passwordCredentialValidator.GetNameOk()
 
 		if passwordCredentialValidatorIdOk && passwordCredentialValidatorNameOk {
-			commentData := map[string]string{
-				"Resource Type": r.ResourceType(),
-				"Password Credential Validator Resource ID":   *passwordCredentialValidatorId,
-				"Password Credential Validator Resource Name": *passwordCredentialValidatorName,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *passwordCredentialValidatorName,
-				ResourceID:         *passwordCredentialValidatorId,
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			passwordCredentialValidatorData[*passwordCredentialValidatorId] = *passwordCredentialValidatorName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingFederatePasswordCredentialValidatorResource) ResourceType() string {
-	return "pingfederate_password_credential_validator"
+	return passwordCredentialValidatorData, nil
 }

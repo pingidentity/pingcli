@@ -22,12 +22,15 @@ func ServerSettingsSystemKeysRotate(clientInfo *connector.PingFederateClientInfo
 	}
 }
 
+func (r *PingFederateServerSettingsSystemKeysRotateResource) ResourceType() string {
+	return "pingfederate_server_settings_system_keys_rotate"
+}
+
 func (r *PingFederateServerSettingsSystemKeysRotateResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
 
 	serverSettingsSystemKeysRotateId := "server_settings_system_keys_rotate_singleton_id"
 	serverSettingsSystemKeysRotateName := "Server Settings System Keys Rotate"
@@ -37,16 +40,14 @@ func (r *PingFederateServerSettingsSystemKeysRotateResource) ExportAll() (*[]con
 		"Singleton ID":  common.SINGLETON_ID_COMMENT_DATA,
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       serverSettingsSystemKeysRotateName,
 		ResourceID:         serverSettingsSystemKeysRotateId,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
-}
-
-func (r *PingFederateServerSettingsSystemKeysRotateResource) ResourceType() string {
-	return "pingfederate_server_settings_system_keys_rotate"
 }

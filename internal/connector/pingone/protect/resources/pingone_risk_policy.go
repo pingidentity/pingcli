@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/risk"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -24,48 +26,59 @@ func RiskPolicy(clientInfo *connector.PingOneClientInfo) *PingOneRiskPolicyResou
 	}
 }
 
+func (r *PingOneRiskPolicyResource) ResourceType() string {
+	return "pingone_risk_policy"
+}
+
 func (r *PingOneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.RiskAPIClient.RiskPoliciesApi.ReadRiskPolicySets(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadRiskPolicySets"
-
-	embedded, err := common.GetProtectEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	riskPolicySetData, err := r.getRiskPolicySetData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
-
-	for _, riskPolicySet := range embedded.GetRiskPolicySets() {
-		riskPolicySetName, riskPolicySetNameOk := riskPolicySet.GetNameOk()
-		riskPolicySetId, riskPolicySetIdOk := riskPolicySet.GetIdOk()
-
-		if riskPolicySetNameOk && riskPolicySetIdOk {
-			commentData := map[string]string{
-				"Resource Type":         r.ResourceType(),
-				"Risk Policy Name":      *riskPolicySetName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
-				"Risk Policy ID":        *riskPolicySetId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *riskPolicySetName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *riskPolicySetId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
-
+	for riskPolicySetId, riskPolicySetName := range riskPolicySetData {
+		commentData := map[string]string{
+			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Resource Type":         r.ResourceType(),
+			"Risk Policy ID":        riskPolicySetId,
+			"Risk Policy Name":      riskPolicySetName,
 		}
+
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       riskPolicySetName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, riskPolicySetId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
+
+		importBlocks = append(importBlocks, importBlock)
 	}
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneRiskPolicyResource) ResourceType() string {
-	return "pingone_risk_policy"
+func (r *PingOneRiskPolicyResource) getRiskPolicySetData() (map[string]string, error) {
+	riskPolicySetData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskPoliciesApi.ReadRiskPolicySets(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	riskPolicySets, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPolicySet](iter, "ReadRiskPolicySets", "GetRiskPolicySets", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, riskPolicySet := range riskPolicySets {
+		riskPolicySetName, riskPolicySetNameOk := riskPolicySet.GetNameOk()
+		riskPolicySetId, riskPolicySetIdOk := riskPolicySet.GetIdOk()
+
+		if riskPolicySetIdOk && riskPolicySetNameOk {
+			riskPolicySetData[*riskPolicySetId] = *riskPolicySetName
+		}
+	}
+
+	return riskPolicySetData, nil
 }

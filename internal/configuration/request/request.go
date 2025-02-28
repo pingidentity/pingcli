@@ -11,6 +11,7 @@ import (
 
 func InitRequestOptions() {
 	initDataOption()
+	initDataRawOption()
 	initHTTPMethodOption()
 	initServiceOption()
 	initAccessTokenOption()
@@ -31,12 +32,36 @@ func initDataOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name: cobraParamName,
-			Usage: "The data to send in the request. Use prefix '@' to specify data file path instead of raw data. " +
-				"\nExample: '@data.json'",
+			Usage: "The file containing data to send in the request. " +
+				"\nExample: './data.json'",
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_STRING,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
+	}
+}
+
+func initDataRawOption() {
+	cobraParamName := "data-raw"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_REQUEST_DATA_RAW"
+
+	options.RequestDataRawOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name: cobraParamName,
+			Usage: "The raw data to send in the request. " +
+				"\nExample: '{\"name\": \"My environment\"}'",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.ENUM_STRING,
+		ViperKey:  "", // No viper key
 	}
 }
 
@@ -63,8 +88,9 @@ func initHTTPMethodOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_REQUEST_HTTP_METHOD,
-		ViperKey: "", // No viper key
+		Sensitive: false,
+		Type:      options.ENUM_REQUEST_HTTP_METHOD,
+		ViperKey:  "", // No viper key
 	}
 }
 
@@ -91,8 +117,9 @@ func initServiceOption() {
 			),
 			Value: cobraValue,
 		},
-		Type:     options.ENUM_REQUEST_SERVICE,
-		ViperKey: "request.service",
+		Sensitive: false,
+		Type:      options.ENUM_REQUEST_SERVICE,
+		ViperKey:  "request.service",
 	}
 }
 
@@ -105,6 +132,7 @@ func initAccessTokenOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "", // No environment variable
 		Flag:            nil,
+		Sensitive:       true,
 		Type:            options.ENUM_STRING,
 		ViperKey:        "request.accessToken",
 	}
@@ -119,6 +147,7 @@ func initAccessTokenExpiryOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "",  // No environment variable
 		Flag:            nil, // No flag
+		Sensitive:       false,
 		Type:            options.ENUM_INT,
 		ViperKey:        "request.accessTokenExpiry",
 	}
@@ -140,8 +169,8 @@ func initFailOption() {
 			Usage:       "Return non-zero exit code when HTTP custom request returns a failure status code.",
 			Value:       cobraValue,
 		},
-
-		Type:     options.ENUM_BOOL,
-		ViperKey: "request.fail",
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "request.fail",
 	}
 }

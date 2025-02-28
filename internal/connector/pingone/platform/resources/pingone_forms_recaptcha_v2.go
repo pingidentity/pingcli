@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -22,43 +23,42 @@ func FormRecaptchaV2(clientInfo *connector.PingOneClientInfo) *PingOneFormRecapt
 	}
 }
 
+func (r *PingOneFormRecaptchaV2Resource) ResourceType() string {
+	return "pingone_forms_recaptcha_v2"
+}
+
 func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
-
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
-
-	// Fetch FormRecaptchaV2 Resource from API.
-	// If response is 204 No Content, then return empty import blocks.
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
-
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := []connector.ImportBlock{}
 
-	if response.StatusCode == 204 {
-		l.Debug().Msgf("No exportable %s resource found", r.ResourceType())
+	ok, err := r.checkFormRecaptchaV2Data()
+	if err != nil {
+		return nil, err
+	}
+	if !ok {
 		return &importBlocks, nil
 	}
 
 	commentData := map[string]string{
-		"Resource Type":         r.ResourceType(),
 		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Resource Type":         r.ResourceType(),
 	}
 
-	importBlocks = append(importBlocks, connector.ImportBlock{
+	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
-		ResourceName:       "recaptcha_configuration",
+		ResourceName:       r.ResourceType(),
 		ResourceID:         r.clientInfo.ExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
-	})
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneFormRecaptchaV2Resource) ResourceType() string {
-	return "pingone_forms_recaptcha_v2"
+func (r *PingOneFormRecaptchaV2Resource) checkFormRecaptchaV2Data() (bool, error) {
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	return pingone.CheckSingletonResource(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
 }

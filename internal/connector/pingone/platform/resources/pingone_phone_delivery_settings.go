@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -25,46 +26,74 @@ func PhoneDeliverySettings(clientInfo *connector.PingOneClientInfo) *PingOnePhon
 	}
 }
 
+func (r *PingOnePhoneDeliverySettingsResource) ResourceType() string {
+	return "pingone_phone_delivery_settings"
+}
+
 func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
+	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	l.Debug().Msgf("Fetching all %s resources...", r.ResourceType())
+	importBlocks := []connector.ImportBlock{}
 
-	apiExecuteFunc := r.clientInfo.ApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute
-	apiFunctionName := "ReadAllPhoneDeliverySettings"
-
-	embedded, err := common.GetManagementEmbedded(apiExecuteFunc, apiFunctionName, r.ResourceType())
+	phoneDeliverySettingsData, err := r.getPhoneDeliverySettingsData()
 	if err != nil {
 		return nil, err
 	}
 
-	importBlocks := []connector.ImportBlock{}
+	for phoneDeliverySettingsId, phoneDeliverySettingsName := range phoneDeliverySettingsData {
+		commentData := map[string]string{
+			"Export Environment ID":        r.clientInfo.ExportEnvironmentID,
+			"Phone Delivery Settings ID":   phoneDeliverySettingsId,
+			"Phone Delivery Settings Name": phoneDeliverySettingsName,
+			"Resource Type":                r.ResourceType(),
+		}
 
-	l.Debug().Msgf("Generating Import Blocks for all %s resources...", r.ResourceType())
+		importBlock := connector.ImportBlock{
+			ResourceType:       r.ResourceType(),
+			ResourceName:       phoneDeliverySettingsName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, phoneDeliverySettingsId),
+			CommentInformation: common.GenerateCommentInformation(commentData),
+		}
 
-	for index, phoneDeliverySettings := range embedded.GetPhoneDeliverySettings() {
+		importBlocks = append(importBlocks, importBlock)
+	}
+
+	return &importBlocks, nil
+}
+
+func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (map[string]string, error) {
+	phoneDeliverySettingsData := make(map[string]string)
+
+	iter := r.clientInfo.ApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	phoneDeliverySettings, err := pingone.GetManagementAPIObjectsFromIterator[management.NotificationsSettingsPhoneDeliverySettings](iter, "ReadAllPhoneDeliverySettings", "GetPhoneDeliverySettings", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, phoneDeliverySettings := range phoneDeliverySettings {
 		var (
 			phoneDeliverySettingsId     *string
-			phoneDeliverySettingsName   *string
 			phoneDeliverySettingsIdOk   bool
+			phoneDeliverySettingsName   string
 			phoneDeliverySettingsNameOk bool
 		)
 
 		switch {
 		case phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsCustom != nil:
 			phoneDeliverySettingsId, phoneDeliverySettingsIdOk = phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsCustom.GetIdOk()
-			phoneDeliverySettingsName, phoneDeliverySettingsNameOk = phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsCustom.GetNameOk()
+			if phoneDeliverySettingsIdOk {
+				phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_custom_%s", *phoneDeliverySettingsId), true
+			}
 		case phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse != nil:
 			phoneDeliverySettingsId, phoneDeliverySettingsIdOk = phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse.GetIdOk()
 			phoneDeliverySettingsProvider, phoneDeliverySettingProviderOk := phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse.GetProviderOk()
-			if phoneDeliverySettingProviderOk {
+			if phoneDeliverySettingsIdOk && phoneDeliverySettingProviderOk {
 				switch *phoneDeliverySettingsProvider {
 				case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_TWILIO:
-					twilioName := fmt.Sprintf("CUSTOM_TWILIO_%d", index)
-					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = &twilioName, true
+					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_twilio_%s", *phoneDeliverySettingsId), true
 				case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_SYNIVERSE:
-					syniverseName := fmt.Sprintf("CUSTOM_SYNIVERSE_%d", index)
-					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = &syniverseName, true
+					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_syniverse_%s", *phoneDeliverySettingsId), true
 				default:
 					continue
 				}
@@ -74,25 +103,9 @@ func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportB
 		}
 
 		if phoneDeliverySettingsIdOk && phoneDeliverySettingsNameOk {
-			commentData := map[string]string{
-				"Resource Type":                r.ResourceType(),
-				"Phone Delivery Settings Name": *phoneDeliverySettingsName,
-				"Export Environment ID":        r.clientInfo.ExportEnvironmentID,
-				"Phone Delivery Settings ID":   *phoneDeliverySettingsId,
-			}
-
-			importBlocks = append(importBlocks, connector.ImportBlock{
-				ResourceType:       r.ResourceType(),
-				ResourceName:       *phoneDeliverySettingsName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, *phoneDeliverySettingsId),
-				CommentInformation: common.GenerateCommentInformation(commentData),
-			})
+			phoneDeliverySettingsData[*phoneDeliverySettingsId] = phoneDeliverySettingsName
 		}
 	}
 
-	return &importBlocks, nil
-}
-
-func (r *PingOnePhoneDeliverySettingsResource) ResourceType() string {
-	return "pingone_phone_delivery_settings"
+	return phoneDeliverySettingsData, nil
 }
