@@ -55,7 +55,7 @@ func (r *PingoneAuthorizeApplicationResourcePermissionResource) ExportAll() (*[]
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s", appResourcePermissionKey),
+				ResourceName:       appResourcePermissionKey,
 				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appResourceId, appResourcePermissionId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
