@@ -227,11 +227,6 @@ func (m MainConfig) ValidateExistingProfileName(pName string) (err error) {
 
 	pNames := m.ProfileNames()
 
-	// Iterate over the profileNames and convert each to lowercase
-	for i := range pNames {
-		pNames[i] = strings.ToLower(pNames[i])
-	}
-
 	if !slices.ContainsFunc(pNames, func(n string) bool {
 		return strings.EqualFold(n, pName)
 	}) {

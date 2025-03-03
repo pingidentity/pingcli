@@ -20,7 +20,7 @@ func RunInternalConfigGet(viperKey string) (err error) {
 		return fmt.Errorf("failed to get configuration: %v", err)
 	}
 
-	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", pName, viperKey)
+	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", strings.ToLower(pName), viperKey)
 
 	for _, opt := range options.Options() {
 		if opt.ViperKey == "" || !strings.Contains(opt.ViperKey, viperKey) {
