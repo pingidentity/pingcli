@@ -52,12 +52,12 @@ func (r *PingOneResourceAttributeResource) ExportAll() (*[]connector.ImportBlock
 
 		for resourceAttributeId, resourceAttributeName := range resourceAttributeData {
 			commentData := map[string]string{
-				"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
-				"Resource Attribute ID":   resourceAttributeId,
-				"Resource Attribute Name": resourceAttributeName,
-				"Resource ID":             resourceId,
-				"Resource Name":           resourceName,
-				"Resource Type":           r.ResourceType(),
+				"Export Environment ID":           r.clientInfo.ExportEnvironmentID,
+				"PingOne Resource Attribute ID":   resourceAttributeId,
+				"PingOne Resource Attribute Name": resourceAttributeName,
+				"PingOne Resource ID":             resourceId,
+				"PingOne Resource Name":           resourceName,
+				"Resource Type":                   r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{

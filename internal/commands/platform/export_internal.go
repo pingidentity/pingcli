@@ -17,6 +17,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/authorize"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/mfa"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/platform"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/protect"
@@ -464,6 +465,8 @@ func getExportableConnectors(exportServices *customtypes.ExportServices) (export
 		switch service {
 		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM:
 			connectors = append(connectors, platform.PlatformConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
+		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE:
+			connectors = append(connectors, authorize.AuthorizeConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
 		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO:
 			connectors = append(connectors, sso.SSOConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
 		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA:

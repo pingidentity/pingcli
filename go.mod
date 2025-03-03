@@ -12,6 +12,7 @@ require (
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/manifoldco/promptui v0.9.0
 	github.com/patrickcping/pingone-go-sdk-v2 v0.12.9
+	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.0
 	github.com/patrickcping/pingone-go-sdk-v2/management v0.49.0
 	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.0
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.19.0
@@ -137,7 +138,6 @@ require (
 	github.com/nishanths/predeclared v0.2.2 // indirect
 	github.com/nunnatsa/ginkgolinter v0.19.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.0 // indirect
 	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.11.0 // indirect
 	github.com/patrickcping/pingone-go-sdk-v2/verify v0.9.0 // indirect
 	github.com/pavius/impi v0.0.3 // indirect
