@@ -46,7 +46,7 @@ func (b *ImportBlock) Sanitize() {
 	b.ResourceName = regexp.MustCompile(`[^a-zA-Z0-9_]+`).ReplaceAllString(b.ResourceName, "")
 	// Remove all numbers in beginning of string
 	b.ResourceName = regexp.MustCompile(`^\d+`).ReplaceAllString(b.ResourceName, "")
-	// Make everything lowercase
+	// Prefix resource names with pingcli-
 	b.ResourceName = "pingcli-" + strings.ToLower(b.ResourceName)
 }
 
