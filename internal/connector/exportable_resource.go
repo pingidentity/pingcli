@@ -44,8 +44,10 @@ func (b *ImportBlock) Sanitize() {
 	b.ResourceName = strings.ReplaceAll(b.ResourceName, ".", "_")
 	// Remove all non-Alphanumeric characters/non-underscores
 	b.ResourceName = regexp.MustCompile(`[^a-zA-Z0-9_]+`).ReplaceAllString(b.ResourceName, "")
+	// Remove all numbers in beginning of string
+	b.ResourceName = regexp.MustCompile(`^\d+`).ReplaceAllString(b.ResourceName, "")
 	// Make everything lowercase
-	b.ResourceName = strings.ToLower(b.ResourceName)
+	b.ResourceName = "pingcli-" + strings.ToLower(b.ResourceName)
 }
 
 func (b *ImportBlock) Equals(a ImportBlock) bool {
