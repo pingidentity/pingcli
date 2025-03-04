@@ -1,8 +1,6 @@
 package resources
 
 import (
-	"fmt"
-
 	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
@@ -48,7 +46,7 @@ func (r *PingoneAuthorizePolicyManagementPolicyResource) ExportAll() (*[]connect
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       editorPolicyName,
-			ResourceID:         fmt.Sprintf("%s", r.clientInfo.ExportEnvironmentID),
+			ResourceID:         r.clientInfo.ExportEnvironmentID,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
