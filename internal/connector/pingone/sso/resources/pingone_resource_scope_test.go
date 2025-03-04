@@ -18,6 +18,16 @@ func TestResourceScopeExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_resource_scope",
+			ResourceName: "authorize-api-service_apiscope",
+			ResourceID:   fmt.Sprintf("%s/3c6001a0-6110-4934-9d34-fa8c4a2894c2/97b9c81c-56a3-4727-8626-9c55826f98c0", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_resource_scope",
+			ResourceName: "authorize-api-service_testing",
+			ResourceID:   fmt.Sprintf("%s/3c6001a0-6110-4934-9d34-fa8c4a2894c2/6aa03c9d-7003-4ddb-9395-b176d4bde6d6", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_resource_scope",
 			ResourceName: "test_testing",
 			ResourceID:   fmt.Sprintf("%s/4b9ef858-62ce-4bd0-9186-997b8527529d/99bda6e7-f34b-4218-8fb0-221f5414e0db", testutils.GetEnvironmentID()),
 		},

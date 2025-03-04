@@ -95,6 +95,16 @@ func Example_setMaskedValue() {
 }
 
 // https://pkg.go.dev/testing#hdr-Examples
+func Example_set_UnmaskedValuesFlag() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", "--unmask-values", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.ViperKey, "1234"))
+
+	// Output:
+	// SUCCESS: Configuration set successfully:
+	// service.pingfederate.authentication.basicAuth.password=1234
+}
+
+// https://pkg.go.dev/testing#hdr-Examples
 func Example_setUnmaskedValue() {
 	t := testing.T{}
 	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.RootColorOption.ViperKey, "true"))

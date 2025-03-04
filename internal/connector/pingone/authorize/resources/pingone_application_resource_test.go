@@ -9,17 +9,17 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestAuthorizeAPIServiceOperationExport(t *testing.T) {
+func TestApplicationResourceExport(t *testing.T) {
 	// Get initialized apiClient and resource
 	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.AuthorizeAPIServiceOperation(PingOneClientInfo)
+	resource := resources.ApplicationResource(PingOneClientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingone_authorize_api_service_operation",
-			ResourceName: "Test API Service_My Path",
-			ResourceID:   fmt.Sprintf("%s/cee5d5a9-49aa-478d-816e-ec47a2b5aede/07fc42c1-d998-40bd-bb64-143911924608", testutils.GetEnvironmentID()),
+			ResourceType: "pingone_application_resource",
+			ResourceName: "authorize-api-service_test-permission1",
+			ResourceID:   fmt.Sprintf("%s/3c6001a0-6110-4934-9d34-fa8c4a2894c2/62b8a221-a530-44f4-ad02-cdb0d3b1395f", testutils.GetEnvironmentID()),
 		},
 	}
 

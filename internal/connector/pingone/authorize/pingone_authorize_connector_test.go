@@ -24,11 +24,11 @@ func TestAuthorizeTerraformPlan(t *testing.T) {
 			resource:      resources.AuthorizeAPIService(PingOneClientInfo),
 			ignoredErrors: nil,
 		},
-		// {
-		// 	name:          "AuthorizeAPIServiceDeployment",
-		// 	resource:      resources.AuthorizeAPIServiceDeployment(PingOneClientInfo),
-		// 	ignoredErrors: nil,
-		// },
+		{
+			name:          "AuthorizeAPIServiceDeployment",
+			resource:      resources.AuthorizeAPIServiceDeployment(PingOneClientInfo),
+			ignoredErrors: nil,
+		},
 		{
 			name:          "AuthorizeAPIServiceOperation",
 			resource:      resources.AuthorizeAPIServiceOperation(PingOneClientInfo),

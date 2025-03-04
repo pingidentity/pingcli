@@ -62,7 +62,7 @@ func (r *PingoneAuthorizeApplicationRoleResource) getApplicationRoleData() (map[
 	applicationRoleData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ApplicationRolesApi", "GetRoles", r.ResourceType())
+	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}

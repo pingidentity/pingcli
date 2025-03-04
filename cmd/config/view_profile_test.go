@@ -19,6 +19,11 @@ func TestConfigViewProfileCmd_Execute_WithProfileFlag(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
+func TestConfigViewProfileCmd_Execute_UnmaskValuesFlag(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "--unmask-values")
+	testutils.CheckExpectedError(t, err, nil)
+}
+
 // Test Config Set Command fails with invalid flag
 func TestConfigViewProfileCmd_Execute_InvalidFlag(t *testing.T) {
 	expectedErrorPattern := `^unknown flag: --invalid$`

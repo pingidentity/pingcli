@@ -18,6 +18,11 @@ func TestResourceExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_resource",
+			ResourceName: "authorize-api-service",
+			ResourceID:   fmt.Sprintf("%s/3c6001a0-6110-4934-9d34-fa8c4a2894c2", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_resource",
 			ResourceName: "test",
 			ResourceID:   fmt.Sprintf("%s/4b9ef858-62ce-4bd0-9186-997b8527529d", testutils.GetEnvironmentID()),
 		},
@@ -35,6 +40,11 @@ func TestResourceExport(t *testing.T) {
 			ResourceType: "pingone_resource",
 			ResourceName: "openid",
 			ResourceID:   fmt.Sprintf("%s/8c428665-3e68-4f3c-997d-16a97f8cbe80", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_resource",
+			ResourceName: "Undeployed Test API Service",
+			ResourceID:   fmt.Sprintf("%s/a35fe5ea-084c-4245-80f1-85f9eaf4f063", testutils.GetEnvironmentID()),
 		},
 	}
 

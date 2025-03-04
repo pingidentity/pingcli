@@ -93,3 +93,14 @@ func Example_getUnmaskedValue() {
 	// Configuration values for profile 'default' and key 'noColor':
 	// noColor=true
 }
+
+// https://pkg.go.dev/testing#hdr-Examples
+func Example_get_UnmaskValuesFlag() {
+	t := testing.T{}
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", "--unmask-values", options.RequestAccessTokenOption.ViperKey)
+
+	// Output:
+	// Configuration values for profile 'default' and key 'request.accessToken':
+	// request.accessToken=
+	// request.accessTokenExpiry=0
+}
