@@ -36,8 +36,6 @@ type ExportableResource interface {
 }
 
 func (b *ImportBlock) Sanitize() {
-	// Replace spaces with underscores
-	b.ResourceName = strings.ReplaceAll(b.ResourceName, " ", "_")
 	// Replace dashes with underscores
 	b.ResourceName = strings.ReplaceAll(b.ResourceName, "-", "_")
 	// Replace period char with underscores
