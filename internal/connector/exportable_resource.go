@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"regexp"
-	"strings"
 
 	pingoneGoClient "github.com/patrickcping/pingone-go-sdk-v2/pingone"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
@@ -41,7 +40,7 @@ func (b *ImportBlock) Sanitize() {
 		return fmt.Sprintf("-%04X-", s)
 	})
 	// Prefix resource names with pingcli--
-	b.ResourceName = "pingcli--" + strings.ToLower(b.ResourceName)
+	b.ResourceName = "pingcli--" + b.ResourceName
 }
 
 func (b *ImportBlock) Equals(a ImportBlock) bool {
