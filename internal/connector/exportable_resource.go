@@ -36,10 +36,6 @@ type ExportableResource interface {
 }
 
 func (b *ImportBlock) Sanitize() {
-	// Replace dashes with underscores
-	b.ResourceName = strings.ReplaceAll(b.ResourceName, "-", "_")
-	// Replace period char with underscores
-	b.ResourceName = strings.ReplaceAll(b.ResourceName, ".", "_")
 	// Hexidecimal encode special characters
 	b.ResourceName = regexp.MustCompile(`[^0-9A-Za-z_\-]`).ReplaceAllStringFunc(b.ResourceName, func(s string) string {
 		return fmt.Sprintf("-%04X-", s)
