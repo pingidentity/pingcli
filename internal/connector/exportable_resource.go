@@ -42,12 +42,12 @@ func (b *ImportBlock) Sanitize() {
 	b.ResourceName = strings.ReplaceAll(b.ResourceName, "-", "_")
 	// Replace period char with underscores
 	b.ResourceName = strings.ReplaceAll(b.ResourceName, ".", "_")
-	// Remove all non-Alphanumeric characters/non-underscores
-	b.ResourceName = regexp.MustCompile(`[^a-zA-Z0-9_]+`).ReplaceAllString(b.ResourceName, "")
-	// Remove all numbers in beginning of string
-	b.ResourceName = regexp.MustCompile(`^\d+`).ReplaceAllString(b.ResourceName, "")
-	// Prefix resource names with pingcli-
-	b.ResourceName = "pingcli-" + strings.ToLower(b.ResourceName)
+	// Hexidecimal encode special characters
+	b.ResourceName = regexp.MustCompile(`[^0-9A-Za-z_\-]`).ReplaceAllStringFunc(b.ResourceName, func(s string) string {
+		return fmt.Sprintf("-%04X-", s)
+	})
+	// Prefix resource names with pingcli--
+	b.ResourceName = "pingcli--" + strings.ToLower(b.ResourceName)
 }
 
 func (b *ImportBlock) Equals(a ImportBlock) bool {
