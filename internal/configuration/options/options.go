@@ -47,6 +47,7 @@ func Options() []Option {
 		PingOneRegionCodeOption,
 
 		PlatformExportExportFormatOption,
+		PlatformExportServiceGroupOption,
 		PlatformExportServiceOption,
 		PlatformExportOutputDirectoryOption,
 		PlatformExportOverwriteOption,
