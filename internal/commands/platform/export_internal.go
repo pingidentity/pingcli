@@ -48,6 +48,10 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if err != nil {
 		return err
 	}
+	exportServiceGroup, err := profiles.GetOptionValue(options.PlatformExportServiceGroupOption)
+	if err != nil {
+		return err
+	}
 	exportServices, err := profiles.GetOptionValue(options.PlatformExportServiceOption)
 	if err != nil {
 		return err
@@ -61,20 +65,38 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		return err
 	}
 
-	es := new(customtypes.ExportServices)
-	if err = es.Set(exportServices); err != nil {
-		return err
-	}
-
-	if es.ContainsPingOneService() {
-		if err = initPingOneServices(ctx, commandVersion); err != nil {
+	var exportableConnectors *[]connector.Exportable
+	if exportServices != "" {
+		es := new(customtypes.ExportServices)
+		if err = es.Set(exportServices); err != nil {
 			return err
 		}
+
+		if es.ContainsPingOneService() {
+			if err = initPingOneServices(ctx, commandVersion); err != nil {
+				return err
+			}
+		}
+
+		if es.ContainsPingFederateService() {
+			if err = initPingFederateServices(ctx, commandVersion); err != nil {
+				return err
+			}
+		}
+
+		exportableConnectors = getExportableConnectors(es)
 	}
 
-	if es.ContainsPingFederateService() {
-		if err = initPingFederateServices(ctx, commandVersion); err != nil {
-			return err
+	if exportServiceGroup != "" {
+		switch exportServiceGroup {
+		case customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE:
+			if err = initPingOneServices(ctx, commandVersion); err != nil {
+				return err
+			}
+
+			exportableConnectors = getPingOneExportableConnectors()
+		default:
+			return fmt.Errorf("failed to get service group %s. Allowed service groups: %s", exportServiceGroup, strings.Join(customtypes.ExportServiceGroupValidValues(), ", "))
 		}
 	}
 
@@ -85,8 +107,6 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if outputDir, err = createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
 		return err
 	}
-
-	exportableConnectors := getExportableConnectors(es)
 
 	if err := exportConnectors(exportableConnectors, exportFormat, outputDir, overwriteExportBool); err != nil {
 		return err
@@ -451,6 +471,30 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 	}
 
 	return nil
+}
+
+func getPingOneExportableConnectors() (exportableConnectors *[]connector.Exportable) {
+	// Using the --service-group pingone parameter provided by user, build list of pingone connectors to export
+	pingOneConnectors := []connector.Exportable{}
+
+	for _, service := range customtypes.ExportServicesPingOneValidValues() {
+		switch service {
+		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM:
+			pingOneConnectors = append(pingOneConnectors, platform.PlatformConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
+		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE:
+			pingOneConnectors = append(pingOneConnectors, authorize.AuthorizeConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
+		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO:
+			pingOneConnectors = append(pingOneConnectors, sso.SSOConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
+		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA:
+			pingOneConnectors = append(pingOneConnectors, mfa.MFAConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
+		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT:
+			pingOneConnectors = append(pingOneConnectors, protect.ProtectConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
+			// default:
+			// This unrecognized service condition is handled by cobra with the custom type MultiService
+		}
+	}
+
+	return &pingOneConnectors
 }
 
 func getExportableConnectors(exportServices *customtypes.ExportServices) (exportableConnectors *[]connector.Exportable) {

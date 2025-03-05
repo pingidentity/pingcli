@@ -183,6 +183,31 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a string slice value", pName, typedValue, key)
 			}
+		case options.ENUM_EXPORT_SERVICE_GROUP:
+			switch typedValue := vValue.(type) {
+			case *customtypes.ExportServiceGroup:
+				continue
+			case string:
+				esg := new(customtypes.ExportServiceGroup)
+				if err = esg.Set(typedValue); err != nil {
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a export service group value: %v", pName, typedValue, key, err)
+				}
+			case []any:
+				esg := new(customtypes.ExportServiceGroup)
+				for _, v := range typedValue {
+					switch innerTypedValue := v.(type) {
+					case string:
+						if err = esg.Set(innerTypedValue); err != nil {
+							return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a export service group value: %v", pName, typedValue, key, err)
+						}
+					default:
+						return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a export service group value", pName, typedValue, key)
+					}
+
+				}
+			default:
+				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a export service group value", pName, typedValue, key)
+			}
 		case options.ENUM_EXPORT_SERVICES:
 			switch typedValue := vValue.(type) {
 			case *customtypes.ExportServices:
