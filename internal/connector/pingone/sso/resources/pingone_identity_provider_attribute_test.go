@@ -18,7 +18,7 @@ func TestIdentityProviderAttributeExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_identity_provider_attribute",
-			ResourceName: "Test IdP_username",
+			ResourceName: "Default Idp Test_username",
 			ResourceID:   fmt.Sprintf("%s/a99df558-7090-4303-8f35-860ac660e371/51a036c6-41ed-44f7-bd1d-eacaa2a1feab", testutils.GetEnvironmentID()),
 		},
 	}
