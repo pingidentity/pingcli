@@ -88,7 +88,12 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	}
 
 	if exportServiceGroup != "" {
-		switch exportServiceGroup {
+		esg := new(customtypes.ExportServiceGroup)
+		if err = esg.Set(exportServiceGroup); err != nil {
+			return err
+		}
+
+		switch esg.String() {
 		case customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE:
 			if err = initPingOneServices(ctx, commandVersion); err != nil {
 				return err
