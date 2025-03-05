@@ -8,6 +8,7 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
@@ -24,6 +25,8 @@ default:
     outputFormat: text
     export:
         outputDirectory: %s
+        serviceGroup: %s
+        services: ["%s"]
     service:
         pingone:
             regionCode: %s
@@ -109,6 +112,8 @@ func InitVipersCustomFile(t *testing.T, fileContents string) {
 func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
+		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
+		customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		os.Getenv(options.PingOneRegionCodeOption.EnvVar),
 		os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
 		os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),

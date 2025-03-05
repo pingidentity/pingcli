@@ -42,6 +42,7 @@ The following parameters can be configured in Ping CLI's static configuration fi
 | export.outputDirectory | ENUM_STRING | --output-directory / -d | Specifies the output directory for export. Example: `$HOME/pingcli-export` |
 | export.overwrite | ENUM_BOOL | --overwrite / -o | Overwrite the existing generated exports in output directory. |
 | export.pingone.environmentID | ENUM_UUID | --pingone-export-environment-id | The ID of the PingOne environment to export. Must be a valid PingOne UUID. |
+| export.serviceGroup | ENUM_EXPORT_SERVICE_GROUP | --service-group / -g | Specifies the service group to export. <br><br>Options are: pingone.<br><br>Example: `pingone` |
 | export.services | ENUM_EXPORT_SERVICES | --services / -s | Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services.<br><br>Options are: pingfederate, pingone-mfa, pingone-platform, pingone-protect, pingone-sso.<br><br>Example: `pingone-sso,pingone-mfa,pingfederate` |
 
 #### Custom Request Properties

@@ -12,6 +12,7 @@ import (
 func InitPlatformExportOptions() {
 	initFormatOption()
 	initServicesOption()
+	initServiceGroupOption()
 	initOutputDirectoryOption()
 	initOverwriteOption()
 	initPingOneEnvironmentIDOption()
@@ -45,12 +46,37 @@ func initFormatOption() {
 	}
 }
 
+func initServiceGroupOption() {
+	cobraParamName := "service-group"
+	cobraValue := new(customtypes.ExportServiceGroup)
+	defaultValue := customtypes.ExportServiceGroup("")
+	envVar := "PINGCLI_EXPORT_SERVICE_GROUP"
+	options.PlatformExportServiceGroupOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:      cobraParamName,
+			Shorthand: "g",
+			Usage: fmt.Sprintf(
+				"Specifies the service group to export. "+
+					"\nOptions are: %s.",
+				strings.Join(customtypes.ExportServiceGroupValidValues(), ", "),
+			),
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.ENUM_EXPORT_SERVICE_GROUP,
+		ViperKey:  "export.serviceGroup",
+	}
+}
+
 func initServicesOption() {
 	cobraParamName := "services"
 	cobraValue := new(customtypes.ExportServices)
-	defaultValue := customtypes.ExportServices(customtypes.ExportServicesValidValues())
+	defaultValue := customtypes.ExportServices([]string{})
 	envVar := "PINGCLI_EXPORT_SERVICES"
-
 	options.PlatformExportServiceOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
