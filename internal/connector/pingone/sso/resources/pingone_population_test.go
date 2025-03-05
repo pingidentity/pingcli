@@ -26,6 +26,11 @@ func TestPopulationExport(t *testing.T) {
 			ResourceName: "LDAP Gateway Population",
 			ResourceID:   fmt.Sprintf("%s/374fdb3c-4e94-4547-838a-0c200b9a7c70", testutils.GetEnvironmentID()),
 		},
+		{
+			ResourceType: "pingone_population",
+			ResourceName: "Test Default Idp Population",
+			ResourceID:   fmt.Sprintf("%s/2814912d-4a0f-4104-a779-80c13b2a6dcd", testutils.GetEnvironmentID()),
+		},
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)

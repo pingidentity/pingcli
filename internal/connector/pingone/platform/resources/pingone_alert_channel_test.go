@@ -5,21 +5,21 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/connector"
-	"github.com/pingidentity/pingcli/internal/connector/pingone/sso/resources"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/platform/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 )
 
-func TestIdentityProviderAttributeExport(t *testing.T) {
+func TestAlertChannelExport(t *testing.T) {
 	// Get initialized apiClient and resource
 	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.IdentityProviderAttribute(PingOneClientInfo)
+	resource := resources.AlertChannel(PingOneClientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
-			ResourceType: "pingone_identity_provider_attribute",
-			ResourceName: "Default Idp Test_username",
-			ResourceID:   fmt.Sprintf("%s/a99df558-7090-4303-8f35-860ac660e371/51a036c6-41ed-44f7-bd1d-eacaa2a1feab", testutils.GetEnvironmentID()),
+			ResourceType: "pingone_alert_channel",
+			ResourceName: "Test Alert Channel",
+			ResourceID:   fmt.Sprintf("%s/6035f516-b474-4941-945a-76514913a74d", testutils.GetEnvironmentID()),
 		},
 	}
 
