@@ -7,8 +7,8 @@ require (
 	github.com/golangci/golangci-lint v1.63.4
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/manifoldco/promptui v0.9.0
-	github.com/patrickcping/pingone-go-sdk-v2 v0.12.7
-	github.com/patrickcping/pingone-go-sdk-v2/management v0.47.0
+	github.com/patrickcping/pingone-go-sdk-v2 v0.12.8
+	github.com/patrickcping/pingone-go-sdk-v2/management v0.48.0
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.18.0
 	github.com/pavius/impi v0.0.3
 	github.com/pingidentity/pingfederate-go-client/v1210 v1210.0.5
@@ -16,9 +16,11 @@ require (
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.19.0
-	golang.org/x/mod v0.22.0
+	golang.org/x/mod v0.23.0
 	gopkg.in/yaml.v3 v3.0.1
 )
+
+replace github.com/patrickcping/pingone-go-sdk-v2/management => github.com/patrickcping/pingone-go-sdk-v2/management v0.48.1-0.20250206155309-4a4785138884
 
 require (
 	4d63.com/gocheckcompilerdirectives v1.2.1 // indirect

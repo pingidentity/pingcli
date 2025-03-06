@@ -8,7 +8,6 @@ import (
 
 type ResourceCreationInfoType string
 
-// OptionType enums
 const (
 	// General ID and Name enums for most resource creation
 	ENUM_ID   ResourceCreationInfoType = "ENUM_ID"
@@ -31,54 +30,71 @@ const (
 
 type ResourceCreationInfo map[ResourceCreationInfoType]string
 
-type TestResource struct {
-	// Resources required to be created before this resource can be created
-	Dependencies []TestResource
+// The TestableResource struct is used to create and delete resources in a test, without prior configuration needed
+// on a service. This allows different developers and contributors to provide their own test service credentials,
+// which would consistently create and clean configuration needed for testing without requiring shared credentials on
+// a central test service.
+//
+// Further, this struct is notably decoupled from resource unit tests and service connector integration test. This
+// allows for both tests to leverage the same struct, without worrying about setup and cleanup. Golang 'defer' applies
+// to the current scope, so this allows for each test to have its own setup and cleanup, without knowing which test
+// ran first or if the resource is still needed for subsequent tests.
+//
+// Finally, this struct allows the integration test to initialize terraform only once, which makes the terraform
+// --generate-config-out testing almost an order of magnitude faster.
+type TestableResource struct {
+	// SDK client used in creation and deletion of this TestableResource
+	ClientInfo *connector.ClientInfo
 
-	// Creation function for this resource
+	// Creation function for this TestableResources
 	CreateFunc func(*testing.T, *connector.ClientInfo, ...string) ResourceCreationInfo
 
-	// Deletion function for this resource
+	// TestableResource information like ID, Name, etc.
+	CreationInfo ResourceCreationInfo
+
+	// Deletion function for this TestableResources
 	DeleteFunc func(*testing.T, *connector.ClientInfo, string, string)
 
-	CreationInfo ResourceCreationInfo
-}
+	// TestableResources required to be created before this TestableResource can be created
+	Dependencies []TestableResource
 
-type TestableResource struct {
-	ClientInfo         *connector.ClientInfo
+	// ExportableResource that this TestableResource is testing
 	ExportableResource connector.ExportableResource
-	TestResource       TestResource
 }
 
-func (tr *TestableResource) CreateResource(t *testing.T, testResource TestResource) ResourceCreationInfo {
+func (tr *TestableResource) CreateResource(t *testing.T) ResourceCreationInfo {
 	t.Helper()
 
-	createFuncInfo := []string{tr.ExportableResource.ResourceType()}
-	for _, dependency := range testResource.Dependencies {
-		creationInfo := tr.CreateResource(t, dependency)
-		depId, ok := creationInfo[ENUM_ID]
+	// Each TestableResource CreateFunc takes in the resource type and a variadic list of dependency IDs needed for creation
+	createdDepIds := []string{tr.ExportableResource.ResourceType()}
+
+	for _, dependency := range tr.Dependencies {
+		// Recursively create dependencies
+		resourceCreationInfo := dependency.CreateResource(t)
+		depId, ok := resourceCreationInfo[ENUM_ID]
 		if !ok {
 			t.Fatalf("Failed to get ID from dependency: %v", dependency)
 		}
 
-		createFuncInfo = append(createFuncInfo, depId)
+		createdDepIds = append(createdDepIds, depId)
 	}
 
-	testResource.CreationInfo = testResource.CreateFunc(t, tr.ClientInfo, createFuncInfo...)
+	tr.CreationInfo = tr.CreateFunc(t, tr.ClientInfo, createdDepIds...)
 
-	return testResource.CreationInfo
+	return tr.CreationInfo
 }
 
-func (tr *TestableResource) DeleteResource(t *testing.T, testResource TestResource) {
+func (tr *TestableResource) DeleteResource(t *testing.T) {
 	t.Helper()
 
-	if testResource.DeleteFunc == nil {
+	// Some resources like singletons don't have a delete function
+	if tr.DeleteFunc == nil {
 		return
 	}
 
-	testResource.DeleteFunc(t, tr.ClientInfo, tr.ExportableResource.ResourceType(), testResource.CreationInfo[ENUM_ID])
+	tr.DeleteFunc(t, tr.ClientInfo, tr.ExportableResource.ResourceType(), tr.CreationInfo[ENUM_ID])
 
-	for _, dependency := range testResource.Dependencies {
-		tr.DeleteResource(t, dependency)
+	for _, dependency := range tr.Dependencies {
+		dependency.DeleteResource(t)
 	}
 }
