@@ -36,4 +36,10 @@ func main() {
 		output.UserError(fmt.Sprintf("Failed to execute pingcli: %v", err), nil)
 		os.Exit(1)
 	}
+
+	if output.WarnLogged() {
+		os.Exit(2)
+	} else {
+		os.Exit(0)
+	}
 }
