@@ -63,13 +63,7 @@ func (es ExportServices) ContainsPingOneService() bool {
 		return false
 	}
 
-	pingoneServices := []string{
-		ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
-		ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE,
-		ENUM_EXPORT_SERVICE_PINGONE_SSO,
-		ENUM_EXPORT_SERVICE_PINGONE_MFA,
-		ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
-	}
+	pingoneServices := ExportServicesPingOneValidValues()
 
 	for _, service := range es {
 		if slices.ContainsFunc(pingoneServices, func(s string) bool {
@@ -111,4 +105,18 @@ func ExportServicesValidValues() []string {
 	slices.Sort(allServices)
 
 	return allServices
+}
+
+func ExportServicesPingOneValidValues() []string {
+	pingOneServices := []string{
+		ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE,
+		ENUM_EXPORT_SERVICE_PINGONE_SSO,
+		ENUM_EXPORT_SERVICE_PINGONE_MFA,
+		ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
+	}
+
+	slices.Sort(pingOneServices)
+
+	return pingOneServices
 }
