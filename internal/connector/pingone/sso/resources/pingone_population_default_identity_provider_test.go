@@ -18,7 +18,17 @@ func TestPopulationDefaultIdpExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_population_default_identity_provider",
-			ResourceName: "Test Default Idp Population",
+			ResourceName: "Default_default_identity_provider",
+			ResourceID:   fmt.Sprintf("%s/720da2ce-4dd0-48d9-af75-aeadbda1860d", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_population_default_identity_provider",
+			ResourceName: "LDAP Gateway Population_default_identity_provider",
+			ResourceID:   fmt.Sprintf("%s/374fdb3c-4e94-4547-838a-0c200b9a7c70", testutils.GetEnvironmentID()),
+		},
+		{
+			ResourceType: "pingone_population_default_identity_provider",
+			ResourceName: "Test Default Idp Population_default_identity_provider",
 			ResourceID:   fmt.Sprintf("%s/2814912d-4a0f-4104-a779-80c13b2a6dcd", testutils.GetEnvironmentID()),
 		},
 	}
