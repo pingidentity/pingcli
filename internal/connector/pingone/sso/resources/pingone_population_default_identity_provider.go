@@ -47,7 +47,7 @@ func (r *PingOnePopulationDefaultIdpResource) ExportAll() (*[]connector.ImportBl
 			return nil, err
 		}
 		if !ok {
-			return &importBlocks, nil
+			continue
 		}
 
 		commentData := map[string]string{
