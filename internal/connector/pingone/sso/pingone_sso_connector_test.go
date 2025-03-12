@@ -120,6 +120,11 @@ func TestSSOTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "ResourceSecret",
+			resource:      resources.ResourceSecret(PingOneClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:     "SchemaAttribute",
 			resource: resources.SchemaAttribute(PingOneClientInfo),
 			ignoredErrors: []string{

@@ -84,9 +84,8 @@ func (r *PingOneResourceSecretResource) getResourceData() (map[string]string, er
 		if resourceInner.Resource != nil {
 			resourceId, resourceIdOk := resourceInner.Resource.GetIdOk()
 			resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
-			resourceType, resourceTypeOk := resourceInner.Resource.GetTypeOk()
 
-			if resourceIdOk && resourceNameOk && resourceTypeOk && *resourceType == management.ENUMRESOURCETYPE_CUSTOM {
+			if resourceIdOk && resourceNameOk {
 				resourceData[*resourceId] = *resourceName
 			}
 		}
@@ -96,23 +95,6 @@ func (r *PingOneResourceSecretResource) getResourceData() (map[string]string, er
 }
 
 func (r *PingOneResourceSecretResource) getResourceSecret(resourceId string) (bool, error) {
-	resource, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourceClientSecretApi.ReadResourceSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
-
-	ok, err := common.HandleClientResponse(response, err, "ReadResourceSecret", r.ResourceType())
-	if err != nil {
-		return false, err
-	}
-	if !ok {
-		return false, nil
-	}
-
-	if resource != nil {
-		_, resourceSecretOk := resource.GetSecretOk()
-
-		if resourceSecretOk {
-			return true, nil
-		}
-	}
-
-	return false, fmt.Errorf("unable to get secret for Resource ID: %s", resourceId)
+	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourceClientSecretApi.ReadResourceSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	return common.HandleClientResponse(response, err, "ReadResourceSecret", r.ResourceType())
 }
