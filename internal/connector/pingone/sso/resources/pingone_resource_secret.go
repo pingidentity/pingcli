@@ -84,8 +84,9 @@ func (r *PingOneResourceSecretResource) getResourceData() (map[string]string, er
 		if resourceInner.Resource != nil {
 			resourceId, resourceIdOk := resourceInner.Resource.GetIdOk()
 			resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
+			resourceType, resourceTypeOk := resourceInner.Resource.GetTypeOk()
 
-			if resourceIdOk && resourceNameOk {
+			if resourceIdOk && resourceNameOk && resourceTypeOk && *resourceType == management.ENUMRESOURCETYPE_CUSTOM {
 				resourceData[*resourceId] = *resourceName
 			}
 		}
