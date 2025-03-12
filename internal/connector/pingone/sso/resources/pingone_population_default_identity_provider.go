@@ -42,7 +42,7 @@ func (r *PingOnePopulationDefaultIdpResource) ExportAll() (*[]connector.ImportBl
 	}
 
 	for populationId, populationName := range populationData {
-		ok, err := r.getPopulationDefaultIdp(populationId)
+		ok, err := r.checkPopulationDefaultIdp(populationId)
 		if err != nil {
 			return nil, err
 		}
@@ -91,7 +91,7 @@ func (r *PingOnePopulationDefaultIdpResource) getPopulationData() (map[string]st
 	return populationData, nil
 }
 
-func (r *PingOnePopulationDefaultIdpResource) getPopulationDefaultIdp(populationId string) (bool, error) {
+func (r *PingOnePopulationDefaultIdpResource) checkPopulationDefaultIdp(populationId string) (bool, error) {
 	_, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadOnePopulationDefaultIdp(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, populationId).Execute()
-	return common.HandleClientResponse(resp, err, "ReadOnePopulationDefaultIdp", r.ResourceType())
+	return pingone.CheckSingletonResource(resp, err, "ReadOnePopulationDefaultIdp", r.ResourceType())
 }
