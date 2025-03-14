@@ -39,8 +39,8 @@ func (b *ImportBlock) Sanitize() {
 	b.ResourceName = regexp.MustCompile(`[^0-9A-Za-z_\-]`).ReplaceAllStringFunc(b.ResourceName, func(s string) string {
 		return fmt.Sprintf("-%04X-", s)
 	})
-	// Prefix resource names with pingcli--
-	b.ResourceName = "pingcli--" + b.ResourceName
+	// Prefix resource names with pingcli__
+	b.ResourceName = "pingcli__" + b.ResourceName
 }
 
 func (b *ImportBlock) Equals(a ImportBlock) bool {
