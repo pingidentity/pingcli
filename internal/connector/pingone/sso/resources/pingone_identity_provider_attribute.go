@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,13 +41,13 @@ func (r *PingOneIdentityProviderAttributeResource) ExportAll() (*[]connector.Imp
 		return nil, err
 	}
 
-	for idpId, idpName := range *identityProviderData {
+	for idpId, idpName := range identityProviderData {
 		identityProviderAttributeData, err := r.getIdentityProviderAttributeData(idpId)
 		if err != nil {
 			return nil, err
 		}
 
-		for idpAttributeId, idpAttributeName := range *identityProviderAttributeData {
+		for idpAttributeId, idpAttributeName := range identityProviderAttributeData {
 			commentData := map[string]string{
 				"Export Environment ID":            r.clientInfo.ExportEnvironmentID,
 				"Identity Provider Attribute ID":   idpAttributeId,
@@ -69,89 +71,67 @@ func (r *PingOneIdentityProviderAttributeResource) ExportAll() (*[]connector.Imp
 	return &importBlocks, nil
 }
 
-func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderData() (*map[string]string, error) {
+func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderData() (map[string]string, error) {
 	identityProviderData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	identityProviders, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityProvider](iter, "ReadAllIdentityProviders", "GetIdentityProviders", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllIdentityProviders", r.ResourceType())
-		if err != nil {
-			return nil, err
+	for _, idp := range identityProviders {
+		var (
+			idpId     *string
+			idpIdOk   bool
+			idpName   *string
+			idpNameOk bool
+		)
+
+		switch {
+		case idp.IdentityProviderApple != nil:
+			idpId, idpIdOk = idp.IdentityProviderApple.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderApple.GetNameOk()
+		case idp.IdentityProviderClientIDClientSecret != nil:
+			idpId, idpIdOk = idp.IdentityProviderClientIDClientSecret.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderClientIDClientSecret.GetNameOk()
+		case idp.IdentityProviderFacebook != nil:
+			idpId, idpIdOk = idp.IdentityProviderFacebook.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderFacebook.GetNameOk()
+		case idp.IdentityProviderOIDC != nil:
+			idpId, idpIdOk = idp.IdentityProviderOIDC.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderOIDC.GetNameOk()
+		case idp.IdentityProviderPaypal != nil:
+			idpId, idpIdOk = idp.IdentityProviderPaypal.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderPaypal.GetNameOk()
+		case idp.IdentityProviderSAML != nil:
+			idpId, idpIdOk = idp.IdentityProviderSAML.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderSAML.GetNameOk()
+		default:
+			continue
 		}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, idp := range embedded.GetIdentityProviders() {
-			var (
-				idpId     *string
-				idpIdOk   bool
-				idpName   *string
-				idpNameOk bool
-			)
-
-			switch {
-			case idp.IdentityProviderApple != nil:
-				idpId, idpIdOk = idp.IdentityProviderApple.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderApple.GetNameOk()
-			case idp.IdentityProviderClientIDClientSecret != nil:
-				idpId, idpIdOk = idp.IdentityProviderClientIDClientSecret.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderClientIDClientSecret.GetNameOk()
-			case idp.IdentityProviderFacebook != nil:
-				idpId, idpIdOk = idp.IdentityProviderFacebook.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderFacebook.GetNameOk()
-			case idp.IdentityProviderOIDC != nil:
-				idpId, idpIdOk = idp.IdentityProviderOIDC.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderOIDC.GetNameOk()
-			case idp.IdentityProviderPaypal != nil:
-				idpId, idpIdOk = idp.IdentityProviderPaypal.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderPaypal.GetNameOk()
-			case idp.IdentityProviderSAML != nil:
-				idpId, idpIdOk = idp.IdentityProviderSAML.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderSAML.GetNameOk()
-			default:
-				continue
-			}
-
-			if idpIdOk && idpNameOk {
-				identityProviderData[*idpId] = *idpName
-			}
+		if idpIdOk && idpNameOk {
+			identityProviderData[*idpId] = *idpName
 		}
 	}
 
-	return &identityProviderData, nil
+	return identityProviderData, nil
 }
 
-func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderAttributeData(idpId string) (*map[string]string, error) {
+func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderAttributeData(idpId string) (map[string]string, error) {
 	identityProviderAttributeData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProviderAttributesApi.ReadAllIdentityProviderAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, idpId).Execute()
+	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllIdentityProviderAttributes", "GetAttributes", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllIdentityProviderAttributes", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
-
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, idpAttribute := range embedded.GetAttributes() {
-			idpAttributeId, idpAttributeIdOk := idpAttribute.IdentityProviderAttribute.GetIdOk()
-			idpAttributeName, idpAttributeNameOk := idpAttribute.IdentityProviderAttribute.GetNameOk()
+	for _, attributeInners := range attributeInners {
+		if attributeInners.IdentityProviderAttribute != nil {
+			idpAttributeId, idpAttributeIdOk := attributeInners.IdentityProviderAttribute.GetIdOk()
+			idpAttributeName, idpAttributeNameOk := attributeInners.IdentityProviderAttribute.GetNameOk()
 
 			if idpAttributeIdOk && idpAttributeNameOk {
 				identityProviderAttributeData[*idpAttributeId] = *idpAttributeName
@@ -159,5 +139,5 @@ func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderAttributeD
 		}
 	}
 
-	return &identityProviderAttributeData, nil
+	return identityProviderAttributeData, nil
 }

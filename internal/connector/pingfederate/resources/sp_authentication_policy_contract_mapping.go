@@ -39,15 +39,15 @@ func (r *PingFederateSpAuthenticationPolicyContractMappingResource) ExportAll() 
 		return nil, err
 	}
 
-	for spAuthenticationPolicyContractMappingId, spAuthenticationPolicyContractMappingInfo := range *spAuthenticationPolicyContractMappingData {
+	for spAuthenticationPolicyContractMappingId, spAuthenticationPolicyContractMappingInfo := range spAuthenticationPolicyContractMappingData {
 		spAuthenticationPolicyContractMappingSourceId := spAuthenticationPolicyContractMappingInfo[0]
 		spAuthenticationPolicyContractMappingTargetId := spAuthenticationPolicyContractMappingInfo[1]
 
 		commentData := map[string]string{
-			"Sp Authentication Policy Contract Mapping ID":        spAuthenticationPolicyContractMappingId,
-			"Sp Authentication Policy Contract Mapping Source ID": spAuthenticationPolicyContractMappingSourceId,
-			"Sp Authentication Policy Contract Mapping Target ID": spAuthenticationPolicyContractMappingTargetId,
-			"Resource Type": r.ResourceType(),
+			"Sp Authentication Policy Contract Mapping ID": spAuthenticationPolicyContractMappingId,
+			"Authentication Policy Contract ID":            spAuthenticationPolicyContractMappingSourceId,
+			"Sp Adapter ID":                                spAuthenticationPolicyContractMappingTargetId,
+			"Resource Type":                                r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
@@ -63,13 +63,16 @@ func (r *PingFederateSpAuthenticationPolicyContractMappingResource) ExportAll() 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateSpAuthenticationPolicyContractMappingResource) getSpAuthenticationPolicyContractMappingData() (*map[string][]string, error) {
+func (r *PingFederateSpAuthenticationPolicyContractMappingResource) getSpAuthenticationPolicyContractMappingData() (map[string][]string, error) {
 	spAuthenticationPolicyContractMappingData := make(map[string][]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetApcToSpAdapterMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetApcToSpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -91,5 +94,5 @@ func (r *PingFederateSpAuthenticationPolicyContractMappingResource) getSpAuthent
 		}
 	}
 
-	return &spAuthenticationPolicyContractMappingData, nil
+	return spAuthenticationPolicyContractMappingData, nil
 }

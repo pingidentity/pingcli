@@ -9,18 +9,19 @@ import (
 )
 
 func Test_PingFederateDataStore(t *testing.T) {
-	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.DataStore(pingfederateClientInfo)
+	clientInfo := testutils.GetPingFederateClientInfo(t)
 
-	// Data store is already configured in the PingFederate instance
+	// Data store resource is already created, so no need to use a testable resource
+	resource := resources.DataStore(clientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: resource.ResourceType(),
-			ResourceName: "JDBC_ProvisionerDS",
+			ResourceName: "ProvisionerDS_JDBC",
 			ResourceID:   "ProvisionerDS",
 		},
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+
 }

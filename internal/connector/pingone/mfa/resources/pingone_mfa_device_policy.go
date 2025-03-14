@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, 
 		return nil, err
 	}
 
-	for devicePolicyId, devicePolicyName := range *deviceAuthPolicyData {
+	for devicePolicyId, devicePolicyName := range deviceAuthPolicyData {
 		commentData := map[string]string{
 			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
 			"MFA Device Policy ID":   devicePolicyId,
@@ -60,35 +62,23 @@ func (r *PingOneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, 
 	return &importBlocks, nil
 }
 
-func (r *PingOneMFADevicePolicyResource) getDeviceAuthPolicyData() (*map[string]string, error) {
+func (r *PingOneMFADevicePolicyResource) getDeviceAuthPolicyData() (map[string]string, error) {
 	deviceAuthPolicyData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.MFAAPIClient.DeviceAuthenticationPolicyApi.ReadDeviceAuthenticationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	deviceAuthPolicies, err := pingone.GetMfaAPIObjectsFromIterator[mfa.DeviceAuthenticationPolicy](iter, "ReadDeviceAuthenticationPolicies", "GetDeviceAuthenticationPolicies", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadDeviceAuthenticationPolicies", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, devicePolicy := range deviceAuthPolicies {
+		devicePolicyId, devicePolicyIdOk := devicePolicy.GetIdOk()
+		devicePolicyName, devicePolicyNameOk := devicePolicy.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, devicePolicy := range embedded.GetDeviceAuthenticationPolicies() {
-			devicePolicyId, devicePolicyIdOk := devicePolicy.GetIdOk()
-			devicePolicyName, devicePolicyNameOk := devicePolicy.GetNameOk()
-
-			if devicePolicyIdOk && devicePolicyNameOk {
-				deviceAuthPolicyData[*devicePolicyId] = *devicePolicyName
-			}
+		if devicePolicyIdOk && devicePolicyNameOk {
+			deviceAuthPolicyData[*devicePolicyId] = *devicePolicyName
 		}
 	}
 
-	return &deviceAuthPolicyData, nil
+	return deviceAuthPolicyData, nil
 }

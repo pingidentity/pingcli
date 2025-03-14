@@ -9,8 +9,9 @@ import (
 )
 
 func Test_PingFederateServerSettingsLogging(t *testing.T) {
-	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ServerSettingsLogging(pingfederateClientInfo)
+	clientInfo := testutils.GetPingFederateClientInfo(t)
+
+	resource := resources.ServerSettingsLogging(clientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
@@ -21,4 +22,5 @@ func Test_PingFederateServerSettingsLogging(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+
 }

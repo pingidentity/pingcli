@@ -37,7 +37,7 @@ func (r *PingFederateIdpTokenProcessorResource) ExportAll() (*[]connector.Import
 		return nil, err
 	}
 
-	for idpTokenProcessorId, idpTokenProcessorName := range *idpTokenProcessorData {
+	for idpTokenProcessorId, idpTokenProcessorName := range idpTokenProcessorData {
 		commentData := map[string]string{
 			"Idp Token Processor ID":   idpTokenProcessorId,
 			"Idp Token Processor Name": idpTokenProcessorName,
@@ -57,13 +57,16 @@ func (r *PingFederateIdpTokenProcessorResource) ExportAll() (*[]connector.Import
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIdpTokenProcessorResource) getIdpTokenProcessorData() (*map[string]string, error) {
+func (r *PingFederateIdpTokenProcessorResource) getIdpTokenProcessorData() (map[string]string, error) {
 	idpTokenProcessorData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpTokenProcessorsAPI.GetTokenProcessors(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTokenProcessors", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTokenProcessors", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateIdpTokenProcessorResource) getIdpTokenProcessorData() (*map
 		}
 	}
 
-	return &idpTokenProcessorData, nil
+	return idpTokenProcessorData, nil
 }

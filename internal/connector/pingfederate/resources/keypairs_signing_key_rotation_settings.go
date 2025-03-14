@@ -39,21 +39,29 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) ExportAll() (*[
 		return nil, err
 	}
 
-	for keyPairViewId, keyPairViewInfo := range *keypairsSigningKeyData {
-		keyPairViewIssuerDn := keyPairViewInfo[0]
-		keyPairViewSerialNumber := keyPairViewInfo[1]
+	for keypairsSigningKeyId, keypairsSigningKeyInfo := range keypairsSigningKeyData {
+		ok, err := r.checkKeypairsSigningKeyRotationSettingsData(keypairsSigningKeyId)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			continue
+		}
+
+		keypairsSigningKeyIssuerDn := keypairsSigningKeyInfo[0]
+		keypairsSigningKeySerialNumber := keypairsSigningKeyInfo[1]
 
 		commentData := map[string]string{
-			"Keypairs Signing Key  ID":           keyPairViewId,
-			"Keypairs Signing Key Issuer DN":     keyPairViewIssuerDn,
-			"Keypairs Signing Key Serial Number": keyPairViewSerialNumber,
+			"Keypairs Signing Key ID":            keypairsSigningKeyId,
+			"Keypairs Signing Key Issuer DN":     keypairsSigningKeyIssuerDn,
+			"Keypairs Signing Key Serial Number": keypairsSigningKeySerialNumber,
 			"Resource Type":                      r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s_rotation_settings", keyPairViewIssuerDn, keyPairViewSerialNumber),
-			ResourceID:         keyPairViewId,
+			ResourceName:       fmt.Sprintf("%s_%s_rotation_settings", keypairsSigningKeyIssuerDn, keypairsSigningKeySerialNumber),
+			ResourceID:         keypairsSigningKeyId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -63,13 +71,16 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) ExportAll() (*[
 	return &importBlocks, nil
 }
 
-func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getKeypairsSigningKeyData() (*map[string][]string, error) {
-	keypairsSigningKeyData := make(map[string][]string)
+func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getKeypairsSigningKeyData() (map[string][]string, error) {
+	signingKeyPairData := make(map[string][]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.KeyPairsSigningAPI.GetSigningKeyPairs(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetSigningKeyPairs", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetSigningKeyPairs", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -81,15 +92,24 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getKeypairsSign
 		return nil, common.DataNilError(r.ResourceType(), response)
 	}
 
-	for _, keyPairView := range items {
-		keyPairViewId, keyPairViewIdOk := keyPairView.GetIdOk()
-		keyPairViewIssuerDn, keyPairViewIssuerDnOk := keyPairView.GetIssuerDNOk()
-		keyPairViewSerialNumber, keyPairViewSerialNumberOk := keyPairView.GetSerialNumberOk()
+	for _, signingKeyPair := range items {
+		_, signingKeyPairRotationSettingsOk := signingKeyPair.GetRotationSettingsOk()
 
-		if keyPairViewIdOk && keyPairViewIssuerDnOk && keyPairViewSerialNumberOk {
-			keypairsSigningKeyData[*keyPairViewId] = []string{*keyPairViewIssuerDn, *keyPairViewSerialNumber}
+		if signingKeyPairRotationSettingsOk {
+			signingKeyPairId, signingKeyPairIdOk := signingKeyPair.GetIdOk()
+			signingKeyPairIssuerDN, signingKeyPairIssuerDNOk := signingKeyPair.GetIssuerDNOk()
+			signingKeyPairSerialNumber, signingKeyPairSerialNumberOk := signingKeyPair.GetSerialNumberOk()
+
+			if signingKeyPairIdOk && signingKeyPairIssuerDNOk && signingKeyPairSerialNumberOk {
+				signingKeyPairData[*signingKeyPairId] = []string{*signingKeyPairIssuerDN, *signingKeyPairSerialNumber}
+			}
 		}
 	}
 
-	return &keypairsSigningKeyData, nil
+	return signingKeyPairData, nil
+}
+
+func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) checkKeypairsSigningKeyRotationSettingsData(id string) (bool, error) {
+	_, response, err := r.clientInfo.PingFederateApiClient.KeyPairsSigningAPI.GetRotationSettings(r.clientInfo.Context, id).Execute()
+	return common.CheckSingletonResource(response, err, "GetRotationSettings", r.ResourceType())
 }

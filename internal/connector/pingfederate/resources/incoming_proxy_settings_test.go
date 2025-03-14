@@ -9,8 +9,9 @@ import (
 )
 
 func Test_PingFederateIncomingProxySettings(t *testing.T) {
-	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.IncomingProxySettings(pingfederateClientInfo)
+	clientInfo := testutils.GetPingFederateClientInfo(t)
+
+	resource := resources.IncomingProxySettings(clientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
@@ -21,4 +22,5 @@ func Test_PingFederateIncomingProxySettings(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+
 }

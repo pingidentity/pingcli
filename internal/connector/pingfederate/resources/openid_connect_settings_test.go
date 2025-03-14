@@ -9,8 +9,9 @@ import (
 )
 
 func Test_PingFederateOpenidConnectSettings(t *testing.T) {
-	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.OpenidConnectSettings(pingfederateClientInfo)
+	clientInfo := testutils.GetPingFederateClientInfo(t)
+
+	resource := resources.OpenidConnectSettings(clientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
@@ -21,4 +22,5 @@ func Test_PingFederateOpenidConnectSettings(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+
 }

@@ -9,8 +9,9 @@ import (
 )
 
 func Test_PingFederateServiceAuthentication(t *testing.T) {
-	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ServiceAuthentication(pingfederateClientInfo)
+	clientInfo := testutils.GetPingFederateClientInfo(t)
+
+	resource := resources.ServiceAuthentication(clientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
@@ -21,4 +22,5 @@ func Test_PingFederateServiceAuthentication(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+
 }

@@ -9,16 +9,16 @@ import (
 )
 
 func Test_PingFederateClusterSettings(t *testing.T) {
-	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ClusterSettings(pingfederateClientInfo)
+	clientInfo := testutils.GetPingFederateClientInfo(t)
+
+	resource := resources.ClusterSettings(clientInfo)
 
 	valid, err := resource.ValidPingFederateVersion()
 	if err != nil {
-		t.Fatalf("Failed to validate PingFederate version: %v", err)
+		t.Errorf("Error checking version compatibility: %v", err)
 	}
 	if !valid {
-		t.Logf("'%s' Resource is not supported in the version of PingFederate used. Skipping tests for export.", resource.ResourceType())
-		t.SkipNow()
+		t.Skipf("'%s' Resource is not supported in the version of PingFederate used. Skipping export test.", resource.ResourceType())
 	}
 
 	expectedImportBlocks := []connector.ImportBlock{
@@ -30,4 +30,5 @@ func Test_PingFederateClusterSettings(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+
 }

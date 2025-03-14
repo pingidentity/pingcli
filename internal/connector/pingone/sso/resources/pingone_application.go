@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneApplicationResource) ExportAll() (*[]connector.ImportBlock, erro
 		return nil, err
 	}
 
-	for appId, appName := range *applicationData {
+	for appId, appName := range applicationData {
 		commentData := map[string]string{
 			"Application ID":        appId,
 			"Application Name":      appName,
@@ -60,53 +62,41 @@ func (r *PingOneApplicationResource) ExportAll() (*[]connector.ImportBlock, erro
 	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationResource) getApplicationData() (*map[string]string, error) {
+func (r *PingOneApplicationResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
-		if err != nil {
-			return nil, err
+	for _, app := range applications {
+		var (
+			appId     *string
+			appIdOk   bool
+			appName   *string
+			appNameOk bool
+		)
+
+		switch {
+		case app.ApplicationOIDC != nil:
+			appId, appIdOk = app.ApplicationOIDC.GetIdOk()
+			appName, appNameOk = app.ApplicationOIDC.GetNameOk()
+		case app.ApplicationSAML != nil:
+			appId, appIdOk = app.ApplicationSAML.GetIdOk()
+			appName, appNameOk = app.ApplicationSAML.GetNameOk()
+		case app.ApplicationExternalLink != nil:
+			appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
+			appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
+		default:
+			continue
 		}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, app := range embedded.GetApplications() {
-			var (
-				appId     *string
-				appIdOk   bool
-				appName   *string
-				appNameOk bool
-			)
-
-			switch {
-			case app.ApplicationOIDC != nil:
-				appId, appIdOk = app.ApplicationOIDC.GetIdOk()
-				appName, appNameOk = app.ApplicationOIDC.GetNameOk()
-			case app.ApplicationSAML != nil:
-				appId, appIdOk = app.ApplicationSAML.GetIdOk()
-				appName, appNameOk = app.ApplicationSAML.GetNameOk()
-			case app.ApplicationExternalLink != nil:
-				appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
-				appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
-			default:
-				continue
-			}
-
-			if appIdOk && appNameOk {
-				applicationData[*appId] = *appName
-			}
+		if appIdOk && appNameOk {
+			applicationData[*appId] = *appName
 		}
 	}
 
-	return &applicationData, nil
+	return applicationData, nil
 }

@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/risk"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -34,12 +36,12 @@ func (r *PingOneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error
 
 	importBlocks := []connector.ImportBlock{}
 
-	ristPolicySetData, err := r.getRiskPolicySetData()
+	riskPolicySetData, err := r.getRiskPolicySetData()
 	if err != nil {
 		return nil, err
 	}
 
-	for riskPolicySetId, riskPolicySetName := range *ristPolicySetData {
+	for riskPolicySetId, riskPolicySetName := range riskPolicySetData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
@@ -60,35 +62,23 @@ func (r *PingOneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error
 	return &importBlocks, nil
 }
 
-func (r *PingOneRiskPolicyResource) getRiskPolicySetData() (*map[string]string, error) {
+func (r *PingOneRiskPolicyResource) getRiskPolicySetData() (map[string]string, error) {
 	riskPolicySetData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskPoliciesApi.ReadRiskPolicySets(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	riskPolicySets, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPolicySet](iter, "ReadRiskPolicySets", "GetRiskPolicySets", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadRiskPolicySets", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, riskPolicySet := range riskPolicySets {
+		riskPolicySetName, riskPolicySetNameOk := riskPolicySet.GetNameOk()
+		riskPolicySetId, riskPolicySetIdOk := riskPolicySet.GetIdOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, riskPolicySet := range embedded.GetRiskPolicySets() {
-			riskPolicySetName, riskPolicySetNameOk := riskPolicySet.GetNameOk()
-			riskPolicySetId, riskPolicySetIdOk := riskPolicySet.GetIdOk()
-
-			if riskPolicySetIdOk && riskPolicySetNameOk {
-				riskPolicySetData[*riskPolicySetId] = *riskPolicySetName
-			}
+		if riskPolicySetIdOk && riskPolicySetNameOk {
+			riskPolicySetData[*riskPolicySetId] = *riskPolicySetName
 		}
 	}
 
-	return &riskPolicySetData, nil
+	return riskPolicySetData, nil
 }

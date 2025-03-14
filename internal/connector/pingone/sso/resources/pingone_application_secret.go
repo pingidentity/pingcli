@@ -3,9 +3,12 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
 )
 
 // Verify that the resource satisfies the exportable resource interface
@@ -39,7 +42,7 @@ func (r *PingOneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock
 		return nil, err
 	}
 
-	for appId, appName := range *applicationData {
+	for appId, appName := range applicationData {
 		ok, err := r.checkApplicationSecretData(appId)
 		if err != nil {
 			return nil, err
@@ -69,79 +72,70 @@ func (r *PingOneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationSecretResource) getApplicationData() (*map[string]string, error) {
+func (r *PingOneApplicationSecretResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
-		if err != nil {
-			return nil, err
+	for _, app := range applications {
+		var (
+			appId     *string
+			appIdOk   bool
+			appName   *string
+			appNameOk bool
+		)
+
+		switch {
+		case app.ApplicationOIDC != nil:
+			appId, appIdOk = app.ApplicationOIDC.GetIdOk()
+			appName, appNameOk = app.ApplicationOIDC.GetNameOk()
+		case app.ApplicationSAML != nil:
+			appId, appIdOk = app.ApplicationSAML.GetIdOk()
+			appName, appNameOk = app.ApplicationSAML.GetNameOk()
+		case app.ApplicationExternalLink != nil:
+			appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
+			appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
+		default:
+			continue
 		}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, app := range embedded.GetApplications() {
-			var (
-				appId     *string
-				appIdOk   bool
-				appName   *string
-				appNameOk bool
-			)
-
-			switch {
-			case app.ApplicationOIDC != nil:
-				appId, appIdOk = app.ApplicationOIDC.GetIdOk()
-				appName, appNameOk = app.ApplicationOIDC.GetNameOk()
-			case app.ApplicationSAML != nil:
-				appId, appIdOk = app.ApplicationSAML.GetIdOk()
-				appName, appNameOk = app.ApplicationSAML.GetNameOk()
-			case app.ApplicationExternalLink != nil:
-				appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
-				appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
-			default:
-				continue
-			}
-
-			if appIdOk && appNameOk {
-				applicationData[*appId] = *appName
-			}
+		if appIdOk && appNameOk {
+			applicationData[*appId] = *appName
 		}
 	}
 
-	return &applicationData, nil
+	return applicationData, nil
 }
 
 func (r *PingOneApplicationSecretResource) checkApplicationSecretData(appId string) (bool, error) {
-	l := logger.Get()
-
 	// The platform enforces that worker apps cannot read their own secret
 	// Make sure we can read the secret before adding it to the import blocks
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	defer response.Body.Close()
 
 	// If the appId is the same as the worker ID, make sure the API response is a 403 and ignore the error
 	if appId == *r.clientInfo.ApiClientId {
 		if response.StatusCode == 403 {
 			return false, nil
 		} else {
-			return false, fmt.Errorf("ReadApplicationSecret: Expected response code 403 - worker apps cannot read their own secret, actual response code: %d", response.StatusCode)
+			return false, fmt.Errorf("error: Expected 403 Forbidden response - worker apps cannot read their own secret\n%s Response Code: %s\nResponse Body: %s", "ReadApplicationSecret", response.Status, response.Body)
 		}
 	}
 
 	// Use output package to warn the user of any errors or non-200 response codes
 	// Expected behavior in this case is to skip the resource, and continue exporting the other resources
-	defer response.Body.Close()
-
 	if err != nil || response.StatusCode >= 300 || response.StatusCode < 200 {
-		l.Warn().Msgf("Failed to read secret for application %s. %s Response Code: %s\nResponse Body: %s", appId, "ReadApplicationSecret", response.Status, response.Body)
+		output.Warn("Failed to read secret for application", map[string]interface{}{
+			"Application ID":    appId,
+			"API Function Name": "ReadApplicationSecret",
+			"Response Code":     response.Status,
+			"Response Body":     response.Body,
+		})
+		return false, nil
 	}
 
 	return true, nil

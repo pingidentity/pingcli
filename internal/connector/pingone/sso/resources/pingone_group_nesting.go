@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,13 +41,13 @@ func (r *PingOneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, err
 		return nil, err
 	}
 
-	for parentGroupId, parentGroupName := range *groupData {
+	for parentGroupId, parentGroupName := range groupData {
 		groupNestingData, err := r.getGroupNestingData(parentGroupId)
 		if err != nil {
 			return nil, err
 		}
 
-		for nestedGroupId, nestedGroupName := range *groupNestingData {
+		for nestedGroupId, nestedGroupName := range groupNestingData {
 			commentData := map[string]string{
 				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 				"Nested Group ID":       nestedGroupId,
@@ -69,68 +71,44 @@ func (r *PingOneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, err
 	return &importBlocks, nil
 }
 
-func (r *PingOneGroupNestingResource) getGroupData() (*map[string]string, error) {
+func (r *PingOneGroupNestingResource) getGroupData() (map[string]string, error) {
 	groupData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	groups, err := pingone.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, parentGroup := range groups {
+		parentGroupId, parentGroupIdOk := parentGroup.GetIdOk()
+		parentGroupName, parentGroupNameOk := parentGroup.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, parentGroup := range embedded.GetGroups() {
-			parentGroupId, parentGroupIdOk := parentGroup.GetIdOk()
-			parentGroupName, parentGroupNameOk := parentGroup.GetNameOk()
-
-			if parentGroupIdOk && parentGroupNameOk {
-				groupData[*parentGroupId] = *parentGroupName
-			}
+		if parentGroupIdOk && parentGroupNameOk {
+			groupData[*parentGroupId] = *parentGroupName
 		}
 	}
 
-	return &groupData, nil
+	return groupData, nil
 }
 
-func (r *PingOneGroupNestingResource) getGroupNestingData(parentGroupId string) (*map[string]string, error) {
+func (r *PingOneGroupNestingResource) getGroupNestingData(parentGroupId string) (map[string]string, error) {
 	groupNestingData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadGroupNesting(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, parentGroupId).Execute()
+	groupNestings, err := pingone.GetManagementAPIObjectsFromIterator[management.GroupMembership](iter, "ReadGroupNesting", "GetGroupMemberships", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadGroupNesting", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, nestedGroup := range groupNestings {
+		nestedGroupId, nestedGroupIdOk := nestedGroup.GetIdOk()
+		nestedGroupName, nestedGroupNameOk := nestedGroup.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, nestedGroup := range embedded.GetGroupMemberships() {
-			nestedGroupId, nestedGroupIdOk := nestedGroup.GetIdOk()
-			nestedGroupName, nestedGroupNameOk := nestedGroup.GetNameOk()
-
-			if nestedGroupIdOk && nestedGroupNameOk {
-				groupNestingData[*nestedGroupId] = *nestedGroupName
-			}
+		if nestedGroupIdOk && nestedGroupNameOk {
+			groupNestingData[*nestedGroupId] = *nestedGroupName
 		}
 	}
 
-	return &groupNestingData, nil
+	return groupNestingData, nil
 }

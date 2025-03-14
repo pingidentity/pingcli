@@ -430,9 +430,12 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 	}
 
 	environment, response, err := pingoneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(ctx, pingoneExportEnvID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadOneEnvironment", "pingone_environment")
+	ok, err := common.HandleClientResponse(response, err, "ReadOneEnvironment", "pingone_environment")
 	if err != nil {
 		return err
+	}
+	if !ok {
+		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
 	}
 
 	if environment == nil {

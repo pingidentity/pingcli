@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -36,9 +37,7 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 	if err != nil {
 		return nil, err
 	}
-
 	if !ok {
-		l.Debug().Msgf("No '%s' resources to export. Skipping...", r.ResourceType())
 		return &importBlocks, nil
 	}
 
@@ -61,14 +60,5 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 
 func (r *PingOneFormRecaptchaV2Resource) checkFormRecaptchaV2Data() (bool, error) {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
-	if err != nil {
-		return false, err
-	}
-
-	if response.StatusCode == 204 {
-		return false, nil
-	}
-
-	return true, nil
+	return pingone.CheckSingletonResource(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
 }

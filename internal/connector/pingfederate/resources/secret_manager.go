@@ -37,7 +37,7 @@ func (r *PingFederateSecretManagerResource) ExportAll() (*[]connector.ImportBloc
 		return nil, err
 	}
 
-	for secretManagerId, secretManagerName := range *secretManagerData {
+	for secretManagerId, secretManagerName := range secretManagerData {
 		commentData := map[string]string{
 			"Secret Manager ID":   secretManagerId,
 			"Secret Manager Name": secretManagerName,
@@ -57,13 +57,16 @@ func (r *PingFederateSecretManagerResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func (r *PingFederateSecretManagerResource) getSecretManagerData() (*map[string]string, error) {
+func (r *PingFederateSecretManagerResource) getSecretManagerData() (map[string]string, error) {
 	secretManagerData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.SecretManagersAPI.GetSecretManagers(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetSecretManagers", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetSecretManagers", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateSecretManagerResource) getSecretManagerData() (*map[string]
 		}
 	}
 
-	return &secretManagerData, nil
+	return secretManagerData, nil
 }

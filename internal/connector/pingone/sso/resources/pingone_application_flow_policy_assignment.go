@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,16 +41,19 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connect
 		return nil, err
 	}
 
-	for appId, appName := range *applicationData {
+	for appId, appName := range applicationData {
 		flowPolicyAssignmentData, err := r.getFlowPolicyAssignmentData(appId)
 		if err != nil {
 			return nil, err
 		}
 
-		for flowPolicyAssignmentId, flowPolicyId := range *flowPolicyAssignmentData {
-			flowPolicyName, err := r.getFlowPolicyName(flowPolicyId)
+		for flowPolicyAssignmentId, flowPolicyId := range flowPolicyAssignmentData {
+			flowPolicyName, flowPolicyNameOk, err := r.getFlowPolicyName(flowPolicyId)
 			if err != nil {
 				return nil, err
+			}
+			if !flowPolicyNameOk {
+				continue
 			}
 
 			commentData := map[string]string{
@@ -56,13 +61,13 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connect
 				"Application Name":          appName,
 				"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
 				"Flow Policy Assignment ID": flowPolicyAssignmentId,
-				"Flow Policy Name":          *flowPolicyName,
+				"Flow Policy Name":          flowPolicyName,
 				"Resource Type":             r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", appName, *flowPolicyName),
+				ResourceName:       fmt.Sprintf("%s_%s", appName, flowPolicyName),
 				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, flowPolicyAssignmentId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
@@ -74,109 +79,88 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connect
 	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationFlowPolicyAssignmentResource) getApplicationData() (*map[string]string, error) {
+func (r *PingOneApplicationFlowPolicyAssignmentResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
-		if err != nil {
-			return nil, err
+	for _, app := range applications {
+		var (
+			appId     *string
+			appIdOk   bool
+			appName   *string
+			appNameOk bool
+		)
+
+		switch {
+		case app.ApplicationOIDC != nil:
+			appId, appIdOk = app.ApplicationOIDC.GetIdOk()
+			appName, appNameOk = app.ApplicationOIDC.GetNameOk()
+		case app.ApplicationSAML != nil:
+			appId, appIdOk = app.ApplicationSAML.GetIdOk()
+			appName, appNameOk = app.ApplicationSAML.GetNameOk()
+		case app.ApplicationExternalLink != nil:
+			appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
+			appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
+		default:
+			continue
 		}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, app := range embedded.GetApplications() {
-			var (
-				appId     *string
-				appIdOk   bool
-				appName   *string
-				appNameOk bool
-			)
-
-			switch {
-			case app.ApplicationOIDC != nil:
-				appId, appIdOk = app.ApplicationOIDC.GetIdOk()
-				appName, appNameOk = app.ApplicationOIDC.GetNameOk()
-			case app.ApplicationSAML != nil:
-				appId, appIdOk = app.ApplicationSAML.GetIdOk()
-				appName, appNameOk = app.ApplicationSAML.GetNameOk()
-			case app.ApplicationExternalLink != nil:
-				appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
-				appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
-			default:
-				continue
-			}
-
-			if appIdOk && appNameOk {
-				applicationData[*appId] = *appName
-			}
+		if appIdOk && appNameOk {
+			applicationData[*appId] = *appName
 		}
 	}
 
-	return &applicationData, nil
+	return applicationData, nil
 }
 
-func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyAssignmentData(appId string) (*map[string]string, error) {
+func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyAssignmentData(appId string) (map[string]string, error) {
 	flowPolicyAssignmentData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationFlowPolicyAssignmentsApi.ReadAllFlowPolicyAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	flowPolicyAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.FlowPolicyAssignment](iter, "ReadAllFlowPolicyAssignments", "GetFlowPolicyAssignments", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllFlowPolicyAssignments", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, flowPolicyAssignment := range flowPolicyAssignments {
+		flowPolicyAssignmentId, flowPolicyAssignmentIdOk := flowPolicyAssignment.GetIdOk()
+		flowPolicyAssignmentFlowPolicy, flowPolicyAssignmentFlowPolicyOk := flowPolicyAssignment.GetFlowPolicyOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+		if flowPolicyAssignmentIdOk && flowPolicyAssignmentFlowPolicyOk {
+			flowPolicyId, flowPolicyIdOk := flowPolicyAssignmentFlowPolicy.GetIdOk()
 
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, flowPolicyAssignment := range embedded.GetFlowPolicyAssignments() {
-			flowPolicyAssignmentId, flowPolicyAssignmentIdOk := flowPolicyAssignment.GetIdOk()
-			flowPolicyAssignmentFlowPolicy, flowPolicyAssignmentFlowPolicyOk := flowPolicyAssignment.GetFlowPolicyOk()
-
-			if flowPolicyAssignmentIdOk && flowPolicyAssignmentFlowPolicyOk {
-				flowPolicyId, flowPolicyIdOk := flowPolicyAssignmentFlowPolicy.GetIdOk()
-
-				if flowPolicyIdOk {
-					flowPolicyAssignmentData[*flowPolicyAssignmentId] = *flowPolicyId
-				}
+			if flowPolicyIdOk {
+				flowPolicyAssignmentData[*flowPolicyAssignmentId] = *flowPolicyId
 			}
 		}
 	}
 
-	return &flowPolicyAssignmentData, nil
+	return flowPolicyAssignmentData, nil
 }
 
-func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyName(flowPolicyId string) (*string, error) {
+func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyName(flowPolicyId string) (string, bool, error) {
 	flowPolicy, response, err := r.clientInfo.ApiClient.ManagementAPIClient.FlowPoliciesApi.ReadOneFlowPolicy(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, flowPolicyId).Execute()
 
-	err = common.HandleClientResponse(response, err, "ReadOneFlowPolicy", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "ReadOneFlowPolicy", r.ResourceType())
 	if err != nil {
-		return nil, err
+		return "", false, err
+	}
+	if !ok {
+		return "", false, nil
 	}
 
 	if flowPolicy != nil {
 		flowPolicyName, flowPolicyNameOk := flowPolicy.GetNameOk()
 
 		if flowPolicyNameOk {
-			return flowPolicyName, nil
+			return *flowPolicyName, true, nil
 		}
 	}
 
-	return nil, fmt.Errorf("Unable to get Flow Policy Name for Flow Policy ID: %s", flowPolicyId)
+	return "", false, fmt.Errorf("unable to get Flow Policy Name for Flow Policy ID: %s", flowPolicyId)
 }

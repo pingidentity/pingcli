@@ -31,18 +31,21 @@ func createAuthenticationApiApplication(t *testing.T, clientInfo *connector.Clie
 	resourceType := strArgs[0]
 
 	request := clientInfo.PingFederateApiClient.AuthenticationApiAPI.CreateApplication(clientInfo.Context)
-	result := client.AuthnApiApplication{
+	clientStruct := client.AuthnApiApplication{
 		Id:   "TestAuthnApiApplicationId",
 		Name: "TestAuthnApiApplicationName",
 		Url:  "https://www.example.com",
 	}
 
-	request = request.Body(result)
+	request = request.Body(clientStruct)
 
 	resource, response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "CreateApplication", resourceType)
+	ok, err := common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+	}
+	if !ok {
+		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -57,8 +60,11 @@ func deleteAuthenticationApiApplication(t *testing.T, clientInfo *connector.Clie
 	request := clientInfo.PingFederateApiClient.AuthenticationApiAPI.DeleteApplication(clientInfo.Context, id)
 
 	response, err := request.Execute()
-	err = common.HandleClientResponse(response, err, "DeleteApplication", resourceType)
+	ok, err := common.HandleClientResponse(response, err, "DeleteApplication", resourceType)
 	if err != nil {
 		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+	}
+	if !ok {
+		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
 	}
 }

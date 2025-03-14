@@ -9,8 +9,9 @@ import (
 )
 
 func Test_PingFederateServerSettingsSystemKeysRotate(t *testing.T) {
-	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.ServerSettingsSystemKeysRotate(pingfederateClientInfo)
+	clientInfo := testutils.GetPingFederateClientInfo(t)
+
+	resource := resources.ServerSettingsSystemKeysRotate(clientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
@@ -21,4 +22,5 @@ func Test_PingFederateServerSettingsSystemKeysRotate(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+
 }

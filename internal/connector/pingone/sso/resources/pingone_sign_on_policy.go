@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneSignOnPolicyResource) ExportAll() (*[]connector.ImportBlock, err
 		return nil, err
 	}
 
-	for signOnPolicyId, signOnPolicyName := range *signOnPolicyData {
+	for signOnPolicyId, signOnPolicyName := range signOnPolicyData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
@@ -60,35 +62,23 @@ func (r *PingOneSignOnPolicyResource) ExportAll() (*[]connector.ImportBlock, err
 	return &importBlocks, nil
 }
 
-func (r *PingOneSignOnPolicyResource) getSignOnPolicyData() (*map[string]string, error) {
+func (r *PingOneSignOnPolicyResource) getSignOnPolicyData() (map[string]string, error) {
 	signOnPolicyData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SignOnPoliciesApi.ReadAllSignOnPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	signOnPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.SignOnPolicy](iter, "ReadAllSignOnPolicies", "GetSignOnPolicies", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSignOnPolicies", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, signOnPolicy := range signOnPolicies {
+		signOnPolicyId, signOnPolicyIdOk := signOnPolicy.GetIdOk()
+		signOnPolicyName, signOnPolicyNameOk := signOnPolicy.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, signOnPolicy := range embedded.GetSignOnPolicies() {
-			signOnPolicyId, signOnPolicyIdOk := signOnPolicy.GetIdOk()
-			signOnPolicyName, signOnPolicyNameOk := signOnPolicy.GetNameOk()
-
-			if signOnPolicyIdOk && signOnPolicyNameOk {
-				signOnPolicyData[*signOnPolicyId] = *signOnPolicyName
-			}
+		if signOnPolicyIdOk && signOnPolicyNameOk {
+			signOnPolicyData[*signOnPolicyId] = *signOnPolicyName
 		}
 	}
 
-	return &signOnPolicyData, nil
+	return signOnPolicyData, nil
 }

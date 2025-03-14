@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneNotificationPolicyResource) ExportAll() (*[]connector.ImportBloc
 		return nil, err
 	}
 
-	for notificationPolicyId, notificationPolicyName := range *notificationPolicyData {
+	for notificationPolicyId, notificationPolicyName := range notificationPolicyData {
 		commentData := map[string]string{
 			"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
 			"Notification Policy ID":   notificationPolicyId,
@@ -60,35 +62,23 @@ func (r *PingOneNotificationPolicyResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func (r *PingOneNotificationPolicyResource) getNotificationPolicyData() (*map[string]string, error) {
+func (r *PingOneNotificationPolicyResource) getNotificationPolicyData() (map[string]string, error) {
 	notificationPolicyData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsPoliciesApi.ReadAllNotificationsPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	notificationPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.NotificationsPolicy](iter, "ReadAllNotificationsPolicies", "GetNotificationsPolicies", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllNotificationsPolicies", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, notificationPolicy := range notificationPolicies {
+		notificationPolicyId, notificationPolicyIdOk := notificationPolicy.GetIdOk()
+		notificationPolicyName, notificationPolicyNameOk := notificationPolicy.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, notificationPolicy := range embedded.GetNotificationsPolicies() {
-			notificationPolicyId, notificationPolicyIdOk := notificationPolicy.GetIdOk()
-			notificationPolicyName, notificationPolicyNameOk := notificationPolicy.GetNameOk()
-
-			if notificationPolicyIdOk && notificationPolicyNameOk {
-				notificationPolicyData[*notificationPolicyId] = *notificationPolicyName
-			}
+		if notificationPolicyIdOk && notificationPolicyNameOk {
+			notificationPolicyData[*notificationPolicyId] = *notificationPolicyName
 		}
 	}
 
-	return &notificationPolicyData, nil
+	return notificationPolicyData, nil
 }

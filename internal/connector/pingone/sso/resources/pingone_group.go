@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneGroupResource) ExportAll() (*[]connector.ImportBlock, error) {
 		return nil, err
 	}
 
-	for groupId, groupName := range *groupData {
+	for groupId, groupName := range groupData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Group ID":              groupId,
@@ -60,35 +62,23 @@ func (r *PingOneGroupResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func (r *PingOneGroupResource) getGroupData() (*map[string]string, error) {
+func (r *PingOneGroupResource) getGroupData() (map[string]string, error) {
 	groupData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	groups, err := pingone.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllGroups", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, group := range groups {
+		groupId, groupIdOk := group.GetIdOk()
+		groupName, groupNameOk := group.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, group := range embedded.GetGroups() {
-			groupId, groupIdOk := group.GetIdOk()
-			groupName, groupNameOk := group.GetNameOk()
-
-			if groupIdOk && groupNameOk {
-				groupData[*groupId] = *groupName
-			}
+		if groupIdOk && groupNameOk {
+			groupData[*groupId] = *groupName
 		}
 	}
 
-	return &groupData, nil
+	return groupData, nil
 }

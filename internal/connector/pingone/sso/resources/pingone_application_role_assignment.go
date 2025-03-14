@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -40,30 +41,33 @@ func (r *PingOneApplicationRoleAssignmentResource) ExportAll() (*[]connector.Imp
 		return nil, err
 	}
 
-	for appId, appName := range *applicationData {
+	for appId, appName := range applicationData {
 		applicationRoleAssignmentData, err := r.getApplicationRoleAssignmentData(appId)
 		if err != nil {
 			return nil, err
 		}
 
-		for roleAssignmentId, roleId := range *applicationRoleAssignmentData {
-			roleName, err := r.getRoleName(roleId)
+		for roleAssignmentId, roleId := range applicationRoleAssignmentData {
+			roleName, roleNameOk, err := r.getRoleName(roleId)
 			if err != nil {
 				return nil, err
+			}
+			if !roleNameOk {
+				continue
 			}
 
 			commentData := map[string]string{
 				"Application ID":                 appId,
 				"Application Name":               appName,
 				"Application Role Assignment ID": roleAssignmentId,
-				"Application Role Name":          string(*roleName),
+				"Application Role Name":          string(roleName),
 				"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
 				"Resource Type":                  r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s_%s", appName, string(*roleName), roleAssignmentId),
+				ResourceName:       fmt.Sprintf("%s_%s_%s", appName, string(roleName), roleAssignmentId),
 				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, roleAssignmentId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
@@ -75,122 +79,101 @@ func (r *PingOneApplicationRoleAssignmentResource) ExportAll() (*[]connector.Imp
 	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationRoleAssignmentResource) getApplicationData() (*map[string]string, error) {
+func (r *PingOneApplicationRoleAssignmentResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
-		if err != nil {
-			return nil, err
+	for _, app := range applications {
+		var (
+			appId                  *string
+			appIdOk                bool
+			appName                *string
+			appNameOk              bool
+			appAccessControlRole   *management.ApplicationAccessControlRole
+			appAccessControlRoleOk bool
+		)
+
+		switch {
+		case app.ApplicationOIDC != nil:
+			appId, appIdOk = app.ApplicationOIDC.GetIdOk()
+			appName, appNameOk = app.ApplicationOIDC.GetNameOk()
+			if app.ApplicationOIDC.AccessControl != nil {
+				appAccessControlRole, appAccessControlRoleOk = app.ApplicationOIDC.AccessControl.GetRoleOk()
+			}
+		case app.ApplicationSAML != nil:
+			appId, appIdOk = app.ApplicationSAML.GetIdOk()
+			appName, appNameOk = app.ApplicationSAML.GetNameOk()
+			if app.ApplicationSAML.AccessControl != nil {
+				appAccessControlRole, appAccessControlRoleOk = app.ApplicationSAML.AccessControl.GetRoleOk()
+			}
+		case app.ApplicationExternalLink != nil:
+			appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
+			appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
+			if app.ApplicationExternalLink.AccessControl != nil {
+				appAccessControlRole, appAccessControlRoleOk = app.ApplicationExternalLink.AccessControl.GetRoleOk()
+			}
+		default:
+			continue
 		}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, app := range embedded.GetApplications() {
-			var (
-				appId                  *string
-				appIdOk                bool
-				appName                *string
-				appNameOk              bool
-				appAccessControlRole   *management.ApplicationAccessControlRole
-				appAccessControlRoleOk bool
-			)
-
-			switch {
-			case app.ApplicationOIDC != nil:
-				appId, appIdOk = app.ApplicationOIDC.GetIdOk()
-				appName, appNameOk = app.ApplicationOIDC.GetNameOk()
-				if app.ApplicationOIDC.AccessControl != nil {
-					appAccessControlRole, appAccessControlRoleOk = app.ApplicationOIDC.AccessControl.GetRoleOk()
-				}
-			case app.ApplicationSAML != nil:
-				appId, appIdOk = app.ApplicationSAML.GetIdOk()
-				appName, appNameOk = app.ApplicationSAML.GetNameOk()
-				if app.ApplicationSAML.AccessControl != nil {
-					appAccessControlRole, appAccessControlRoleOk = app.ApplicationSAML.AccessControl.GetRoleOk()
-				}
-			case app.ApplicationExternalLink != nil:
-				appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
-				appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
-				if app.ApplicationExternalLink.AccessControl != nil {
-					appAccessControlRole, appAccessControlRoleOk = app.ApplicationExternalLink.AccessControl.GetRoleOk()
-				}
-			default:
+		if appIdOk && appNameOk && appAccessControlRoleOk {
+			if appAccessControlRole.GetType() != management.ENUMAPPLICATIONACCESSCONTROLTYPE_ADMIN_USERS_ONLY {
 				continue
 			}
 
-			if appIdOk && appNameOk && appAccessControlRoleOk {
-				if appAccessControlRole.GetType() != management.ENUMAPPLICATIONACCESSCONTROLTYPE_ADMIN_USERS_ONLY {
-					continue
-				}
-
-				applicationData[*appId] = *appName
-			}
+			applicationData[*appId] = *appName
 		}
 	}
 
-	return &applicationData, nil
+	return applicationData, nil
 }
 
-func (r *PingOneApplicationRoleAssignmentResource) getApplicationRoleAssignmentData(appId string) (*map[string]string, error) {
+func (r *PingOneApplicationRoleAssignmentResource) getApplicationRoleAssignmentData(appId string) (map[string]string, error) {
 	applicationRoleAssignmentData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationRoleAssignmentsApi.ReadApplicationRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	applicationRoleAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadApplicationRoleAssignments", "GetRoleAssignments", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadApplicationRoleAssignments", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, roleAssignment := range applicationRoleAssignments {
+		roleAssignmentId, roleAssignmentIdOk := roleAssignment.GetIdOk()
+		roleAssignmentRole, roleAssignmentRoleOk := roleAssignment.GetRoleOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+		if roleAssignmentIdOk && roleAssignmentRoleOk {
+			roleAssignmentRoleId, roleAssignmentRoleIdOk := roleAssignmentRole.GetIdOk()
 
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, roleAssignment := range embedded.GetRoleAssignments() {
-			roleAssignmentId, roleAssignmentIdOk := roleAssignment.GetIdOk()
-			roleAssignmentRole, roleAssignmentRoleOk := roleAssignment.GetRoleOk()
-
-			if roleAssignmentIdOk && roleAssignmentRoleOk {
-				roleAssignmentRoleId, roleAssignmentRoleIdOk := roleAssignmentRole.GetIdOk()
-
-				if roleAssignmentRoleIdOk {
-					applicationRoleAssignmentData[*roleAssignmentId] = *roleAssignmentRoleId
-				}
+			if roleAssignmentRoleIdOk {
+				applicationRoleAssignmentData[*roleAssignmentId] = *roleAssignmentRoleId
 			}
 		}
 	}
 
-	return &applicationRoleAssignmentData, nil
+	return applicationRoleAssignmentData, nil
 }
 
-func (r *PingOneApplicationRoleAssignmentResource) getRoleName(roleId string) (*management.EnumRoleName, error) {
+func (r *PingOneApplicationRoleAssignmentResource) getRoleName(roleId string) (management.EnumRoleName, bool, error) {
 	apiRole, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
-	err = common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
+	ok, err := common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
-		return nil, err
+		return "", false, err
+	}
+	if !ok {
+		return "", false, nil
 	}
 
 	if apiRole != nil {
 		apiRoleName, apiRoleNameOk := apiRole.GetNameOk()
 		if apiRoleNameOk {
-			return apiRoleName, nil
+			return *apiRoleName, true, nil
 		}
 	}
 
-	return nil, fmt.Errorf("Unable to get role name for role ID: %s", roleId)
+	return "", false, fmt.Errorf("unable to get role name for role ID: %s", roleId)
 }

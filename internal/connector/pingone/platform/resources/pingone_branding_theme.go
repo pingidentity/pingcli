@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, er
 		return nil, err
 	}
 
-	for brandingThemeId, brandingThemeName := range *brandingThemeData {
+	for brandingThemeId, brandingThemeName := range brandingThemeData {
 		commentData := map[string]string{
 			"Branding Theme ID":     brandingThemeId,
 			"Branding Theme Name":   brandingThemeName,
@@ -60,39 +62,27 @@ func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, er
 	return &importBlocks, nil
 }
 
-func (r *PingOneBrandingThemeResource) getBrandingThemeData() (*map[string]string, error) {
+func (r *PingOneBrandingThemeResource) getBrandingThemeData() (map[string]string, error) {
 	brandingThemeData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	brandingThemes, err := pingone.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadBrandingThemes", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, brandingTheme := range brandingThemes {
+		brandingThemeId, brandingThemeIdOk := brandingTheme.GetIdOk()
+		brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+		if brandingThemeIdOk && brandingThemeConfigurationOk {
+			brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
 
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, brandingTheme := range embedded.GetThemes() {
-			brandingThemeId, brandingThemeIdOk := brandingTheme.GetIdOk()
-			brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
-
-			if brandingThemeIdOk && brandingThemeConfigurationOk {
-				brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
-
-				if brandingThemeNameOk {
-					brandingThemeData[*brandingThemeId] = *brandingThemeName
-				}
+			if brandingThemeNameOk {
+				brandingThemeData[*brandingThemeId] = *brandingThemeName
 			}
 		}
 	}
 
-	return &brandingThemeData, nil
+	return brandingThemeData, nil
 }

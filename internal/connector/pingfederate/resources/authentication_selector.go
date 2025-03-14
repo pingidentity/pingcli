@@ -37,7 +37,7 @@ func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.I
 		return nil, err
 	}
 
-	for authenticationSelectorId, authenticationSelectorName := range *authenticationSelectorData {
+	for authenticationSelectorId, authenticationSelectorName := range authenticationSelectorData {
 		commentData := map[string]string{
 			"Authentication Selector ID":   authenticationSelectorId,
 			"Authentication Selector Name": authenticationSelectorName,
@@ -57,13 +57,16 @@ func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.I
 	return &importBlocks, nil
 }
 
-func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorData() (*map[string]string, error) {
+func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorData() (map[string]string, error) {
 	authenticationSelectorData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetAuthenticationSelectors", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationSelectors", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorDa
 		}
 	}
 
-	return &authenticationSelectorData, nil
+	return authenticationSelectorData, nil
 }

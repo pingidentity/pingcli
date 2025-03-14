@@ -39,7 +39,7 @@ func (r *PingFederateOauthAuthenticationPolicyContractMappingResource) ExportAll
 		return nil, err
 	}
 
-	for _, oauthAuthenticationPolicyContractMappingId := range *oauthAuthenticationPolicyContractMappingData {
+	for _, oauthAuthenticationPolicyContractMappingId := range oauthAuthenticationPolicyContractMappingData {
 		commentData := map[string]string{
 			"Oauth Authentication Policy Contract Mapping ID": oauthAuthenticationPolicyContractMappingId,
 			"Resource Type": r.ResourceType(),
@@ -58,13 +58,16 @@ func (r *PingFederateOauthAuthenticationPolicyContractMappingResource) ExportAll
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOauthAuthenticationPolicyContractMappingResource) getOauthAuthenticationPolicyContractMappingData() (*[]string, error) {
+func (r *PingFederateOauthAuthenticationPolicyContractMappingResource) getOauthAuthenticationPolicyContractMappingData() ([]string, error) {
 	oauthAuthenticationPolicyContractMappingData := []string{}
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAuthenticationPolicyContractMappingsAPI.GetApcMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetApcMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetApcMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateOauthAuthenticationPolicyContractMappingResource) getOauthA
 		}
 	}
 
-	return &oauthAuthenticationPolicyContractMappingData, nil
+	return oauthAuthenticationPolicyContractMappingData, nil
 }

@@ -37,7 +37,7 @@ func (r *PingFederateCaptchaProviderResource) ExportAll() (*[]connector.ImportBl
 		return nil, err
 	}
 
-	for captchaProviderId, captchaProviderName := range *captchaProviderData {
+	for captchaProviderId, captchaProviderName := range captchaProviderData {
 		commentData := map[string]string{
 			"Captcha Provider ID":   captchaProviderId,
 			"Captcha Provider Name": captchaProviderName,
@@ -57,13 +57,16 @@ func (r *PingFederateCaptchaProviderResource) ExportAll() (*[]connector.ImportBl
 	return &importBlocks, nil
 }
 
-func (r *PingFederateCaptchaProviderResource) getCaptchaProviderData() (*map[string]string, error) {
+func (r *PingFederateCaptchaProviderResource) getCaptchaProviderData() (map[string]string, error) {
 	captchaProviderData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.CaptchaProvidersAPI.GetCaptchaProviders(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetCaptchaProviders", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetCaptchaProviders", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateCaptchaProviderResource) getCaptchaProviderData() (*map[str
 		}
 	}
 
-	return &captchaProviderData, nil
+	return captchaProviderData, nil
 }

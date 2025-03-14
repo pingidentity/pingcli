@@ -39,7 +39,7 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 		return nil, err
 	}
 
-	for serverSettingsWsTrustStsSettingsIssuerCertificateId, serverSettingsWsTrustStsSettingsIssuerCertificateInfo := range *serverSettingsWsTrustStsSettingsIssuerCertificateData {
+	for serverSettingsWsTrustStsSettingsIssuerCertificateId, serverSettingsWsTrustStsSettingsIssuerCertificateInfo := range serverSettingsWsTrustStsSettingsIssuerCertificateData {
 		serverSettingsWsTrustStsSettingsIssuerCertificateIssuerDn := serverSettingsWsTrustStsSettingsIssuerCertificateInfo[0]
 		serverSettingsWsTrustStsSettingsIssuerCertificateSerialNumber := serverSettingsWsTrustStsSettingsIssuerCertificateInfo[1]
 
@@ -63,13 +63,16 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) getServerSettingsWsTrustStsSettingsIssuerCertificateData() (*map[string][]string, error) {
+func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) getServerSettingsWsTrustStsSettingsIssuerCertificateData() (map[string][]string, error) {
 	serverSettingsWsTrustStsSettingsIssuerCertificateData := make(map[string][]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.ServerSettingsAPI.GetCerts(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetCerts", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetCerts", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -95,5 +98,5 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 		}
 	}
 
-	return &serverSettingsWsTrustStsSettingsIssuerCertificateData, nil
+	return serverSettingsWsTrustStsSettingsIssuerCertificateData, nil
 }

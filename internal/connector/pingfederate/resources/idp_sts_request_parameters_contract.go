@@ -37,7 +37,7 @@ func (r *PingFederateIdpStsRequestParametersContractResource) ExportAll() (*[]co
 		return nil, err
 	}
 
-	for idpStsRequestParametersContractId, idpStsRequestParametersContractName := range *idpStsRequestParametersContractData {
+	for idpStsRequestParametersContractId, idpStsRequestParametersContractName := range idpStsRequestParametersContractData {
 		commentData := map[string]string{
 			"Idp Sts Request Parameters Contract ID":   idpStsRequestParametersContractId,
 			"Idp Sts Request Parameters Contract Name": idpStsRequestParametersContractName,
@@ -57,13 +57,16 @@ func (r *PingFederateIdpStsRequestParametersContractResource) ExportAll() (*[]co
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIdpStsRequestParametersContractResource) getIdpStsRequestParametersContractData() (*map[string]string, error) {
+func (r *PingFederateIdpStsRequestParametersContractResource) getIdpStsRequestParametersContractData() (map[string]string, error) {
 	idpStsRequestParametersContractData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpStsRequestParametersContractsAPI.GetStsRequestParamContracts(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetStsRequestParamContracts", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetStsRequestParamContracts", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateIdpStsRequestParametersContractResource) getIdpStsRequestPa
 		}
 	}
 
-	return &idpStsRequestParametersContractData, nil
+	return idpStsRequestParametersContractData, nil
 }

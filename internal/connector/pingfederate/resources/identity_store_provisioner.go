@@ -37,7 +37,7 @@ func (r *PingFederateIdentityStoreProvisionerResource) ExportAll() (*[]connector
 		return nil, err
 	}
 
-	for identityStoreProvisionerId, identityStoreProvisionerName := range *identityStoreProvisionerData {
+	for identityStoreProvisionerId, identityStoreProvisionerName := range identityStoreProvisionerData {
 		commentData := map[string]string{
 			"Identity Store Provisioner ID":   identityStoreProvisionerId,
 			"Identity Store Provisioner Name": identityStoreProvisionerName,
@@ -57,13 +57,16 @@ func (r *PingFederateIdentityStoreProvisionerResource) ExportAll() (*[]connector
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIdentityStoreProvisionerResource) getIdentityStoreProvisionerData() (*map[string]string, error) {
+func (r *PingFederateIdentityStoreProvisionerResource) getIdentityStoreProvisionerData() (map[string]string, error) {
 	identityStoreProvisionerData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdentityStoreProvisionersAPI.GetIdentityStoreProvisioners(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdentityStoreProvisioners", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdentityStoreProvisioners", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateIdentityStoreProvisionerResource) getIdentityStoreProvision
 		}
 	}
 
-	return &identityStoreProvisionerData, nil
+	return identityStoreProvisionerData, nil
 }

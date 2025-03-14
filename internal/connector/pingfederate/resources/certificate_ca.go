@@ -39,7 +39,7 @@ func (r *PingFederateCertificateCaResource) ExportAll() (*[]connector.ImportBloc
 		return nil, err
 	}
 
-	for certificateCaId, certificateCaInfo := range *certificateCaData {
+	for certificateCaId, certificateCaInfo := range certificateCaData {
 		certificateCaIssuerDn := certificateCaInfo[0]
 		certificateCaSerialNumber := certificateCaInfo[1]
 
@@ -63,13 +63,16 @@ func (r *PingFederateCertificateCaResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func (r *PingFederateCertificateCaResource) getCertificateCaData() (*map[string][]string, error) {
+func (r *PingFederateCertificateCaResource) getCertificateCaData() (map[string][]string, error) {
 	certificateCaData := make(map[string][]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTrustedCAs", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTrustedCAs", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -91,5 +94,5 @@ func (r *PingFederateCertificateCaResource) getCertificateCaData() (*map[string]
 		}
 	}
 
-	return &certificateCaData, nil
+	return certificateCaData, nil
 }

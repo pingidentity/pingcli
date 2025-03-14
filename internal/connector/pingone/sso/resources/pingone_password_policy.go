@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOnePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, e
 		return nil, err
 	}
 
-	for passwordPolicyId, passwordPolicyName := range *passwordPolicyData {
+	for passwordPolicyId, passwordPolicyName := range passwordPolicyData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Password Policy ID":    passwordPolicyId,
@@ -60,35 +62,23 @@ func (r *PingOnePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, e
 	return &importBlocks, nil
 }
 
-func (r *PingOnePasswordPolicyResource) getPasswordPolicyData() (*map[string]string, error) {
+func (r *PingOnePasswordPolicyResource) getPasswordPolicyData() (map[string]string, error) {
 	passwordPolicyData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.PasswordPoliciesApi.ReadAllPasswordPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	passwordPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.PasswordPolicy](iter, "ReadAllPasswordPolicies", "GetPasswordPolicies", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPasswordPolicies", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, passwordPolicy := range passwordPolicies {
+		passwordPolicyId, passwordPolicyIdOk := passwordPolicy.GetIdOk()
+		passwordPolicyName, passwordPolicyNameOk := passwordPolicy.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, passwordPolicy := range embedded.GetPasswordPolicies() {
-			passwordPolicyId, passwordPolicyIdOk := passwordPolicy.GetIdOk()
-			passwordPolicyName, passwordPolicyNameOk := passwordPolicy.GetNameOk()
-
-			if passwordPolicyIdOk && passwordPolicyNameOk {
-				passwordPolicyData[*passwordPolicyId] = *passwordPolicyName
-			}
+		if passwordPolicyIdOk && passwordPolicyNameOk {
+			passwordPolicyData[*passwordPolicyId] = *passwordPolicyName
 		}
 	}
 
-	return &passwordPolicyData, nil
+	return passwordPolicyData, nil
 }

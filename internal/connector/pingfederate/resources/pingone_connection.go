@@ -37,7 +37,7 @@ func (r *PingFederatePingoneConnectionResource) ExportAll() (*[]connector.Import
 		return nil, err
 	}
 
-	for pingoneConnectionId, pingoneConnectionName := range *pingoneConnectionData {
+	for pingoneConnectionId, pingoneConnectionName := range pingoneConnectionData {
 		commentData := map[string]string{
 			"Pingone Connection ID":   pingoneConnectionId,
 			"Pingone Connection Name": pingoneConnectionName,
@@ -57,13 +57,16 @@ func (r *PingFederatePingoneConnectionResource) ExportAll() (*[]connector.Import
 	return &importBlocks, nil
 }
 
-func (r *PingFederatePingoneConnectionResource) getPingoneConnectionData() (*map[string]string, error) {
+func (r *PingFederatePingoneConnectionResource) getPingoneConnectionData() (map[string]string, error) {
 	pingoneConnectionData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.PingOneConnectionsAPI.GetPingOneConnections(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetPingOneConnections", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetPingOneConnections", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederatePingoneConnectionResource) getPingoneConnectionData() (*map
 		}
 	}
 
-	return &pingoneConnectionData, nil
+	return pingoneConnectionData, nil
 }

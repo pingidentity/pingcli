@@ -39,7 +39,7 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 		return nil, err
 	}
 
-	for keyId, keyNameAndType := range *keyData {
+	for keyId, keyNameAndType := range keyData {
 		keyName := keyNameAndType[0]
 		keyType := keyNameAndType[1]
 
@@ -64,15 +64,18 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func (r *PingOneKeyResource) getKeyData() (*map[string][]string, error) {
+func (r *PingOneKeyResource) getKeyData() (map[string][]string, error) {
 	keyData := make(map[string][]string)
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
 	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
-	err = common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if entityArray == nil {
@@ -94,5 +97,5 @@ func (r *PingOneKeyResource) getKeyData() (*map[string][]string, error) {
 		}
 	}
 
-	return &keyData, nil
+	return keyData, nil
 }

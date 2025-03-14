@@ -37,7 +37,7 @@ func (r *PingFederateAuthenticationPolicyContractResource) ExportAll() (*[]conne
 		return nil, err
 	}
 
-	for authenticationPolicyContractId, authenticationPolicyContractName := range *authenticationPolicyContractData {
+	for authenticationPolicyContractId, authenticationPolicyContractName := range authenticationPolicyContractData {
 		commentData := map[string]string{
 			"Authentication Policy Contract ID":   authenticationPolicyContractId,
 			"Authentication Policy Contract Name": authenticationPolicyContractName,
@@ -57,13 +57,16 @@ func (r *PingFederateAuthenticationPolicyContractResource) ExportAll() (*[]conne
 	return &importBlocks, nil
 }
 
-func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPolicyContractData() (*map[string]string, error) {
+func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPolicyContractData() (map[string]string, error) {
 	authenticationPolicyContractData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationPolicyContractsAPI.GetAuthenticationPolicyContracts(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetAuthenticationPolicyContracts", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationPolicyContracts", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPoli
 		}
 	}
 
-	return &authenticationPolicyContractData, nil
+	return authenticationPolicyContractData, nil
 }

@@ -39,7 +39,7 @@ func (r *PingFederateOauthAccessTokenMappingResource) ExportAll() (*[]connector.
 		return nil, err
 	}
 
-	for oauthAccessTokenMappingId, oauthAccessTokenMappingContextType := range *oauthAccessTokenMappingData {
+	for oauthAccessTokenMappingId, oauthAccessTokenMappingContextType := range oauthAccessTokenMappingData {
 		commentData := map[string]string{
 			"Oauth Access Token Mapping ID":           oauthAccessTokenMappingId,
 			"Oauth Access Token Mapping Context Type": oauthAccessTokenMappingContextType,
@@ -48,7 +48,7 @@ func (r *PingFederateOauthAccessTokenMappingResource) ExportAll() (*[]connector.
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s", oauthAccessTokenMappingContextType, oauthAccessTokenMappingId),
+			ResourceName:       fmt.Sprintf("%s_%s", oauthAccessTokenMappingId, oauthAccessTokenMappingContextType),
 			ResourceID:         oauthAccessTokenMappingId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -59,20 +59,19 @@ func (r *PingFederateOauthAccessTokenMappingResource) ExportAll() (*[]connector.
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOauthAccessTokenMappingResource) getOauthAccessTokenMappingData() (*map[string]string, error) {
+func (r *PingFederateOauthAccessTokenMappingResource) getOauthAccessTokenMappingData() (map[string]string, error) {
 	oauthAccessTokenMappingData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.GetMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetMappings", r.ResourceType())
+	mappings, response, err := r.clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.GetMappings(r.clientInfo.Context).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
-
-	if apiObj == nil {
-		return nil, common.DataNilError(r.ResourceType(), response)
+	if !ok {
+		return nil, nil
 	}
 
-	for _, oauthAccessTokenMapping := range apiObj {
+	for _, oauthAccessTokenMapping := range mappings {
 		oauthAccessTokenMappingId, oauthAccessTokenMappingIdOk := oauthAccessTokenMapping.GetIdOk()
 		oauthAccessTokenMappingContext, oauthAccessTokenMappingContextOk := oauthAccessTokenMapping.GetContextOk()
 
@@ -85,5 +84,5 @@ func (r *PingFederateOauthAccessTokenMappingResource) getOauthAccessTokenMapping
 		}
 	}
 
-	return &oauthAccessTokenMappingData, nil
+	return oauthAccessTokenMappingData, nil
 }

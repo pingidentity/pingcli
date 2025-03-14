@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -40,7 +41,7 @@ func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportB
 		return nil, err
 	}
 
-	for phoneDeliverySettingsId, phoneDeliverySettingsName := range *phoneDeliverySettingsData {
+	for phoneDeliverySettingsId, phoneDeliverySettingsName := range phoneDeliverySettingsData {
 		commentData := map[string]string{
 			"Export Environment ID":        r.clientInfo.ExportEnvironmentID,
 			"Phone Delivery Settings ID":   phoneDeliverySettingsId,
@@ -61,62 +62,50 @@ func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportB
 	return &importBlocks, nil
 }
 
-func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (*map[string]string, error) {
+func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (map[string]string, error) {
 	phoneDeliverySettingsData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	phoneDeliverySettings, err := pingone.GetManagementAPIObjectsFromIterator[management.NotificationsSettingsPhoneDeliverySettings](iter, "ReadAllPhoneDeliverySettings", "GetPhoneDeliverySettings", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPhoneDeliverySettings", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, phoneDeliverySettings := range phoneDeliverySettings {
+		var (
+			phoneDeliverySettingsId     *string
+			phoneDeliverySettingsIdOk   bool
+			phoneDeliverySettingsName   string
+			phoneDeliverySettingsNameOk bool
+		)
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, phoneDeliverySettings := range embedded.GetPhoneDeliverySettings() {
-			var (
-				phoneDeliverySettingsId     *string
-				phoneDeliverySettingsIdOk   bool
-				phoneDeliverySettingsName   string
-				phoneDeliverySettingsNameOk bool
-			)
-
-			switch {
-			case phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsCustom != nil:
-				phoneDeliverySettingsId, phoneDeliverySettingsIdOk = phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsCustom.GetIdOk()
-				if phoneDeliverySettingsIdOk {
-					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_custom_%s", *phoneDeliverySettingsId), true
-				}
-			case phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse != nil:
-				phoneDeliverySettingsId, phoneDeliverySettingsIdOk = phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse.GetIdOk()
-				phoneDeliverySettingsProvider, phoneDeliverySettingProviderOk := phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse.GetProviderOk()
-				if phoneDeliverySettingsIdOk && phoneDeliverySettingProviderOk {
-					switch *phoneDeliverySettingsProvider {
-					case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_TWILIO:
-						phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_twilio_%s", *phoneDeliverySettingsId), true
-					case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_SYNIVERSE:
-						phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_syniverse_%s", *phoneDeliverySettingsId), true
-					default:
-						continue
-					}
-				}
-			default:
-				continue
+		switch {
+		case phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsCustom != nil:
+			phoneDeliverySettingsId, phoneDeliverySettingsIdOk = phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsCustom.GetIdOk()
+			if phoneDeliverySettingsIdOk {
+				phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_custom_%s", *phoneDeliverySettingsId), true
 			}
-
-			if phoneDeliverySettingsIdOk && phoneDeliverySettingsNameOk {
-				phoneDeliverySettingsData[*phoneDeliverySettingsId] = phoneDeliverySettingsName
+		case phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse != nil:
+			phoneDeliverySettingsId, phoneDeliverySettingsIdOk = phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse.GetIdOk()
+			phoneDeliverySettingsProvider, phoneDeliverySettingProviderOk := phoneDeliverySettings.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse.GetProviderOk()
+			if phoneDeliverySettingsIdOk && phoneDeliverySettingProviderOk {
+				switch *phoneDeliverySettingsProvider {
+				case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_TWILIO:
+					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_twilio_%s", *phoneDeliverySettingsId), true
+				case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_SYNIVERSE:
+					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_syniverse_%s", *phoneDeliverySettingsId), true
+				default:
+					continue
+				}
 			}
+		default:
+			continue
+		}
+
+		if phoneDeliverySettingsIdOk && phoneDeliverySettingsNameOk {
+			phoneDeliverySettingsData[*phoneDeliverySettingsId] = phoneDeliverySettingsName
 		}
 	}
 
-	return &phoneDeliverySettingsData, nil
+	return phoneDeliverySettingsData, nil
 }

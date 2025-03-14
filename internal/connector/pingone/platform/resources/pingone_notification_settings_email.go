@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -32,9 +33,12 @@ func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.Imp
 
 	importBlocks := []connector.ImportBlock{}
 
-	err := r.checkNotificationSettingsEmailData()
+	ok, err := r.checkNotificationSettingsEmailData()
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return &importBlocks, nil
 	}
 
 	commentData := map[string]string{
@@ -54,16 +58,7 @@ func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.Imp
 	return &importBlocks, nil
 }
 
-func (r *PingOneNotificationSettingsEmailResource) checkNotificationSettingsEmailData() error {
+func (r *PingOneNotificationSettingsEmailResource) checkNotificationSettingsEmailData() (bool, error) {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	err = common.HandleClientResponse(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
-	if err != nil {
-		return err
-	}
-
-	if response.StatusCode == 204 {
-		return common.DataNilError(r.ResourceType(), response)
-	}
-
-	return nil
+	return pingone.CheckSingletonResource(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
 }

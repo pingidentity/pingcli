@@ -39,7 +39,7 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 		return nil, err
 	}
 
-	for dataStoreId, dataStoreType := range *dataStoreData {
+	for dataStoreId, dataStoreType := range dataStoreData {
 		commentData := map[string]string{
 			"Data Store ID":   dataStoreId,
 			"Data Store Type": dataStoreType,
@@ -48,7 +48,7 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s", dataStoreType, dataStoreId),
+			ResourceName:       fmt.Sprintf("%s_%s", dataStoreId, dataStoreType),
 			ResourceID:         dataStoreId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -59,13 +59,16 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 	return &importBlocks, nil
 }
 
-func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, error) {
+func (r *PingFederateDataStoreResource) getDataStoreData() (map[string]string, error) {
 	dataStoreData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetDataStores", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetDataStores", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -86,5 +89,5 @@ func (r *PingFederateDataStoreResource) getDataStoreData() (*map[string]string, 
 		}
 	}
 
-	return &dataStoreData, nil
+	return dataStoreData, nil
 }

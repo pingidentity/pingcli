@@ -37,7 +37,7 @@ func (r *PingFederateKerberosRealmResource) ExportAll() (*[]connector.ImportBloc
 		return nil, err
 	}
 
-	for kerberosRealmId, kerberosRealmName := range *kerberosRealmData {
+	for kerberosRealmId, kerberosRealmName := range kerberosRealmData {
 		commentData := map[string]string{
 			"Kerberos Realm ID":   kerberosRealmId,
 			"Kerberos Realm Name": kerberosRealmName,
@@ -57,13 +57,16 @@ func (r *PingFederateKerberosRealmResource) ExportAll() (*[]connector.ImportBloc
 	return &importBlocks, nil
 }
 
-func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (*map[string]string, error) {
+func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (map[string]string, error) {
 	kerberosRealmData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.KerberosRealmsAPI.GetKerberosRealms(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetKerberosRealms", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetKerberosRealms", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (*map[string]
 		}
 	}
 
-	return &kerberosRealmData, nil
+	return kerberosRealmData, nil
 }

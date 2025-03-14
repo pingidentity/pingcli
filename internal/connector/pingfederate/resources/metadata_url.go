@@ -37,7 +37,7 @@ func (r *PingFederateMetadataUrlResource) ExportAll() (*[]connector.ImportBlock,
 		return nil, err
 	}
 
-	for metadataUrlId, metadataUrlName := range *metadataUrlData {
+	for metadataUrlId, metadataUrlName := range metadataUrlData {
 		commentData := map[string]string{
 			"Metadata Url ID":   metadataUrlId,
 			"Metadata Url Name": metadataUrlName,
@@ -57,13 +57,16 @@ func (r *PingFederateMetadataUrlResource) ExportAll() (*[]connector.ImportBlock,
 	return &importBlocks, nil
 }
 
-func (r *PingFederateMetadataUrlResource) getMetadataUrlData() (*map[string]string, error) {
+func (r *PingFederateMetadataUrlResource) getMetadataUrlData() (map[string]string, error) {
 	metadataUrlData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.MetadataUrlsAPI.GetMetadataUrls(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetMetadataUrls", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetMetadataUrls", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateMetadataUrlResource) getMetadataUrlData() (*map[string]stri
 		}
 	}
 
-	return &metadataUrlData, nil
+	return metadataUrlData, nil
 }

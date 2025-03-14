@@ -39,19 +39,20 @@ func (r *PingFederateSessionAuthenticationPolicyResource) ExportAll() (*[]connec
 		return nil, err
 	}
 
-	for sessionAuthenticationPolicyId, sessionAuthenticationPolicyInfo := range *sessionAuthenticationPolicyData {
+	for sessionAuthenticationPolicyId, sessionAuthenticationPolicyInfo := range sessionAuthenticationPolicyData {
 		sessionAuthenticationPolicyAuthenticationSourceType := sessionAuthenticationPolicyInfo[0]
-		sessionAuthenticationPolicyAuthenticationSourceSourceRefId := sessionAuthenticationPolicyInfo[1]
+		sessionAuthenticationPolicyAuthenticationSourceRefId := sessionAuthenticationPolicyInfo[1]
+
 		commentData := map[string]string{
 			"Session Authentication Policy ID":                           sessionAuthenticationPolicyId,
 			"Session Authentication Policy Authentication Source Type":   sessionAuthenticationPolicyAuthenticationSourceType,
-			"Session Authentication Policy Authentication Source Ref ID": sessionAuthenticationPolicyAuthenticationSourceSourceRefId,
+			"Session Authentication Policy Authentication Source Ref ID": sessionAuthenticationPolicyAuthenticationSourceRefId,
 			"Resource Type": r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s_%s", sessionAuthenticationPolicyId, sessionAuthenticationPolicyAuthenticationSourceType, sessionAuthenticationPolicyAuthenticationSourceSourceRefId),
+			ResourceName:       fmt.Sprintf("%s_%s_%s", sessionAuthenticationPolicyId, sessionAuthenticationPolicyAuthenticationSourceType, sessionAuthenticationPolicyAuthenticationSourceRefId),
 			ResourceID:         sessionAuthenticationPolicyId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -62,13 +63,16 @@ func (r *PingFederateSessionAuthenticationPolicyResource) ExportAll() (*[]connec
 	return &importBlocks, nil
 }
 
-func (r *PingFederateSessionAuthenticationPolicyResource) getSessionAuthenticationPolicyData() (*map[string][]string, error) {
+func (r *PingFederateSessionAuthenticationPolicyResource) getSessionAuthenticationPolicyData() (map[string][]string, error) {
 	sessionAuthenticationPolicyData := make(map[string][]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.SessionAPI.GetSourcePolicies(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetSourcePolicies", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetSourcePolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -86,17 +90,17 @@ func (r *PingFederateSessionAuthenticationPolicyResource) getSessionAuthenticati
 
 		if sessionAuthenticationPolicyIdOk && sessionAuthenticationPolicyAuthenticationSourceOk {
 			sessionAuthenticationPolicyAuthenticationSourceType, sessionAuthenticationPolicyAuthenticationSourceTypeOk := sessionAuthenticationPolicyAuthenticationSource.GetTypeOk()
-			sessionAuthenticationPolicyAuthenticationSourceSourceRef, sessionAuthenticationPolicyAuthenticationSourceSourceRefOk := sessionAuthenticationPolicyAuthenticationSource.GetSourceRefOk()
+			sessionAuthenticationPolicyAuthenticationSourceRef, sessionAuthenticationPolicyAuthenticationSourceRefOk := sessionAuthenticationPolicyAuthenticationSource.GetSourceRefOk()
 
-			if sessionAuthenticationPolicyAuthenticationSourceTypeOk && sessionAuthenticationPolicyAuthenticationSourceSourceRefOk {
-				sessionAuthenticationPolicyAuthenticationSourceSourceRefId, sessionAuthenticationPolicyAuthenticationSourceSourceRefIdOk := sessionAuthenticationPolicyAuthenticationSourceSourceRef.GetIdOk()
+			if sessionAuthenticationPolicyAuthenticationSourceTypeOk && sessionAuthenticationPolicyAuthenticationSourceRefOk {
+				sessionAuthenticationPolicyAuthenticationSourceRefId, sessionAuthenticationPolicyAuthenticationSourceRefIdOk := sessionAuthenticationPolicyAuthenticationSourceRef.GetIdOk()
 
-				if sessionAuthenticationPolicyAuthenticationSourceSourceRefIdOk {
-					sessionAuthenticationPolicyData[*sessionAuthenticationPolicyId] = []string{*sessionAuthenticationPolicyAuthenticationSourceType, *sessionAuthenticationPolicyAuthenticationSourceSourceRefId}
+				if sessionAuthenticationPolicyAuthenticationSourceRefIdOk {
+					sessionAuthenticationPolicyData[*sessionAuthenticationPolicyId] = []string{*sessionAuthenticationPolicyAuthenticationSourceType, *sessionAuthenticationPolicyAuthenticationSourceRefId}
 				}
 			}
 		}
 	}
 
-	return &sessionAuthenticationPolicyData, nil
+	return sessionAuthenticationPolicyData, nil
 }

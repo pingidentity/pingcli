@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOnePopulationResource) ExportAll() (*[]connector.ImportBlock, error
 		return nil, err
 	}
 
-	for populationId, populationName := range *populationData {
+	for populationId, populationName := range populationData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Population ID":         populationId,
@@ -60,35 +62,23 @@ func (r *PingOnePopulationResource) ExportAll() (*[]connector.ImportBlock, error
 	return &importBlocks, nil
 }
 
-func (r *PingOnePopulationResource) getPopulationData() (*map[string]string, error) {
+func (r *PingOnePopulationResource) getPopulationData() (map[string]string, error) {
 	populationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	populations, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllPopulations", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, population := range populations {
+		populationId, populationIdOk := population.GetIdOk()
+		populationName, populationNameOk := population.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, population := range embedded.GetPopulations() {
-			populationId, populationIdOk := population.GetIdOk()
-			populationName, populationNameOk := population.GetNameOk()
-
-			if populationIdOk && populationNameOk {
-				populationData[*populationId] = *populationName
-			}
+		if populationIdOk && populationNameOk {
+			populationData[*populationId] = *populationName
 		}
 	}
 
-	return &populationData, nil
+	return populationData, nil
 }

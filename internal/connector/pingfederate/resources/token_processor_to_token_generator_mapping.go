@@ -39,15 +39,15 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) ExportAll() 
 		return nil, err
 	}
 
-	for tokenProcessorToTokenGeneratorMappingId, tokenProcessorToTokenGeneratorMappingInfo := range *tokenProcessorToTokenGeneratorMappingData {
+	for tokenProcessorToTokenGeneratorMappingId, tokenProcessorToTokenGeneratorMappingInfo := range tokenProcessorToTokenGeneratorMappingData {
 		tokenProcessorToTokenGeneratorMappingSourceId := tokenProcessorToTokenGeneratorMappingInfo[0]
 		tokenProcessorToTokenGeneratorMappingTargetId := tokenProcessorToTokenGeneratorMappingInfo[1]
 
 		commentData := map[string]string{
-			"Token Processor To Token Generator Mapping ID":        tokenProcessorToTokenGeneratorMappingId,
-			"Token Processor To Token Generator Mapping Source ID": tokenProcessorToTokenGeneratorMappingSourceId,
-			"Token Processor To Token Generator Mapping Target ID": tokenProcessorToTokenGeneratorMappingTargetId,
-			"Resource Type": r.ResourceType(),
+			"Token Processor To Token Generator Mapping ID": tokenProcessorToTokenGeneratorMappingId,
+			"Token Processor ID":                            tokenProcessorToTokenGeneratorMappingSourceId,
+			"Token Generator ID":                            tokenProcessorToTokenGeneratorMappingTargetId,
+			"Resource Type":                                 r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
@@ -63,13 +63,16 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) ExportAll() 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenProcessorToTokenGeneratorMappingData() (*map[string][]string, error) {
+func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenProcessorToTokenGeneratorMappingData() (map[string][]string, error) {
 	tokenProcessorToTokenGeneratorMappingData := make(map[string][]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.GetTokenToTokenMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTokenToTokenMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTokenToTokenMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -91,5 +94,5 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenProc
 		}
 	}
 
-	return &tokenProcessorToTokenGeneratorMappingData, nil
+	return tokenProcessorToTokenGeneratorMappingData, nil
 }

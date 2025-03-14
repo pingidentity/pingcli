@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,13 +41,13 @@ func (r *PingOneApplicationAttributeMappingResource) ExportAll() (*[]connector.I
 		return nil, err
 	}
 
-	for appId, appName := range *applicationData {
+	for appId, appName := range applicationData {
 		applicationAttributeMappingData, err := r.getApplicationAttributeMappingData(appId)
 		if err != nil {
 			return nil, err
 		}
 
-		for attributeMappingId, attributeMappingName := range *applicationAttributeMappingData {
+		for attributeMappingId, attributeMappingName := range applicationAttributeMappingData {
 			commentData := map[string]string{
 				"Application ID":         appId,
 				"Application Name":       appName,
@@ -69,85 +71,61 @@ func (r *PingOneApplicationAttributeMappingResource) ExportAll() (*[]connector.I
 	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationAttributeMappingResource) getApplicationData() (*map[string]string, error) {
+func (r *PingOneApplicationAttributeMappingResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
-		if err != nil {
-			return nil, err
+	for _, app := range applications {
+		var (
+			appId     *string
+			appIdOk   bool
+			appName   *string
+			appNameOk bool
+		)
+
+		switch {
+		case app.ApplicationOIDC != nil:
+			appId, appIdOk = app.ApplicationOIDC.GetIdOk()
+			appName, appNameOk = app.ApplicationOIDC.GetNameOk()
+		case app.ApplicationSAML != nil:
+			appId, appIdOk = app.ApplicationSAML.GetIdOk()
+			appName, appNameOk = app.ApplicationSAML.GetNameOk()
+		default:
+			continue
 		}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, app := range embedded.GetApplications() {
-			var (
-				appId     *string
-				appIdOk   bool
-				appName   *string
-				appNameOk bool
-			)
-
-			switch {
-			case app.ApplicationOIDC != nil:
-				appId, appIdOk = app.ApplicationOIDC.GetIdOk()
-				appName, appNameOk = app.ApplicationOIDC.GetNameOk()
-			case app.ApplicationSAML != nil:
-				appId, appIdOk = app.ApplicationSAML.GetIdOk()
-				appName, appNameOk = app.ApplicationSAML.GetNameOk()
-			default:
-				continue
-			}
-
-			if appIdOk && appNameOk {
-				applicationData[*appId] = *appName
-			}
+		if appIdOk && appNameOk {
+			applicationData[*appId] = *appName
 		}
 	}
 
-	return &applicationData, nil
+	return applicationData, nil
 }
 
-func (r *PingOneApplicationAttributeMappingResource) getApplicationAttributeMappingData(appId string) (*map[string]string, error) {
+func (r *PingOneApplicationAttributeMappingResource) getApplicationAttributeMappingData(appId string) (map[string]string, error) {
 	applicationAttributeMappingData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationAttributeMappingApi.ReadAllApplicationAttributeMappings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	attributeMappingInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllApplicationAttributeMappings", "GetAttributes", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplicationAttributeMappings", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, attributeMappingInner := range attributeMappingInners {
+		if attributeMappingInner.ApplicationAttributeMapping != nil {
+			attributeMappingId, attributeMappingIdOk := attributeMappingInner.ApplicationAttributeMapping.GetIdOk()
+			attributeMappingName, attributeMappingNameOk := attributeMappingInner.ApplicationAttributeMapping.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, attributeMapping := range embedded.GetAttributes() {
-			if attributeMapping.ApplicationAttributeMapping != nil {
-				attributeMappingId, attributeMappingIdOk := attributeMapping.ApplicationAttributeMapping.GetIdOk()
-				attributeMappingName, attributeMappingNameOk := attributeMapping.ApplicationAttributeMapping.GetNameOk()
-
-				if attributeMappingIdOk && attributeMappingNameOk {
-					applicationAttributeMappingData[*attributeMappingId] = *attributeMappingName
-				}
+			if attributeMappingIdOk && attributeMappingNameOk {
+				applicationAttributeMappingData[*attributeMappingId] = *attributeMappingName
 			}
 		}
 	}
 
-	return &applicationAttributeMappingData, nil
+	return applicationAttributeMappingData, nil
 }

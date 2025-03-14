@@ -37,7 +37,7 @@ func (r *PingFederateOauthClientRegistrationPolicyResource) ExportAll() (*[]conn
 		return nil, err
 	}
 
-	for oauthClientRegistrationPolicyId, oauthClientRegistrationPolicyName := range *oauthClientRegistrationPolicyData {
+	for oauthClientRegistrationPolicyId, oauthClientRegistrationPolicyName := range oauthClientRegistrationPolicyData {
 		commentData := map[string]string{
 			"Oauth Client Registration Policy ID":   oauthClientRegistrationPolicyId,
 			"Oauth Client Registration Policy Name": oauthClientRegistrationPolicyName,
@@ -57,13 +57,16 @@ func (r *PingFederateOauthClientRegistrationPolicyResource) ExportAll() (*[]conn
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOauthClientRegistrationPolicyResource) getOauthClientRegistrationPolicyData() (*map[string]string, error) {
+func (r *PingFederateOauthClientRegistrationPolicyResource) getOauthClientRegistrationPolicyData() (map[string]string, error) {
 	oauthClientRegistrationPolicyData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthClientRegistrationPoliciesAPI.GetDynamicClientRegistrationPolicies(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetDynamicClientRegistrationPolicies", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetDynamicClientRegistrationPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateOauthClientRegistrationPolicyResource) getOauthClientRegist
 		}
 	}
 
-	return &oauthClientRegistrationPolicyData, nil
+	return oauthClientRegistrationPolicyData, nil
 }

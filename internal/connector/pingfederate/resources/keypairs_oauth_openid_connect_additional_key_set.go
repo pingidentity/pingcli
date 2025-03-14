@@ -37,7 +37,7 @@ func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) ExportA
 		return nil, err
 	}
 
-	for keypairsOauthOpenidConnectAdditionalKeySetId, keypairsOauthOpenidConnectAdditionalKeySetName := range *keypairsOauthOpenidConnectAdditionalKeySetData {
+	for keypairsOauthOpenidConnectAdditionalKeySetId, keypairsOauthOpenidConnectAdditionalKeySetName := range keypairsOauthOpenidConnectAdditionalKeySetData {
 		commentData := map[string]string{
 			"Keypairs Oauth Openid Connect Additional Key Set ID":   keypairsOauthOpenidConnectAdditionalKeySetId,
 			"Keypairs Oauth Openid Connect Additional Key Set Name": keypairsOauthOpenidConnectAdditionalKeySetName,
@@ -57,13 +57,16 @@ func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) ExportA
 	return &importBlocks, nil
 }
 
-func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) getKeypairsOauthOpenidConnectAdditionalKeySetData() (*map[string]string, error) {
+func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) getKeypairsOauthOpenidConnectAdditionalKeySetData() (map[string]string, error) {
 	keypairsOauthOpenidConnectAdditionalKeySetData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.GetKeySets(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetKeySets", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetKeySets", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) getKeyp
 		}
 	}
 
-	return &keypairsOauthOpenidConnectAdditionalKeySetData, nil
+	return keypairsOauthOpenidConnectAdditionalKeySetData, nil
 }

@@ -95,6 +95,11 @@ func TestSSOTerraformPlan(t *testing.T) {
 			ignoredErrors: nil,
 		},
 		{
+			name:          "PopulationDefaultIdp",
+			resource:      resources.PopulationDefaultIdp(PingOneClientInfo),
+			ignoredErrors: nil,
+		},
+		{
 			name:          "Resource",
 			resource:      resources.Resource(PingOneClientInfo),
 			ignoredErrors: nil,
@@ -117,6 +122,11 @@ func TestSSOTerraformPlan(t *testing.T) {
 		{
 			name:          "ResourceScopePingOneApi",
 			resource:      resources.ResourceScopePingOneApi(PingOneClientInfo),
+			ignoredErrors: nil,
+		},
+		{
+			name:          "ResourceSecret",
+			resource:      resources.ResourceSecret(PingOneClientInfo),
 			ignoredErrors: nil,
 		},
 		{

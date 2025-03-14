@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneAgreementResource) ExportAll() (*[]connector.ImportBlock, error)
 		return nil, err
 	}
 
-	for agreementId, agreementName := range *agreementData {
+	for agreementId, agreementName := range agreementData {
 		commentData := map[string]string{
 			"Agreement ID":          agreementId,
 			"Agreement Name":        agreementName,
@@ -60,35 +62,23 @@ func (r *PingOneAgreementResource) ExportAll() (*[]connector.ImportBlock, error)
 	return &importBlocks, nil
 }
 
-func (r *PingOneAgreementResource) getAgreementData() (*map[string]string, error) {
+func (r *PingOneAgreementResource) getAgreementData() (map[string]string, error) {
 	agreementData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	agreements, err := pingone.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllAgreements", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, agreement := range agreements {
+		agreementId, agreementIdOk := agreement.GetIdOk()
+		agreementName, agreementNameOk := agreement.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, agreement := range embedded.GetAgreements() {
-			agreementId, agreementIdOk := agreement.GetIdOk()
-			agreementName, agreementNameOk := agreement.GetNameOk()
-
-			if agreementIdOk && agreementNameOk {
-				agreementData[*agreementId] = *agreementName
-			}
+		if agreementIdOk && agreementNameOk {
+			agreementData[*agreementId] = *agreementName
 		}
 	}
 
-	return &agreementData, nil
+	return agreementData, nil
 }

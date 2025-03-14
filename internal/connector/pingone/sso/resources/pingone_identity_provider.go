@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock,
 		return nil, err
 	}
 
-	for idpId, idpName := range *identityProviderData {
+	for idpId, idpName := range identityProviderData {
 		commentData := map[string]string{
 			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
 			"Identity Provider ID":   idpId,
@@ -60,62 +62,50 @@ func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock,
 	return &importBlocks, nil
 }
 
-func (r *PingOneIdentityProviderResource) getIdentityProviderData() (*map[string]string, error) {
+func (r *PingOneIdentityProviderResource) getIdentityProviderData() (map[string]string, error) {
 	identityProviderData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	identityProviders, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityProvider](iter, "ReadAllIdentityProviders", "GetIdentityProviders", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllIdentityProviders", r.ResourceType())
-		if err != nil {
-			return nil, err
+	for _, idp := range identityProviders {
+		var (
+			idpId     *string
+			idpIdOk   bool
+			idpName   *string
+			idpNameOk bool
+		)
+
+		switch {
+		case idp.IdentityProviderApple != nil:
+			idpId, idpIdOk = idp.IdentityProviderApple.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderApple.GetNameOk()
+		case idp.IdentityProviderClientIDClientSecret != nil:
+			idpId, idpIdOk = idp.IdentityProviderClientIDClientSecret.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderClientIDClientSecret.GetNameOk()
+		case idp.IdentityProviderFacebook != nil:
+			idpId, idpIdOk = idp.IdentityProviderFacebook.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderFacebook.GetNameOk()
+		case idp.IdentityProviderOIDC != nil:
+			idpId, idpIdOk = idp.IdentityProviderOIDC.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderOIDC.GetNameOk()
+		case idp.IdentityProviderPaypal != nil:
+			idpId, idpIdOk = idp.IdentityProviderPaypal.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderPaypal.GetNameOk()
+		case idp.IdentityProviderSAML != nil:
+			idpId, idpIdOk = idp.IdentityProviderSAML.GetIdOk()
+			idpName, idpNameOk = idp.IdentityProviderSAML.GetNameOk()
+		default:
+			continue
 		}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, idp := range embedded.GetIdentityProviders() {
-			var (
-				idpId     *string
-				idpIdOk   bool
-				idpName   *string
-				idpNameOk bool
-			)
-
-			switch {
-			case idp.IdentityProviderApple != nil:
-				idpId, idpIdOk = idp.IdentityProviderApple.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderApple.GetNameOk()
-			case idp.IdentityProviderClientIDClientSecret != nil:
-				idpId, idpIdOk = idp.IdentityProviderClientIDClientSecret.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderClientIDClientSecret.GetNameOk()
-			case idp.IdentityProviderFacebook != nil:
-				idpId, idpIdOk = idp.IdentityProviderFacebook.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderFacebook.GetNameOk()
-			case idp.IdentityProviderOIDC != nil:
-				idpId, idpIdOk = idp.IdentityProviderOIDC.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderOIDC.GetNameOk()
-			case idp.IdentityProviderPaypal != nil:
-				idpId, idpIdOk = idp.IdentityProviderPaypal.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderPaypal.GetNameOk()
-			case idp.IdentityProviderSAML != nil:
-				idpId, idpIdOk = idp.IdentityProviderSAML.GetIdOk()
-				idpName, idpNameOk = idp.IdentityProviderSAML.GetNameOk()
-			default:
-				continue
-			}
-
-			if idpIdOk && idpNameOk {
-				identityProviderData[*idpId] = *idpName
-			}
+		if idpIdOk && idpNameOk {
+			identityProviderData[*idpId] = *idpName
 		}
 	}
 
-	return &identityProviderData, nil
+	return identityProviderData, nil
 }

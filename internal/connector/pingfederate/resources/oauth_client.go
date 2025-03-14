@@ -37,7 +37,7 @@ func (r *PingFederateOauthClientResource) ExportAll() (*[]connector.ImportBlock,
 		return nil, err
 	}
 
-	for oauthClientId, oauthClientName := range *oauthClientData {
+	for oauthClientId, oauthClientName := range oauthClientData {
 		commentData := map[string]string{
 			"Oauth Client ID":   oauthClientId,
 			"Oauth Client Name": oauthClientName,
@@ -57,13 +57,16 @@ func (r *PingFederateOauthClientResource) ExportAll() (*[]connector.ImportBlock,
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOauthClientResource) getOauthClientData() (*map[string]string, error) {
+func (r *PingFederateOauthClientResource) getOauthClientData() (map[string]string, error) {
 	oauthClientData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthClientsAPI.GetOauthClients(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetOauthClients", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetOauthClients", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateOauthClientResource) getOauthClientData() (*map[string]stri
 		}
 	}
 
-	return &oauthClientData, nil
+	return oauthClientData, nil
 }

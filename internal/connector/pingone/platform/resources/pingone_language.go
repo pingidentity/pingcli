@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) 
 		return nil, err
 	}
 
-	for languageId, languageName := range *languageData {
+	for languageId, languageName := range languageData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Language ID":           languageId,
@@ -60,43 +62,31 @@ func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) 
 	return &importBlocks, nil
 }
 
-func (r *PingOneLanguageResource) getLanguageData() (*map[string]string, error) {
+func (r *PingOneLanguageResource) getLanguageData() (map[string]string, error) {
 	languageData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	languageInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadLanguages", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, languageInner := range languageInners {
+		if languageInner.Language != nil {
+			// If language is not customer added, skip it
+			languageCustomerAdded, languageCustomerAddedOk := languageInner.Language.GetCustomerAddedOk()
+			if !languageCustomerAddedOk || !*languageCustomerAdded {
+				continue
+			}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+			languageId, languageIdOk := languageInner.Language.GetIdOk()
+			languageName, languageNameOk := languageInner.Language.GetNameOk()
 
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, languageInner := range embedded.GetLanguages() {
-			if languageInner.Language != nil {
-				// If language is not customer added, skip it
-				languageCustomerAdded, languageCustomerAddedOk := languageInner.Language.GetCustomerAddedOk()
-				if !languageCustomerAddedOk || !*languageCustomerAdded {
-					continue
-				}
-
-				languageId, languageIdOk := languageInner.Language.GetIdOk()
-				languageName, languageNameOk := languageInner.Language.GetNameOk()
-
-				if languageIdOk && languageNameOk {
-					languageData[*languageId] = *languageName
-				}
+			if languageIdOk && languageNameOk {
+				languageData[*languageId] = *languageName
 			}
 		}
 	}
 
-	return &languageData, nil
+	return languageData, nil
 }

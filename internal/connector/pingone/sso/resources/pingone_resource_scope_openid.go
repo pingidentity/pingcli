@@ -6,6 +6,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -40,13 +41,13 @@ func (r *PingOneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlo
 		return nil, err
 	}
 
-	for resourceId, resourceName := range *resourceData {
+	for resourceId, resourceName := range resourceData {
 		resourceScopeData, err := r.getResourceScopeData(resourceId)
 		if err != nil {
 			return nil, err
 		}
 
-		for resourceScopeId, resourceScopeName := range *resourceScopeData {
+		for resourceScopeId, resourceScopeName := range resourceScopeData {
 			commentData := map[string]string{
 				"Export Environment ID":              r.clientInfo.ExportEnvironmentID,
 				"OpenID Connect Resource Name":       resourceName,
@@ -69,71 +70,47 @@ func (r *PingOneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlo
 	return &importBlocks, nil
 }
 
-func (r *PingOneResourceScopeOpenIdResource) getResourceData() (*map[string]string, error) {
+func (r *PingOneResourceScopeOpenIdResource) getResourceData() (map[string]string, error) {
 	resourceData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResources", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, resourceInner := range resourceInners {
+		if resourceInner.Resource != nil {
+			resourceId, resourceIdOk := resourceInner.Resource.GetIdOk()
+			resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
+			resourceType, resourceTypeOk := resourceInner.Resource.GetTypeOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, resourceInner := range embedded.GetResources() {
-			if resourceInner.Resource != nil {
-				resourceId, resourceIdOk := resourceInner.Resource.GetIdOk()
-				resourceName, resourceNameOk := resourceInner.Resource.GetNameOk()
-				resourceType, resourceTypeOk := resourceInner.Resource.GetTypeOk()
-
-				if resourceIdOk && resourceNameOk && resourceTypeOk && *resourceType == management.ENUMRESOURCETYPE_OPENID_CONNECT {
-					resourceData[*resourceId] = *resourceName
-				}
+			if resourceIdOk && resourceNameOk && resourceTypeOk && *resourceType == management.ENUMRESOURCETYPE_OPENID_CONNECT {
+				resourceData[*resourceId] = *resourceName
 			}
 		}
 	}
 
-	return &resourceData, nil
+	return resourceData, nil
 }
 
-func (r *PingOneResourceScopeOpenIdResource) getResourceScopeData(resourceId string) (*map[string]string, error) {
+func (r *PingOneResourceScopeOpenIdResource) getResourceScopeData(resourceId string) (map[string]string, error) {
 	resourceScopeData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	resourceScopes, err := pingone.GetManagementAPIObjectsFromIterator[management.ResourceScope](iter, "ReadAllResourceScopes", "GetScopes", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllResourceScopes", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, scopeOpenId := range resourceScopes {
+		scopeOpenIdId, scopeOpenIdIdOk := scopeOpenId.GetIdOk()
+		scopeOpenIdName, scopeOpenIdNameOk := scopeOpenId.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, scopeOpenId := range embedded.GetScopes() {
-			scopeOpenIdId, scopeOpenIdIdOk := scopeOpenId.GetIdOk()
-			scopeOpenIdName, scopeOpenIdNameOk := scopeOpenId.GetNameOk()
-
-			if scopeOpenIdIdOk && scopeOpenIdNameOk {
-				resourceScopeData[*scopeOpenIdId] = *scopeOpenIdName
-			}
+		if scopeOpenIdIdOk && scopeOpenIdNameOk {
+			resourceScopeData[*scopeOpenIdId] = *scopeOpenIdName
 		}
 	}
 
-	return &resourceScopeData, nil
+	return resourceScopeData, nil
 }

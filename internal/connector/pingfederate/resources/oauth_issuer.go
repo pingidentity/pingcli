@@ -37,7 +37,7 @@ func (r *PingFederateOauthIssuerResource) ExportAll() (*[]connector.ImportBlock,
 		return nil, err
 	}
 
-	for oauthIssuerId, oauthIssuerName := range *oauthIssuerData {
+	for oauthIssuerId, oauthIssuerName := range oauthIssuerData {
 		commentData := map[string]string{
 			"Oauth Issuer ID":   oauthIssuerId,
 			"Oauth Issuer Name": oauthIssuerName,
@@ -57,13 +57,16 @@ func (r *PingFederateOauthIssuerResource) ExportAll() (*[]connector.ImportBlock,
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOauthIssuerResource) getOauthIssuerData() (*map[string]string, error) {
+func (r *PingFederateOauthIssuerResource) getOauthIssuerData() (map[string]string, error) {
 	oauthIssuerData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthIssuersAPI.GetOauthIssuers(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetOauthIssuers", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetOauthIssuers", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateOauthIssuerResource) getOauthIssuerData() (*map[string]stri
 		}
 	}
 
-	return &oauthIssuerData, nil
+	return oauthIssuerData, nil
 }

@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 		return nil, err
 	}
 
-	for domainId, domainName := range *domainData {
+	for domainId, domainName := range domainData {
 		commentData := map[string]string{
 			"Custom Domain ID":      domainId,
 			"Custom Domain Name":    domainName,
@@ -60,35 +62,23 @@ func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 	return &importBlocks, nil
 }
 
-func (r *PingOneCustomDomainResource) getCustomDomainData() (*map[string]string, error) {
+func (r *PingOneCustomDomainResource) getCustomDomainData() (map[string]string, error) {
 	domainData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	customDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.CustomDomain](iter, "ReadAllDomains", "GetCustomDomains", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllDomains", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, customDomain := range customDomains {
+		customDomainName, customDomainNameOk := customDomain.GetDomainNameOk()
+		customDomainId, customDomainIdOk := customDomain.GetIdOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, customDomain := range embedded.GetCustomDomains() {
-			customDomainName, customDomainNameOk := customDomain.GetDomainNameOk()
-			customDomainId, customDomainIdOk := customDomain.GetIdOk()
-
-			if customDomainIdOk && customDomainNameOk {
-				domainData[*customDomainId] = *customDomainName
-			}
+		if customDomainIdOk && customDomainNameOk {
+			domainData[*customDomainId] = *customDomainName
 		}
 	}
 
-	return &domainData, nil
+	return domainData, nil
 }

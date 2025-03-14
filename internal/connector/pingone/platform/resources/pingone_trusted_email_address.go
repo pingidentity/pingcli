@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,13 +41,13 @@ func (r *PingOneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlo
 		return nil, err
 	}
 
-	for trustedEmailDomainId, trustedEmailDomainName := range *trustedEmailDomainData {
+	for trustedEmailDomainId, trustedEmailDomainName := range trustedEmailDomainData {
 		trustedEmailAddressData, err := r.getTrustedEmailAddressData(trustedEmailDomainId)
 		if err != nil {
 			return nil, err
 		}
 
-		for trustedEmailId, trustedEmailAddress := range *trustedEmailAddressData {
+		for trustedEmailId, trustedEmailAddress := range trustedEmailAddressData {
 			commentData := map[string]string{
 				"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
 				"Resource Type":             r.ResourceType(),
@@ -69,68 +71,44 @@ func (r *PingOneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlo
 	return &importBlocks, nil
 }
 
-func (r *PingOneTrustedEmailAddressResource) getTrustedEmailDomainData() (*map[string]string, error) {
+func (r *PingOneTrustedEmailAddressResource) getTrustedEmailDomainData() (map[string]string, error) {
 	trustedEmailDomainData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	trustedEmailDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomain](iter, "ReadAllTrustedEmailDomains", "GetEmailDomains", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllTrustedEmailDomains", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, trustedEmailDomain := range trustedEmailDomains {
+		trustedEmailDomainId, trustedEmailDomainIdOk := trustedEmailDomain.GetIdOk()
+		trustedEmailDomainName, trustedEmailDomainNameOk := trustedEmailDomain.GetDomainNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, trustedEmailDomain := range embedded.GetEmailDomains() {
-			trustedEmailDomainId, trustedEmailDomainIdOk := trustedEmailDomain.GetIdOk()
-			trustedEmailDomainName, trustedEmailDomainNameOk := trustedEmailDomain.GetDomainNameOk()
-
-			if trustedEmailDomainIdOk && trustedEmailDomainNameOk {
-				trustedEmailDomainData[*trustedEmailDomainId] = *trustedEmailDomainName
-			}
+		if trustedEmailDomainIdOk && trustedEmailDomainNameOk {
+			trustedEmailDomainData[*trustedEmailDomainId] = *trustedEmailDomainName
 		}
 	}
 
-	return &trustedEmailDomainData, nil
+	return trustedEmailDomainData, nil
 }
 
-func (r *PingOneTrustedEmailAddressResource) getTrustedEmailAddressData(trustedEmailDomainId string) (*map[string]string, error) {
+func (r *PingOneTrustedEmailAddressResource) getTrustedEmailAddressData(trustedEmailDomainId string) (map[string]string, error) {
 	trustedEmailAddressData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailAddressesApi.ReadAllTrustedEmailAddresses(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, trustedEmailDomainId).Execute()
+	trustedEmailAddresses, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomainTrustedEmail](iter, "ReadAllTrustedEmailAddresses", "GetTrustedEmails", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllTrustedEmailAddresses", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, trustedEmail := range trustedEmailAddresses {
+		trustedEmailAddress, trustedEmailAddressOk := trustedEmail.GetEmailAddressOk()
+		trustedEmailId, trustedEmailIdOk := trustedEmail.GetIdOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, trustedEmail := range embedded.GetTrustedEmails() {
-			trustedEmailAddress, trustedEmailAddressOk := trustedEmail.GetEmailAddressOk()
-			trustedEmailId, trustedEmailIdOk := trustedEmail.GetIdOk()
-
-			if trustedEmailAddressOk && trustedEmailIdOk {
-				trustedEmailAddressData[*trustedEmailId] = *trustedEmailAddress
-			}
+		if trustedEmailAddressOk && trustedEmailIdOk {
+			trustedEmailAddressData[*trustedEmailId] = *trustedEmailAddress
 		}
 	}
 
-	return &trustedEmailAddressData, nil
+	return trustedEmailAddressData, nil
 }

@@ -3,6 +3,7 @@ package resources
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -32,9 +33,12 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 
 	importBlocks := []connector.ImportBlock{}
 
-	err := r.checkEnvironmentData()
+	ok, err := r.checkEnvironmentData()
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return &importBlocks, nil
 	}
 
 	commentData := map[string]string{
@@ -54,13 +58,7 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 	return &importBlocks, nil
 }
 
-func (r *PingOneEnvironmentResource) checkEnvironmentData() error {
+func (r *PingOneEnvironmentResource) checkEnvironmentData() (bool, error) {
 	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-
-	err = common.HandleClientResponse(response, err, "ReadOneEnvironment", r.ResourceType())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return pingone.CheckSingletonResource(response, err, "ReadOneEnvironment", r.ResourceType())
 }

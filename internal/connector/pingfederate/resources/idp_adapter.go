@@ -37,7 +37,7 @@ func (r *PingFederateIdpAdapterResource) ExportAll() (*[]connector.ImportBlock, 
 		return nil, err
 	}
 
-	for idpAdapterId, idpAdapterName := range *idpAdapterData {
+	for idpAdapterId, idpAdapterName := range idpAdapterData {
 		commentData := map[string]string{
 			"Idp Adapter ID":   idpAdapterId,
 			"Idp Adapter Name": idpAdapterName,
@@ -57,13 +57,16 @@ func (r *PingFederateIdpAdapterResource) ExportAll() (*[]connector.ImportBlock, 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIdpAdapterResource) getIdpAdapterData() (*map[string]string, error) {
+func (r *PingFederateIdpAdapterResource) getIdpAdapterData() (map[string]string, error) {
 	idpAdapterData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpAdaptersAPI.GetIdpAdapters(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdpAdapters", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdpAdapters", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateIdpAdapterResource) getIdpAdapterData() (*map[string]string
 		}
 	}
 
-	return &idpAdapterData, nil
+	return idpAdapterData, nil
 }

@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -38,6 +40,9 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 	if err != nil {
 		return nil, err
 	}
+	if defaultBrandingThemeName == nil {
+		return &importBlocks, nil
+	}
 
 	commentData := map[string]string{
 		"Default Branding Theme Name": *defaultBrandingThemeName,
@@ -59,38 +64,27 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 
 func (r *PingOneBrandingThemeDefaultResource) getDefaultBrandingThemeName() (*string, error) {
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	brandingThemes, err := pingone.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadBrandingThemes", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, brandingTheme := range brandingThemes {
+		brandingThemeDefault, brandingThemeDefaultOk := brandingTheme.GetDefaultOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+		if brandingThemeDefaultOk && *brandingThemeDefault {
+			brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
 
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+			if brandingThemeConfigurationOk {
+				brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
 
-		for _, brandingTheme := range embedded.GetThemes() {
-			brandingThemeDefault, brandingThemeDefaultOk := brandingTheme.GetDefaultOk()
-
-			if brandingThemeDefaultOk && *brandingThemeDefault {
-				brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
-
-				if brandingThemeConfigurationOk {
-					brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
-
-					if brandingThemeNameOk {
-						return brandingThemeName, nil
-					}
+				if brandingThemeNameOk {
+					return brandingThemeName, nil
 				}
 			}
+
 		}
 	}
 
-	return nil, fmt.Errorf("failed to export resource '%s'. No default branding theme found.", r.ResourceType())
+	return nil, fmt.Errorf("failed to export resource '%s'. No default branding theme found", r.ResourceType())
 }

@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,7 +41,7 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 		return nil, err
 	}
 
-	for subscriptionId, subscriptionName := range *subscriptionData {
+	for subscriptionId, subscriptionName := range subscriptionData {
 		commentData := map[string]string{
 			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
@@ -60,35 +62,23 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func (r *PingOneWebhookResource) getSubscriptionData() (*map[string]string, error) {
+func (r *PingOneWebhookResource) getSubscriptionData() (map[string]string, error) {
 	subscriptionData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	subscriptions, err := pingone.GetManagementAPIObjectsFromIterator[management.Subscription](iter, "ReadAllSubscriptions", "GetSubscriptions", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSubscriptions", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, subscription := range subscriptions {
+		subscriptionId, subscriptionIdOk := subscription.GetIdOk()
+		subscriptionName, subscriptionNameOk := subscription.GetNameOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, subscription := range embedded.GetSubscriptions() {
-			subscriptionId, subscriptionIdOk := subscription.GetIdOk()
-			subscriptionName, subscriptionNameOk := subscription.GetNameOk()
-
-			if subscriptionIdOk && subscriptionNameOk {
-				subscriptionData[*subscriptionId] = *subscriptionName
-			}
+		if subscriptionIdOk && subscriptionNameOk {
+			subscriptionData[*subscriptionId] = *subscriptionName
 		}
 	}
 
-	return &subscriptionData, nil
+	return subscriptionData, nil
 }

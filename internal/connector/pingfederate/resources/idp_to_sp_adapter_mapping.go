@@ -39,21 +39,17 @@ func (r *PingFederateIdpToSpAdapterMappingResource) ExportAll() (*[]connector.Im
 		return nil, err
 	}
 
-	for idpToSpAdapterMappingId, idpToSpAdapterMappingInfo := range *idpToSpAdapterMappingData {
-		idpToSpAdapterMappingSourceId := idpToSpAdapterMappingInfo[0]
-		idpToSpAdapterMappingTargetId := idpToSpAdapterMappingInfo[1]
-
+	for idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId := range idpToSpAdapterMappingData {
 		commentData := map[string]string{
-			"Idp To Sp Adapter Mapping ID":        idpToSpAdapterMappingId,
-			"Idp To Sp Adapter Mapping Source ID": idpToSpAdapterMappingSourceId,
-			"Idp To Sp Adapter Mapping Target ID": idpToSpAdapterMappingTargetId,
-			"Resource Type":                       r.ResourceType(),
+			"Idp To Sp Adapter Mapping IDP ID": idpToSpAdapterMappingSourceId,
+			"Idp To Sp Adapter Mapping SP ID":  idpToSpAdapterMappingTargetId,
+			"Resource Type":                    r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s", idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId),
-			ResourceID:         idpToSpAdapterMappingId,
+			ResourceName:       fmt.Sprintf("%s_to_%s", idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId),
+			ResourceID:         fmt.Sprintf("%s|%s", idpToSpAdapterMappingSourceId, idpToSpAdapterMappingTargetId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -63,13 +59,16 @@ func (r *PingFederateIdpToSpAdapterMappingResource) ExportAll() (*[]connector.Im
 	return &importBlocks, nil
 }
 
-func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData() (*map[string][]string, error) {
-	idpToSpAdapterMappingData := make(map[string][]string)
+func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData() (map[string]string, error) {
+	idpToSpAdapterMappingData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpToSpAdapterMappingAPI.GetIdpToSpAdapterMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetIdpToSpAdapterMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetIdpToSpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -82,14 +81,13 @@ func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData
 	}
 
 	for _, idpToSpAdapterMapping := range items {
-		idpToSpAdapterMappingId, idpToSpAdapterMappingIdOk := idpToSpAdapterMapping.GetIdOk()
 		idpToSpAdapterMappingSourceId, idpToSpAdapterMappingSourceIdOk := idpToSpAdapterMapping.GetSourceIdOk()
 		idpToSpAdapterMappingTargetId, idpToSpAdapterMappingTargetIdOk := idpToSpAdapterMapping.GetTargetIdOk()
 
-		if idpToSpAdapterMappingIdOk && idpToSpAdapterMappingSourceIdOk && idpToSpAdapterMappingTargetIdOk {
-			idpToSpAdapterMappingData[*idpToSpAdapterMappingId] = []string{*idpToSpAdapterMappingSourceId, *idpToSpAdapterMappingTargetId}
+		if idpToSpAdapterMappingSourceIdOk && idpToSpAdapterMappingTargetIdOk {
+			idpToSpAdapterMappingData[*idpToSpAdapterMappingSourceId] = *idpToSpAdapterMappingTargetId
 		}
 	}
 
-	return &idpToSpAdapterMappingData, nil
+	return idpToSpAdapterMappingData, nil
 }

@@ -39,20 +39,20 @@ func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) ExportAll(
 		return nil, err
 	}
 
-	for oauthTokenExchangeTokenGeneratorMappingId, oauthTokenExchangeTokenGeneratorMappingInfo := range *oauthTokenExchangeTokenGeneratorMappingData {
+	for oauthTokenExchangeTokenGeneratorMappingId, oauthTokenExchangeTokenGeneratorMappingInfo := range oauthTokenExchangeTokenGeneratorMappingData {
 		oauthTokenExchangeTokenGeneratorMappingSourceId := oauthTokenExchangeTokenGeneratorMappingInfo[0]
 		oauthTokenExchangeTokenGeneratorMappingTargetId := oauthTokenExchangeTokenGeneratorMappingInfo[1]
 
 		commentData := map[string]string{
-			"Oauth Token Exchange Token Generator Mapping ID":        oauthTokenExchangeTokenGeneratorMappingId,
-			"Oauth Token Exchange Token Generator Mapping Source ID": oauthTokenExchangeTokenGeneratorMappingSourceId,
-			"Oauth Token Exchange Token Generator Mapping Target ID": oauthTokenExchangeTokenGeneratorMappingTargetId,
-			"Resource Type": r.ResourceType(),
+			"Oauth Token Exchange Token Generator Mapping ID": oauthTokenExchangeTokenGeneratorMappingId,
+			"Processor Policy ID":                             oauthTokenExchangeTokenGeneratorMappingSourceId,
+			"Token Generator ID":                              oauthTokenExchangeTokenGeneratorMappingTargetId,
+			"Resource Type":                                   r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s", oauthTokenExchangeTokenGeneratorMappingSourceId, oauthTokenExchangeTokenGeneratorMappingTargetId),
+			ResourceName:       fmt.Sprintf("%s_to_%s", oauthTokenExchangeTokenGeneratorMappingSourceId, oauthTokenExchangeTokenGeneratorMappingTargetId),
 			ResourceID:         oauthTokenExchangeTokenGeneratorMappingId,
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -63,13 +63,16 @@ func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) ExportAll(
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) getOauthTokenExchangeTokenGeneratorMappingData() (*map[string][]string, error) {
+func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) getOauthTokenExchangeTokenGeneratorMappingData() (map[string][]string, error) {
 	oauthTokenExchangeTokenGeneratorMappingData := make(map[string][]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.GetTokenGeneratorMappings(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTokenGeneratorMappings", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTokenGeneratorMappings", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -91,5 +94,5 @@ func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) getOauthTo
 		}
 	}
 
-	return &oauthTokenExchangeTokenGeneratorMappingData, nil
+	return oauthTokenExchangeTokenGeneratorMappingData, nil
 }

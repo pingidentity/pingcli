@@ -9,8 +9,9 @@ import (
 )
 
 func Test_PingFederateSessionAuthenticationPoliciesGlobal(t *testing.T) {
-	pingfederateClientInfo := testutils.GetPingFederateClientInfo(t)
-	resource := resources.SessionAuthenticationPoliciesGlobal(pingfederateClientInfo)
+	clientInfo := testutils.GetPingFederateClientInfo(t)
+
+	resource := resources.SessionAuthenticationPoliciesGlobal(clientInfo)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
@@ -21,4 +22,5 @@ func Test_PingFederateSessionAuthenticationPoliciesGlobal(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
+
 }

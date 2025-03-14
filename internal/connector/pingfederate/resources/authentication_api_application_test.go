@@ -11,6 +11,7 @@ import (
 
 func Test_PingFederateAuthenticationApiApplication(t *testing.T) {
 	clientInfo := testutils.GetPingFederateClientInfo(t)
+
 	tr := pingfederate.TestableResource_PingFederateAuthenticationApiApplication(t, clientInfo)
 
 	creationInfo := tr.CreateResource(t)
@@ -25,4 +26,5 @@ func Test_PingFederateAuthenticationApiApplication(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
+
 }

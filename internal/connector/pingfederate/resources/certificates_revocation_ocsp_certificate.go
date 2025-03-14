@@ -39,7 +39,7 @@ func (r *PingFederateCertificatesRevocationOcspCertificateResource) ExportAll() 
 		return nil, err
 	}
 
-	for certificatesRevocationOcspCertificateId, certificatesRevocationOcspCertificateInfo := range *certificatesRevocationOcspCertificateData {
+	for certificatesRevocationOcspCertificateId, certificatesRevocationOcspCertificateInfo := range certificatesRevocationOcspCertificateData {
 		certificatesRevocationOcspCertificateIssuerDn := certificatesRevocationOcspCertificateInfo[0]
 		certificatesRevocationOcspCertificateSerialNumber := certificatesRevocationOcspCertificateInfo[1]
 
@@ -63,13 +63,16 @@ func (r *PingFederateCertificatesRevocationOcspCertificateResource) ExportAll() 
 	return &importBlocks, nil
 }
 
-func (r *PingFederateCertificatesRevocationOcspCertificateResource) getCertificatesRevocationOcspCertificateData() (*map[string][]string, error) {
+func (r *PingFederateCertificatesRevocationOcspCertificateResource) getCertificatesRevocationOcspCertificateData() (map[string][]string, error) {
 	certificatesRevocationOcspCertificateData := make(map[string][]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.CertificatesRevocationAPI.GetOcspCertificates(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetOcspCertificates", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetOcspCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -91,5 +94,5 @@ func (r *PingFederateCertificatesRevocationOcspCertificateResource) getCertifica
 		}
 	}
 
-	return &certificatesRevocationOcspCertificateData, nil
+	return certificatesRevocationOcspCertificateData, nil
 }

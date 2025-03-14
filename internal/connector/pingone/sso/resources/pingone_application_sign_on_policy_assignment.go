@@ -3,8 +3,10 @@ package resources
 import (
 	"fmt"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,16 +41,19 @@ func (r *PingOneApplicationSignOnPolicyAssignmentResource) ExportAll() (*[]conne
 		return nil, err
 	}
 
-	for appId, appName := range *applicationData {
+	for appId, appName := range applicationData {
 		signOnPolicyAssignmentData, err := r.getApplicationSignOnPolicyAssignmentData(appId)
 		if err != nil {
 			return nil, err
 		}
 
-		for signOnPolicyAssignmentId, signOnPolicyId := range *signOnPolicyAssignmentData {
-			signOnPolicyName, err := r.getSignOnPolicyName(signOnPolicyId)
+		for signOnPolicyAssignmentId, signOnPolicyId := range signOnPolicyAssignmentData {
+			signOnPolicyName, signOnPolicyNameOk, err := r.getSignOnPolicyName(signOnPolicyId)
 			if err != nil {
 				return nil, err
+			}
+			if !signOnPolicyNameOk {
+				continue
 			}
 
 			commentData := map[string]string{
@@ -56,13 +61,13 @@ func (r *PingOneApplicationSignOnPolicyAssignmentResource) ExportAll() (*[]conne
 				"Application ID":   appId,
 				"Application Name": appName,
 				"Application Sign-On Policy Assignment ID": signOnPolicyAssignmentId,
-				"Application Sign-On Policy Name":          *signOnPolicyName,
+				"Application Sign-On Policy Name":          signOnPolicyName,
 				"Export Environment ID":                    r.clientInfo.ExportEnvironmentID,
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", appName, *signOnPolicyName),
+				ResourceName:       fmt.Sprintf("%s_%s", appName, signOnPolicyName),
 				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, signOnPolicyAssignmentId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
@@ -74,108 +79,87 @@ func (r *PingOneApplicationSignOnPolicyAssignmentResource) ExportAll() (*[]conne
 	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationSignOnPolicyAssignmentResource) getApplicationData() (*map[string]string, error) {
+func (r *PingOneApplicationSignOnPolicyAssignmentResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllApplications", r.ResourceType())
-		if err != nil {
-			return nil, err
+	for _, app := range applications {
+		var (
+			appId     *string
+			appIdOk   bool
+			appName   *string
+			appNameOk bool
+		)
+
+		switch {
+		case app.ApplicationOIDC != nil:
+			appId, appIdOk = app.ApplicationOIDC.GetIdOk()
+			appName, appNameOk = app.ApplicationOIDC.GetNameOk()
+		case app.ApplicationSAML != nil:
+			appId, appIdOk = app.ApplicationSAML.GetIdOk()
+			appName, appNameOk = app.ApplicationSAML.GetNameOk()
+		case app.ApplicationExternalLink != nil:
+			appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
+			appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
+		default:
+			continue
 		}
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, app := range embedded.GetApplications() {
-			var (
-				appId     *string
-				appIdOk   bool
-				appName   *string
-				appNameOk bool
-			)
-
-			switch {
-			case app.ApplicationOIDC != nil:
-				appId, appIdOk = app.ApplicationOIDC.GetIdOk()
-				appName, appNameOk = app.ApplicationOIDC.GetNameOk()
-			case app.ApplicationSAML != nil:
-				appId, appIdOk = app.ApplicationSAML.GetIdOk()
-				appName, appNameOk = app.ApplicationSAML.GetNameOk()
-			case app.ApplicationExternalLink != nil:
-				appId, appIdOk = app.ApplicationExternalLink.GetIdOk()
-				appName, appNameOk = app.ApplicationExternalLink.GetNameOk()
-			default:
-				continue
-			}
-
-			if appIdOk && appNameOk {
-				applicationData[*appId] = *appName
-			}
+		if appIdOk && appNameOk {
+			applicationData[*appId] = *appName
 		}
 	}
 
-	return &applicationData, nil
+	return applicationData, nil
 }
 
-func (r *PingOneApplicationSignOnPolicyAssignmentResource) getApplicationSignOnPolicyAssignmentData(appId string) (*map[string]string, error) {
+func (r *PingOneApplicationSignOnPolicyAssignmentResource) getApplicationSignOnPolicyAssignmentData(appId string) (map[string]string, error) {
 	signOnPolicyAssignmentData := make(map[string]string)
 
 	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationSignOnPolicyAssignmentsApi.ReadAllSignOnPolicyAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	signOnPolicyAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.SignOnPolicyAssignment](iter, "ReadAllSignOnPolicyAssignments", "GetSignOnPolicyAssignments", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
 
-	for cursor, err := range iter {
-		err = common.HandleClientResponse(cursor.HTTPResponse, err, "ReadAllSignOnPolicyAssignments", r.ResourceType())
-		if err != nil {
-			return nil, err
-		}
+	for _, signOnPolicyAssignment := range signOnPolicyAssignments {
+		signOnPolicyAssignmentId, signOnPolicyAssignmentIdOk := signOnPolicyAssignment.GetIdOk()
+		signOnPolicyAssignmentSignOnPolicy, signOnPolicyAssignmentSignOnPolicyOk := signOnPolicyAssignment.GetSignOnPolicyOk()
 
-		if cursor.EntityArray == nil {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
+		if signOnPolicyAssignmentIdOk && signOnPolicyAssignmentSignOnPolicyOk {
+			signOnPolicyAssignmentSignOnPolicyId, signOnPolicyAssignmentSignOnPolicyIdOk := signOnPolicyAssignmentSignOnPolicy.GetIdOk()
 
-		embedded, embeddedOk := cursor.EntityArray.GetEmbeddedOk()
-		if !embeddedOk {
-			return nil, common.DataNilError(r.ResourceType(), cursor.HTTPResponse)
-		}
-
-		for _, signOnPolicyAssignment := range embedded.GetSignOnPolicyAssignments() {
-			signOnPolicyAssignmentId, signOnPolicyAssignmentIdOk := signOnPolicyAssignment.GetIdOk()
-			signOnPolicyAssignmentSignOnPolicy, signOnPolicyAssignmentSignOnPolicyOk := signOnPolicyAssignment.GetSignOnPolicyOk()
-
-			if signOnPolicyAssignmentIdOk && signOnPolicyAssignmentSignOnPolicyOk {
-				signOnPolicyAssignmentSignOnPolicyId, signOnPolicyAssignmentSignOnPolicyIdOk := signOnPolicyAssignmentSignOnPolicy.GetIdOk()
-
-				if signOnPolicyAssignmentSignOnPolicyIdOk {
-					signOnPolicyAssignmentData[*signOnPolicyAssignmentId] = *signOnPolicyAssignmentSignOnPolicyId
-				}
+			if signOnPolicyAssignmentSignOnPolicyIdOk {
+				signOnPolicyAssignmentData[*signOnPolicyAssignmentId] = *signOnPolicyAssignmentSignOnPolicyId
 			}
 		}
 	}
 
-	return &signOnPolicyAssignmentData, nil
+	return signOnPolicyAssignmentData, nil
 }
 
-func (r *PingOneApplicationSignOnPolicyAssignmentResource) getSignOnPolicyName(signOnPolicyId string) (*string, error) {
+func (r *PingOneApplicationSignOnPolicyAssignmentResource) getSignOnPolicyName(signOnPolicyId string) (string, bool, error) {
 	signOnPolicy, response, err := r.clientInfo.ApiClient.ManagementAPIClient.SignOnPoliciesApi.ReadOneSignOnPolicy(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, signOnPolicyId).Execute()
-	err = common.HandleClientResponse(response, err, "ReadOneSignOnPolicy", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "ReadOneSignOnPolicy", r.ResourceType())
 	if err != nil {
-		return nil, err
+		return "", false, err
+	}
+	if !ok {
+		return "", false, nil
 	}
 
 	if signOnPolicy != nil {
 		signOnPolicyName, signOnPolicyNameOk := signOnPolicy.GetNameOk()
 
 		if signOnPolicyNameOk {
-			return signOnPolicyName, nil
+			return *signOnPolicyName, true, nil
 		}
 	}
 
-	return nil, fmt.Errorf("Unable to get sign-on policy name for sign-on policy ID: %s", signOnPolicyId)
+	return "", false, fmt.Errorf("unable to get sign-on policy name for sign-on policy ID: %s", signOnPolicyId)
 }

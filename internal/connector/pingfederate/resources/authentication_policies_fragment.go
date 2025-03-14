@@ -37,7 +37,7 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) ExportAll() (*[]con
 		return nil, err
 	}
 
-	for authenticationPoliciesFragmentId, authenticationPoliciesFragmentName := range *authenticationPoliciesFragmentData {
+	for authenticationPoliciesFragmentId, authenticationPoliciesFragmentName := range authenticationPoliciesFragmentData {
 		commentData := map[string]string{
 			"Authentication Policies Fragment ID":   authenticationPoliciesFragmentId,
 			"Authentication Policies Fragment Name": authenticationPoliciesFragmentName,
@@ -57,13 +57,16 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) ExportAll() (*[]con
 	return &importBlocks, nil
 }
 
-func (r *PingFederateAuthenticationPoliciesFragmentResource) getAuthenticationPoliciesFragmentData() (*map[string]string, error) {
+func (r *PingFederateAuthenticationPoliciesFragmentResource) getAuthenticationPoliciesFragmentData() (map[string]string, error) {
 	authenticationPoliciesFragmentData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetFragments", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetFragments", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) getAuthenticationPo
 		}
 	}
 
-	return &authenticationPoliciesFragmentData, nil
+	return authenticationPoliciesFragmentData, nil
 }

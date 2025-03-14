@@ -37,7 +37,7 @@ func (r *PingFederatePasswordCredentialValidatorResource) ExportAll() (*[]connec
 		return nil, err
 	}
 
-	for passwordCredentialValidatorId, passwordCredentialValidatorName := range *passwordCredentialValidatorData {
+	for passwordCredentialValidatorId, passwordCredentialValidatorName := range passwordCredentialValidatorData {
 		commentData := map[string]string{
 			"Password Credential Validator ID":   passwordCredentialValidatorId,
 			"Password Credential Validator Name": passwordCredentialValidatorName,
@@ -57,13 +57,16 @@ func (r *PingFederatePasswordCredentialValidatorResource) ExportAll() (*[]connec
 	return &importBlocks, nil
 }
 
-func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialValidatorData() (*map[string]string, error) {
+func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialValidatorData() (map[string]string, error) {
 	passwordCredentialValidatorData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.PasswordCredentialValidatorsAPI.GetPasswordCredentialValidators(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetPasswordCredentialValidators", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetPasswordCredentialValidators", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialV
 		}
 	}
 
-	return &passwordCredentialValidatorData, nil
+	return passwordCredentialValidatorData, nil
 }

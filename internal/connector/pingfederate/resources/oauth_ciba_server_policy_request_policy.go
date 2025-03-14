@@ -37,7 +37,7 @@ func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) ExportAll() (*[
 		return nil, err
 	}
 
-	for oauthCibaServerPolicyRequestPolicyId, oauthCibaServerPolicyRequestPolicyName := range *oauthCibaServerPolicyRequestPolicyData {
+	for oauthCibaServerPolicyRequestPolicyId, oauthCibaServerPolicyRequestPolicyName := range oauthCibaServerPolicyRequestPolicyData {
 		commentData := map[string]string{
 			"Oauth Ciba Server Policy Request Policy ID":   oauthCibaServerPolicyRequestPolicyId,
 			"Oauth Ciba Server Policy Request Policy Name": oauthCibaServerPolicyRequestPolicyName,
@@ -57,13 +57,16 @@ func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) ExportAll() (*[
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) getOauthCibaServerPolicyRequestPolicyData() (*map[string]string, error) {
+func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) getOauthCibaServerPolicyRequestPolicyData() (map[string]string, error) {
 	oauthCibaServerPolicyRequestPolicyData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthCibaServerPolicyAPI.GetCibaServerPolicies(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetCibaServerPolicies", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetCibaServerPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) getOauthCibaSer
 		}
 	}
 
-	return &oauthCibaServerPolicyRequestPolicyData, nil
+	return oauthCibaServerPolicyRequestPolicyData, nil
 }

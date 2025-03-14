@@ -37,7 +37,7 @@ func (r *PingFederateOauthAccessTokenManagerResource) ExportAll() (*[]connector.
 		return nil, err
 	}
 
-	for oauthAccessTokenManagerId, oauthAccessTokenManagerName := range *oauthAccessTokenManagerData {
+	for oauthAccessTokenManagerId, oauthAccessTokenManagerName := range oauthAccessTokenManagerData {
 		commentData := map[string]string{
 			"Oauth Access Token Manager ID":   oauthAccessTokenManagerId,
 			"Oauth Access Token Manager Name": oauthAccessTokenManagerName,
@@ -57,13 +57,16 @@ func (r *PingFederateOauthAccessTokenManagerResource) ExportAll() (*[]connector.
 	return &importBlocks, nil
 }
 
-func (r *PingFederateOauthAccessTokenManagerResource) getOauthAccessTokenManagerData() (*map[string]string, error) {
+func (r *PingFederateOauthAccessTokenManagerResource) getOauthAccessTokenManagerData() (map[string]string, error) {
 	oauthAccessTokenManagerData := make(map[string]string)
 
 	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAccessTokenManagersAPI.GetTokenManagers(r.clientInfo.Context).Execute()
-	err = common.HandleClientResponse(response, err, "GetTokenManagers", r.ResourceType())
+	ok, err := common.HandleClientResponse(response, err, "GetTokenManagers", r.ResourceType())
 	if err != nil {
 		return nil, err
+	}
+	if !ok {
+		return nil, nil
 	}
 
 	if apiObj == nil {
@@ -84,5 +87,5 @@ func (r *PingFederateOauthAccessTokenManagerResource) getOauthAccessTokenManager
 		}
 	}
 
-	return &oauthAccessTokenManagerData, nil
+	return oauthAccessTokenManagerData, nil
 }
