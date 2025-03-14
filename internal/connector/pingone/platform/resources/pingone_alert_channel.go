@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneAlertChannelResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneAlertChannelResource
-func AlertChannel(clientInfo *connector.PingOneClientInfo) *PingOneAlertChannelResource {
+func AlertChannel(clientInfo *connector.ClientInfo) *PingOneAlertChannelResource {
 	return &PingOneAlertChannelResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneAlertChannelResource) ExportAll() (*[]connector.ImportBlock, err
 func (r *PingOneAlertChannelResource) getAlertChannelData() (map[string]string, error) {
 	alertChannelData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.AlertingApi.ReadAllAlertChannels(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AlertingApi.ReadAllAlertChannels(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	alertChannels, err := pingone.GetManagementAPIObjectsFromIterator[management.AlertChannel](iter, "ReadAllAlertChannels", "GetAlertChannels", r.ResourceType())
 	if err != nil {
 		return nil, err

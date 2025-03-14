@@ -14,11 +14,11 @@ var (
 )
 
 type PingOneCertificateResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneCertificateResource
-func Certificate(clientInfo *connector.PingOneClientInfo) *PingOneCertificateResource {
+func Certificate(clientInfo *connector.ClientInfo) *PingOneCertificateResource {
 	return &PingOneCertificateResource{
 		clientInfo: clientInfo,
 	}
@@ -64,7 +64,7 @@ func (r *PingOneCertificateResource) getCertificateData() (map[string]string, er
 	certificateData := make(map[string]string)
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
-	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	entityArray, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err

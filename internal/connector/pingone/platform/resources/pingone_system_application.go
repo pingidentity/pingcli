@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneSystemApplicationResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneSystemApplicationResource
-func SystemApplication(clientInfo *connector.PingOneClientInfo) *PingOneSystemApplicationResource {
+func SystemApplication(clientInfo *connector.ClientInfo) *PingOneSystemApplicationResource {
 	return &PingOneSystemApplicationResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneSystemApplicationResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneSystemApplicationResource) getSystemApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err

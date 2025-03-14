@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneGroupRoleAssignmentResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneGroupRoleAssignmentResource
-func GroupRoleAssignment(clientInfo *connector.PingOneClientInfo) *PingOneGroupRoleAssignmentResource {
+func GroupRoleAssignment(clientInfo *connector.ClientInfo) *PingOneGroupRoleAssignmentResource {
 	return &PingOneGroupRoleAssignmentResource{
 		clientInfo: clientInfo,
 	}
@@ -82,7 +82,7 @@ func (r *PingOneGroupRoleAssignmentResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingOneGroupRoleAssignmentResource) getGroupData() (map[string]string, error) {
 	groupData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	groups, err := pingone.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -103,7 +103,7 @@ func (r *PingOneGroupRoleAssignmentResource) getGroupData() (map[string]string, 
 func (r *PingOneGroupRoleAssignmentResource) getGroupRoleAssignmentData(groupId string) (map[string]string, error) {
 	groupRoleAssignmentData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupRoleAssignmentsApi.ReadGroupRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, groupId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupRoleAssignmentsApi.ReadGroupRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, groupId).Execute()
 	roleAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGroupRoleAssignments", "GetRoleAssignments", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -126,7 +126,7 @@ func (r *PingOneGroupRoleAssignmentResource) getGroupRoleAssignmentData(groupId 
 }
 
 func (r *PingOneGroupRoleAssignmentResource) getRoleName(roleId string) (*management.EnumRoleName, error) {
-	apiRole, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
+	apiRole, resp, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
 	ok, err := common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
 		return nil, err

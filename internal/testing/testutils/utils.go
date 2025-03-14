@@ -80,8 +80,8 @@ func GetPingOneClientInfo(t *testing.T) *connector.ClientInfo {
 		pingOneClientInfo = &connector.ClientInfo{
 			Context:             ctx,
 			PingOneApiClient:    client,
-			ApiClientId:         &clientID,
-			ExportEnvironmentID: &environmentId,
+			ApiClientId:         clientID,
+			ExportEnvironmentID: environmentId,
 		}
 	})
 
@@ -236,7 +236,7 @@ func CreateX509Certificate() (string, error) {
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 	if err != nil {
-		return "", fmt.Errorf("Failed to generate serial number: %v", err)
+		return "", fmt.Errorf("failed to generate serial number: %v", err)
 	}
 
 	certificateCA := &x509.Certificate{
@@ -260,12 +260,12 @@ func CreateX509Certificate() (string, error) {
 
 	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
-		return "", fmt.Errorf("Failed to generate private key: %v", err)
+		return "", fmt.Errorf("failed to generate private key: %v", err)
 	}
 
 	caBytes, err := x509.CreateCertificate(rand.Reader, certificateCA, certificateCA, &caPrivKey.PublicKey, caPrivKey)
 	if err != nil {
-		return "", fmt.Errorf("Failed to create certificate: %v", err)
+		return "", fmt.Errorf("failed to create certificate: %v", err)
 	}
 
 	caPEM := new(bytes.Buffer)

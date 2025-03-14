@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneCustomDomainResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneCustomDomainResource
-func CustomDomain(clientInfo *connector.PingOneClientInfo) *PingOneCustomDomainResource {
+func CustomDomain(clientInfo *connector.ClientInfo) *PingOneCustomDomainResource {
 	return &PingOneCustomDomainResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 func (r *PingOneCustomDomainResource) getCustomDomainData() (map[string]string, error) {
 	domainData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	customDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.CustomDomain](iter, "ReadAllDomains", "GetCustomDomains", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneGroupResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneGroupResource
-func Group(clientInfo *connector.PingOneClientInfo) *PingOneGroupResource {
+func Group(clientInfo *connector.ClientInfo) *PingOneGroupResource {
 	return &PingOneGroupResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneGroupResource) ExportAll() (*[]connector.ImportBlock, error) {
 func (r *PingOneGroupResource) getGroupData() (map[string]string, error) {
 	groupData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	groups, err := pingone.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneRiskPredictorResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneRiskPredictorResource
-func RiskPredictor(clientInfo *connector.PingOneClientInfo) *PingOneRiskPredictorResource {
+func RiskPredictor(clientInfo *connector.ClientInfo) *PingOneRiskPredictorResource {
 	return &PingOneRiskPredictorResource{
 		clientInfo: clientInfo,
 	}
@@ -69,7 +69,7 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 func (r *PingOneRiskPredictorResource) getRiskPredictorData() (map[string][]string, error) {
 	riskPredictorData := make(map[string][]string)
 
-	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	riskPredictors, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPredictor](iter, "ReadAllRiskPredictors", "GetRiskPredictors", r.ResourceType())
 	if err != nil {
 		return nil, err

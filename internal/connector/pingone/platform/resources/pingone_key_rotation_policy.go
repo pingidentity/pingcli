@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneKeyRotationPolicyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneKeyRotationPolicyResource
-func KeyRotationPolicy(clientInfo *connector.PingOneClientInfo) *PingOneKeyRotationPolicyResource {
+func KeyRotationPolicy(clientInfo *connector.ClientInfo) *PingOneKeyRotationPolicyResource {
 	return &PingOneKeyRotationPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneKeyRotationPolicyResource) getKeyRotationPolicyData() (map[string]string, error) {
 	keyRotationPolicyData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	keyRotationPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.KeyRotationPolicy](iter, "GetKeyRotationPolicies", "GetKeyRotationPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -16,11 +16,11 @@ var (
 )
 
 type PingoneAuthorizeApplicationRolePermissionResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeApplicationRolePermissionResource
-func AuthorizeApplicationRolePermission(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeApplicationRolePermissionResource {
+func AuthorizeApplicationRolePermission(clientInfo *connector.ClientInfo) *PingoneAuthorizeApplicationRolePermissionResource {
 	return &PingoneAuthorizeApplicationRolePermissionResource{
 		clientInfo: clientInfo,
 	}
@@ -70,7 +70,7 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) ExportAll() (*[]conn
 func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRoleData() (map[string]string, error) {
 	applicationRoleData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRoleDa
 func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRolePermissionData(appRoleId string) (map[string]string, error) {
 	applicationRolePermissionData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolePermissionsApi.ReadApplicationRolePermissions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appRoleId).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolePermissionsApi.ReadApplicationRolePermissions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appRoleId).Execute()
 	applicationRolePermissions, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.EntityArrayEmbeddedPermissionsInner](iter, "ReadApplicationRolePermissions", "GetPermissions", r.ResourceType())
 	if err != nil {
 		return nil, err

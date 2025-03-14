@@ -16,11 +16,11 @@ var (
 )
 
 type PingOnePasswordPolicyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePasswordPolicyResource
-func PasswordPolicy(clientInfo *connector.PingOneClientInfo) *PingOnePasswordPolicyResource {
+func PasswordPolicy(clientInfo *connector.ClientInfo) *PingOnePasswordPolicyResource {
 	return &PingOnePasswordPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOnePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingOnePasswordPolicyResource) getPasswordPolicyData() (map[string]string, error) {
 	passwordPolicyData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.PasswordPoliciesApi.ReadAllPasswordPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PasswordPoliciesApi.ReadAllPasswordPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	passwordPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.PasswordPolicy](iter, "ReadAllPasswordPolicies", "GetPasswordPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneAgreementLocalizationResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneAgreementLocalizationResource
-func AgreementLocalization(clientInfo *connector.PingOneClientInfo) *PingOneAgreementLocalizationResource {
+func AgreementLocalization(clientInfo *connector.ClientInfo) *PingOneAgreementLocalizationResource {
 	return &PingOneAgreementLocalizationResource{
 		clientInfo: clientInfo,
 	}
@@ -74,7 +74,7 @@ func (r *PingOneAgreementLocalizationResource) ExportAll() (*[]connector.ImportB
 func (r *PingOneAgreementLocalizationResource) getAgreementData() (map[string]string, error) {
 	agreementData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	agreements, err := pingone.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (r *PingOneAgreementLocalizationResource) getAgreementData() (map[string]st
 func (r *PingOneAgreementLocalizationResource) getAgreementLocalizationData(agreementId string) (map[string]string, error) {
 	agreementLocalizationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId).Execute()
 	languageInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadAllAgreementLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err

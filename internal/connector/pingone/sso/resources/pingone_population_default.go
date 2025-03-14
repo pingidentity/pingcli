@@ -16,11 +16,11 @@ var (
 )
 
 type PingOnePopulationDefaultResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePopulationDefaultResource
-func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultResource {
+func PopulationDefault(clientInfo *connector.ClientInfo) *PingOnePopulationDefaultResource {
 	return &PingOnePopulationDefaultResource{
 		clientInfo: clientInfo,
 	}
@@ -60,7 +60,7 @@ func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock
 }
 
 func (r *PingOnePopulationDefaultResource) getDefaultPopulationName() (*string, error) {
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	populations, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
 	if err != nil {
 		return nil, err

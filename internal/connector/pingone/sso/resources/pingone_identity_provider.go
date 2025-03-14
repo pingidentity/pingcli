@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneIdentityProviderResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneIdentityProviderResource
-func IdentityProvider(clientInfo *connector.PingOneClientInfo) *PingOneIdentityProviderResource {
+func IdentityProvider(clientInfo *connector.ClientInfo) *PingOneIdentityProviderResource {
 	return &PingOneIdentityProviderResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock,
 func (r *PingOneIdentityProviderResource) getIdentityProviderData() (map[string]string, error) {
 	identityProviderData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	identityProviders, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityProvider](iter, "ReadAllIdentityProviders", "GetIdentityProviders", r.ResourceType())
 	if err != nil {
 		return nil, err

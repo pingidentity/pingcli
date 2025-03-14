@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneResourceAttributeResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneResourceAttributeResource
-func ResourceAttribute(clientInfo *connector.PingOneClientInfo) *PingOneResourceAttributeResource {
+func ResourceAttribute(clientInfo *connector.ClientInfo) *PingOneResourceAttributeResource {
 	return &PingOneResourceAttributeResource{
 		clientInfo: clientInfo,
 	}
@@ -77,7 +77,7 @@ func (r *PingOneResourceAttributeResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneResourceAttributeResource) getResourceData() (map[string][]string, error) {
 	resourceData := make(map[string][]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (r *PingOneResourceAttributeResource) getResourceData() (map[string][]strin
 func (r *PingOneResourceAttributeResource) getResourceAttributeData(resourceId string, resourceType string) (map[string]string, error) {
 	resourceAttributeData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourceAttributesApi.ReadAllResourceAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceAttributesApi.ReadAllResourceAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
 	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllResourceAttributes", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err

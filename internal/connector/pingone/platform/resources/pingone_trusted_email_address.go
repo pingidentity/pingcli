@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneTrustedEmailAddressResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneTrustedEmailAddressResource
-func TrustedEmailAddress(clientInfo *connector.PingOneClientInfo) *PingOneTrustedEmailAddressResource {
+func TrustedEmailAddress(clientInfo *connector.ClientInfo) *PingOneTrustedEmailAddressResource {
 	return &PingOneTrustedEmailAddressResource{
 		clientInfo: clientInfo,
 	}
@@ -74,7 +74,7 @@ func (r *PingOneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingOneTrustedEmailAddressResource) getTrustedEmailDomainData() (map[string]string, error) {
 	trustedEmailDomainData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	trustedEmailDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomain](iter, "ReadAllTrustedEmailDomains", "GetEmailDomains", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (r *PingOneTrustedEmailAddressResource) getTrustedEmailDomainData() (map[st
 func (r *PingOneTrustedEmailAddressResource) getTrustedEmailAddressData(trustedEmailDomainId string) (map[string]string, error) {
 	trustedEmailAddressData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailAddressesApi.ReadAllTrustedEmailAddresses(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, trustedEmailDomainId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailAddressesApi.ReadAllTrustedEmailAddresses(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, trustedEmailDomainId).Execute()
 	trustedEmailAddresses, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomainTrustedEmail](iter, "ReadAllTrustedEmailAddresses", "GetTrustedEmails", r.ResourceType())
 	if err != nil {
 		return nil, err

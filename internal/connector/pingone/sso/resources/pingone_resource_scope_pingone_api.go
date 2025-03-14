@@ -17,11 +17,11 @@ var (
 )
 
 type PingOneResourceScopePingOneApiResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneResourceScopePingOneApiResource
-func ResourceScopePingOneApi(clientInfo *connector.PingOneClientInfo) *PingOneResourceScopePingOneApiResource {
+func ResourceScopePingOneApi(clientInfo *connector.ClientInfo) *PingOneResourceScopePingOneApiResource {
 	return &PingOneResourceScopePingOneApiResource{
 		clientInfo: clientInfo,
 	}
@@ -74,7 +74,7 @@ func (r *PingOneResourceScopePingOneApiResource) ExportAll() (*[]connector.Impor
 func (r *PingOneResourceScopePingOneApiResource) getResourceData() (map[string]string, error) {
 	resourceData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func (r *PingOneResourceScopePingOneApiResource) getResourceData() (map[string]s
 func (r *PingOneResourceScopePingOneApiResource) getResourceScopeData(resourceId string) (map[string]string, error) {
 	resourceScopeData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
 	resourceScopes, err := pingone.GetManagementAPIObjectsFromIterator[management.ResourceScope](iter, "ReadAllResourceScopes", "GetScopes", r.ResourceType())
 	if err != nil {
 		return nil, err

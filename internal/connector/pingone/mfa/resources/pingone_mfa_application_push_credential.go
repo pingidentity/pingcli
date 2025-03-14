@@ -17,11 +17,11 @@ var (
 )
 
 type PingOneMFAApplicationPushCredentialResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneMFAApplicationPushCredentialResource
-func MFAApplicationPushCredential(clientInfo *connector.PingOneClientInfo) *PingOneMFAApplicationPushCredentialResource {
+func MFAApplicationPushCredential(clientInfo *connector.ClientInfo) *PingOneMFAApplicationPushCredentialResource {
 	return &PingOneMFAApplicationPushCredentialResource{
 		clientInfo: clientInfo,
 	}
@@ -75,7 +75,7 @@ func (r *PingOneMFAApplicationPushCredentialResource) ExportAll() (*[]connector.
 func (r *PingOneMFAApplicationPushCredentialResource) getOIDCApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (r *PingOneMFAApplicationPushCredentialResource) getOIDCApplicationData() (
 func (r *PingOneMFAApplicationPushCredentialResource) getPushCredentialData(applicationId string) (map[string]string, error) {
 	mfaPushCredentialData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, applicationId).Execute()
+	iter := r.clientInfo.PingOneApiClient.MFAAPIClient.ApplicationsApplicationMFAPushCredentialsApi.ReadAllMFAPushCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, applicationId).Execute()
 	mfaPushCredentials, err := pingone.GetMfaAPIObjectsFromIterator[mfa.MFAPushCredentialResponse](iter, "ReadAllMFAPushCredentials", "GetPushCredentials", r.ResourceType())
 	if err != nil {
 		return nil, err

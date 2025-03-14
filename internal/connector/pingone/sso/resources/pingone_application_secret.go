@@ -17,11 +17,11 @@ var (
 )
 
 type PingOneApplicationSecretResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneApplicationSecretResource
-func ApplicationSecret(clientInfo *connector.PingOneClientInfo) *PingOneApplicationSecretResource {
+func ApplicationSecret(clientInfo *connector.ClientInfo) *PingOneApplicationSecretResource {
 	return &PingOneApplicationSecretResource{
 		clientInfo: clientInfo,
 	}
@@ -75,7 +75,7 @@ func (r *PingOneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneApplicationSecretResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -114,11 +114,11 @@ func (r *PingOneApplicationSecretResource) getApplicationData() (map[string]stri
 func (r *PingOneApplicationSecretResource) checkApplicationSecretData(appId string) (bool, error) {
 	// The platform enforces that worker apps cannot read their own secret
 	// Make sure we can read the secret before adding it to the import blocks
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
 	defer response.Body.Close()
 
 	// If the appId is the same as the worker ID, make sure the API response is a 403 and ignore the error
-	if appId == *r.clientInfo.ApiClientId {
+	if appId == r.clientInfo.ApiClientId {
 		if response.StatusCode == 403 {
 			return false, nil
 		} else {

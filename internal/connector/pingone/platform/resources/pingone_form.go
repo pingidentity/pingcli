@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneFormResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneFormResource
-func Form(clientInfo *connector.PingOneClientInfo) *PingOneFormResource {
+func Form(clientInfo *connector.ClientInfo) *PingOneFormResource {
 	return &PingOneFormResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneFormResource) ExportAll() (*[]connector.ImportBlock, error) {
 func (r *PingOneFormResource) getFormData() (map[string]string, error) {
 	formData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.FormManagementApi.ReadAllForms(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.FormManagementApi.ReadAllForms(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	forms, err := pingone.GetManagementAPIObjectsFromIterator[management.Form](iter, "ReadAllForms", "GetForms", r.ResourceType())
 	if err != nil {
 		return nil, err

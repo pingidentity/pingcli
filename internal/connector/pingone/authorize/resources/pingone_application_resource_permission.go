@@ -16,11 +16,11 @@ var (
 )
 
 type PingoneAuthorizeApplicationResourcePermissionResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeApplicationResourcePermissionResource
-func AuthorizeApplicationResourcePermission(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeApplicationResourcePermissionResource {
+func AuthorizeApplicationResourcePermission(clientInfo *connector.ClientInfo) *PingoneAuthorizeApplicationResourcePermissionResource {
 	return &PingoneAuthorizeApplicationResourcePermissionResource{
 		clientInfo: clientInfo,
 	}
@@ -70,7 +70,7 @@ func (r *PingoneAuthorizeApplicationResourcePermissionResource) ExportAll() (*[]
 func (r *PingoneAuthorizeApplicationResourcePermissionResource) getApplicationResourceData() (map[string]string, error) {
 	applicationResourceData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationResourcesApi.ReadApplicationResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationResourcesApi.ReadApplicationResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	applicationResources, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationResource](iter, "ReadApplicationResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (r *PingoneAuthorizeApplicationResourcePermissionResource) getApplicationRe
 func (r *PingoneAuthorizeApplicationResourcePermissionResource) getApplicationResourcePermissionData(appResourceId string) (map[string]string, error) {
 	applicationResourcePermissionData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationResourcePermissionsApi.ReadApplicationPermissions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appResourceId).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationResourcePermissionsApi.ReadApplicationPermissions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appResourceId).Execute()
 	applicationResourcePermissions, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.EntityArrayEmbeddedPermissionsInner](iter, "ReadApplicationPermissions", "GetPermissions", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -16,11 +16,11 @@ var (
 )
 
 type PingOnePhoneDeliverySettingsResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePhoneDeliverySettingsResource
-func PhoneDeliverySettings(clientInfo *connector.PingOneClientInfo) *PingOnePhoneDeliverySettingsResource {
+func PhoneDeliverySettings(clientInfo *connector.ClientInfo) *PingOnePhoneDeliverySettingsResource {
 	return &PingOnePhoneDeliverySettingsResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOnePhoneDeliverySettingsResource) ExportAll() (*[]connector.ImportB
 func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (map[string]string, error) {
 	phoneDeliverySettingsData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.ReadAllPhoneDeliverySettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	phoneDeliverySettings, err := pingone.GetManagementAPIObjectsFromIterator[management.NotificationsSettingsPhoneDeliverySettings](iter, "ReadAllPhoneDeliverySettings", "GetPhoneDeliverySettings", r.ResourceType())
 	if err != nil {
 		return nil, err

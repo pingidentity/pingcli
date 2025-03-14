@@ -16,11 +16,11 @@ var (
 )
 
 type PingOnePopulationDefaultIdpResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePopulationDefaultIdpResource
-func PopulationDefaultIdp(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultIdpResource {
+func PopulationDefaultIdp(clientInfo *connector.ClientInfo) *PingOnePopulationDefaultIdpResource {
 	return &PingOnePopulationDefaultIdpResource{
 		clientInfo: clientInfo,
 	}
@@ -73,7 +73,7 @@ func (r *PingOnePopulationDefaultIdpResource) ExportAll() (*[]connector.ImportBl
 func (r *PingOnePopulationDefaultIdpResource) getPopulationData() (map[string]string, error) {
 	populationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	populations, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -92,6 +92,6 @@ func (r *PingOnePopulationDefaultIdpResource) getPopulationData() (map[string]st
 }
 
 func (r *PingOnePopulationDefaultIdpResource) checkPopulationDefaultIdp(populationId string) (bool, error) {
-	_, resp, err := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadOnePopulationDefaultIdp(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, populationId).Execute()
-	return pingone.CheckSingletonResource(resp, err, "ReadOnePopulationDefaultIdp", r.ResourceType())
+	_, resp, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadOnePopulationDefaultIdp(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, populationId).Execute()
+	return common.CheckSingletonResource(resp, err, "ReadOnePopulationDefaultIdp", r.ResourceType())
 }

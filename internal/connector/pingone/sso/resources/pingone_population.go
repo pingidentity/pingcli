@@ -16,11 +16,11 @@ var (
 )
 
 type PingOnePopulationResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePopulationResource
-func Population(clientInfo *connector.PingOneClientInfo) *PingOnePopulationResource {
+func Population(clientInfo *connector.ClientInfo) *PingOnePopulationResource {
 	return &PingOnePopulationResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOnePopulationResource) ExportAll() (*[]connector.ImportBlock, error
 func (r *PingOnePopulationResource) getPopulationData() (map[string]string, error) {
 	populationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	populations, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
 	if err != nil {
 		return nil, err

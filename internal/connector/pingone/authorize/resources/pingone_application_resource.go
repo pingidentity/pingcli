@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneApplicationResourceResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneApplicationResourceResource
-func ApplicationResource(clientInfo *connector.PingOneClientInfo) *PingOneApplicationResourceResource {
+func ApplicationResource(clientInfo *connector.ClientInfo) *PingOneApplicationResourceResource {
 	return &PingOneApplicationResourceResource{
 		clientInfo: clientInfo,
 	}
@@ -73,7 +73,7 @@ func (r *PingOneApplicationResourceResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingOneApplicationResourceResource) getApplicationResourceData() (map[string]applicationResourceObj, error) {
 	applicationResourceData := make(map[string]applicationResourceObj)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationResourcesApi.ReadApplicationResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationResourcesApi.ReadApplicationResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	applicationResources, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationResource](iter, "ReadApplicationResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -86,7 +86,7 @@ func (r *PingOneApplicationResourceResource) getApplicationResourceData() (map[s
 
 		if applicationResourceIdOk && applicationResourceNameOk && resourceIdOk {
 
-			resourceObj, httpResponse, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *resourceId).Execute()
+			resourceObj, httpResponse, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *resourceId).Execute()
 			ok, err := common.HandleClientResponse(httpResponse, err, "ReadOneResource", r.ResourceType())
 			if err != nil {
 				return nil, err

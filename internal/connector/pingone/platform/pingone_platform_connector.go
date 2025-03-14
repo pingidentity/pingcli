@@ -21,16 +21,16 @@ var (
 )
 
 type PingOnePlatformConnector struct {
-	clientInfo connector.PingOneClientInfo
+	clientInfo connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePlatformConnector
 func PlatformConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOnePlatformConnector {
 	return &PingOnePlatformConnector{
-		clientInfo: connector.PingOneClientInfo{
+		clientInfo: connector.ClientInfo{
 			Context:             ctx,
-			ApiClient:           apiClient,
-			ApiClientId:         apiClientId,
+			PingOneApiClient:    apiClient,
+			ApiClientId:         *apiClientId,
 			ExportEnvironmentID: exportEnvironmentID,
 		},
 	}

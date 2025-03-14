@@ -17,9 +17,9 @@ type ImportBlock struct {
 }
 
 type ClientInfo struct {
-	ApiClientId           *string
+	ApiClientId           string
 	Context               context.Context
-	ExportEnvironmentID   *string
+	ExportEnvironmentID   string
 	PingFederateApiClient *pingfederateGoClient.APIClient
 	PingOneApiClient      *pingoneGoClient.Client
 }

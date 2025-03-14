@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneGatewayResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneGatewayResource
-func Gateway(clientInfo *connector.PingOneClientInfo) *PingOneGatewayResource {
+func Gateway(clientInfo *connector.ClientInfo) *PingOneGatewayResource {
 	return &PingOneGatewayResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneGatewayResource) ExportAll() (*[]connector.ImportBlock, error) {
 func (r *PingOneGatewayResource) getGatewayData() (map[string]string, error) {
 	gatewayData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	gateways, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
 	if err != nil {
 		return nil, err

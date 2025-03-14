@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneResourceScopeOpenIdResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneResourceScopeOpenIdResource
-func ResourceScopeOpenId(clientInfo *connector.PingOneClientInfo) *PingOneResourceScopeOpenIdResource {
+func ResourceScopeOpenId(clientInfo *connector.ClientInfo) *PingOneResourceScopeOpenIdResource {
 	return &PingOneResourceScopeOpenIdResource{
 		clientInfo: clientInfo,
 	}
@@ -73,7 +73,7 @@ func (r *PingOneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingOneResourceScopeOpenIdResource) getResourceData() (map[string]string, error) {
 	resourceData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (r *PingOneResourceScopeOpenIdResource) getResourceData() (map[string]strin
 func (r *PingOneResourceScopeOpenIdResource) getResourceScopeData(resourceId string) (map[string]string, error) {
 	resourceScopeData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
 	resourceScopes, err := pingone.GetManagementAPIObjectsFromIterator[management.ResourceScope](iter, "ReadAllResourceScopes", "GetScopes", r.ResourceType())
 	if err != nil {
 		return nil, err

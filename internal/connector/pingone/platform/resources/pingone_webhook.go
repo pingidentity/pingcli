@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneWebhookResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneWebhookResource
-func Webhook(clientInfo *connector.PingOneClientInfo) *PingOneWebhookResource {
+func Webhook(clientInfo *connector.ClientInfo) *PingOneWebhookResource {
 	return &PingOneWebhookResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 func (r *PingOneWebhookResource) getSubscriptionData() (map[string]string, error) {
 	subscriptionData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	subscriptions, err := pingone.GetManagementAPIObjectsFromIterator[management.Subscription](iter, "ReadAllSubscriptions", "GetSubscriptions", r.ResourceType())
 	if err != nil {
 		return nil, err

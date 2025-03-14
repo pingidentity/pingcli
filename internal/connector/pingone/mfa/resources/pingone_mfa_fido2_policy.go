@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneMFAFido2PolicyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneMFAFido2PolicyResource
-func MFAFido2Policy(clientInfo *connector.PingOneClientInfo) *PingOneMFAFido2PolicyResource {
+func MFAFido2Policy(clientInfo *connector.ClientInfo) *PingOneMFAFido2PolicyResource {
 	return &PingOneMFAFido2PolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingOneMFAFido2PolicyResource) getFido2PolicyData() (map[string]string, error) {
 	fido2PolicyData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	fido2Policies, err := pingone.GetMfaAPIObjectsFromIterator[mfa.FIDO2Policy](iter, "ReadFIDO2Policies", "GetFido2Policies", r.ResourceType())
 	if err != nil {
 		return nil, err

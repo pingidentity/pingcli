@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneTrustedEmailDomainResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOne Trusted Email Domain Resource
-func TrustedEmailDomain(clientInfo *connector.PingOneClientInfo) *PingOneTrustedEmailDomainResource {
+func TrustedEmailDomain(clientInfo *connector.ClientInfo) *PingOneTrustedEmailDomainResource {
 	return &PingOneTrustedEmailDomainResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneTrustedEmailDomainResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingOneTrustedEmailDomainResource) getTrustedEmailDomainData() (map[string]string, error) {
 	trustedEmailDomainData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	trustedEmailDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomain](iter, "ReadAllTrustedEmailDomains", "GetEmailDomains", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -21,16 +21,16 @@ var (
 )
 
 type PingoneAuthorizeConnector struct {
-	clientInfo connector.PingOneClientInfo
+	clientInfo connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeConnector
 func AuthorizeConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingoneAuthorizeConnector {
 	return &PingoneAuthorizeConnector{
-		clientInfo: connector.PingOneClientInfo{
+		clientInfo: connector.ClientInfo{
 			Context:             ctx,
-			ApiClient:           apiClient,
-			ApiClientId:         apiClientId,
+			PingOneApiClient:    apiClient,
+			ApiClientId:         *apiClientId,
 			ExportEnvironmentID: exportEnvironmentID,
 		},
 	}

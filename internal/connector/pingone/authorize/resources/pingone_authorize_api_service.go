@@ -16,11 +16,11 @@ var (
 )
 
 type PingoneAuthorizeAPIServiceResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeAPIServiceResource
-func AuthorizeAPIService(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeAPIServiceResource {
+func AuthorizeAPIService(clientInfo *connector.ClientInfo) *PingoneAuthorizeAPIServiceResource {
 	return &PingoneAuthorizeAPIServiceResource{
 		clientInfo: clientInfo,
 	}
@@ -61,7 +61,7 @@ func (r *PingoneAuthorizeAPIServiceResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingoneAuthorizeAPIServiceResource) getAPIServerData() (map[string]string, error) {
 	apiServerData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	apiServers, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServer](iter, "ReadAllAPIServers", "GetApiServers", r.ResourceType())
 	if err != nil {
 		return nil, err

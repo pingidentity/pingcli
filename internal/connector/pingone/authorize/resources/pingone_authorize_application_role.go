@@ -16,11 +16,11 @@ var (
 )
 
 type PingoneAuthorizeApplicationRoleResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeApplicationRoleResource
-func AuthorizeApplicationRole(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeApplicationRoleResource {
+func AuthorizeApplicationRole(clientInfo *connector.ClientInfo) *PingoneAuthorizeApplicationRoleResource {
 	return &PingoneAuthorizeApplicationRoleResource{
 		clientInfo: clientInfo,
 	}
@@ -61,7 +61,7 @@ func (r *PingoneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.Impo
 func (r *PingoneAuthorizeApplicationRoleResource) getApplicationRoleData() (map[string]string, error) {
 	applicationRoleData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
 	if err != nil {
 		return nil, err

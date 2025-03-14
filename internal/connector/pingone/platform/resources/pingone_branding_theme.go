@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneBrandingThemeResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneBrandingThemeResource
-func BrandingTheme(clientInfo *connector.PingOneClientInfo) *PingOneBrandingThemeResource {
+func BrandingTheme(clientInfo *connector.ClientInfo) *PingOneBrandingThemeResource {
 	return &PingOneBrandingThemeResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, er
 func (r *PingOneBrandingThemeResource) getBrandingThemeData() (map[string]string, error) {
 	brandingThemeData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	brandingThemes, err := pingone.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", r.ResourceType())
 	if err != nil {
 		return nil, err

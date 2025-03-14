@@ -14,11 +14,11 @@ var (
 )
 
 type PingOneKeyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneKeyResource
-func Key(clientInfo *connector.PingOneClientInfo) *PingOneKeyResource {
+func Key(clientInfo *connector.ClientInfo) *PingOneKeyResource {
 	return &PingOneKeyResource{
 		clientInfo: clientInfo,
 	}
@@ -68,7 +68,7 @@ func (r *PingOneKeyResource) getKeyData() (map[string][]string, error) {
 	keyData := make(map[string][]string)
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
-	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	entityArray, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 
 	ok, err := common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
 	if err != nil {

@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneApplicationAttributeMappingResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneApplicationAttributeMappingResource
-func ApplicationAttributeMapping(clientInfo *connector.PingOneClientInfo) *PingOneApplicationAttributeMappingResource {
+func ApplicationAttributeMapping(clientInfo *connector.ClientInfo) *PingOneApplicationAttributeMappingResource {
 	return &PingOneApplicationAttributeMappingResource{
 		clientInfo: clientInfo,
 	}
@@ -74,7 +74,7 @@ func (r *PingOneApplicationAttributeMappingResource) ExportAll() (*[]connector.I
 func (r *PingOneApplicationAttributeMappingResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (r *PingOneApplicationAttributeMappingResource) getApplicationData() (map[s
 func (r *PingOneApplicationAttributeMappingResource) getApplicationAttributeMappingData(appId string) (map[string]string, error) {
 	applicationAttributeMappingData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationAttributeMappingApi.ReadAllApplicationAttributeMappings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationAttributeMappingApi.ReadAllApplicationAttributeMappings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
 	attributeMappingInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllApplicationAttributeMappings", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneResourceSecretResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneResourceSecretResource
-func ResourceSecret(clientInfo *connector.PingOneClientInfo) *PingOneResourceSecretResource {
+func ResourceSecret(clientInfo *connector.ClientInfo) *PingOneResourceSecretResource {
 	return &PingOneResourceSecretResource{
 		clientInfo: clientInfo,
 	}
@@ -74,7 +74,7 @@ func (r *PingOneResourceSecretResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingOneResourceSecretResource) getResourceData() (map[string]string, error) {
 	resourceData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -96,6 +96,6 @@ func (r *PingOneResourceSecretResource) getResourceData() (map[string]string, er
 }
 
 func (r *PingOneResourceSecretResource) getResourceSecret(resourceId string) (bool, error) {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourceClientSecretApi.ReadResourceSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceClientSecretApi.ReadResourceSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
 	return common.HandleClientResponse(response, err, "ReadResourceSecret", r.ResourceType())
 }

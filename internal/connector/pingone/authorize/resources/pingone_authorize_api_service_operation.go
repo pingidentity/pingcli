@@ -16,11 +16,11 @@ var (
 )
 
 type PingoneAuthorizeAPIServiceOperationResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeAPIServiceOperationResource
-func AuthorizeAPIServiceOperation(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeAPIServiceOperationResource {
+func AuthorizeAPIServiceOperation(clientInfo *connector.ClientInfo) *PingoneAuthorizeAPIServiceOperationResource {
 	return &PingoneAuthorizeAPIServiceOperationResource{
 		clientInfo: clientInfo,
 	}
@@ -70,7 +70,7 @@ func (r *PingoneAuthorizeAPIServiceOperationResource) ExportAll() (*[]connector.
 func (r *PingoneAuthorizeAPIServiceOperationResource) getAPIServiceData() (map[string]string, error) {
 	apiServiceData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	apiServices, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServer](iter, "ReadAllAPIServers", "GetApiServers", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (r *PingoneAuthorizeAPIServiceOperationResource) getAPIServiceData() (map[s
 func (r *PingoneAuthorizeAPIServiceOperationResource) getAPIServiceOperationData(apiServiceId string) (map[string]string, error) {
 	apiServiceOperationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.APIServerOperationsApi.ReadAllAPIServerOperations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, apiServiceId).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServerOperationsApi.ReadAllAPIServerOperations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, apiServiceId).Execute()
 	apiServiceOperations, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServerOperation](iter, "ReadAllAPIServerOperations", "GetOperations", r.ResourceType())
 	if err != nil {
 		return nil, err

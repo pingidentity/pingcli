@@ -16,11 +16,11 @@ var (
 )
 
 type PingoneAuthorizeDecisionEndpointResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeDecisionEndpointResource
-func AuthorizeDecisionEndpoint(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeDecisionEndpointResource {
+func AuthorizeDecisionEndpoint(clientInfo *connector.ClientInfo) *PingoneAuthorizeDecisionEndpointResource {
 	return &PingoneAuthorizeDecisionEndpointResource{
 		clientInfo: clientInfo,
 	}
@@ -61,7 +61,7 @@ func (r *PingoneAuthorizeDecisionEndpointResource) ExportAll() (*[]connector.Imp
 func (r *PingoneAuthorizeDecisionEndpointResource) getDecisionEndpointData() (map[string]string, error) {
 	decisionEndpointData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.PolicyDecisionManagementApi.ReadAllDecisionEndpoints(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.PolicyDecisionManagementApi.ReadAllDecisionEndpoints(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	decisionEndpoints, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.DecisionEndpoint](iter, "ReadAllDecisionEndpoints", "GetDecisionEndpoints", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneRiskPolicyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneRiskPolicyResource
-func RiskPolicy(clientInfo *connector.PingOneClientInfo) *PingOneRiskPolicyResource {
+func RiskPolicy(clientInfo *connector.ClientInfo) *PingOneRiskPolicyResource {
 	return &PingOneRiskPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error
 func (r *PingOneRiskPolicyResource) getRiskPolicySetData() (map[string]string, error) {
 	riskPolicySetData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskPoliciesApi.ReadRiskPolicySets(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.RiskAPIClient.RiskPoliciesApi.ReadRiskPolicySets(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	riskPolicySets, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPolicySet](iter, "ReadRiskPolicySets", "GetRiskPolicySets", r.ResourceType())
 	if err != nil {
 		return nil, err

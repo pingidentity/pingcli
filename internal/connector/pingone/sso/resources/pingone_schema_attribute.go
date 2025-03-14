@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneSchemaAttributeResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneSchemaAttributeResource
-func SchemaAttribute(clientInfo *connector.PingOneClientInfo) *PingOneSchemaAttributeResource {
+func SchemaAttribute(clientInfo *connector.ClientInfo) *PingOneSchemaAttributeResource {
 	return &PingOneSchemaAttributeResource{
 		clientInfo: clientInfo,
 	}
@@ -74,7 +74,7 @@ func (r *PingOneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, 
 func (r *PingOneSchemaAttributeResource) getSchemaData() (map[string]string, error) {
 	schemaData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	schemas, err := pingone.GetManagementAPIObjectsFromIterator[management.Schema](iter, "ReadAllSchemas", "GetSchemas", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (r *PingOneSchemaAttributeResource) getSchemaData() (map[string]string, err
 func (r *PingOneSchemaAttributeResource) getSchemaAttributeData(schemaId string) (map[string]string, error) {
 	schemaAttributeData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemaAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, schemaId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemaAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, schemaId).Execute()
 	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllSchemaAttributes", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err

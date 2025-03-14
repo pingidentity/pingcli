@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneIdentityPropagationPlanResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneIdentityPropagationPlanResource
-func IdentityPropagationPlan(clientInfo *connector.PingOneClientInfo) *PingOneIdentityPropagationPlanResource {
+func IdentityPropagationPlan(clientInfo *connector.ClientInfo) *PingOneIdentityPropagationPlanResource {
 	return &PingOneIdentityPropagationPlanResource{
 		clientInfo: clientInfo,
 	}
@@ -65,7 +65,7 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 func (r *PingOneIdentityPropagationPlanResource) getIdentityPropagationPlanData() (map[string]string, error) {
 	identityPropagationPlanData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	identityPropagationPlans, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityPropagationPlan](iter, "ReadAllPlans", "GetPlans", r.ResourceType())
 	if err != nil {
 		return nil, err

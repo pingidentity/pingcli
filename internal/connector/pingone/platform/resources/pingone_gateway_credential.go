@@ -16,11 +16,11 @@ var (
 )
 
 type PingOneGatewayCredentialResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneGatewayCredentialResource
-func GatewayCredential(clientInfo *connector.PingOneClientInfo) *PingOneGatewayCredentialResource {
+func GatewayCredential(clientInfo *connector.ClientInfo) *PingOneGatewayCredentialResource {
 	return &PingOneGatewayCredentialResource{
 		clientInfo: clientInfo,
 	}
@@ -73,7 +73,7 @@ func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneGatewayCredentialResource) getGatewayData() (map[string]string, error) {
 	gatewayData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
 	gatewayInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -112,7 +112,7 @@ func (r *PingOneGatewayCredentialResource) getGatewayData() (map[string]string, 
 func (r *PingOneGatewayCredentialResource) getGatewayCredentialData(gatewayId string) ([]string, error) {
 	gatewayCredentialData := []string{}
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
 	gatewayCredentials, err := pingone.GetManagementAPIObjectsFromIterator[management.GatewayCredential](iter, "ReadAllGatewayCredentials", "GetCredentials", r.ResourceType())
 	if err != nil {
 		return nil, err
