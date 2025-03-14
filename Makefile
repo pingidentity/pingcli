@@ -32,7 +32,7 @@ starttestcontainer:
 		-d -p 9031:9031 \
 		-p 9999:9999 \
 		--env-file "${HOME}/.pingidentity/config" \
-		pingidentity/pingfederate:latest
+		pingidentity/pingfederate:12.2.0-latest
 # Wait for the instance to become ready
 	sleep 1
 	duration=0

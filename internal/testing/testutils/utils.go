@@ -269,10 +269,13 @@ func CreateX509Certificate() (string, error) {
 	}
 
 	caPEM := new(bytes.Buffer)
-	pem.Encode(caPEM, &pem.Block{
+	err = pem.Encode(caPEM, &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: caBytes,
 	})
+	if err != nil {
+		return "", fmt.Errorf("failed to encode certificate: %v", err)
+	}
 
 	return caPEM.String(), nil
 }

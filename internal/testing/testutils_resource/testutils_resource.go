@@ -24,7 +24,7 @@ const (
 	// Miscellaneous Info for resources that don't fit the above
 	ENUM_TYPE          ResourceCreationInfoType = "ENUM_TYPE"
 	ENUM_CONTEXT_TYPE  ResourceCreationInfoType = "ENUM_CONTEXT_TYPE"
-	ENUM_CREDENTIAL    ResourceCreationInfoType = "ENUM_CREDENTIAL"
+	ENUM_CREDENTIAL    ResourceCreationInfoType = "ENUM_CREDENTIAL" //#nosec G101 -- This is not hard-coded credentials
 	ENUM_SOURCE_REF_ID ResourceCreationInfoType = "ENUM_SOURCE_REF_ID"
 )
 

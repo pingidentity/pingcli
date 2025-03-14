@@ -32,8 +32,8 @@ func (r *PingFederateOauthAccessTokenManagerSettingsResource) ExportAll() (*[]co
 
 	importBlocks := []connector.ImportBlock{}
 
-	oauthAccessTokenManagerSettingsId := "oauth_access_token_manager_settings_singleton_id"
-	oauthAccessTokenManagerSettingsName := "Oauth Access Token Manager Settings"
+	oauthAccessTokenManagerSettingsId := "oauth_access_token_manager_settings_singleton_id" //#nosec G101 -- This is not hard-coded credentials
+	oauthAccessTokenManagerSettingsName := "Oauth Access Token Manager Settings"            //#nosec G101 -- This is not hard-coded credentials
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
