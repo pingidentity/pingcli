@@ -15,6 +15,11 @@ func Validate() (err error) {
 	// Get a slice of all profile names configured in the config.yaml file
 	profileNames := GetMainConfig().ProfileNames()
 
+	// Iterate over the profileNames and convert each to lowercase
+	for i := range profileNames {
+		profileNames[i] = strings.ToLower(profileNames[i])
+	}
+
 	// Validate profile names
 	if err = validateProfileNames(profileNames); err != nil {
 		return err
@@ -22,6 +27,7 @@ func Validate() (err error) {
 
 	// Make sure selected active profile is in the configuration file
 	activeProfileName, err := GetOptionValue(options.RootActiveProfileOption)
+	activeProfileName = strings.ToLower(activeProfileName)
 	if err != nil {
 		return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
 	}

@@ -42,7 +42,7 @@ func TestConfigSetActiveProfileCmd_ActiveProfile(t *testing.T) {
 
 // Test Config set-active-profile Command fails when provided an invalid profile name
 func TestConfigSetActiveProfileCmd_InvalidProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to set active profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^failed to set active profile: invalid profile name: '.*' profile does not exist$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "pname&*^*&^$&@!")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

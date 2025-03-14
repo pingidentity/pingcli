@@ -17,6 +17,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate"
+	"github.com/pingidentity/pingcli/internal/connector/pingone/authorize"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/mfa"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/platform"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/protect"
@@ -212,6 +213,13 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		return fmt.Errorf("failed to initialize PingFederate services. unrecognized authentication type '%s'", authType)
 	}
 
+	// Test PF API client with create Context Auth
+	_, response, err := pingfederateApiClient.VersionAPI.GetVersion(pingfederateContext).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetVersion", "pingfederate_client_init")
+	if err != nil || !ok {
+		return fmt.Errorf("failed to initialize PingFederate Go Client. Check authentication type and credentials")
+	}
+
 	return nil
 }
 
@@ -347,8 +355,8 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 
 	// Check if outputDir is empty
 	if outputDir == "" {
-		return "", fmt.Errorf("Failed to export services. The output directory is not set. Specify the output directory "+
-			"via the '--%s' flag, '%s' environment variable, or key '%s' in the configuration file.",
+		return "", fmt.Errorf("failed to export services. The output directory is not set. Specify the output directory "+
+			"via the '--%s' flag, '%s' environment variable, or key '%s' in the configuration file",
 			options.PlatformExportOutputDirectoryOption.CobraParamName,
 			options.PlatformExportOutputDirectoryOption.EnvVar,
 			options.PlatformExportOutputDirectoryOption.ViperKey)
@@ -408,7 +416,7 @@ func getPingOneExportEnvID() (err error) {
 			return err
 		}
 		if pingoneExportEnvID == "" {
-			return fmt.Errorf("failed to determine pingone export environment ID.")
+			return fmt.Errorf("failed to determine pingone export environment ID")
 		}
 
 		output.Warn("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
@@ -435,7 +443,7 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 		return err
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		return fmt.Errorf("failed to validate pingone environment ID '%s'", pingoneExportEnvID)
 	}
 
 	if environment == nil {
@@ -457,6 +465,8 @@ func getExportableConnectors(exportServices *customtypes.ExportServices) (export
 		switch service {
 		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM:
 			connectors = append(connectors, platform.PlatformConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
+		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE:
+			connectors = append(connectors, authorize.AuthorizeConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
 		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO:
 			connectors = append(connectors, sso.SSOConnector(pingoneContext, pingoneApiClient, &pingoneApiClientId, pingoneExportEnvID))
 		case customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA:

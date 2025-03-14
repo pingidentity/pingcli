@@ -21,6 +21,10 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 		}
 	}
 
+	if err = profiles.GetMainConfig().ValidateExistingProfileName(pName); err != nil {
+		return fmt.Errorf("failed to delete profile: %v", err)
+	}
+
 	confirmed, err := promptUserToConfirmDelete(pName, rc)
 	if err != nil {
 		return fmt.Errorf("failed to delete profile: %v", err)

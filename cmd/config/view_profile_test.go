@@ -19,6 +19,11 @@ func TestConfigViewProfileCmd_Execute_WithProfileFlag(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
+func TestConfigViewProfileCmd_Execute_UnmaskValuesFlag(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "--unmask-values")
+	testutils.CheckExpectedError(t, err, nil)
+}
+
 // Test Config Set Command fails with invalid flag
 func TestConfigViewProfileCmd_Execute_InvalidFlag(t *testing.T) {
 	expectedErrorPattern := `^unknown flag: --invalid$`
@@ -35,7 +40,7 @@ func TestConfigViewProfileCmd_Execute_NonExistentProfile(t *testing.T) {
 
 // Test Config Set Command fails with invalid profile
 func TestConfigViewProfileCmd_Execute_InvalidProfile(t *testing.T) {
-	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*' profile does not exist$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "(*&*(#))")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

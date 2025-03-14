@@ -6,3 +6,4 @@ go.work.sum
 export
 vendor
 env*.sh
+.env

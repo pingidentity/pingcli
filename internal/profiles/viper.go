@@ -219,14 +219,14 @@ func (m MainConfig) SaveProfile(pName string, subViper *viper.Viper) (err error)
 	return nil
 }
 
-// The profile name format must be valid
 // The profile name must exist
 func (m MainConfig) ValidateExistingProfileName(pName string) (err error) {
-	if err := m.ValidateProfileNameFormat(pName); err != nil {
-		return err
+	if pName == "" {
+		return fmt.Errorf("invalid profile name: profile name cannot be empty")
 	}
 
 	pNames := m.ProfileNames()
+
 	if !slices.ContainsFunc(pNames, func(n string) bool {
 		return strings.EqualFold(n, pName)
 	}) {
@@ -260,9 +260,9 @@ func (m MainConfig) ValidateProfileNameFormat(pName string) (err error) {
 		return fmt.Errorf("invalid profile name: profile name cannot be empty")
 	}
 
-	re := regexp.MustCompile(`^[a-zA-Z0-9\_\-]+$`)
+	re := regexp.MustCompile(`^[a-z0-9\_\-]+$`)
 	if !re.MatchString(pName) {
-		return fmt.Errorf("invalid profile name: '%s'. name must contain only alphanumeric characters, underscores, and dashes", pName)
+		return fmt.Errorf("invalid profile name: '%s'. name must be lowercase and contain only alphanumeric characters, underscores, and dashes", pName)
 	}
 
 	return nil

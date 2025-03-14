@@ -11,6 +11,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -199,23 +200,20 @@ func InitPingFederateTerraform(t *testing.T) {
 }
 
 provider "pingfederate" {
-  client_id       = "%s"
-  client_secret   = "%s"
-  scopes          = ["%s"]
-  token_url       = "%s"
-  https_host      = "%s"
-  admin_api_path  = "%s"
+  username = "%s"
+  password = "%s"
+  https_host = "%s"
+  admin_api_path = "%s"
   product_version = "12.2"
   insecure_trust_all_tls = true
   x_bypass_external_validation_header = true
 }
-`, os.Getenv("PINGCLI_PINGFEDERATE_PROVIDER_VERSION"),
-		os.Getenv("PINGCLI_PINGFEDERATE_CLIENT_ID"),
-		os.Getenv("PINGCLI_PINGFEDERATE_CLIENT_SECRET"),
-		os.Getenv("PINGCLI_PINGFEDERATE_SCOPES"),
-		os.Getenv("PINGCLI_PINGFEDERATE_TOKEN_URL"),
-		os.Getenv("PINGCLI_PINGFEDERATE_HTTPS_HOST"),
-		os.Getenv("PINGCLI_PINGFEDERATE_ADMIN_API_PATH"))
+`,
+		os.Getenv("PINGCLI_PINGFEDERATE_PROVIDER_VERSION"),
+		os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
+		os.Getenv(options.PingFederateHTTPSHostOption.EnvVar),
+		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar))
 
 	// Write main.tf to testing directory
 	mainTFFilepath := filepath.Join(exportDir, "main.tf")

@@ -52,7 +52,12 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: %v", err)
 	}
 
-	if opt.Sensitive {
+	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
+	if err != nil {
+		unmaskOptionVal = "false"
+	}
+
+	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
 		msgStr += fmt.Sprintf("%s=%s", vKey, profiles.MaskValue(vVal))
 	} else {
 		msgStr += fmt.Sprintf("%s=%s", vKey, vVal)

@@ -49,9 +49,19 @@ func TestConfigAddProfileCmd_DuplicateProfileName(t *testing.T) {
 
 // Test config add profile command fails when provided an invalid profile name
 func TestConfigAddProfileCmd_InvalidProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'\. name must be lowercase and contain only alphanumeric characters, underscores, and dashes$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
 		"--name", "pname&*^*&^$&@!",
+		"--description", "test description",
+		"--set-active=false")
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Root Command fails when provided an invalid value containing uppercase character for profile name
+func TestConfigAddProfileCmd_InvalidUpperCaseProfileName(t *testing.T) {
+	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'\. name must be lowercase and contain only alphanumeric characters, underscores, and dashes$`
+	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
+		"--name", "myProfile",
 		"--description", "test description",
 		"--set-active=false")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)

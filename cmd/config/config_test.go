@@ -35,7 +35,7 @@ func TestConfigCmd_HelpFlag(t *testing.T) {
 // 	expectedErrorPattern := `^failed to update profile '.*' name to: .*\. invalid profile name: '.*' profile does not exist$`
 // 	err := testutils_cobra.ExecutePingcli(t, "config",
 // 		"--profile", "nonexistent",
-// 		"--name", "myProfile",
+// 		"--name", "myprofile",
 // 		"--description", "hello")
 
 // 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -46,7 +46,7 @@ func TestConfigCmd_HelpFlag(t *testing.T) {
 // 	expectedErrorPattern := `^failed to update profile '.*' name to: .*\. '.*' is the active profile and cannot be deleted$`
 // 	err := testutils_cobra.ExecutePingcli(t, "config",
 // 		"--profile", "default",
-// 		"--name", "myProfile",
+// 		"--name", "myprofile",
 // 		"--description", "hello")
 
 // 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -54,7 +54,7 @@ func TestConfigCmd_HelpFlag(t *testing.T) {
 
 // // Test Config Command fails when provided an invalid profile name
 // func TestConfigCmd_InvalidProfileName(t *testing.T) {
-// 	expectedErrorPattern := `^failed to update profile '.*' name to: .*\. invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+// 	expectedErrorPattern := `^failed to update profile '.*' name to: .*\. invalid profile name: '.*'\. name must be lowercase and contain only alphanumeric characters, underscores, and dashes$`
 // 	err := testutils_cobra.ExecutePingcli(t, "config",
 // 		"--profile", "production",
 // 		"--name", "pname&*^*&^$&@!",

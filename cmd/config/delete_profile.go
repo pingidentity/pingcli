@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -15,10 +16,10 @@ const (
     pingcli config delete-profile
 
   Delete a configuration profile by specifying the name of an existing configured profile.
-    pingcli config delete-profile MyDeveloperEnv
+    pingcli config delete-profile myprofile
 	
   Delete a configuration profile by auto-accepting the deletion.
-    pingcli config delete-profile --yes MyDeveloperEnv`
+    pingcli config delete-profile --yes myprofile`
 )
 
 func NewConfigDeleteProfileCommand() *cobra.Command {
@@ -29,9 +30,10 @@ func NewConfigDeleteProfileCommand() *cobra.Command {
 		Long: `Delete an existing custom configuration profile from the CLI.
 		
 The profile to delete will be removed from the CLI configuration file.`,
-		RunE:  configDeleteProfileRunE,
-		Short: "Delete a custom configuration profile.",
-		Use:   "delete-profile [flags] [profile-name]",
+		RunE:              configDeleteProfileRunE,
+		Short:             "Delete a custom configuration profile.",
+		Use:               "delete-profile [flags] [profile-name]",
+		ValidArgsFunction: autocompletion.ConfigReturnNonActiveProfilesFunc,
 	}
 
 	cmd.Flags().AddFlag(options.ConfigDeleteAutoAcceptOption.Flag)

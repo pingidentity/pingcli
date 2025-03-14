@@ -20,7 +20,7 @@ func RunInternalConfigGet(viperKey string) (err error) {
 		return fmt.Errorf("failed to get configuration: %v", err)
 	}
 
-	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", pName, viperKey)
+	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", strings.ToLower(pName), viperKey)
 
 	for _, opt := range options.Options() {
 		if opt.ViperKey == "" || !strings.Contains(opt.ViperKey, viperKey) {
@@ -32,7 +32,12 @@ func RunInternalConfigGet(viperKey string) (err error) {
 			return fmt.Errorf("failed to get configuration: %v", err)
 		}
 
-		if opt.Sensitive {
+		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
+		if err != nil {
+			unmaskOptionVal = "false"
+		}
+
+		if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
 		} else {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)

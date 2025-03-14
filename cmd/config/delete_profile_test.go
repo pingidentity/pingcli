@@ -43,7 +43,7 @@ func TestConfigDeleteProfileCmd_ActiveProfile(t *testing.T) {
 
 // Test Config delete-profile Command fails when provided an invalid profile name
 func TestConfigDeleteProfileCmd_InvalidProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to delete profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^failed to delete profile: invalid profile name: '.*' profile does not exist$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "delete-profile", "--yes", "pname&*^*&^$&@!")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

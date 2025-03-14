@@ -65,7 +65,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		}
 
 		for _, importBlock := range *importBlocks {
-			// Sanitize import block "to". Make lowercase, remove special chars, convert space to underscore
+			// Sanitize import block "to". Add pingcli-- prefix, hexidecimal encode special chars and spaces
 			importBlock.Sanitize()
 
 			switch format {

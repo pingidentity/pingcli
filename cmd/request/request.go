@@ -1,10 +1,14 @@
 package request
 
 import (
+	"fmt"
+
 	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/autocompletion"
 	request_internal "github.com/pingidentity/pingcli/internal/commands/request"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/spf13/cobra"
 )
 
@@ -15,11 +19,11 @@ const (
   Send a custom API request to the configured PingOne tenant, making a GET request to retrieve JSON configuration for a specific environment.
     pingcli request --service pingone --http-method GET --output-format json environments/$MY_ENVIRONMENT_ID
 
-  Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
-    pingcli request --service pingone --http-method POST --data '{"name": "My environment"}' environments
-
   Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with JSON data sourced from a file.
-    pingcli request --service pingone --http-method POST --data @./my-environment.json environments
+    pingcli request --service pingone --http-method POST --data ./my-environment.json environments
+	
+  Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
+    pingcli request --service pingone --http-method POST --data-raw '{"name": "My environment"}' environments
 
   Send a custom API request to the configured PingOne tenant, making a DELETE request to remove an application attribute mapping.
     pingcli request --service pingone --http-method DELETE environments/$MY_ENVIRONMENT_ID/applications/$MY_APPLICATION_ID/attributes/$MY_ATTRIBUTE_MAPPING_ID`
@@ -39,10 +43,30 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 		Use:   "request [flags] API_URI",
 	}
 
-	cmd.Flags().AddFlag(options.RequestHTTPMethodOption.Flag)
-	cmd.Flags().AddFlag(options.RequestServiceOption.Flag)
+	// --data
 	cmd.Flags().AddFlag(options.RequestDataOption.Flag)
+
+	// --data-raw
+	cmd.Flags().AddFlag(options.RequestDataRawOption.Flag)
+
+	// --fail, -f
 	cmd.Flags().AddFlag(options.RequestFailOption.Flag)
+
+	// --http-method, -m
+	cmd.Flags().AddFlag(options.RequestHTTPMethodOption.Flag)
+	// auto-completion
+	err := cmd.RegisterFlagCompletionFunc(options.RequestHTTPMethodOption.CobraParamName, autocompletion.RequestHTTPMethodFunc)
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for request flag %s: %v", options.RequestHTTPMethodOption.CobraParamName, err), nil)
+	}
+
+	// --service, -s
+	cmd.Flags().AddFlag(options.RequestServiceOption.Flag)
+	// auto-completion
+	err = cmd.RegisterFlagCompletionFunc(options.RequestServiceOption.CobraParamName, autocompletion.RequestServiceFunc)
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for request flag %s: %v", options.RequestServiceOption.CobraParamName, err), nil)
+	}
 
 	return cmd
 }

@@ -197,11 +197,28 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsRequiredTogether(t *testing
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
+// Test Platform Export Command fails when provided invalid PingOne Client Credential flags
+func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
+	outputDir := t.TempDir()
+
+	expectedErrorPattern := `^failed to initialize pingone API client\. Check worker client ID, worker client secret, worker environment ID, and pingone region code configuration values\. oauth2: \"invalid_client\" \"Request denied: Unsupported authentication method \(Correlation ID: .*\)\"$`
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--output-directory", outputDir,
+		"--overwrite",
+		"--services", "pingone-protect",
+		"--pingone-worker-environment-id", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
+		"--pingone-worker-client-id", os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
+		"--pingone-worker-client-secret", "invalid",
+		"--pingone-region-code", os.Getenv(options.PingOneRegionCodeOption.EnvVar),
+	)
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
 // Test Platform Export Command fails when provided invalid PingFederate Basic Auth flags
 func TestPlatformExportCmd_PingFederateBasicAuthFlagsInvalid(t *testing.T) {
 	outputDir := t.TempDir()
 
-	expectedErrorPattern := `^failed to export 'pingfederate' service: failed to export resource .*\. err: .* Request for resource '.*' was not successful\.\s+Response Code: 401 Unauthorized\s+Response Body: {{"resultId":"invalid_credentials","message":"The credentials you provided were not recognized\."}}\s+Error: 401 Unauthorized$`
+	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--overwrite",
@@ -242,7 +259,7 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsRequiredTogethe
 func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalid(t *testing.T) {
 	outputDir := t.TempDir()
 
-	expectedErrorPattern := `^failed to export 'pingfederate' service: failed to export resource .*\. err: .* Request for resource '.*' was not successful\. Response is nil\. Error: oauth2: "invalid_client" "Invalid client or client credentials\."$`
+	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--overwrite",
@@ -259,7 +276,7 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalid(t *test
 func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalidTokenURL(t *testing.T) {
 	outputDir := t.TempDir()
 
-	expectedErrorPattern := `(?s)^failed to export 'pingfederate' service: failed to export resource.*\. err:.*Request for resource '.*' was not successful\. Response is nil\. Error: oauth2: cannot fetch token: 404 Not Found\s+Response: \<!DOCTYPE html\>\s+.*$`
+	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--overwrite",
@@ -308,7 +325,7 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
 func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
 	outputDir := t.TempDir()
 
-	expectedErrorPattern := `^failed to export '.*' service: failed to export resource .*\. err: .* Request for resource '.*' was not successful\. Response is nil\. Error: Get "https.*": tls: failed to verify certificate: x509: certificate signed by unknown authority$`
+	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--output-directory", outputDir,
 		"--overwrite",

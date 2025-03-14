@@ -28,7 +28,7 @@ func Test_deleteProfile_ActiveProfile(t *testing.T) {
 func Test_deleteProfile_InvalidProfileName(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^invalid profile name: '.*' profile does not exist$`
 	err := deleteProfile("(*#&)")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

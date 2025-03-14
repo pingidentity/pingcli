@@ -20,7 +20,7 @@ func Test_RunInternalConfigSetActiveProfile(t *testing.T) {
 func Test_RunInternalConfigSetActiveProfile_InvalidProfileName(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	expectedErrorPattern := `^failed to set active profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^failed to set active profile: invalid profile name: '.*' profile does not exist$`
 	err := RunInternalConfigSetActiveProfile([]string{"(*#&)"}, os.Stdin)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

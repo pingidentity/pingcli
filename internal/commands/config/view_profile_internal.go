@@ -2,6 +2,7 @@ package config_internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/output"
@@ -37,7 +38,12 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 			return fmt.Errorf("failed to view profile: %v", err)
 		}
 
-		if opt.Sensitive {
+		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
+		if err != nil {
+			unmaskOptionVal = "false"
+		}
+
+		if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
 		} else {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)

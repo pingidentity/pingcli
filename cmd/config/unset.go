@@ -3,6 +3,7 @@ package config
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -11,8 +12,8 @@ const (
 	configUnsetCommandExamples = `  Unset the color setting for the currently active profile.
     pingcli config unset color
 
-  Unset the PingOne tenant region code setting for the profile named 'myProfile'.
-    pingcli config unset --profile myProfile service.pingone.regionCode`
+  Unset the PingOne tenant region code setting for the profile named 'myprofile'.
+    pingcli config unset --profile myprofile service.pingone.regionCode`
 )
 
 func NewConfigUnsetCommand() *cobra.Command {
@@ -23,9 +24,10 @@ func NewConfigUnsetCommand() *cobra.Command {
 		Long: "Unset stored configuration settings for the CLI.\n\n" +
 			"The `--profile` parameter can be used to unset configuration settings for a specified custom configuration profile.\n" +
 			"Where `--profile` is not specified, configuration settings will be unset for the currently active profile.",
-		RunE:  configUnsetRunE,
-		Short: "Unset stored configuration settings for the CLI.",
-		Use:   "unset [flags] key",
+		RunE:      configUnsetRunE,
+		Short:     "Unset stored configuration settings for the CLI.",
+		Use:       "unset [flags] key",
+		ValidArgs: configuration.ViperKeys(),
 	}
 
 	return cmd

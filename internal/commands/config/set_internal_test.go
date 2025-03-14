@@ -81,7 +81,7 @@ func Test_RunInternalConfigSet_InvalidProfileName(t *testing.T) {
 	options.RootProfileOption.Flag.Changed = true
 	options.RootProfileOption.CobraParamValue = &profileName
 
-	expectedErrorPattern := `^failed to set configuration: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^failed to set configuration: invalid profile name: '.*' profile does not exist$`
 	err := RunInternalConfigSet("noColor=true")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
