@@ -32,8 +32,8 @@ func (r *PingFederateOauthTokenExchangeGeneratorSettingsResource) ExportAll() (*
 
 	importBlocks := []connector.ImportBlock{}
 
-	oauthTokenExchangeGeneratorSettingsId := "oauth_token_exchange_generator_settings_singleton_id"
-	oauthTokenExchangeGeneratorSettingsName := "Oauth Token Exchange Generator Settings"
+	oauthTokenExchangeGeneratorSettingsId := "oauth_token_exchange_generator_settings_singleton_id" //#nosec G101 -- This is not hard-coded credentials
+	oauthTokenExchangeGeneratorSettingsName := "Oauth Token Exchange Generator Settings"            //#nosec G101 -- This is not hard-coded credentials
 
 	commentData := map[string]string{
 		"Resource Type": r.ResourceType(),
