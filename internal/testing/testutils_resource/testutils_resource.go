@@ -93,17 +93,15 @@ func (tr *TestableResource) CreateResource(t *testing.T) ResourceCreationInfo {
 func (tr *TestableResource) DeleteResource(t *testing.T) {
 	t.Helper()
 
-	// Some resources like singletons don't have a delete function
-	if tr.DeleteFunc == nil {
-		return
-	}
-
 	resourceType := "<nil>"
 	if tr.ExportableResource != nil {
 		resourceType = tr.ExportableResource.ResourceType()
 	}
 
-	tr.DeleteFunc(t, tr.ClientInfo, resourceType, tr.CreationInfo[ENUM_ID])
+	// Some resources like singletons don't have a delete function
+	if tr.DeleteFunc != nil {
+		tr.DeleteFunc(t, tr.ClientInfo, resourceType, tr.CreationInfo[ENUM_ID])
+	}
 
 	for _, dependency := range tr.Dependencies {
 		dependency.DeleteResource(t)

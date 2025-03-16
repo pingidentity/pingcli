@@ -1,6 +1,7 @@
 package resources_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/connector"
@@ -20,8 +21,8 @@ func Test_PingFederateSpAuthenticationPolicyContractMapping(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo[testutils_resource.ENUM_NAME],
-			ResourceID:   creationInfo[testutils_resource.ENUM_ID],
+			ResourceName: fmt.Sprintf("%s_to_%s", creationInfo[testutils_resource.ENUM_SOURCE_ID], creationInfo[testutils_resource.ENUM_TARGET_ID]),
+			ResourceID:   fmt.Sprintf("%s|%s", creationInfo[testutils_resource.ENUM_SOURCE_ID], creationInfo[testutils_resource.ENUM_TARGET_ID]),
 		},
 	}
 

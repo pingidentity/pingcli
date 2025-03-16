@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: install fmt vet test devchecknotest devcheck importfmtlint
+.PHONY: install fmt vet test devchecknotest devcheck importfmtlint golangcilint starttestcontainer removetestcontainer spincontainer openlocalwebapi openapp
 
 default: install
 
@@ -115,7 +115,7 @@ starttestcontainer: --checkneededpfenvvars --checkdocker --dockerrunpf --waitfor
 	docker logs pingcli_test_pingfederate_container || echo "No logs available."; \
 	exit 1
 
-removetestcontainer:
+removetestcontainer: --checkdocker
 	@echo -n "Stopping and removing the PingFederate container..."
 	@if docker rm -f pingcli_test_pingfederate_container > /dev/null 2>&1; then \
 		echo " SUCCESS"; \
