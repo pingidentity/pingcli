@@ -49,7 +49,7 @@ func (r *PingOneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlo
 
 		for trustedEmailId, trustedEmailAddress := range trustedEmailAddressData {
 			commentData := map[string]string{
-				"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":     r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":             r.ResourceType(),
 				"Trusted Email Address":     trustedEmailAddress,
 				"Trusted Email Address ID":  trustedEmailId,
@@ -60,7 +60,7 @@ func (r *PingOneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlo
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", trustedEmailDomainName, trustedEmailAddress),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, trustedEmailDomainId, trustedEmailId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, trustedEmailDomainId, trustedEmailId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -74,7 +74,7 @@ func (r *PingOneTrustedEmailAddressResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingOneTrustedEmailAddressResource) getTrustedEmailDomainData() (map[string]string, error) {
 	trustedEmailDomainData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailDomainsApi.ReadAllTrustedEmailDomains(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	trustedEmailDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomain](iter, "ReadAllTrustedEmailDomains", "GetEmailDomains", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (r *PingOneTrustedEmailAddressResource) getTrustedEmailDomainData() (map[st
 func (r *PingOneTrustedEmailAddressResource) getTrustedEmailAddressData(trustedEmailDomainId string) (map[string]string, error) {
 	trustedEmailAddressData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailAddressesApi.ReadAllTrustedEmailAddresses(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, trustedEmailDomainId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailAddressesApi.ReadAllTrustedEmailAddresses(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, trustedEmailDomainId).Execute()
 	trustedEmailAddresses, err := pingone.GetManagementAPIObjectsFromIterator[management.EmailDomainTrustedEmail](iter, "ReadAllTrustedEmailAddresses", "GetTrustedEmails", r.ResourceType())
 	if err != nil {
 		return nil, err

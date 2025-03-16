@@ -9,7 +9,7 @@ import (
 )
 
 func Test_PingFederateServerSettingsSystemKeysRotate(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	resource := resources.ServerSettingsSystemKeysRotate(clientInfo)
 

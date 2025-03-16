@@ -60,7 +60,7 @@ func (r *PingFederateIdpAdapterResource) ExportAll() (*[]connector.ImportBlock, 
 func (r *PingFederateIdpAdapterResource) getIdpAdapterData() (map[string]string, error) {
 	idpAdapterData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpAdaptersAPI.GetIdpAdapters(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpAdaptersAPI.GetIdpAdapters(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetIdpAdapters", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -60,7 +60,7 @@ func (r *PingFederateIdentityStoreProvisionerResource) ExportAll() (*[]connector
 func (r *PingFederateIdentityStoreProvisionerResource) getIdentityStoreProvisionerData() (map[string]string, error) {
 	identityStoreProvisionerData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdentityStoreProvisionersAPI.GetIdentityStoreProvisioners(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdentityStoreProvisionersAPI.GetIdentityStoreProvisioners(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetIdentityStoreProvisioners", r.ResourceType())
 	if err != nil {
 		return nil, err

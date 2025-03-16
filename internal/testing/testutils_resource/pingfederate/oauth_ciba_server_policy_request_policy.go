@@ -11,14 +11,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createOauthCibaServerPolicyRequestPolicy,
 		DeleteFunc: deleteOauthCibaServerPolicyRequestPolicy,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederateOutOfBandAuthPlugins(t, clientInfo),
 		},
 		ExportableResource: resources.OauthCibaServerPolicyRequestPolicy(clientInfo),
@@ -34,7 +34,7 @@ func createOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 	resourceType := strArgs[0]
 	testAuthenticatorId := strArgs[1]
 
-	request := clientInfo.PingFederateApiClient.OauthCibaServerPolicyAPI.CreateCibaServerPolicy(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.OauthCibaServerPolicyAPI.CreateCibaServerPolicy(clientInfo.PingFederateContext)
 	clientStruct := client.RequestPolicy{
 		AllowUnsignedLoginHintToken: utils.Pointer(false),
 		AuthenticatorRef: client.ResourceLink{
@@ -82,10 +82,10 @@ func createOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateCibaServerPolicy", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -97,14 +97,14 @@ func createOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 func deleteOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.OauthCibaServerPolicyAPI.DeleteCibaServerPolicy(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.OauthCibaServerPolicyAPI.DeleteCibaServerPolicy(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteCibaServerPolicy", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

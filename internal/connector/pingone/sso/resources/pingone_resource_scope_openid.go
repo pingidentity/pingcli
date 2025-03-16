@@ -49,7 +49,7 @@ func (r *PingOneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlo
 
 		for resourceScopeId, resourceScopeName := range resourceScopeData {
 			commentData := map[string]string{
-				"Export Environment ID":              r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":              r.clientInfo.PingOneExportEnvironmentID,
 				"OpenID Connect Resource Name":       resourceName,
 				"OpenID Connect Resource Scope ID":   resourceScopeId,
 				"OpenID Connect Resource Scope Name": resourceScopeName,
@@ -59,7 +59,7 @@ func (r *PingOneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlo
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", resourceName, resourceScopeName),
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, resourceScopeId),
+				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, resourceScopeId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -73,7 +73,7 @@ func (r *PingOneResourceScopeOpenIdResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingOneResourceScopeOpenIdResource) getResourceData() (map[string]string, error) {
 	resourceData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -97,7 +97,7 @@ func (r *PingOneResourceScopeOpenIdResource) getResourceData() (map[string]strin
 func (r *PingOneResourceScopeOpenIdResource) getResourceScopeData(resourceId string) (map[string]string, error) {
 	resourceScopeData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceScopesApi.ReadAllResourceScopes(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, resourceId).Execute()
 	resourceScopes, err := pingone.GetManagementAPIObjectsFromIterator[management.ResourceScope](iter, "ReadAllResourceScopes", "GetScopes", r.ResourceType())
 	if err != nil {
 		return nil, err

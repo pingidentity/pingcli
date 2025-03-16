@@ -66,7 +66,7 @@ func (r *PingFederateSessionAuthenticationPolicyResource) ExportAll() (*[]connec
 func (r *PingFederateSessionAuthenticationPolicyResource) getSessionAuthenticationPolicyData() (map[string][]string, error) {
 	sessionAuthenticationPolicyData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.SessionAPI.GetSourcePolicies(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.SessionAPI.GetSourcePolicies(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetSourcePolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

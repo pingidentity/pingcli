@@ -60,7 +60,7 @@ func (r *PingFederatePasswordCredentialValidatorResource) ExportAll() (*[]connec
 func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialValidatorData() (map[string]string, error) {
 	passwordCredentialValidatorData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.PasswordCredentialValidatorsAPI.GetPasswordCredentialValidators(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.PasswordCredentialValidatorsAPI.GetPasswordCredentialValidators(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetPasswordCredentialValidators", r.ResourceType())
 	if err != nil {
 		return nil, err

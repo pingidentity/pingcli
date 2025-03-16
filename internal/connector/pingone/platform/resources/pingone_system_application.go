@@ -43,7 +43,7 @@ func (r *PingOneSystemApplicationResource) ExportAll() (*[]connector.ImportBlock
 
 	for appId, appName := range applicationData {
 		commentData := map[string]string{
-			"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID":   r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":           r.ResourceType(),
 			"System Application ID":   appId,
 			"System Application Name": appName,
@@ -52,7 +52,7 @@ func (r *PingOneSystemApplicationResource) ExportAll() (*[]connector.ImportBlock
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       appName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, appId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, appId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +65,7 @@ func (r *PingOneSystemApplicationResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneSystemApplicationResource) getSystemApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -49,14 +49,14 @@ func (r *PingoneAuthorizeAPIServiceOperationResource) ExportAll() (*[]connector.
 				"API Service Name":           apiServiceName,
 				"API Service Operation ID":   apiServiceOperationId,
 				"API Service Operation Name": apiServiceOperationName,
-				"Export Environment ID":      r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":      r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":              r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", apiServiceName, apiServiceOperationName),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, apiServiceId, apiServiceOperationId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, apiServiceId, apiServiceOperationId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -70,7 +70,7 @@ func (r *PingoneAuthorizeAPIServiceOperationResource) ExportAll() (*[]connector.
 func (r *PingoneAuthorizeAPIServiceOperationResource) getAPIServiceData() (map[string]string, error) {
 	apiServiceData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	apiServices, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServer](iter, "ReadAllAPIServers", "GetApiServers", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -91,7 +91,7 @@ func (r *PingoneAuthorizeAPIServiceOperationResource) getAPIServiceData() (map[s
 func (r *PingoneAuthorizeAPIServiceOperationResource) getAPIServiceOperationData(apiServiceId string) (map[string]string, error) {
 	apiServiceOperationData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServerOperationsApi.ReadAllAPIServerOperations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, apiServiceId).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServerOperationsApi.ReadAllAPIServerOperations(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, apiServiceId).Execute()
 	apiServiceOperations, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServerOperation](iter, "ReadAllAPIServerOperations", "GetOperations", r.ResourceType())
 	if err != nil {
 		return nil, err

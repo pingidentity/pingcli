@@ -61,14 +61,14 @@ func (r *PingOneApplicationRoleAssignmentResource) ExportAll() (*[]connector.Imp
 				"Application Name":               appName,
 				"Application Role Assignment ID": roleAssignmentId,
 				"Application Role Name":          string(roleName),
-				"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":          r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":                  r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s_%s", appName, string(roleName), roleAssignmentId),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, roleAssignmentId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, appId, roleAssignmentId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -82,7 +82,7 @@ func (r *PingOneApplicationRoleAssignmentResource) ExportAll() (*[]connector.Imp
 func (r *PingOneApplicationRoleAssignmentResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -136,7 +136,7 @@ func (r *PingOneApplicationRoleAssignmentResource) getApplicationData() (map[str
 func (r *PingOneApplicationRoleAssignmentResource) getApplicationRoleAssignmentData(appId string) (map[string]string, error) {
 	applicationRoleAssignmentData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationRoleAssignmentsApi.ReadApplicationRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationRoleAssignmentsApi.ReadApplicationRoleAssignments(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, appId).Execute()
 	applicationRoleAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadApplicationRoleAssignments", "GetRoleAssignments", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -159,7 +159,7 @@ func (r *PingOneApplicationRoleAssignmentResource) getApplicationRoleAssignmentD
 }
 
 func (r *PingOneApplicationRoleAssignmentResource) getRoleName(roleId string) (management.EnumRoleName, bool, error) {
-	apiRole, resp, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
+	apiRole, resp, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.PingOneContext, roleId).Execute()
 	ok, err := common.HandleClientResponse(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
 		return "", false, err

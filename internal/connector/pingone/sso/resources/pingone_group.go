@@ -43,7 +43,7 @@ func (r *PingOneGroupResource) ExportAll() (*[]connector.ImportBlock, error) {
 
 	for groupId, groupName := range groupData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Group ID":              groupId,
 			"Group Name":            groupName,
 			"Resource Type":         r.ResourceType(),
@@ -52,7 +52,7 @@ func (r *PingOneGroupResource) ExportAll() (*[]connector.ImportBlock, error) {
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       groupName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, groupId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, groupId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +65,7 @@ func (r *PingOneGroupResource) ExportAll() (*[]connector.ImportBlock, error) {
 func (r *PingOneGroupResource) getGroupData() (map[string]string, error) {
 	groupData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	groups, err := pingone.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -60,7 +60,7 @@ func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.I
 func (r *PingFederateAuthenticationSelectorResource) getAuthenticationSelectorData() (map[string]string, error) {
 	authenticationSelectorData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.GetAuthenticationSelectors(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationSelectors", r.ResourceType())
 	if err != nil {
 		return nil, err

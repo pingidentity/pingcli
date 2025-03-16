@@ -11,15 +11,15 @@ import (
 
 func TestPhoneDeliverySettingsExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.PhoneDeliverySettings(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.PhoneDeliverySettings(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_phone_delivery_settings",
 			ResourceName: "provider_custom_eb90b2a5-a801-45b3-8bf4-7d06cb6a5374",
-			ResourceID:   fmt.Sprintf("%s/eb90b2a5-a801-45b3-8bf4-7d06cb6a5374", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/eb90b2a5-a801-45b3-8bf4-7d06cb6a5374", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

@@ -10,15 +10,15 @@ import (
 
 func TestBrandingThemeDefaultExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.BrandingThemeDefault(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.BrandingThemeDefault(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_branding_theme_default",
 			ResourceName: "test_slate_2_default_theme",
-			ResourceID:   testutils.GetEnvironmentID(),
+			ResourceID:   clientInfo.PingOneExportEnvironmentID,
 		},
 	}
 

@@ -11,14 +11,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createKeypairsOauthOpenidConnectAdditionalKeySet,
 		DeleteFunc: deleteKeypairsOauthOpenidConnectAdditionalKeySet,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederateOauthIssuer(t, clientInfo),
 			TestableResource_PingFederateKeypairsSigningKey(t, clientInfo),
 		},
@@ -36,7 +36,7 @@ func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *
 	testOauthIssuerId := strArgs[1]
 	testKeyPairId := strArgs[2]
 
-	request := clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.CreateKeySet(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.CreateKeySet(clientInfo.PingFederateContext)
 	clientStruct := client.AdditionalKeySet{
 		Id: utils.Pointer("TestAdditionalKeySetId"),
 		Issuers: []client.ResourceLink{
@@ -57,10 +57,10 @@ func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateKeySet", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -72,14 +72,14 @@ func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *
 func deleteKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.DeleteKeySet(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.DeleteKeySet(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteKeySet", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

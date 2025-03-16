@@ -60,7 +60,7 @@ func (r *PingFederateOauthAccessTokenManagerResource) ExportAll() (*[]connector.
 func (r *PingFederateOauthAccessTokenManagerResource) getOauthAccessTokenManagerData() (map[string]string, error) {
 	oauthAccessTokenManagerData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAccessTokenManagersAPI.GetTokenManagers(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAccessTokenManagersAPI.GetTokenManagers(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetTokenManagers", r.ResourceType())
 	if err != nil {
 		return nil, err

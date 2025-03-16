@@ -11,14 +11,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createAuthenticationPoliciesFragment,
 		DeleteFunc: deleteAuthenticationPoliciesFragment,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederateIdpAdapter(t, clientInfo),
 		},
 		ExportableResource: resources.AuthenticationPoliciesFragment(clientInfo),
@@ -34,7 +34,7 @@ func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.Cl
 	resourceType := strArgs[0]
 	idpAdapterId := strArgs[1]
 
-	request := clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.CreateFragment(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.CreateFragment(clientInfo.PingFederateContext)
 	clientStruct := client.AuthenticationPolicyFragment{
 		Id:   utils.Pointer("TestFragmentId"),
 		Name: utils.Pointer("TestFragmentName"),
@@ -82,10 +82,10 @@ func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.Cl
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateFragment", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -97,14 +97,14 @@ func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.Cl
 func deleteAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.DeleteFragment(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.DeleteFragment(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteFragment", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

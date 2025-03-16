@@ -62,7 +62,7 @@ func (r *PingFederateDataStoreResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingFederateDataStoreResource) getDataStoreData() (map[string]string, error) {
 	dataStoreData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.DataStoresAPI.GetDataStores(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.DataStoresAPI.GetDataStores(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetDataStores", r.ResourceType())
 	if err != nil {
 		return nil, err

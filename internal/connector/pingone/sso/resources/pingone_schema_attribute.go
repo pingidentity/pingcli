@@ -49,7 +49,7 @@ func (r *PingOneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, 
 
 		for schemaAttributeId, schemaAttributeName := range schemaAttributeData {
 			commentData := map[string]string{
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":         r.ResourceType(),
 				"Schema Attribute ID":   schemaAttributeId,
 				"Schema Attribute Name": schemaAttributeName,
@@ -60,7 +60,7 @@ func (r *PingOneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", schemaName, schemaAttributeName),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, schemaId, schemaAttributeId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, schemaId, schemaAttributeId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -74,7 +74,7 @@ func (r *PingOneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, 
 func (r *PingOneSchemaAttributeResource) getSchemaData() (map[string]string, error) {
 	schemaData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	schemas, err := pingone.GetManagementAPIObjectsFromIterator[management.Schema](iter, "ReadAllSchemas", "GetSchemas", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -94,7 +94,7 @@ func (r *PingOneSchemaAttributeResource) getSchemaData() (map[string]string, err
 func (r *PingOneSchemaAttributeResource) getSchemaAttributeData(schemaId string) (map[string]string, error) {
 	schemaAttributeData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemaAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, schemaId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemaAttributes(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, schemaId).Execute()
 	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllSchemaAttributes", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err

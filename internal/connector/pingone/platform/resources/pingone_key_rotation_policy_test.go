@@ -11,15 +11,15 @@ import (
 
 func TestKeyRotationPolicyExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.KeyRotationPolicy(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.KeyRotationPolicy(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_key_rotation_policy",
 			ResourceName: "PingOne Key Rotation Policy for PingFederate Terraform Provider environment",
-			ResourceID:   fmt.Sprintf("%s/9ad5e4a1-b414-40cc-84d1-8255272e4a30", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/9ad5e4a1-b414-40cc-84d1-8255272e4a30", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

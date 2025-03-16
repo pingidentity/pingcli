@@ -11,15 +11,15 @@ import (
 
 func TestIdentityProviderExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.IdentityProvider(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.IdentityProvider(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_identity_provider",
 			ResourceName: "Default Idp Test",
-			ResourceID:   fmt.Sprintf("%s/a99df558-7090-4303-8f35-860ac660e371", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/a99df558-7090-4303-8f35-860ac660e371", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

@@ -60,7 +60,7 @@ func (r *PingFederateAuthenticationPoliciesFragmentResource) ExportAll() (*[]con
 func (r *PingFederateAuthenticationPoliciesFragmentResource) getAuthenticationPoliciesFragmentData() (map[string]string, error) {
 	authenticationPoliciesFragmentData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.GetFragments(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetFragments", r.ResourceType())
 	if err != nil {
 		return nil, err

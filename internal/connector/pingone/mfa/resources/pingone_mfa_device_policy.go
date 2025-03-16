@@ -43,7 +43,7 @@ func (r *PingOneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, 
 
 	for devicePolicyId, devicePolicyName := range deviceAuthPolicyData {
 		commentData := map[string]string{
-			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID":  r.clientInfo.PingOneExportEnvironmentID,
 			"MFA Device Policy ID":   devicePolicyId,
 			"MFA Device Policy Name": devicePolicyName,
 			"Resource Type":          r.ResourceType(),
@@ -52,7 +52,7 @@ func (r *PingOneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       devicePolicyName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, devicePolicyId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, devicePolicyId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +65,7 @@ func (r *PingOneMFADevicePolicyResource) ExportAll() (*[]connector.ImportBlock, 
 func (r *PingOneMFADevicePolicyResource) getDeviceAuthPolicyData() (map[string]string, error) {
 	deviceAuthPolicyData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.MFAAPIClient.DeviceAuthenticationPolicyApi.ReadDeviceAuthenticationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.MFAAPIClient.DeviceAuthenticationPolicyApi.ReadDeviceAuthenticationPolicies(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	deviceAuthPolicies, err := pingone.GetMfaAPIObjectsFromIterator[mfa.DeviceAuthenticationPolicy](iter, "ReadDeviceAuthenticationPolicies", "GetDeviceAuthenticationPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

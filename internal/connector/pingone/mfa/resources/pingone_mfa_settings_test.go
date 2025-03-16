@@ -10,15 +10,15 @@ import (
 
 func TestMFASettingsExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.MFASettings(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.MFASettings(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_mfa_settings",
 			ResourceName: "pingone_mfa_settings",
-			ResourceID:   testutils.GetEnvironmentID(),
+			ResourceID:   clientInfo.PingOneExportEnvironmentID,
 		},
 	}
 

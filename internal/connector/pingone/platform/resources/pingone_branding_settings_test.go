@@ -10,15 +10,15 @@ import (
 
 func TestBrandingSettingsExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.BrandingSettings(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.BrandingSettings(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_branding_settings",
 			ResourceName: "pingone_branding_settings",
-			ResourceID:   testutils.GetEnvironmentID(),
+			ResourceID:   clientInfo.PingOneExportEnvironmentID,
 		},
 	}
 

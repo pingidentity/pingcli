@@ -57,7 +57,7 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 			}
 
 			commentData := map[string]string{
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 				"Gateway ID":            gatewayId,
 				"Gateway Name":          gatewayName,
 				"Resource Type":         r.ResourceType(),
@@ -68,7 +68,7 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s_%s", gatewayName, string(*roleName), roleAssignmentId),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, gatewayId, roleAssignmentId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, gatewayId, roleAssignmentId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -82,7 +82,7 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 func (r *PingOneGatewayRoleAssignmentResource) getGatewayData() (map[string]string, error) {
 	gatewayData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	gatewayInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayData() (map[string]stri
 func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gatewayId string) (map[string]string, error) {
 	gatewayRoleAssignmentData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.ReadGatewayRoleAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.ReadGatewayRoleAssignments(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, gatewayId).Execute()
 	gatewayRoleAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.RoleAssignment](iter, "ReadGatewayRoleAssignments", "GetRoleAssignments", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -132,7 +132,7 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gate
 }
 
 func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId string) (*management.EnumRoleName, error) {
-	role, resp, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.Context, roleId).Execute()
+	role, resp, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.PingOneContext, roleId).Execute()
 	ok, err := common.CheckSingletonResource(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -6,14 +6,13 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 )
 
-func TestableResource_PingOnePingFederateGateway(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingOnePingFederateGateway(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
 		CreateFunc:         createPingFederateGateway,
 		DeleteFunc:         deletePingFederateGateway,
@@ -38,13 +37,16 @@ func createPingFederateGateway(t *testing.T, clientInfo *connector.ClientInfo, s
 		},
 	}
 
-	createGateway201Response, response, err := clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.CreateGateway(clientInfo.Context, testutils.GetEnvironmentID()).CreateGatewayRequest(result).Execute()
+	api_request := clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.CreateGateway(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
+	api_request = api_request.CreateGatewayRequest(result)
+
+	createGateway201Response, response, err := api_request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateGateway", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	if createGateway201Response == nil || createGateway201Response.Gateway == nil {
@@ -64,12 +66,12 @@ func createPingFederateGateway(t *testing.T, clientInfo *connector.ClientInfo, s
 func deletePingFederateGateway(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	response, err := clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.DeleteGateway(clientInfo.Context, testutils.GetEnvironmentID(), id).Execute()
+	response, err := clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.DeleteGateway(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, id).Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteGateway", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

@@ -60,7 +60,7 @@ func (r *PingFederateIdpTokenProcessorResource) ExportAll() (*[]connector.Import
 func (r *PingFederateIdpTokenProcessorResource) getIdpTokenProcessorData() (map[string]string, error) {
 	idpTokenProcessorData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpTokenProcessorsAPI.GetTokenProcessors(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpTokenProcessorsAPI.GetTokenProcessors(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetTokenProcessors", r.ResourceType())
 	if err != nil {
 		return nil, err

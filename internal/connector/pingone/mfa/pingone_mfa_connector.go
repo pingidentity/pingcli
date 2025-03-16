@@ -28,10 +28,10 @@ type PingOneMFAConnector struct {
 func MFAConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOneMFAConnector {
 	return &PingOneMFAConnector{
 		clientInfo: connector.ClientInfo{
-			Context:             ctx,
-			PingOneApiClient:    apiClient,
-			ApiClientId:         *apiClientId,
-			ExportEnvironmentID: exportEnvironmentID,
+			PingOneContext:             ctx,
+			PingOneApiClient:           apiClient,
+			PingOneApiClientId:         *apiClientId,
+			PingOneExportEnvironmentID: exportEnvironmentID,
 		},
 	}
 }

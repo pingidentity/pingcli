@@ -11,14 +11,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createKeypairsSigningKeyRotationSettings,
 		DeleteFunc: deleteKeypairsSigningKeyRotationSettings,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederateKeypairsSigningKey(t, clientInfo),
 		},
 		ExportableResource: resources.KeypairsSigningKeyRotationSettings(clientInfo),
@@ -34,7 +34,7 @@ func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 	resourceType := strArgs[0]
 	keyPairId := strArgs[1]
 
-	request := clientInfo.PingFederateApiClient.KeyPairsSigningAPI.UpdateRotationSettings(clientInfo.Context, keyPairId)
+	request := clientInfo.PingFederateApiClient.KeyPairsSigningAPI.UpdateRotationSettings(clientInfo.PingFederateContext, keyPairId)
 	clientStruct := client.KeyPairRotationSettings{
 		ActivationBufferDays: 10,
 		CreationBufferDays:   10,
@@ -46,10 +46,10 @@ func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 	_, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "UpdateRotationSettings", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	// Deletion of this resource is referenced by the keyPairId
@@ -61,14 +61,14 @@ func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 func deleteKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.KeyPairsSigningAPI.DeleteKeyPairRotationSettings(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.KeyPairsSigningAPI.DeleteKeyPairRotationSettings(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteKeyPairRotationSettings", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

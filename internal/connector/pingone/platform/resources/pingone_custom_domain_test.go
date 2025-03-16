@@ -11,15 +11,15 @@ import (
 
 func TestCustomDomainExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.CustomDomain(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.CustomDomain(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_custom_domain",
 			ResourceName: "pioneerpalaceband.com",
-			ResourceID:   fmt.Sprintf("%s/5eb2548d-fdb2-45f6-85bc-7adfd856cbd9", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/5eb2548d-fdb2-45f6-85bc-7adfd856cbd9", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

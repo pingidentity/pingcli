@@ -11,20 +11,20 @@ import (
 
 func TestNotificationPolicyExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.NotificationPolicy(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.NotificationPolicy(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_notification_policy",
 			ResourceName: "Test",
-			ResourceID:   fmt.Sprintf("%s/32cc413d-0ec8-4be9-823c-a9e06f5a5830", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/32cc413d-0ec8-4be9-823c-a9e06f5a5830", clientInfo.PingOneExportEnvironmentID),
 		},
 		{
 			ResourceType: "pingone_notification_policy",
 			ResourceName: "Default Notification Policy",
-			ResourceID:   fmt.Sprintf("%s/54606af4-72a6-4b38-bfb8-75034097af9a", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/54606af4-72a6-4b38-bfb8-75034097af9a", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

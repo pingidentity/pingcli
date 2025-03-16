@@ -60,7 +60,7 @@ func (r *PingFederateLocalIdentityProfileResource) ExportAll() (*[]connector.Imp
 func (r *PingFederateLocalIdentityProfileResource) getLocalIdentityProfileData() (map[string]string, error) {
 	localIdentityProfileData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.LocalIdentityIdentityProfilesAPI.GetIdentityProfiles(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.LocalIdentityIdentityProfilesAPI.GetIdentityProfiles(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetIdentityProfiles", r.ResourceType())
 	if err != nil {
 		return nil, err

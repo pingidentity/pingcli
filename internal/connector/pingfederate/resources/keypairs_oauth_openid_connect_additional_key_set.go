@@ -60,7 +60,7 @@ func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) ExportA
 func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) getKeypairsOauthOpenidConnectAdditionalKeySetData() (map[string]string, error) {
 	keypairsOauthOpenidConnectAdditionalKeySetData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.GetKeySets(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.KeyPairsOauthOpenIdConnectAPI.GetKeySets(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetKeySets", r.ResourceType())
 	if err != nil {
 		return nil, err

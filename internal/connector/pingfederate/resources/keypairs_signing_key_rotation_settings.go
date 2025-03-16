@@ -74,7 +74,7 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) ExportAll() (*[
 func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getKeypairsSigningKeyData() (map[string][]string, error) {
 	signingKeyPairData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.KeyPairsSigningAPI.GetSigningKeyPairs(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.KeyPairsSigningAPI.GetSigningKeyPairs(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetSigningKeyPairs", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -110,6 +110,6 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getKeypairsSign
 }
 
 func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) checkKeypairsSigningKeyRotationSettingsData(id string) (bool, error) {
-	_, response, err := r.clientInfo.PingFederateApiClient.KeyPairsSigningAPI.GetRotationSettings(r.clientInfo.Context, id).Execute()
+	_, response, err := r.clientInfo.PingFederateApiClient.KeyPairsSigningAPI.GetRotationSettings(r.clientInfo.PingFederateContext, id).Execute()
 	return common.CheckSingletonResource(response, err, "GetRotationSettings", r.ResourceType())
 }

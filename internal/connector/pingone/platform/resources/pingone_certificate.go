@@ -43,14 +43,14 @@ func (r *PingOneCertificateResource) ExportAll() (*[]connector.ImportBlock, erro
 		commentData := map[string]string{
 			"Certificate ID":        certificateId,
 			"Certificate Name":      certificateName,
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       certificateName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, certificateId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, certificateId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -64,7 +64,7 @@ func (r *PingOneCertificateResource) getCertificateData() (map[string]string, er
 	certificateData := make(map[string]string)
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
-	entityArray, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	entityArray, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err

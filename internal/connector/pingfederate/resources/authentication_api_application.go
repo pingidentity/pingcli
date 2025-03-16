@@ -60,7 +60,7 @@ func (r *PingFederateAuthenticationApiApplicationResource) ExportAll() (*[]conne
 func (r *PingFederateAuthenticationApiApplicationResource) getAuthenticationApiApplicationData() (map[string]string, error) {
 	authenticationApiApplicationData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationApiAPI.GetAuthenticationApiApplications(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.AuthenticationApiAPI.GetAuthenticationApiApplications(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetAuthenticationApiApplications", r.ResourceType())
 	if err != nil {
 		return nil, err

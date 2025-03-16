@@ -61,7 +61,7 @@ func (r *PingFederateOauthAuthenticationPolicyContractMappingResource) ExportAll
 func (r *PingFederateOauthAuthenticationPolicyContractMappingResource) getOauthAuthenticationPolicyContractMappingData() ([]string, error) {
 	oauthAuthenticationPolicyContractMappingData := []string{}
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAuthenticationPolicyContractMappingsAPI.GetApcMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthAuthenticationPolicyContractMappingsAPI.GetApcMappings(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetApcMappings", r.ResourceType())
 	if err != nil {
 		return nil, err

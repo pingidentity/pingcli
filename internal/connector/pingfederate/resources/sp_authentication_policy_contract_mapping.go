@@ -66,7 +66,7 @@ func (r *PingFederateSpAuthenticationPolicyContractMappingResource) ExportAll() 
 func (r *PingFederateSpAuthenticationPolicyContractMappingResource) getSpAuthenticationPolicyContractMappingData() (map[string][]string, error) {
 	spAuthenticationPolicyContractMappingData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.SpAuthenticationPolicyContractMappingsAPI.GetApcToSpAdapterMappings(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetApcToSpAdapterMappings", r.ResourceType())
 	if err != nil {
 		return nil, err

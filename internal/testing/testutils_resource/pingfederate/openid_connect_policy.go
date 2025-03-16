@@ -11,14 +11,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createOpenidConnectPolicy,
 		DeleteFunc: deleteOpenidConnectPolicy,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederateOauthAccessTokenManager(t, clientInfo),
 		},
 		ExportableResource: resources.OpenidConnectPolicy(clientInfo),
@@ -34,7 +34,7 @@ func createOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, s
 	resourceType := strArgs[0]
 	testAccessTokenManagerId := strArgs[1]
 
-	request := clientInfo.PingFederateApiClient.OauthOpenIdConnectAPI.CreateOIDCPolicy(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.OauthOpenIdConnectAPI.CreateOIDCPolicy(clientInfo.PingFederateContext)
 	clientStruct := client.OpenIdConnectPolicy{
 		AccessTokenManagerRef: client.ResourceLink{
 			Id: testAccessTokenManagerId,
@@ -65,10 +65,10 @@ func createOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, s
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateOIDCPolicy", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -80,14 +80,14 @@ func createOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, s
 func deleteOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.OauthOpenIdConnectAPI.DeleteOIDCPolicy(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.OauthOpenIdConnectAPI.DeleteOIDCPolicy(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteOIDCPolicy", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

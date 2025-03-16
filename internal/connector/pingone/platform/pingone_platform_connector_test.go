@@ -10,7 +10,7 @@ import (
 )
 
 func TestPlatformTerraformPlan(t *testing.T) {
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	testutils_terraform.InitPingOneTerraform(t)
 
@@ -21,78 +21,78 @@ func TestPlatformTerraformPlan(t *testing.T) {
 	}{
 		{
 			name:          "Agreement",
-			resource:      resources.Agreement(PingOneClientInfo),
+			resource:      resources.Agreement(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AgreementEnable",
-			resource:      resources.AgreementEnable(PingOneClientInfo),
+			resource:      resources.AgreementEnable(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AgreementLocalization",
-			resource:      resources.AgreementLocalization(PingOneClientInfo),
+			resource:      resources.AgreementLocalization(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AgreementLocalizationEnable",
-			resource:      resources.AgreementLocalizationEnable(PingOneClientInfo),
+			resource:      resources.AgreementLocalizationEnable(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AgreementLocalizationRevision",
-			resource:      resources.AgreementLocalizationRevision(PingOneClientInfo),
+			resource:      resources.AgreementLocalizationRevision(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "BrandingSettings",
-			resource:      resources.BrandingSettings(PingOneClientInfo),
+			resource:      resources.BrandingSettings(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:     "BrandingTheme",
-			resource: resources.BrandingTheme(PingOneClientInfo),
+			resource: resources.BrandingTheme(clientInfo),
 			ignoredErrors: []string{
 				"Error: Invalid Attribute Combination",
 			},
 		},
 		{
 			name:          "BrandingThemeDefault",
-			resource:      resources.BrandingThemeDefault(PingOneClientInfo),
+			resource:      resources.BrandingThemeDefault(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:     "Certificate",
-			resource: resources.Certificate(PingOneClientInfo),
+			resource: resources.Certificate(clientInfo),
 			ignoredErrors: []string{
 				"Error: Invalid combination of arguments",
 			},
 		},
 		{
 			name:          "CustomDomain",
-			resource:      resources.CustomDomain(PingOneClientInfo),
+			resource:      resources.CustomDomain(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "Environment",
-			resource:      resources.Environment(PingOneClientInfo),
+			resource:      resources.Environment(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "Form",
-			resource:      resources.Form(PingOneClientInfo),
+			resource:      resources.Form(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:     "FormRecaptchaV2",
-			resource: resources.FormRecaptchaV2(PingOneClientInfo),
+			resource: resources.FormRecaptchaV2(clientInfo),
 			ignoredErrors: []string{
 				"Error: Missing Configuration for Required Attribute",
 			},
 		},
 		{
 			name:     "Gateway",
-			resource: resources.Gateway(PingOneClientInfo),
+			resource: resources.Gateway(clientInfo),
 			ignoredErrors: []string{
 				"Error: Invalid Attribute Combination",
 				"Error: Missing required argument",
@@ -100,52 +100,52 @@ func TestPlatformTerraformPlan(t *testing.T) {
 		},
 		{
 			name:          "GatewayCredential",
-			resource:      resources.GatewayCredential(PingOneClientInfo),
+			resource:      resources.GatewayCredential(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "GatewayRoleAssignment",
-			resource:      resources.GatewayRoleAssignment(PingOneClientInfo),
+			resource:      resources.GatewayRoleAssignment(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "IdentityPropagationPlan",
-			resource:      resources.IdentityPropagationPlan(PingOneClientInfo),
+			resource:      resources.IdentityPropagationPlan(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "Key",
-			resource:      resources.Key(PingOneClientInfo),
+			resource:      resources.Key(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "KeyRotationPolicy",
-			resource:      resources.KeyRotationPolicy(PingOneClientInfo),
+			resource:      resources.KeyRotationPolicy(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "Language",
-			resource:      resources.Language(PingOneClientInfo),
+			resource:      resources.Language(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "LanguageUpdate",
-			resource:      resources.LanguageUpdate(PingOneClientInfo),
+			resource:      resources.LanguageUpdate(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "NotificationPolicy",
-			resource:      resources.NotificationPolicy(PingOneClientInfo),
+			resource:      resources.NotificationPolicy(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "NotificationSettings",
-			resource:      resources.NotificationSettings(PingOneClientInfo),
+			resource:      resources.NotificationSettings(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:     "NotificationSettingsEmail",
-			resource: resources.NotificationSettingsEmail(PingOneClientInfo),
+			resource: resources.NotificationSettingsEmail(clientInfo),
 			ignoredErrors: []string{
 				"Error: Missing Configuration for Required Attribute",
 			},
@@ -153,12 +153,12 @@ func TestPlatformTerraformPlan(t *testing.T) {
 		// TODO remove this skip dependent upon STAGING-25369
 		// {
 		// 	name:          "NotificationTemplateContent",
-		// 	resource:      resources.NotificationTemplateContent(PingOneClientInfo),
+		// 	resource:      resources.NotificationTemplateContent(clientInfo),
 		// 	ignoredErrors: nil,
 		// },
 		{
 			name:     "PhoneDeliverySettings",
-			resource: resources.PhoneDeliverySettings(PingOneClientInfo),
+			resource: resources.PhoneDeliverySettings(clientInfo),
 			ignoredErrors: []string{
 				"Error: Missing required argument",
 				"Error: Missing Configuration for Required Attribute",
@@ -166,22 +166,22 @@ func TestPlatformTerraformPlan(t *testing.T) {
 		},
 		{
 			name:          "SystemApplication",
-			resource:      resources.SystemApplication(PingOneClientInfo),
+			resource:      resources.SystemApplication(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "TrustedEmailAddress",
-			resource:      resources.TrustedEmailAddress(PingOneClientInfo),
+			resource:      resources.TrustedEmailAddress(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "TrustedEmailDomain",
-			resource:      resources.TrustedEmailDomain(PingOneClientInfo),
+			resource:      resources.TrustedEmailDomain(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "Webhook",
-			resource:      resources.Webhook(PingOneClientInfo),
+			resource:      resources.Webhook(clientInfo),
 			ignoredErrors: nil,
 		},
 	}

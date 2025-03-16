@@ -11,20 +11,20 @@ import (
 
 func TestSystemApplicationExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.SystemApplication(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.SystemApplication(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_system_application",
 			ResourceName: "PingOne Application Portal",
-			ResourceID:   fmt.Sprintf("%s/92a3765c-e135-4afa-8b12-4469672ac8a9", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/92a3765c-e135-4afa-8b12-4469672ac8a9", clientInfo.PingOneExportEnvironmentID),
 		},
 		{
 			ResourceType: "pingone_system_application",
 			ResourceName: "PingOne Self-Service - MyAccount",
-			ResourceID:   fmt.Sprintf("%s/4ce54d01-5138-4c56-8175-4f02f69278f5", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/4ce54d01-5138-4c56-8175-4f02f69278f5", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

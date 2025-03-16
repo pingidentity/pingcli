@@ -66,7 +66,7 @@ func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) ExportAll(
 func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) getOauthTokenExchangeTokenGeneratorMappingData() (map[string][]string, error) {
 	oauthTokenExchangeTokenGeneratorMappingData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.GetTokenGeneratorMappings(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.GetTokenGeneratorMappings(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetTokenGeneratorMappings", r.ResourceType())
 	if err != nil {
 		return nil, err

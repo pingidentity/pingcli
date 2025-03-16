@@ -60,7 +60,7 @@ func (r *PingFederateKerberosRealmResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (map[string]string, error) {
 	kerberosRealmData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.KerberosRealmsAPI.GetKerberosRealms(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.KerberosRealmsAPI.GetKerberosRealms(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetKerberosRealms", r.ResourceType())
 	if err != nil {
 		return nil, err

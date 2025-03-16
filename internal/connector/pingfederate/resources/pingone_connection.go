@@ -60,7 +60,7 @@ func (r *PingFederatePingoneConnectionResource) ExportAll() (*[]connector.Import
 func (r *PingFederatePingoneConnectionResource) getPingoneConnectionData() (map[string]string, error) {
 	pingoneConnectionData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.PingOneConnectionsAPI.GetPingOneConnections(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.PingOneConnectionsAPI.GetPingOneConnections(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetPingOneConnections", r.ResourceType())
 	if err != nil {
 		return nil, err

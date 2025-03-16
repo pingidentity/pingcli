@@ -11,10 +11,10 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
 		CreateFunc:         createAuthenticationSelector,
 		DeleteFunc:         deleteAuthenticationSelector,
@@ -31,7 +31,7 @@ func createAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo
 	}
 	resourceType := strArgs[0]
 
-	request := clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.CreateAuthenticationSelector(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.CreateAuthenticationSelector(clientInfo.PingFederateContext)
 	clientStruct := client.AuthenticationSelector{
 		Configuration: client.PluginConfiguration{
 			Fields: []client.ConfigField{
@@ -69,10 +69,10 @@ func createAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateAuthenticationSelector", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -84,14 +84,14 @@ func createAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo
 func deleteAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.DeleteAuthenticationSelector(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.AuthenticationSelectorsAPI.DeleteAuthenticationSelector(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteAuthenticationSelector", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

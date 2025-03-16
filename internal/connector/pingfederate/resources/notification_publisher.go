@@ -60,7 +60,7 @@ func (r *PingFederateNotificationPublisherResource) ExportAll() (*[]connector.Im
 func (r *PingFederateNotificationPublisherResource) getNotificationPublisherData() (map[string]string, error) {
 	notificationPublisherData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.NotificationPublishersAPI.GetNotificationPublishers(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.NotificationPublishersAPI.GetNotificationPublishers(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetNotificationPublishers", r.ResourceType())
 	if err != nil {
 		return nil, err

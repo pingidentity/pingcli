@@ -10,7 +10,7 @@ import (
 )
 
 func TestAuthorizeTerraformPlan(t *testing.T) {
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	testutils_terraform.InitPingOneTerraform(t)
 
@@ -21,32 +21,32 @@ func TestAuthorizeTerraformPlan(t *testing.T) {
 	}{
 		{
 			name:          "AuthorizeAPIService",
-			resource:      resources.AuthorizeAPIService(PingOneClientInfo),
+			resource:      resources.AuthorizeAPIService(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AuthorizeAPIServiceDeployment",
-			resource:      resources.AuthorizeAPIServiceDeployment(PingOneClientInfo),
+			resource:      resources.AuthorizeAPIServiceDeployment(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AuthorizeAPIServiceOperation",
-			resource:      resources.AuthorizeAPIServiceOperation(PingOneClientInfo),
+			resource:      resources.AuthorizeAPIServiceOperation(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AuthorizeApplicationRole",
-			resource:      resources.AuthorizeApplicationRole(PingOneClientInfo),
+			resource:      resources.AuthorizeApplicationRole(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AuthorizeApplicationRolePermission",
-			resource:      resources.AuthorizeApplicationRolePermission(PingOneClientInfo),
+			resource:      resources.AuthorizeApplicationRolePermission(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "AuthorizeDecisionEndpoint",
-			resource:      resources.AuthorizeDecisionEndpoint(PingOneClientInfo),
+			resource:      resources.AuthorizeDecisionEndpoint(clientInfo),
 			ignoredErrors: nil,
 		},
 	}

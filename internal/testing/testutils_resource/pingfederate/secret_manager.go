@@ -11,10 +11,10 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateSecretManager(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateSecretManager(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
 		CreateFunc:         createSecretManager,
 		DeleteFunc:         deleteSecretManager,
@@ -31,7 +31,7 @@ func createSecretManager(t *testing.T, clientInfo *connector.ClientInfo, strArgs
 	}
 	resourceType := strArgs[0]
 
-	request := clientInfo.PingFederateApiClient.SecretManagersAPI.CreateSecretManager(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.SecretManagersAPI.CreateSecretManager(clientInfo.PingFederateContext)
 	clientStruct := client.SecretManager{
 		Configuration: client.PluginConfiguration{
 			Fields: []client.ConfigField{
@@ -53,10 +53,10 @@ func createSecretManager(t *testing.T, clientInfo *connector.ClientInfo, strArgs
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateSecretManager", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -68,14 +68,14 @@ func createSecretManager(t *testing.T, clientInfo *connector.ClientInfo, strArgs
 func deleteSecretManager(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.SecretManagersAPI.DeleteSecretManager(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.SecretManagersAPI.DeleteSecretManager(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteSecretManager", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

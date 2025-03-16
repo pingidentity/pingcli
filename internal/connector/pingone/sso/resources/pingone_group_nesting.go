@@ -49,7 +49,7 @@ func (r *PingOneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, err
 
 		for nestedGroupId, nestedGroupName := range groupNestingData {
 			commentData := map[string]string{
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 				"Nested Group ID":       nestedGroupId,
 				"Nested Group Name":     nestedGroupName,
 				"Parent Group ID":       parentGroupId,
@@ -60,7 +60,7 @@ func (r *PingOneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, err
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", parentGroupName, nestedGroupName),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, parentGroupId, nestedGroupId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, parentGroupId, nestedGroupId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -74,7 +74,7 @@ func (r *PingOneGroupNestingResource) ExportAll() (*[]connector.ImportBlock, err
 func (r *PingOneGroupNestingResource) getGroupData() (map[string]string, error) {
 	groupData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadAllGroups(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	groups, err := pingone.GetManagementAPIObjectsFromIterator[management.Group](iter, "ReadAllGroups", "GetGroups", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (r *PingOneGroupNestingResource) getGroupData() (map[string]string, error) 
 func (r *PingOneGroupNestingResource) getGroupNestingData(parentGroupId string) (map[string]string, error) {
 	groupNestingData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadGroupNesting(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, parentGroupId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadGroupNesting(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, parentGroupId).Execute()
 	groupNestings, err := pingone.GetManagementAPIObjectsFromIterator[management.GroupMembership](iter, "ReadGroupNesting", "GetGroupMemberships", r.ResourceType())
 	if err != nil {
 		return nil, err

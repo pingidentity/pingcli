@@ -11,15 +11,15 @@ import (
 
 func TestAlertChannelExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.AlertChannel(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.AlertChannel(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_alert_channel",
 			ResourceName: "Test Alert Channel",
-			ResourceID:   fmt.Sprintf("%s/6035f516-b474-4941-945a-76514913a74d", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/6035f516-b474-4941-945a-76514913a74d", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

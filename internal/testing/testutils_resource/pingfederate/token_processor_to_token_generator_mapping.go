@@ -11,14 +11,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createTokenProcessorToTokenGeneratorMapping,
 		DeleteFunc: deleteTokenProcessorToTokenGeneratorMapping,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederateIdpTokenProcessor(t, clientInfo),
 			TestableResource_PingFederateSpTokenGenerator(t, clientInfo),
 		},
@@ -36,7 +36,7 @@ func createTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *conne
 	testTokenProcessorId := strArgs[1]
 	testTokenGeneratorId := strArgs[2]
 
-	request := clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.CreateTokenToTokenMapping(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.CreateTokenToTokenMapping(clientInfo.PingFederateContext)
 	clientStruct := client.TokenToTokenMapping{
 		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
 			"SAML_SUBJECT": {
@@ -55,10 +55,10 @@ func createTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *conne
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateTokenToTokenMapping", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -71,14 +71,14 @@ func createTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *conne
 func deleteTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.DeleteTokenToTokenMappingById(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.DeleteTokenToTokenMappingById(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteTokenToTokenMappingById", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

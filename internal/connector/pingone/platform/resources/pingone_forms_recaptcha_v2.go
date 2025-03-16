@@ -41,14 +41,14 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 	}
 
 	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 		"Resource Type":         r.ResourceType(),
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       r.ResourceType(),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
@@ -58,6 +58,6 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 }
 
 func (r *PingOneFormRecaptchaV2Resource) checkFormRecaptchaV2Data() (bool, error) {
-	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	return common.CheckSingletonResource(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
 }

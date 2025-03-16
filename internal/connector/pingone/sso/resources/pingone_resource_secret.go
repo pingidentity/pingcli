@@ -54,14 +54,14 @@ func (r *PingOneResourceSecretResource) ExportAll() (*[]connector.ImportBlock, e
 		commentData := map[string]string{
 			"Resource ID":           resourceId,
 			"Resource Name":         resourceName,
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       fmt.Sprintf("%s_secret", resourceName),
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, resourceId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, resourceId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -74,7 +74,7 @@ func (r *PingOneResourceSecretResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingOneResourceSecretResource) getResourceData() (map[string]string, error) {
 	resourceData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -96,6 +96,6 @@ func (r *PingOneResourceSecretResource) getResourceData() (map[string]string, er
 }
 
 func (r *PingOneResourceSecretResource) getResourceSecret(resourceId string) (bool, error) {
-	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceClientSecretApi.ReadResourceSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceClientSecretApi.ReadResourceSecret(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, resourceId).Execute()
 	return common.HandleClientResponse(response, err, "ReadResourceSecret", r.ResourceType())
 }

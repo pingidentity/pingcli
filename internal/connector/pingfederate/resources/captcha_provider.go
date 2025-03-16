@@ -60,7 +60,7 @@ func (r *PingFederateCaptchaProviderResource) ExportAll() (*[]connector.ImportBl
 func (r *PingFederateCaptchaProviderResource) getCaptchaProviderData() (map[string]string, error) {
 	captchaProviderData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.CaptchaProvidersAPI.GetCaptchaProviders(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.CaptchaProvidersAPI.GetCaptchaProviders(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetCaptchaProviders", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -11,7 +11,7 @@ import (
 )
 
 func Test_PingFederateSessionAuthenticationPolicy(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingfederate.TestableResource_PingFederateSessionAuthenticationPolicy(t, clientInfo)
 

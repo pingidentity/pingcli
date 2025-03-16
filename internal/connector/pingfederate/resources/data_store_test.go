@@ -9,7 +9,7 @@ import (
 )
 
 func Test_PingFederateDataStore(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	// Data store resource is already created, so no need to use a testable resource
 	resource := resources.DataStore(clientInfo)

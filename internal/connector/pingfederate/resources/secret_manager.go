@@ -60,7 +60,7 @@ func (r *PingFederateSecretManagerResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingFederateSecretManagerResource) getSecretManagerData() (map[string]string, error) {
 	secretManagerData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.SecretManagersAPI.GetSecretManagers(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.SecretManagersAPI.GetSecretManagers(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetSecretManagers", r.ResourceType())
 	if err != nil {
 		return nil, err

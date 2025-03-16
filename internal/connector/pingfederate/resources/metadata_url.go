@@ -60,7 +60,7 @@ func (r *PingFederateMetadataUrlResource) ExportAll() (*[]connector.ImportBlock,
 func (r *PingFederateMetadataUrlResource) getMetadataUrlData() (map[string]string, error) {
 	metadataUrlData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.MetadataUrlsAPI.GetMetadataUrls(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.MetadataUrlsAPI.GetMetadataUrls(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetMetadataUrls", r.ResourceType())
 	if err != nil {
 		return nil, err

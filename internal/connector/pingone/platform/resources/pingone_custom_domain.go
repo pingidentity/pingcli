@@ -45,14 +45,14 @@ func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 		commentData := map[string]string{
 			"Custom Domain ID":      domainId,
 			"Custom Domain Name":    domainName,
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       domainName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, domainId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, domainId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +65,7 @@ func (r *PingOneCustomDomainResource) ExportAll() (*[]connector.ImportBlock, err
 func (r *PingOneCustomDomainResource) getCustomDomainData() (map[string]string, error) {
 	domainData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.CustomDomainsApi.ReadAllDomains(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	customDomains, err := pingone.GetManagementAPIObjectsFromIterator[management.CustomDomain](iter, "ReadAllDomains", "GetCustomDomains", r.ResourceType())
 	if err != nil {
 		return nil, err

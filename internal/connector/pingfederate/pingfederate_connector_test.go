@@ -10,13 +10,13 @@ import (
 )
 
 func TestPingFederateTerraformPlan(t *testing.T) {
-	pingFederateClientInfo := testutils.GetPingFederateClientInfo(t)
+	pingFederateClientInfo := testutils.GetClientInfo(t)
 
 	testutils_terraform.InitPingFederateTerraform(t)
 
 	testCases := []struct {
 		name             string
-		testableResource testutils_resource.TestableResource
+		testableResource *testutils_resource.TestableResource
 		ignoredErrors    []string
 	}{
 		{

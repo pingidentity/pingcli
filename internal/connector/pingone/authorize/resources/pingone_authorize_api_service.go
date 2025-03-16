@@ -39,7 +39,7 @@ func (r *PingoneAuthorizeAPIServiceResource) ExportAll() (*[]connector.ImportBlo
 
 	for apiServerId, apiServerName := range APIServerData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"API Server ID":         apiServerId,
 			"API Server Name":       apiServerName,
 			"Resource Type":         r.ResourceType(),
@@ -48,7 +48,7 @@ func (r *PingoneAuthorizeAPIServiceResource) ExportAll() (*[]connector.ImportBlo
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       apiServerName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, apiServerId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, apiServerId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -61,7 +61,7 @@ func (r *PingoneAuthorizeAPIServiceResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingoneAuthorizeAPIServiceResource) getAPIServerData() (map[string]string, error) {
 	apiServerData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	apiServers, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServer](iter, "ReadAllAPIServers", "GetApiServers", r.ResourceType())
 	if err != nil {
 		return nil, err

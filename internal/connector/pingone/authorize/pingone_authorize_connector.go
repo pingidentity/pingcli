@@ -28,10 +28,10 @@ type PingoneAuthorizeConnector struct {
 func AuthorizeConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingoneAuthorizeConnector {
 	return &PingoneAuthorizeConnector{
 		clientInfo: connector.ClientInfo{
-			Context:             ctx,
-			PingOneApiClient:    apiClient,
-			ApiClientId:         *apiClientId,
-			ExportEnvironmentID: exportEnvironmentID,
+			PingOneContext:             ctx,
+			PingOneApiClient:           apiClient,
+			PingOneApiClientId:         *apiClientId,
+			PingOneExportEnvironmentID: exportEnvironmentID,
 		},
 	}
 }

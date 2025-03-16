@@ -10,10 +10,10 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateIdentityStoreProvisioner(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateIdentityStoreProvisioner(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
 		CreateFunc:         createIdentityStoreProvisioner,
 		DeleteFunc:         deleteIdentityStoreProvisioner,
@@ -30,7 +30,7 @@ func createIdentityStoreProvisioner(t *testing.T, clientInfo *connector.ClientIn
 	}
 	resourceType := strArgs[0]
 
-	request := clientInfo.PingFederateApiClient.IdentityStoreProvisionersAPI.CreateIdentityStoreProvisioner(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.IdentityStoreProvisionersAPI.CreateIdentityStoreProvisioner(clientInfo.PingFederateContext)
 	clientStruct := client.IdentityStoreProvisioner{
 		AttributeContract: &client.IdentityStoreProvisionerAttributeContract{
 			CoreAttributes: []client.Attribute{
@@ -58,10 +58,10 @@ func createIdentityStoreProvisioner(t *testing.T, clientInfo *connector.ClientIn
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateIdentityStoreProvisioner", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -73,14 +73,14 @@ func createIdentityStoreProvisioner(t *testing.T, clientInfo *connector.ClientIn
 func deleteIdentityStoreProvisioner(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.IdentityStoreProvisionersAPI.DeleteIdentityStoreProvisioner(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.IdentityStoreProvisionersAPI.DeleteIdentityStoreProvisioner(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteIdentityStoreProvisioner", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

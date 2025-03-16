@@ -28,10 +28,10 @@ type PingOnePlatformConnector struct {
 func PlatformConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOnePlatformConnector {
 	return &PingOnePlatformConnector{
 		clientInfo: connector.ClientInfo{
-			Context:             ctx,
-			PingOneApiClient:    apiClient,
-			ApiClientId:         *apiClientId,
-			ExportEnvironmentID: exportEnvironmentID,
+			PingOneContext:             ctx,
+			PingOneApiClient:           apiClient,
+			PingOneApiClientId:         *apiClientId,
+			PingOneExportEnvironmentID: exportEnvironmentID,
 		},
 	}
 }

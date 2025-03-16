@@ -43,7 +43,7 @@ func (r *PingOnePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, e
 
 	for passwordPolicyId, passwordPolicyName := range passwordPolicyData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Password Policy ID":    passwordPolicyId,
 			"Password Policy Name":  passwordPolicyName,
 			"Resource Type":         r.ResourceType(),
@@ -52,7 +52,7 @@ func (r *PingOnePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, e
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       passwordPolicyName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, passwordPolicyId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, passwordPolicyId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +65,7 @@ func (r *PingOnePasswordPolicyResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingOnePasswordPolicyResource) getPasswordPolicyData() (map[string]string, error) {
 	passwordPolicyData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PasswordPoliciesApi.ReadAllPasswordPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PasswordPoliciesApi.ReadAllPasswordPolicies(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	passwordPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.PasswordPolicy](iter, "ReadAllPasswordPolicies", "GetPasswordPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

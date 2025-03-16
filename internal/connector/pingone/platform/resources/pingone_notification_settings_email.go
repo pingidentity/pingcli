@@ -41,14 +41,14 @@ func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.Imp
 	}
 
 	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 		"Resource Type":         r.ResourceType(),
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       r.ResourceType(),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
@@ -58,6 +58,6 @@ func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.Imp
 }
 
 func (r *PingOneNotificationSettingsEmailResource) checkNotificationSettingsEmailData() (bool, error) {
-	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	return common.CheckSingletonResource(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
 }

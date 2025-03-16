@@ -9,7 +9,7 @@ import (
 )
 
 func Test_PingFederateConfigurationEncryptionKeysRotate(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	resource := resources.ConfigurationEncryptionKeysRotate(clientInfo)
 

@@ -10,7 +10,7 @@ import (
 )
 
 func Test_PingFederateKerberosRealm(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingfederate.TestableResource_PingFederateKerberosRealm(t, clientInfo)
 

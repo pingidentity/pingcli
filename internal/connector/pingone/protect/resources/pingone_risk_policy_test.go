@@ -11,20 +11,20 @@ import (
 
 func TestRiskPolicyExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.RiskPolicy(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.RiskPolicy(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_risk_policy",
 			ResourceName: "Default Risk Policy",
-			ResourceID:   fmt.Sprintf("%s/f277d6e2-e073-018c-1b78-8be4cd16d898", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/f277d6e2-e073-018c-1b78-8be4cd16d898", clientInfo.PingOneExportEnvironmentID),
 		},
 		{
 			ResourceType: "pingone_risk_policy",
 			ResourceName: "Test Risk Polict",
-			ResourceID:   fmt.Sprintf("%s/9964b80b-3140-4d70-9ed5-ff29baf8438f", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/9964b80b-3140-4d70-9ed5-ff29baf8438f", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

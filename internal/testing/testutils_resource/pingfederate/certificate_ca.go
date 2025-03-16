@@ -12,10 +12,10 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateCertificateCa(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateCertificateCa(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
 		CreateFunc:         createCertificateCa,
 		DeleteFunc:         deleteCertificateCa,
@@ -37,7 +37,7 @@ func createCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, strArgs
 		t.Fatalf("Failed to create test pem certificate %s: %v", resourceType, err)
 	}
 
-	request := clientInfo.PingFederateApiClient.CertificatesCaAPI.ImportTrustedCA(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.CertificatesCaAPI.ImportTrustedCA(clientInfo.PingFederateContext)
 	clientStruct := client.X509File{
 		FileData: filedata,
 		Id:       utils.Pointer("testx509fileid"),
@@ -48,10 +48,10 @@ func createCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, strArgs
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "ImportTrustedCA", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -64,14 +64,14 @@ func createCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, strArgs
 func deleteCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.CertificatesCaAPI.DeleteTrustedCA(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.CertificatesCaAPI.DeleteTrustedCA(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteTrustedCA", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

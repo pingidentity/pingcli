@@ -10,7 +10,7 @@ import (
 )
 
 func Test_PingFederateIdentityStoreProvisioner(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingfederate.TestableResource_PingFederateIdentityStoreProvisioner(t, clientInfo)
 

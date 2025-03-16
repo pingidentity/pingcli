@@ -42,13 +42,13 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 
 	commentData := map[string]string{
 		"Resource Type":         r.ResourceType(),
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       r.ResourceType(),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
@@ -58,6 +58,6 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 }
 
 func (r *PingOneEnvironmentResource) checkEnvironmentData() (bool, error) {
-	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	return common.CheckSingletonResource(response, err, "ReadOneEnvironment", r.ResourceType())
 }

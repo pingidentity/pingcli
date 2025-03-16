@@ -56,7 +56,7 @@ type TestableResource struct {
 	DeleteFunc func(*testing.T, *connector.ClientInfo, string, string)
 
 	// TestableResources required to be created before this TestableResource can be created
-	Dependencies []TestableResource
+	Dependencies []*TestableResource
 
 	// ExportableResource that this TestableResource is testing
 	ExportableResource connector.ExportableResource
@@ -66,12 +66,18 @@ func (tr *TestableResource) CreateResource(t *testing.T) ResourceCreationInfo {
 	t.Helper()
 
 	// Each TestableResource CreateFunc takes in the resource type and a variadic list of dependency IDs needed for creation
-	createdDepIds := []string{tr.ExportableResource.ResourceType()}
+	createdDepIds := []string{}
+	if tr.ExportableResource == nil {
+		// Some resources like out_of_band_auth_plugins do not implement ExportableResource
+		createdDepIds = append(createdDepIds, "<nil>")
+	} else {
+		createdDepIds = append(createdDepIds, tr.ExportableResource.ResourceType())
+	}
 
 	for _, dependency := range tr.Dependencies {
 		// Recursively create dependencies
-		resourceCreationInfo := dependency.CreateResource(t)
-		depId, ok := resourceCreationInfo[ENUM_ID]
+		dependency.CreationInfo = dependency.CreateResource(t)
+		depId, ok := dependency.CreationInfo[ENUM_ID]
 		if !ok {
 			t.Fatalf("Failed to get ID from dependency: %v", dependency)
 		}
@@ -92,7 +98,12 @@ func (tr *TestableResource) DeleteResource(t *testing.T) {
 		return
 	}
 
-	tr.DeleteFunc(t, tr.ClientInfo, tr.ExportableResource.ResourceType(), tr.CreationInfo[ENUM_ID])
+	resourceType := "<nil>"
+	if tr.ExportableResource != nil {
+		resourceType = tr.ExportableResource.ResourceType()
+	}
+
+	tr.DeleteFunc(t, tr.ClientInfo, resourceType, tr.CreationInfo[ENUM_ID])
 
 	for _, dependency := range tr.Dependencies {
 		dependency.DeleteResource(t)

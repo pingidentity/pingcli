@@ -11,7 +11,7 @@ import (
 )
 
 func Test_PingFederateOauthIdpAdapterMapping(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingfederate.TestableResource_PingFederateOauthIdpAdapterMapping(t, clientInfo)
 

@@ -11,15 +11,15 @@ import (
 
 func TestLanguageExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.Language(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.Language(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_language",
 			ResourceName: "Afar",
-			ResourceID:   fmt.Sprintf("%s/c5f97303-c5c1-459a-b8ee-3fcb183eb52a", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/c5f97303-c5c1-459a-b8ee-3fcb183eb52a", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

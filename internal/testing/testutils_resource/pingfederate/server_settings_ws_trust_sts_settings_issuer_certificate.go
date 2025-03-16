@@ -12,10 +12,10 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
 		CreateFunc:         createServerSettingsWsTrustStsSettingsIssuerCertificate,
 		DeleteFunc:         deleteServerSettingsWsTrustStsSettingsIssuerCertificate,
@@ -37,7 +37,7 @@ func createServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clien
 		t.Fatalf("Failed to create test %s: %v", resourceType, err)
 	}
 
-	request := clientInfo.PingFederateApiClient.ServerSettingsAPI.ImportCertificate(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.ServerSettingsAPI.ImportCertificate(clientInfo.PingFederateContext)
 	clientStruct := client.X509File{
 		FileData: fileData,
 		Id:       utils.Pointer("testx509fileid"),
@@ -48,10 +48,10 @@ func createServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clien
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "ImportCertificate", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -64,14 +64,14 @@ func createServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clien
 func deleteServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.ServerSettingsAPI.DeleteCertificate(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.ServerSettingsAPI.DeleteCertificate(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteCertificate", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

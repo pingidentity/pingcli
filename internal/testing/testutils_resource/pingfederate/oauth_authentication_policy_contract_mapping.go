@@ -10,14 +10,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createOauthAuthenticationPolicyContractMapping,
 		DeleteFunc: deleteOauthAuthenticationPolicyContractMapping,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederateAuthenticationPolicyContract(t, clientInfo),
 		},
 		ExportableResource: resources.OauthAuthenticationPolicyContractMapping(clientInfo),
@@ -33,7 +33,7 @@ func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 	resourceType := strArgs[0]
 	testApcId := strArgs[1]
 
-	request := clientInfo.PingFederateApiClient.OauthAuthenticationPolicyContractMappingsAPI.CreateApcMapping(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.OauthAuthenticationPolicyContractMappingsAPI.CreateApcMapping(clientInfo.PingFederateContext)
 	clientStruct := client.ApcToPersistentGrantMapping{
 		AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
 			"USER_NAME": {
@@ -58,10 +58,10 @@ func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateApcMapping", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -72,14 +72,14 @@ func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 func deleteOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.OauthAuthenticationPolicyContractMappingsAPI.DeleteApcMapping(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.OauthAuthenticationPolicyContractMappingsAPI.DeleteApcMapping(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteApcMapping", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

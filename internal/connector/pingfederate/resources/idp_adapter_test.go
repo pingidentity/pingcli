@@ -10,7 +10,7 @@ import (
 )
 
 func Test_PingFederateIdpAdapter(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingfederate.TestableResource_PingFederateIdpAdapter(t, clientInfo)
 

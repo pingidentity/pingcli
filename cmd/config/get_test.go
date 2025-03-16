@@ -77,11 +77,11 @@ func Example_getEmptyMaskedValue() {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_getMaskedValue() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.PingFederateClientCredentialsAuthClientSecretOption.ViperKey)
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.PingFederateBasicAuthPasswordOption.ViperKey)
 
 	// Output:
-	// Configuration values for profile 'default' and key 'service.pingfederate.authentication.clientCredentialsAuth.clientSecret':
-	// service.pingfederate.authentication.clientCredentialsAuth.clientSecret=********
+	// Configuration values for profile 'default' and key 'service.pingfederate.authentication.basicAuth.password':
+	// service.pingfederate.authentication.basicAuth.password=********
 }
 
 // https://pkg.go.dev/testing#hdr-Examples

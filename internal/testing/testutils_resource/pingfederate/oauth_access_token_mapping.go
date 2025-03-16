@@ -11,14 +11,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateOauthAccessTokenMapping(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateOauthAccessTokenMapping(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createOauthAccessTokenMapping,
 		DeleteFunc: deleteOauthAccessTokenMapping,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederateOauthAccessTokenManager(t, clientInfo),
 		},
 		ExportableResource: resources.OauthAccessTokenMapping(clientInfo),
@@ -34,7 +34,7 @@ func createOauthAccessTokenMapping(t *testing.T, clientInfo *connector.ClientInf
 	resourceType := strArgs[0]
 	testTokenManagerId := strArgs[1]
 
-	request := clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.CreateMapping(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.CreateMapping(clientInfo.PingFederateContext)
 	clientStruct := client.AccessTokenMapping{
 		AccessTokenManagerRef: client.ResourceLink{
 			Id: testTokenManagerId,
@@ -57,10 +57,10 @@ func createOauthAccessTokenMapping(t *testing.T, clientInfo *connector.ClientInf
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateMapping", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -72,14 +72,14 @@ func createOauthAccessTokenMapping(t *testing.T, clientInfo *connector.ClientInf
 func deleteOauthAccessTokenMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.DeleteMapping(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.OauthAccessTokenMappingsAPI.DeleteMapping(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteMapping", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

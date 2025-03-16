@@ -66,7 +66,7 @@ func (r *PingFederateClusterSettingsResource) ExportAll() (*[]connector.ImportBl
 }
 
 func (r *PingFederateClusterSettingsResource) ValidPingFederateVersion() (bool, error) {
-	versionObj, response, err := r.clientInfo.PingFederateApiClient.VersionAPI.GetVersion(r.clientInfo.Context).Execute()
+	versionObj, response, err := r.clientInfo.PingFederateApiClient.VersionAPI.GetVersion(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetVersion", r.ResourceType())
 	if err != nil {
 		return false, err

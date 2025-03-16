@@ -43,7 +43,7 @@ func (r *PingOneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error
 
 	for riskPolicySetId, riskPolicySetName := range riskPolicySetData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 			"Risk Policy ID":        riskPolicySetId,
 			"Risk Policy Name":      riskPolicySetName,
@@ -52,7 +52,7 @@ func (r *PingOneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       riskPolicySetName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, riskPolicySetId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, riskPolicySetId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +65,7 @@ func (r *PingOneRiskPolicyResource) ExportAll() (*[]connector.ImportBlock, error
 func (r *PingOneRiskPolicyResource) getRiskPolicySetData() (map[string]string, error) {
 	riskPolicySetData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.RiskAPIClient.RiskPoliciesApi.ReadRiskPolicySets(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.RiskAPIClient.RiskPoliciesApi.ReadRiskPolicySets(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	riskPolicySets, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPolicySet](iter, "ReadRiskPolicySets", "GetRiskPolicySets", r.ResourceType())
 	if err != nil {
 		return nil, err

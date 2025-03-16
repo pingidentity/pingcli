@@ -60,7 +60,7 @@ func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) ExportAll() (*[
 func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) getOauthCibaServerPolicyRequestPolicyData() (map[string]string, error) {
 	oauthCibaServerPolicyRequestPolicyData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthCibaServerPolicyAPI.GetCibaServerPolicies(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthCibaServerPolicyAPI.GetCibaServerPolicies(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetCibaServerPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

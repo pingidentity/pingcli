@@ -29,7 +29,7 @@ func PFConnector(ctx context.Context, apiClient *pingfederateGoClient.APIClient)
 	return &PingFederateConnector{
 		clientInfo: connector.ClientInfo{
 			PingFederateApiClient: apiClient,
-			Context:               ctx,
+			PingFederateContext:   ctx,
 		},
 	}
 }

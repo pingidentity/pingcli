@@ -60,7 +60,7 @@ func (r *PingFederateIdpStsRequestParametersContractResource) ExportAll() (*[]co
 func (r *PingFederateIdpStsRequestParametersContractResource) getIdpStsRequestParametersContractData() (map[string]string, error) {
 	idpStsRequestParametersContractData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpStsRequestParametersContractsAPI.GetStsRequestParamContracts(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpStsRequestParametersContractsAPI.GetStsRequestParamContracts(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetStsRequestParamContracts", r.ResourceType())
 	if err != nil {
 		return nil, err

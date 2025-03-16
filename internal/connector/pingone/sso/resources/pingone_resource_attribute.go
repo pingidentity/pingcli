@@ -52,7 +52,7 @@ func (r *PingOneResourceAttributeResource) ExportAll() (*[]connector.ImportBlock
 
 		for resourceAttributeId, resourceAttributeName := range resourceAttributeData {
 			commentData := map[string]string{
-				"Export Environment ID":           r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":           r.clientInfo.PingOneExportEnvironmentID,
 				"PingOne Resource Attribute ID":   resourceAttributeId,
 				"PingOne Resource Attribute Name": resourceAttributeName,
 				"PingOne Resource ID":             resourceId,
@@ -63,7 +63,7 @@ func (r *PingOneResourceAttributeResource) ExportAll() (*[]connector.ImportBlock
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", resourceName, resourceAttributeName),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, resourceId, resourceAttributeId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, resourceId, resourceAttributeId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -77,7 +77,7 @@ func (r *PingOneResourceAttributeResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneResourceAttributeResource) getResourceData() (map[string][]string, error) {
 	resourceData := make(map[string][]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -101,7 +101,7 @@ func (r *PingOneResourceAttributeResource) getResourceData() (map[string][]strin
 func (r *PingOneResourceAttributeResource) getResourceAttributeData(resourceId string, resourceType string) (map[string]string, error) {
 	resourceAttributeData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceAttributesApi.ReadAllResourceAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, resourceId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceAttributesApi.ReadAllResourceAttributes(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, resourceId).Execute()
 	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllResourceAttributes", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err

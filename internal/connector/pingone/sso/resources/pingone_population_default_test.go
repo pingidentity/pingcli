@@ -10,15 +10,15 @@ import (
 
 func TestPopulationDefaultExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.PopulationDefault(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.PopulationDefault(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_population_default",
 			ResourceName: "Default_population_default",
-			ResourceID:   testutils.GetEnvironmentID(),
+			ResourceID:   clientInfo.PingOneExportEnvironmentID,
 		},
 	}
 

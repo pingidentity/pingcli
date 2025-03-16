@@ -60,7 +60,7 @@ func (r *PingFederateOpenidConnectPolicyResource) ExportAll() (*[]connector.Impo
 func (r *PingFederateOpenidConnectPolicyResource) getOpenidConnectPolicyData() (map[string]string, error) {
 	openidConnectPolicyData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthOpenIdConnectAPI.GetOIDCPolicies(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthOpenIdConnectAPI.GetOIDCPolicies(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetOIDCPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

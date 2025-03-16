@@ -43,7 +43,7 @@ func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, e
 
 	for fido2PolicyId, fido2PolicyName := range fido2PolicyData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"FIDO2 Policy ID":       fido2PolicyId,
 			"FIDO2 Policy Name":     fido2PolicyName,
 			"Resource Type":         r.ResourceType(),
@@ -52,7 +52,7 @@ func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, e
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       fido2PolicyName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, fido2PolicyId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, fido2PolicyId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +65,7 @@ func (r *PingOneMFAFido2PolicyResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingOneMFAFido2PolicyResource) getFido2PolicyData() (map[string]string, error) {
 	fido2PolicyData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.MFAAPIClient.FIDO2PolicyApi.ReadFIDO2Policies(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	fido2Policies, err := pingone.GetMfaAPIObjectsFromIterator[mfa.FIDO2Policy](iter, "ReadFIDO2Policies", "GetFido2Policies", r.ResourceType())
 	if err != nil {
 		return nil, err

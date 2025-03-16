@@ -11,15 +11,15 @@ import (
 
 func TestWebhookExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.Webhook(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.Webhook(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_webhook",
 			ResourceName: "Test Webhook",
-			ResourceID:   fmt.Sprintf("%s/e50056fe-6571-46bc-aee1-e70f702c8b74", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/e50056fe-6571-46bc-aee1-e70f702c8b74", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

@@ -60,7 +60,7 @@ func (r *PingFederateSpAdapterResource) ExportAll() (*[]connector.ImportBlock, e
 func (r *PingFederateSpAdapterResource) getSpAdapterData() (map[string]string, error) {
 	spAdapterData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.SpAdaptersAPI.GetSpAdapters(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.SpAdaptersAPI.GetSpAdapters(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetSpAdapters", r.ResourceType())
 	if err != nil {
 		return nil, err

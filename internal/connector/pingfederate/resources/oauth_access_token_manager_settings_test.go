@@ -9,7 +9,7 @@ import (
 )
 
 func Test_PingFederateOauthAccessTokenManagerSettings(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	resource := resources.OauthAccessTokenManagerSettings(clientInfo)
 

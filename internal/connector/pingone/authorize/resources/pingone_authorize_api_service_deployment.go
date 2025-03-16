@@ -47,14 +47,14 @@ func (r *PingoneAuthorizeAPIServiceDeploymentResource) ExportAll() (*[]connector
 			commentData := map[string]string{
 				"API Service ID":        apiServiceId,
 				"API Service Name":      apiServiceName,
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":         r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       apiServiceName,
-				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, apiServiceId),
+				ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, apiServiceId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -68,7 +68,7 @@ func (r *PingoneAuthorizeAPIServiceDeploymentResource) ExportAll() (*[]connector
 func (r *PingoneAuthorizeAPIServiceDeploymentResource) getAPIServiceData() (map[string]string, error) {
 	apiServiceData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServersApi.ReadAllAPIServers(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	apiServices, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.APIServer](iter, "ReadAllAPIServers", "GetApiServers", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (r *PingoneAuthorizeAPIServiceDeploymentResource) getAPIServiceData() (map[
 
 func (r *PingoneAuthorizeAPIServiceDeploymentResource) getAPIServiceDeployed(apiServiceId string) (bool, error) {
 
-	apiServerDeployment, httpResponse, err := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServerDeploymentApi.ReadDeploymentStatus(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, apiServiceId).Execute()
+	apiServerDeployment, httpResponse, err := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServerDeploymentApi.ReadDeploymentStatus(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, apiServiceId).Execute()
 	ok, err := common.HandleClientResponse(httpResponse, err, "ReadDeploymentStatus", r.ResourceType())
 	if err != nil {
 		return false, err

@@ -39,7 +39,7 @@ func (r *PingoneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.Impo
 
 	for applicationRoleId, applicationRoleName := range ApplicationRoleData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Application Role ID":   applicationRoleId,
 			"Application Role Name": applicationRoleName,
 			"Resource Type":         r.ResourceType(),
@@ -48,7 +48,7 @@ func (r *PingoneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.Impo
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       applicationRoleName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, applicationRoleId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, applicationRoleId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -61,7 +61,7 @@ func (r *PingoneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.Impo
 func (r *PingoneAuthorizeApplicationRoleResource) getApplicationRoleData() (map[string]string, error) {
 	applicationRoleData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
 	if err != nil {
 		return nil, err

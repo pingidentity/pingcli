@@ -55,14 +55,14 @@ func (r *PingOneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock
 		commentData := map[string]string{
 			"Application ID":        appId,
 			"Application Name":      appName,
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       fmt.Sprintf("%s_secret", appName),
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, appId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, appId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -75,7 +75,7 @@ func (r *PingOneApplicationSecretResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneApplicationSecretResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -114,11 +114,11 @@ func (r *PingOneApplicationSecretResource) getApplicationData() (map[string]stri
 func (r *PingOneApplicationSecretResource) checkApplicationSecretData(appId string) (bool, error) {
 	// The platform enforces that worker apps cannot read their own secret
 	// Make sure we can read the secret before adding it to the import blocks
-	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, appId).Execute()
 	defer response.Body.Close()
 
 	// If the appId is the same as the worker ID, make sure the API response is a 403 and ignore the error
-	if appId == r.clientInfo.ApiClientId {
+	if appId == r.clientInfo.PingOneApiClientId {
 		if response.StatusCode == 403 {
 			return false, nil
 		} else {

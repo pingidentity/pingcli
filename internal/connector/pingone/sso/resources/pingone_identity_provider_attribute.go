@@ -49,7 +49,7 @@ func (r *PingOneIdentityProviderAttributeResource) ExportAll() (*[]connector.Imp
 
 		for idpAttributeId, idpAttributeName := range identityProviderAttributeData {
 			commentData := map[string]string{
-				"Export Environment ID":            r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":            r.clientInfo.PingOneExportEnvironmentID,
 				"Identity Provider Attribute ID":   idpAttributeId,
 				"Identity Provider Attribute Name": idpAttributeName,
 				"Identity Provider ID":             idpId,
@@ -60,7 +60,7 @@ func (r *PingOneIdentityProviderAttributeResource) ExportAll() (*[]connector.Imp
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", idpName, idpAttributeName),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, idpId, idpAttributeId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, idpId, idpAttributeId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -74,7 +74,7 @@ func (r *PingOneIdentityProviderAttributeResource) ExportAll() (*[]connector.Imp
 func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderData() (map[string]string, error) {
 	identityProviderData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	identityProviders, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityProvider](iter, "ReadAllIdentityProviders", "GetIdentityProviders", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -122,7 +122,7 @@ func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderData() (ma
 func (r *PingOneIdentityProviderAttributeResource) getIdentityProviderAttributeData(idpId string) (map[string]string, error) {
 	identityProviderAttributeData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.IdentityProviderAttributesApi.ReadAllIdentityProviderAttributes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, idpId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.IdentityProviderAttributesApi.ReadAllIdentityProviderAttributes(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, idpId).Execute()
 	attributeInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedAttributesInner](iter, "ReadAllIdentityProviderAttributes", "GetAttributes", r.ResourceType())
 	if err != nil {
 		return nil, err

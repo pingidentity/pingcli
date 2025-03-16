@@ -66,7 +66,7 @@ func (r *PingFederateCertificateCaResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingFederateCertificateCaResource) getCertificateCaData() (map[string][]string, error) {
 	certificateCaData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.CertificatesCaAPI.GetTrustedCAs(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetTrustedCAs", r.ResourceType())
 	if err != nil {
 		return nil, err

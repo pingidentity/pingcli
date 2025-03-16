@@ -60,7 +60,7 @@ func (r *PingFederateOauthClientResource) ExportAll() (*[]connector.ImportBlock,
 func (r *PingFederateOauthClientResource) getOauthClientData() (map[string]string, error) {
 	oauthClientData := make(map[string]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthClientsAPI.GetOauthClients(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.OauthClientsAPI.GetOauthClients(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetOauthClients", r.ResourceType())
 	if err != nil {
 		return nil, err

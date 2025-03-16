@@ -11,14 +11,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createIdpTokenProcessor,
 		DeleteFunc: deleteIdpTokenProcessor,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			TestableResource_PingFederatePasswordCredentialValidator(t, clientInfo),
 		},
 		ExportableResource: resources.IdpTokenProcessor(clientInfo),
@@ -34,7 +34,7 @@ func createIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo, str
 	resourceType := strArgs[0]
 	testPCVId := strArgs[1]
 
-	request := clientInfo.PingFederateApiClient.IdpTokenProcessorsAPI.CreateTokenProcessor(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.IdpTokenProcessorsAPI.CreateTokenProcessor(clientInfo.PingFederateContext)
 	clientStruct := client.TokenProcessor{
 		AttributeContract: &client.TokenProcessorAttributeContract{
 			CoreAttributes: []client.TokenProcessorAttribute{
@@ -75,10 +75,10 @@ func createIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo, str
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateTokenProcessor", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -90,14 +90,14 @@ func createIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo, str
 func deleteIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.IdpTokenProcessorsAPI.DeleteTokenProcessor(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.IdpTokenProcessorsAPI.DeleteTokenProcessor(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteTokenProcessor", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

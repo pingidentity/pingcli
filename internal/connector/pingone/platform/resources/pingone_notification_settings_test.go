@@ -10,15 +10,15 @@ import (
 
 func TestNotificationSettingsExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.NotificationSettings(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.NotificationSettings(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_notification_settings",
 			ResourceName: "pingone_notification_settings",
-			ResourceID:   testutils.GetEnvironmentID(),
+			ResourceID:   clientInfo.PingOneExportEnvironmentID,
 		},
 	}
 

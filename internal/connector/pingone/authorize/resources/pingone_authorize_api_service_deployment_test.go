@@ -11,15 +11,15 @@ import (
 
 func TestAuthorizeAPIServiceDeploymentExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.AuthorizeAPIServiceDeployment(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.AuthorizeAPIServiceDeployment(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_authorize_api_service_deployment",
 			ResourceName: "Test API Service",
-			ResourceID:   fmt.Sprintf("%s/cee5d5a9-49aa-478d-816e-ec47a2b5aede", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/cee5d5a9-49aa-478d-816e-ec47a2b5aede", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

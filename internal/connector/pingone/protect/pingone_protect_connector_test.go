@@ -10,7 +10,7 @@ import (
 )
 
 func TestProtectTerraformPlan(t *testing.T) {
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	testutils_terraform.InitPingOneTerraform(t)
 
@@ -21,12 +21,12 @@ func TestProtectTerraformPlan(t *testing.T) {
 	}{
 		{
 			name:          "RiskPolicy",
-			resource:      resources.RiskPolicy(PingOneClientInfo),
+			resource:      resources.RiskPolicy(clientInfo),
 			ignoredErrors: nil,
 		},
 		{
 			name:          "RiskPredictor",
-			resource:      resources.RiskPredictor(PingOneClientInfo),
+			resource:      resources.RiskPredictor(clientInfo),
 			ignoredErrors: nil,
 		},
 	}

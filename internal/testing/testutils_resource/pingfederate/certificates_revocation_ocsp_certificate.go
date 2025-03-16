@@ -12,10 +12,10 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederateCertificatesRevocationOcspCertificate(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederateCertificatesRevocationOcspCertificate(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
 		CreateFunc:         createCertificatesRevocationOcspCertificate,
 		DeleteFunc:         deleteCertificatesRevocationOcspCertificate,
@@ -37,7 +37,7 @@ func createCertificatesRevocationOcspCertificate(t *testing.T, clientInfo *conne
 		t.Fatalf("Failed to create test pem certificate %s: %v", resourceType, err)
 	}
 
-	request := clientInfo.PingFederateApiClient.CertificatesRevocationAPI.ImportOcspCertificate(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.CertificatesRevocationAPI.ImportOcspCertificate(clientInfo.PingFederateContext)
 	clientStruct := client.X509File{
 		FileData: filedata,
 		Id:       utils.Pointer("testx509fileid"),
@@ -48,10 +48,10 @@ func createCertificatesRevocationOcspCertificate(t *testing.T, clientInfo *conne
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "ImportOcspCertificate", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -64,14 +64,14 @@ func createCertificatesRevocationOcspCertificate(t *testing.T, clientInfo *conne
 func deleteCertificatesRevocationOcspCertificate(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.CertificatesRevocationAPI.DeleteOcspCertificateById(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.CertificatesRevocationAPI.DeleteOcspCertificateById(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteOcspCertificateById", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

@@ -66,7 +66,7 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) getServerSettingsWsTrustStsSettingsIssuerCertificateData() (map[string][]string, error) {
 	serverSettingsWsTrustStsSettingsIssuerCertificateData := make(map[string][]string)
 
-	apiObj, response, err := r.clientInfo.PingFederateApiClient.ServerSettingsAPI.GetCerts(r.clientInfo.Context).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.ServerSettingsAPI.GetCerts(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetCerts", r.ResourceType())
 	if err != nil {
 		return nil, err

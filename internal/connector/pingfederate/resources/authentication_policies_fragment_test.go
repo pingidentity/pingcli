@@ -10,7 +10,7 @@ import (
 )
 
 func Test_PingFederateAuthenticationPoliciesFragment(t *testing.T) {
-	clientInfo := testutils.GetPingFederateClientInfo(t)
+	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingfederate.TestableResource_PingFederateAuthenticationPoliciesFragment(t, clientInfo)
 

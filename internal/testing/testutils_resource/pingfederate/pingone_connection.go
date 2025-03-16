@@ -12,14 +12,14 @@ import (
 	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
 )
 
-func TestableResource_PingFederatePingoneConnection(t *testing.T, clientInfo *connector.ClientInfo) testutils_resource.TestableResource {
+func TestableResource_PingFederatePingoneConnection(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
-	return testutils_resource.TestableResource{
+	return &testutils_resource.TestableResource{
 		ClientInfo: clientInfo,
 		CreateFunc: createPingoneConnection,
 		DeleteFunc: deletePingoneConnection,
-		Dependencies: []testutils_resource.TestableResource{
+		Dependencies: []*testutils_resource.TestableResource{
 			pingone.TestableResource_PingOnePingFederateGatewayCredential(t, clientInfo),
 		},
 		ExportableResource: resources.PingoneConnection(clientInfo),
@@ -29,13 +29,13 @@ func TestableResource_PingFederatePingoneConnection(t *testing.T, clientInfo *co
 func createPingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 { //TODO
+	if len(strArgs) != 2 {
 		t.Fatalf("Unexpected number of arguments provided to createPingoneConnection(): %v", strArgs)
 	}
 	resourceType := strArgs[0]
 	credential := strArgs[1]
 
-	request := clientInfo.PingFederateApiClient.PingOneConnectionsAPI.CreatePingOneConnection(clientInfo.Context)
+	request := clientInfo.PingFederateApiClient.PingOneConnectionsAPI.CreatePingOneConnection(clientInfo.PingFederateContext)
 	clientStruct := client.PingOneConnection{
 		Credential: &credential,
 		Id:         utils.Pointer("TestPingoneConnectionId"),
@@ -47,10 +47,10 @@ func createPingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, str
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreatePingOneConnection", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to create test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
 	return testutils_resource.ResourceCreationInfo{
@@ -62,14 +62,14 @@ func createPingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, str
 func deletePingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, resourceType, id string) {
 	t.Helper()
 
-	request := clientInfo.PingFederateApiClient.PingOneConnectionsAPI.DeletePingOneConnection(clientInfo.Context, id)
+	request := clientInfo.PingFederateApiClient.PingOneConnectionsAPI.DeletePingOneConnection(clientInfo.PingFederateContext, id)
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeletePingOneConnection", resourceType)
 	if err != nil {
-		t.Errorf("Failed to delete test %s: %v", resourceType, err)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
 	}
 	if !ok {
-		t.Fatalf("Failed to delete test %s: non-ok response", resourceType)
+		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }
