@@ -123,7 +123,6 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     env:
-      PING_IDENTITY_CONFIG: ${{ secrets.PING_IDENTITY_CONFIG }}
       PINGCLI_PINGONE_WORKER_CLIENT_ID: ${{ secrets.PINGCLI_PINGONE_WORKER_CLIENT_ID }}
       PINGCLI_PINGONE_WORKER_CLIENT_SECRET: ${{ secrets.PINGCLI_PINGONE_WORKER_CLIENT_SECRET }}
       PINGCLI_PINGONE_REGION_CODE: ${{ secrets.PINGCLI_PINGONE_REGION_CODE }}
@@ -145,6 +144,9 @@ jobs:
       PINGCLI_PINGFEDERATE_TOKEN_URL: ${{ secrets.PINGCLI_PINGFEDERATE_TOKEN_URL }}
       PINGCLI_PINGFEDERATE_USERNAME: ${{ secrets.PINGCLI_PINGFEDERATE_USERNAME }}
       PINGCLI_PINGFEDERATE_PROVIDER_VERSION: ${{ vars.PINGCLI_PINGFEDERATE_PROVIDER_VERSION }}
+      PING_IDENTITY_DEVOPS_USER: ${{ secrets.PING_IDENTITY_DEVOPS_USER }}
+      PING_IDENTITY_DEVOPS_KEY: ${{ secrets.PING_IDENTITY_DEVOPS_KEY }}
+      PING_IDENTITY_ACCEPT_EULA: ${{ vars.PING_IDENTITY_ACCEPT_EULA }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
@@ -154,4 +156,4 @@ jobs:
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
-      - run: mkdir -p $HOME/.pingidentity/ && echo "$PING_IDENTITY_CONFIG" >> $HOME/.pingidentity/config && grep -E "[a-zA-Z]" $HOME/.pingidentity/config || exit 1 && make starttestcontainer && make test && make removetestcontainer
+      - run: make starttestcontainer && make test && make removetestcontainer
