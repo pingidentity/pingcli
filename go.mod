@@ -25,8 +25,6 @@ require (
 	gopkg.in/yaml.v3 v3.0.1
 )
 
-replace github.com/patrickcping/pingone-go-sdk-v2/management => github.com/patrickcping/pingone-go-sdk-v2/management v0.48.1-0.20250206155309-4a4785138884
-
 require (
 	4d63.com/gocheckcompilerdirectives v1.2.1 // indirect
 	4d63.com/gochecknoglobals v0.2.2 // indirect
