@@ -320,4 +320,72 @@ release:
   # - `replace`: replace existing notes
   #
   # Default is `keep-existing`.
-  mode: append
+  mode: "append"
+
+signs:
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "checksum"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "checksum"
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "binary"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "binary"
+  - #
+    # ID of the sign config, must be unique.
+    #
+    # Default: 'default'.
+    id: "package"
+
+    # Which artifacts to sign
+    #
+    # Valid options are:
+    # - none        no signing
+    # - all:        all artifacts
+    # - checksum:   checksum files
+    # - source:     source archive
+    # - package:    Linux packages (deb, rpm, apk, etc)
+    # - installer:  Windows MSI installers (Pro only)
+    # - diskimage:  macOS DMG disk images (Pro only)
+    # - archive:    archives from archive pipe
+    # - sbom:       any SBOMs generated for other artifacts
+    # - binary:     binaries (only when `archives.format` is 'binary', use binaries_sign otherwise)
+    #
+    # Default: 'none'.
+    artifacts: "package"
