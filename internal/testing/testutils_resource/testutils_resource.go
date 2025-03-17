@@ -85,7 +85,9 @@ func (tr *TestableResource) CreateResource(t *testing.T) ResourceCreationInfo {
 		createdDepIds = append(createdDepIds, depId)
 	}
 
-	tr.CreationInfo = tr.CreateFunc(t, tr.ClientInfo, createdDepIds...)
+	if tr.CreateFunc != nil {
+		tr.CreationInfo = tr.CreateFunc(t, tr.ClientInfo, createdDepIds...)
+	}
 
 	return tr.CreationInfo
 }
@@ -98,7 +100,6 @@ func (tr *TestableResource) DeleteResource(t *testing.T) {
 		resourceType = tr.ExportableResource.ResourceType()
 	}
 
-	// Some resources like singletons don't have a delete function
 	if tr.DeleteFunc != nil {
 		tr.DeleteFunc(t, tr.ClientInfo, resourceType, tr.CreationInfo[ENUM_ID])
 	}
