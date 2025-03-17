@@ -39,14 +39,39 @@ vet:
 		exit 1; \
 	fi
 
-test:
-	@echo "Running 'go test' to execute all pingcli tests..."
-	@if go test -count=1 ./...; then \
-		echo "'go test' - SUCCESS"; \
-	else \
-		echo "'go test' - FAILED"; \
-		exit 1; \
-	fi
+test: --test-cmd --test-internal-commands --test-internal-configuration --test-internal-connector --test-internal-customtypes --test-internal-input --test-internal-profiles
+
+--test-cmd:
+	@echo "Running tests for cmd..."
+	@go test -count=1 ./cmd/...
+
+--test-internal-commands:
+	@echo "Running tests for internal/commands..."
+	@go test -count=1 ./internal/commands/...
+
+--test-internal-configuration:
+	@echo "Running tests for internal/configuration..."
+	@go test -count=1 ./internal/configuration/...
+
+--test-internal-connector:
+	@echo "Running tests for internal/connector..."
+
+	@# Test each connector package separately to avoid configuration collision
+	@go test -count=1 ./internal/connector
+	@go test -count=1 ./internal/connector/pingfederate/...
+	@go test -count=1 ./internal/connector/pingone/...
+
+--test-internal-customtypes:
+	@echo "Running tests for internal/customtypes..."
+	@go test -count=1 ./internal/customtypes/...
+
+--test-internal-input:
+	@echo "Running tests for internal/input..."
+	@go test -count=1 ./internal/input/...
+
+--test-internal-profiles:
+	@echo "Running tests for internal/profiles..."
+	@go test -count=1 ./internal/profiles/...
 
 devchecknotest: install importfmtlint fmt vet golangcilint
 
@@ -93,7 +118,7 @@ starttestcontainer: --checkneededpfenvvars --checkdocker --dockerrunpf --waitfor
 		--env PING_IDENTITY_DEVOPS_KEY="$${PING_IDENTITY_DEVOPS_KEY}" \
 		--env PING_IDENTITY_ACCEPT_EULA="$${PING_IDENTITY_ACCEPT_EULA}" \
 		--env CREATE_INITIAL_ADMIN_USER="true" \
-		-v $$(pwd)/internal/testing/pingfederate_deploy:/opt/in/instance/server/default/deploy \
+		-v $$(pwd)/internal/testing/pingfederate_container_files/deploy:/opt/in/instance/server/default/deploy \
 		pingidentity/pingfederate:latest > /dev/null 2>&1 || { echo " FAILED"; echo "Failed to start the PingFederate container. Please check your Docker setup."; exit 1; }
 	@echo " SUCCESS"
 

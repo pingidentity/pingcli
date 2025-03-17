@@ -9,7 +9,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
-	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	client "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 func TestableResource_PingFederateCertificateCa(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
@@ -19,7 +19,7 @@ func TestableResource_PingFederateCertificateCa(t *testing.T, clientInfo *connec
 		ClientInfo:         clientInfo,
 		CreateFunc:         createCertificateCa,
 		DeleteFunc:         deleteCertificateCa,
-		Dependencies:       nil, //TODO
+		Dependencies:       nil,
 		ExportableResource: resources.CertificateCa(clientInfo),
 	}
 }
@@ -27,7 +27,7 @@ func TestableResource_PingFederateCertificateCa(t *testing.T, clientInfo *connec
 func createCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 { //TODO
+	if len(strArgs) != 1 {
 		t.Fatalf("Unexpected number of arguments provided to createCertificateCa(): %v", strArgs)
 	}
 	resourceType := strArgs[0]

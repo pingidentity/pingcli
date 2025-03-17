@@ -76,6 +76,7 @@ func configureMainViper(t *testing.T) {
 	// Give main viper instance a file location to write to
 	mainViper := profiles.GetMainConfig().ViperInstance()
 	mainViper.SetConfigFile(configFilepath)
+	mainViper.SetConfigType("yaml")
 	if err := mainViper.ReadInConfig(); err != nil {
 		t.Fatal(err)
 	}

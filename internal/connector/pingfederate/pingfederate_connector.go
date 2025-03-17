@@ -7,7 +7,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/logger"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 const (

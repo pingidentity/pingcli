@@ -8,7 +8,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone"
 	"github.com/pingidentity/pingcli/internal/utils"
-	client "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	client "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 func TestableResource_PingFederateOutOfBandAuthPlugins(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
