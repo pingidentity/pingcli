@@ -42,14 +42,21 @@ func (c *PingoneAuthorizeConnector) Export(format, outputDir string, overwriteEx
 	l.Debug().Msgf("Exporting all PingOne Authorize Resources...")
 
 	exportableResources := []connector.ExportableResource{
+		resources.ApplicationResource(&c.clientInfo),
 		resources.AuthorizeAPIService(&c.clientInfo),
 		resources.AuthorizeAPIServiceDeployment(&c.clientInfo),
 		resources.AuthorizeAPIServiceOperation(&c.clientInfo),
-		resources.ApplicationResource(&c.clientInfo),
 		resources.AuthorizeApplicationResourcePermission(&c.clientInfo),
 		resources.AuthorizeApplicationRole(&c.clientInfo),
 		resources.AuthorizeApplicationRolePermission(&c.clientInfo),
 		resources.AuthorizeDecisionEndpoint(&c.clientInfo),
+		resources.AuthorizePolicyManagementPolicy(&c.clientInfo),
+		resources.AuthorizePolicyManagementRule(&c.clientInfo),
+		resources.AuthorizePolicyManagementStatement(&c.clientInfo),
+		resources.AuthorizeTrustFrameworkAttribute(&c.clientInfo),
+		resources.AuthorizeTrustFrameworkCondition(&c.clientInfo),
+		resources.AuthorizeTrustFrameworkProcessor(&c.clientInfo),
+		resources.AuthorizeTrustFrameworkService(&c.clientInfo),
 	}
 
 	return common.WriteFiles(exportableResources, format, outputDir, overwriteExport)
