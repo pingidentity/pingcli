@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneGatewayCredentialResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneGatewayCredentialResource
-func GatewayCredential(clientInfo *connector.PingOneClientInfo) *PingOneGatewayCredentialResource {
+func GatewayCredential(clientInfo *connector.ClientInfo) *PingOneGatewayCredentialResource {
 	return &PingOneGatewayCredentialResource{
 		clientInfo: clientInfo,
 	}
@@ -49,7 +51,7 @@ func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 
 		for _, gatewayCredentialId := range gatewayCredentialData {
 			commentData := map[string]string{
-				"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 				"Gateway Credential ID": gatewayCredentialId,
 				"Gateway ID":            gatewayId,
 				"Gateway Name":          gatewayName,
@@ -59,7 +61,7 @@ func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_credential_%s", gatewayName, gatewayCredentialId),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, gatewayId, gatewayCredentialId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, gatewayId, gatewayCredentialId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -73,7 +75,7 @@ func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneGatewayCredentialResource) getGatewayData() (map[string]string, error) {
 	gatewayData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	gatewayInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -112,7 +114,7 @@ func (r *PingOneGatewayCredentialResource) getGatewayData() (map[string]string, 
 func (r *PingOneGatewayCredentialResource) getGatewayCredentialData(gatewayId string) ([]string, error) {
 	gatewayCredentialData := []string{}
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, gatewayId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, gatewayId).Execute()
 	gatewayCredentials, err := pingone.GetManagementAPIObjectsFromIterator[management.GatewayCredential](iter, "ReadAllGatewayCredentials", "GetCredentials", r.ResourceType())
 	if err != nil {
 		return nil, err

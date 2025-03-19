@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOnePopulationResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePopulationResource
-func Population(clientInfo *connector.PingOneClientInfo) *PingOnePopulationResource {
+func Population(clientInfo *connector.ClientInfo) *PingOnePopulationResource {
 	return &PingOnePopulationResource{
 		clientInfo: clientInfo,
 	}
@@ -43,7 +45,7 @@ func (r *PingOnePopulationResource) ExportAll() (*[]connector.ImportBlock, error
 
 	for populationId, populationName := range populationData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Population ID":         populationId,
 			"Population Name":       populationName,
 			"Resource Type":         r.ResourceType(),
@@ -52,7 +54,7 @@ func (r *PingOnePopulationResource) ExportAll() (*[]connector.ImportBlock, error
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       populationName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, populationId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, populationId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOnePopulationResource) ExportAll() (*[]connector.ImportBlock, error
 func (r *PingOnePopulationResource) getPopulationData() (map[string]string, error) {
 	populationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	populations, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneApplicationFlowPolicyAssignmentResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneApplicationFlowPolicyAssignmentResource
-func ApplicationFlowPolicyAssignment(clientInfo *connector.PingOneClientInfo) *PingOneApplicationFlowPolicyAssignmentResource {
+func ApplicationFlowPolicyAssignment(clientInfo *connector.ClientInfo) *PingOneApplicationFlowPolicyAssignmentResource {
 	return &PingOneApplicationFlowPolicyAssignmentResource{
 		clientInfo: clientInfo,
 	}
@@ -59,7 +61,7 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connect
 			commentData := map[string]string{
 				"Application ID":            appId,
 				"Application Name":          appName,
-				"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":     r.clientInfo.PingOneExportEnvironmentID,
 				"Flow Policy Assignment ID": flowPolicyAssignmentId,
 				"Flow Policy Name":          flowPolicyName,
 				"Resource Type":             r.ResourceType(),
@@ -68,7 +70,7 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connect
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", appName, flowPolicyName),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, flowPolicyAssignmentId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, appId, flowPolicyAssignmentId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -82,7 +84,7 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) ExportAll() (*[]connect
 func (r *PingOneApplicationFlowPolicyAssignmentResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -121,7 +123,7 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) getApplicationData() (m
 func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyAssignmentData(appId string) (map[string]string, error) {
 	flowPolicyAssignmentData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationFlowPolicyAssignmentsApi.ReadAllFlowPolicyAssignments(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationFlowPolicyAssignmentsApi.ReadAllFlowPolicyAssignments(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, appId).Execute()
 	flowPolicyAssignments, err := pingone.GetManagementAPIObjectsFromIterator[management.FlowPolicyAssignment](iter, "ReadAllFlowPolicyAssignments", "GetFlowPolicyAssignments", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -144,7 +146,7 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyAssignment
 }
 
 func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyName(flowPolicyId string) (string, bool, error) {
-	flowPolicy, response, err := r.clientInfo.ApiClient.ManagementAPIClient.FlowPoliciesApi.ReadOneFlowPolicy(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, flowPolicyId).Execute()
+	flowPolicy, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.FlowPoliciesApi.ReadOneFlowPolicy(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, flowPolicyId).Execute()
 
 	ok, err := common.HandleClientResponse(response, err, "ReadOneFlowPolicy", r.ResourceType())
 	if err != nil {

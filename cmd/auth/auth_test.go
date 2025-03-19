@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package auth_test
 
 // Test Auth Login Command Executes without issue

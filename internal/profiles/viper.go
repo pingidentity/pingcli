@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package profiles
 
 /* The main viper instance should ONLY interact with the configuration file

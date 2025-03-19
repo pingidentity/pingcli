@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneBrandingThemeResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneBrandingThemeResource
-func BrandingTheme(clientInfo *connector.PingOneClientInfo) *PingOneBrandingThemeResource {
+func BrandingTheme(clientInfo *connector.ClientInfo) *PingOneBrandingThemeResource {
 	return &PingOneBrandingThemeResource{
 		clientInfo: clientInfo,
 	}
@@ -45,14 +47,14 @@ func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, er
 		commentData := map[string]string{
 			"Branding Theme ID":     brandingThemeId,
 			"Branding Theme Name":   brandingThemeName,
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       brandingThemeName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, brandingThemeId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, brandingThemeId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOneBrandingThemeResource) ExportAll() (*[]connector.ImportBlock, er
 func (r *PingOneBrandingThemeResource) getBrandingThemeData() (map[string]string, error) {
 	brandingThemeData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	brandingThemes, err := pingone.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", r.ResourceType())
 	if err != nil {
 		return nil, err

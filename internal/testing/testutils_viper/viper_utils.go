@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package testutils_viper
 
 import (
@@ -39,12 +41,10 @@ default:
         pingfederate:
             adminapipath: %s
             authentication:
-                type: clientcredentialsauth
-                clientcredentialsauth:
-                    clientid: %s
-                    clientsecret: %s
-                    scopes: %s
-                    tokenurl: %s
+                type: basicauth
+                basicauth:
+                    username: %s
+                    password: %s
             httpshost: %s
             insecureTrustAllTLS: true
             xBypassExternalValidationHeader: true
@@ -81,6 +81,7 @@ func configureMainViper(t *testing.T) {
 	// Give main viper instance a file location to write to
 	mainViper := profiles.GetMainConfig().ViperInstance()
 	mainViper.SetConfigFile(configFilepath)
+	mainViper.SetConfigType("yaml")
 	if err := mainViper.ReadInConfig(); err != nil {
 		t.Fatal(err)
 	}
@@ -119,9 +120,7 @@ func getDefaultConfigFileContents() string {
 		os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
 		os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
 		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar),
-		os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
-		os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
-		os.Getenv(options.PingFederateClientCredentialsAuthScopesOption.EnvVar),
-		os.Getenv(options.PingFederateClientCredentialsAuthTokenURLOption.EnvVar),
+		os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
 		os.Getenv(options.PingFederateHTTPSHostOption.EnvVar))
 }

@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingoneAuthorizeDecisionEndpointResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeDecisionEndpointResource
-func AuthorizeDecisionEndpoint(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeDecisionEndpointResource {
+func AuthorizeDecisionEndpoint(clientInfo *connector.ClientInfo) *PingoneAuthorizeDecisionEndpointResource {
 	return &PingoneAuthorizeDecisionEndpointResource{
 		clientInfo: clientInfo,
 	}
@@ -39,7 +41,7 @@ func (r *PingoneAuthorizeDecisionEndpointResource) ExportAll() (*[]connector.Imp
 
 	for decisionEndpointId, decisionEndpointName := range DecisionEndpointData {
 		commentData := map[string]string{
-			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID":  r.clientInfo.PingOneExportEnvironmentID,
 			"Decision Endpoint ID":   decisionEndpointId,
 			"Decision Endpoint Name": decisionEndpointName,
 			"Resource Type":          r.ResourceType(),
@@ -48,7 +50,7 @@ func (r *PingoneAuthorizeDecisionEndpointResource) ExportAll() (*[]connector.Imp
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       decisionEndpointName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, decisionEndpointId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, decisionEndpointId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -61,7 +63,7 @@ func (r *PingoneAuthorizeDecisionEndpointResource) ExportAll() (*[]connector.Imp
 func (r *PingoneAuthorizeDecisionEndpointResource) getDecisionEndpointData() (map[string]string, error) {
 	decisionEndpointData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.PolicyDecisionManagementApi.ReadAllDecisionEndpoints(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.PolicyDecisionManagementApi.ReadAllDecisionEndpoints(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	decisionEndpoints, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.DecisionEndpoint](iter, "ReadAllDecisionEndpoints", "GetDecisionEndpoints", r.ResourceType())
 	if err != nil {
 		return nil, err

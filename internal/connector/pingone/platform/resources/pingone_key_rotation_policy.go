@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneKeyRotationPolicyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneKeyRotationPolicyResource
-func KeyRotationPolicy(clientInfo *connector.PingOneClientInfo) *PingOneKeyRotationPolicyResource {
+func KeyRotationPolicy(clientInfo *connector.ClientInfo) *PingOneKeyRotationPolicyResource {
 	return &PingOneKeyRotationPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -43,7 +45,7 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 
 	for keyRotationPolicyId, keyRotationPolicyName := range keyRotationPolicyData {
 		commentData := map[string]string{
-			"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID":    r.clientInfo.PingOneExportEnvironmentID,
 			"Key Rotation Policy ID":   keyRotationPolicyId,
 			"Key Rotation Policy Name": keyRotationPolicyName,
 			"Resource Type":            r.ResourceType(),
@@ -52,7 +54,7 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       keyRotationPolicyName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, keyRotationPolicyId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, keyRotationPolicyId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOneKeyRotationPolicyResource) ExportAll() (*[]connector.ImportBlock
 func (r *PingOneKeyRotationPolicyResource) getKeyRotationPolicyData() (map[string]string, error) {
 	keyRotationPolicyData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.KeyRotationPoliciesApi.GetKeyRotationPolicies(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	keyRotationPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.KeyRotationPolicy](iter, "GetKeyRotationPolicies", "GetKeyRotationPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err

@@ -1,9 +1,10 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
-	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -13,11 +14,11 @@ var (
 )
 
 type PingOneEnvironmentResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneEnvironmentResource
-func Environment(clientInfo *connector.PingOneClientInfo) *PingOneEnvironmentResource {
+func Environment(clientInfo *connector.ClientInfo) *PingOneEnvironmentResource {
 	return &PingOneEnvironmentResource{
 		clientInfo: clientInfo,
 	}
@@ -43,13 +44,13 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 
 	commentData := map[string]string{
 		"Resource Type":         r.ResourceType(),
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       r.ResourceType(),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
@@ -59,6 +60,6 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 }
 
 func (r *PingOneEnvironmentResource) checkEnvironmentData() (bool, error) {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	return pingone.CheckSingletonResource(response, err, "ReadOneEnvironment", r.ResourceType())
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadOneEnvironment", r.ResourceType())
 }

@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneResourceResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneResourceResource
-func Resource(clientInfo *connector.PingOneClientInfo) *PingOneResourceResource {
+func Resource(clientInfo *connector.ClientInfo) *PingOneResourceResource {
 	return &PingOneResourceResource{
 		clientInfo: clientInfo,
 	}
@@ -43,7 +45,7 @@ func (r *PingOneResourceResource) ExportAll() (*[]connector.ImportBlock, error) 
 
 	for resourceId, resourceName := range resourceData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"PingOne Resource ID":   resourceId,
 			"PingOne Resource Name": resourceName,
 			"Resource Type":         r.ResourceType(),
@@ -52,7 +54,7 @@ func (r *PingOneResourceResource) ExportAll() (*[]connector.ImportBlock, error) 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       resourceName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, resourceId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, resourceId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOneResourceResource) ExportAll() (*[]connector.ImportBlock, error) 
 func (r *PingOneResourceResource) getResourceData() (map[string]string, error) {
 	resourceData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	resourceInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err

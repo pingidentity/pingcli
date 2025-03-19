@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneBrandingThemeDefaultResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneBrandingThemeDefaultResource
-func BrandingThemeDefault(clientInfo *connector.PingOneClientInfo) *PingOneBrandingThemeDefaultResource {
+func BrandingThemeDefault(clientInfo *connector.ClientInfo) *PingOneBrandingThemeDefaultResource {
 	return &PingOneBrandingThemeDefaultResource{
 		clientInfo: clientInfo,
 	}
@@ -46,14 +48,14 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 
 	commentData := map[string]string{
 		"Default Branding Theme Name": *defaultBrandingThemeName,
-		"Export Environment ID":       r.clientInfo.ExportEnvironmentID,
+		"Export Environment ID":       r.clientInfo.PingOneExportEnvironmentID,
 		"Resource Type":               r.ResourceType(),
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       fmt.Sprintf("%s_default_theme", *defaultBrandingThemeName),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
@@ -63,7 +65,7 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 }
 
 func (r *PingOneBrandingThemeDefaultResource) getDefaultBrandingThemeName() (*string, error) {
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	brandingThemes, err := pingone.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", r.ResourceType())
 	if err != nil {
 		return nil, err

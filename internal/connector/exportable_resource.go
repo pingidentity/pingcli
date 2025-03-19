@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package connector
 
 import (
@@ -6,7 +8,7 @@ import (
 	"regexp"
 
 	pingoneGoClient "github.com/patrickcping/pingone-go-sdk-v2/pingone"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 type ImportBlock struct {
@@ -16,16 +18,13 @@ type ImportBlock struct {
 	ResourceID         string
 }
 
-type PingOneClientInfo struct {
-	ApiClient           *pingoneGoClient.Client
-	ApiClientId         *string
-	Context             context.Context
-	ExportEnvironmentID string
-}
-
-type PingFederateClientInfo struct {
-	ApiClient *pingfederateGoClient.APIClient
-	Context   context.Context
+type ClientInfo struct {
+	PingFederateApiClient      *pingfederateGoClient.APIClient
+	PingFederateContext        context.Context
+	PingOneApiClient           *pingoneGoClient.Client
+	PingOneApiClientId         string
+	PingOneContext             context.Context
+	PingOneExportEnvironmentID string
 }
 
 // A connector that allows exporting configuration

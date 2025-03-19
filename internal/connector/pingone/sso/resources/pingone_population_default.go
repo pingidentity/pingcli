@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOnePopulationDefaultResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePopulationDefaultResource
-func PopulationDefault(clientInfo *connector.PingOneClientInfo) *PingOnePopulationDefaultResource {
+func PopulationDefault(clientInfo *connector.ClientInfo) *PingOnePopulationDefaultResource {
 	return &PingOnePopulationDefaultResource{
 		clientInfo: clientInfo,
 	}
@@ -43,14 +45,14 @@ func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock
 
 	commentData := map[string]string{
 		"Default Population Name": *defaultPopulationName,
-		"Export Environment ID":   r.clientInfo.ExportEnvironmentID,
+		"Export Environment ID":   r.clientInfo.PingOneExportEnvironmentID,
 		"Resource Type":           r.ResourceType(),
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       fmt.Sprintf("%s_population_default", *defaultPopulationName),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
@@ -60,7 +62,7 @@ func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock
 }
 
 func (r *PingOnePopulationDefaultResource) getDefaultPopulationName() (*string, error) {
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	populations, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
 	if err != nil {
 		return nil, err

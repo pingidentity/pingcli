@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneWebhookResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneWebhookResource
-func Webhook(clientInfo *connector.PingOneClientInfo) *PingOneWebhookResource {
+func Webhook(clientInfo *connector.ClientInfo) *PingOneWebhookResource {
 	return &PingOneWebhookResource{
 		clientInfo: clientInfo,
 	}
@@ -43,7 +45,7 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 
 	for subscriptionId, subscriptionName := range subscriptionData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 			"Webhook ID":            subscriptionId,
 			"Webhook Name":          subscriptionName,
@@ -52,7 +54,7 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       subscriptionName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, subscriptionId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, subscriptionId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOneWebhookResource) ExportAll() (*[]connector.ImportBlock, error) {
 func (r *PingOneWebhookResource) getSubscriptionData() (map[string]string, error) {
 	subscriptionData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.ReadAllSubscriptions(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	subscriptions, err := pingone.GetManagementAPIObjectsFromIterator[management.Subscription](iter, "ReadAllSubscriptions", "GetSubscriptions", r.ResourceType())
 	if err != nil {
 		return nil, err
