@@ -93,3 +93,55 @@ func Test_ExportServices_String(t *testing.T) {
 		t.Errorf("String returned: %s, expected: %s", actual, expected)
 	}
 }
+
+// Test ExportServiceGroup Set function
+func Test_ExportServiceGroup_Set(t *testing.T) {
+	// Create a new ExportServiceGroup
+	exportServiceGroup := new(customtypes.ExportServices)
+
+	err := exportServiceGroup.SetServiceGroup(customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE)
+	if err != nil {
+		t.Errorf("Set returned error: %v", err)
+	}
+}
+
+// Test ExportServiceGroup Set function fails with invalid value
+func Test_ExportServiceGroup_Set_InvalidValue(t *testing.T) {
+	// Create a new ExportServiceGroup
+	exportServiceGroup := new(customtypes.ExportServices)
+
+	invalidValue := "invalid"
+
+	expectedErrorPattern := `^failed to set ExportServices: Invalid service group: .*\. Allowed service group\(s\): .*$`
+	err := exportServiceGroup.SetServiceGroup(invalidValue)
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test ExportServiceGroup Set function fails with nil
+func Test_ExportServiceGroup_Set_Nil(t *testing.T) {
+	var exportServiceGroup *customtypes.ExportServices
+
+	val := customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE
+
+	expectedErrorPattern := `^failed to set ExportServices group value: .* ExportServices is nil$`
+	err := exportServiceGroup.SetServiceGroup(val)
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test ExportServiceGroupValidValues
+func Test_ExportServiceGroupValidValues(t *testing.T) {
+	serviceGroupEnum := customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE
+
+	serviceGroupValidValues := customtypes.ExportServiceGroupValidValues()
+	if serviceGroupValidValues[0] != serviceGroupEnum {
+		t.Errorf("ExportServiceGroupValidValues returned: %v, expected: %v", serviceGroupValidValues, serviceGroupEnum)
+	}
+}
+
+// Test ExportServicePingOneValidValues
+func Test_ExportServicesPingOneValidValues(t *testing.T) {
+	pingOneServiceGroupValidValues := customtypes.ExportServicesPingOneValidValues()
+	if len(pingOneServiceGroupValidValues) != 5 {
+		t.Errorf("ExportServicesPingOneValidValues returned: %v, expected: %v", len(pingOneServiceGroupValidValues), 5)
+	}
+}

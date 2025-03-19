@@ -15,6 +15,7 @@ const (
 	ENUM_EXPORT_SERVICE_PINGONE_MFA       string = "pingone-mfa"
 	ENUM_EXPORT_SERVICE_PINGONE_PROTECT   string = "pingone-protect"
 	ENUM_EXPORT_SERVICE_PINGFEDERATE      string = "pingfederate"
+	ENUM_EXPORT_SERVICE_GROUP_PINGONE     string = "pingone"
 )
 
 type ExportServices []string
@@ -39,11 +40,14 @@ func (es *ExportServices) Set(services string) error {
 
 	validServices := ExportServicesValidValues()
 	serviceList := strings.Split(services, ",")
+	returnServiceList := []string{}
 
-	for i, service := range serviceList {
+	for _, service := range serviceList {
 		if !slices.ContainsFunc(validServices, func(validService string) bool {
 			if strings.EqualFold(validService, service) {
-				serviceList[i] = validService
+				if !slices.Contains(returnServiceList, validService) {
+					returnServiceList = append(returnServiceList, validService)
+				}
 				return true
 			}
 			return false
@@ -52,9 +56,37 @@ func (es *ExportServices) Set(services string) error {
 		}
 	}
 
-	slices.Sort(serviceList)
+	slices.Sort(returnServiceList)
 
-	*es = ExportServices(serviceList)
+	*es = ExportServices(returnServiceList)
+	return nil
+}
+
+func (es *ExportServices) SetServiceGroup(serviceGroup string) error {
+	if es == nil {
+		return fmt.Errorf("failed to set ExportServices group value: %s. ExportServices is nil", serviceGroup)
+	}
+
+	if serviceGroup == "" || serviceGroup == "[]" {
+		return nil
+	}
+
+	validServiceGroups := ExportServiceGroupValidValues()
+
+	if !slices.ContainsFunc(validServiceGroups, func(validServiceGroup string) bool {
+		if strings.EqualFold(validServiceGroup, serviceGroup) {
+			switch {
+			case strings.EqualFold(ENUM_EXPORT_SERVICE_GROUP_PINGONE, serviceGroup):
+				*es = append(*es, ExportServicesPingOneValidValues()...)
+			}
+			return true
+		}
+		return false
+	}) {
+		return fmt.Errorf("failed to set ExportServices: Invalid service group: %s. Allowed service group(s): %s", serviceGroup, strings.Join(validServiceGroups, ", "))
+	}
+
+	slices.Sort(*es)
 	return nil
 }
 
@@ -119,4 +151,18 @@ func ExportServicesPingOneValidValues() []string {
 	slices.Sort(pingOneServices)
 
 	return pingOneServices
+}
+
+func ExportServiceGroupValidValues() []string {
+	validServiceGroups := []string{
+		ENUM_EXPORT_SERVICE_GROUP_PINGONE,
+	}
+
+	slices.Sort(validServiceGroups)
+
+	return validServiceGroups
+}
+
+func (es *ExportServices) Merge(es2 ExportServices) error {
+	return es.Set(strings.Join(append(es.GetServices(), es2.GetServices()...), ","))
 }

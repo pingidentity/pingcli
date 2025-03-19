@@ -48,8 +48,8 @@ func initFormatOption() {
 
 func initServiceGroupOption() {
 	cobraParamName := "service-group"
-	cobraValue := new(customtypes.ExportServiceGroup)
-	defaultValue := customtypes.ExportServiceGroup("")
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
 	envVar := "PINGCLI_EXPORT_SERVICE_GROUP"
 	options.PlatformExportServiceGroupOption = options.Option{
 		CobraParamName:  cobraParamName,

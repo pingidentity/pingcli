@@ -185,15 +185,15 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			}
 		case options.ENUM_EXPORT_SERVICE_GROUP:
 			switch typedValue := vValue.(type) {
-			case *customtypes.ExportServiceGroup:
+			case *customtypes.String:
 				continue
 			case string:
-				esg := new(customtypes.ExportServiceGroup)
+				esg := new(customtypes.String)
 				if err = esg.Set(typedValue); err != nil {
 					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a export service group value: %v", pName, typedValue, key, err)
 				}
 			case []any:
-				esg := new(customtypes.ExportServiceGroup)
+				esg := new(customtypes.String)
 				for _, v := range typedValue {
 					switch innerTypedValue := v.(type) {
 					case string:

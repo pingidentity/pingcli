@@ -97,11 +97,6 @@ func initGeneralExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PlatformExportOutputDirectoryOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportOverwriteOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportPingOneEnvironmentIDOption.Flag)
-
-	cmd.MarkFlagsMutuallyExclusive(
-		options.PlatformExportServiceOption.CobraParamName,
-		options.PlatformExportServiceGroupOption.CobraParamName,
-	)
 }
 
 func initPingOneExportFlags(cmd *cobra.Command) {
