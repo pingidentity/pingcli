@@ -74,7 +74,7 @@ func TestInitPingFederateServices(t *testing.T) {
 
 	// check pf context has auth values included
 	if pingfederateContext.Value(pingfederateGoClient.ContextBasicAuth) == nil {
-		t.Errorf("initPingFederateServices() pingfederateContext.Value = %v, want non-nil", pingfederateContext.Value(pingfederateGoClient.ContextOAuth2))
+		t.Errorf("initPingFederateServices() pingfederateContext.Value = %v, want non-nil", pingfederateContext.Value(pingfederateGoClient.ContextBasicAuth))
 	}
 }
 

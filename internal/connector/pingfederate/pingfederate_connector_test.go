@@ -215,11 +215,12 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 			testableResource: pingfederate.TestableResource_PingFederateOauthAuthenticationPolicyContractMapping(t, pingFederateClientInfo),
 			ignoredErrors:    nil,
 		},
-		{
-			name:             "PingFederateOauthCibaServerPolicyRequestPolicy",
-			testableResource: pingfederate.TestableResource_PingFederateOauthCibaServerPolicyRequestPolicy(t, pingFederateClientInfo),
-			ignoredErrors:    nil,
-		},
+		// TODO: Re-enable this test after PingFederate OOB Plugin API is triaged
+		// {
+		// 	name:             "PingFederateOauthCibaServerPolicyRequestPolicy",
+		// 	testableResource: pingfederate.TestableResource_PingFederateOauthCibaServerPolicyRequestPolicy(t, pingFederateClientInfo),
+		// 	ignoredErrors:    nil,
+		// },
 		{
 			name:             "PingFederateOauthCibaServerPolicySettings",
 			testableResource: pingfederate.TestableResource_PingFederateOauthCibaServerPolicySettings(t, pingFederateClientInfo),

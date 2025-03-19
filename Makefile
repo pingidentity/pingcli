@@ -58,8 +58,14 @@ test: --test-cmd --test-internal-commands --test-internal-configuration --test-i
 
 	@# Test each connector package separately to avoid configuration collision
 	@go test -count=1 ./internal/connector
-	@go test -count=1 ./internal/connector/pingfederate/...
-	@go test -count=1 ./internal/connector/pingone/...
+
+	@# Test the resources within each connector first
+	@go test -count=1 ./internal/connector/pingfederate/resources
+	@go test -count=1 ./internal/connector/pingone/.../resources
+
+	@# Test the connectors itegration terraform plan tests
+	@go test -count=1 ./internal/connector/pingfederate
+	@go test -count=1 ./internal/connector/pingone/*/
 
 --test-internal-customtypes:
 	@echo "Running tests for internal/customtypes..."
@@ -88,7 +94,8 @@ importfmtlint:
 
 golangcilint:
 	@echo -n "Running 'golangci-lint' to check for code quality issues..."
-	@if golangci-lint run --timeout 5m ./...; then \
+	@# Clear the cache for every run, so that the linter outputs the same results as the GH Actions workflow
+	@if golangci-lint cache clear && golangci-lint run --timeout 5m ./...; then \
 		echo " SUCCESS"; \
 	else \
 		echo " FAILED"; \

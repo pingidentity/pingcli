@@ -10,6 +10,9 @@ import (
 )
 
 func Test_PingFederateOauthCibaServerPolicyRequestPolicy(t *testing.T) {
+	// TODO: Re-enable this test after PingFederate OOB Plugin API is triaged
+	t.SkipNow()
+
 	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingfederate.TestableResource_PingFederateOauthCibaServerPolicyRequestPolicy(t, clientInfo)
