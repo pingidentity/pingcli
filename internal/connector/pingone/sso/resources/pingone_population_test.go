@@ -33,11 +33,6 @@ func TestPopulationExport(t *testing.T) {
 			ResourceName: "Test Default Idp Population",
 			ResourceID:   fmt.Sprintf("%s/2814912d-4a0f-4104-a779-80c13b2a6dcd", clientInfo.PingOneExportEnvironmentID),
 		},
-		{
-			ResourceType: "pingone_population",
-			ResourceName: "Test Default Idp Population",
-			ResourceID:   fmt.Sprintf("%s/2814912d-4a0f-4104-a779-80c13b2a6dcd", clientInfo.PingOneExportEnvironmentID),
-		},
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)
