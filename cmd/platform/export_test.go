@@ -53,9 +53,9 @@ func TestPlatformExportCmd_ServiceGroupFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--service-group", "pingone")
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceGroupOption.CobraParamName, "pingone")
 	testutils.CheckExpectedError(t, err, nil)
 }
 

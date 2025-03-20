@@ -36,7 +36,7 @@ func TestPopulationExport(t *testing.T) {
 		{
 			ResourceType: "pingone_population",
 			ResourceName: "Test Default Idp Population",
-			ResourceID:   fmt.Sprintf("%s/2814912d-4a0f-4104-a779-80c13b2a6dcd", testutils.GetEnvironmentID()),
+			ResourceID:   fmt.Sprintf("%s/2814912d-4a0f-4104-a779-80c13b2a6dcd", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 
