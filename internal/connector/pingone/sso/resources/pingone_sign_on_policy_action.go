@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneSignOnPolicyActionResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneSignOnPolicyActionResource
-func SignOnPolicyAction(clientInfo *connector.PingOneClientInfo) *PingOneSignOnPolicyActionResource {
+func SignOnPolicyAction(clientInfo *connector.ClientInfo) *PingOneSignOnPolicyActionResource {
 	return &PingOneSignOnPolicyActionResource{
 		clientInfo: clientInfo,
 	}
@@ -49,7 +51,7 @@ func (r *PingOneSignOnPolicyActionResource) ExportAll() (*[]connector.ImportBloc
 
 		for actionId, actionType := range signOnPolicyActionData {
 			commentData := map[string]string{
-				"Export Environment ID":      r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":      r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":              r.ResourceType(),
 				"Sign-On Policy Action ID":   actionId,
 				"Sign-On Policy Action Type": actionType,
@@ -60,7 +62,7 @@ func (r *PingOneSignOnPolicyActionResource) ExportAll() (*[]connector.ImportBloc
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", signOnPolicyName, actionType),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, signOnPolicyId, actionId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, signOnPolicyId, actionId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -74,7 +76,7 @@ func (r *PingOneSignOnPolicyActionResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyData() (map[string]string, error) {
 	signOnPolicyData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.SignOnPoliciesApi.ReadAllSignOnPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SignOnPoliciesApi.ReadAllSignOnPolicies(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	signOnPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.SignOnPolicy](iter, "ReadAllSignOnPolicies", "GetSignOnPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -95,7 +97,7 @@ func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyData() (map[string]st
 func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyActionData(signOnPolicyId string) (map[string]string, error) {
 	signOnPolicyActionData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.SignOnPolicyActionsApi.ReadAllSignOnPolicyActions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, signOnPolicyId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.SignOnPolicyActionsApi.ReadAllSignOnPolicyActions(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, signOnPolicyId).Execute()
 	signOnPolicyActions, err := pingone.GetManagementAPIObjectsFromIterator[management.SignOnPolicyAction](iter, "ReadAllSignOnPolicyActions", "GetActions", r.ResourceType())
 	if err != nil {
 		return nil, err

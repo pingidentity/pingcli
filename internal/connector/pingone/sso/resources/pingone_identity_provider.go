@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneIdentityProviderResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneIdentityProviderResource
-func IdentityProvider(clientInfo *connector.PingOneClientInfo) *PingOneIdentityProviderResource {
+func IdentityProvider(clientInfo *connector.ClientInfo) *PingOneIdentityProviderResource {
 	return &PingOneIdentityProviderResource{
 		clientInfo: clientInfo,
 	}
@@ -43,7 +45,7 @@ func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock,
 
 	for idpId, idpName := range identityProviderData {
 		commentData := map[string]string{
-			"Export Environment ID":  r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID":  r.clientInfo.PingOneExportEnvironmentID,
 			"Identity Provider ID":   idpId,
 			"Identity Provider Name": idpName,
 			"Resource Type":          r.ResourceType(),
@@ -52,7 +54,7 @@ func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock,
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       idpName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, idpId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, idpId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOneIdentityProviderResource) ExportAll() (*[]connector.ImportBlock,
 func (r *PingOneIdentityProviderResource) getIdentityProviderData() (map[string]string, error) {
 	identityProviderData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.IdentityProvidersApi.ReadAllIdentityProviders(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	identityProviders, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityProvider](iter, "ReadAllIdentityProviders", "GetIdentityProviders", r.ResourceType())
 	if err != nil {
 		return nil, err

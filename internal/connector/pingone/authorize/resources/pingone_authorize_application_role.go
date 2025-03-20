@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingoneAuthorizeApplicationRoleResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeApplicationRoleResource
-func AuthorizeApplicationRole(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeApplicationRoleResource {
+func AuthorizeApplicationRole(clientInfo *connector.ClientInfo) *PingoneAuthorizeApplicationRoleResource {
 	return &PingoneAuthorizeApplicationRoleResource{
 		clientInfo: clientInfo,
 	}
@@ -39,7 +41,7 @@ func (r *PingoneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.Impo
 
 	for applicationRoleId, applicationRoleName := range ApplicationRoleData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Application Role ID":   applicationRoleId,
 			"Application Role Name": applicationRoleName,
 			"Resource Type":         r.ResourceType(),
@@ -48,7 +50,7 @@ func (r *PingoneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.Impo
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       applicationRoleName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, applicationRoleId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, applicationRoleId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -61,7 +63,7 @@ func (r *PingoneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.Impo
 func (r *PingoneAuthorizeApplicationRoleResource) getApplicationRoleData() (map[string]string, error) {
 	applicationRoleData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
 	if err != nil {
 		return nil, err

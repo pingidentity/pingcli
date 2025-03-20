@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneAlertChannelResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneAlertChannelResource
-func AlertChannel(clientInfo *connector.PingOneClientInfo) *PingOneAlertChannelResource {
+func AlertChannel(clientInfo *connector.ClientInfo) *PingOneAlertChannelResource {
 	return &PingOneAlertChannelResource{
 		clientInfo: clientInfo,
 	}
@@ -43,7 +45,7 @@ func (r *PingOneAlertChannelResource) ExportAll() (*[]connector.ImportBlock, err
 
 	for alertChannelId, alertChannelName := range alertChannelData {
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Alert Channel ID":      alertChannelId,
 			"Alert Channel Name":    alertChannelName,
 			"Resource Type":         r.ResourceType(),
@@ -52,7 +54,7 @@ func (r *PingOneAlertChannelResource) ExportAll() (*[]connector.ImportBlock, err
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       alertChannelName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, alertChannelId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, alertChannelId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOneAlertChannelResource) ExportAll() (*[]connector.ImportBlock, err
 func (r *PingOneAlertChannelResource) getAlertChannelData() (map[string]string, error) {
 	alertChannelData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.AlertingApi.ReadAllAlertChannels(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AlertingApi.ReadAllAlertChannels(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	alertChannels, err := pingone.GetManagementAPIObjectsFromIterator[management.AlertChannel](iter, "ReadAllAlertChannels", "GetAlertChannels", r.ResourceType())
 	if err != nil {
 		return nil, err

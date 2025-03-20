@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -26,11 +28,11 @@ var (
 )
 
 type PingOneNotificationTemplateContentResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneNotificationTemplateContentResource
-func NotificationTemplateContent(clientInfo *connector.PingOneClientInfo) *PingOneNotificationTemplateContentResource {
+func NotificationTemplateContent(clientInfo *connector.ClientInfo) *PingOneNotificationTemplateContentResource {
 	return &PingOneNotificationTemplateContentResource{
 		clientInfo: clientInfo,
 	}
@@ -75,7 +77,7 @@ func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.I
 					"Template Name":                    string(templateName),
 					"Template Content Delivery Method": templateContentDeliveryMethod,
 					"Template Content Locale":          templateContentLocale,
-					"Export Environment ID":            r.clientInfo.ExportEnvironmentID,
+					"Export Environment ID":            r.clientInfo.PingOneExportEnvironmentID,
 					"Template Content ID":              templateContentId,
 				}
 
@@ -87,7 +89,7 @@ func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.I
 				importBlock := connector.ImportBlock{
 					ResourceType:       r.ResourceType(),
 					ResourceName:       fmt.Sprintf("%s_%s_%s%s", string(templateName), templateContentDeliveryMethod, templateContentLocale, templateContentVariant),
-					ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, string(templateName), templateContentId),
+					ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, string(templateName), templateContentId),
 					CommentInformation: common.GenerateCommentInformation(commentData),
 				}
 
@@ -102,7 +104,7 @@ func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.I
 func (r *PingOneNotificationTemplateContentResource) getEnabledLocales() (map[string]bool, error) {
 	enabledLocales := make(map[string]bool)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	languageInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -126,7 +128,7 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateNames() ([]manag
 	templateNames := []management.EnumTemplateName{}
 
 	for _, templateName := range management.AllowedEnumTemplateNameEnumValues {
-		_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadOneTemplate(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, templateName).Execute()
+		_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadOneTemplate(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, templateName).Execute()
 		// When PingOne services are not enabled in an environment,
 		// the response code for the templates related to that service is
 		// 400 Bad Request - "CONSTRAINT_VIOLATION"
@@ -160,7 +162,7 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateNames() ([]manag
 func (r *PingOneNotificationTemplateContentResource) getTemplateContentData(templateName management.EnumTemplateName) ([]NotificationTemplateContentData, error) {
 	templateContentData := []NotificationTemplateContentData{}
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadAllTemplateContents(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, templateName).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.NotificationsTemplatesApi.ReadAllTemplateContents(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, templateName).Execute()
 	templateContents, err := pingone.GetManagementAPIObjectsFromIterator[management.TemplateContent](iter, "ReadAllTemplateContents", "GetContents", r.ResourceType())
 	if err != nil {
 		return nil, err

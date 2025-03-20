@@ -1,86 +1,54 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package testutils
 
 import (
+	"bytes"
 	"context"
+	"crypto/rand"
+	"crypto/rsa"
 	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/pem"
+	"fmt"
+	"math/big"
 	"net/http"
 	"os"
 	"regexp"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/patrickcping/pingone-go-sdk-v2/pingone"
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/connector"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 var (
-	envIdOnce         sync.Once
-	apiClientOnce     sync.Once
-	PingOneClientInfo *connector.PingOneClientInfo
-	environmentId     string
+	clientInfoOnce sync.Once
+	clientInfo     *connector.ClientInfo = &connector.ClientInfo{}
 )
 
-func GetEnvironmentID() string {
-	envIdOnce.Do(func() {
-		environmentId = os.Getenv(options.PlatformExportPingOneEnvironmentIDOption.EnvVar)
-	})
-
-	return environmentId
-}
-
-// Utility method to initialize a PingOne SDK client for testing
-func GetPingOneClientInfo(t *testing.T) *connector.PingOneClientInfo {
+func GetClientInfo(t *testing.T) *connector.ClientInfo {
 	t.Helper()
 
-	apiClientOnce.Do(func() {
+	// Ensure that the client info is initialized only once
+	clientInfoOnce.Do(func() {
 		configuration.InitAllOptions()
-		// Grab environment vars for initializing the API client.
-		// These are set in GitHub Actions.
-		clientID := os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar)
-		clientSecret := os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar)
-		environmentId := GetEnvironmentID()
-		regionCode := os.Getenv(options.PingOneRegionCodeOption.EnvVar)
-		sdkRegionCode := management.EnumRegionCode(regionCode)
 
-		if clientID == "" || clientSecret == "" || environmentId == "" || regionCode == "" {
-			t.Fatalf("Unable to retrieve env var value for one or more of clientID, clientSecret, environmentID, regionCode.")
-		}
-
-		apiConfig := &pingone.Config{
-			ClientID:      &clientID,
-			ClientSecret:  &clientSecret,
-			EnvironmentID: &environmentId,
-			RegionCode:    &sdkRegionCode,
-		}
-
-		// Make empty context for testing
-		ctx := context.Background()
-
-		// Initialize the API client
-		client, err := apiConfig.APIClient(ctx)
-		if err != nil {
-			t.Fatal(err.Error())
-		}
-
-		PingOneClientInfo = &connector.PingOneClientInfo{
-			Context:             ctx,
-			ApiClient:           client,
-			ApiClientId:         &clientID,
-			ExportEnvironmentID: environmentId,
-		}
+		initPingFederateClientInfo(t, clientInfo)
+		initPingOneClientInfo(t, clientInfo)
 	})
 
-	return PingOneClientInfo
+	return clientInfo
 }
 
-func GetPingFederateClientInfo(t *testing.T) *connector.PingFederateClientInfo {
+func initPingFederateClientInfo(t *testing.T, clientInfo *connector.ClientInfo) {
 	t.Helper()
-
-	configuration.InitAllOptions()
 
 	httpsHost := os.Getenv(options.PingFederateHTTPSHostOption.EnvVar)
 	adminApiPath := os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar)
@@ -104,15 +72,48 @@ func GetPingFederateClientInfo(t *testing.T) *connector.PingFederateClientInfo {
 		}}}
 	pfClientConfig.HTTPClient = httpClient
 
-	apiClient := pingfederateGoClient.NewAPIClient(pfClientConfig)
+	clientInfo.PingFederateApiClient = pingfederateGoClient.NewAPIClient(pfClientConfig)
+	clientInfo.PingFederateContext = context.WithValue(context.Background(), pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
+		UserName: pfUsername,
+		Password: pfPassword,
+	})
+}
 
-	return &connector.PingFederateClientInfo{
-		ApiClient: apiClient,
-		Context: context.WithValue(context.Background(), pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
-			UserName: pfUsername,
-			Password: pfPassword,
-		}),
+func initPingOneClientInfo(t *testing.T, clientInfo *connector.ClientInfo) {
+	t.Helper()
+
+	// Grab environment vars for initializing the API client.
+	// These are set in GitHub Actions.
+	clientID := os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar)
+	clientSecret := os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar)
+	environmentId := os.Getenv(options.PlatformExportPingOneEnvironmentIDOption.EnvVar)
+	regionCode := os.Getenv(options.PingOneRegionCodeOption.EnvVar)
+	sdkRegionCode := management.EnumRegionCode(regionCode)
+
+	if clientID == "" || clientSecret == "" || environmentId == "" || regionCode == "" {
+		t.Fatalf("Unable to retrieve env var value for one or more of clientID, clientSecret, environmentID, regionCode.")
 	}
+
+	apiConfig := &pingone.Config{
+		ClientID:      &clientID,
+		ClientSecret:  &clientSecret,
+		EnvironmentID: &environmentId,
+		RegionCode:    &sdkRegionCode,
+	}
+
+	// Make empty context for testing
+	ctx := context.Background()
+
+	// Initialize the API client
+	client, err := apiConfig.APIClient(ctx)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
+	clientInfo.PingOneApiClient = client
+	clientInfo.PingOneContext = ctx
+	clientInfo.PingOneApiClientId = clientID
+	clientInfo.PingOneExportEnvironmentID = environmentId
 }
 
 func ValidateImportBlocks(t *testing.T, resource connector.ExportableResource, expectedImportBlocks *[]connector.ImportBlock) {
@@ -215,4 +216,52 @@ func WriteStringToPipe(str string, t *testing.T) (reader *os.File) {
 	}
 
 	return reader
+}
+
+func CreateX509Certificate() (string, error) {
+	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
+	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate serial number: %v", err)
+	}
+
+	certificateCA := &x509.Certificate{
+		SerialNumber: serialNumber,
+		Subject: pkix.Name{
+			Organization:  []string{"Ping Identity Corporation"},
+			Country:       []string{"US"},
+			Province:      []string{"CO"},
+			Locality:      []string{"Denver"},
+			StreetAddress: []string{"1001 17th St"},
+			PostalCode:    []string{"80202"},
+			CommonName:    "*.pingidentity.com",
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(1, 0, 0),
+		IsCA:                  true,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		BasicConstraintsValid: true,
+	}
+
+	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate private key: %v", err)
+	}
+
+	caBytes, err := x509.CreateCertificate(rand.Reader, certificateCA, certificateCA, &caPrivKey.PublicKey, caPrivKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to create certificate: %v", err)
+	}
+
+	caPEM := new(bytes.Buffer)
+	err = pem.Encode(caPEM, &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: caBytes,
+	})
+	if err != nil {
+		return "", fmt.Errorf("failed to encode certificate: %v", err)
+	}
+
+	return caPEM.String(), nil
 }

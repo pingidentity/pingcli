@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources_test
 
 import (
@@ -10,8 +12,8 @@ import (
 
 func TestTrustedEmailAddressExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.TrustedEmailAddress(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.TrustedEmailAddress(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{}

@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneAgreementLocalizationResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneAgreementLocalizationResource
-func AgreementLocalization(clientInfo *connector.PingOneClientInfo) *PingOneAgreementLocalizationResource {
+func AgreementLocalization(clientInfo *connector.ClientInfo) *PingOneAgreementLocalizationResource {
 	return &PingOneAgreementLocalizationResource{
 		clientInfo: clientInfo,
 	}
@@ -53,14 +55,14 @@ func (r *PingOneAgreementLocalizationResource) ExportAll() (*[]connector.ImportB
 				"Agreement Name":                agreementName,
 				"Agreement Localization ID":     agreementLocalizationId,
 				"Agreement Localization Locale": agreementLocalizationLocale,
-				"Export Environment ID":         r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":         r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":                 r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", agreementName, agreementLocalizationLocale),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, agreementId, agreementLocalizationId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, agreementId, agreementLocalizationId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -74,7 +76,7 @@ func (r *PingOneAgreementLocalizationResource) ExportAll() (*[]connector.ImportB
 func (r *PingOneAgreementLocalizationResource) getAgreementData() (map[string]string, error) {
 	agreementData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	agreements, err := pingone.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -95,7 +97,7 @@ func (r *PingOneAgreementLocalizationResource) getAgreementData() (map[string]st
 func (r *PingOneAgreementLocalizationResource) getAgreementLocalizationData(agreementId string) (map[string]string, error) {
 	agreementLocalizationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, agreementId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, agreementId).Execute()
 	languageInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadAllAgreementLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err

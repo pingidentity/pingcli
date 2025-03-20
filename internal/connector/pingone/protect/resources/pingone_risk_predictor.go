@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneRiskPredictorResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneRiskPredictorResource
-func RiskPredictor(clientInfo *connector.PingOneClientInfo) *PingOneRiskPredictorResource {
+func RiskPredictor(clientInfo *connector.ClientInfo) *PingOneRiskPredictorResource {
 	return &PingOneRiskPredictorResource{
 		clientInfo: clientInfo,
 	}
@@ -46,7 +48,7 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 		riskPredictorType := riskPredictorInfo[1]
 
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 			"Risk Predictor ID":     riskPredictorId,
 			"Risk Predictor Name":   riskPredictorName,
@@ -56,7 +58,7 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       fmt.Sprintf("%s_%s", riskPredictorType, riskPredictorName),
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, riskPredictorId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, riskPredictorId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -69,7 +71,7 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 func (r *PingOneRiskPredictorResource) getRiskPredictorData() (map[string][]string, error) {
 	riskPredictorData := make(map[string][]string)
 
-	iter := r.clientInfo.ApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.RiskAPIClient.RiskAdvancedPredictorsApi.ReadAllRiskPredictors(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	riskPredictors, err := pingone.GetRiskAPIObjectsFromIterator[risk.RiskPredictor](iter, "ReadAllRiskPredictors", "GetRiskPredictors", r.ResourceType())
 	if err != nil {
 		return nil, err

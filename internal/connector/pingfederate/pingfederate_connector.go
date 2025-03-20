@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package pingfederate
 
 import (
@@ -7,7 +9,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/logger"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 const (
@@ -21,15 +23,15 @@ var (
 )
 
 type PingFederateConnector struct {
-	clientInfo connector.PingFederateClientInfo
+	clientInfo connector.ClientInfo
 }
 
 // Utility method for creating a PingFederateConnector
 func PFConnector(ctx context.Context, apiClient *pingfederateGoClient.APIClient) *PingFederateConnector {
 	return &PingFederateConnector{
-		clientInfo: connector.PingFederateClientInfo{
-			ApiClient: apiClient,
-			Context:   ctx,
+		clientInfo: connector.ClientInfo{
+			PingFederateApiClient: apiClient,
+			PingFederateContext:   ctx,
 		},
 	}
 }
@@ -49,17 +51,17 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.AuthenticationSelector(&c.clientInfo),
 		resources.CaptchaProvider(&c.clientInfo),
 		resources.CaptchaProviderSettings(&c.clientInfo),
-		resources.CertificateCA(&c.clientInfo),
-		resources.CertificatesRevocationOCSPCertificate(&c.clientInfo),
+		resources.CertificateCa(&c.clientInfo),
+		resources.CertificatesRevocationOcspCertificate(&c.clientInfo),
 		resources.CertificatesRevocationSettings(&c.clientInfo),
 		resources.ClusterSettings(&c.clientInfo),
 		resources.ConfigurationEncryptionKeysRotate(&c.clientInfo),
 		resources.DataStore(&c.clientInfo),
-		resources.DefaultURLs(&c.clientInfo),
+		resources.DefaultUrls(&c.clientInfo),
 		resources.ExtendedProperties(&c.clientInfo),
 		resources.IdentityStoreProvisioner(&c.clientInfo),
-		resources.IDPAdapter(&c.clientInfo),
-		resources.IDPSPConnection(&c.clientInfo),
+		resources.IdpAdapter(&c.clientInfo),
+		resources.IdpSpConnection(&c.clientInfo),
 		resources.IdpStsRequestParametersContract(&c.clientInfo),
 		resources.IdpTokenProcessor(&c.clientInfo),
 		resources.IdpToSpAdapterMapping(&c.clientInfo),
@@ -74,24 +76,24 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.MetadataUrl(&c.clientInfo),
 		resources.NotificationPublisher(&c.clientInfo),
 		resources.NotificationPublisherSettings(&c.clientInfo),
-		resources.OAuthAccessTokenManager(&c.clientInfo),
-		resources.OAuthAccessTokenManagerSettings(&c.clientInfo),
-		resources.OAuthAccessTokenMapping(&c.clientInfo),
-		resources.OAuthAuthenticationPolicyContractMapping(&c.clientInfo),
-		resources.OAuthCibaServerPolicyRequestPolicy(&c.clientInfo),
-		resources.OAuthCIBAServerPolicySettings(&c.clientInfo),
-		resources.OAuthClient(&c.clientInfo),
-		resources.OAuthClientRegistrationPolicy(&c.clientInfo),
-		resources.OAuthClientSettings(&c.clientInfo),
-		resources.OAuthIdpAdapterMapping(&c.clientInfo),
-		resources.OAuthIssuer(&c.clientInfo),
-		resources.OAuthServerSettings(&c.clientInfo),
-		resources.OAuthTokenExchangeGeneratorSettings(&c.clientInfo),
-		resources.OAuthTokenExchangeTokenGeneratorMapping(&c.clientInfo),
-		resources.OpenIDConnectPolicy(&c.clientInfo),
-		resources.OpenIDConnectSettings(&c.clientInfo),
+		resources.OauthAccessTokenManager(&c.clientInfo),
+		resources.OauthAccessTokenManagerSettings(&c.clientInfo),
+		resources.OauthAccessTokenMapping(&c.clientInfo),
+		resources.OauthAuthenticationPolicyContractMapping(&c.clientInfo),
+		resources.OauthCibaServerPolicyRequestPolicy(&c.clientInfo),
+		resources.OauthCibaServerPolicySettings(&c.clientInfo),
+		resources.OauthClient(&c.clientInfo),
+		resources.OauthClientRegistrationPolicy(&c.clientInfo),
+		resources.OauthClientSettings(&c.clientInfo),
+		resources.OauthIdpAdapterMapping(&c.clientInfo),
+		resources.OauthIssuer(&c.clientInfo),
+		resources.OauthServerSettings(&c.clientInfo),
+		resources.OauthTokenExchangeGeneratorSettings(&c.clientInfo),
+		resources.OauthTokenExchangeTokenGeneratorMapping(&c.clientInfo),
+		resources.OpenidConnectPolicy(&c.clientInfo),
+		resources.OpenidConnectSettings(&c.clientInfo),
 		resources.PasswordCredentialValidator(&c.clientInfo),
-		resources.PingOneConnection(&c.clientInfo),
+		resources.PingoneConnection(&c.clientInfo),
 		resources.ProtocolMetadataLifetimeSettings(&c.clientInfo),
 		resources.ProtocolMetadataSigningSettings(&c.clientInfo),
 		resources.RedirectValidation(&c.clientInfo),
@@ -108,7 +110,7 @@ func (c *PingFederateConnector) Export(format, outputDir string, overwriteExport
 		resources.SessionAuthenticationPolicy(&c.clientInfo),
 		resources.SessionSettings(&c.clientInfo),
 		resources.SpAdapter(&c.clientInfo),
-		resources.SPAuthenticationPolicyContractMapping(&c.clientInfo),
+		resources.SpAuthenticationPolicyContractMapping(&c.clientInfo),
 		resources.SpIdpConnection(&c.clientInfo),
 		resources.SpTargetUrlMappings(&c.clientInfo),
 		resources.TokenProcessorToTokenGeneratorMapping(&c.clientInfo),

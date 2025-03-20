@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneApplicationResourceGrantResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneApplicationResourceGrantResource
-func ApplicationResourceGrant(clientInfo *connector.PingOneClientInfo) *PingOneApplicationResourceGrantResource {
+func ApplicationResourceGrant(clientInfo *connector.ClientInfo) *PingOneApplicationResourceGrantResource {
 	return &PingOneApplicationResourceGrantResource{
 		clientInfo: clientInfo,
 	}
@@ -61,14 +63,14 @@ func (r *PingOneApplicationResourceGrantResource) ExportAll() (*[]connector.Impo
 				"Application Name":              appName,
 				"Application Resource Grant ID": grantId,
 				"Application Resource Name":     resourceName,
-				"Export Environment ID":         r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":         r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":                 r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", appName, resourceName),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appId, grantId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, appId, grantId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -82,7 +84,7 @@ func (r *PingOneApplicationResourceGrantResource) ExportAll() (*[]connector.Impo
 func (r *PingOneApplicationResourceGrantResource) getApplicationData() (map[string]string, error) {
 	applicationData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -121,7 +123,7 @@ func (r *PingOneApplicationResourceGrantResource) getApplicationData() (map[stri
 func (r *PingOneApplicationResourceGrantResource) getApplicationGrantData(appId string) (map[string]string, error) {
 	applicationGrantData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.ApplicationResourceGrantsApi.ReadAllApplicationGrants(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appId).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationResourceGrantsApi.ReadAllApplicationGrants(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, appId).Execute()
 	applicationGrants, err := pingone.GetManagementAPIObjectsFromIterator[management.ApplicationResourceGrant](iter, "ReadAllApplicationGrants", "GetGrants", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -144,7 +146,7 @@ func (r *PingOneApplicationResourceGrantResource) getApplicationGrantData(appId 
 }
 
 func (r *PingOneApplicationResourceGrantResource) getGrantResourceName(grantResourceId string) (string, bool, error) {
-	resource, response, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, grantResourceId).Execute()
+	resource, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, grantResourceId).Execute()
 	ok, err := common.HandleClientResponse(response, err, "ReadOneResource", r.ResourceType())
 	if err != nil {
 		return "", false, err

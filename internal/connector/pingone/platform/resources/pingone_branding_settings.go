@@ -1,9 +1,10 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
-	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -13,11 +14,11 @@ var (
 )
 
 type PingOneBrandingSettingsResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneBrandingSettingsResource
-func BrandingSettings(clientInfo *connector.PingOneClientInfo) *PingOneBrandingSettingsResource {
+func BrandingSettings(clientInfo *connector.ClientInfo) *PingOneBrandingSettingsResource {
 	return &PingOneBrandingSettingsResource{
 		clientInfo: clientInfo,
 	}
@@ -43,13 +44,13 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 
 	commentData := map[string]string{
 		"Resource Type":         r.ResourceType(),
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       r.ResourceType(),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
@@ -59,6 +60,6 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 }
 
 func (r *PingOneBrandingSettingsResource) checkBrandingSettingsData() (bool, error) {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	return pingone.CheckSingletonResource(response, err, "ReadBrandingSettings", r.ResourceType())
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadBrandingSettings", r.ResourceType())
 }

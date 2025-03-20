@@ -1,9 +1,10 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
-	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -13,11 +14,11 @@ var (
 )
 
 type PingOneFormRecaptchaV2Resource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneFormRecaptchaV2Resource
-func FormRecaptchaV2(clientInfo *connector.PingOneClientInfo) *PingOneFormRecaptchaV2Resource {
+func FormRecaptchaV2(clientInfo *connector.ClientInfo) *PingOneFormRecaptchaV2Resource {
 	return &PingOneFormRecaptchaV2Resource{
 		clientInfo: clientInfo,
 	}
@@ -42,14 +43,14 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 	}
 
 	commentData := map[string]string{
-		"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+		"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 		"Resource Type":         r.ResourceType(),
 	}
 
 	importBlock := connector.ImportBlock{
 		ResourceType:       r.ResourceType(),
 		ResourceName:       r.ResourceType(),
-		ResourceID:         r.clientInfo.ExportEnvironmentID,
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
 		CommentInformation: common.GenerateCommentInformation(commentData),
 	}
 
@@ -59,6 +60,6 @@ func (r *PingOneFormRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock, 
 }
 
 func (r *PingOneFormRecaptchaV2Resource) checkFormRecaptchaV2Data() (bool, error) {
-	_, response, err := r.clientInfo.ApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
-	return pingone.CheckSingletonResource(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
 }

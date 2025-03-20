@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -14,11 +16,11 @@ var (
 )
 
 type PingOneKeyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneKeyResource
-func Key(clientInfo *connector.PingOneClientInfo) *PingOneKeyResource {
+func Key(clientInfo *connector.ClientInfo) *PingOneKeyResource {
 	return &PingOneKeyResource{
 		clientInfo: clientInfo,
 	}
@@ -44,7 +46,7 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 		keyType := keyNameAndType[1]
 
 		commentData := map[string]string{
-			"Export Environment ID": r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Key ID":                keyId,
 			"Key Name":              keyName,
 			"Key Type":              keyType,
@@ -54,7 +56,7 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       fmt.Sprintf("%s_%s", keyName, keyType),
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, keyId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, keyId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -68,7 +70,7 @@ func (r *PingOneKeyResource) getKeyData() (map[string][]string, error) {
 	keyData := make(map[string][]string)
 
 	// TODO: Implement pagination once supported in the PingOne Go Client SDK
-	entityArray, response, err := r.clientInfo.ApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	entityArray, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 
 	ok, err := common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
 	if err != nil {

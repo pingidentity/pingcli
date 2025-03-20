@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneApplicationResourceResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneApplicationResourceResource
-func ApplicationResource(clientInfo *connector.PingOneClientInfo) *PingOneApplicationResourceResource {
+func ApplicationResource(clientInfo *connector.ClientInfo) *PingOneApplicationResourceResource {
 	return &PingOneApplicationResourceResource{
 		clientInfo: clientInfo,
 	}
@@ -53,14 +55,14 @@ func (r *PingOneApplicationResourceResource) ExportAll() (*[]connector.ImportBlo
 			"PingOne Resource Name":     applicationResourceObj.resourceName,
 			"Application Resource ID":   applicationResourceId,
 			"Application Resource Name": applicationResourceObj.applicationResourceName,
-			"Export Environment ID":     r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID":     r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":             r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       fmt.Sprintf("%s_%s", applicationResourceObj.resourceName, applicationResourceObj.applicationResourceName),
-			ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, applicationResourceObj.resourceId, applicationResourceId),
+			ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, applicationResourceObj.resourceId, applicationResourceId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -73,7 +75,7 @@ func (r *PingOneApplicationResourceResource) ExportAll() (*[]connector.ImportBlo
 func (r *PingOneApplicationResourceResource) getApplicationResourceData() (map[string]applicationResourceObj, error) {
 	applicationResourceData := make(map[string]applicationResourceObj)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationResourcesApi.ReadApplicationResources(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationResourcesApi.ReadApplicationResources(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applicationResources, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationResource](iter, "ReadApplicationResources", "GetResources", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -86,7 +88,7 @@ func (r *PingOneApplicationResourceResource) getApplicationResourceData() (map[s
 
 		if applicationResourceIdOk && applicationResourceNameOk && resourceIdOk {
 
-			resourceObj, httpResponse, err := r.clientInfo.ApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, *resourceId).Execute()
+			resourceObj, httpResponse, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, *resourceId).Execute()
 			ok, err := common.HandleClientResponse(httpResponse, err, "ReadOneResource", r.ResourceType())
 			if err != nil {
 				return nil, err

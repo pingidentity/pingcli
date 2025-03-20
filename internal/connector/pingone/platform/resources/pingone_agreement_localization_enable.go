@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -13,11 +15,11 @@ var (
 )
 
 type PingOneAgreementLocalizationEnableResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneAgreementLocalizationEnableResource
-func AgreementLocalizationEnable(clientInfo *connector.PingOneClientInfo) *PingOneAgreementLocalizationEnableResource {
+func AgreementLocalizationEnable(clientInfo *connector.ClientInfo) *PingOneAgreementLocalizationEnableResource {
 	return &PingOneAgreementLocalizationEnableResource{
 		clientInfo: clientInfo,
 	}

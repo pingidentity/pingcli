@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingoneAuthorizeApplicationRolePermissionResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeApplicationRolePermissionResource
-func AuthorizeApplicationRolePermission(clientInfo *connector.PingOneClientInfo) *PingoneAuthorizeApplicationRolePermissionResource {
+func AuthorizeApplicationRolePermission(clientInfo *connector.ClientInfo) *PingoneAuthorizeApplicationRolePermissionResource {
 	return &PingoneAuthorizeApplicationRolePermissionResource{
 		clientInfo: clientInfo,
 	}
@@ -49,14 +51,14 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) ExportAll() (*[]conn
 				"Application Role Name":           appRoleName,
 				"Application Role Permission ID":  appRolePermissionId,
 				"Application Role Permission Key": appRolePermissionKey,
-				"Export Environment ID":           r.clientInfo.ExportEnvironmentID,
+				"Export Environment ID":           r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":                   r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
 				ResourceName:       fmt.Sprintf("%s_%s", appRoleName, appRolePermissionKey),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.ExportEnvironmentID, appRoleId, appRolePermissionId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, appRoleId, appRolePermissionId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -70,7 +72,7 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) ExportAll() (*[]conn
 func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRoleData() (map[string]string, error) {
 	applicationRoleData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -91,7 +93,7 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRoleDa
 func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRolePermissionData(appRoleId string) (map[string]string, error) {
 	applicationRolePermissionData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.AuthorizeAPIClient.ApplicationRolePermissionsApi.ReadApplicationRolePermissions(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID, appRoleId).Execute()
+	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolePermissionsApi.ReadApplicationRolePermissions(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, appRoleId).Execute()
 	applicationRolePermissions, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.EntityArrayEmbeddedPermissionsInner](iter, "ReadApplicationRolePermissions", "GetPermissions", r.ResourceType())
 	if err != nil {
 		return nil, err

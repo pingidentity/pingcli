@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources_test
 
 import (
@@ -10,15 +12,15 @@ import (
 
 func TestEnvironmentExport(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.Environment(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.Environment(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_environment",
 			ResourceName: "pingone_environment",
-			ResourceID:   testutils.GetEnvironmentID(),
+			ResourceID:   clientInfo.PingOneExportEnvironmentID,
 		},
 	}
 

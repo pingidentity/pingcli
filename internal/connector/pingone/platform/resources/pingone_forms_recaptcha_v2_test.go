@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources_test
 
 import (
@@ -10,15 +12,15 @@ import (
 
 func TestFormRecaptchaV2Export(t *testing.T) {
 	// Get initialized apiClient and resource
-	PingOneClientInfo := testutils.GetPingOneClientInfo(t)
-	resource := resources.FormRecaptchaV2(PingOneClientInfo)
+	clientInfo := testutils.GetClientInfo(t)
+	resource := resources.FormRecaptchaV2(clientInfo)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_forms_recaptcha_v2",
 			ResourceName: "pingone_forms_recaptcha_v2",
-			ResourceID:   testutils.GetEnvironmentID(),
+			ResourceID:   clientInfo.PingOneExportEnvironmentID,
 		},
 	}
 

@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package platform_internal
 
 import (
@@ -14,7 +16,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 // Test RunInternalExport function
@@ -73,8 +75,8 @@ func TestInitPingFederateServices(t *testing.T) {
 	}
 
 	// check pf context has auth values included
-	if pingfederateContext.Value(pingfederateGoClient.ContextOAuth2) == nil {
-		t.Errorf("initPingFederateServices() pingfederateContext.Value = %v, want non-nil", pingfederateContext.Value(pingfederateGoClient.ContextOAuth2))
+	if pingfederateContext.Value(pingfederateGoClient.ContextBasicAuth) == nil {
+		t.Errorf("initPingFederateServices() pingfederateContext.Value = %v, want non-nil", pingfederateContext.Value(pingfederateGoClient.ContextBasicAuth))
 	}
 }
 

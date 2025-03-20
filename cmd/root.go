@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package cmd
 
 import (
@@ -183,6 +185,7 @@ func loadMainViperConfig(cfgFile string) {
 	mainViper := profiles.GetMainConfig().ViperInstance()
 	// Use config file from the flag.
 	mainViper.SetConfigFile(cfgFile)
+	mainViper.SetConfigType("yaml")
 
 	// If a config file is found, read it in.
 	if err := mainViper.ReadInConfig(); err != nil {

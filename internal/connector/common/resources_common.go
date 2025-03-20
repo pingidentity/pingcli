@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package common
 
 import (
@@ -12,6 +14,28 @@ import (
 const (
 	SINGLETON_ID_COMMENT_DATA = "This resource is a singleton, so the value of 'ID' in the import block does not matter - it is just a placeholder and required by terraform."
 )
+
+func CheckSingletonResource(response *http.Response, err error, apiFuncName, resourceType string) (bool, error) {
+	ok, err := HandleClientResponse(response, err, apiFuncName, resourceType)
+	if err != nil {
+		return false, err
+	}
+	if !ok {
+		return false, nil
+	}
+
+	if response.StatusCode == 204 {
+		output.Warn("API client 204 No Content response.", map[string]interface{}{
+			"API Function Name": apiFuncName,
+			"Resource Type":     resourceType,
+			"Response Code":     response.Status,
+			"Response Body":     response.Body,
+		})
+		return false, nil
+	}
+
+	return true, nil
+}
 
 func HandleClientResponse(response *http.Response, err error, apiFunctionName string, resourceType string) (bool, error) {
 	if err != nil {

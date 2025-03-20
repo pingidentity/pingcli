@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package platform
 
 import (
@@ -21,17 +23,17 @@ var (
 )
 
 type PingOnePlatformConnector struct {
-	clientInfo connector.PingOneClientInfo
+	clientInfo connector.ClientInfo
 }
 
 // Utility method for creating a PingOnePlatformConnector
 func PlatformConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOnePlatformConnector {
 	return &PingOnePlatformConnector{
-		clientInfo: connector.PingOneClientInfo{
-			Context:             ctx,
-			ApiClient:           apiClient,
-			ApiClientId:         apiClientId,
-			ExportEnvironmentID: exportEnvironmentID,
+		clientInfo: connector.ClientInfo{
+			PingOneContext:             ctx,
+			PingOneApiClient:           apiClient,
+			PingOneApiClientId:         *apiClientId,
+			PingOneExportEnvironmentID: exportEnvironmentID,
 		},
 	}
 }

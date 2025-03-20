@@ -1,8 +1,9 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package pingone
 
 import (
 	"fmt"
-	"net/http"
 	"reflect"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/authorize"
@@ -12,28 +13,6 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/output"
 )
-
-func CheckSingletonResource(response *http.Response, err error, apiFuncName, resourceType string) (bool, error) {
-	ok, err := common.HandleClientResponse(response, err, apiFuncName, resourceType)
-	if err != nil {
-		return false, err
-	}
-	if !ok {
-		return false, nil
-	}
-
-	if response.StatusCode == 204 {
-		output.Warn("API client 204 No Content response.", map[string]interface{}{
-			"API Function Name": apiFuncName,
-			"Resource Type":     resourceType,
-			"Response Code":     response.Status,
-			"Response Body":     response.Body,
-		})
-		return false, nil
-	}
-
-	return true, nil
-}
 
 func GetAuthorizeAPIObjectsFromIterator[T any](iter authorize.EntityArrayPagedIterator, clientFuncName, extractionFuncName, resourceType string) ([]T, error) {
 	apiObjects := []T{}

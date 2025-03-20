@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneIdentityPropagationPlanResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneIdentityPropagationPlanResource
-func IdentityPropagationPlan(clientInfo *connector.PingOneClientInfo) *PingOneIdentityPropagationPlanResource {
+func IdentityPropagationPlan(clientInfo *connector.ClientInfo) *PingOneIdentityPropagationPlanResource {
 	return &PingOneIdentityPropagationPlanResource{
 		clientInfo: clientInfo,
 	}
@@ -43,7 +45,7 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 
 	for planId, planName := range planData {
 		commentData := map[string]string{
-			"Export Environment ID":          r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID":          r.clientInfo.PingOneExportEnvironmentID,
 			"Identity Propagation Plan ID":   planId,
 			"Identity Propagation Plan Name": planName,
 			"Resource Type":                  r.ResourceType(),
@@ -52,7 +54,7 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       planName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, planId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, planId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 func (r *PingOneIdentityPropagationPlanResource) getIdentityPropagationPlanData() (map[string]string, error) {
 	identityPropagationPlanData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.IdentityPropagationPlansApi.ReadAllPlans(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	identityPropagationPlans, err := pingone.GetManagementAPIObjectsFromIterator[management.IdentityPropagationPlan](iter, "ReadAllPlans", "GetPlans", r.ResourceType())
 	if err != nil {
 		return nil, err

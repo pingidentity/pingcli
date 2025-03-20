@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package resources
 
 import (
@@ -16,11 +18,11 @@ var (
 )
 
 type PingOneNotificationPolicyResource struct {
-	clientInfo *connector.PingOneClientInfo
+	clientInfo *connector.ClientInfo
 }
 
 // Utility method for creating a PingOneNotificationPolicyResource
-func NotificationPolicy(clientInfo *connector.PingOneClientInfo) *PingOneNotificationPolicyResource {
+func NotificationPolicy(clientInfo *connector.ClientInfo) *PingOneNotificationPolicyResource {
 	return &PingOneNotificationPolicyResource{
 		clientInfo: clientInfo,
 	}
@@ -43,7 +45,7 @@ func (r *PingOneNotificationPolicyResource) ExportAll() (*[]connector.ImportBloc
 
 	for notificationPolicyId, notificationPolicyName := range notificationPolicyData {
 		commentData := map[string]string{
-			"Export Environment ID":    r.clientInfo.ExportEnvironmentID,
+			"Export Environment ID":    r.clientInfo.PingOneExportEnvironmentID,
 			"Notification Policy ID":   notificationPolicyId,
 			"Notification Policy Name": notificationPolicyName,
 			"Resource Type":            r.ResourceType(),
@@ -52,7 +54,7 @@ func (r *PingOneNotificationPolicyResource) ExportAll() (*[]connector.ImportBloc
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
 			ResourceName:       notificationPolicyName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.ExportEnvironmentID, notificationPolicyId),
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, notificationPolicyId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -65,7 +67,7 @@ func (r *PingOneNotificationPolicyResource) ExportAll() (*[]connector.ImportBloc
 func (r *PingOneNotificationPolicyResource) getNotificationPolicyData() (map[string]string, error) {
 	notificationPolicyData := make(map[string]string)
 
-	iter := r.clientInfo.ApiClient.ManagementAPIClient.NotificationsPoliciesApi.ReadAllNotificationsPolicies(r.clientInfo.Context, r.clientInfo.ExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.NotificationsPoliciesApi.ReadAllNotificationsPolicies(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	notificationPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.NotificationsPolicy](iter, "ReadAllNotificationsPolicies", "GetNotificationsPolicies", r.ResourceType())
 	if err != nil {
 		return nil, err
