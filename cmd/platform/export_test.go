@@ -62,7 +62,8 @@ func TestPlatformExportCmd_ServiceGroupFlag(t *testing.T) {
 // Test Platform Export Command --service-group with non-supported service group
 func TestPlatformExportCmd_ServiceGroupFlagInvalidServiceGroup(t *testing.T) {
 	expectedErrorPattern := `^invalid argument ".*" for "-g, --service-group" flag: unrecognized service group '.*'\. Must be one of: .*$`
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export", "--service-group", "invalid")
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportServiceGroupOption.CobraParamName, "invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 

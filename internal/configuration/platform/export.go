@@ -63,8 +63,10 @@ func initServiceGroupOption() {
 			Shorthand: "g",
 			Usage: fmt.Sprintf(
 				"Specifies the service group to export. "+
-					"\nOptions are: %s.",
+					"\nOptions are: %s."+
+					"\nExample: '%s'",
 				strings.Join(customtypes.ExportServiceGroupValidValues(), ", "),
+				string(customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE),
 			),
 			Value: cobraValue,
 		},
@@ -89,10 +91,8 @@ func initServicesOption() {
 			Shorthand: "s",
 			Usage: fmt.Sprintf(
 				"Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services. "+
-					"(default %s)"+
 					"\nOptions are: %s."+
 					"\nExample: '%s,%s,%s'",
-				strings.Join(customtypes.ExportServicesValidValues(), ", "),
 				strings.Join(customtypes.ExportServicesValidValues(), ", "),
 				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO),
 				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA),

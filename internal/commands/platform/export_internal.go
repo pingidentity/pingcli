@@ -79,7 +79,7 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	}
 
 	es2 := new(customtypes.ExportServices)
-	if err = es2.GetServicesInGroup(esg.String()); err != nil {
+	if err = es2.SetServicesByServiceGroup(esg); err != nil {
 		return err
 	}
 
