@@ -27,25 +27,11 @@ func (esg *ExportServiceGroup) Set(serviceGroup string) error {
 	}
 
 	switch {
-	case strings.EqualFold(serviceGroup, ENUM_EXPORT_SERVICE_GROUP_PINGONE):
+	case strings.EqualFold(ENUM_EXPORT_SERVICE_GROUP_PINGONE, serviceGroup):
 		*esg = ExportServiceGroup(ENUM_EXPORT_SERVICE_GROUP_PINGONE)
 	default:
 		return fmt.Errorf("unrecognized service group '%s'. Must be one of: %s", serviceGroup, strings.Join(ExportServiceGroupValidValues(), ", "))
 	}
-	return nil
-}
-
-func (es *ExportServices) SetServiceGroup(serviceGroup string) error {
-	if es == nil {
-		return fmt.Errorf("failed to set ExportServices value: %s. ExportServices is nil", serviceGroup)
-	}
-
-	switch {
-	case strings.EqualFold(ENUM_EXPORT_SERVICE_GROUP_PINGONE, serviceGroup):
-		*es = append(*es, ExportServicesPingOneValidValues()...)
-	}
-
-	slices.Sort(*es)
 	return nil
 }
 

@@ -63,6 +63,20 @@ func (es *ExportServices) Set(services string) error {
 	return nil
 }
 
+func (es *ExportServices) GetServicesInGroup(serviceGroup string) error {
+	if es == nil {
+		return fmt.Errorf("failed to set ExportServices value: %s. ExportServices is nil", serviceGroup)
+	}
+
+	switch {
+	case strings.EqualFold(ENUM_EXPORT_SERVICE_GROUP_PINGONE, serviceGroup):
+		*es = append(*es, ExportServicesPingOneValidValues()...)
+	}
+
+	slices.Sort(*es)
+	return nil
+}
+
 func (es ExportServices) ContainsPingOneService() bool {
 	if es == nil {
 		return false
