@@ -95,7 +95,7 @@ importfmtlint:
 golangcilint:
 	@echo -n "Running 'golangci-lint' to check for code quality issues..."
 	@# Clear the cache for every run, so that the linter outputs the same results as the GH Actions workflow
-	@if golangci-lint cache clear && golangci-lint run --timeout 5m ./...; then \
+	@if golangci-lint cache clean && golangci-lint run --timeout 5m ./...; then \
 		echo " SUCCESS"; \
 	else \
 		echo " FAILED"; \

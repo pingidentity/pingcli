@@ -50,6 +50,10 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if err != nil {
 		return err
 	}
+	exportServiceGroup, err := profiles.GetOptionValue(options.PlatformExportServiceGroupOption)
+	if err != nil {
+		return err
+	}
 	exportServices, err := profiles.GetOptionValue(options.PlatformExportServiceOption)
 	if err != nil {
 		return err
@@ -63,8 +67,23 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		return err
 	}
 
+	var exportableConnectors *[]connector.Exportable
 	es := new(customtypes.ExportServices)
 	if err = es.Set(exportServices); err != nil {
+		return err
+	}
+
+	esg := new(customtypes.ExportServiceGroup)
+	if err = esg.Set(exportServiceGroup); err != nil {
+		return err
+	}
+
+	es2 := new(customtypes.ExportServices)
+	if err = es2.SetServicesByServiceGroup(esg); err != nil {
+		return err
+	}
+
+	if err = es.Merge(*es2); err != nil {
 		return err
 	}
 
@@ -80,6 +99,8 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		}
 	}
 
+	exportableConnectors = getExportableConnectors(es)
+
 	overwriteExportBool, err := strconv.ParseBool(overwriteExport)
 	if err != nil {
 		return err
@@ -87,8 +108,6 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if outputDir, err = createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
 		return err
 	}
-
-	exportableConnectors := getExportableConnectors(es)
 
 	if err := exportConnectors(exportableConnectors, exportFormat, outputDir, overwriteExportBool); err != nil {
 		return err

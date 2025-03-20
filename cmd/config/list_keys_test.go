@@ -54,6 +54,7 @@ func Example_listKeysValue() {
 	// - export.outputDirectory
 	// - export.overwrite
 	// - export.pingone.environmentID
+	// - export.serviceGroup
 	// - export.services
 	// - noColor
 	// - outputFormat
