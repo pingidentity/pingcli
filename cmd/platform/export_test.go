@@ -8,7 +8,6 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
@@ -377,18 +376,4 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Platform Export command (containing an ouput Warn level message), returns WarnLogged as true
-func TestPlatformExportCmd_WarnLogged(t *testing.T) {
-	outputDir := t.TempDir()
-
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export", "--profile", "default", "--services", "pingfederate", "--output-directory", outputDir)
-	if err != nil {
-		t.Errorf("Platform Export WarnExitCode test failed: %s", err)
-	} else {
-		if output.WarnLogged() {
-			t.Errorf("Platform Export WarnExitCode test failed: WarnLogged() function did not return expected value")
-		}
-	}
 }

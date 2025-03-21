@@ -18,6 +18,7 @@ func InitRootOptions() {
 	initProfileOption()
 	initColorOption()
 	initConfigOption()
+	initDetailedExitCodeOption()
 	initOutputFormatOption()
 	initUnmaskSecretValuesOption()
 }
@@ -101,6 +102,29 @@ func initConfigOption() {
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
 		ViperKey:  "", // No viper key
+	}
+}
+
+func initDetailedExitCodeOption() {
+	cobraParamName := "detailed-exitcode"
+	cobraValue := new(customtypes.Bool)
+	defaultValue := customtypes.Bool(false)
+
+	options.RootDetailedExitCodeOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          "PINGCLI_DETAILED_EXITCODE",
+		Flag: &pflag.Flag{
+			Name:        cobraParamName,
+			Shorthand:   "D",
+			Usage:       "Enable detailed exit code output. (default false)",
+			Value:       cobraValue,
+			NoOptDefVal: "true", // Make this flag a boolean flag
+		},
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "detailedExitCode",
 	}
 }
 

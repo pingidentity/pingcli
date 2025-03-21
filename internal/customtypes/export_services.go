@@ -68,6 +68,10 @@ func (es *ExportServices) SetServicesByServiceGroup(serviceGroup *ExportServiceG
 		return fmt.Errorf("failed to set ExportServices value: %s. ExportServices is nil", serviceGroup)
 	}
 
+	if serviceGroup.String() == "" {
+		return nil
+	}
+
 	switch {
 	case strings.EqualFold(ENUM_EXPORT_SERVICE_GROUP_PINGONE, serviceGroup.String()):
 		return es.Set(strings.Join(ExportServicesPingOneValidValues(), ","))

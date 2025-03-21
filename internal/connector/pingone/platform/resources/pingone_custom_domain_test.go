@@ -20,8 +20,8 @@ func TestCustomDomainExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: "pingone_custom_domain",
-			ResourceName: "pioneerpalaceband.com",
-			ResourceID:   fmt.Sprintf("%s/5eb2548d-fdb2-45f6-85bc-7adfd856cbd9", clientInfo.PingOneExportEnvironmentID),
+			ResourceName: "mycustomdomain.com",
+			ResourceID:   fmt.Sprintf("%s/2f478666-ce6d-48b8-aef8-043ad3093109", clientInfo.PingOneExportEnvironmentID),
 		},
 	}
 

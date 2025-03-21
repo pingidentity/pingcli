@@ -398,7 +398,7 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 	l.Debug().Msgf("Validating export output directory '%s'", outputDir)
 	_, err = os.Stat(outputDir)
 	if err != nil {
-		output.Warn(fmt.Sprintf("Output directory does not exist. Creating the directory at filepath '%s'", outputDir), nil)
+		output.Message(fmt.Sprintf("Output directory does not exist. Creating the directory at filepath '%s'", outputDir), nil)
 
 		err = os.MkdirAll(outputDir, os.ModePerm)
 		if err != nil {
@@ -440,7 +440,7 @@ func getPingOneExportEnvID() (err error) {
 			return fmt.Errorf("failed to determine pingone export environment ID")
 		}
 
-		output.Warn("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
+		output.Message("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
 	}
 
 	return nil
