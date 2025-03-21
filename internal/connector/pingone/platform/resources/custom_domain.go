@@ -76,7 +76,7 @@ func (r *PingOneCustomDomainResource) getCustomDomainData() (map[string]string, 
 
 	for _, customDomain := range apiObjs {
 		customDomainId, customDomainIdOk := customDomain.GetIdOk()
-		customDomainName, customDomainNameOk := customDomain.GetNameOk()
+		customDomainName, customDomainNameOk := customDomain.GetDomainNameOk()
 
 		if customDomainIdOk && customDomainNameOk {
 			customDomainData[*customDomainId] = *customDomainName

@@ -29,5 +29,6 @@ func Test_BrandingTheme(t *testing.T) {
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
+	// There are pre-configured branding themes in the environment, so only validate the import blocks as a subset.
+	testutils.ValidateImportBlockSubset(t, tr.ExportableResource, &expectedImportBlocks)
 }

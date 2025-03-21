@@ -48,6 +48,7 @@ func createAgreementLocalizationRevision(t *testing.T, clientInfo *connector.Cli
 		}(),
 		RequireReconsent: false,
 		Text:             "Test, test, test",
+		ContentType:      "text/plain",
 	}
 
 	request = request.AgreementLanguageRevision(clientStruct)

@@ -35,44 +35,20 @@ func createForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.FormManagementApi.CreateForm(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
 	clientStruct := management.Form{
-		Name:        "CustomFormName",
-		Description: utils.Pointer("Test Description - created via CREATE Custom Form request"),
-		Category:    "CUSTOM",
-		Components: management.FormComponents{
-			Fields: []management.FormField{
-				{
-					FormFieldText: &management.FormFieldText{
-						Position: management.FormFieldCommonPosition{Row: 0, Col: 0},
-						Key:      "field",
-						Label:    "[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"},{\"type\":\"i18n\",\"key\":\"fields.user.email.label\",\"defaultTranslation\":\"Email Address\",\"inline\":true,\"children\":[{\"text\":\"\"}]},{\"text\":\"\"}]}]",
-						Required: utils.Pointer(true),
-						Validation: management.FormElementValidation{
-							Type:         utils.Pointer(management.ENUMFORMELEMENTVALIDATIONTYPE_NONE),
-							Regex:        utils.Pointer(""),
-							ErrorMessage: utils.Pointer(""),
-						},
-						AttributeDisabled: utils.Pointer(false),
-					},
-				},
-				{
-					FormFieldSubmitButton: &management.FormFieldSubmitButton{
-						Position: management.FormFieldCommonPosition{Row: 1, Col: 0},
-						Label:    "[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"},{\"type\":\"i18n\",\"key\":\"button.text\",\"defaultTranslation\":\"Submit\",\"inline\":true,\"children\":[{\"text\":\"\"}]},{\"text\":\"\"}]}]",
-					},
-				},
-			},
-		},
+		Name:              "TestFormName",
+		Description:       utils.Pointer("TestFormDescription"),
+		Category:          management.ENUMFORMCATEGORY_CUSTOM,
 		Cols:              utils.Pointer(int32(4)),
 		MarkOptional:      true,
 		MarkRequired:      false,
 		TranslationMethod: utils.Pointer(management.ENUMFORMTRANSLATIONMETHOD_TRANSLATE),
 		FieldTypes: []management.EnumFormFieldType{
-			management.ENUMFORMFIELDTYPE_SUBMIT_BUTTON,
+			management.ENUMFORMFIELDTYPE_ERROR_DISPLAY,
 			management.ENUMFORMFIELDTYPE_TEXT,
+			management.ENUMFORMFIELDTYPE_SUBMIT_BUTTON,
 		},
 		LanguageBundle: &map[string]string{
-			"fields.user.email.label": "Email Address",
-			"button.text":             "Submit",
+			"button.text": "Submit",
 		},
 	}
 

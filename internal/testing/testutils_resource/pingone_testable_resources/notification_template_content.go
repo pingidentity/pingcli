@@ -4,7 +4,6 @@
 package pingone_testable_resources
 
 import (
-	"strconv"
 	"testing"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
@@ -61,9 +60,9 @@ func createNotificationTemplateContent(t *testing.T, clientInfo *connector.Clien
 		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:                       *resource.TemplateContentSMS.Id,
 			testutils_resource.ENUM_NAME:                     string(management.ENUMTEMPLATENAME_STRONG_AUTHENTICATION),
+			testutils_resource.ENUM_LOCALE:                   resource.TemplateContentSMS.Locale,
 			testutils_resource.ENUM_TEMPLATE_VARIANT:         *resource.TemplateContentSMS.Variant,
 			testutils_resource.ENUM_TEMPLATE_DELIVERY_METHOD: string(resource.TemplateContentSMS.DeliveryMethod),
-			testutils_resource.ENUM_TEMPLATE_DEFAULT:         strconv.FormatBool(*resource.TemplateContentSMS.Default),
 		},
 	}
 }

@@ -76,10 +76,14 @@ func (r *PingOneBrandingThemeResource) getBrandingThemeData() (map[string]string
 
 	for _, brandingTheme := range apiObjs {
 		brandingThemeId, brandingThemeIdOk := brandingTheme.GetIdOk()
-		brandingThemeName, brandingThemeNameOk := brandingTheme.GetNameOk()
+		brandingThemeConfiguration, brandingThemeConfigurationOk := brandingTheme.GetConfigurationOk()
 
-		if brandingThemeIdOk && brandingThemeNameOk {
-			brandingThemeData[*brandingThemeId] = *brandingThemeName
+		if brandingThemeIdOk && brandingThemeConfigurationOk {
+			brandingThemeName, brandingThemeNameOk := brandingThemeConfiguration.GetNameOk()
+
+			if brandingThemeNameOk {
+				brandingThemeData[*brandingThemeId] = *brandingThemeName
+			}
 		}
 	}
 

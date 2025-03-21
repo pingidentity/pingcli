@@ -29,7 +29,6 @@ const (
 	// Template Info for Template resources
 	ENUM_TEMPLATE_VARIANT         ResourceCreationInfoType = "ENUM_TEMPLATE_VARIANT"
 	ENUM_TEMPLATE_DELIVERY_METHOD ResourceCreationInfoType = "ENUM_TEMPLATE_DELIVERY_METHOD"
-	ENUM_TEMPLATE_DEFAULT         ResourceCreationInfoType = "ENUM_TEMPLATE_DEFAULT"
 
 	// Miscellaneous Info for resources that don't fit the above
 	ENUM_TYPE          ResourceCreationInfoType = "ENUM_TYPE"
@@ -93,6 +92,9 @@ func (tr *TestableResource) CreateResource(t *testing.T) ResourceCreationInfo {
 			t.Fatalf("Failed to get ID from dependency: %v", dependency)
 		}
 
+		if len(dependency.CreationInfo.DepIds) > 0 {
+			createdDepIds = append(createdDepIds, dependency.CreationInfo.DepIds...)
+		}
 		createdDepIds = append(createdDepIds, depId)
 	}
 

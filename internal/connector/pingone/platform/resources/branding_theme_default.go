@@ -4,8 +4,10 @@
 package resources
 
 import (
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -61,6 +63,18 @@ func (r *PingOneBrandingThemeDefaultResource) ExportAll() (*[]connector.ImportBl
 }
 
 func (r *PingOneBrandingThemeDefaultResource) checkBrandingThemeDefaultData() (bool, error) {
-	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemeDefault(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
-	return common.CheckSingletonResource(response, err, "ReadBrandingThemeDefault", r.ResourceType())
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemes(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	brandingThemes, err := pingone.GetManagementAPIObjectsFromIterator[management.BrandingTheme](iter, "ReadBrandingThemes", "GetThemes", r.ResourceType())
+	if err != nil {
+		return false, err
+	}
+
+	for _, brandingTheme := range brandingThemes {
+		if brandingTheme.Default {
+			_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemeDefault(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, *brandingTheme.Id).Execute()
+			return common.CheckSingletonResource(response, err, "ReadBrandingThemeDefault", r.ResourceType())
+		}
+	}
+
+	return false, nil
 }

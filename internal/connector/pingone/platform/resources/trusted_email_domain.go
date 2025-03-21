@@ -76,7 +76,7 @@ func (r *PingOneTrustedEmailDomainResource) getTrustedEmailDomainData() (map[str
 
 	for _, trustedEmailDomain := range apiObjs {
 		trustedEmailDomainId, trustedEmailDomainIdOk := trustedEmailDomain.GetIdOk()
-		trustedEmailDomainName, trustedEmailDomainNameOk := trustedEmailDomain.GetNameOk()
+		trustedEmailDomainName, trustedEmailDomainNameOk := trustedEmailDomain.GetDomainNameOk()
 
 		if trustedEmailDomainIdOk && trustedEmailDomainNameOk {
 			trustedEmailDomainData[*trustedEmailDomainId] = *trustedEmailDomainName

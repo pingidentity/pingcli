@@ -24,10 +24,11 @@ func Test_NotificationTemplateContent(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo.SelfInfo[testutils_resource.ENUM_NAME],
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: fmt.Sprintf("%s_%s_%s_%s_%s", creationInfo.SelfInfo[testutils_resource.ENUM_NAME], creationInfo.SelfInfo[testutils_resource.ENUM_TEMPLATE_DELIVERY_METHOD], creationInfo.SelfInfo[testutils_resource.ENUM_LOCALE], creationInfo.SelfInfo[testutils_resource.ENUM_TEMPLATE_VARIANT], creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceID:   fmt.Sprintf("%s/%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_NAME], creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
+	// There are pre-configured notification template contents in the environment, so only validate the import blocks as a subset.
+	testutils.ValidateImportBlockSubset(t, tr.ExportableResource, &expectedImportBlocks)
 }

@@ -64,6 +64,7 @@ func createKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Id,
 			testutils_resource.ENUM_NAME: resource.Name,
+			testutils_resource.ENUM_TYPE: string(resource.UsageType),
 		},
 	}
 }

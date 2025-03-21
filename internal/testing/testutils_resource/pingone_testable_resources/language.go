@@ -13,23 +13,23 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 )
 
-func Langauge(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
+func Language(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
 	t.Helper()
 
 	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
-		CreateFunc:         createLangauge,
-		DeleteFunc:         deleteLangauge,
+		CreateFunc:         createLanguage,
+		DeleteFunc:         deleteLanguage,
 		Dependencies:       nil,
-		ExportableResource: resources.Langauge(clientInfo),
+		ExportableResource: resources.Language(clientInfo),
 	}
 }
 
-func createLangauge(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createLanguage(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createLangauge(): %v", strArgs)
+		t.Fatalf("Unexpected number of arguments provided to createLanguage(): %v", strArgs)
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.LanguagesApi.CreateLanguage(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
@@ -48,6 +48,24 @@ func createLangauge(t *testing.T, clientInfo *connector.ClientInfo, resourceType
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
+	// Enable the language
+	enableRequest := clientInfo.PingOneApiClient.ManagementAPIClient.LanguagesApi.UpdateLanguage(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, *resource.Id)
+	enabledClientStruct := management.Language{
+		Enabled: true,
+		Locale:  "fi",
+	}
+
+	enableRequest = enableRequest.Language(enabledClientStruct)
+
+	_, response, err = enableRequest.Execute()
+	ok, err = common.HandleClientResponse(response, err, "UpdateLanguage", resourceType)
+	if err != nil {
+		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+	}
+	if !ok {
+		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+	}
+
 	return testutils_resource.ResourceCreationInfo{
 		DepIds: []string{},
 		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
@@ -57,11 +75,11 @@ func createLangauge(t *testing.T, clientInfo *connector.ClientInfo, resourceType
 	}
 }
 
-func deleteLangauge(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, ids ...string) {
+func deleteLanguage(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, ids ...string) {
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteLangauge(): %v", ids)
+		t.Fatalf("Unexpected number of arguments provided to deleteLanguage(): %v", ids)
 	}
 	id := ids[0]
 

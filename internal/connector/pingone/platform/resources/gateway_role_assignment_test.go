@@ -21,13 +21,15 @@ func Test_GatewayRoleAssignment(t *testing.T) {
 	creationInfo := tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
+	gatewayTr := tr.Dependencies[0]
+
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo.SelfInfo[testutils_resource.ENUM_NAME],
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: fmt.Sprintf("%s_%s_%s", gatewayTr.CreationInfo.SelfInfo[testutils_resource.ENUM_NAME], creationInfo.SelfInfo[testutils_resource.ENUM_NAME], creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceID:   fmt.Sprintf("%s/%s/%s", clientInfo.PingOneExportEnvironmentID, gatewayTr.CreationInfo.SelfInfo[testutils_resource.ENUM_ID], creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
+	testutils.ValidateImportBlockSubset(t, tr.ExportableResource, &expectedImportBlocks)
 }

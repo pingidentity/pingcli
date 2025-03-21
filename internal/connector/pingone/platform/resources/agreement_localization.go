@@ -39,40 +39,66 @@ func (r *PingOneAgreementLocalizationResource) ExportAll() (*[]connector.ImportB
 
 	importBlocks := []connector.ImportBlock{}
 
-	agreementLocalizationData, err := r.getAgreementLocalizationData()
+	agreementData, err := r.getAgreementData()
 	if err != nil {
 		return nil, err
 	}
 
-	for agreementLocalizationId, agreementLocalizationName := range agreementLocalizationData {
-		commentData := map[string]string{
-			"Agreement Localization ID":   agreementLocalizationId,
-			"Agreement Localization Name": agreementLocalizationName,
-			"Export Environment ID":       r.clientInfo.PingOneExportEnvironmentID,
-			"Resource Type":               r.ResourceType(),
+	for agreementId, agreementName := range agreementData {
+		agreementLocalizationData, err := r.getAgreementLocalizationData(agreementId)
+		if err != nil {
+			return nil, err
 		}
 
-		importBlock := connector.ImportBlock{
-			ResourceType:       r.ResourceType(),
-			ResourceName:       agreementLocalizationName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, agreementLocalizationId),
-			CommentInformation: common.GenerateCommentInformation(commentData),
-		}
+		for agreementLocalizationId, agreementLocalizationLocale := range agreementLocalizationData {
+			commentData := map[string]string{
+				"Agreement ID":                  agreementId,
+				"Agreement Name":                agreementName,
+				"Agreement Localization ID":     agreementLocalizationId,
+				"Agreement Localization Locale": agreementLocalizationLocale,
+				"Export Environment ID":         r.clientInfo.PingOneExportEnvironmentID,
+				"Resource Type":                 r.ResourceType(),
+			}
 
-		importBlocks = append(importBlocks, importBlock)
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_%s", agreementName, agreementLocalizationLocale),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, agreementId, agreementLocalizationId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
 	}
 
 	return &importBlocks, nil
 }
 
 func (r *PingOneAgreementLocalizationResource) getAgreementData() (map[string]string, error) {
-	//TODO
+	agreementData := make(map[string]string)
+
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AgreementsResourcesApi.ReadAllAgreements(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.Agreement](iter, "ReadAllAgreements", "GetAgreements", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, agreement := range apiObjs {
+		agreementId, agreementIdOk := agreement.GetIdOk()
+		agreementName, agreementNameOk := agreement.GetNameOk()
+
+		if agreementIdOk && agreementNameOk {
+			agreementData[*agreementId] = *agreementName
+		}
+	}
+
+	return agreementData, nil
 }
 
-func (r *PingOneAgreementLocalizationResource) getAgreementLocalizationData() (map[string]string, error) {
+func (r *PingOneAgreementLocalizationResource) getAgreementLocalizationData(agreementId string) (map[string]string, error) {
 	agreementLocalizationData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.ReadAllAgreementLanguages(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, agreementId).Execute()
 	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadAllAgreementLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -80,11 +106,11 @@ func (r *PingOneAgreementLocalizationResource) getAgreementLocalizationData() (m
 
 	for _, innerObj := range apiObjs {
 		if innerObj.AgreementLanguage != nil {
-			agreementLocalizationId, agreementLocalizationIdOk := inner.AgreementLanguage.GetIdOk()
-			agreementLocalizationName, agreementLocalizationNameOk := inner.AgreementLanguage.GetNameOk()
+			agreementLocalizationId, agreementLocalizationIdOk := innerObj.AgreementLanguage.GetIdOk()
+			agreementLocalizationLocale, agreementLocalizationLocaleOk := innerObj.AgreementLanguage.GetLocaleOk()
 
-			if agreementLocalizationIdOk && agreementLocalizationNameOk {
-				agreementLocalizationData[*agreementLocalizationId] = *agreementLocalizationName
+			if agreementLocalizationIdOk && agreementLocalizationLocaleOk {
+				agreementLocalizationData[*agreementLocalizationId] = *agreementLocalizationLocale
 			}
 		}
 	}

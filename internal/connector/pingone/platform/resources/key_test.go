@@ -24,10 +24,11 @@ func Test_Key(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo.SelfInfo[testutils_resource.ENUM_NAME],
+			ResourceName: fmt.Sprintf("%s_%s", creationInfo.SelfInfo[testutils_resource.ENUM_NAME], creationInfo.SelfInfo[testutils_resource.ENUM_TYPE]),
 			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
+	// There are pre-configured keys in the environment, so only validate the import blocks as a subset.
+	testutils.ValidateImportBlockSubset(t, tr.ExportableResource, &expectedImportBlocks)
 }

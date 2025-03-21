@@ -6,10 +6,8 @@ package resources
 import (
 	"fmt"
 
-	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
-	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -44,17 +42,21 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 		return nil, err
 	}
 
-	for keyId, keyName := range keyData {
+	for keyId, keyInfo := range keyData {
+		keyName := keyInfo[0]
+		keyType := keyInfo[1]
+
 		commentData := map[string]string{
 			"Key ID":                keyId,
 			"Key Name":              keyName,
+			"Key Type":              keyType,
 			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       keyName,
+			ResourceName:       fmt.Sprintf("%s_%s", keyName, keyType),
 			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, keyId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
@@ -65,21 +67,36 @@ func (r *PingOneKeyResource) ExportAll() (*[]connector.ImportBlock, error) {
 	return &importBlocks, nil
 }
 
-func (r *PingOneKeyResource) getKeyData() (map[string]string, error) {
-	keyData := make(map[string]string)
+func (r *PingOneKeyResource) getKeyData() (map[string][]string, error) {
+	keyData := make(map[string][]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
-	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.Certificate](iter, "GetKeys", "GetKeys", r.ResourceType())
+	// TODO: Implement pagination once supported in the PingOne Go Client SDK
+	entityArray, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetKeys(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+
+	ok, err := common.HandleClientResponse(response, err, "GetKeys", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
+	if !ok {
+		return nil, nil
+	}
 
-	for _, key := range apiObjs {
+	if entityArray == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
+	embedded, embeddedOk := entityArray.GetEmbeddedOk()
+	if !embeddedOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
+	for _, key := range embedded.GetKeys() {
 		keyId, keyIdOk := key.GetIdOk()
 		keyName, keyNameOk := key.GetNameOk()
+		keyUsageType, keyUsageTypeOk := key.GetUsageTypeOk()
 
-		if keyIdOk && keyNameOk {
-			keyData[*keyId] = *keyName
+		if keyIdOk && keyNameOk && keyUsageTypeOk {
+			keyData[*keyId] = []string{*keyName, string(*keyUsageType)}
 		}
 	}
 

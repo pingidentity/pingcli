@@ -17,6 +17,7 @@ func Test_GatewayCredential(t *testing.T) {
 	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingone_testable_resources.GatewayCredential(t, clientInfo)
+	gatewayTr := tr.Dependencies[0]
 
 	creationInfo := tr.CreateResource(t)
 	defer tr.DeleteResource(t)
@@ -24,8 +25,8 @@ func Test_GatewayCredential(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo.SelfInfo[testutils_resource.ENUM_NAME],
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: fmt.Sprintf("%s_credential_%s", gatewayTr.CreationInfo.SelfInfo[testutils_resource.ENUM_NAME], creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceID:   fmt.Sprintf("%s/%s/%s", clientInfo.PingOneExportEnvironmentID, gatewayTr.CreationInfo.SelfInfo[testutils_resource.ENUM_ID], creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 

@@ -4,12 +4,10 @@
 package resources_test
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_testable_resources"
 )
 
@@ -18,14 +16,11 @@ func Test_Environment(t *testing.T) {
 
 	tr := pingone_testable_resources.Environment(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
-	defer tr.DeleteResource(t)
-
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo.SelfInfo[testutils_resource.ENUM_NAME],
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: tr.ExportableResource.ResourceType(),
+			ResourceID:   clientInfo.PingOneExportEnvironmentID,
 		},
 	}
 

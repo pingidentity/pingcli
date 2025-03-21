@@ -40,7 +40,8 @@ func createCertificate(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 		t.Fatalf("Failed to create X509 certificate: %v", err)
 	}
 
-	request.File(utils.Pointer([]byte(fileData)))
+	request = request.File(utils.Pointer([]byte(fileData)))
+	request = request.UsageType("SIGNING")
 
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateCertificateFromFile", resourceType)

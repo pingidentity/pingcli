@@ -116,7 +116,7 @@ func initPingOneClientInfo(t *testing.T, clientInfo *connector.ClientInfo) {
 	clientInfo.PingOneExportEnvironmentID = environmentId
 }
 
-func ValidateImportBlocks(t *testing.T, resource connector.ExportableResource, expectedImportBlocks *[]connector.ImportBlock) {
+func getValidatedActualImportBlocks(t *testing.T, resource connector.ExportableResource) *[]connector.ImportBlock {
 	t.Helper()
 
 	importBlocks, err := resource.ExportAll()
@@ -139,10 +139,40 @@ func ValidateImportBlocks(t *testing.T, resource connector.ExportableResource, e
 		resourceIDs[importBlock.ResourceID] = true
 	}
 
+	return importBlocks
+}
+
+func getValidatedExpectedImportBlocks(t *testing.T, expectedImportBlocks *[]connector.ImportBlock) *[]connector.ImportBlock {
+	t.Helper()
+
 	// Check if provided pointer to expected import blocks is nil, and created an empty slice if so.
 	if expectedImportBlocks == nil {
 		expectedImportBlocks = &[]connector.ImportBlock{}
 	}
+
+	// Make sure the resource name and id in each import block is unique across all import blocks
+	resourceNames := map[string]bool{}
+	resourceIDs := map[string]bool{}
+	for _, importBlock := range *expectedImportBlocks {
+		if resourceNames[importBlock.ResourceName] {
+			t.Errorf("Resource name %s is not unique", importBlock.ResourceName)
+		}
+		resourceNames[importBlock.ResourceName] = true
+
+		if resourceIDs[importBlock.ResourceID] {
+			t.Errorf("Resource ID %s is not unique", importBlock.ResourceID)
+		}
+		resourceIDs[importBlock.ResourceID] = true
+	}
+
+	return expectedImportBlocks
+}
+
+func ValidateImportBlocks(t *testing.T, resource connector.ExportableResource, expectedImportBlocks *[]connector.ImportBlock) {
+	t.Helper()
+
+	actualImportBlocks := getValidatedActualImportBlocks(t, resource)
+	expectedImportBlocks = getValidatedExpectedImportBlocks(t, expectedImportBlocks)
 
 	expectedImportBlocksMap := map[string]connector.ImportBlock{}
 	for _, importBlock := range *expectedImportBlocks {
@@ -150,23 +180,61 @@ func ValidateImportBlocks(t *testing.T, resource connector.ExportableResource, e
 	}
 
 	// Check number of export blocks
-	expectedNumberOfBlocks := len(expectedImportBlocksMap)
-	actualNumberOfBlocks := len(*importBlocks)
+	expectedNumberOfBlocks := len(*expectedImportBlocks)
+	actualNumberOfBlocks := len(*actualImportBlocks)
 	if actualNumberOfBlocks != expectedNumberOfBlocks {
 		t.Fatalf("Expected %d import blocks, got %d", expectedNumberOfBlocks, actualNumberOfBlocks)
 	}
 
 	// Make sure the import blocks match the expected import blocks
-	for _, importBlock := range *importBlocks {
-		expectedImportBlock, ok := expectedImportBlocksMap[importBlock.ResourceName]
+	for _, actualImportBlock := range *actualImportBlocks {
+		expectedImportBlock, ok := expectedImportBlocksMap[actualImportBlock.ResourceName]
 
 		if !ok {
-			t.Errorf("No matching expected import block for generated import block:\n%s", importBlock.String())
+			t.Errorf("No matching expected import block for generated import block:\n%s", actualImportBlock.String())
 			continue
 		}
 
-		if !importBlock.Equals(expectedImportBlock) {
-			t.Errorf("Expected import block \n%s\n Got import block \n%s", expectedImportBlock.String(), importBlock.String())
+		if !actualImportBlock.Equals(expectedImportBlock) {
+			t.Errorf("Expected import block \n%s\n Got import block \n%s", expectedImportBlock.String(), actualImportBlock.String())
+		}
+	}
+}
+
+// Similar to ValidateImportBlocks, but only checks if the expectedImportBlocks are a subset of the actual import blocks.
+// This is useful for resources that have pre-configured resources that are not created by the test.
+func ValidateImportBlockSubset(t *testing.T, resource connector.ExportableResource, expectedImportBlocks *[]connector.ImportBlock) {
+	t.Helper()
+
+	actualImportBlocks := getValidatedActualImportBlocks(t, resource)
+	expectedImportBlocks = getValidatedExpectedImportBlocks(t, expectedImportBlocks)
+
+	actualImportBlocksMap := map[string]connector.ImportBlock{}
+	for _, importBlock := range *actualImportBlocks {
+		actualImportBlocksMap[importBlock.ResourceName] = importBlock
+	}
+
+	// Check number of export blocks
+	expectedNumberOfBlocks := len(*expectedImportBlocks)
+	actualNumberOfBlocks := len(*actualImportBlocks)
+	if actualNumberOfBlocks < expectedNumberOfBlocks {
+		t.Fatalf("Expected import blocks count (%d) is greater than Actual import blocks count (%d)", expectedNumberOfBlocks, actualNumberOfBlocks)
+	}
+	if expectedNumberOfBlocks == 0 {
+		t.Fatalf("Expected import blocks count is 0")
+	}
+
+	// For each expected import block, make sure it matches an actual import block
+	for _, expectedImportBlock := range *expectedImportBlocks {
+		actualImportBlock, ok := actualImportBlocksMap[expectedImportBlock.ResourceName]
+
+		if !ok {
+			t.Errorf("No matching actual import block for expected import block:\n%s", expectedImportBlock.String())
+			continue
+		}
+
+		if !actualImportBlock.Equals(expectedImportBlock) {
+			t.Errorf("Expected import block \n%s\n Got import block \n%s", expectedImportBlock.String(), actualImportBlock.String())
 		}
 	}
 }

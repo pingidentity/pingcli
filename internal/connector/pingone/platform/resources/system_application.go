@@ -68,11 +68,11 @@ func (r *PingOneSystemApplicationResource) getSystemApplicationData() (map[strin
 	applicationData := make(map[string]string)
 
 	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
-	applications, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
+	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
-	for _, application := range applications {
+	for _, application := range apiObjs {
 		var (
 			applicationId     *string
 			applicationIdOk   bool

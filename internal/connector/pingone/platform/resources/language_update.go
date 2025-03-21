@@ -68,16 +68,16 @@ func (r *PingOneLanguageUpdateResource) getLanguageUpdateData() (map[string]stri
 	languageUpdateData := make(map[string]string)
 
 	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
-	languageInners, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
+	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, languageInner := range languageInners {
-		if languageInner.Language != nil {
-			languageEnabled, languageEnabledOk := languageInner.Language.GetEnabledOk()
-			languageLocale, languageLocaleOk := languageInner.Language.GetLocaleOk()
-			languageDefault, languageDefaultOk := languageInner.Language.GetDefaultOk()
+	for _, innerObj := range apiObjs {
+		if innerObj.Language != nil {
+			languageEnabled, languageEnabledOk := innerObj.Language.GetEnabledOk()
+			languageLocale, languageLocaleOk := innerObj.Language.GetLocaleOk()
+			languageDefault, languageDefaultOk := innerObj.Language.GetDefaultOk()
 
 			if languageEnabledOk && languageLocaleOk && languageDefaultOk {
 				// Export the language if it meets any of the criteria of the following 3 conditions:
@@ -86,8 +86,8 @@ func (r *PingOneLanguageUpdateResource) getLanguageUpdateData() (map[string]stri
 				// 3) If any language other than 'en' is the default
 
 				if *languageEnabled || (*languageLocale == "en" && !*languageEnabled) || (*languageLocale != "en" && *languageDefault) {
-					languageId, languageIdOk := languageInner.Language.GetIdOk()
-					languageName, languageNameOk := languageInner.Language.GetNameOk()
+					languageId, languageIdOk := innerObj.Language.GetIdOk()
+					languageName, languageNameOk := innerObj.Language.GetNameOk()
 
 					if languageIdOk && languageNameOk {
 						languageUpdateData[*languageId] = *languageName

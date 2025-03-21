@@ -16,6 +16,9 @@ func Test_FormsRecaptchaV2(t *testing.T) {
 
 	tr := pingone_testable_resources.FormsRecaptchaV2(t, clientInfo)
 
+	_ = tr.CreateResource(t)
+	defer tr.DeleteResource(t)
+
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),

@@ -69,14 +69,32 @@ func (r *PingOneGatewayResource) getGatewayData() (map[string]string, error) {
 	gatewayData := make(map[string]string)
 
 	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
-	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.CreateGatewayRequest](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
+	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, gateway := range apiObjs {
-		gatewayId, gatewayIdOk := gateway.GetIdOk()
-		gatewayName, gatewayNameOk := gateway.GetNameOk()
+	for _, innerObj := range apiObjs {
+		var (
+			gatewayId     *string
+			gatewayIdOk   bool
+			gatewayName   *string
+			gatewayNameOk bool
+		)
+
+		switch {
+		case innerObj.Gateway != nil:
+			gatewayId, gatewayIdOk = innerObj.Gateway.GetIdOk()
+			gatewayName, gatewayNameOk = innerObj.Gateway.GetNameOk()
+		case innerObj.GatewayTypeLDAP != nil:
+			gatewayId, gatewayIdOk = innerObj.GatewayTypeLDAP.GetIdOk()
+			gatewayName, gatewayNameOk = innerObj.GatewayTypeLDAP.GetNameOk()
+		case innerObj.GatewayTypeRADIUS != nil:
+			gatewayId, gatewayIdOk = innerObj.GatewayTypeRADIUS.GetIdOk()
+			gatewayName, gatewayNameOk = innerObj.GatewayTypeRADIUS.GetNameOk()
+		default:
+			continue
+		}
 
 		if gatewayIdOk && gatewayNameOk {
 			gatewayData[*gatewayId] = *gatewayName

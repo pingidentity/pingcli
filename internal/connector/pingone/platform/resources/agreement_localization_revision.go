@@ -112,10 +112,10 @@ func (r *PingOneAgreementLocalizationRevisionResource) getAgreementLanguageData(
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
-		if inner.AgreementLanguage != nil {
-			agreementLocalizationId, agreementLocalizationIdOk := inner.AgreementLanguage.GetIdOk()
-			agreementLocalizationLocale, agreementLocalizationLocaleOk := inner.AgreementLanguage.GetLocaleOk()
+	for _, innerObj := range apiObjs {
+		if innerObj.AgreementLanguage != nil {
+			agreementLocalizationId, agreementLocalizationIdOk := innerObj.AgreementLanguage.GetIdOk()
+			agreementLocalizationLocale, agreementLocalizationLocaleOk := innerObj.AgreementLanguage.GetLocaleOk()
 
 			if agreementLocalizationIdOk && agreementLocalizationLocaleOk {
 				agreementLocalizationData[*agreementLocalizationId] = *agreementLocalizationLocale

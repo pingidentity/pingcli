@@ -36,7 +36,8 @@ func createPhoneDeliverySettings(t *testing.T, clientInfo *connector.ClientInfo,
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.PhoneDeliverySettingsApi.CreatePhoneDeliverySettings(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
 	clientStruct := management.NotificationsSettingsPhoneDeliverySettings{
 		NotificationsSettingsPhoneDeliverySettingsCustom: &management.NotificationsSettingsPhoneDeliverySettingsCustom{
-			Name: "CustomProviderName1",
+			Provider: management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_PROVIDER,
+			Name:     "CustomProviderName1",
 			Authentication: management.NotificationsSettingsPhoneDeliverySettingsCustomAllOfAuthentication{
 				Method:   management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMAUTHMETHOD_BASIC,
 				Username: utils.Pointer("testUsername"),
@@ -47,21 +48,29 @@ func createPhoneDeliverySettings(t *testing.T, clientInfo *connector.ClientInfo,
 					DeliveryMethod: management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMDELIVERYMETHOD_SMS,
 					Url:            "https://example.com/message",
 					Method:         management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMREQUESTMETHOD_POST,
-					Body:           utils.Pointer("ARN&message=${message}&phoneNumber=${to}&sender=${from}"),
+					Body:           utils.Pointer("messageType=ARN&message=${message}&phoneNumber=${to}&sender=${from}"),
+					Headers: &map[string]string{
+						"content-type": "application/json",
+					},
+					PhoneNumberFormat: management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMNUMBERFORMAT_FULL,
 				},
 				{
 					DeliveryMethod: management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMDELIVERYMETHOD_VOICE,
 					Url:            "https://example.com/voice",
 					Method:         management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMREQUESTMETHOD_POST,
-					Body:           utils.Pointer("ARN&message=${message}&phoneNumber=${to}&sender=${from}"),
+					Body:           utils.Pointer("messageType=ARN&message=${message}&phoneNumber=${to}&sender=${from}"),
+					Headers: &map[string]string{
+						"content-type": "application/json",
+					},
+					PhoneNumberFormat: management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMNUMBERFORMAT_FULL,
 				},
 			},
 			Numbers: []management.NotificationsSettingsPhoneDeliverySettingsCustomNumbers{
 				{
 					Type:      management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMNUMBERSTYPE_PHONE_NUMBER,
-					Number:    "+1 222 333",
-					Selected:  utils.Pointer(true),
-					Available: utils.Pointer(true),
+					Number:    "12164081234",
+					Selected:  utils.Pointer(false),
+					Available: utils.Pointer(false),
 					Capabilities: []management.EnumNotificationsSettingsPhoneDeliverySettingsCustomNumbersCapability{
 						management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMNUMBERSCAPABILITY_SMS,
 						management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMNUMBERSCAPABILITY_VOICE,
@@ -69,9 +78,9 @@ func createPhoneDeliverySettings(t *testing.T, clientInfo *connector.ClientInfo,
 				},
 				{
 					Type:      management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMNUMBERSTYPE_TOLL_FREE,
-					Number:    "+18544440099",
+					Number:    "18661234567",
 					Selected:  utils.Pointer(false),
-					Available: utils.Pointer(true),
+					Available: utils.Pointer(false),
 					Capabilities: []management.EnumNotificationsSettingsPhoneDeliverySettingsCustomNumbersCapability{
 						management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMNUMBERSCAPABILITY_SMS,
 						management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSCUSTOMNUMBERSCAPABILITY_VOICE,

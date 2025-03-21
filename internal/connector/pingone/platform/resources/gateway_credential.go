@@ -39,40 +39,83 @@ func (r *PingOneGatewayCredentialResource) ExportAll() (*[]connector.ImportBlock
 
 	importBlocks := []connector.ImportBlock{}
 
-	gatewayCredentialData, err := r.getGatewayCredentialData()
+	gatewayData, err := r.getGatewayData()
 	if err != nil {
 		return nil, err
 	}
 
-	for gatewayCredentialId, gatewayCredentialName := range gatewayCredentialData {
-		commentData := map[string]string{
-			"Gateway Credential ID":   gatewayCredentialId,
-			"Gateway Credential Name": gatewayCredentialName,
-			"Export Environment ID":   r.clientInfo.PingOneExportEnvironmentID,
-			"Resource Type":           r.ResourceType(),
+	for gatewayId, gatewayName := range gatewayData {
+		gatewayCredentialData, err := r.getGatewayCredentialData(gatewayId)
+		if err != nil {
+			return nil, err
 		}
 
-		importBlock := connector.ImportBlock{
-			ResourceType:       r.ResourceType(),
-			ResourceName:       gatewayCredentialName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, gatewayCredentialId),
-			CommentInformation: common.GenerateCommentInformation(commentData),
-		}
+		for _, gatewayCredentialId := range gatewayCredentialData {
+			commentData := map[string]string{
+				"Gateway ID":            gatewayId,
+				"Gateway Name":          gatewayName,
+				"Gateway Credential ID": gatewayCredentialId,
+				"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
+				"Resource Type":         r.ResourceType(),
+			}
 
-		importBlocks = append(importBlocks, importBlock)
+			importBlock := connector.ImportBlock{
+				ResourceType:       r.ResourceType(),
+				ResourceName:       fmt.Sprintf("%s_credential_%s", gatewayName, gatewayCredentialId),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, gatewayId, gatewayCredentialId),
+				CommentInformation: common.GenerateCommentInformation(commentData),
+			}
+
+			importBlocks = append(importBlocks, importBlock)
+		}
 	}
 
 	return &importBlocks, nil
 }
 
 func (r *PingOneGatewayCredentialResource) getGatewayData() (map[string]string, error) {
-	//TODO
+	gatewayData := make(map[string]string)
+
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.ReadAllGateways(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedGatewaysInner](iter, "ReadAllGateways", "GetGateways", r.ResourceType())
+	if err != nil {
+		return nil, err
+	}
+
+	for _, innerObj := range apiObjs {
+		var (
+			gatewayId     *string
+			gatewayIdOk   bool
+			gatewayName   *string
+			gatewayNameOk bool
+		)
+
+		switch {
+		case innerObj.Gateway != nil:
+			gatewayId, gatewayIdOk = innerObj.Gateway.GetIdOk()
+			gatewayName, gatewayNameOk = innerObj.Gateway.GetNameOk()
+		case innerObj.GatewayTypeLDAP != nil:
+			gatewayId, gatewayIdOk = innerObj.GatewayTypeLDAP.GetIdOk()
+			gatewayName, gatewayNameOk = innerObj.GatewayTypeLDAP.GetNameOk()
+		case innerObj.GatewayTypeRADIUS != nil:
+			gatewayId, gatewayIdOk = innerObj.GatewayTypeRADIUS.GetIdOk()
+			gatewayName, gatewayNameOk = innerObj.GatewayTypeRADIUS.GetNameOk()
+		default:
+			continue
+		}
+
+		if gatewayIdOk && gatewayNameOk {
+			gatewayData[*gatewayId] = *gatewayName
+		}
+	}
+
+	return gatewayData, nil
 }
 
-func (r *PingOneGatewayCredentialResource) getGatewayCredentialData() (map[string]string, error) {
-	gatewayCredentialData := make(map[string]string)
+func (r *PingOneGatewayCredentialResource) getGatewayCredentialData(gatewayId string) ([]string, error) {
+	gatewayCredentialData := []string{}
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.GatewayCredentialsApi.ReadAllGatewayCredentials(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, gatewayId).Execute()
 	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.GatewayCredential](iter, "ReadAllGatewayCredentials", "GetCredentials", r.ResourceType())
 	if err != nil {
 		return nil, err
@@ -80,10 +123,9 @@ func (r *PingOneGatewayCredentialResource) getGatewayCredentialData() (map[strin
 
 	for _, gatewayCredential := range apiObjs {
 		gatewayCredentialId, gatewayCredentialIdOk := gatewayCredential.GetIdOk()
-		gatewayCredentialName, gatewayCredentialNameOk := gatewayCredential.GetNameOk()
 
-		if gatewayCredentialIdOk && gatewayCredentialNameOk {
-			gatewayCredentialData[*gatewayCredentialId] = *gatewayCredentialName
+		if gatewayCredentialIdOk {
+			gatewayCredentialData = append(gatewayCredentialData, *gatewayCredentialId)
 		}
 	}
 

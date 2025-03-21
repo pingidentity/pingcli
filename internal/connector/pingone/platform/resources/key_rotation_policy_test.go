@@ -29,5 +29,6 @@ func Test_KeyRotationPolicy(t *testing.T) {
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
+	// There are pre-configured key rotation policies in the environment, so only validate the import blocks as a subset.
+	testutils.ValidateImportBlockSubset(t, tr.ExportableResource, &expectedImportBlocks)
 }

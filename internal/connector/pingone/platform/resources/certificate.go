@@ -6,10 +6,8 @@ package resources
 import (
 	"fmt"
 
-	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
-	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -68,13 +66,26 @@ func (r *PingOneCertificateResource) ExportAll() (*[]connector.ImportBlock, erro
 func (r *PingOneCertificateResource) getCertificateData() (map[string]string, error) {
 	certificateData := make(map[string]string)
 
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
-	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.PKIFileUpload](iter, "GetCertificates", "GetKeys", r.ResourceType())
+	// TODO: Implement pagination once supported in the PingOne Go Client SDK
+	entityArray, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.GetCertificates(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	ok, err := common.HandleClientResponse(response, err, "GetCertificates", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
+	if !ok {
+		return nil, nil
+	}
 
-	for _, certificate := range apiObjs {
+	if entityArray == nil {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
+	embedded, embeddedOk := entityArray.GetEmbeddedOk()
+	if !embeddedOk {
+		return nil, common.DataNilError(r.ResourceType(), response)
+	}
+
+	for _, certificate := range embedded.GetCertificates() {
 		certificateId, certificateIdOk := certificate.GetIdOk()
 		certificateName, certificateNameOk := certificate.GetNameOk()
 

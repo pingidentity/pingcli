@@ -6,7 +6,9 @@ package pingone_testable_resources
 import (
 	"testing"
 
+	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
+	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/platform/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 )
@@ -16,9 +18,54 @@ func FormsRecaptchaV2(t *testing.T, clientInfo *connector.ClientInfo) *testutils
 
 	return &testutils_resource.TestableResource{
 		ClientInfo:         clientInfo,
-		CreateFunc:         nil,
-		DeleteFunc:         nil,
+		CreateFunc:         createFormsRecaptchaV2,
+		DeleteFunc:         deleteFormsRecaptchaV2,
 		Dependencies:       nil,
 		ExportableResource: resources.FormsRecaptchaV2(clientInfo),
+	}
+}
+
+func createFormsRecaptchaV2(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+	t.Helper()
+
+	if len(strArgs) != 0 {
+		t.Fatalf("Unexpected number of arguments provided to createFormsRecaptchaV2(): %v", strArgs)
+	}
+
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.RecaptchaConfigurationApi.UpdateRecaptchaConfiguration(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
+	clientStruct := management.RecaptchaConfiguration{
+		SiteKey:   "siteKey",
+		SecretKey: "secretKey",
+	}
+
+	request = request.RecaptchaConfiguration(clientStruct)
+
+	_, response, err := request.Execute()
+	ok, err := common.HandleClientResponse(response, err, "UpdateRecaptchaConfiguration", resourceType)
+	if err != nil {
+		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+	}
+	if !ok {
+		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+	}
+
+	return testutils_resource.ResourceCreationInfo{
+		DepIds:   []string{},
+		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{},
+	}
+}
+
+func deleteFormsRecaptchaV2(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, ids ...string) {
+	t.Helper()
+
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.RecaptchaConfigurationApi.DeleteRecaptchaConfiguration(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
+
+	response, err := request.Execute()
+	ok, err := common.HandleClientResponse(response, err, "DeleteRecaptchaConfiguration", resourceType)
+	if err != nil {
+		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+	}
+	if !ok {
+		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 }

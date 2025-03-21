@@ -4,12 +4,8 @@
 package resources
 
 import (
-	"fmt"
-
-	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
-	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
@@ -39,49 +35,32 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 
 	importBlocks := []connector.ImportBlock{}
 
-	environmentData, err := r.getEnvironmentData()
+	ok, err := r.checkEnvironmentData()
 	if err != nil {
 		return nil, err
 	}
-
-	for environmentId, environmentName := range environmentData {
-		commentData := map[string]string{
-			"Environment ID":        environmentId,
-			"Environment Name":      environmentName,
-			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
-			"Resource Type":         r.ResourceType(),
-		}
-
-		importBlock := connector.ImportBlock{
-			ResourceType:       r.ResourceType(),
-			ResourceName:       environmentName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, environmentId),
-			CommentInformation: common.GenerateCommentInformation(commentData),
-		}
-
-		importBlocks = append(importBlocks, importBlock)
+	if !ok {
+		return &importBlocks, nil
 	}
+
+	commentData := map[string]string{
+		"Resource Type":         r.ResourceType(),
+		"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
+	}
+
+	importBlock := connector.ImportBlock{
+		ResourceType:       r.ResourceType(),
+		ResourceName:       r.ResourceType(),
+		ResourceID:         r.clientInfo.PingOneExportEnvironmentID,
+		CommentInformation: common.GenerateCommentInformation(commentData),
+	}
+
+	importBlocks = append(importBlocks, importBlock)
 
 	return &importBlocks, nil
 }
 
-func (r *PingOneEnvironmentResource) getEnvironmentData() (map[string]string, error) {
-	environmentData := make(map[string]string)
-
-	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.EnvironmentsApi.ReadAllEnvironments(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
-	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.Environment](iter, "ReadAllEnvironments", "GetEnvironments", r.ResourceType())
-	if err != nil {
-		return nil, err
-	}
-
-	for _, environment := range apiObjs {
-		environmentId, environmentIdOk := environment.GetIdOk()
-		environmentName, environmentNameOk := environment.GetNameOk()
-
-		if environmentIdOk && environmentNameOk {
-			environmentData[*environmentId] = *environmentName
-		}
-	}
-
-	return environmentData, nil
+func (r *PingOneEnvironmentResource) checkEnvironmentData() (bool, error) {
+	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+	return common.CheckSingletonResource(response, err, "ReadOneEnvironment", r.ResourceType())
 }

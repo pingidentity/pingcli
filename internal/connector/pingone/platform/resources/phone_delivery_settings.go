@@ -74,9 +74,37 @@ func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (m
 		return nil, err
 	}
 
-	for _, phoneDeliverySettings := range apiObjs {
-		phoneDeliverySettingsId, phoneDeliverySettingsIdOk := phoneDeliverySettings.GetIdOk()
-		phoneDeliverySettingsName, phoneDeliverySettingsNameOk := phoneDeliverySettings.GetNameOk()
+	for _, innerObj := range apiObjs {
+		var (
+			phoneDeliverySettingsId     *string
+			phoneDeliverySettingsIdOk   bool
+			phoneDeliverySettingsName   *string
+			phoneDeliverySettingsNameOk bool
+		)
+
+		switch {
+		case innerObj.NotificationsSettingsPhoneDeliverySettingsCustom != nil:
+			phoneDeliverySettingsId, phoneDeliverySettingsIdOk = innerObj.NotificationsSettingsPhoneDeliverySettingsCustom.GetIdOk()
+			phoneDeliverySettingsName, phoneDeliverySettingsNameOk = innerObj.NotificationsSettingsPhoneDeliverySettingsCustom.GetNameOk()
+			if phoneDeliverySettingsNameOk {
+				*phoneDeliverySettingsName = fmt.Sprintf("provider_custom_%s", *phoneDeliverySettingsName)
+			}
+		case innerObj.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse != nil:
+			phoneDeliverySettingsId, phoneDeliverySettingsIdOk = innerObj.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse.GetIdOk()
+			phoneDeliverySettingsProvider, phoneDeliverySettingProviderOk := innerObj.NotificationsSettingsPhoneDeliverySettingsTwilioSyniverse.GetProviderOk()
+			if phoneDeliverySettingsIdOk && phoneDeliverySettingProviderOk {
+				switch *phoneDeliverySettingsProvider {
+				case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_TWILIO:
+					*phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_twilio_%s", *phoneDeliverySettingsId), true
+				case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_SYNIVERSE:
+					*phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_syniverse_%s", *phoneDeliverySettingsId), true
+				default:
+					continue
+				}
+			}
+		default:
+			continue
+		}
 
 		if phoneDeliverySettingsIdOk && phoneDeliverySettingsNameOk {
 			phoneDeliverySettingsData[*phoneDeliverySettingsId] = *phoneDeliverySettingsName

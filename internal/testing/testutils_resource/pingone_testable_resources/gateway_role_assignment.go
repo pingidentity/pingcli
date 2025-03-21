@@ -37,22 +37,33 @@ func createGatewayRoleAssignment(t *testing.T, clientInfo *connector.ClientInfo,
 	gatewayId := strArgs[0]
 
 	iter := clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadAllRoles(clientInfo.PingOneContext).Execute()
-	roles, err := pingone.GetManagementAPIObjectsFromIterator[management.Role](iter, "ReadAllRoles", "GetRoles", resourceType)
+	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedRolesInner](iter, "ReadAllRoles", "GetRoles", resourceType)
 	if err != nil {
 		t.Fatalf("Failed to execute PingOne client function\nError: %v", err)
 	}
-	if len(roles) == 0 {
-		t.Fatalf("Failed to execute PingOne client function\n No built-in roles returned from ReadAllRoles()", err)
+	if len(apiObjs) == 0 {
+		t.Fatal("Failed to execute PingOne client function\n No built-in roles returned from ReadAllRoles()")
 	}
 
-	// Use a random role
-	roleId := roles[0].Id
-	roleName := roles[0].Name
+	var (
+		roleId   string
+		roleName string
+	)
+
+	for _, role := range apiObjs {
+		if role.Role != nil {
+			if role.Role.Name != nil && *role.Role.Name == management.ENUMROLENAME_APPLICATION_OWNER {
+				roleId = *role.Role.Id
+				roleName = string(*role.Role.Name)
+				break
+			}
+		}
+	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.GatewayRoleAssignmentsApi.CreateGatewayRoleAssignment(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, gatewayId)
 	clientStruct := management.RoleAssignment{
 		Role: management.RoleAssignmentRole{
-			Id: *roleId,
+			Id: roleId,
 		},
 		Scope: management.RoleAssignmentScope{
 			Id:   clientInfo.PingOneExportEnvironmentID,
@@ -77,7 +88,7 @@ func createGatewayRoleAssignment(t *testing.T, clientInfo *connector.ClientInfo,
 		},
 		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Id,
-			testutils_resource.ENUM_NAME: string(*roleName),
+			testutils_resource.ENUM_NAME: roleName,
 		},
 	}
 }

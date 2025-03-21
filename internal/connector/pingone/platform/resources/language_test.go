@@ -13,10 +13,10 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_testable_resources"
 )
 
-func Test_Langauge(t *testing.T) {
+func Test_Language(t *testing.T) {
 	clientInfo := testutils.GetClientInfo(t)
 
-	tr := pingone_testable_resources.Langauge(t, clientInfo)
+	tr := pingone_testable_resources.Language(t, clientInfo)
 
 	creationInfo := tr.CreateResource(t)
 	defer tr.DeleteResource(t)
@@ -29,5 +29,6 @@ func Test_Langauge(t *testing.T) {
 		},
 	}
 
-	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
+	// There are pre-configured languages in the environment, so only validate the import blocks as a subset.
+	testutils.ValidateImportBlockSubset(t, tr.ExportableResource, &expectedImportBlocks)
 }
