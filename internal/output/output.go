@@ -16,12 +16,13 @@ import (
 )
 
 var (
-	boldRed = color.New(color.FgRed).Add(color.Bold).SprintfFunc()
-	cyan    = color.New(color.FgCyan).SprintfFunc()
-	green   = color.New(color.FgGreen).SprintfFunc()
-	red     = color.New(color.FgRed).SprintfFunc()
-	white   = color.New(color.FgWhite).SprintfFunc()
-	yellow  = color.New(color.FgYellow).SprintfFunc()
+	boldRed                    = color.New(color.FgRed).Add(color.Bold).SprintfFunc()
+	cyan                       = color.New(color.FgCyan).SprintfFunc()
+	green                      = color.New(color.FgGreen).SprintfFunc()
+	red                        = color.New(color.FgRed).SprintfFunc()
+	white                      = color.New(color.FgWhite).SprintfFunc()
+	yellow                     = color.New(color.FgYellow).SprintfFunc()
+	detailedExitCodeWarnLogged = false
 )
 
 // Set the faith color option based on user configuration
@@ -56,8 +57,21 @@ func Success(message string, fields map[string]interface{}) {
 // This function outputs yellow text to inform the user of a warning
 func Warn(message string, fields map[string]interface{}) {
 	l := logger.Get()
+	detailedExitCodeWarnLogged = true
 
 	print(fmt.Sprintf("WARNING: %s", message), fields, yellow, l.Warn)
+}
+
+func DetailedExitCodeWarnLogged() (bool, error) {
+	detailedExitCodeEnabled, err := profiles.GetOptionValue(options.RootDetailedExitCodeOption)
+	if err != nil {
+		return false, err
+	}
+
+	if detailedExitCodeEnabled == "true" {
+		return detailedExitCodeWarnLogged, nil
+	}
+	return false, nil
 }
 
 // This functions is used to inform the user their configuration

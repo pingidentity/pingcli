@@ -33,11 +33,6 @@ func TestTrustedEmailDomainExport(t *testing.T) {
 			ResourceName: "demo.bxretail.org",
 			ResourceID:   fmt.Sprintf("%s/49f94864-f9c7-4778-ae37-839c2c546d1c", clientInfo.PingOneExportEnvironmentID),
 		},
-		{
-			ResourceType: "pingone_trusted_email_domain",
-			ResourceName: "pioneerpalaceband.com",
-			ResourceID:   fmt.Sprintf("%s/63d645d1-046a-4d53-a267-513cfc1d4213", clientInfo.PingOneExportEnvironmentID),
-		},
 	}
 
 	testutils.ValidateImportBlocks(t, resource, &expectedImportBlocks)

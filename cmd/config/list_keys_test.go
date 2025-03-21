@@ -50,6 +50,7 @@ func Example_listKeysValue() {
 	// Valid Keys:
 	// - activeProfile
 	// - description
+	// - detailedExitCode
 	// - export.format
 	// - export.outputDirectory
 	// - export.overwrite

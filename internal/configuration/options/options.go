@@ -73,6 +73,7 @@ func Options() []Option {
 		RootProfileOption,
 		RootColorOption,
 		RootConfigOption,
+		RootDetailedExitCodeOption,
 		RootOutputFormatOption,
 
 		ProfileDescriptionOption,
@@ -157,11 +158,12 @@ var (
 
 // Root Command Options
 var (
-	RootActiveProfileOption Option
-	RootProfileOption       Option
-	RootColorOption         Option
-	RootConfigOption        Option
-	RootOutputFormatOption  Option
+	RootActiveProfileOption    Option
+	RootDetailedExitCodeOption Option
+	RootProfileOption          Option
+	RootColorOption            Option
+	RootConfigOption           Option
+	RootOutputFormatOption     Option
 )
 
 // 'pingcli request' command options

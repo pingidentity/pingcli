@@ -180,7 +180,7 @@ func pingoneAccessToken() (accessToken string, err error) {
 		}
 	}
 
-	output.Warn("PingOne access token does not exist or is expired, requesting a new token...", nil)
+	output.Message("PingOne access token does not exist or is expired, requesting a new token...", nil)
 
 	// If no valid access token is available, login and get a new one
 	return pingoneAuth()
