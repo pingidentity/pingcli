@@ -10,13 +10,13 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_testable_resources"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_platform_testable_resources"
 )
 
 func Test_KeyRotationPolicy(t *testing.T) {
 	clientInfo := testutils.GetClientInfo(t)
 
-	tr := pingone_testable_resources.KeyRotationPolicy(t, clientInfo)
+	tr := pingone_platform_testable_resources.KeyRotationPolicy(t, clientInfo)
 
 	tr.CreateResource(t)
 	defer tr.DeleteResource(t)

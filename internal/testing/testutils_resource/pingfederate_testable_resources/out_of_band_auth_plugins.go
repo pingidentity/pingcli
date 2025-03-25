@@ -8,7 +8,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_testable_resources"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_sso_testable_resources"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
@@ -22,7 +22,7 @@ func OutOfBandAuthPlugins(t *testing.T, clientInfo *connector.ClientInfo) *testu
 		DeleteFunc: deleteOutOfBandAuthPlugins,
 		Dependencies: []*testutils_resource.TestableResource{
 			PingoneConnection(t, clientInfo),
-			pingone_testable_resources.DeviceAuthApplication(t, clientInfo),
+			pingone_sso_testable_resources.ApplicationDeviceAuthorization(t, clientInfo),
 		},
 		ExportableResource: nil,
 	}

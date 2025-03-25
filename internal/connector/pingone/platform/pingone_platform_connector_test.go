@@ -7,7 +7,7 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_testable_resources"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_platform_testable_resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_terraform"
 )
 
@@ -23,110 +23,110 @@ func TestPlatformTerraformPlan(t *testing.T) {
 	}{
 		{
 			name:             "Agreement",
-			testableResource: pingone_testable_resources.Agreement(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.Agreement(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "AgreementEnable",
-			testableResource: pingone_testable_resources.AgreementEnable(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.AgreementEnable(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "AgreementLocalization",
-			testableResource: pingone_testable_resources.AgreementLocalization(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.AgreementLocalization(t, clientInfo),
 			ignoredErrors: []string{
 				"Error: Cannot find language by locale en-US",
 			},
 		},
 		{
 			name:             "AgreementLocalizationEnable",
-			testableResource: pingone_testable_resources.AgreementLocalizationEnable(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.AgreementLocalizationEnable(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "AgreementLocalizationRevision",
-			testableResource: pingone_testable_resources.AgreementLocalizationRevision(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.AgreementLocalizationRevision(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "BrandingSettings",
-			testableResource: pingone_testable_resources.BrandingSettings(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.BrandingSettings(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "BrandingTheme",
-			testableResource: pingone_testable_resources.BrandingTheme(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.BrandingTheme(t, clientInfo),
 			ignoredErrors: []string{
 				"Error: Invalid Attribute Combination",
 			},
 		},
 		{
 			name:             "BrandingThemeDefault",
-			testableResource: pingone_testable_resources.BrandingThemeDefault(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.BrandingThemeDefault(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "Certificate",
-			testableResource: pingone_testable_resources.Certificate(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.Certificate(t, clientInfo),
 			ignoredErrors: []string{
 				"Error: Invalid combination of arguments",
 			},
 		},
 		{
 			name:             "CustomDomain",
-			testableResource: pingone_testable_resources.CustomDomain(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.CustomDomain(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "Environment",
-			testableResource: pingone_testable_resources.Environment(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.Environment(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "Form",
-			testableResource: pingone_testable_resources.Form(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.Form(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "FormsRecaptchaV2",
-			testableResource: pingone_testable_resources.FormsRecaptchaV2(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.FormsRecaptchaV2(t, clientInfo),
 			ignoredErrors: []string{
 				"Error: Missing Configuration for Required Attribute",
 			},
 		},
 		{
 			name:             "Gateway",
-			testableResource: pingone_testable_resources.Gateway(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.Gateway(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "GatewayCredential",
-			testableResource: pingone_testable_resources.GatewayCredential(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.GatewayCredential(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "GatewayRoleAssignment",
-			testableResource: pingone_testable_resources.GatewayRoleAssignment(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.GatewayRoleAssignment(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "IdentityPropagationPlan",
-			testableResource: pingone_testable_resources.IdentityPropagationPlan(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.IdentityPropagationPlan(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "Key",
-			testableResource: pingone_testable_resources.Key(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.Key(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "KeyRotationPolicy",
-			testableResource: pingone_testable_resources.KeyRotationPolicy(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.KeyRotationPolicy(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "Language",
-			testableResource: pingone_testable_resources.Language(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.Language(t, clientInfo),
 			ignoredErrors: []string{
 				"Error: The language code `pt` is reserved and cannot be imported into this provider.  Please use `pingone_language_override` for system-defined languages instead.",
 				"Error: The language code `fr` is reserved and cannot be imported into this provider.  Please use `pingone_language_override` for system-defined languages instead.",
@@ -149,57 +149,57 @@ func TestPlatformTerraformPlan(t *testing.T) {
 		},
 		{
 			name:             "LanguageUpdate",
-			testableResource: pingone_testable_resources.LanguageUpdate(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.LanguageUpdate(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "NotificationPolicy",
-			testableResource: pingone_testable_resources.NotificationPolicy(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.NotificationPolicy(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "NotificationSettings",
-			testableResource: pingone_testable_resources.NotificationSettings(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.NotificationSettings(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "NotificationSettingsEmail",
-			testableResource: pingone_testable_resources.NotificationSettingsEmail(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.NotificationSettingsEmail(t, clientInfo),
 			ignoredErrors: []string{
 				"Error: Missing Configuration for Required Attribute",
 			},
 		},
 		{
 			name:             "NotificationTemplateContent",
-			testableResource: pingone_testable_resources.NotificationTemplateContent(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.NotificationTemplateContent(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "PhoneDeliverySettings",
-			testableResource: pingone_testable_resources.PhoneDeliverySettings(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.PhoneDeliverySettings(t, clientInfo),
 			ignoredErrors: []string{
 				"Error: Missing required argument",
 			},
 		},
 		{
 			name:             "SystemApplication",
-			testableResource: pingone_testable_resources.SystemApplication(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.SystemApplication(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		// TODO: Currently unable to create a trusted email address via API due to trust email domain verification requirement
 		// {
 		// 	name:             "TrustedEmailAddress",
-		// 	testableResource: pingone_testable_resources.TrustedEmailAddress(t, clientInfo),
+		// 	testableResource: pingone_platform_testable_resources.TrustedEmailAddress(t, clientInfo),
 		// 	ignoredErrors:    nil,
 		// },
 		{
 			name:             "TrustedEmailDomain",
-			testableResource: pingone_testable_resources.TrustedEmailDomain(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.TrustedEmailDomain(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 		{
 			name:             "Webhook",
-			testableResource: pingone_testable_resources.Webhook(t, clientInfo),
+			testableResource: pingone_platform_testable_resources.Webhook(t, clientInfo),
 			ignoredErrors:    nil,
 		},
 	}

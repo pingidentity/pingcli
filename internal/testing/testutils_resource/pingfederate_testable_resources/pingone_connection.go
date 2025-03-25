@@ -10,7 +10,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_testable_resources"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_platform_testable_resources"
 	"github.com/pingidentity/pingcli/internal/utils"
 	client "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
@@ -23,7 +23,7 @@ func PingoneConnection(t *testing.T, clientInfo *connector.ClientInfo) *testutil
 		CreateFunc: createPingoneConnection,
 		DeleteFunc: deletePingoneConnection,
 		Dependencies: []*testutils_resource.TestableResource{
-			pingone_testable_resources.GatewayCredential(t, clientInfo),
+			pingone_platform_testable_resources.GatewayCredential(t, clientInfo),
 		},
 		ExportableResource: resources.PingoneConnection(clientInfo),
 	}
