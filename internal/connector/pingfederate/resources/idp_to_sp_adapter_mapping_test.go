@@ -18,14 +18,14 @@ func Test_PingFederateIdpToSpAdapterMapping(t *testing.T) {
 
 	tr := pingfederate_testable_resources.IdpToSpAdapterMapping(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_to_%s", creationInfo.SelfInfo[testutils_resource.ENUM_SOURCE_ID], creationInfo.SelfInfo[testutils_resource.ENUM_TARGET_ID]),
-			ResourceID:   fmt.Sprintf("%s|%s", creationInfo.SelfInfo[testutils_resource.ENUM_SOURCE_ID], creationInfo.SelfInfo[testutils_resource.ENUM_TARGET_ID]),
+			ResourceName: fmt.Sprintf("%s_to_%s", tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_SOURCE_ID], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_TARGET_ID]),
+			ResourceID:   fmt.Sprintf("%s|%s", tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_SOURCE_ID], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_TARGET_ID]),
 		},
 	}
 

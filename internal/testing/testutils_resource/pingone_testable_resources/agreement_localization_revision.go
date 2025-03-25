@@ -28,7 +28,7 @@ func AgreementLocalizationRevision(t *testing.T, clientInfo *connector.ClientInf
 	}
 }
 
-func createAgreementLocalizationRevision(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createAgreementLocalizationRevision(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 2 {
@@ -62,12 +62,13 @@ func createAgreementLocalizationRevision(t *testing.T, clientInfo *connector.Cli
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
 			agreementId,
 			agreementLocalizationId,
+			*resource.Id,
 		},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID: *resource.Id,
 		},
 	}
@@ -79,11 +80,8 @@ func deleteAgreementLocalizationRevision(t *testing.T, clientInfo *connector.Cli
 	if len(ids) != 3 {
 		t.Fatalf("Unexpected number of arguments provided to deleteAgreementLocalizationRevision(): %v", ids)
 	}
-	agreementId := ids[0]
-	agreementLocalizationId := ids[1]
-	agreementLocalizationRevisionId := ids[2]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.AgreementRevisionsResourcesApi.DeleteAgreementLanguageRevision(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, agreementId, agreementLocalizationId, agreementLocalizationRevisionId)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.AgreementRevisionsResourcesApi.DeleteAgreementLanguageRevision(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1], ids[2])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteAgreementLanguageRevision", resourceType)

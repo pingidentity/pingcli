@@ -18,14 +18,14 @@ func Test_PingFederateOauthAccessTokenMapping(t *testing.T) {
 
 	tr := pingfederate_testable_resources.OauthAccessTokenMapping(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s", creationInfo.SelfInfo[testutils_resource.ENUM_ID], creationInfo.SelfInfo[testutils_resource.ENUM_CONTEXT_TYPE]),
-			ResourceID:   creationInfo.SelfInfo[testutils_resource.ENUM_ID],
+			ResourceName: fmt.Sprintf("%s_%s", tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_CONTEXT_TYPE]),
+			ResourceID:   tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 

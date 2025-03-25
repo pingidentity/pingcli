@@ -17,14 +17,14 @@ func Test_PingFederateAuthenticationPoliciesFragment(t *testing.T) {
 
 	tr := pingfederate_testable_resources.AuthenticationPoliciesFragment(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo.SelfInfo[testutils_resource.ENUM_NAME],
-			ResourceID:   creationInfo.SelfInfo[testutils_resource.ENUM_ID],
+			ResourceName: tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 

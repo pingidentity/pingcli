@@ -27,7 +27,7 @@ func SpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo) *testutils_
 	}
 }
 
-func createSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 0 {
@@ -84,9 +84,9 @@ func createSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Id,
 			testutils_resource.ENUM_NAME: resource.Name,
 		},

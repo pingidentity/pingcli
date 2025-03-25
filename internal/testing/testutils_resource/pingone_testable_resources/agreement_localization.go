@@ -27,7 +27,7 @@ func AgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo) *test
 	}
 }
 
-func createAgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createAgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 1 {
@@ -53,11 +53,12 @@ func createAgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo,
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
 			agreementId,
+			*resource.Id,
 		},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:     *resource.Id,
 			testutils_resource.ENUM_LOCALE: resource.Locale,
 		},
@@ -70,10 +71,8 @@ func deleteAgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo,
 	if len(ids) != 2 {
 		t.Fatalf("Unexpected number of arguments provided to deleteAgreementLocalization(): %v", ids)
 	}
-	agreementId := ids[0]
-	agreementLocalizationId := ids[1]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.DeleteAgreementLanguage(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, agreementId, agreementLocalizationId)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.AgreementLanguagesResourcesApi.DeleteAgreementLanguage(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteAgreementLanguage", resourceType)

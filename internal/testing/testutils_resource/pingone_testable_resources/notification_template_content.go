@@ -26,7 +26,7 @@ func NotificationTemplateContent(t *testing.T, clientInfo *connector.ClientInfo)
 	}
 }
 
-func createNotificationTemplateContent(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createNotificationTemplateContent(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 0 {
@@ -55,9 +55,11 @@ func createNotificationTemplateContent(t *testing.T, clientInfo *connector.Clien
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
+			*resource.TemplateContentSMS.Id,
+		},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:                       *resource.TemplateContentSMS.Id,
 			testutils_resource.ENUM_NAME:                     string(management.ENUMTEMPLATENAME_STRONG_AUTHENTICATION),
 			testutils_resource.ENUM_LOCALE:                   resource.TemplateContentSMS.Locale,
@@ -73,9 +75,8 @@ func deleteNotificationTemplateContent(t *testing.T, clientInfo *connector.Clien
 	if len(ids) != 1 {
 		t.Fatalf("Unexpected number of arguments provided to deleteNotificationTemplateContent(): %v", ids)
 	}
-	id := ids[0]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.NotificationsTemplatesApi.DeleteContent(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, management.ENUMTEMPLATENAME_STRONG_AUTHENTICATION, id)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.NotificationsTemplatesApi.DeleteContent(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, management.ENUMTEMPLATENAME_STRONG_AUTHENTICATION, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteContent", resourceType)

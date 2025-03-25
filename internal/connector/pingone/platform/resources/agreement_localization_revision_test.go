@@ -18,7 +18,7 @@ func Test_AgreementLocalizationRevision(t *testing.T) {
 
 	tr := pingone_testable_resources.AgreementLocalizationRevision(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	agreementLocalizationTr := tr.Dependencies[0]
@@ -27,8 +27,8 @@ func Test_AgreementLocalizationRevision(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s_%s", agreementTr.CreationInfo.SelfInfo[testutils_resource.ENUM_NAME], agreementLocalizationTr.CreationInfo.SelfInfo[testutils_resource.ENUM_LOCALE], creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
-			ResourceID:   fmt.Sprintf("%s/%s/%s/%s", clientInfo.PingOneExportEnvironmentID, agreementTr.CreationInfo.SelfInfo[testutils_resource.ENUM_ID], agreementLocalizationTr.CreationInfo.SelfInfo[testutils_resource.ENUM_ID], creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: fmt.Sprintf("%s_%s_%s", agreementTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_NAME], agreementLocalizationTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_LOCALE], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID]),
+			ResourceID:   fmt.Sprintf("%s/%s/%s/%s", clientInfo.PingOneExportEnvironmentID, agreementTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID], agreementLocalizationTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 

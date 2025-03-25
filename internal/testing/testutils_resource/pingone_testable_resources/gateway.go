@@ -26,7 +26,7 @@ func Gateway(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource
 	}
 }
 
-func createGateway(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createGateway(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 0 {
@@ -54,9 +54,11 @@ func createGateway(t *testing.T, clientInfo *connector.ClientInfo, resourceType 
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
+			*resource.Gateway.Id,
+		},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Gateway.Id,
 			testutils_resource.ENUM_NAME: resource.Gateway.Name,
 		},
@@ -69,9 +71,8 @@ func deleteGateway(t *testing.T, clientInfo *connector.ClientInfo, resourceType 
 	if len(ids) != 1 {
 		t.Fatalf("Unexpected number of arguments provided to deleteGateway(): %v", ids)
 	}
-	id := ids[0]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.DeleteGateway(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, id)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.GatewaysApi.DeleteGateway(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteGateway", resourceType)

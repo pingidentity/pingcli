@@ -30,6 +30,10 @@ const (
 	ENUM_TEMPLATE_VARIANT         ResourceCreationInfoType = "ENUM_TEMPLATE_VARIANT"
 	ENUM_TEMPLATE_DELIVERY_METHOD ResourceCreationInfoType = "ENUM_TEMPLATE_DELIVERY_METHOD"
 
+	// Schema Info for Schema Attribute resources
+	ENUM_SCHEMA_ID   ResourceCreationInfoType = "ENUM_SCHEMA_ID"
+	ENUM_SCHEMA_NAME ResourceCreationInfoType = "ENUM_SCHEMA_NAME"
+
 	// Miscellaneous Info for resources that don't fit the above
 	ENUM_TYPE          ResourceCreationInfoType = "ENUM_TYPE"
 	ENUM_CONTEXT_TYPE  ResourceCreationInfoType = "ENUM_CONTEXT_TYPE"
@@ -37,9 +41,9 @@ const (
 	ENUM_SOURCE_REF_ID ResourceCreationInfoType = "ENUM_SOURCE_REF_ID"
 )
 
-type ResourceCreationInfo struct {
-	SelfInfo map[ResourceCreationInfoType]string
-	DepIds   []string
+type ResourceInfo struct {
+	CreationInfo map[ResourceCreationInfoType]string
+	DeletionIds  []string
 }
 
 // The TestableResource struct is used to create and delete resources in a test, without prior configuration needed
@@ -59,10 +63,10 @@ type TestableResource struct {
 	ClientInfo *connector.ClientInfo
 
 	// Creation function for this TestableResources
-	CreateFunc func(*testing.T, *connector.ClientInfo, string, ...string) ResourceCreationInfo
+	CreateFunc func(*testing.T, *connector.ClientInfo, string, ...string) ResourceInfo
 
 	// TestableResource information like ID, Name, etc.
-	CreationInfo ResourceCreationInfo
+	ResourceInfo ResourceInfo
 
 	// Deletion function for this TestableResources
 	DeleteFunc func(*testing.T, *connector.ClientInfo, string, ...string)
@@ -74,7 +78,7 @@ type TestableResource struct {
 	ExportableResource connector.ExportableResource
 }
 
-func (tr *TestableResource) CreateResource(t *testing.T) ResourceCreationInfo {
+func (tr *TestableResource) CreateResource(t *testing.T) {
 	t.Helper()
 
 	// Some resources like out_of_band_auth_plugins do not implement ExportableResource
@@ -86,23 +90,18 @@ func (tr *TestableResource) CreateResource(t *testing.T) ResourceCreationInfo {
 	createdDepIds := []string{}
 	for _, dependency := range tr.Dependencies {
 		// Recursively create dependencies
-		dependency.CreationInfo = dependency.CreateResource(t)
-		depId, ok := dependency.CreationInfo.SelfInfo[ENUM_ID]
+		dependency.CreateResource(t)
+		depId, ok := dependency.ResourceInfo.CreationInfo[ENUM_ID]
 		if !ok {
 			t.Fatalf("Failed to get ID from dependency: %v", dependency)
 		}
 
-		if len(dependency.CreationInfo.DepIds) > 0 {
-			createdDepIds = append(createdDepIds, dependency.CreationInfo.DepIds...)
-		}
 		createdDepIds = append(createdDepIds, depId)
 	}
 
 	if tr.CreateFunc != nil {
-		tr.CreationInfo = tr.CreateFunc(t, tr.ClientInfo, resourceType, createdDepIds...)
+		tr.ResourceInfo = tr.CreateFunc(t, tr.ClientInfo, resourceType, createdDepIds...)
 	}
-
-	return tr.CreationInfo
 }
 
 func (tr *TestableResource) DeleteResource(t *testing.T) {
@@ -113,10 +112,8 @@ func (tr *TestableResource) DeleteResource(t *testing.T) {
 		resourceType = tr.ExportableResource.ResourceType()
 	}
 
-	ids := append(tr.CreationInfo.DepIds, tr.CreationInfo.SelfInfo[ENUM_ID])
-
 	if tr.DeleteFunc != nil {
-		tr.DeleteFunc(t, tr.ClientInfo, resourceType, ids...)
+		tr.DeleteFunc(t, tr.ClientInfo, resourceType, tr.ResourceInfo.DeletionIds...)
 	}
 
 	for _, dependency := range tr.Dependencies {

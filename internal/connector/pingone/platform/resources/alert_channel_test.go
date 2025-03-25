@@ -17,15 +17,15 @@ func TestAlertChannelExport(t *testing.T) {
 
 	tr := pingone_testable_resources.AlertChannel(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	// Defined the expected ImportBlocks for the resource
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo.SelfInfo[testutils_resource.ENUM_NAME],
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 

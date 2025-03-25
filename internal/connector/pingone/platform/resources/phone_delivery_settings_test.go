@@ -18,14 +18,14 @@ func Test_PhoneDeliverySettings(t *testing.T) {
 
 	tr := pingone_testable_resources.PhoneDeliverySettings(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("provider_custom_%s", creationInfo.SelfInfo[testutils_resource.ENUM_NAME]),
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: fmt.Sprintf("provider_custom_%s", tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_NAME]),
+			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 

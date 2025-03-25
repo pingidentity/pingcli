@@ -17,7 +17,7 @@ func TestLanguageUpdateExport(t *testing.T) {
 
 	tr := pingone_testable_resources.LanguageUpdate(t, clientInfo)
 
-	_ = tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	languageTr := tr.Dependencies[0]
@@ -26,8 +26,8 @@ func TestLanguageUpdateExport(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_update", languageTr.CreationInfo.SelfInfo[testutils_resource.ENUM_NAME]),
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, languageTr.CreationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: fmt.Sprintf("%s_update", languageTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_NAME]),
+			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, languageTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 

@@ -18,14 +18,14 @@ func Test_CustomDomain(t *testing.T) {
 
 	tr := pingone_testable_resources.CustomDomain(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: creationInfo.SelfInfo[testutils_resource.ENUM_NAME],
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_NAME],
+			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 

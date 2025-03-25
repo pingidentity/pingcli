@@ -27,7 +27,7 @@ func CertificateCa(t *testing.T, clientInfo *connector.ClientInfo) *testutils_re
 	}
 }
 
-func createCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 0 {
@@ -56,9 +56,9 @@ func createCertificateCa(t *testing.T, clientInfo *connector.ClientInfo, resourc
 		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:            *resource.Id,
 			testutils_resource.ENUM_ISSUER_DN:     *resource.IssuerDN,
 			testutils_resource.ENUM_SERIAL_NUMBER: *resource.SerialNumber,

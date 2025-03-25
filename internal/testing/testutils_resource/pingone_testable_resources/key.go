@@ -27,7 +27,7 @@ func Key(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.Tes
 	}
 }
 
-func createKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 0 {
@@ -59,9 +59,11 @@ func createKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
+			*resource.Id,
+		},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Id,
 			testutils_resource.ENUM_NAME: resource.Name,
 			testutils_resource.ENUM_TYPE: string(resource.UsageType),
@@ -75,9 +77,8 @@ func deleteKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 	if len(ids) != 1 {
 		t.Fatalf("Unexpected number of arguments provided to deleteKey(): %v", ids)
 	}
-	id := ids[0]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.DeleteKey(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, id)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.DeleteKey(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteKey", resourceType)

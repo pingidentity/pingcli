@@ -18,14 +18,14 @@ func Test_Key(t *testing.T) {
 
 	tr := pingone_testable_resources.Key(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s", creationInfo.SelfInfo[testutils_resource.ENUM_NAME], creationInfo.SelfInfo[testutils_resource.ENUM_TYPE]),
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, creationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: fmt.Sprintf("%s_%s", tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_NAME], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_TYPE]),
+			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 

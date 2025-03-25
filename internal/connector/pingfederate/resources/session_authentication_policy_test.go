@@ -18,14 +18,14 @@ func Test_PingFederateSessionAuthenticationPolicy(t *testing.T) {
 
 	tr := pingfederate_testable_resources.SessionAuthenticationPolicy(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s_%s", creationInfo.SelfInfo[testutils_resource.ENUM_ID], creationInfo.SelfInfo[testutils_resource.ENUM_TYPE], creationInfo.SelfInfo[testutils_resource.ENUM_SOURCE_REF_ID]),
-			ResourceID:   creationInfo.SelfInfo[testutils_resource.ENUM_ID],
+			ResourceName: fmt.Sprintf("%s_%s_%s", tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_TYPE], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_SOURCE_REF_ID]),
+			ResourceID:   tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 

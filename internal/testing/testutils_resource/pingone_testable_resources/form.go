@@ -26,7 +26,7 @@ func Form(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.Te
 	}
 }
 
-func createForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 0 {
@@ -63,9 +63,11 @@ func createForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
+			*resource.Id,
+		},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Id,
 			testutils_resource.ENUM_NAME: resource.Name,
 		},
@@ -78,9 +80,8 @@ func deleteForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 	if len(ids) != 1 {
 		t.Fatalf("Unexpected number of arguments provided to deleteForm(): %v", ids)
 	}
-	id := ids[0]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.FormManagementApi.DeleteForm(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, id)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.FormManagementApi.DeleteForm(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteForm", resourceType)

@@ -18,7 +18,7 @@ func Test_PingFederateKeypairsSigningKeyRotationSettings(t *testing.T) {
 
 	tr := pingfederate_testable_resources.KeypairsSigningKeyRotationSettings(t, clientInfo)
 
-	_ = tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	// Test_PingFederateKeypairsSigningKeyRotationSettings only has one dependency
@@ -27,8 +27,8 @@ func Test_PingFederateKeypairsSigningKeyRotationSettings(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s_rotation_settings", keypairTr.CreationInfo.SelfInfo[testutils_resource.ENUM_ISSUER_DN], keypairTr.CreationInfo.SelfInfo[testutils_resource.ENUM_SERIAL_NUMBER]),
-			ResourceID:   keypairTr.CreationInfo.SelfInfo[testutils_resource.ENUM_ID],
+			ResourceName: fmt.Sprintf("%s_%s_rotation_settings", keypairTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ISSUER_DN], keypairTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_SERIAL_NUMBER]),
+			ResourceID:   keypairTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 

@@ -17,7 +17,7 @@ func Test_AgreementEnable(t *testing.T) {
 
 	tr := pingone_testable_resources.AgreementEnable(t, clientInfo)
 
-	_ = tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	agreementTr := tr.Dependencies[0]
@@ -26,8 +26,8 @@ func Test_AgreementEnable(t *testing.T) {
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_enable", agreementTr.CreationInfo.SelfInfo[testutils_resource.ENUM_NAME]),
-			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, agreementTr.CreationInfo.SelfInfo[testutils_resource.ENUM_ID]),
+			ResourceName: fmt.Sprintf("%s_enable", agreementTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_NAME]),
+			ResourceID:   fmt.Sprintf("%s/%s", clientInfo.PingOneExportEnvironmentID, agreementTr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID]),
 		},
 	}
 

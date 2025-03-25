@@ -26,7 +26,7 @@ func GatewayCredential(t *testing.T, clientInfo *connector.ClientInfo) *testutil
 	}
 }
 
-func createGatewayCredential(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createGatewayCredential(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 1 {
@@ -45,11 +45,12 @@ func createGatewayCredential(t *testing.T, clientInfo *connector.ClientInfo, res
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
 			gatewayId,
+			*resource.Id,
 		},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID: *resource.Id,
 		},
 	}
@@ -61,10 +62,8 @@ func deleteGatewayCredential(t *testing.T, clientInfo *connector.ClientInfo, res
 	if len(ids) != 2 {
 		t.Fatalf("Unexpected number of arguments provided to deleteGatewayCredential(): %v", ids)
 	}
-	gatewayId := ids[0]
-	gatewayCredentialId := ids[1]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.GatewayCredentialsApi.DeleteGatewayCredential(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, gatewayId, gatewayCredentialId)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.GatewayCredentialsApi.DeleteGatewayCredential(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteGatewayCredential", resourceType)

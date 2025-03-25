@@ -18,14 +18,14 @@ func Test_PingFederateCertificateCa(t *testing.T) {
 
 	tr := pingfederate_testable_resources.CertificateCa(t, clientInfo)
 
-	creationInfo := tr.CreateResource(t)
+	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{
 			ResourceType: tr.ExportableResource.ResourceType(),
-			ResourceName: fmt.Sprintf("%s_%s", creationInfo.SelfInfo[testutils_resource.ENUM_ISSUER_DN], creationInfo.SelfInfo[testutils_resource.ENUM_SERIAL_NUMBER]),
-			ResourceID:   creationInfo.SelfInfo[testutils_resource.ENUM_ID],
+			ResourceName: fmt.Sprintf("%s_%s", tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ISSUER_DN], tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_SERIAL_NUMBER]),
+			ResourceID:   tr.ResourceInfo.CreationInfo[testutils_resource.ENUM_ID],
 		},
 	}
 

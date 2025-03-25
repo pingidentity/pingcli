@@ -28,7 +28,7 @@ func SessionAuthenticationPolicy(t *testing.T, clientInfo *connector.ClientInfo)
 	}
 }
 
-func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 1 {
@@ -58,9 +58,9 @@ func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.Clien
 		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:            *resource.Id,
 			testutils_resource.ENUM_TYPE:          resource.AuthenticationSource.Type,
 			testutils_resource.ENUM_SOURCE_REF_ID: resource.AuthenticationSource.SourceRef.Id,

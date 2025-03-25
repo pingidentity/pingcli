@@ -28,7 +28,7 @@ func KeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.Clie
 	}
 }
 
-func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 1 {
@@ -55,9 +55,9 @@ func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 	}
 
 	// Deletion of this resource is referenced by the keyPairId
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID: keyPairId,
 		},
 	}

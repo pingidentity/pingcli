@@ -26,7 +26,7 @@ func Agreement(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resour
 	}
 }
 
-func createAgreement(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createAgreement(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 0 {
@@ -52,9 +52,11 @@ func createAgreement(t *testing.T, clientInfo *connector.ClientInfo, resourceTyp
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
+			*resource.Id,
+		},
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Id,
 			testutils_resource.ENUM_NAME: resource.Name,
 		},
@@ -67,9 +69,8 @@ func deleteAgreement(t *testing.T, clientInfo *connector.ClientInfo, resourceTyp
 	if len(ids) != 1 {
 		t.Fatalf("Unexpected number of arguments provided to deleteAgreement(): %v", ids)
 	}
-	id := ids[0]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.AgreementsResourcesApi.DeleteAgreement(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, id)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.AgreementsResourcesApi.DeleteAgreement(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteAgreement", resourceType)

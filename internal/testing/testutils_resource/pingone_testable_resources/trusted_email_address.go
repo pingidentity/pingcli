@@ -27,7 +27,7 @@ func TrustedEmailAddress(t *testing.T, clientInfo *connector.ClientInfo) *testut
 	}
 }
 
-func createTrustedEmailAddress(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceCreationInfo {
+func createTrustedEmailAddress(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
 	if len(strArgs) != 1 {
@@ -51,11 +51,12 @@ func createTrustedEmailAddress(t *testing.T, clientInfo *connector.ClientInfo, r
 		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
 	}
 
-	return testutils_resource.ResourceCreationInfo{
-		DepIds: []string{
+	return testutils_resource.ResourceInfo{
+		DeletionIds: []string{
 			trustedEmailDomainId,
+			*resource.Id,
 		},
-		SelfInfo: map[testutils_resource.ResourceCreationInfoType]string{
+		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Id,
 			testutils_resource.ENUM_NAME: resource.EmailAddress,
 		},
@@ -68,10 +69,8 @@ func deleteTrustedEmailAddress(t *testing.T, clientInfo *connector.ClientInfo, r
 	if len(ids) != 2 {
 		t.Fatalf("Unexpected number of arguments provided to deleteTrustedEmailAddress(): %v", ids)
 	}
-	trustedEmailDomainId := ids[0]
-	TrustedEmailAddressId := ids[1]
 
-	request := clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailAddressesApi.DeleteTrustedEmailAddress(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, trustedEmailDomainId, TrustedEmailAddressId)
+	request := clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailAddressesApi.DeleteTrustedEmailAddress(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteTrustedEmailAddress", resourceType)
