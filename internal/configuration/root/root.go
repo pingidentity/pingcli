@@ -116,9 +116,12 @@ func initDetailedExitCodeOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "PINGCLI_DETAILED_EXITCODE",
 		Flag: &pflag.Flag{
-			Name:        cobraParamName,
-			Shorthand:   "D",
-			Usage:       "Enable detailed exit code output. (default false)",
+			Name:      cobraParamName,
+			Shorthand: "D",
+			Usage: "Enable detailed exit code output. (default false)" +
+				"\n0 - pingcli command succeeded with no errors or warnings." +
+				"\n1 - pingcli command failed with errors." +
+				"\n2 - pingcli command succeeded with warnings.",
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},

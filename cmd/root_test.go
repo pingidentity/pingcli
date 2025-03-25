@@ -144,7 +144,8 @@ func TestRootCmd_DetailedExitCodeWarnLoggedFunc(t *testing.T) {
 	output.Warn("test warning", nil)
 
 	warnLogged, err := output.DetailedExitCodeWarnLogged()
-	if warnLogged {
-		testutils.CheckExpectedError(t, err, nil)
+	testutils.CheckExpectedError(t, err, nil)
+	if !warnLogged {
+		t.Errorf("Expected DetailedExitCodeWarnLogged to return true")
 	}
 }
