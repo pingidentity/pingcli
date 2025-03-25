@@ -29,7 +29,8 @@ func createTrustedEmailDomain(t *testing.T, clientInfo *connector.ClientInfo, re
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createTrustedEmailDomain(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createTrustedEmailDomain(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailDomainsApi.CreateTrustedEmailDomain(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
@@ -42,10 +43,12 @@ func createTrustedEmailDomain(t *testing.T, clientInfo *connector.ClientInfo, re
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateTrustedEmailDomain", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -63,7 +66,8 @@ func deleteTrustedEmailDomain(t *testing.T, clientInfo *connector.ClientInfo, re
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteTrustedEmailDomain(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteTrustedEmailDomain(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.TrustedEmailDomainsApi.DeleteTrustedEmailDomain(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -71,9 +75,11 @@ func deleteTrustedEmailDomain(t *testing.T, clientInfo *connector.ClientInfo, re
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteTrustedEmailDomain", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

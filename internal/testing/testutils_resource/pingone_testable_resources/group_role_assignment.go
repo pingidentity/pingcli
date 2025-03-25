@@ -32,14 +32,16 @@ func createGroupRoleAssignment(t *testing.T, clientInfo *connector.ClientInfo, r
 	t.Helper()
 
 	if len(strArgs) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to createGroupRoleAssignment(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createGroupRoleAssignment(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 	groupId := strArgs[0]
 
 	iter := clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadAllRoles(clientInfo.PingOneContext).Execute()
 	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedRolesInner](iter, "ReadAllRoles", "GetRoles", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nError: %v", err)
+		t.Errorf("Failed to execute PingOne client function\nError: %v", err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if len(apiObjs) == 0 {
 		t.Fatal("Failed to execute PingOne client function\n No built-in roles returned from ReadAllRoles()")
@@ -76,10 +78,12 @@ func createGroupRoleAssignment(t *testing.T, clientInfo *connector.ClientInfo, r
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateGroupRoleAssignment", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -98,7 +102,8 @@ func deleteGroupRoleAssignment(t *testing.T, clientInfo *connector.ClientInfo, r
 	t.Helper()
 
 	if len(ids) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to deleteGroupRoleAssignment(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteGroupRoleAssignment(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.GroupRoleAssignmentsApi.DeleteGroupRoleAssignment(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
@@ -106,9 +111,11 @@ func deleteGroupRoleAssignment(t *testing.T, clientInfo *connector.ClientInfo, r
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteGroupRoleAssignment", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

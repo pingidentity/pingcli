@@ -32,7 +32,8 @@ func createPopulation(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	t.Helper()
 
 	if len(strArgs) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to createPopulation(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createPopulation(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 	passwordPolicyId := strArgs[0]
 
@@ -51,10 +52,12 @@ func createPopulation(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreatePopulation", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -72,17 +75,20 @@ func deletePopulation(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deletePopulation(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deletePopulation(): %v", ids)
+		return
 	}
 
 	getRequest := clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadOnePopulation(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
 	populationClientStruct, response, err := getRequest.Execute()
 	ok, err := common.HandleClientResponse(response, err, "ReadOnePopulation", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 
 	updateRequest := clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.UpdatePopulation(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -92,10 +98,12 @@ func deletePopulation(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	_, response, err = updateRequest.Execute()
 	ok, err = common.HandleClientResponse(response, err, "UpdatePopulation", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 
 	deleteRequest := clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.DeletePopulation(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -103,9 +111,11 @@ func deletePopulation(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	response, err = deleteRequest.Execute()
 	ok, err = common.HandleClientResponse(response, err, "DeletePopulation", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

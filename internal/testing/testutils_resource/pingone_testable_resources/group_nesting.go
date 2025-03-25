@@ -32,7 +32,8 @@ func createGroupNesting(t *testing.T, clientInfo *connector.ClientInfo, resource
 	t.Helper()
 
 	if len(strArgs) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to createGroupNesting(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createGroupNesting(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 	groupId := strArgs[0]
 	nestedGroupId := strArgs[1]
@@ -47,19 +48,23 @@ func createGroupNesting(t *testing.T, clientInfo *connector.ClientInfo, resource
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateGroupNesting", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	group, response, err := clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.ReadOneGroup(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, groupId).Execute()
 	ok, err = common.HandleClientResponse(response, err, "ReadOneGroup", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -78,7 +83,8 @@ func deleteGroupNesting(t *testing.T, clientInfo *connector.ClientInfo, resource
 	t.Helper()
 
 	if len(ids) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to deleteGroupNesting(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteGroupNesting(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.GroupsApi.DeleteGroupNesting(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
@@ -86,9 +92,11 @@ func deleteGroupNesting(t *testing.T, clientInfo *connector.ClientInfo, resource
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteGroupNesting", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

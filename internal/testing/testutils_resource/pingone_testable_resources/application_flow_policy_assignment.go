@@ -32,18 +32,21 @@ func createApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 	t.Helper()
 
 	if len(strArgs) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to createApplicationFlowPolicyAssignment(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createApplicationFlowPolicyAssignment(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 	applicationId := strArgs[0]
 
 	iter := clientInfo.PingOneApiClient.ManagementAPIClient.FlowPoliciesApi.ReadAllFlowPolicies(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID).Execute()
 	flowPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.FlowPolicy](iter, "ReadAllFlowPolicies", "GetFlowPolicies", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nError: %v", err)
+		t.Errorf("Failed to execute PingOne client function\nError: %v", err)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	if len(flowPolicies) == 0 {
-		t.Fatalf("No flow policies found")
+		t.Errorf("No flow policies found")
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationFlowPolicyAssignmentsApi.CreateFlowPolicyAssignment(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, applicationId)
@@ -59,20 +62,24 @@ func createApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateFlowPolicyAssignment", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	flowPolicy, response, err := clientInfo.PingOneApiClient.ManagementAPIClient.FlowPoliciesApi.ReadOneFlowPolicy(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, resource.FlowPolicy.Id).Execute()
 
 	ok, err = common.HandleClientResponse(response, err, "ReadOneFlowPolicy", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -91,7 +98,8 @@ func deleteApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 	t.Helper()
 
 	if len(ids) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to deleteApplicationFlowPolicyAssignment(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteApplicationFlowPolicyAssignment(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationFlowPolicyAssignmentsApi.DeleteFlowPolicyAssignment(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
@@ -99,9 +107,11 @@ func deleteApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteFlowPolicyAssignment", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

@@ -29,7 +29,8 @@ func createWebhook(t *testing.T, clientInfo *connector.ClientInfo, resourceType 
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createWebhook(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createWebhook(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.CreateSubscription(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
@@ -57,10 +58,12 @@ func createWebhook(t *testing.T, clientInfo *connector.ClientInfo, resourceType 
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateSubscription", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -78,7 +81,8 @@ func deleteWebhook(t *testing.T, clientInfo *connector.ClientInfo, resourceType 
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteWebhook(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteWebhook(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.DeleteSubscription(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -86,9 +90,11 @@ func deleteWebhook(t *testing.T, clientInfo *connector.ClientInfo, resourceType 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteSubscription", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

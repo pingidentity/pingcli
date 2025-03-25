@@ -30,7 +30,8 @@ func createForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createForm(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createForm(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.FormManagementApi.CreateForm(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
@@ -57,10 +58,12 @@ func createForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateForm", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -78,7 +81,8 @@ func deleteForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteForm(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteForm(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.FormManagementApi.DeleteForm(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -86,9 +90,11 @@ func deleteForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteForm", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

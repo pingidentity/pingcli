@@ -32,7 +32,8 @@ func createApplicationResourceGrant(t *testing.T, clientInfo *connector.ClientIn
 	t.Helper()
 
 	if len(strArgs) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to createApplicationResourceGrant(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createApplicationResourceGrant(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 	applicationId := strArgs[0]
 	resourceId := strArgs[1]
@@ -46,10 +47,12 @@ func createApplicationResourceGrant(t *testing.T, clientInfo *connector.ClientIn
 	scope, response, err := resReq.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateResourceScope", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationResourceGrantsApi.CreateApplicationGrant(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, applicationId)
@@ -69,19 +72,23 @@ func createApplicationResourceGrant(t *testing.T, clientInfo *connector.ClientIn
 	resource, response, err := request.Execute()
 	ok, err = common.HandleClientResponse(response, err, "CreateApplicationGrant", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	resObj, resResponse, resErr := clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, resourceId).Execute()
 	ok, err = common.HandleClientResponse(resResponse, resErr, "ReadOneResource", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", resResponse.Status, resResponse.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", resResponse.Status, resResponse.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", resResponse.Status, resResponse.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", resResponse.Status, resResponse.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -100,7 +107,8 @@ func deleteApplicationResourceGrant(t *testing.T, clientInfo *connector.ClientIn
 	t.Helper()
 
 	if len(ids) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to deleteApplicationResourceGrant(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteApplicationResourceGrant(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationResourceGrantsApi.DeleteApplicationGrant(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
@@ -108,9 +116,11 @@ func deleteApplicationResourceGrant(t *testing.T, clientInfo *connector.ClientIn
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteApplicationGrant", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

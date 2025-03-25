@@ -31,13 +31,15 @@ func createSchemaAttribute(t *testing.T, clientInfo *connector.ClientInfo, resou
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createSchemaAttribute(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createSchemaAttribute(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	iter := clientInfo.PingOneApiClient.ManagementAPIClient.SchemasApi.ReadAllSchemas(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID).Execute()
 	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.Schema](iter, "ReadAllSchemas", "GetSchemas", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nError: %v", err)
+		t.Errorf("Failed to execute PingOne client function\nError: %v", err)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	if len(apiObjs) == 0 {
@@ -74,10 +76,12 @@ func createSchemaAttribute(t *testing.T, clientInfo *connector.ClientInfo, resou
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateAttribute", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -98,7 +102,8 @@ func deleteSchemaAttribute(t *testing.T, clientInfo *connector.ClientInfo, resou
 	t.Helper()
 
 	if len(ids) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to deleteSchemaAttribute(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteSchemaAttribute(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.SchemasApi.DeleteAttribute(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
@@ -106,9 +111,11 @@ func deleteSchemaAttribute(t *testing.T, clientInfo *connector.ClientInfo, resou
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteAttribute", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

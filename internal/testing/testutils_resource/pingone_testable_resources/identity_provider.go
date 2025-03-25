@@ -30,7 +30,8 @@ func createIdentityProvider(t *testing.T, clientInfo *connector.ClientInfo, reso
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createIdentityProvider(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createIdentityProvider(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.IdentityProvidersApi.CreateIdentityProvider(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
@@ -58,10 +59,12 @@ func createIdentityProvider(t *testing.T, clientInfo *connector.ClientInfo, reso
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateIdentityProvider", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -79,7 +82,8 @@ func deleteIdentityProvider(t *testing.T, clientInfo *connector.ClientInfo, reso
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteIdentityProvider(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteIdentityProvider(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.IdentityProvidersApi.DeleteIdentityProvider(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -87,9 +91,11 @@ func deleteIdentityProvider(t *testing.T, clientInfo *connector.ClientInfo, reso
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteIdentityProvider", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

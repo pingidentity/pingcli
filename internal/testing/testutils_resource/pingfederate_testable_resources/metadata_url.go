@@ -30,7 +30,8 @@ func createMetadataUrl(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createMetadataUrl(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createMetadataUrl(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingFederateApiClient.MetadataUrlsAPI.AddMetadataUrl(clientInfo.PingFederateContext)
@@ -45,14 +46,18 @@ func createMetadataUrl(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "AddMetadataUrl", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
-		DeletionIds: []string{},
+		DeletionIds: []string{
+			*resource.Id,
+		},
 		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   *resource.Id,
 			testutils_resource.ENUM_NAME: resource.Name,
@@ -64,18 +69,20 @@ func deleteMetadataUrl(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteMetadataUrl(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteMetadataUrl(): %v", ids)
+		return
 	}
-	id := ids[0]
 
-	request := clientInfo.PingFederateApiClient.MetadataUrlsAPI.DeleteMetadataUrl(clientInfo.PingFederateContext, id)
+	request := clientInfo.PingFederateApiClient.MetadataUrlsAPI.DeleteMetadataUrl(clientInfo.PingFederateContext, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteMetadataUrl", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

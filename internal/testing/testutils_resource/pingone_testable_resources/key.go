@@ -31,7 +31,8 @@ func createKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createKey(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createKey(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.CreateKey(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
@@ -53,10 +54,12 @@ func createKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateKey", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -75,7 +78,8 @@ func deleteKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteKey(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteKey(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.CertificateManagementApi.DeleteKey(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -83,9 +87,11 @@ func deleteKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteKey", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

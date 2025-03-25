@@ -29,7 +29,8 @@ func createAuthenticationApiApplication(t *testing.T, clientInfo *connector.Clie
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createAuthenticationApiApplication(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createAuthenticationApiApplication(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingFederateApiClient.AuthenticationApiAPI.CreateApplication(clientInfo.PingFederateContext)
@@ -44,14 +45,18 @@ func createAuthenticationApiApplication(t *testing.T, clientInfo *connector.Clie
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
-		DeletionIds: []string{},
+		DeletionIds: []string{
+			resource.Id,
+		},
 		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:   resource.Id,
 			testutils_resource.ENUM_NAME: resource.Name,
@@ -63,18 +68,20 @@ func deleteAuthenticationApiApplication(t *testing.T, clientInfo *connector.Clie
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteAuthenticationApiApplication(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteAuthenticationApiApplication(): %v", ids)
+		return
 	}
-	id := ids[0]
 
-	request := clientInfo.PingFederateApiClient.AuthenticationApiAPI.DeleteApplication(clientInfo.PingFederateContext, id)
+	request := clientInfo.PingFederateApiClient.AuthenticationApiAPI.DeleteApplication(clientInfo.PingFederateContext, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteApplication", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

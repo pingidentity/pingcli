@@ -30,7 +30,8 @@ func createSignOnPolicy(t *testing.T, clientInfo *connector.ClientInfo, resource
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createSignOnPolicy(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createSignOnPolicy(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.SignOnPoliciesApi.CreateSignOnPolicy(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
@@ -45,10 +46,12 @@ func createSignOnPolicy(t *testing.T, clientInfo *connector.ClientInfo, resource
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateSignOnPolicy", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -66,7 +69,8 @@ func deleteSignOnPolicy(t *testing.T, clientInfo *connector.ClientInfo, resource
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteSignOnPolicy(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteSignOnPolicy(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.SignOnPoliciesApi.DeleteSignOnPolicy(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -74,9 +78,11 @@ func deleteSignOnPolicy(t *testing.T, clientInfo *connector.ClientInfo, resource
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteSignOnPolicy", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

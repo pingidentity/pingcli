@@ -31,19 +31,22 @@ func createBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createBrandingTheme(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createBrandingTheme(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.CreateBrandingTheme(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
 
 	newLogoId, err := uuid.GenerateUUID()
 	if err != nil {
-		t.Fatalf("Failed to generate UUID: %v", err)
+		t.Errorf("Failed to generate UUID: %v", err)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	newImageId, err := uuid.GenerateUUID()
 	if err != nil {
-		t.Fatalf("Failed to generate UUID: %v", err)
+		t.Errorf("Failed to generate UUID: %v", err)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	clientStruct := management.BrandingTheme{
@@ -76,10 +79,12 @@ func createBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateBrandingTheme", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -97,7 +102,8 @@ func deleteBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteBrandingTheme(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteBrandingTheme(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.DeleteBrandingTheme(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -105,9 +111,11 @@ func deleteBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteBrandingTheme", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

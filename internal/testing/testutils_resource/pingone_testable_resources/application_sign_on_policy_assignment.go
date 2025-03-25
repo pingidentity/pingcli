@@ -32,7 +32,8 @@ func createApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 	t.Helper()
 
 	if len(strArgs) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to createApplicationSignOnPolicyAssignment(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createApplicationSignOnPolicyAssignment(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 	applicationId := strArgs[0]
 	policyId := strArgs[1]
@@ -50,19 +51,23 @@ func createApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateSignOnPolicyAssignment", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	signOnPolicy, response, err := clientInfo.PingOneApiClient.ManagementAPIClient.SignOnPoliciesApi.ReadOneSignOnPolicy(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, resource.SignOnPolicy.Id).Execute()
 	ok, err = common.HandleClientResponse(response, err, "ReadOneSignOnPolicy", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -81,7 +86,8 @@ func deleteApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 	t.Helper()
 
 	if len(ids) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to deleteApplicationSignOnPolicyAssignment(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteApplicationSignOnPolicyAssignment(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationSignOnPolicyAssignmentsApi.DeleteSignOnPolicyAssignment(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
@@ -89,9 +95,11 @@ func deleteApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteSignOnPolicyAssignment", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

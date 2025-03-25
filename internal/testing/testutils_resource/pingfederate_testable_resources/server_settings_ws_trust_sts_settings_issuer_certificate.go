@@ -36,7 +36,8 @@ func createServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clien
 
 	fileData, err := testutils.CreateX509Certificate()
 	if err != nil {
-		t.Fatalf("Failed to create test %s: %v", resourceType, err)
+		t.Errorf("Failed to create test %s: %v", resourceType, err)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingFederateApiClient.ServerSettingsAPI.ImportCertificate(clientInfo.PingFederateContext)
@@ -50,14 +51,18 @@ func createServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clien
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "ImportCertificate", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
-		DeletionIds: []string{},
+		DeletionIds: []string{
+			*resource.CertView.Id,
+		},
 		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID:            *resource.CertView.Id,
 			testutils_resource.ENUM_ISSUER_DN:     *resource.CertView.IssuerDN,
@@ -70,18 +75,20 @@ func deleteServerSettingsWsTrustStsSettingsIssuerCertificate(t *testing.T, clien
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteServerSettingsWsTrustStsSettingsIssuerCertificate(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteServerSettingsWsTrustStsSettingsIssuerCertificate(): %v", ids)
+		return
 	}
-	id := ids[0]
 
-	request := clientInfo.PingFederateApiClient.ServerSettingsAPI.DeleteCertificate(clientInfo.PingFederateContext, id)
+	request := clientInfo.PingFederateApiClient.ServerSettingsAPI.DeleteCertificate(clientInfo.PingFederateContext, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteCertificate", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

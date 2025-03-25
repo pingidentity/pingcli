@@ -29,7 +29,8 @@ func createAlertChannel(t *testing.T, clientInfo *connector.ClientInfo, resource
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createAlertChannel(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createAlertChannel(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.AlertingApi.CreateAlertChannel(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
@@ -53,10 +54,12 @@ func createAlertChannel(t *testing.T, clientInfo *connector.ClientInfo, resource
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateAlertChannel", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -74,7 +77,8 @@ func deleteAlertChannel(t *testing.T, clientInfo *connector.ClientInfo, resource
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteAlertChannel(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteAlertChannel(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.AlertingApi.DeleteAlertChannel(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0])
@@ -82,9 +86,11 @@ func deleteAlertChannel(t *testing.T, clientInfo *connector.ClientInfo, resource
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteAlertChannel", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

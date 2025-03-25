@@ -31,7 +31,8 @@ func createApplicationAttributeMapping(t *testing.T, clientInfo *connector.Clien
 	t.Helper()
 
 	if len(strArgs) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to createApplicationAttributeMapping(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createApplicationAttributeMapping(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 	applicationId := strArgs[0]
 
@@ -47,10 +48,12 @@ func createApplicationAttributeMapping(t *testing.T, clientInfo *connector.Clien
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateApplicationAttributeMapping", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -69,7 +72,8 @@ func deleteApplicationAttributeMapping(t *testing.T, clientInfo *connector.Clien
 	t.Helper()
 
 	if len(ids) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to deleteApplicationAttributeMapping(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteApplicationAttributeMapping(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationAttributeMappingApi.DeleteApplicationAttributeMapping(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
@@ -77,9 +81,11 @@ func deleteApplicationAttributeMapping(t *testing.T, clientInfo *connector.Clien
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteApplicationAttributeMapping", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

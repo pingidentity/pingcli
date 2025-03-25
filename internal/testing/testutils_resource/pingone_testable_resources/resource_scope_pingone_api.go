@@ -31,13 +31,15 @@ func createResourceScopePingoneApi(t *testing.T, clientInfo *connector.ClientInf
 	t.Helper()
 
 	if len(strArgs) != 0 {
-		t.Fatalf("Unexpected number of arguments provided to createResourceScopePingoneApi(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createResourceScopePingoneApi(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	iter := clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadAllResources(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID).Execute()
 	generatedResources, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nError: %v", err)
+		t.Errorf("Failed to execute PingOne client function\nError: %v", err)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	var resourceId string
@@ -63,10 +65,12 @@ func createResourceScopePingoneApi(t *testing.T, clientInfo *connector.ClientInf
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateResourceScope", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
@@ -85,7 +89,8 @@ func deleteResourceScopePingoneApi(t *testing.T, clientInfo *connector.ClientInf
 	t.Helper()
 
 	if len(ids) != 2 {
-		t.Fatalf("Unexpected number of arguments provided to deleteResourceScopePingoneApi(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteResourceScopePingoneApi(): %v", ids)
+		return
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.ResourceScopesApi.DeleteResourceScope(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, ids[0], ids[1])
@@ -93,9 +98,11 @@ func deleteResourceScopePingoneApi(t *testing.T, clientInfo *connector.ClientInf
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteResourceScope", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }

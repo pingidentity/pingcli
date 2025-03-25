@@ -31,7 +31,8 @@ func createOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector
 	t.Helper()
 
 	if len(strArgs) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to createOauthTokenExchangeProcessorPolicy(): %v", strArgs)
+		t.Errorf("Unexpected number of arguments provided to createOauthTokenExchangeProcessorPolicy(): %v", strArgs)
+		return testutils_resource.ResourceInfo{}
 	}
 	testTokenProcessorId := strArgs[0]
 
@@ -69,14 +70,18 @@ func createOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector
 	resource, response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "CreateOauthTokenExchangeProcessorPolicy", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return testutils_resource.ResourceInfo{}
 	}
 
 	return testutils_resource.ResourceInfo{
-		DeletionIds: []string{},
+		DeletionIds: []string{
+			resource.Id,
+		},
 		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
 			testutils_resource.ENUM_ID: resource.Id,
 		},
@@ -87,18 +92,20 @@ func deleteOauthTokenExchangeProcessorPolicy(t *testing.T, clientInfo *connector
 	t.Helper()
 
 	if len(ids) != 1 {
-		t.Fatalf("Unexpected number of arguments provided to deleteOauthTokenExchangeProcessorPolicy(): %v", ids)
+		t.Errorf("Unexpected number of arguments provided to deleteOauthTokenExchangeProcessorPolicy(): %v", ids)
+		return
 	}
-	id := ids[0]
 
-	request := clientInfo.PingFederateApiClient.OauthTokenExchangeProcessorAPI.DeleteOauthTokenExchangeProcessorPolicyy(clientInfo.PingFederateContext, id)
+	request := clientInfo.PingFederateApiClient.OauthTokenExchangeProcessorAPI.DeleteOauthTokenExchangeProcessorPolicyy(clientInfo.PingFederateContext, ids[0])
 
 	response, err := request.Execute()
 	ok, err := common.HandleClientResponse(response, err, "DeleteOauthTokenExchangeProcessorPolicy", resourceType)
 	if err != nil {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+		return
 	}
 	if !ok {
-		t.Fatalf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		return
 	}
 }
