@@ -9,7 +9,6 @@ import (
 	"slices"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -91,15 +90,9 @@ func writeHeader(format, outputFilePath string, outputFile *os.File) error {
 		return fmt.Errorf("failed to parse HCL import header template. err: %s", err.Error())
 	}
 
-	header := struct {
-		DateTime string
-	}{
-		DateTime: time.Now().Format(time.RFC1123),
-	}
-
 	switch format {
 	case customtypes.ENUM_EXPORT_FORMAT_HCL:
-		err := hclImportHeaderTemplate.Execute(outputFile, header)
+		err := hclImportHeaderTemplate.Execute(outputFile, nil)
 		if err != nil {
 			return fmt.Errorf("failed to write import template to file %q. err: %s", outputFilePath, err.Error())
 		}
