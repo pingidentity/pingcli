@@ -32,11 +32,11 @@ func ApplicationResourcePermission(t *testing.T, clientInfo *connector.ClientInf
 func createApplicationResourcePermission(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 {
+	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createApplicationResourcePermission(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	applicationResourceId := strArgs[0]
+	applicationResourceId := strArgs[1]
 
 	request := clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationResourcePermissionsApi.CreateApplicationPermission(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, applicationResourceId)
 	clientStruct := authorize.ApplicationResourcePermission{

@@ -177,7 +177,10 @@ func TestCreateOrValidateOutputDirExistentDirWithFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("os.Create() error = %v", err)
 	}
-	file.Close()
+	err = file.Close()
+	if err != nil {
+		t.Fatalf("file.Close() error = %v", err)
+	}
 
 	_, err = createOrValidateOutputDir(outputDir, true)
 	testutils.CheckExpectedError(t, err, nil)
@@ -194,7 +197,10 @@ func TestCreateOrValidateOutputDirExistentDirWithFileNoOverwrite(t *testing.T) {
 	if err != nil {
 		t.Fatalf("os.Create() error = %v", err)
 	}
-	file.Close()
+	err = file.Close()
+	if err != nil {
+		t.Fatalf("file.Close() error = %v", err)
+	}
 
 	expectedErrorPattern := `^output directory '.*' is not empty\. Use --overwrite to overwrite existing export data$`
 	_, err = createOrValidateOutputDir(outputDir, false)

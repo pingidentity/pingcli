@@ -5,6 +5,7 @@ package request_internal
 import (
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -96,7 +97,12 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return err
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		cErr := res.Body.Close()
+		if cErr != nil {
+			err = errors.Join(err, cErr)
+		}
+	}()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -234,7 +240,13 @@ func pingoneAuth() (accessToken string, err error) {
 		return "", err
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		cErr := res.Body.Close()
+		if cErr != nil {
+			err = errors.Join(err, cErr)
+		}
+	}()
+
 	responseBodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", err

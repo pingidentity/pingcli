@@ -54,7 +54,8 @@ func createGatewayCredential(t *testing.T, clientInfo *connector.ClientInfo, res
 			*resource.Id,
 		},
 		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
-			testutils_resource.ENUM_ID: *resource.Id,
+			testutils_resource.ENUM_ID:         *resource.Credential,
+			testutils_resource.ENUM_CREDENTIAL: *resource.Id,
 		},
 	}
 }

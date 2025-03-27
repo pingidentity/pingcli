@@ -32,12 +32,12 @@ func OauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *connector
 func createOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 2 {
+	if len(strArgs) != 5 {
 		t.Errorf("Unexpected number of arguments provided to createOauthTokenExchangeTokenGeneratorMapping(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	testProcessorPolicyId := strArgs[0]
-	testTokenGeneratorId := strArgs[1]
+	testProcessorPolicyId := strArgs[2]
+	testTokenGeneratorId := strArgs[4]
 
 	request := clientInfo.PingFederateApiClient.OauthTokenExchangeTokenGeneratorMappingsAPI.CreateTokenGeneratorMapping(clientInfo.PingFederateContext)
 	clientStruct := client.ProcessorPolicyToGeneratorMapping{

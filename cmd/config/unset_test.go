@@ -3,13 +3,13 @@
 package config_test
 
 import (
-	"os"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
 )
 
 // Test Config Unset Command Executes without issue
@@ -41,15 +41,19 @@ func TestConfigUnsetCmd_InvalidKey(t *testing.T) {
 
 // Test Config Unset Command for key 'pingone.worker.clientId' updates viper configuration
 func TestConfigUnsetCmd_CheckViperConfig(t *testing.T) {
+	testutils_viper.InitVipers(t)
+
+	mainViper := profiles.GetMainConfig().ViperInstance()
 	viperKey := options.PingOneAuthenticationWorkerClientIDOption.ViperKey
-	viperOldValue := os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar)
+	profileViperKey := "default." + viperKey
+
+	viperOldValue := mainViper.GetString(profileViperKey)
 
 	err := testutils_cobra.ExecutePingcli(t, "config", "unset", viperKey)
 	testutils.CheckExpectedError(t, err, nil)
 
-	mainViper := profiles.GetMainConfig().ViperInstance()
-	profileViperKey := "default." + viperKey
 	viperNewValue := mainViper.GetString(profileViperKey)
+
 	if viperOldValue == viperNewValue {
 		t.Errorf("Expected viper configuration value to be updated. Old: %s, New: %s", viperOldValue, viperNewValue)
 	}

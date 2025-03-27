@@ -11,6 +11,7 @@ import (
 	"crypto/x509"
 	"crypto/x509/pkix"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"math/big"
 	"net/http"
@@ -79,8 +80,8 @@ func initPingOneClientInfo(t *testing.T, clientInfo *connector.ClientInfo) {
 
 	// Grab environment vars for initializing the API client.
 	// These are set in GitHub Actions.
-	clientID := os.Getenv("TEST_PINGONE_CLIENT_ID")
-	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_SECRET")
+	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
 	environmentId := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 	sdkRegionCode := management.EnumRegionCode(regionCode)
@@ -265,17 +266,16 @@ func WriteStringToPipe(str string, t *testing.T) (reader *os.File) {
 		t.Fatal(err)
 	}
 
-	defer writer.Close()
-
 	if _, err := writer.WriteString(str); err != nil {
-		reader.Close()
-		t.Fatal(err)
+		rcErr := reader.Close()
+		wcErr := writer.Close()
+		t.Fatal(errors.Join(err, rcErr, wcErr))
 	}
 
 	// Close the writer to simulate EOF
 	if err = writer.Close(); err != nil {
-		reader.Close()
-		t.Fatal(err)
+		cErr := reader.Close()
+		t.Fatal(errors.Join(err, cErr))
 	}
 
 	return reader

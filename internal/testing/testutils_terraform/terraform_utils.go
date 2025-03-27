@@ -168,8 +168,8 @@ provider "pingone" {
   region_code = "%s"
 }
 `,
-		os.Getenv("TEST_PINGONE_CLIENT_ID"),
-		os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
 		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
 	)

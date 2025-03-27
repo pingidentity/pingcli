@@ -31,11 +31,11 @@ func OpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo) *testut
 func createOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 {
+	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createOpenidConnectPolicy(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	testAccessTokenManagerId := strArgs[0]
+	testAccessTokenManagerId := strArgs[1]
 
 	request := clientInfo.PingFederateApiClient.OauthOpenIdConnectAPI.CreateOIDCPolicy(clientInfo.PingFederateContext)
 	clientStruct := client.OpenIdConnectPolicy{

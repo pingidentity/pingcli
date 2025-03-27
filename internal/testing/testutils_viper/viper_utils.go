@@ -111,8 +111,8 @@ func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
-		os.Getenv("TEST_PINGONE_CLIENT_ID"),
-		os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
 		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 	)
 }

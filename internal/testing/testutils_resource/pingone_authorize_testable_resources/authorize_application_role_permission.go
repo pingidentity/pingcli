@@ -31,12 +31,12 @@ func AuthorizeApplicationRolePermission(t *testing.T, clientInfo *connector.Clie
 func createAuthorizeApplicationRolePermission(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 2 {
+	if len(strArgs) != 4 {
 		t.Errorf("Unexpected number of arguments provided to createAuthorizeApplicationRolePermission(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
 	applicationRoleId := strArgs[0]
-	applicationResourcePermissionId := strArgs[1]
+	applicationResourcePermissionId := strArgs[3]
 
 	request := clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolePermissionsApi.CreateApplicationRolePermission(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, applicationRoleId)
 	clientStruct := authorize.ApplicationRolePermission{

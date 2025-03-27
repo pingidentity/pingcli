@@ -31,11 +31,11 @@ func AuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.ClientIn
 func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 {
+	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createAuthenticationPoliciesFragment(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	idpAdapterId := strArgs[0]
+	idpAdapterId := strArgs[1]
 
 	request := clientInfo.PingFederateApiClient.AuthenticationPoliciesAPI.CreateFragment(clientInfo.PingFederateContext)
 	clientStruct := client.AuthenticationPolicyFragment{

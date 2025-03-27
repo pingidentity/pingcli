@@ -32,12 +32,12 @@ func TokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.C
 func createTokenProcessorToTokenGeneratorMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 2 {
+	if len(strArgs) != 4 {
 		t.Errorf("Unexpected number of arguments provided to createTokenProcessorToTokenGeneratorMapping(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	testTokenProcessorId := strArgs[0]
-	testTokenGeneratorId := strArgs[1]
+	testTokenProcessorId := strArgs[1]
+	testTokenGeneratorId := strArgs[3]
 
 	request := clientInfo.PingFederateApiClient.TokenProcessorToTokenGeneratorMappingsAPI.CreateTokenToTokenMapping(clientInfo.PingFederateContext)
 	clientStruct := client.TokenToTokenMapping{

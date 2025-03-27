@@ -29,11 +29,11 @@ func AuthorizeApiServiceDeployment(t *testing.T, clientInfo *connector.ClientInf
 func createAuthorizeApiServiceDeployment(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 {
+	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createAuthorizeApiServiceDeployment(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	authorizeApiServiceId := strArgs[0]
+	authorizeApiServiceId := strArgs[1]
 
 	request := clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServerDeploymentApi.DeployAPIServer(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, authorizeApiServiceId)
 	request = request.ContentType("application/vnd.pingidentity.apiserver.deploy+json")

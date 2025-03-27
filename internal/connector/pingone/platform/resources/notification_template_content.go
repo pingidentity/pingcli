@@ -4,6 +4,7 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -125,7 +126,7 @@ func (r *PingOneNotificationTemplateContentResource) getEnabledLocales() (map[st
 	return enabledLocales, nil
 }
 
-func (r *PingOneNotificationTemplateContentResource) getTemplateNames() ([]management.EnumTemplateName, error) {
+func (r *PingOneNotificationTemplateContentResource) getTemplateNames() (arr []management.EnumTemplateName, err error) {
 	templateNames := []management.EnumTemplateName{}
 
 	for _, templateName := range management.AllowedEnumTemplateNameEnumValues {
@@ -134,7 +135,13 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateNames() ([]manag
 		// the response code for the templates related to that service is
 		// 400 Bad Request - "CONSTRAINT_VIOLATION"
 		if err != nil && response.StatusCode == 400 && response.Status == "400 Bad Request" {
-			defer response.Body.Close()
+			defer func() {
+				cErr := response.Body.Close()
+				if cErr != nil {
+					err = errors.Join(err, cErr)
+				}
+			}()
+
 			body, err := io.ReadAll(response.Body)
 			if err != nil {
 				return nil, err

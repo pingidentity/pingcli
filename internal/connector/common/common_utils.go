@@ -3,6 +3,7 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -16,7 +17,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
-func WriteFiles(exportableResources []connector.ExportableResource, format, outputDir string, overwriteExport bool) error {
+func WriteFiles(exportableResources []connector.ExportableResource, format, outputDir string, overwriteExport bool) (err error) {
 	l := logger.Get()
 
 	// Parse the HCL import block template
@@ -59,7 +60,12 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		if err != nil {
 			return fmt.Errorf("failed to create export file %q. err: %s", outputFilePath, err.Error())
 		}
-		defer outputFile.Close()
+		defer func() {
+			cErr := outputFile.Close()
+			if cErr != nil {
+				err = errors.Join(err, cErr)
+			}
+		}()
 
 		err = writeHeader(format, outputFilePath, outputFile)
 		if err != nil {

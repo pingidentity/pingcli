@@ -1,8 +1,3 @@
-# Options for analysis running.
-run:
-  timeout: 30m
-
-# Use all default linters + those defined here
+version: "2"
 linters:
-  enable:
-    - gosec
+  enable-all: true

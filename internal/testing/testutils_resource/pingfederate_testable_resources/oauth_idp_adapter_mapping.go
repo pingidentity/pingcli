@@ -30,11 +30,11 @@ func OauthIdpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo) *tes
 func createOauthIdpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 {
+	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createOauthIdpAdapterMapping(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	testIdpAdapterId := strArgs[0]
+	testIdpAdapterId := strArgs[1]
 
 	request := clientInfo.PingFederateApiClient.OauthIdpAdapterMappingsAPI.CreateIdpAdapterMapping(clientInfo.PingFederateContext)
 	clientStruct := client.IdpAdapterMapping{

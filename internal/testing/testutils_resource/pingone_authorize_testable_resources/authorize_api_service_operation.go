@@ -30,11 +30,11 @@ func AuthorizeApiServiceOperation(t *testing.T, clientInfo *connector.ClientInfo
 func createAuthorizeApiServiceOperation(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 {
+	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createAuthorizeApiServiceOperation(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	apiServerId := strArgs[0]
+	apiServerId := strArgs[1]
 
 	request := clientInfo.PingOneApiClient.AuthorizeAPIClient.APIServerOperationsApi.CreateAPIServerOperation(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID, apiServerId)
 	clientStruct := authorize.APIServerOperation{

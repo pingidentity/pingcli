@@ -10,6 +10,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/output"
 )
 
 // Verify that the resource satisfies the exportable resource interface
@@ -38,9 +39,13 @@ func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock
 
 	importBlocks := []connector.ImportBlock{}
 
-	defaultPopulationName, err := r.getDefaultPopulationName()
+	defaultPopulationName, defaultPopulationNameOk, err := r.getDefaultPopulationName()
 	if err != nil {
 		return nil, err
+	}
+
+	if !defaultPopulationNameOk {
+		return &importBlocks, nil
 	}
 
 	commentData := map[string]string{
@@ -61,11 +66,11 @@ func (r *PingOnePopulationDefaultResource) ExportAll() (*[]connector.ImportBlock
 	return &importBlocks, nil
 }
 
-func (r *PingOnePopulationDefaultResource) getDefaultPopulationName() (*string, error) {
+func (r *PingOnePopulationDefaultResource) getDefaultPopulationName() (*string, bool, error) {
 	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadAllPopulations(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.Population](iter, "ReadAllPopulations", "GetPopulations", r.ResourceType())
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 
 	for _, population := range apiObjs {
@@ -75,10 +80,12 @@ func (r *PingOnePopulationDefaultResource) getDefaultPopulationName() (*string, 
 			populationName, populationNameOk := population.GetNameOk()
 
 			if populationNameOk {
-				return populationName, nil
+				return populationName, true, nil
 			}
 		}
 	}
 
-	return nil, fmt.Errorf("unable to find the name of the default population")
+	output.Warn("Unable to export the default population. No default population found.", nil)
+
+	return nil, false, nil
 }

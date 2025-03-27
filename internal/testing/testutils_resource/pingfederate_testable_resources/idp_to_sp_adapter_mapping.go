@@ -32,12 +32,12 @@ func IdpToSpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo) *test
 func createIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 2 {
+	if len(strArgs) != 3 {
 		t.Errorf("Unexpected number of arguments provided to createIdpToSpAdapterMapping(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	testIdpAdapterId := strArgs[0]
-	testSpAdapterId := strArgs[1]
+	testIdpAdapterId := strArgs[1]
+	testSpAdapterId := strArgs[2]
 
 	request := clientInfo.PingFederateApiClient.IdpToSpAdapterMappingAPI.CreateIdpToSpAdapterMapping(clientInfo.PingFederateContext)
 	clientStruct := client.IdpToSpAdapterMapping{

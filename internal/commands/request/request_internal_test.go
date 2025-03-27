@@ -53,9 +53,12 @@ func Test_RunInternalRequestWithFail(t *testing.T) {
 func Test_RunInternalRequest_EmptyService(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	os.Unsetenv(options.RequestServiceOption.EnvVar)
+	err := os.Unsetenv(options.RequestServiceOption.EnvVar)
+	if err != nil {
+		t.Fatalf("failed to unset environment variable: %v", err)
+	}
 
-	err := RunInternalRequest("environments")
+	err = RunInternalRequest("environments")
 	expectedErrorPattern := "failed to send custom request: service is required"
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

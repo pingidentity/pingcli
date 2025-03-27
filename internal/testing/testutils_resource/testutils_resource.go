@@ -87,20 +87,18 @@ func (tr *TestableResource) CreateResource(t *testing.T) {
 		resourceType = tr.ExportableResource.ResourceType()
 	}
 
-	createdDepIds := []string{}
 	for _, dependency := range tr.Dependencies {
 		// Recursively create dependencies
 		dependency.CreateResource(t)
-		depId, ok := dependency.ResourceInfo.CreationInfo[ENUM_ID]
-		if !ok {
-			t.Fatalf("Failed to get ID from dependency: %v", dependency)
-		}
-
-		createdDepIds = append(createdDepIds, depId)
+	}
+	depIds, ok := tr.getDepIds()
+	if !ok {
+		t.Errorf("Failed to get dependency IDs for resource %s", resourceType)
+		return
 	}
 
 	if tr.CreateFunc != nil {
-		tr.ResourceInfo = tr.CreateFunc(t, tr.ClientInfo, resourceType, createdDepIds...)
+		tr.ResourceInfo = tr.CreateFunc(t, tr.ClientInfo, resourceType, depIds...)
 	}
 }
 
@@ -119,4 +117,24 @@ func (tr *TestableResource) DeleteResource(t *testing.T) {
 	for _, dependency := range tr.Dependencies {
 		dependency.DeleteResource(t)
 	}
+}
+
+func (tr *TestableResource) getDepIds() ([]string, bool) {
+	depIds := []string{}
+	for _, dependency := range tr.Dependencies {
+		if len(dependency.Dependencies) > 0 {
+			nestedDepIds, ok := dependency.getDepIds()
+			if !ok {
+				return []string{}, false
+			}
+			depIds = append(depIds, nestedDepIds...)
+		}
+
+		depId, ok := dependency.ResourceInfo.CreationInfo[ENUM_ID]
+		if !ok {
+			return []string{}, false
+		}
+		depIds = append(depIds, depId)
+	}
+	return depIds, true
 }

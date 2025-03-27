@@ -32,11 +32,11 @@ func PingoneConnection(t *testing.T, clientInfo *connector.ClientInfo) *testutil
 func createPingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 {
+	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createPingoneConnection(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	credential := strArgs[0]
+	credential := strArgs[1]
 
 	request := clientInfo.PingFederateApiClient.PingOneConnectionsAPI.CreatePingOneConnection(clientInfo.PingFederateContext)
 	clientStruct := client.PingOneConnection{

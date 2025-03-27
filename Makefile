@@ -69,11 +69,19 @@ test: --checktestenvvars --test-cmd --test-internal-commands --test-internal-con
 
 	@# Test the resources within each connector first
 	@go test -count=1 ./internal/connector/pingfederate/resources
-	@go test -count=1 ./internal/connector/pingone/.../resources
+	@go test -count=1 ./internal/connector/pingone/authorize/resources
+	@go test -count=1 ./internal/connector/pingone/mfa/resources
+	@go test -count=1 ./internal/connector/pingone/platform/resources
+	@go test -count=1 ./internal/connector/pingone/protect/resources
+	@go test -count=1 ./internal/connector/pingone/sso/resources
 
 	@# Test the connectors itegration terraform plan tests
 	@go test -count=1 ./internal/connector/pingfederate
-	@go test -count=1 ./internal/connector/pingone/*/
+	@go test -count=1 ./internal/connector/pingone/authorize
+	@go test -count=1 ./internal/connector/pingone/mfa
+	@go test -count=1 ./internal/connector/pingone/platform
+	@go test -count=1 ./internal/connector/pingone/protect
+	@go test -count=1 ./internal/connector/pingone/sso
 
 --test-internal-customtypes:
 	@echo "Running tests for internal/customtypes..."
@@ -101,14 +109,9 @@ importfmtlint:
 	fi
 
 golangcilint:
-	@echo -n "Running 'golangci-lint' to check for code quality issues..."
+	@echo -n "Running 'golangci-lint' to check for code quality issues... "
 	@# Clear the cache for every run, so that the linter outputs the same results as the GH Actions workflow
-	@if golangci-lint cache clear && golangci-lint run --timeout 5m ./...; then \
-		echo " SUCCESS"; \
-	else \
-		echo " FAILED"; \
-		exit 1; \
-	fi
+	@golangci-lint cache clean && golangci-lint run --timeout 5m ./...
 
 starttestcontainer: --checkpfcontainerenvvars --checkdocker --dockerrunpf --waitforpfhealthy
 

@@ -4,6 +4,7 @@
 package resources
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
@@ -114,11 +115,16 @@ func (r *PingOneApplicationSecretResource) getApplicationData() (map[string]stri
 	return applicationData, nil
 }
 
-func (r *PingOneApplicationSecretResource) checkApplicationSecretData(applicationId string) (bool, error) {
+func (r *PingOneApplicationSecretResource) checkApplicationSecretData(applicationId string) (b bool, err error) {
 	// The platform enforces that worker apps cannot read their own secret
 	// Make sure we can read the secret before adding it to the import blocks
 	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationSecretApi.ReadApplicationSecret(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, applicationId).Execute()
-	defer response.Body.Close()
+	defer func() {
+		cErr := response.Body.Close()
+		if cErr != nil {
+			err = errors.Join(err, cErr)
+		}
+	}()
 
 	// If the appId is the same as the worker ID, make sure the API response is a 403 and ignore the error
 	if applicationId == r.clientInfo.PingOneApiClientId {

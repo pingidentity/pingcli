@@ -22,18 +22,26 @@ func TestRequestCmd_Execute(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create pipe: %v", err)
 	}
-	defer pipeReader.Close()
+	defer func() {
+		err := pipeReader.Close()
+		if err != nil {
+			t.Fatalf("Failed to close pipe: %v", err)
+		}
+	}()
 	os.Stdout = pipeWriter
 
 	err = testutils_cobra.ExecutePingcli(t, "request",
 		"--service", "pingone",
 		"--http-method", "GET",
-		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+		fmt.Sprintf("environments/%s/populations", os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")),
 	)
 	testutils.CheckExpectedError(t, err, nil)
 
 	os.Stdout = originalStdout
-	pipeWriter.Close()
+	err = pipeWriter.Close()
+	if err != nil {
+		t.Fatalf("Failed to close pipe: %v", err)
+	}
 
 	pipeReaderOut, err := io.ReadAll(pipeReader)
 	if err != nil {

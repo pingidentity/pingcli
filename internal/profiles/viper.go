@@ -342,7 +342,7 @@ func (m MainConfig) DefaultMissingViperKeys() (err error) {
 		}
 		err = m.SaveProfile(pName, subViper)
 		if err != nil {
-			return fmt.Errorf("Failed to save profile '%s': %v", pName, err)
+			return fmt.Errorf("failed to save profile '%s': %v", pName, err)
 		}
 	}
 

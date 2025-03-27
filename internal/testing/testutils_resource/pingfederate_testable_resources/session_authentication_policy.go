@@ -31,11 +31,11 @@ func SessionAuthenticationPolicy(t *testing.T, clientInfo *connector.ClientInfo)
 func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 1 {
+	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createSessionAuthenticationPolicy(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
-	testIdpAdapterId := strArgs[0]
+	testIdpAdapterId := strArgs[1]
 
 	request := clientInfo.PingFederateApiClient.SessionAPI.CreateSourcePolicy(clientInfo.PingFederateContext)
 	clientStruct := client.AuthenticationSessionPolicy{

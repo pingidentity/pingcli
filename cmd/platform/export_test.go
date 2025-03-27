@@ -164,10 +164,10 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
-		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		"--"+options.PingOneAuthenticationWorkerClientIDOption.CobraParamName, os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
-		"--"+options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName, os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
-		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv(options.PingOneRegionCodeOption.EnvVar))
+		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		"--"+options.PingOneAuthenticationWorkerClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -175,7 +175,7 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlagRequiredTogether(t *testing.T) {
 	expectedErrorPattern := `^if any flags in the group \[pingone-worker-environment-id pingone-worker-client-id pingone-worker-client-secret pingone-region-code] are set they must all be set; missing \[pingone-region-code pingone-worker-client-id pingone-worker-client-secret]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar))
+		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -187,8 +187,8 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlags(t *testing.T) {
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
-		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -198,7 +198,7 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlags(t *testing.T) {
 func TestPlatformExportCmd_PingFederateBasicAuthFlagsRequiredTogether(t *testing.T) {
 	expectedErrorPattern := `^if any flags in the group \[pingfederate-username pingfederate-password] are set they must all be set; missing \[pingfederate-password]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar))
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -211,10 +211,10 @@ func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
-		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		"--"+options.PingOneAuthenticationWorkerClientIDOption.CobraParamName, os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
+		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		"--"+options.PingOneAuthenticationWorkerClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
 		"--"+options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName, "invalid",
-		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv(options.PingOneRegionCodeOption.EnvVar),
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -228,7 +228,7 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsInvalid(t *testing.T) {
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
-		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
 		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "invalid",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
@@ -239,7 +239,7 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsInvalid(t *testing.T) {
 func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsRequiredTogether(t *testing.T) {
 	expectedErrorPattern := `^if any flags in the group \[pingfederate-client-id pingfederate-client-secret pingfederate-token-url] are set they must all be set; missing \[pingfederate-client-secret pingfederate-token-url]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar))
+		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, "test")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -252,10 +252,10 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalid(t *test
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
-		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
+		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, "test",
 		"--"+options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamName, "invalid",
-		"--"+options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamName, os.Getenv(options.PingFederateClientCredentialsAuthTokenURLOption.EnvVar),
-		"--"+options.PingFederateClientCredentialsAuthScopesOption.CobraParamName, os.Getenv(options.PingFederateClientCredentialsAuthScopesOption.EnvVar),
+		"--"+options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamName, "https://localhost:9031/as/token.oauth2",
+		"--"+options.PingFederateClientCredentialsAuthScopesOption.CobraParamName, "email",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -270,8 +270,8 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalidTokenURL
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
-		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
-		"--"+options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamName, os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
+		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, "test",
+		"--"+options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamName, "2FederateM0re!",
 		"--"+options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamName, "https://localhost:9031/as/invalid",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 	)
@@ -287,8 +287,8 @@ func TestPlatformExportCmd_PingFederateXBypassHeaderFlag(t *testing.T) {
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		"--"+options.PingFederateXBypassExternalValidationHeaderOption.CobraParamName,
-		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -303,8 +303,8 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		"--"+options.PingFederateInsecureTrustAllTLSOption.CobraParamName,
-		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -320,8 +320,8 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		"--"+options.PingFederateInsecureTrustAllTLSOption.CobraParamName+"=false",
-		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -339,8 +339,8 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		"--"+options.PingFederateInsecureTrustAllTLSOption.CobraParamName+"=true",
 		"--"+options.PingFederateCACertificatePemFilesOption.CobraParamName, "testdata/ssl-server-crt.pem",
-		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
@@ -352,8 +352,8 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		"--"+options.PingFederateCACertificatePemFilesOption.CobraParamName, "invalid/crt.pem",
-		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
 		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)

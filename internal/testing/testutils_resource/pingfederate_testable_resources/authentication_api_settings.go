@@ -19,6 +19,6 @@ func AuthenticationApiSettings(t *testing.T, clientInfo *connector.ClientInfo) *
 		CreateFunc:         nil,
 		DeleteFunc:         nil,
 		Dependencies:       nil,
-		ExportableResource: resources.AuthenticationApiApplication(clientInfo),
+		ExportableResource: resources.AuthenticationApiSettings(clientInfo),
 	}
 }

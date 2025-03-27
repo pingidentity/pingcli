@@ -32,12 +32,12 @@ func IdpSpConnection(t *testing.T, clientInfo *connector.ClientInfo) *testutils_
 func createIdpSpConnection(t *testing.T, clientInfo *connector.ClientInfo, resourceType string, strArgs ...string) testutils_resource.ResourceInfo {
 	t.Helper()
 
-	if len(strArgs) != 2 {
+	if len(strArgs) != 3 {
 		t.Errorf("Unexpected number of arguments provided to createIdpSpConnection(): %v", strArgs)
 		return testutils_resource.ResourceInfo{}
 	}
 	signingKeyPairId := strArgs[0]
-	idpTokenProcessorId := strArgs[1]
+	idpTokenProcessorId := strArgs[2]
 
 	request := clientInfo.PingFederateApiClient.IdpSpConnectionsAPI.CreateSpConnection(clientInfo.PingFederateContext)
 	clientStruct := client.SpConnection{
