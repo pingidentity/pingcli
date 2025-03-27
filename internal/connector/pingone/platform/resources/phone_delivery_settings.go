@@ -11,6 +11,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/utils"
 )
 
 // Verify that the resource satisfies the exportable resource interface
@@ -95,9 +96,9 @@ func (r *PingOnePhoneDeliverySettingsResource) getPhoneDeliverySettingsData() (m
 			if phoneDeliverySettingsIdOk && phoneDeliverySettingProviderOk {
 				switch *phoneDeliverySettingsProvider {
 				case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_TWILIO:
-					*phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_twilio_%s", *phoneDeliverySettingsId), true
+					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = utils.Pointer(fmt.Sprintf("provider_twilio_%s", *phoneDeliverySettingsId)), true
 				case management.ENUMNOTIFICATIONSSETTINGSPHONEDELIVERYSETTINGSPROVIDER_SYNIVERSE:
-					*phoneDeliverySettingsName, phoneDeliverySettingsNameOk = fmt.Sprintf("provider_syniverse_%s", *phoneDeliverySettingsId), true
+					phoneDeliverySettingsName, phoneDeliverySettingsNameOk = utils.Pointer(fmt.Sprintf("provider_syniverse_%s", *phoneDeliverySettingsId)), true
 				default:
 					continue
 				}

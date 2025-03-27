@@ -27,6 +27,9 @@ const (
   Export configuration-as-code packages for PingOne (core platform and SSO services).
     pingcli platform export --services pingone-platform,pingone-sso
 
+  Export all configuration-as-code packages for PingOne. The --service-group flag can be used instead of listing all pingone-* packages in --services flag.
+    pingcli platform export --service-group pingone
+
   Export configuration-as-code packages for PingOne (core platform), specifying the PingOne environment connection details.
     pingcli platform export --services pingone-platform --pingone-client-environment-id 3cf2... --pingone-worker-client-id a719... --pingone-worker-client-secret ey..... --pingone-region-code EU
 
@@ -92,6 +95,7 @@ func exportRunE(cmd *cobra.Command, args []string) error {
 func initGeneralExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PlatformExportExportFormatOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportServiceOption.Flag)
+	cmd.Flags().AddFlag(options.PlatformExportServiceGroupOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportOutputDirectoryOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportOverwriteOption.Flag)
 	cmd.Flags().AddFlag(options.PlatformExportPingOneEnvironmentIDOption.Flag)

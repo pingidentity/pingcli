@@ -48,8 +48,27 @@ func TestPlatformExportCmd_HelpFlag(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
+// Test Platform Export Command --service-group, -g flag
+func TestPlatformExportCmd_ServiceGroupFlag(t *testing.T) {
+	outputDir := t.TempDir()
+
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceGroupOption.CobraParamName, "pingone")
+	testutils.CheckExpectedError(t, err, nil)
+}
+
+// Test Platform Export Command --service-group with non-supported service group
+func TestPlatformExportCmd_ServiceGroupFlagInvalidServiceGroup(t *testing.T) {
+	expectedErrorPattern := `^invalid argument ".*" for "-g, --service-group" flag: unrecognized service group '.*'\. Must be one of: .*$`
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportServiceGroupOption.CobraParamName, "invalid")
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
 // Test Platform Export Command --services flag
-func TestPlatformExportCmd_ServiceFlag(t *testing.T) {
+func TestPlatformExportCmd_ServicesFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -60,7 +79,7 @@ func TestPlatformExportCmd_ServiceFlag(t *testing.T) {
 }
 
 // Test Platform Export Command --services flag with invalid service
-func TestPlatformExportCmd_ServiceFlagInvalidService(t *testing.T) {
+func TestPlatformExportCmd_ServicesFlagInvalidService(t *testing.T) {
 	expectedErrorPattern := `^invalid argument ".*" for "-s, --services" flag: failed to set ExportServices: Invalid service: .*\. Allowed services: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportServiceOption.CobraParamName, "invalid")

@@ -16,6 +16,7 @@ const (
 	ENUM_BOOL                   OptionType = "ENUM_BOOL"
 	ENUM_EXPORT_FORMAT          OptionType = "ENUM_EXPORT_FORMAT"
 	ENUM_INT                    OptionType = "ENUM_INT"
+	ENUM_EXPORT_SERVICE_GROUP   OptionType = "ENUM_EXPORT_SERVICE_GROUP"
 	ENUM_EXPORT_SERVICES        OptionType = "ENUM_EXPORT_SERVICES"
 	ENUM_OUTPUT_FORMAT          OptionType = "ENUM_OUTPUT_FORMAT"
 	ENUM_PINGFEDERATE_AUTH_TYPE OptionType = "ENUM_PINGFEDERATE_AUTH_TYPE"
@@ -48,6 +49,7 @@ func Options() []Option {
 		PingOneRegionCodeOption,
 
 		PlatformExportExportFormatOption,
+		PlatformExportServiceGroupOption,
 		PlatformExportServiceOption,
 		PlatformExportOutputDirectoryOption,
 		PlatformExportOverwriteOption,
@@ -71,6 +73,7 @@ func Options() []Option {
 		RootProfileOption,
 		RootColorOption,
 		RootConfigOption,
+		RootDetailedExitCodeOption,
 		RootOutputFormatOption,
 
 		ProfileDescriptionOption,
@@ -142,6 +145,7 @@ var (
 var (
 	PlatformExportExportFormatOption         Option
 	PlatformExportServiceOption              Option
+	PlatformExportServiceGroupOption         Option
 	PlatformExportOutputDirectoryOption      Option
 	PlatformExportOverwriteOption            Option
 	PlatformExportPingOneEnvironmentIDOption Option
@@ -154,11 +158,12 @@ var (
 
 // Root Command Options
 var (
-	RootActiveProfileOption Option
-	RootProfileOption       Option
-	RootColorOption         Option
-	RootConfigOption        Option
-	RootOutputFormatOption  Option
+	RootActiveProfileOption    Option
+	RootDetailedExitCodeOption Option
+	RootProfileOption          Option
+	RootColorOption            Option
+	RootConfigOption           Option
+	RootOutputFormatOption     Option
 )
 
 // 'pingcli request' command options

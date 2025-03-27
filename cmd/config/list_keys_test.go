@@ -50,10 +50,12 @@ func Example_listKeysValue() {
 	// Valid Keys:
 	// - activeProfile
 	// - description
+	// - detailedExitCode
 	// - export.format
 	// - export.outputDirectory
 	// - export.overwrite
 	// - export.pingone.environmentID
+	// - export.serviceGroup
 	// - export.services
 	// - noColor
 	// - outputFormat

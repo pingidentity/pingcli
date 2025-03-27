@@ -18,6 +18,7 @@ func InitRootOptions() {
 	initProfileOption()
 	initColorOption()
 	initConfigOption()
+	initDetailedExitCodeOption()
 	initOutputFormatOption()
 	initUnmaskSecretValuesOption()
 }
@@ -101,6 +102,32 @@ func initConfigOption() {
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
 		ViperKey:  "", // No viper key
+	}
+}
+
+func initDetailedExitCodeOption() {
+	cobraParamName := "detailed-exitcode"
+	cobraValue := new(customtypes.Bool)
+	defaultValue := customtypes.Bool(false)
+
+	options.RootDetailedExitCodeOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          "PINGCLI_DETAILED_EXITCODE",
+		Flag: &pflag.Flag{
+			Name:      cobraParamName,
+			Shorthand: "D",
+			Usage: "Enable detailed exit code output. (default false)" +
+				"\n0 - pingcli command succeeded with no errors or warnings." +
+				"\n1 - pingcli command failed with errors." +
+				"\n2 - pingcli command succeeded with warnings.",
+			Value:       cobraValue,
+			NoOptDefVal: "true", // Make this flag a boolean flag
+		},
+		Sensitive: false,
+		Type:      options.ENUM_BOOL,
+		ViperKey:  "detailedExitCode",
 	}
 }
 

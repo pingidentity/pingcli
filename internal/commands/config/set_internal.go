@@ -123,6 +123,12 @@ func setValue(profileViper *viper.Viper, vKey, vValue string, valueType options.
 			return fmt.Errorf("value for key '%s' must be a valid export format. Allowed [%s]: %v", vKey, strings.Join(customtypes.ExportFormatValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, exportFormat)
+	case options.ENUM_EXPORT_SERVICE_GROUP:
+		exportServiceGroup := new(customtypes.ExportServiceGroup)
+		if err = exportServiceGroup.Set(vValue); err != nil {
+			return fmt.Errorf("value for key '%s' must be valid export service group. Allowed [%s]: %v", vKey, strings.Join(customtypes.ExportServiceGroupValidValues(), ", "), err)
+		}
+		profileViper.Set(vKey, exportServiceGroup)
 	case options.ENUM_EXPORT_SERVICES:
 		exportServices := new(customtypes.ExportServices)
 		if err = exportServices.Set(vValue); err != nil {

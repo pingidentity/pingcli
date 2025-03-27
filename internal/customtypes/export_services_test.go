@@ -95,3 +95,11 @@ func Test_ExportServices_String(t *testing.T) {
 		t.Errorf("String returned: %s, expected: %s", actual, expected)
 	}
 }
+
+// Test ExportServicePingOneValidValues
+func Test_ExportServicesPingOneValidValues(t *testing.T) {
+	pingOneServiceGroupValidValues := customtypes.ExportServicesPingOneValidValues()
+	if len(pingOneServiceGroupValidValues) != 5 {
+		t.Errorf("ExportServicesPingOneValidValues returned: %v, expected: %v", len(pingOneServiceGroupValidValues), 5)
+	}
+}

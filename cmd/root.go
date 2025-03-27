@@ -55,6 +55,9 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	// --config, -C
 	cmd.PersistentFlags().AddFlag(options.RootConfigOption.Flag)
 
+	// --detailed-exitcode, -D
+	cmd.PersistentFlags().AddFlag(options.RootDetailedExitCodeOption.Flag)
+
 	// --profile, -P
 	cmd.PersistentFlags().AddFlag(options.RootProfileOption.Flag)
 	// auto-completion
@@ -131,7 +134,7 @@ func checkCfgFileLocation(cfgFile string) {
 	if os.IsNotExist(err) {
 		// Only create a new configuration file if it is the default configuration file location
 		if cfgFile == options.RootConfigOption.DefaultValue.String() {
-			output.Warn(fmt.Sprintf("Ping CLI configuration file '%s' does not exist.", cfgFile), nil)
+			output.Message(fmt.Sprintf("Ping CLI configuration file '%s' does not exist.", cfgFile), nil)
 
 			createConfigFile(options.RootConfigOption.DefaultValue.String())
 		} else {
