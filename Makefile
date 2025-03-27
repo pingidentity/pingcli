@@ -134,7 +134,7 @@ starttestcontainer: --checkpfcontainerenvvars --checkdocker --dockerrunpf --wait
 		-p 9999:9999 \
 		--env PING_IDENTITY_DEVOPS_USER="$${TEST_PING_IDENTITY_DEVOPS_USER}" \
 		--env PING_IDENTITY_DEVOPS_KEY="$${TEST_PING_IDENTITY_DEVOPS_KEY}" \
-		--env PING_IDENTITY_ACCEPT_EULA="$${PING_IDENTITY_ACCEPT_EULA}" \
+		--env PING_IDENTITY_ACCEPT_EULA="$${TEST_PING_IDENTITY_ACCEPT_EULA}" \
 		--env CREATE_INITIAL_ADMIN_USER="true" \
 		-v $$(pwd)/internal/testing/pingfederate_container_files/deploy:/opt/in/instance/server/default/deploy \
 		pingidentity/pingfederate:latest > /dev/null 2>&1 || { echo " FAILED"; echo "Failed to start the PingFederate container. Please check your Docker setup."; exit 1; }
