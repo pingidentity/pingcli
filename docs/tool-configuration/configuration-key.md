@@ -26,7 +26,7 @@ The following parameters can be configured in Ping CLI's static configuration fi
 | service.pingfederate.authentication.type | ENUM_PINGFEDERATE_AUTH_TYPE | --pingfederate-authentication-type | The authentication type to use when connecting to the PingFederate admin API.<br><br>Options are: accessTokenAuth, basicAuth, clientCredentialsAuth.<br><br>Example: `basicAuth` |
 | service.pingfederate.caCertificatePemFiles | ENUM_STRING_SLICE | --pingfederate-ca-certificate-pem-files | Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS.<br><br>Accepts a comma-separated string to delimit multiple PEM files. |
 | service.pingfederate.httpsHost | ENUM_STRING | --pingfederate-https-host | The PingFederate HTTPS host used to communicate with PingFederate's admin API.<br><br>Example: `https://pingfederate-admin.bxretail.org` |
-| service.pingfederate.insecureTrustAllTLS | ENUM_BOOL | --pingfederate-insecure-trust-all-tls | Trust any certificate when connecting to the PingFederate server admin API.<br><br>This is insecure and should not be enabled outside of testing. |
+| service.pingfederate.insecureTrustAllTLS | ENUM_BOOL | --pingfederate-insecure-trust-all-tls | Trust any certificate when connecting to the PingFederate server admin API.<br><br>This is insecure and shouldn't be enabled outside of testing. |
 | service.pingfederate.xBypassExternalValidationHeader | ENUM_BOOL | --pingfederate-x-bypass-external-validation-header | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). |
 | service.pingone.authentication.type | ENUM_PINGONE_AUTH_TYPE | --pingone-authentication-type | The authentication type to use to authenticate to the PingOne management API.<br><br>Options are: worker.<br><br>Example: `worker` |
 | service.pingone.authentication.worker.clientID | ENUM_UUID | --pingone-worker-client-id | The worker client ID used to authenticate to the PingOne management API. |
@@ -40,7 +40,7 @@ The following parameters can be configured in Ping CLI's static configuration fi
 |---|---|---|---|
 | export.format | ENUM_STRING | --format / -f | Specifies the export format.<br><br>Options are: HCL.<br><br>Example: `HCL` |
 | export.outputDirectory | ENUM_STRING | --output-directory / -d | Specifies the output directory for export. Example: `$HOME/pingcli-export` |
-| export.overwrite | ENUM_BOOL | --overwrite / -o | Overwrite the existing generated exports in output directory. |
+| export.overwrite | ENUM_BOOL | --overwrite / -o | Overwrites the existing generated exports in output directory. |
 | export.pingone.environmentID | ENUM_UUID | --pingone-export-environment-id | The ID of the PingOne environment to export. Must be a valid PingOne UUID. |
 | export.serviceGroup | ENUM_EXPORT_SERVICE_GROUP | --service-group / -g | Specifies the service group to export. <br><br>Options are: pingone.<br><br>Example: `pingone` |
 | export.services | ENUM_EXPORT_SERVICES | --services / -s | Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services.<br><br>Options are: pingfederate, pingone-mfa, pingone-platform, pingone-protect, pingone-sso.<br><br>Example: `pingone-sso,pingone-mfa,pingfederate` |

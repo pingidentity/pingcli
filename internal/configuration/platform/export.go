@@ -145,7 +145,7 @@ func initOverwriteOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "o",
-			Usage: "Overwrite the existing generated exports in output directory. " +
+			Usage: "Overwrites the existing generated exports in output directory. " +
 				"(default false)",
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
