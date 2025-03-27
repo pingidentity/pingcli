@@ -132,8 +132,8 @@ starttestcontainer: --checkpfcontainerenvvars --checkdocker --dockerrunpf --wait
 	@docker run --name pingcli_test_pingfederate_container \
 		-d -p 9031:9031 \
 		-p 9999:9999 \
-		--env PING_IDENTITY_DEVOPS_USER="$${PING_IDENTITY_DEVOPS_USER}" \
-		--env PING_IDENTITY_DEVOPS_KEY="$${PING_IDENTITY_DEVOPS_KEY}" \
+		--env PING_IDENTITY_DEVOPS_USER="$${TEST_PING_IDENTITY_DEVOPS_USER}" \
+		--env PING_IDENTITY_DEVOPS_KEY="$${TEST_PING_IDENTITY_DEVOPS_KEY}" \
 		--env PING_IDENTITY_ACCEPT_EULA="$${PING_IDENTITY_ACCEPT_EULA}" \
 		--env CREATE_INITIAL_ADMIN_USER="true" \
 		-v $$(pwd)/internal/testing/pingfederate_container_files/deploy:/opt/in/instance/server/default/deploy \
