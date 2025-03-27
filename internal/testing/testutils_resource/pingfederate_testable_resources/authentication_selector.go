@@ -31,6 +31,7 @@ func createAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createAuthenticationSelector(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -73,10 +74,12 @@ func createAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo
 	ok, err := common.HandleClientResponse(response, err, "CreateAuthenticationSelector", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -96,6 +99,7 @@ func deleteAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteAuthenticationSelector(): %v", ids)
+
 		return
 	}
 
@@ -105,10 +109,12 @@ func deleteAuthenticationSelector(t *testing.T, clientInfo *connector.ClientInfo
 	ok, err := common.HandleClientResponse(response, err, "DeleteAuthenticationSelector", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

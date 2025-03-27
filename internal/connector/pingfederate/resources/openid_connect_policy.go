@@ -69,7 +69,7 @@ func (r *PingFederateOpenidConnectPolicyResource) getOpenidConnectPolicyData() (
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return openidConnectPolicyData, nil
 	}
 
 	if apiObj == nil {

@@ -37,6 +37,7 @@ func (o *OutputFormat) Set(outputFormat string) error {
 	default:
 		return fmt.Errorf("unrecognized Output Format: '%s'. Must be one of: %s", outputFormat, strings.Join(OutputFormatValidValues(), ", "))
 	}
+
 	return nil
 }
 

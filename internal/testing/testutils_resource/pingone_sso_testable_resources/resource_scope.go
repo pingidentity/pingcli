@@ -33,6 +33,7 @@ func createResourceScope(t *testing.T, clientInfo *connector.ClientInfo, resourc
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createResourceScope(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	resourceId := strArgs[0]
@@ -49,10 +50,12 @@ func createResourceScope(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	ok, err := common.HandleClientResponse(response, err, "CreateResourceScope", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -73,6 +76,7 @@ func deleteResourceScope(t *testing.T, clientInfo *connector.ClientInfo, resourc
 
 	if len(ids) != 2 {
 		t.Errorf("Unexpected number of arguments provided to deleteResourceScope(): %v", ids)
+
 		return
 	}
 
@@ -82,10 +86,12 @@ func deleteResourceScope(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	ok, err := common.HandleClientResponse(response, err, "DeleteResourceScope", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

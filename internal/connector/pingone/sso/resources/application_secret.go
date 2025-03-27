@@ -6,6 +6,7 @@ package resources
 import (
 	"errors"
 	"fmt"
+	"net/http"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
@@ -128,7 +129,7 @@ func (r *PingOneApplicationSecretResource) checkApplicationSecretData(applicatio
 
 	// If the appId is the same as the worker ID, make sure the API response is a 403 and ignore the error
 	if applicationId == r.clientInfo.PingOneApiClientId {
-		if response.StatusCode == 403 {
+		if response.StatusCode == http.StatusForbidden {
 			return false, nil
 		} else {
 			return false, fmt.Errorf("error: Expected 403 Forbidden response - worker apps cannot read their own secret\n%s Response Code: %s\nResponse Body: %s", "ReadApplicationSecret", response.Status, response.Body)
@@ -144,6 +145,7 @@ func (r *PingOneApplicationSecretResource) checkApplicationSecretData(applicatio
 			"Response Code":     response.Status,
 			"Response Body":     response.Body,
 		})
+
 		return false, nil
 	}
 

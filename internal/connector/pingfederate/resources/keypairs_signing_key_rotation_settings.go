@@ -83,7 +83,7 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getKeypairsSign
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return signingKeyPairData, nil
 	}
 
 	if apiObj == nil {
@@ -114,5 +114,6 @@ func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) getKeypairsSign
 
 func (r *PingFederateKeypairsSigningKeyRotationSettingsResource) checkKeypairsSigningKeyRotationSettingsData(id string) (bool, error) {
 	_, response, err := r.clientInfo.PingFederateApiClient.KeyPairsSigningAPI.GetRotationSettings(r.clientInfo.PingFederateContext, id).Execute()
+
 	return common.CheckSingletonResource(response, err, "GetRotationSettings", r.ResourceType())
 }

@@ -32,6 +32,7 @@ func createGroup(t *testing.T, clientInfo *connector.ClientInfo, resourceType st
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createGroup(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -39,6 +40,7 @@ func createGroup(t *testing.T, clientInfo *connector.ClientInfo, resourceType st
 	groupName, err := uuid.GenerateUUID()
 	if err != nil {
 		t.Errorf("Failed to generate UUID for group name: %v", err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -58,10 +60,12 @@ func createGroup(t *testing.T, clientInfo *connector.ClientInfo, resourceType st
 	ok, err := common.HandleClientResponse(response, err, "CreateGroup", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -81,6 +85,7 @@ func deleteGroup(t *testing.T, clientInfo *connector.ClientInfo, resourceType st
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteGroup(): %v", ids)
+
 		return
 	}
 
@@ -90,10 +95,12 @@ func deleteGroup(t *testing.T, clientInfo *connector.ClientInfo, resourceType st
 	ok, err := common.HandleClientResponse(response, err, "DeleteGroup", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

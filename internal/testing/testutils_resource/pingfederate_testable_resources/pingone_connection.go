@@ -34,6 +34,7 @@ func createPingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, res
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createPingoneConnection(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	credential := strArgs[1]
@@ -51,10 +52,12 @@ func createPingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, res
 	ok, err := common.HandleClientResponse(response, err, "CreatePingOneConnection", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -74,6 +77,7 @@ func deletePingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, res
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deletePingoneConnection(): %v", ids)
+
 		return
 	}
 
@@ -83,10 +87,12 @@ func deletePingoneConnection(t *testing.T, clientInfo *connector.ClientInfo, res
 	ok, err := common.HandleClientResponse(response, err, "DeletePingOneConnection", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

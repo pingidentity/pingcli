@@ -31,6 +31,7 @@ func createPhoneDeliverySettings(t *testing.T, clientInfo *connector.ClientInfo,
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createPhoneDeliverySettings(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -101,10 +102,12 @@ func createPhoneDeliverySettings(t *testing.T, clientInfo *connector.ClientInfo,
 	ok, err := common.HandleClientResponse(response, err, "CreatePhoneDeliverySettings", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -124,6 +127,7 @@ func deletePhoneDeliverySettings(t *testing.T, clientInfo *connector.ClientInfo,
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deletePhoneDeliverySettings(): %v", ids)
+
 		return
 	}
 
@@ -133,10 +137,12 @@ func deletePhoneDeliverySettings(t *testing.T, clientInfo *connector.ClientInfo,
 	ok, err := common.HandleClientResponse(response, err, "DeletePhoneDeliverySettings", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

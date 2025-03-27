@@ -69,7 +69,7 @@ func (r *PingFederateIdpTokenProcessorResource) getIdpTokenProcessorData() (map[
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return idpTokenProcessorData, nil
 	}
 
 	if apiObj == nil {

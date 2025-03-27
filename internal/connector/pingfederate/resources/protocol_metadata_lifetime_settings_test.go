@@ -25,5 +25,4 @@ func Test_PingFederateProtocolMetadataLifetimeSettings(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

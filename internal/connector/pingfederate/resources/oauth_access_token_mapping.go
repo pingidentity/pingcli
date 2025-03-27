@@ -71,7 +71,7 @@ func (r *PingFederateOauthAccessTokenMappingResource) getOauthAccessTokenMapping
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return oauthAccessTokenMappingData, nil
 	}
 
 	for _, oauthAccessTokenMapping := range mappings {

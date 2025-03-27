@@ -114,7 +114,6 @@ func initPingOneExportFlags(cmd *cobra.Command) {
 		options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName,
 		options.PingOneRegionCodeOption.CobraParamName,
 	)
-
 }
 
 func initPingFederateGeneralFlags(cmd *cobra.Command) {

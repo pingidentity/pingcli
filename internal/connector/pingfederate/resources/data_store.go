@@ -71,7 +71,7 @@ func (r *PingFederateDataStoreResource) getDataStoreData() (map[string]string, e
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return dataStoreData, nil
 	}
 
 	if apiObj == nil {

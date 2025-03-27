@@ -45,6 +45,7 @@ func (r *PingFederateClusterSettingsResource) ExportAll() (*[]connector.ImportBl
 	}
 	if !valid {
 		l.Warn().Msgf("'%s' Resource is not supported in the version of PingFederate used. Skipping export.", r.ResourceType())
+
 		return &importBlocks, nil
 	}
 
@@ -85,5 +86,6 @@ func (r *PingFederateClusterSettingsResource) ValidPingFederateVersion() (bool, 
 
 	semVer := (*version)[:strings.LastIndex(*version, ".")]
 	compareResult := semver.Compare(fmt.Sprintf("v%s", semVer), "v12.0.0")
+
 	return compareResult >= 0, nil
 }

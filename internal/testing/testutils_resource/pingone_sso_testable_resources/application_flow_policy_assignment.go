@@ -33,6 +33,7 @@ func createApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createApplicationFlowPolicyAssignment(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	applicationId := strArgs[0]
@@ -41,11 +42,13 @@ func createApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 	flowPolicies, err := pingone.GetManagementAPIObjectsFromIterator[management.FlowPolicy](iter, "ReadAllFlowPolicies", "GetFlowPolicies", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nError: %v", err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
 	if len(flowPolicies) == 0 {
 		t.Errorf("No flow policies found")
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -63,10 +66,12 @@ func createApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 	ok, err := common.HandleClientResponse(response, err, "CreateFlowPolicyAssignment", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -75,10 +80,12 @@ func createApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 	ok, err = common.HandleClientResponse(response, err, "ReadOneFlowPolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -99,6 +106,7 @@ func deleteApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 
 	if len(ids) != 2 {
 		t.Errorf("Unexpected number of arguments provided to deleteApplicationFlowPolicyAssignment(): %v", ids)
+
 		return
 	}
 
@@ -108,10 +116,12 @@ func deleteApplicationFlowPolicyAssignment(t *testing.T, clientInfo *connector.C
 	ok, err := common.HandleClientResponse(response, err, "DeleteFlowPolicyAssignment", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -33,6 +33,7 @@ func createApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createApplicationSignOnPolicyAssignment(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	applicationId := strArgs[0]
@@ -52,10 +53,12 @@ func createApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 	ok, err := common.HandleClientResponse(response, err, "CreateSignOnPolicyAssignment", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -63,10 +66,12 @@ func createApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 	ok, err = common.HandleClientResponse(response, err, "ReadOneSignOnPolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -87,6 +92,7 @@ func deleteApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 
 	if len(ids) != 2 {
 		t.Errorf("Unexpected number of arguments provided to deleteApplicationSignOnPolicyAssignment(): %v", ids)
+
 		return
 	}
 
@@ -96,10 +102,12 @@ func deleteApplicationSignOnPolicyAssignment(t *testing.T, clientInfo *connector
 	ok, err := common.HandleClientResponse(response, err, "DeleteSignOnPolicyAssignment", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

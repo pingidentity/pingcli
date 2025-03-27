@@ -69,7 +69,7 @@ func (r *PingFederateSecretManagerResource) getSecretManagerData() (map[string]s
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return secretManagerData, nil
 	}
 
 	if apiObj == nil {

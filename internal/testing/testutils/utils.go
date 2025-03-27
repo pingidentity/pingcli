@@ -69,7 +69,7 @@ func initPingFederateClientInfo(t *testing.T, clientInfo *connector.ClientInfo) 
 	pfClientConfig.HTTPClient = httpClient
 
 	clientInfo.PingFederateApiClient = pingfederateGoClient.NewAPIClient(pfClientConfig)
-	clientInfo.PingFederateContext = context.WithValue(context.Background(), pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
+	clientInfo.PingFederateContext = context.WithValue(t.Context(), pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
 		UserName: pfUsername,
 		Password: pfPassword,
 	})
@@ -98,7 +98,7 @@ func initPingOneClientInfo(t *testing.T, clientInfo *connector.ClientInfo) {
 	}
 
 	// Make empty context for testing
-	ctx := context.Background()
+	ctx := t.Context()
 
 	// Initialize the API client
 	client, err := apiConfig.APIClient(ctx)
@@ -188,6 +188,7 @@ func ValidateImportBlocks(t *testing.T, resource connector.ExportableResource, e
 
 		if !ok {
 			t.Errorf("No matching expected import block for generated import block:\n%s", actualImportBlock.String())
+
 			continue
 		}
 
@@ -226,6 +227,7 @@ func ValidateImportBlockSubset(t *testing.T, resource connector.ExportableResour
 
 		if !ok {
 			t.Errorf("No matching actual import block for expected import block:\n%s", expectedImportBlock.String())
+
 			continue
 		}
 
@@ -240,11 +242,13 @@ func CheckExpectedError(t *testing.T, err error, errMessagePattern *string) {
 
 	if err == nil && errMessagePattern != nil {
 		t.Errorf("Error message did not match expected regex\n\nerror message: '%v'\n\nregex pattern %s", err, *errMessagePattern)
+
 		return
 	}
 
 	if err != nil && errMessagePattern == nil {
 		t.Errorf("Expected no error, but got error: %v", err)
+
 		return
 	}
 
@@ -258,7 +262,7 @@ func CheckExpectedError(t *testing.T, err error, errMessagePattern *string) {
 
 // Get os.File with string written to it.
 // The caller is responsible for closing the file.
-func WriteStringToPipe(str string, t *testing.T) (reader *os.File) {
+func WriteStringToPipe(t *testing.T, str string) (reader *os.File) {
 	t.Helper()
 
 	reader, writer, err := os.Pipe()
@@ -285,7 +289,7 @@ func CreateX509Certificate() (string, error) {
 	serialNumberLimit := new(big.Int).Lsh(big.NewInt(1), 128)
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate serial number: %v", err)
+		return "", fmt.Errorf("failed to generate serial number: %w", err)
 	}
 
 	certificateCA := &x509.Certificate{
@@ -309,12 +313,12 @@ func CreateX509Certificate() (string, error) {
 
 	caPrivKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate private key: %v", err)
+		return "", fmt.Errorf("failed to generate private key: %w", err)
 	}
 
 	caBytes, err := x509.CreateCertificate(rand.Reader, certificateCA, certificateCA, &caPrivKey.PublicKey, caPrivKey)
 	if err != nil {
-		return "", fmt.Errorf("failed to create certificate: %v", err)
+		return "", fmt.Errorf("failed to create certificate: %w", err)
 	}
 
 	caPEM := new(bytes.Buffer)
@@ -323,7 +327,7 @@ func CreateX509Certificate() (string, error) {
 		Bytes: caBytes,
 	})
 	if err != nil {
-		return "", fmt.Errorf("failed to encode certificate: %v", err)
+		return "", fmt.Errorf("failed to encode certificate: %w", err)
 	}
 
 	return caPEM.String(), nil

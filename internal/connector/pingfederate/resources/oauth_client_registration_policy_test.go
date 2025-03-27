@@ -29,5 +29,4 @@ func Test_PingFederateOauthClientRegistrationPolicy(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

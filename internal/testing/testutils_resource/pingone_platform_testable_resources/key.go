@@ -32,6 +32,7 @@ func createKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createKey(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -55,10 +56,12 @@ func createKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 	ok, err := common.HandleClientResponse(response, err, "CreateKey", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -79,6 +82,7 @@ func deleteKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteKey(): %v", ids)
+
 		return
 	}
 
@@ -88,10 +92,12 @@ func deleteKey(t *testing.T, clientInfo *connector.ClientInfo, resourceType stri
 	ok, err := common.HandleClientResponse(response, err, "DeleteKey", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

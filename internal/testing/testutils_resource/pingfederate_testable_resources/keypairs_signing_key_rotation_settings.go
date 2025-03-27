@@ -33,6 +33,7 @@ func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createKeypairsSigningKeyRotationSettings(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	keyPairId := strArgs[0]
@@ -50,10 +51,12 @@ func createKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 	ok, err := common.HandleClientResponse(response, err, "UpdateRotationSettings", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -73,6 +76,7 @@ func deleteKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteKeypairsSigningKeyRotationSettings(): %v", ids)
+
 		return
 	}
 
@@ -82,10 +86,12 @@ func deleteKeypairsSigningKeyRotationSettings(t *testing.T, clientInfo *connecto
 	ok, err := common.HandleClientResponse(response, err, "DeleteKeyPairRotationSettings", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

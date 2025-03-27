@@ -75,7 +75,7 @@ func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) getOauthTo
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return oauthTokenExchangeTokenGeneratorMappingData, nil
 	}
 
 	if apiObj == nil {

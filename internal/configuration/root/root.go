@@ -190,12 +190,14 @@ func getDefaultConfigFilepath() (defaultConfigFilepath *customtypes.String) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		l.Err(err).Msg("Failed to determine user's home directory")
+
 		return nil
 	}
 
 	err = defaultConfigFilepath.Set(fmt.Sprintf("%s/.pingcli/config.yaml", homeDir))
 	if err != nil {
 		l.Err(err).Msg("Failed to set default config file path")
+
 		return nil
 	}
 

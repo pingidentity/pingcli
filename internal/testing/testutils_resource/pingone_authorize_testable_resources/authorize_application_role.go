@@ -31,6 +31,7 @@ func createAuthorizeApplicationRole(t *testing.T, clientInfo *connector.ClientIn
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createAuthorizeApplicationRole(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -46,10 +47,12 @@ func createAuthorizeApplicationRole(t *testing.T, clientInfo *connector.ClientIn
 	ok, err := common.HandleClientResponse(response, err, "CreateApplicationRoles", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -69,6 +72,7 @@ func deleteAuthorizeApplicationRole(t *testing.T, clientInfo *connector.ClientIn
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteAuthorizeApplicationRole(): %v", ids)
+
 		return
 	}
 
@@ -78,10 +82,12 @@ func deleteAuthorizeApplicationRole(t *testing.T, clientInfo *connector.ClientIn
 	ok, err := common.HandleClientResponse(response, err, "DeleteApplicationRole", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -51,7 +51,6 @@ func (r *PingOneGroupRoleAssignmentResource) ExportAll() (*[]connector.ImportBlo
 		}
 
 		for groupRoleAssignmentId, groupRoleAssignmentRoleId := range groupRoleAssignmentData {
-
 			groupRoleAssignmentRoleName, groupRoleAssignmentRoleNameOk, err := r.getRoleName(groupRoleAssignmentRoleId)
 			if err != nil {
 				return nil, err

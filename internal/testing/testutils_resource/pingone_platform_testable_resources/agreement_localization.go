@@ -32,6 +32,7 @@ func createAgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo,
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createAgreementLocalization(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	agreementId := strArgs[0]
@@ -49,10 +50,12 @@ func createAgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo,
 	ok, err := common.HandleClientResponse(response, err, "CreateAgreementLanguage", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -73,6 +76,7 @@ func deleteAgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo,
 
 	if len(ids) != 2 {
 		t.Errorf("Unexpected number of arguments provided to deleteAgreementLocalization(): %v", ids)
+
 		return
 	}
 
@@ -82,10 +86,12 @@ func deleteAgreementLocalization(t *testing.T, clientInfo *connector.ClientInfo,
 	ok, err := common.HandleClientResponse(response, err, "DeleteAgreementLanguage", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -29,5 +29,4 @@ func Test_PingFederateIdpAdapter(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

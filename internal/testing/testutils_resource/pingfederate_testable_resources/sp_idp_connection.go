@@ -37,6 +37,7 @@ func createSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 	filedata, err := testutils.CreateX509Certificate()
 	if err != nil {
 		t.Errorf("Failed to create test %s: %v", resourceType, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -80,10 +81,12 @@ func createSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 	ok, err := common.HandleClientResponse(response, err, "CreateConnection", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -103,6 +106,7 @@ func deleteSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteSpIdpConnection(): %v", ids)
+
 		return
 	}
 
@@ -112,10 +116,12 @@ func deleteSpIdpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 	ok, err := common.HandleClientResponse(response, err, "DeleteConnection", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

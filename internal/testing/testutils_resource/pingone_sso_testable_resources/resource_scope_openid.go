@@ -31,6 +31,7 @@ func createResourceScopeOpenid(t *testing.T, clientInfo *connector.ClientInfo, r
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createResourceScopeOpenid(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -38,6 +39,7 @@ func createResourceScopeOpenid(t *testing.T, clientInfo *connector.ClientInfo, r
 	generatedResources, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedResourcesInner](iter, "ReadAllResources", "GetResources", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nError: %v", err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -45,6 +47,7 @@ func createResourceScopeOpenid(t *testing.T, clientInfo *connector.ClientInfo, r
 	for _, generatedResource := range generatedResources {
 		if generatedResource.Resource != nil && generatedResource.Resource.Name == "openid" && *generatedResource.Resource.Type == management.ENUMRESOURCETYPE_OPENID_CONNECT {
 			resourceId = *generatedResource.Resource.Id
+
 			break
 		}
 	}
@@ -60,10 +63,12 @@ func createResourceScopeOpenid(t *testing.T, clientInfo *connector.ClientInfo, r
 	ok, err := common.HandleClientResponse(response, err, "CreateResourceScope", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -84,6 +89,7 @@ func deleteResourceScopeOpenid(t *testing.T, clientInfo *connector.ClientInfo, r
 
 	if len(ids) != 2 {
 		t.Errorf("Unexpected number of arguments provided to deleteResourceScopeOpenid(): %v", ids)
+
 		return
 	}
 
@@ -93,10 +99,12 @@ func deleteResourceScopeOpenid(t *testing.T, clientInfo *connector.ClientInfo, r
 	ok, err := common.HandleClientResponse(response, err, "DeleteResourceScope", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -30,6 +30,7 @@ func createIdpStsRequestParametersContract(t *testing.T, clientInfo *connector.C
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createIdpStsRequestParametersContract(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -48,10 +49,12 @@ func createIdpStsRequestParametersContract(t *testing.T, clientInfo *connector.C
 	ok, err := common.HandleClientResponse(response, err, "CreateStsRequestParamContract", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -71,6 +74,7 @@ func deleteIdpStsRequestParametersContract(t *testing.T, clientInfo *connector.C
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteIdpStsRequestParametersContract(): %v", ids)
+
 		return
 	}
 
@@ -80,10 +84,12 @@ func deleteIdpStsRequestParametersContract(t *testing.T, clientInfo *connector.C
 	ok, err := common.HandleClientResponse(response, err, "DeleteStsRequestParamContractById", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

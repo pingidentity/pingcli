@@ -33,6 +33,7 @@ func createOauthAccessTokenManager(t *testing.T, clientInfo *connector.ClientInf
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createOauthAccessTokenManager(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testKeyPairId := strArgs[0]
@@ -92,10 +93,12 @@ func createOauthAccessTokenManager(t *testing.T, clientInfo *connector.ClientInf
 	ok, err := common.HandleClientResponse(response, err, "CreateTokenManager", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -115,6 +118,7 @@ func deleteOauthAccessTokenManager(t *testing.T, clientInfo *connector.ClientInf
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteOauthAccessTokenManager(): %v", ids)
+
 		return
 	}
 
@@ -124,10 +128,12 @@ func deleteOauthAccessTokenManager(t *testing.T, clientInfo *connector.ClientInf
 	ok, err := common.HandleClientResponse(response, err, "DeleteTokenManager", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

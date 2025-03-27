@@ -69,7 +69,7 @@ func (r *PingFederateOauthAccessTokenManagerResource) getOauthAccessTokenManager
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return oauthAccessTokenManagerData, nil
 	}
 
 	if apiObj == nil {

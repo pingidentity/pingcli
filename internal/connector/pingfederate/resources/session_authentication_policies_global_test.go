@@ -25,5 +25,4 @@ func Test_PingFederateSessionAuthenticationPoliciesGlobal(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

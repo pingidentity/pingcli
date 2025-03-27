@@ -32,6 +32,7 @@ func createOauthIdpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createOauthIdpAdapterMapping(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testIdpAdapterId := strArgs[1]
@@ -62,10 +63,12 @@ func createOauthIdpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo
 	ok, err := common.HandleClientResponse(response, err, "CreateIdpAdapterMapping", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -84,6 +87,7 @@ func deleteOauthIdpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteOauthIdpAdapterMapping(): %v", ids)
+
 		return
 	}
 
@@ -93,10 +97,12 @@ func deleteOauthIdpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo
 	ok, err := common.HandleClientResponse(response, err, "DeleteIdpAdapterMapping", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

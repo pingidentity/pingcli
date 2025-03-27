@@ -51,11 +51,14 @@ func (r *PingOneGatewayRoleAssignmentResource) ExportAll() (*[]connector.ImportB
 		}
 
 		for gatewayRoleAssignmentId, gatewayRoleId := range gatewayRoleAssignmentData {
-			gatewayRoleName, err := r.getRoleAssignmentRoleName(gatewayRoleId)
+			gatewayRoleName, gatewayRoleNameOk, err := r.getRoleAssignmentRoleName(gatewayRoleId)
 			if err != nil {
 				return nil, err
 			}
 			if gatewayRoleName == nil {
+				continue
+			}
+			if !gatewayRoleNameOk {
 				continue
 			}
 
@@ -135,22 +138,22 @@ func (r *PingOneGatewayRoleAssignmentResource) getGatewayRoleAssignmentData(gate
 	return gatewayRoleAssignmentData, nil
 }
 
-func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId string) (*management.EnumRoleName, error) {
+func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId string) (*management.EnumRoleName, bool, error) {
 	role, resp, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadOneRole(r.clientInfo.PingOneContext, roleId).Execute()
 	ok, err := common.CheckSingletonResource(resp, err, "ReadOneRole", r.ResourceType())
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	if !ok {
-		return nil, nil
+		return nil, false, nil
 	}
 
 	if role != nil {
 		roleName, roleNameOk := role.GetNameOk()
 		if roleNameOk {
-			return roleName, nil
+			return roleName, true, nil
 		}
 	}
 
-	return nil, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'", r.ResourceType(), roleId)
+	return nil, false, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'", r.ResourceType(), roleId)
 }

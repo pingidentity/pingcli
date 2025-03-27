@@ -31,6 +31,7 @@ func createRiskPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createRiskPolicy(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -75,10 +76,12 @@ func createRiskPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	ok, err := common.HandleClientResponse(response, err, "CreateRiskPolicySet", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -98,6 +101,7 @@ func deleteRiskPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteRiskPolicy(): %v", ids)
+
 		return
 	}
 
@@ -107,10 +111,12 @@ func deleteRiskPolicy(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	ok, err := common.HandleClientResponse(response, err, "DeleteRiskPolicySet", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

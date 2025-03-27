@@ -51,6 +51,7 @@ func (prc *PingOneRegionCode) Set(regionCode string) error {
 	default:
 		return fmt.Errorf("unrecognized PingOne Region Code: '%s'. Must be one of: %s", regionCode, strings.Join(PingOneRegionCodeValidValues(), ", "))
 	}
+
 	return nil
 }
 

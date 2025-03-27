@@ -18,14 +18,14 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 	} else {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 		if err != nil {
-			return fmt.Errorf("failed to view profile: %v", err)
+			return fmt.Errorf("failed to view profile: %w", err)
 		}
 	}
 
 	// Validate the profile name
 	err = profiles.GetMainConfig().ValidateExistingProfileName(pName)
 	if err != nil {
-		return fmt.Errorf("failed to view profile: %v", err)
+		return fmt.Errorf("failed to view profile: %w", err)
 	}
 
 	msgStr := fmt.Sprintf("Configuration for profile '%s':\n", pName)
@@ -37,7 +37,7 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 
 		vVal, _, err := profiles.ViperValueFromOption(opt)
 		if err != nil {
-			return fmt.Errorf("failed to view profile: %v", err)
+			return fmt.Errorf("failed to view profile: %w", err)
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)

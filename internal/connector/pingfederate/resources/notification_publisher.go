@@ -69,7 +69,7 @@ func (r *PingFederateNotificationPublisherResource) getNotificationPublisherData
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return notificationPublisherData, nil
 	}
 
 	if apiObj == nil {

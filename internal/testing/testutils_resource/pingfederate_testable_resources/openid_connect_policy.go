@@ -33,6 +33,7 @@ func createOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, r
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createOpenidConnectPolicy(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testAccessTokenManagerId := strArgs[1]
@@ -69,10 +70,12 @@ func createOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, r
 	ok, err := common.HandleClientResponse(response, err, "CreateOIDCPolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -92,6 +95,7 @@ func deleteOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, r
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteOpenidConnectPolicy(): %v", ids)
+
 		return
 	}
 
@@ -101,10 +105,12 @@ func deleteOpenidConnectPolicy(t *testing.T, clientInfo *connector.ClientInfo, r
 	ok, err := common.HandleClientResponse(response, err, "DeleteOIDCPolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

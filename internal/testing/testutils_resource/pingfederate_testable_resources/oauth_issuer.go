@@ -31,6 +31,7 @@ func createOauthIssuer(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createOauthIssuer(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -47,10 +48,12 @@ func createOauthIssuer(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 	ok, err := common.HandleClientResponse(response, err, "AddOauthIssuer", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -70,6 +73,7 @@ func deleteOauthIssuer(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteOauthIssuer(): %v", ids)
+
 		return
 	}
 
@@ -79,10 +83,12 @@ func deleteOauthIssuer(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 	ok, err := common.HandleClientResponse(response, err, "DeleteOauthIssuer", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

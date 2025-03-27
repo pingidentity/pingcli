@@ -141,7 +141,7 @@ func TestPlatformExportCmd_OverwriteFlag(t *testing.T) {
 func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T) {
 	outputDir := t.TempDir()
 
-	_, err := os.Create(outputDir + "/file")
+	_, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
 	if err != nil {
 		t.Errorf("Error creating file in output directory: %v", err)
 	}
@@ -159,7 +159,7 @@ func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T)
 func TestPlatformExportCmd_OverwriteFlagTrueWithExistingDirectory(t *testing.T) {
 	outputDir := t.TempDir()
 
-	_, err := os.Create(outputDir + "/file")
+	_, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
 	if err != nil {
 		t.Errorf("Error creating file in output directory: %v", err)
 	}

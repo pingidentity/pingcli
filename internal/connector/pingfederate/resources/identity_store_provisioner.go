@@ -69,7 +69,7 @@ func (r *PingFederateIdentityStoreProvisionerResource) getIdentityStoreProvision
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return identityStoreProvisionerData, nil
 	}
 
 	if apiObj == nil {

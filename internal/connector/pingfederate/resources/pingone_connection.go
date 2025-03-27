@@ -69,7 +69,7 @@ func (r *PingFederatePingoneConnectionResource) getPingoneConnectionData() (map[
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return pingoneConnectionData, nil
 	}
 
 	if apiObj == nil {

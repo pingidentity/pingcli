@@ -34,6 +34,7 @@ func createIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo,
 
 	if len(strArgs) != 3 {
 		t.Errorf("Unexpected number of arguments provided to createIdpToSpAdapterMapping(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testIdpAdapterId := strArgs[1]
@@ -59,10 +60,12 @@ func createIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo,
 	ok, err := common.HandleClientResponse(response, err, "CreateIdpToSpAdapterMapping", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -83,6 +86,7 @@ func deleteIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo,
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteIdpToSpAdapterMapping(): %v", ids)
+
 		return
 	}
 
@@ -92,10 +96,12 @@ func deleteIdpToSpAdapterMapping(t *testing.T, clientInfo *connector.ClientInfo,
 	ok, err := common.HandleClientResponse(response, err, "DeleteIdpToSpAdapterMappingsById", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -32,6 +32,7 @@ func createIdentityProviderAttribute(t *testing.T, clientInfo *connector.ClientI
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createIdentityProviderAttribute(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -50,10 +51,12 @@ func createIdentityProviderAttribute(t *testing.T, clientInfo *connector.ClientI
 	ok, err := common.HandleClientResponse(response, err, "CreateIdentityProviderAttribute", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -74,6 +77,7 @@ func deleteIdentityProviderAttribute(t *testing.T, clientInfo *connector.ClientI
 
 	if len(ids) != 2 {
 		t.Errorf("Unexpected number of arguments provided to deleteIdentityProviderAttribute(): %v", ids)
+
 		return
 	}
 
@@ -83,10 +87,12 @@ func deleteIdentityProviderAttribute(t *testing.T, clientInfo *connector.ClientI
 	ok, err := common.HandleClientResponse(response, err, "DeleteIdentityProviderAttribute", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -75,7 +75,7 @@ func (r *PingFederateSessionAuthenticationPolicyResource) getSessionAuthenticati
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return sessionAuthenticationPolicyData, nil
 	}
 
 	if apiObj == nil {

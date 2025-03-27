@@ -33,6 +33,7 @@ func RunPromptConfirm(message string, rc io.ReadCloser) (bool, error) {
 		if errors.Is(err, promptui.ErrAbort) {
 			return false, nil
 		}
+
 		return false, err
 	}
 
@@ -48,5 +49,6 @@ func RunPromptSelect(message string, items []string, rc io.ReadCloser) (selectio
 	}
 
 	_, selection, err = p.Run()
+
 	return selection, err
 }

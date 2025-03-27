@@ -35,6 +35,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		if len(*importBlocks) == 0 {
 			// No resources exported. Avoid creating an empty import.tf file
 			l.Debug().Msgf("Nothing exported for resource %s. Skipping import file generation...", exportableResource.ResourceType())
+
 			continue
 		}
 
@@ -47,6 +48,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 
 		outputFileName := fmt.Sprintf("%s.tf", exportableResource.ResourceType())
 		outputFilePath := filepath.Join(outputDir, filepath.Base(outputFileName))
+		outputFilePath = filepath.Clean(outputFilePath)
 
 		// Check to see if outputFile already exists.
 		// If so, default behavior is to exit and not overwrite.
@@ -73,7 +75,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		}
 
 		for _, importBlock := range *importBlocks {
-			// Sanitize import block "to". Add pingcli-- prefix, hexidecimal encode special chars and spaces
+			// Sanitize import block "to". Add pingcli-- prefix, hexadecimal encode special chars and spaces
 			importBlock.Sanitize()
 
 			switch format {
@@ -87,6 +89,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 			}
 		}
 	}
+
 	return nil
 }
 

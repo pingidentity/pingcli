@@ -32,6 +32,7 @@ func createBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createBrandingTheme(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -40,12 +41,14 @@ func createBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	newLogoId, err := uuid.GenerateUUID()
 	if err != nil {
 		t.Errorf("Failed to generate UUID: %v", err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
 	newImageId, err := uuid.GenerateUUID()
 	if err != nil {
 		t.Errorf("Failed to generate UUID: %v", err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -80,10 +83,12 @@ func createBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	ok, err := common.HandleClientResponse(response, err, "CreateBrandingTheme", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -103,6 +108,7 @@ func deleteBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteBrandingTheme(): %v", ids)
+
 		return
 	}
 
@@ -112,10 +118,12 @@ func deleteBrandingTheme(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	ok, err := common.HandleClientResponse(response, err, "DeleteBrandingTheme", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

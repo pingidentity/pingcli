@@ -33,6 +33,7 @@ func createIdpAdapter(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createIdpAdapter(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	pcvId := strArgs[0]
@@ -95,10 +96,12 @@ func createIdpAdapter(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	ok, err := common.HandleClientResponse(response, err, "CreateIdpAdapter", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -118,6 +121,7 @@ func deleteIdpAdapter(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteIdpAdapter(): %v", ids)
+
 		return
 	}
 
@@ -127,10 +131,12 @@ func deleteIdpAdapter(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 	ok, err := common.HandleClientResponse(response, err, "DeleteIdpAdapter", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

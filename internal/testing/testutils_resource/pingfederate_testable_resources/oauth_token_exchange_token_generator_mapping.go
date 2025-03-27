@@ -34,6 +34,7 @@ func createOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *con
 
 	if len(strArgs) != 5 {
 		t.Errorf("Unexpected number of arguments provided to createOauthTokenExchangeTokenGeneratorMapping(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testProcessorPolicyId := strArgs[2]
@@ -59,10 +60,12 @@ func createOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *con
 	ok, err := common.HandleClientResponse(response, err, "CreateTokenGeneratorMapping", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -83,6 +86,7 @@ func deleteOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *con
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteOauthTokenExchangeTokenGeneratorMapping(): %v", ids)
+
 		return
 	}
 
@@ -92,10 +96,12 @@ func deleteOauthTokenExchangeTokenGeneratorMapping(t *testing.T, clientInfo *con
 	ok, err := common.HandleClientResponse(response, err, "DeleteTokenGeneratorMappingById", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -34,6 +34,7 @@ func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createKeypairsOauthOpenidConnectAdditionalKeySet(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testOauthIssuerId := strArgs[0]
@@ -61,10 +62,12 @@ func createKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *
 	ok, err := common.HandleClientResponse(response, err, "CreateKeySet", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -84,6 +87,7 @@ func deleteKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteKeypairsOauthOpenidConnectAdditionalKeySet(): %v", ids)
+
 		return
 	}
 
@@ -93,10 +97,12 @@ func deleteKeypairsOauthOpenidConnectAdditionalKeySet(t *testing.T, clientInfo *
 	ok, err := common.HandleClientResponse(response, err, "DeleteKeySet", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

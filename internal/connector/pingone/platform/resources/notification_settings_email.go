@@ -62,5 +62,6 @@ func (r *PingOneNotificationSettingsEmailResource) ExportAll() (*[]connector.Imp
 
 func (r *PingOneNotificationSettingsEmailResource) checkNotificationSettingsEmailData() (bool, error) {
 	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.NotificationsSettingsSMTPApi.ReadEmailNotificationsSettings(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+
 	return common.CheckSingletonResource(response, err, "ReadEmailNotificationsSettings", r.ResourceType())
 }

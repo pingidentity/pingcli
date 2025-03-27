@@ -78,7 +78,7 @@ func (r *PingOneKeyResource) getKeyData() (map[string][]string, error) {
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return keyData, nil
 	}
 
 	if entityArray == nil {

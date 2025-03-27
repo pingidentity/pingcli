@@ -31,6 +31,7 @@ func createKerberosRealm(t *testing.T, clientInfo *connector.ClientInfo, resourc
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createKerberosRealm(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -50,10 +51,12 @@ func createKerberosRealm(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	ok, err := common.HandleClientResponse(response, err, "CreateKerberosRealm", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -73,6 +76,7 @@ func deleteKerberosRealm(t *testing.T, clientInfo *connector.ClientInfo, resourc
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteKerberosRealm(): %v", ids)
+
 		return
 	}
 
@@ -82,10 +86,12 @@ func deleteKerberosRealm(t *testing.T, clientInfo *connector.ClientInfo, resourc
 	ok, err := common.HandleClientResponse(response, err, "DeleteKerberosRealm", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

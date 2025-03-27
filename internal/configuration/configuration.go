@@ -24,6 +24,7 @@ func ViperKeys() (keys []string) {
 	}
 
 	slices.Sort(keys)
+
 	return keys
 }
 
@@ -46,7 +47,7 @@ func ExpandedViperKeys() (keys []string) {
 	leafKeys := ViperKeys()
 	for _, key := range leafKeys {
 		keySplit := strings.Split(key, ".")
-		for i := 0; i < len(keySplit); i++ {
+		for i := range keySplit {
 			curKey := strings.Join(keySplit[:i+1], ".")
 			if !slices.ContainsFunc(keys, func(v string) bool {
 				return strings.EqualFold(v, curKey)
@@ -57,6 +58,7 @@ func ExpandedViperKeys() (keys []string) {
 	}
 
 	slices.Sort(keys)
+
 	return keys
 }
 
@@ -77,6 +79,7 @@ func OptionFromViperKey(viperKey string) (opt options.Option, err error) {
 			return opt, nil
 		}
 	}
+
 	return opt, fmt.Errorf("failed to get option: no option found for viper key: %s", viperKey)
 }
 

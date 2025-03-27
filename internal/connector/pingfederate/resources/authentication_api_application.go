@@ -69,7 +69,7 @@ func (r *PingFederateAuthenticationApiApplicationResource) getAuthenticationApiA
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return authenticationApiApplicationData, nil
 	}
 
 	if apiObj == nil {

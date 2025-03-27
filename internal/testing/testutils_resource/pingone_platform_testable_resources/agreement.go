@@ -31,6 +31,7 @@ func createAgreement(t *testing.T, clientInfo *connector.ClientInfo, resourceTyp
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createAgreement(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -48,10 +49,12 @@ func createAgreement(t *testing.T, clientInfo *connector.ClientInfo, resourceTyp
 	ok, err := common.HandleClientResponse(response, err, "CreateAgreement", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -71,6 +74,7 @@ func deleteAgreement(t *testing.T, clientInfo *connector.ClientInfo, resourceTyp
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteAgreement(): %v", ids)
+
 		return
 	}
 
@@ -80,10 +84,12 @@ func deleteAgreement(t *testing.T, clientInfo *connector.ClientInfo, resourceTyp
 	ok, err := common.HandleClientResponse(response, err, "DeleteAgreement", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

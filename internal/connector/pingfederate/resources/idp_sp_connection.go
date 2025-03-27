@@ -69,7 +69,7 @@ func (r *PingFederateIdpSpConnectionResource) getIdpSpConnectionData() (map[stri
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return idpSpConnectionData, nil
 	}
 
 	if apiObj == nil {

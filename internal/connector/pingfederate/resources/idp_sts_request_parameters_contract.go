@@ -69,7 +69,7 @@ func (r *PingFederateIdpStsRequestParametersContractResource) getIdpStsRequestPa
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return idpStsRequestParametersContractData, nil
 	}
 
 	if apiObj == nil {

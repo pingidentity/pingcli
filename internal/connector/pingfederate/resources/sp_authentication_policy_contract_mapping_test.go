@@ -30,5 +30,4 @@ func Test_PingFederateSpAuthenticationPolicyContractMapping(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

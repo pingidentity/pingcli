@@ -33,6 +33,7 @@ func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.Clien
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createSessionAuthenticationPolicy(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testIdpAdapterId := strArgs[1]
@@ -54,10 +55,12 @@ func createSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.Clien
 	ok, err := common.HandleClientResponse(response, err, "CreateSourcePolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -78,6 +81,7 @@ func deleteSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.Clien
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteSessionAuthenticationPolicy(): %v", ids)
+
 		return
 	}
 
@@ -87,10 +91,12 @@ func deleteSessionAuthenticationPolicy(t *testing.T, clientInfo *connector.Clien
 	ok, err := common.HandleClientResponse(response, err, "DeleteSourcePolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

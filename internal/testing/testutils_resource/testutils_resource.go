@@ -94,6 +94,7 @@ func (tr *TestableResource) CreateResource(t *testing.T) {
 	depIds, ok := tr.getDepIds()
 	if !ok {
 		t.Errorf("Failed to get dependency IDs for resource %s", resourceType)
+
 		return
 	}
 
@@ -136,5 +137,6 @@ func (tr *TestableResource) getDepIds() ([]string, bool) {
 		}
 		depIds = append(depIds, depId)
 	}
+
 	return depIds, true
 }

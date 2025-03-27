@@ -32,6 +32,7 @@ func createResourceAttribute(t *testing.T, clientInfo *connector.ClientInfo, res
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createResourceAttribute(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	resourceId := strArgs[0]
@@ -48,10 +49,12 @@ func createResourceAttribute(t *testing.T, clientInfo *connector.ClientInfo, res
 	ok, err := common.HandleClientResponse(response, err, "CreateResourceAttribute", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -72,6 +75,7 @@ func deleteResourceAttribute(t *testing.T, clientInfo *connector.ClientInfo, res
 
 	if len(ids) != 2 {
 		t.Errorf("Unexpected number of arguments provided to deleteResourceAttribute(): %v", ids)
+
 		return
 	}
 
@@ -81,10 +85,12 @@ func deleteResourceAttribute(t *testing.T, clientInfo *connector.ClientInfo, res
 	ok, err := common.HandleClientResponse(response, err, "DeleteResourceAttribute", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

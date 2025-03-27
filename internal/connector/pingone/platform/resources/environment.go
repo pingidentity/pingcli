@@ -62,5 +62,6 @@ func (r *PingOneEnvironmentResource) ExportAll() (*[]connector.ImportBlock, erro
 
 func (r *PingOneEnvironmentResource) checkEnvironmentData() (bool, error) {
 	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+
 	return common.CheckSingletonResource(response, err, "ReadOneEnvironment", r.ResourceType())
 }

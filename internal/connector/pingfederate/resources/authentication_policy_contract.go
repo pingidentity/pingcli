@@ -69,7 +69,7 @@ func (r *PingFederateAuthenticationPolicyContractResource) getAuthenticationPoli
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return authenticationPolicyContractData, nil
 	}
 
 	if apiObj == nil {

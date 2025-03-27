@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"strings"
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
@@ -134,7 +135,7 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateNames() (arr []m
 		// When PingOne services are not enabled in an environment,
 		// the response code for the templates related to that service is
 		// 400 Bad Request - "CONSTRAINT_VIOLATION"
-		if err != nil && response.StatusCode == 400 && response.Status == "400 Bad Request" {
+		if err != nil && response.StatusCode == http.StatusBadRequest && response.Status == "400 Bad Request" {
 			defer func() {
 				cErr := response.Body.Close()
 				if cErr != nil {
@@ -210,6 +211,7 @@ func (r *PingOneNotificationTemplateContentResource) getNotificationTemplateCont
 			notificationTemplateContentVariant = notificationTemplateContent.TemplateContentVoice.GetVariant()
 		default:
 			output.Warn(fmt.Sprintf("Template content '%v' for template '%s' is not one of: Push, SMS, Email, or Voice. Skipping export.", notificationTemplateContent, templateName), nil)
+
 			continue
 		}
 

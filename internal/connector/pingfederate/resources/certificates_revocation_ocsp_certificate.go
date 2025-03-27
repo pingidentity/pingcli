@@ -75,7 +75,7 @@ func (r *PingFederateCertificatesRevocationOcspCertificateResource) getCertifica
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return certificatesRevocationOcspCertificateData, nil
 	}
 
 	if apiObj == nil {

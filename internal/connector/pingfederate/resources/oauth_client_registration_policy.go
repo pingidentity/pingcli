@@ -69,7 +69,7 @@ func (r *PingFederateOauthClientRegistrationPolicyResource) getOauthClientRegist
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return oauthClientRegistrationPolicyData, nil
 	}
 
 	if apiObj == nil {

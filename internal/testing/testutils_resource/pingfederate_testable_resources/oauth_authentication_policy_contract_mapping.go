@@ -32,6 +32,7 @@ func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createOauthAuthenticationPolicyContractMapping(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testApcId := strArgs[0]
@@ -62,10 +63,12 @@ func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 	ok, err := common.HandleClientResponse(response, err, "CreateApcMapping", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -84,6 +87,7 @@ func deleteOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteOauthAuthenticationPolicyContractMapping(): %v", ids)
+
 		return
 	}
 
@@ -93,10 +97,12 @@ func deleteOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 	ok, err := common.HandleClientResponse(response, err, "DeleteApcMapping", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

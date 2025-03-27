@@ -75,7 +75,7 @@ func (r *PingFederateTokenProcessorToTokenGeneratorMappingResource) getTokenProc
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return tokenProcessorToTokenGeneratorMappingData, nil
 	}
 
 	if apiObj == nil {

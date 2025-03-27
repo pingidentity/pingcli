@@ -25,5 +25,4 @@ func Test_PingFederateKeypairsOauthOpenidConnect(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

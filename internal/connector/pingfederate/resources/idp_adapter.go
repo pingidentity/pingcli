@@ -69,7 +69,7 @@ func (r *PingFederateIdpAdapterResource) getIdpAdapterData() (map[string]string,
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return idpAdapterData, nil
 	}
 
 	if apiObj == nil {

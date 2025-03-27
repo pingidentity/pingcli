@@ -31,6 +31,7 @@ func createAuthorizeApiServiceDeployment(t *testing.T, clientInfo *connector.Cli
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createAuthorizeApiServiceDeployment(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	authorizeApiServiceId := strArgs[1]
@@ -42,6 +43,7 @@ func createAuthorizeApiServiceDeployment(t *testing.T, clientInfo *connector.Cli
 	ok, err := common.HandleClientResponse(response, err, "CreateApplicationPermission", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
@@ -50,6 +52,7 @@ func createAuthorizeApiServiceDeployment(t *testing.T, clientInfo *connector.Cli
 		} else {
 			t.Errorf("Failed to execute PingOne client function")
 		}
+
 		return testutils_resource.ResourceInfo{}
 	}
 

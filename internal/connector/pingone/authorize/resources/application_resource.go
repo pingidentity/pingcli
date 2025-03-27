@@ -93,7 +93,6 @@ func (r *PingOneApplicationResourceResource) getApplicationResourceData() (map[s
 		resourceId, resourceIdOk := applicationResource.Parent.GetIdOk()
 
 		if applicationResourceIdOk && applicationResourceNameOk && resourceIdOk {
-
 			applicationResourceData[*applicationResourceId] = []string{*applicationResourceName, *resourceId}
 		}
 	}

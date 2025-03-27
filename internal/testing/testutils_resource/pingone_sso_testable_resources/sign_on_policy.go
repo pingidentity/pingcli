@@ -31,6 +31,7 @@ func createSignOnPolicy(t *testing.T, clientInfo *connector.ClientInfo, resource
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createSignOnPolicy(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -47,10 +48,12 @@ func createSignOnPolicy(t *testing.T, clientInfo *connector.ClientInfo, resource
 	ok, err := common.HandleClientResponse(response, err, "CreateSignOnPolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -70,6 +73,7 @@ func deleteSignOnPolicy(t *testing.T, clientInfo *connector.ClientInfo, resource
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteSignOnPolicy(): %v", ids)
+
 		return
 	}
 
@@ -79,10 +83,12 @@ func deleteSignOnPolicy(t *testing.T, clientInfo *connector.ClientInfo, resource
 	ok, err := common.HandleClientResponse(response, err, "DeleteSignOnPolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

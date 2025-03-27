@@ -66,7 +66,7 @@ func initServiceGroupOption() {
 					"\nOptions are: %s."+
 					"\nExample: '%s'",
 				strings.Join(customtypes.ExportServiceGroupValidValues(), ", "),
-				string(customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE),
+				customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
 			),
 			Value: cobraValue,
 		},
@@ -94,9 +94,9 @@ func initServicesOption() {
 					"\nOptions are: %s."+
 					"\nExample: '%s,%s,%s'",
 				strings.Join(customtypes.ExportServicesValidValues(), ", "),
-				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO),
-				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA),
-				string(customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE),
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO,
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA,
+				customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 			),
 			Value: cobraValue,
 		},

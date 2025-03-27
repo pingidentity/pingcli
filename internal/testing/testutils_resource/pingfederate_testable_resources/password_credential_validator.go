@@ -31,6 +31,7 @@ func createPasswordCredentialValidator(t *testing.T, clientInfo *connector.Clien
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createPasswordCredentialValidator(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -79,10 +80,12 @@ func createPasswordCredentialValidator(t *testing.T, clientInfo *connector.Clien
 	ok, err := common.HandleClientResponse(response, err, "CreatePasswordCredentialValidator", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -102,6 +105,7 @@ func deletePasswordCredentialValidator(t *testing.T, clientInfo *connector.Clien
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deletePasswordCredentialValidator(): %v", ids)
+
 		return
 	}
 
@@ -111,10 +115,12 @@ func deletePasswordCredentialValidator(t *testing.T, clientInfo *connector.Clien
 	ok, err := common.HandleClientResponse(response, err, "DeletePasswordCredentialValidator", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -33,6 +33,7 @@ func createOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createOauthCibaServerPolicyRequestPolicy(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testAuthenticatorId := strArgs[0]
@@ -86,10 +87,12 @@ func createOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 	ok, err := common.HandleClientResponse(response, err, "CreateCibaServerPolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -109,6 +112,7 @@ func deleteOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteOauthCibaServerPolicyRequestPolicy(): %v", ids)
+
 		return
 	}
 
@@ -118,10 +122,12 @@ func deleteOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 	ok, err := common.HandleClientResponse(response, err, "DeleteCibaServerPolicy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

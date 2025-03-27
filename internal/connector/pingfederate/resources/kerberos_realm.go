@@ -69,7 +69,7 @@ func (r *PingFederateKerberosRealmResource) getKerberosRealmData() (map[string]s
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return kerberosRealmData, nil
 	}
 
 	if apiObj == nil {

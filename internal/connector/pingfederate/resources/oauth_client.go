@@ -69,7 +69,7 @@ func (r *PingFederateOauthClientResource) getOauthClientData() (map[string]strin
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return oauthClientData, nil
 	}
 
 	if apiObj == nil {

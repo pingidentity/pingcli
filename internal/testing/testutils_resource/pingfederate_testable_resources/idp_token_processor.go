@@ -33,6 +33,7 @@ func createIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo, res
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createIdpTokenProcessor(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testPCVId := strArgs[0]
@@ -79,10 +80,12 @@ func createIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo, res
 	ok, err := common.HandleClientResponse(response, err, "CreateTokenProcessor", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -102,6 +105,7 @@ func deleteIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo, res
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteIdpTokenProcessor(): %v", ids)
+
 		return
 	}
 
@@ -111,10 +115,12 @@ func deleteIdpTokenProcessor(t *testing.T, clientInfo *connector.ClientInfo, res
 	ok, err := common.HandleClientResponse(response, err, "DeleteTokenProcessor", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

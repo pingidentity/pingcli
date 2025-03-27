@@ -75,7 +75,7 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return serverSettingsWsTrustStsSettingsIssuerCertificateData, nil
 	}
 
 	if apiObj == nil {

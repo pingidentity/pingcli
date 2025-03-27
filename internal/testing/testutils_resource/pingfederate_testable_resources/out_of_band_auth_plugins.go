@@ -33,6 +33,7 @@ func createOutOfBandAuthPlugins(t *testing.T, clientInfo *connector.ClientInfo, 
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createOutOfBandAuthPlugins(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	testPingOneConnectionId := strArgs[0]
@@ -72,10 +73,12 @@ func createOutOfBandAuthPlugins(t *testing.T, clientInfo *connector.ClientInfo, 
 	ok, err := common.HandleClientResponse(response, err, "CreateOOBAuthenticator", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -94,6 +97,7 @@ func deleteOutOfBandAuthPlugins(t *testing.T, clientInfo *connector.ClientInfo, 
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteOutOfBandAuthPlugins(): %v", ids)
+
 		return
 	}
 
@@ -103,10 +107,12 @@ func deleteOutOfBandAuthPlugins(t *testing.T, clientInfo *connector.ClientInfo, 
 	ok, err := common.HandleClientResponse(response, err, "DeleteOOBAuthenticator", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

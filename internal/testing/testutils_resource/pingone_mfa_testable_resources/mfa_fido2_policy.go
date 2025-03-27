@@ -31,6 +31,7 @@ func createMfaFido2Policy(t *testing.T, clientInfo *connector.ClientInfo, resour
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createMfaFido2Policy(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -84,10 +85,12 @@ func createMfaFido2Policy(t *testing.T, clientInfo *connector.ClientInfo, resour
 	ok, err := common.HandleClientResponse(response, err, "CreateFIDO2Policy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -107,6 +110,7 @@ func deleteMfaFido2Policy(t *testing.T, clientInfo *connector.ClientInfo, resour
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteMfaFido2Policy(): %v", ids)
+
 		return
 	}
 
@@ -116,10 +120,12 @@ func deleteMfaFido2Policy(t *testing.T, clientInfo *connector.ClientInfo, resour
 	ok, err := common.HandleClientResponse(response, err, "DeleteFIDO2Policy", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

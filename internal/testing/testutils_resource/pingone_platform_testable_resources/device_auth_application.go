@@ -28,6 +28,7 @@ func createDeviceAuthApplication(t *testing.T, clientInfo *connector.ClientInfo,
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createPingOneDeviceAuthApplication(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -49,21 +50,25 @@ func createDeviceAuthApplication(t *testing.T, clientInfo *connector.ClientInfo,
 	ok, err := common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
 	if createApplication201Response == nil || createApplication201Response.ApplicationOIDC == nil {
 		t.Errorf("Failed to create test %s: %v", resourceType, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
 	appId, appIdOk := createApplication201Response.ApplicationOIDC.GetIdOk()
 	if !appIdOk {
 		t.Errorf("Failed to create test %s: %v", resourceType, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -82,6 +87,7 @@ func deleteDeviceAuthApplication(t *testing.T, clientInfo *connector.ClientInfo,
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteDeviceAuthApplication(): %v", ids)
+
 		return
 	}
 
@@ -89,10 +95,12 @@ func deleteDeviceAuthApplication(t *testing.T, clientInfo *connector.ClientInfo,
 	ok, err := common.HandleClientResponse(response, err, "DeleteApplication", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -31,6 +31,7 @@ func createForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createForm(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -59,10 +60,12 @@ func createForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 	ok, err := common.HandleClientResponse(response, err, "CreateForm", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -82,6 +85,7 @@ func deleteForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteForm(): %v", ids)
+
 		return
 	}
 
@@ -91,10 +95,12 @@ func deleteForm(t *testing.T, clientInfo *connector.ClientInfo, resourceType str
 	ok, err := common.HandleClientResponse(response, err, "DeleteForm", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

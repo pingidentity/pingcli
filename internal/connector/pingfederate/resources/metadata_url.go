@@ -69,7 +69,7 @@ func (r *PingFederateMetadataUrlResource) getMetadataUrlData() (map[string]strin
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return metadataUrlData, nil
 	}
 
 	if apiObj == nil {

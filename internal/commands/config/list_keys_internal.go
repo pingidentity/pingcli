@@ -32,7 +32,10 @@ func returnKeysYamlString() (string, error) {
 		}
 
 		// Create a nested map for each yaml key
-		currentMap := keyMap
+		var (
+			currentMap   = keyMap
+			currentMapOk bool
+		)
 		yamlKeys := strings.Split(viperKey, ".")
 		for i, k := range yamlKeys {
 			// If it's the last yaml key, set an empty map
@@ -43,7 +46,10 @@ func returnKeysYamlString() (string, error) {
 				if _, exists := currentMap[k]; !exists {
 					currentMap[k] = make(map[string]interface{})
 				}
-				currentMap = currentMap[k].(map[string]interface{})
+				currentMap, currentMapOk = currentMap[k].(map[string]interface{})
+				if !currentMapOk {
+					return "", fmt.Errorf("failed to get configuration keys list: error creating nested map for key %s", viperKey)
+				}
 			}
 		}
 	}
@@ -65,6 +71,7 @@ func returnKeysString() (string, error) {
 		return "", fmt.Errorf("unable to retrieve valid keys")
 	} else {
 		validKeysJoined := strings.Join(validKeys, "\n- ")
+
 		return "Valid Keys:\n- " + validKeysJoined, nil
 	}
 }

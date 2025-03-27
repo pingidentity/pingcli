@@ -33,6 +33,7 @@ func createAgreementLocalizationRevision(t *testing.T, clientInfo *connector.Cli
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createAgreementLocalizationRevision(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	agreementId := strArgs[0]
@@ -41,6 +42,7 @@ func createAgreementLocalizationRevision(t *testing.T, clientInfo *connector.Cli
 	parsedTime, err := time.Parse(time.RFC3339, "2098-08-01T22:45:44.497Z")
 	if err != nil {
 		t.Errorf("Failed to parse time: %v", err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -58,10 +60,12 @@ func createAgreementLocalizationRevision(t *testing.T, clientInfo *connector.Cli
 	ok, err := common.HandleClientResponse(response, err, "CreateAgreementLanguageRevision", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -82,6 +86,7 @@ func deleteAgreementLocalizationRevision(t *testing.T, clientInfo *connector.Cli
 
 	if len(ids) != 3 {
 		t.Errorf("Unexpected number of arguments provided to deleteAgreementLocalizationRevision(): %v", ids)
+
 		return
 	}
 
@@ -91,10 +96,12 @@ func deleteAgreementLocalizationRevision(t *testing.T, clientInfo *connector.Cli
 	ok, err := common.HandleClientResponse(response, err, "DeleteAgreementLanguageRevision", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

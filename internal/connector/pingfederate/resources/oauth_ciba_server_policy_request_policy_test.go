@@ -32,5 +32,4 @@ func Test_PingFederateOauthCibaServerPolicyRequestPolicy(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

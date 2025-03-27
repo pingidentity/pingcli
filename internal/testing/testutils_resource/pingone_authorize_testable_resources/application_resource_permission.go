@@ -34,6 +34,7 @@ func createApplicationResourcePermission(t *testing.T, clientInfo *connector.Cli
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createApplicationResourcePermission(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	applicationResourceId := strArgs[1]
@@ -50,10 +51,12 @@ func createApplicationResourcePermission(t *testing.T, clientInfo *connector.Cli
 	ok, err := common.HandleClientResponse(response, err, "CreateApplicationPermission", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -74,6 +77,7 @@ func deleteApplicationResourcePermission(t *testing.T, clientInfo *connector.Cli
 
 	if len(ids) != 2 {
 		t.Errorf("Unexpected number of arguments provided to deleteApplicationResourcePermission(): %v", ids)
+
 		return
 	}
 
@@ -83,10 +87,12 @@ func deleteApplicationResourcePermission(t *testing.T, clientInfo *connector.Cli
 	ok, err := common.HandleClientResponse(response, err, "DeleteApplicationPermission", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

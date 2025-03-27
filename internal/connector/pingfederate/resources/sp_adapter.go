@@ -69,7 +69,7 @@ func (r *PingFederateSpAdapterResource) getSpAdapterData() (map[string]string, e
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return spAdapterData, nil
 	}
 
 	if apiObj == nil {

@@ -33,6 +33,7 @@ func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.Cl
 
 	if len(strArgs) != 2 {
 		t.Errorf("Unexpected number of arguments provided to createAuthenticationPoliciesFragment(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	idpAdapterId := strArgs[1]
@@ -86,10 +87,12 @@ func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.Cl
 	ok, err := common.HandleClientResponse(response, err, "CreateFragment", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -109,6 +112,7 @@ func deleteAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.Cl
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteAuthenticationPoliciesFragment(): %v", ids)
+
 		return
 	}
 
@@ -118,10 +122,12 @@ func deleteAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.Cl
 	ok, err := common.HandleClientResponse(response, err, "DeleteFragment", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

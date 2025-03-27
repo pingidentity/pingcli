@@ -18,14 +18,14 @@ func RunInternalConfigSetActiveProfile(args []string, rc io.ReadCloser) (err err
 	} else {
 		pName, err = promptUserToSelectActiveProfile(rc)
 		if err != nil {
-			return fmt.Errorf("failed to set active profile: %v", err)
+			return fmt.Errorf("failed to set active profile: %w", err)
 		}
 	}
 
 	output.Message(fmt.Sprintf("Setting active profile to '%s'...", pName), nil)
 
 	if err = profiles.GetMainConfig().ChangeActiveProfile(pName); err != nil {
-		return fmt.Errorf("failed to set active profile: %v", err)
+		return fmt.Errorf("failed to set active profile: %w", err)
 	}
 
 	output.Success(fmt.Sprintf("Active profile set to '%s'", pName), nil)

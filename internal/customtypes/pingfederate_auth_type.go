@@ -39,6 +39,7 @@ func (pat *PingFederateAuthenticationType) Set(authType string) error {
 	default:
 		return fmt.Errorf("unrecognized PingFederate Authentication Type: '%s'. Must be one of: %s", authType, strings.Join(PingFederateAuthenticationTypeValidValues(), ", "))
 	}
+
 	return nil
 }
 

@@ -96,5 +96,6 @@ func (r *PingOnePopulationDefaultIdentityProviderResource) getPopulationData() (
 
 func (r *PingOnePopulationDefaultIdentityProviderResource) checkPopulationDefaultIdentityProviderData(populationId string) (bool, error) {
 	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.PopulationsApi.ReadOnePopulationDefaultIdp(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, populationId).Execute()
+
 	return common.CheckSingletonResource(response, err, "ReadOnePopulationDefaultIdp", r.ResourceType())
 }

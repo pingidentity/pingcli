@@ -33,5 +33,4 @@ func Test_PingFederateKeypairsSigningKeyRotationSettings(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

@@ -72,6 +72,7 @@ func (r *PingOneBrandingThemeDefaultResource) checkBrandingThemeDefaultData() (b
 	for _, brandingTheme := range brandingThemes {
 		if brandingTheme.Default {
 			_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingThemesApi.ReadBrandingThemeDefault(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, *brandingTheme.Id).Execute()
+
 			return common.CheckSingletonResource(response, err, "ReadBrandingThemeDefault", r.ResourceType())
 		}
 	}

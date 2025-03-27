@@ -31,6 +31,7 @@ func createApplicationDeviceAuthorization(t *testing.T, clientInfo *connector.Cl
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createApplicationDeviceAuthorization(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -38,6 +39,7 @@ func createApplicationDeviceAuthorization(t *testing.T, clientInfo *connector.Cl
 	applicationName, err := uuid.GenerateUUID()
 	if err != nil {
 		t.Errorf("Failed to generate UUID for application name: %v", err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -62,10 +64,12 @@ func createApplicationDeviceAuthorization(t *testing.T, clientInfo *connector.Cl
 	ok, err := common.HandleClientResponse(response, err, "CreateApplication", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -85,6 +89,7 @@ func deleteApplicationDeviceAuthorization(t *testing.T, clientInfo *connector.Cl
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteApplicationDeviceAuthorization(): %v", ids)
+
 		return
 	}
 
@@ -94,10 +99,12 @@ func deleteApplicationDeviceAuthorization(t *testing.T, clientInfo *connector.Cl
 	ok, err := common.HandleClientResponse(response, err, "DeleteApplication", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

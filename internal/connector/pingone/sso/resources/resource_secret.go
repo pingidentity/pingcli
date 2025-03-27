@@ -99,5 +99,6 @@ func (r *PingOneResourceSecretResource) getResourceData() (map[string]string, er
 
 func (r *PingOneResourceSecretResource) checkResourceSecretData(resourceId string) (bool, error) {
 	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourceClientSecretApi.ReadResourceSecret(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, resourceId).Execute()
+
 	return common.CheckSingletonResource(response, err, "ReadResourceSecret", r.ResourceType())
 }

@@ -62,5 +62,6 @@ func (r *PingOneBrandingSettingsResource) ExportAll() (*[]connector.ImportBlock,
 
 func (r *PingOneBrandingSettingsResource) checkBrandingSettingsData() (bool, error) {
 	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.BrandingSettingsApi.ReadBrandingSettings(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+
 	return common.CheckSingletonResource(response, err, "ReadBrandingSettings", r.ResourceType())
 }

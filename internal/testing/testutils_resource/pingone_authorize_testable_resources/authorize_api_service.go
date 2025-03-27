@@ -33,6 +33,7 @@ func createAuthorizeApiService(t *testing.T, clientInfo *connector.ClientInfo, r
 
 	if len(strArgs) != 1 {
 		t.Errorf("Unexpected number of arguments provided to createAuthorizeApiService(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	resourceId := strArgs[0]
@@ -58,10 +59,12 @@ func createAuthorizeApiService(t *testing.T, clientInfo *connector.ClientInfo, r
 	ok, err := common.HandleClientResponse(response, err, "CreateAPIServer", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -81,6 +84,7 @@ func deleteAuthorizeApiService(t *testing.T, clientInfo *connector.ClientInfo, r
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteAuthorizeApiService(): %v", ids)
+
 		return
 	}
 
@@ -90,10 +94,12 @@ func deleteAuthorizeApiService(t *testing.T, clientInfo *connector.ClientInfo, r
 	ok, err := common.HandleClientResponse(response, err, "DeleteAPIServer", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

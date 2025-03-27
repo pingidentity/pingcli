@@ -71,7 +71,7 @@ func (r *PingFederateIdpToSpAdapterMappingResource) getIdpToSpAdapterMappingData
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return idpToSpAdapterMappingData, nil
 	}
 
 	if apiObj == nil {

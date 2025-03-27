@@ -69,7 +69,7 @@ func (r *PingFederateLocalIdentityProfileResource) getLocalIdentityProfileData()
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return localIdentityProfileData, nil
 	}
 
 	if apiObj == nil {

@@ -99,7 +99,7 @@ func initViperProfile() {
 
 	l.Debug().Msgf("Validated configuration file location at: %s", cfgFile)
 
-	//Configure the main viper instance
+	// Configure the main viper instance
 	initMainViper(cfgFile)
 
 	userDefinedProfile, err := profiles.GetOptionValue(options.RootProfileOption)
@@ -149,7 +149,7 @@ func createConfigFile(cfgFile string) {
 	output.Message(fmt.Sprintf("Creating new Ping CLI configuration file at: %s", cfgFile), nil)
 
 	// MkdirAll does nothing if directories already exist. Create needed directories for config file location.
-	err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
+	err := os.MkdirAll(filepath.Dir(cfgFile), os.FileMode(0700))
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Failed to make the directory for the new configuration file '%s': %v", cfgFile, err), nil)
 	}

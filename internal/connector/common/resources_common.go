@@ -25,13 +25,14 @@ func CheckSingletonResource(response *http.Response, err error, apiFuncName, res
 		return false, nil
 	}
 
-	if response.StatusCode == 204 {
+	if response.StatusCode == http.StatusNoContent {
 		output.Warn("API client 204 No Content response.", map[string]interface{}{
 			"API Function Name": apiFuncName,
 			"Resource Type":     resourceType,
 			"Response Code":     response.Status,
 			"Response Body":     response.Body,
 		})
+
 		return false, nil
 	}
 
@@ -62,7 +63,7 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 	}()
 
 	// When the client returns forbidden, warn user and skip export of resource
-	if response.StatusCode == 403 {
+	if response.StatusCode == http.StatusForbidden {
 		output.Warn("API client 403 forbidden response.", map[string]interface{}{
 			"API Function Name": apiFunctionName,
 			"Resource Type":     resourceType,

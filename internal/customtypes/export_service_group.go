@@ -32,6 +32,7 @@ func (esg *ExportServiceGroup) Set(serviceGroup string) error {
 	default:
 		return fmt.Errorf("unrecognized service group '%s'. Must be one of: %s", serviceGroup, strings.Join(ExportServiceGroupValidValues(), ", "))
 	}
+
 	return nil
 }
 

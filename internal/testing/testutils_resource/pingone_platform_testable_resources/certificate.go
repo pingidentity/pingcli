@@ -31,6 +31,7 @@ func createCertificate(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createCertificate(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -39,6 +40,7 @@ func createCertificate(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 	fileData, err := testutils.CreateX509Certificate()
 	if err != nil {
 		t.Errorf("Failed to create X509 certificate: %v", err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -49,10 +51,12 @@ func createCertificate(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 	ok, err := common.HandleClientResponse(response, err, "CreateCertificateFromFile", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -72,6 +76,7 @@ func deleteCertificate(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteCertificate(): %v", ids)
+
 		return
 	}
 
@@ -81,10 +86,12 @@ func deleteCertificate(t *testing.T, clientInfo *connector.ClientInfo, resourceT
 	ok, err := common.HandleClientResponse(response, err, "DeleteCertificate", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

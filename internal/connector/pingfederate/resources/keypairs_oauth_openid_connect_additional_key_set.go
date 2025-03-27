@@ -69,7 +69,7 @@ func (r *PingFederateKeypairsOauthOpenidConnectAdditionalKeySetResource) getKeyp
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return keypairsOauthOpenidConnectAdditionalKeySetData, nil
 	}
 
 	if apiObj == nil {

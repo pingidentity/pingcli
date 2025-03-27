@@ -69,7 +69,7 @@ func (r *PingFederateCaptchaProviderResource) getCaptchaProviderData() (map[stri
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return captchaProviderData, nil
 	}
 
 	if apiObj == nil {

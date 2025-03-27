@@ -30,5 +30,4 @@ func Test_PingFederateOauthAccessTokenMapping(t *testing.T) {
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

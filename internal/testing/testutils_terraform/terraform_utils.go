@@ -4,6 +4,7 @@ package testutils_terraform
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -42,6 +43,7 @@ func ValidateTerraformPlan(t *testing.T, resource connector.ExportableResource, 
 				if output["@message"] == ignoredError {
 					usedIgnoreErrors[ignoredError] = true
 					ignore = true
+
 					break
 				}
 			}
@@ -107,6 +109,8 @@ func singleResourceTerraformPlanGenerateConfigOut(t *testing.T, resource connect
 
 // Helper function to run terraform plan --generate-config-out
 func runTerraformPlanGenerateConfigOut(t *testing.T, terraformExecutableFilepath, exportDir string) string {
+	t.Helper()
+
 	// Create the os.exec Command
 	terraformPlanCmd := exec.Command(terraformExecutableFilepath)
 	// Add the arguments to the command
@@ -133,8 +137,10 @@ func runTerraformPlanGenerateConfigOut(t *testing.T, terraformExecutableFilepath
 
 	// Wait for the command to finish
 	if err := terraformPlanCmd.Wait(); err != nil {
+		var exitErr *exec.ExitError
+
 		// If err is of type *exec.ExitError, ignore the error
-		if _, ok := err.(*exec.ExitError); !ok {
+		if !errors.As(err, &exitErr) {
 			t.Fatalf("Failed to run terraform plan: %v", err)
 		}
 	}
@@ -181,7 +187,7 @@ provider "pingone" {
 	}
 
 	// Run terraform init in testing directory
-	initCmd := exec.Command(terraformExecutableFilepath)
+	initCmd := exec.Command(terraformExecutableFilepath) //#nosec G204 -- This is a test
 	initCmd.Args = append(initCmd.Args, "init")
 	initCmd.Dir = exportDir
 
@@ -228,7 +234,7 @@ provider "pingfederate" {
 	}
 
 	// Run terraform init in testing directory
-	initCmd := exec.Command(terraformExecutableFilepath)
+	initCmd := exec.Command(terraformExecutableFilepath) //#nosec G204 -- This is a test
 	initCmd.Args = append(initCmd.Args, "init")
 	initCmd.Dir = exportDir
 

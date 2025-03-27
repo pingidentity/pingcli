@@ -30,6 +30,7 @@ func createAlertChannel(t *testing.T, clientInfo *connector.ClientInfo, resource
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createAlertChannel(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -55,10 +56,12 @@ func createAlertChannel(t *testing.T, clientInfo *connector.ClientInfo, resource
 	ok, err := common.HandleClientResponse(response, err, "CreateAlertChannel", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -78,6 +81,7 @@ func deleteAlertChannel(t *testing.T, clientInfo *connector.ClientInfo, resource
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteAlertChannel(): %v", ids)
+
 		return
 	}
 
@@ -87,10 +91,12 @@ func deleteAlertChannel(t *testing.T, clientInfo *connector.ClientInfo, resource
 	ok, err := common.HandleClientResponse(response, err, "DeleteAlertChannel", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

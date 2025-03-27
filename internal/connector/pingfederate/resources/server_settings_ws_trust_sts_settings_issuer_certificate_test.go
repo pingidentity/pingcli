@@ -30,5 +30,4 @@ func Test_PingFederateServerSettingsWsTrustStsSettingsIssuerCertificate(t *testi
 	}
 
 	testutils.ValidateImportBlocks(t, tr.ExportableResource, &expectedImportBlocks)
-
 }

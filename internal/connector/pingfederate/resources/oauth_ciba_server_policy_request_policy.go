@@ -69,7 +69,7 @@ func (r *PingFederateOauthCibaServerPolicyRequestPolicyResource) getOauthCibaSer
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return oauthCibaServerPolicyRequestPolicyData, nil
 	}
 
 	if apiObj == nil {

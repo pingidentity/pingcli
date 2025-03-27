@@ -62,5 +62,6 @@ func (r *PingOneFormsRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock,
 
 func (r *PingOneFormsRecaptchaV2Resource) checkFormsRecaptchaV2Data() (bool, error) {
 	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.RecaptchaConfigurationApi.ReadRecaptchaConfiguration(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+
 	return common.CheckSingletonResource(response, err, "ReadRecaptchaConfiguration", r.ResourceType())
 }

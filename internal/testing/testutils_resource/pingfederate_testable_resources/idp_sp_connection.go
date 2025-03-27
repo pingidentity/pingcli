@@ -34,6 +34,7 @@ func createIdpSpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 
 	if len(strArgs) != 3 {
 		t.Errorf("Unexpected number of arguments provided to createIdpSpConnection(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	signingKeyPairId := strArgs[0]
@@ -100,10 +101,12 @@ func createIdpSpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 	ok, err := common.HandleClientResponse(response, err, "CreateSpConnection", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -123,6 +126,7 @@ func deleteIdpSpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteIdpSpConnection(): %v", ids)
+
 		return
 	}
 
@@ -132,10 +136,12 @@ func deleteIdpSpConnection(t *testing.T, clientInfo *connector.ClientInfo, resou
 	ok, err := common.HandleClientResponse(response, err, "DeleteSpConnection", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

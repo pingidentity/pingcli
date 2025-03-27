@@ -69,7 +69,7 @@ func (r *PingFederatePasswordCredentialValidatorResource) getPasswordCredentialV
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return passwordCredentialValidatorData, nil
 	}
 
 	if apiObj == nil {

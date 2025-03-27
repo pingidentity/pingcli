@@ -30,6 +30,7 @@ func createIdentityPropagationPlan(t *testing.T, clientInfo *connector.ClientInf
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createIdentityPropagationPlan(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -44,10 +45,12 @@ func createIdentityPropagationPlan(t *testing.T, clientInfo *connector.ClientInf
 	ok, err := common.HandleClientResponse(response, err, "CreatePlan", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -67,6 +70,7 @@ func deleteIdentityPropagationPlan(t *testing.T, clientInfo *connector.ClientInf
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteIdentityPropagationPlan(): %v", ids)
+
 		return
 	}
 
@@ -76,10 +80,12 @@ func deleteIdentityPropagationPlan(t *testing.T, clientInfo *connector.ClientInf
 	ok, err := common.HandleClientResponse(response, err, "DeletePlan", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

@@ -30,6 +30,7 @@ func createLanguage(t *testing.T, clientInfo *connector.ClientInfo, resourceType
 
 	if len(strArgs) != 0 {
 		t.Errorf("Unexpected number of arguments provided to createLanguage(): %v", strArgs)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -44,10 +45,12 @@ func createLanguage(t *testing.T, clientInfo *connector.ClientInfo, resourceType
 	ok, err := common.HandleClientResponse(response, err, "CreateLanguage", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -64,10 +67,12 @@ func createLanguage(t *testing.T, clientInfo *connector.ClientInfo, resourceType
 	ok, err = common.HandleClientResponse(response, err, "UpdateLanguage", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return testutils_resource.ResourceInfo{}
 	}
 
@@ -87,6 +92,7 @@ func deleteLanguage(t *testing.T, clientInfo *connector.ClientInfo, resourceType
 
 	if len(ids) != 1 {
 		t.Errorf("Unexpected number of arguments provided to deleteLanguage(): %v", ids)
+
 		return
 	}
 
@@ -96,10 +102,12 @@ func deleteLanguage(t *testing.T, clientInfo *connector.ClientInfo, resourceType
 	ok, err := common.HandleClientResponse(response, err, "DeleteLanguage", resourceType)
 	if err != nil {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s\nError: %v", response.Status, response.Body, err)
+
 		return
 	}
 	if !ok {
 		t.Errorf("Failed to execute PingOne client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+
 		return
 	}
 }

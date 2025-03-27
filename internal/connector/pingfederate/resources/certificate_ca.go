@@ -75,7 +75,7 @@ func (r *PingFederateCertificateCaResource) getCertificateCaData() (map[string][
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return certificateCaData, nil
 	}
 
 	if apiObj == nil {

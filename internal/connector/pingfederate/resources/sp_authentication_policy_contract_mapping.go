@@ -75,7 +75,7 @@ func (r *PingFederateSpAuthenticationPolicyContractMappingResource) getSpAuthent
 		return nil, err
 	}
 	if !ok {
-		return nil, nil
+		return spAuthenticationPolicyContractMappingData, nil
 	}
 
 	if apiObj == nil {
