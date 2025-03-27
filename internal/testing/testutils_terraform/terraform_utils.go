@@ -13,7 +13,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -157,13 +156,23 @@ func InitPingOneTerraform(t *testing.T) {
 	required_providers {
 		pingone = {
 		source = "pingidentity/pingone"
-		version = "%s"
+		version = "1.6.0"
 		}
 	}
 }
 	
-provider "pingone" {}
-`, os.Getenv("PINGCLI_PINGONE_PROVIDER_VERSION"))
+provider "pingone" {
+  client_id = "%s"
+  client_secret = "%s"
+  environment_id = "%s"
+  region_code = "%s"
+}
+`,
+		os.Getenv("TEST_PINGONE_CLIENT_ID"),
+		os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		os.Getenv("TEST_PINGONE_REGION_CODE"),
+	)
 
 	// Write main.tf to testing directory
 	mainTFFilepath := filepath.Join(exportDir, "main.tf")
@@ -192,30 +201,25 @@ func InitPingFederateTerraform(t *testing.T) {
 	// Check if terraform is installed
 	checkTerraformInstallPath(t)
 
-	mainTFFileContents := fmt.Sprintf(`terraform {
+	mainTFFileContents := `terraform {
 	required_providers {
 		pingfederate = {
 		source = "pingidentity/pingfederate"
-		version = "%s"
+		version = "1.4.3"
 		}
 	}
 }
 
 provider "pingfederate" {
-  username = "%s"
-  password = "%s"
-  https_host = "%s"
-  admin_api_path = "%s"
+  username = "Administrator"
+  password = "2FederateM0re"
+  https_host = "https://localhost:9999"
+  admin_api_path = "/pf-admin-api/v1"
   product_version = "12.2"
   insecure_trust_all_tls = true
   x_bypass_external_validation_header = true
 }
-`,
-		os.Getenv("PINGCLI_PINGFEDERATE_PROVIDER_VERSION"),
-		os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		os.Getenv(options.PingFederateHTTPSHostOption.EnvVar),
-		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar))
+`
 
 	// Write main.tf to testing directory
 	mainTFFilepath := filepath.Join(exportDir, "main.tf")

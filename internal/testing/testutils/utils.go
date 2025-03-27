@@ -23,7 +23,6 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/patrickcping/pingone-go-sdk-v2/pingone"
 	"github.com/pingidentity/pingcli/internal/configuration"
-	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/connector"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
@@ -50,14 +49,10 @@ func GetClientInfo(t *testing.T) *connector.ClientInfo {
 func initPingFederateClientInfo(t *testing.T, clientInfo *connector.ClientInfo) {
 	t.Helper()
 
-	httpsHost := os.Getenv(options.PingFederateHTTPSHostOption.EnvVar)
-	adminApiPath := os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar)
-	pfUsername := os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar)
-	pfPassword := os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar)
-
-	if httpsHost == "" || adminApiPath == "" || pfUsername == "" || pfPassword == "" {
-		t.Fatalf("Unable to retrieve env var value for one or more of httpsHost, adminApiPath, pfUsername, pfPassword.")
-	}
+	httpsHost := "https://localhost:9999"
+	adminApiPath := "/pf-admin-api/v1"
+	pfUsername := "Administrator"
+	pfPassword := "2FederateM0re"
 
 	pfClientConfig := pingfederateGoClient.NewConfiguration()
 	pfClientConfig.DefaultHeader["X-Xsrf-Header"] = "PingFederate"
@@ -84,10 +79,10 @@ func initPingOneClientInfo(t *testing.T, clientInfo *connector.ClientInfo) {
 
 	// Grab environment vars for initializing the API client.
 	// These are set in GitHub Actions.
-	clientID := os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar)
-	clientSecret := os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar)
-	environmentId := os.Getenv(options.PlatformExportPingOneEnvironmentIDOption.EnvVar)
-	regionCode := os.Getenv(options.PingOneRegionCodeOption.EnvVar)
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_SECRET")
+	environmentId := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
+	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 	sdkRegionCode := management.EnumRegionCode(regionCode)
 
 	if clientID == "" || clientSecret == "" || environmentId == "" || regionCode == "" {
