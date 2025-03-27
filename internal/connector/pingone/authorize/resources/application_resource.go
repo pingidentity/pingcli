@@ -32,12 +32,6 @@ func (r *PingOneApplicationResourceResource) ResourceType() string {
 	return "pingone_application_resource"
 }
 
-type applicationResourceObj struct {
-	applicationResourceName string
-	resourceId              string
-	resourceName            string
-}
-
 func (r *PingOneApplicationResourceResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
@@ -49,20 +43,32 @@ func (r *PingOneApplicationResourceResource) ExportAll() (*[]connector.ImportBlo
 		return nil, err
 	}
 
-	for applicationResourceId, applicationResourceObj := range applicationResourceData {
+	for applicationResourceId, applicationResourceInfo := range applicationResourceData {
+		applicationResourceName := applicationResourceInfo[0]
+		resourceId := applicationResourceInfo[1]
+
+		resourceName, resourceNameOk, err := r.getResourceName(resourceId)
+		if err != nil {
+			return nil, err
+		}
+
+		if !resourceNameOk {
+			continue
+		}
+
 		commentData := map[string]string{
-			"PingOne Resource ID":       applicationResourceObj.resourceId,
-			"PingOne Resource Name":     applicationResourceObj.resourceName,
+			"PingOne Resource ID":       resourceId,
+			"PingOne Resource Name":     *resourceName,
 			"Application Resource ID":   applicationResourceId,
-			"Application Resource Name": applicationResourceObj.applicationResourceName,
+			"Application Resource Name": applicationResourceName,
 			"Export Environment ID":     r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":             r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       fmt.Sprintf("%s_%s", applicationResourceObj.resourceName, applicationResourceObj.applicationResourceName),
-			ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, applicationResourceObj.resourceId, applicationResourceId),
+			ResourceName:       fmt.Sprintf("%s_%s", *resourceName, applicationResourceName),
+			ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, resourceId, applicationResourceId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -72,8 +78,8 @@ func (r *PingOneApplicationResourceResource) ExportAll() (*[]connector.ImportBlo
 	return &importBlocks, nil
 }
 
-func (r *PingOneApplicationResourceResource) getApplicationResourceData() (map[string]applicationResourceObj, error) {
-	applicationResourceData := make(map[string]applicationResourceObj)
+func (r *PingOneApplicationResourceResource) getApplicationResourceData() (map[string][]string, error) {
+	applicationResourceData := make(map[string][]string)
 
 	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationResourcesApi.ReadApplicationResources(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	applicationResources, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationResource](iter, "ReadApplicationResources", "GetResources", r.ResourceType())
@@ -88,23 +94,31 @@ func (r *PingOneApplicationResourceResource) getApplicationResourceData() (map[s
 
 		if applicationResourceIdOk && applicationResourceNameOk && resourceIdOk {
 
-			resourceObj, httpResponse, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, *resourceId).Execute()
-			ok, err := common.HandleClientResponse(httpResponse, err, "ReadOneResource", r.ResourceType())
-			if err != nil {
-				return nil, err
-			}
-			// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
-			if !ok {
-				return nil, nil
-			}
-
-			applicationResourceData[*applicationResourceId] = applicationResourceObj{
-				applicationResourceName: *applicationResourceName,
-				resourceId:              *resourceId,
-				resourceName:            resourceObj.GetName(),
-			}
+			applicationResourceData[*applicationResourceId] = []string{*applicationResourceName, *resourceId}
 		}
 	}
 
 	return applicationResourceData, nil
+}
+
+func (r *PingOneApplicationResourceResource) getResourceName(resourceId string) (*string, bool, error) {
+	apiObj, httpResponse, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.ResourcesApi.ReadOneResource(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, resourceId).Execute()
+	ok, err := common.HandleClientResponse(httpResponse, err, "ReadOneResource", r.ResourceType())
+	if err != nil {
+		return nil, false, err
+	}
+	if !ok {
+		return nil, false, nil
+	}
+
+	if apiObj == nil {
+		return nil, false, nil
+	}
+
+	resourceName, resourceNameOk := apiObj.GetNameOk()
+	if !resourceNameOk {
+		return nil, false, nil
+	}
+
+	return resourceName, true, nil
 }

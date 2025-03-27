@@ -28,6 +28,10 @@ func AuthorizeApplicationRolePermission(clientInfo *connector.ClientInfo) *Pingo
 	}
 }
 
+func (r *PingoneAuthorizeApplicationRolePermissionResource) ResourceType() string {
+	return "pingone_authorize_application_role_permission"
+}
+
 func (r *PingoneAuthorizeApplicationRolePermissionResource) ExportAll() (*[]connector.ImportBlock, error) {
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
@@ -39,26 +43,26 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) ExportAll() (*[]conn
 		return nil, err
 	}
 
-	for appRoleId, appRoleName := range applicationRoleData {
-		appRolePermissionData, err := r.getApplicationRolePermissionData(appRoleId)
+	for applicationRoleId, applicationRoleName := range applicationRoleData {
+		appRolePermissionData, err := r.getApplicationRolePermissionData(applicationRoleId)
 		if err != nil {
 			return nil, err
 		}
 
-		for appRolePermissionId, appRolePermissionKey := range appRolePermissionData {
+		for applicationRolePermissionId, applicationRolePermissionKey := range appRolePermissionData {
 			commentData := map[string]string{
-				"Application Role ID":             appRoleId,
-				"Application Role Name":           appRoleName,
-				"Application Role Permission ID":  appRolePermissionId,
-				"Application Role Permission Key": appRolePermissionKey,
+				"Application Role ID":             applicationRoleId,
+				"Application Role Name":           applicationRoleName,
+				"Application Role Permission ID":  applicationRolePermissionId,
+				"Application Role Permission Key": applicationRolePermissionKey,
 				"Export Environment ID":           r.clientInfo.PingOneExportEnvironmentID,
 				"Resource Type":                   r.ResourceType(),
 			}
 
 			importBlock := connector.ImportBlock{
 				ResourceType:       r.ResourceType(),
-				ResourceName:       fmt.Sprintf("%s_%s", appRoleName, appRolePermissionKey),
-				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, appRoleId, appRolePermissionId),
+				ResourceName:       fmt.Sprintf("%s_%s", applicationRoleName, applicationRolePermissionKey),
+				ResourceID:         fmt.Sprintf("%s/%s/%s", r.clientInfo.PingOneExportEnvironmentID, applicationRoleId, applicationRolePermissionId),
 				CommentInformation: common.GenerateCommentInformation(commentData),
 			}
 
@@ -73,12 +77,12 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRoleDa
 	applicationRoleData := make(map[string]string)
 
 	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolesApi.ReadApplicationRoles(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
-	applicationRoles, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
+	apiObjs, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.ApplicationRole](iter, "ReadApplicationRoles", "GetRoles", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, applicationRole := range applicationRoles {
+	for _, applicationRole := range apiObjs {
 		applicationRoleId, applicationRoleIdOk := applicationRole.GetIdOk()
 		applicationRoleName, applicationRoleNameOk := applicationRole.GetNameOk()
 
@@ -94,36 +98,21 @@ func (r *PingoneAuthorizeApplicationRolePermissionResource) getApplicationRolePe
 	applicationRolePermissionData := make(map[string]string)
 
 	iter := r.clientInfo.PingOneApiClient.AuthorizeAPIClient.ApplicationRolePermissionsApi.ReadApplicationRolePermissions(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID, appRoleId).Execute()
-	applicationRolePermissions, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.EntityArrayEmbeddedPermissionsInner](iter, "ReadApplicationRolePermissions", "GetPermissions", r.ResourceType())
+	apiObjs, err := pingone.GetAuthorizeAPIObjectsFromIterator[authorize.EntityArrayEmbeddedPermissionsInner](iter, "ReadApplicationRolePermissions", "GetPermissions", r.ResourceType())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, applicationRolePermission := range applicationRolePermissions {
+	for _, innerObj := range apiObjs {
+		if innerObj.ApplicationRolePermission != nil {
+			applicationRolePermissionId, applicationRolePermissionIdOk := innerObj.ApplicationRolePermission.GetIdOk()
+			applicationRolePermissionKey, applicationRolePermissionKeyOk := innerObj.ApplicationRolePermission.GetKeyOk()
 
-		var (
-			applicationRolePermissionId    *string
-			applicationRolePermissionIdOk  bool
-			applicationRolePermissionKey   *string
-			applicationRolePermissionKeyOk bool
-		)
-
-		switch t := applicationRolePermission.GetActualInstance().(type) {
-		case *authorize.ApplicationRolePermission:
-			applicationRolePermissionId, applicationRolePermissionIdOk = t.GetIdOk()
-			applicationRolePermissionKey, applicationRolePermissionKeyOk = t.GetKeyOk()
-		default:
-			continue
-		}
-
-		if applicationRolePermissionIdOk && applicationRolePermissionKeyOk {
-			applicationRolePermissionData[*applicationRolePermissionId] = *applicationRolePermissionKey
+			if applicationRolePermissionIdOk && applicationRolePermissionKeyOk {
+				applicationRolePermissionData[*applicationRolePermissionId] = *applicationRolePermissionKey
+			}
 		}
 	}
 
 	return applicationRolePermissionData, nil
-}
-
-func (r *PingoneAuthorizeApplicationRolePermissionResource) ResourceType() string {
-	return "pingone_authorize_application_role_permission"
 }
