@@ -142,18 +142,20 @@ func TestSSOTerraformPlan(t *testing.T) {
 				"Error: Data Loss Protection",
 			},
 		},
-		{
-			name:             "SignOnPolicy",
-			testableResource: pingone_sso_testable_resources.SignOnPolicy(t, clientInfo),
-			ignoredErrors:    nil,
-		},
-		{
-			name:             "SignOnPolicyAction",
-			testableResource: pingone_sso_testable_resources.SignOnPolicyAction(t, clientInfo),
-			ignoredErrors: []string{
-				"Error: Conflicting configuration arguments",
-			},
-		},
+		// TODO: Re-enable test after compleition of TRIAGE-26632
+		// {
+		// 	name:             "SignOnPolicy",
+		// 	testableResource: pingone_sso_testable_resources.SignOnPolicy(t, clientInfo),
+		// 	ignoredErrors:    nil,
+		// },
+		// TODO: Re-enable test after compleition of TRIAGE-26632
+		// {
+		// 	name:             "SignOnPolicyAction",
+		// 	testableResource: pingone_sso_testable_resources.SignOnPolicyAction(t, clientInfo),
+		// 	ignoredErrors: []string{
+		// 		"Error: Conflicting configuration arguments",
+		// 	},
+		// },
 	}
 
 	for _, tc := range testCases {

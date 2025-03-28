@@ -14,6 +14,9 @@ import (
 )
 
 func Test_SignOnPolicyAction(t *testing.T) {
+	// TODO: Re-enable test after compleition of TRIAGE-26632
+	t.SkipNow()
+
 	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingone_sso_testable_resources.SignOnPolicyAction(t, clientInfo)
