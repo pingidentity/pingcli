@@ -84,7 +84,11 @@ func createPasswordCredentialValidator(t *testing.T, clientInfo *connector.Clien
 		return testutils_resource.ResourceInfo{}
 	}
 	if !ok {
-		t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		if response != nil {
+			t.Errorf("Failed to execute client function\nResponse Status: %s\nResponse Body: %s", response.Status, response.Body)
+		} else {
+			t.Errorf("Failed to execute client function")
+		}
 
 		return testutils_resource.ResourceInfo{}
 	}

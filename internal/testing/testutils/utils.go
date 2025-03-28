@@ -69,7 +69,7 @@ func initPingFederateClientInfo(t *testing.T, clientInfo *connector.ClientInfo) 
 	pfClientConfig.HTTPClient = httpClient
 
 	clientInfo.PingFederateApiClient = pingfederateGoClient.NewAPIClient(pfClientConfig)
-	clientInfo.PingFederateContext = context.WithValue(t.Context(), pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
+	clientInfo.PingFederateContext = context.WithValue(context.WithoutCancel(t.Context()), pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
 		UserName: pfUsername,
 		Password: pfPassword,
 	})
@@ -98,7 +98,7 @@ func initPingOneClientInfo(t *testing.T, clientInfo *connector.ClientInfo) {
 	}
 
 	// Make empty context for testing
-	ctx := t.Context()
+	ctx := context.WithoutCancel(t.Context())
 
 	// Initialize the API client
 	client, err := apiConfig.APIClient(ctx)
