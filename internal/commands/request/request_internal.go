@@ -1,12 +1,17 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package request_internal
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -26,7 +31,7 @@ type PingOneAuthResponse struct {
 func RunInternalRequest(uri string) (err error) {
 	service, err := profiles.GetOptionValue(options.RequestServiceOption)
 	if err != nil {
-		return fmt.Errorf("failed to send custom request: %v", err)
+		return fmt.Errorf("failed to send custom request: %w", err)
 	}
 
 	if service == "" {
@@ -37,7 +42,7 @@ func RunInternalRequest(uri string) (err error) {
 	case customtypes.ENUM_REQUEST_SERVICE_PINGONE:
 		err = runInternalPingOneRequest(uri)
 		if err != nil {
-			return fmt.Errorf("failed to send custom request: %v", err)
+			return fmt.Errorf("failed to send custom request: %w", err)
 		}
 	default:
 		return fmt.Errorf("failed to send custom request: unrecognized service '%s'", service)
@@ -73,15 +78,22 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return fmt.Errorf("http method is required")
 	}
 
-	data, err := getData()
+	data, err := getDataRaw()
 	if err != nil {
 		return err
+	}
+
+	if data == "" {
+		data, err = getDataFile()
+		if err != nil {
+			return err
+		}
 	}
 
 	payload := strings.NewReader(data)
 
 	client := &http.Client{}
-	req, err := http.NewRequest(httpMethod, apiURL, payload)
+	req, err := http.NewRequestWithContext(context.Background(), httpMethod, apiURL, payload)
 	if err != nil {
 		return err
 	}
@@ -94,7 +106,12 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return err
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		cErr := res.Body.Close()
+		if cErr != nil {
+			err = errors.Join(err, cErr)
+		}
+	}()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
@@ -109,7 +126,10 @@ func runInternalPingOneRequest(uri string) (err error) {
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
 		output.UserError("Failed Custom Request", fields)
 		if failOption == "true" {
-			os.Exit(1)
+			// Allow response body to clean up before exiting
+			defer os.Exit(1)
+
+			return nil
 		}
 	} else {
 		output.Success("Custom request successful", fields)
@@ -178,7 +198,7 @@ func pingoneAccessToken() (accessToken string, err error) {
 		}
 	}
 
-	output.Warn("PingOne access token does not exist or is expired, requesting a new token...", nil)
+	output.Message("PingOne access token does not exist or is expired, requesting a new token...", nil)
 
 	// If no valid access token is available, login and get a new one
 	return pingoneAuth()
@@ -219,7 +239,7 @@ func pingoneAuth() (accessToken string, err error) {
 	payload := strings.NewReader("grant_type=client_credentials")
 
 	client := &http.Client{}
-	req, err := http.NewRequest(customtypes.ENUM_HTTP_METHOD_POST, authURL, payload)
+	req, err := http.NewRequestWithContext(context.Background(), customtypes.ENUM_HTTP_METHOD_POST, authURL, payload)
 	if err != nil {
 		return "", err
 	}
@@ -232,7 +252,13 @@ func pingoneAuth() (accessToken string, err error) {
 		return "", err
 	}
 
-	defer res.Body.Close()
+	defer func() {
+		cErr := res.Body.Close()
+		if cErr != nil {
+			err = errors.Join(err, cErr)
+		}
+	}()
+
 	responseBodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
 		return "", err
@@ -279,27 +305,29 @@ func pingoneAuth() (accessToken string, err error) {
 	return pingoneAuthResponse.AccessToken, nil
 }
 
-func getData() (data string, err error) {
-	data, err = profiles.GetOptionValue(options.RequestDataRawOption)
+func getDataFile() (data string, err error) {
+	dataFilepath, err := profiles.GetOptionValue(options.RequestDataOption)
 	if err != nil {
 		return "", err
-	}
-	if data != "" {
-		return data, nil
 	}
 
-	// get data from file
-	data, err = profiles.GetOptionValue(options.RequestDataOption)
-	if err != nil {
-		return "", err
-	}
-	if data != "" {
-		contents, err := os.ReadFile(data)
+	if dataFilepath != "" {
+		dataFilepath = filepath.Clean(dataFilepath)
+		contents, err := os.ReadFile(dataFilepath)
 		if err != nil {
 			return "", err
 		}
 
 		return string(contents), nil
+	}
+
+	return "", nil
+}
+
+func getDataRaw() (data string, err error) {
+	data, err = profiles.GetOptionValue(options.RequestDataRawOption)
+	if err != nil {
+		return "", err
 	}
 
 	return data, nil

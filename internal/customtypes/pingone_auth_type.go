@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package customtypes
 
 import (
@@ -31,6 +33,7 @@ func (pat *PingOneAuthenticationType) Set(authType string) error {
 	default:
 		return fmt.Errorf("unrecognized PingOne Authentication Type: '%s'. Must be one of: %s", authType, strings.Join(PingOneAuthenticationTypeValidValues(), ", "))
 	}
+
 	return nil
 }
 

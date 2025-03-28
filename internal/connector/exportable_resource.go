@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package connector
 
 import (
@@ -6,7 +8,7 @@ import (
 	"regexp"
 
 	pingoneGoClient "github.com/patrickcping/pingone-go-sdk-v2/pingone"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 type ImportBlock struct {
@@ -16,16 +18,13 @@ type ImportBlock struct {
 	ResourceID         string
 }
 
-type PingOneClientInfo struct {
-	ApiClient           *pingoneGoClient.Client
-	ApiClientId         *string
-	Context             context.Context
-	ExportEnvironmentID string
-}
-
-type PingFederateClientInfo struct {
-	ApiClient *pingfederateGoClient.APIClient
-	Context   context.Context
+type ClientInfo struct {
+	PingFederateApiClient      *pingfederateGoClient.APIClient
+	PingFederateContext        context.Context
+	PingOneApiClient           *pingoneGoClient.Client
+	PingOneApiClientId         string
+	PingOneContext             context.Context
+	PingOneExportEnvironmentID string
 }
 
 // A connector that allows exporting configuration
@@ -35,7 +34,7 @@ type ExportableResource interface {
 }
 
 func (b *ImportBlock) Sanitize() {
-	// Hexidecimal encode special characters
+	// Hexadecimal encode special characters
 	b.ResourceName = regexp.MustCompile(`[^0-9A-Za-z_\-]`).ReplaceAllStringFunc(b.ResourceName, func(s string) string {
 		return fmt.Sprintf("-%04X-", s)
 	})
@@ -66,5 +65,6 @@ import {
 	to = %s.%s
 	id = "%s"
 }`
+
 	return fmt.Sprintf(pattern, b.CommentInformation, b.ResourceType, b.ResourceName, b.ResourceID)
 }

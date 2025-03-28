@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package configuration_services
 
 import (
@@ -15,7 +17,6 @@ func InitPingOneServiceOptions() {
 	initAuthenticationWorkerClientSecretOption()
 	initAuthenticationWorkerEnvironmentIDOption()
 	initRegionCodeOption()
-
 }
 
 func initAuthenticationWorkerClientIDOption() {

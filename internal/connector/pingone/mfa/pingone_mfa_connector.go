@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package mfa
 
 import (
@@ -21,17 +23,17 @@ var (
 )
 
 type PingOneMFAConnector struct {
-	clientInfo connector.PingOneClientInfo
+	clientInfo connector.ClientInfo
 }
 
 // Utility method for creating a PingOneMFAConnector
 func MFAConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingOneMFAConnector {
 	return &PingOneMFAConnector{
-		clientInfo: connector.PingOneClientInfo{
-			Context:             ctx,
-			ApiClient:           apiClient,
-			ApiClientId:         apiClientId,
-			ExportEnvironmentID: exportEnvironmentID,
+		clientInfo: connector.ClientInfo{
+			PingOneContext:             ctx,
+			PingOneApiClient:           apiClient,
+			PingOneApiClientId:         *apiClientId,
+			PingOneExportEnvironmentID: exportEnvironmentID,
 		},
 	}
 }
@@ -42,10 +44,10 @@ func (c *PingOneMFAConnector) Export(format, outputDir string, overwriteExport b
 	l.Debug().Msgf("Exporting all PingOne MFA Resources...")
 
 	exportableResources := []connector.ExportableResource{
-		resources.MFAApplicationPushCredential(&c.clientInfo),
-		resources.MFAFido2Policy(&c.clientInfo),
-		resources.MFADevicePolicy(&c.clientInfo),
-		resources.MFASettings(&c.clientInfo),
+		resources.MfaApplicationPushCredential(&c.clientInfo),
+		resources.MfaDevicePolicy(&c.clientInfo),
+		resources.MfaFido2Policy(&c.clientInfo),
+		resources.MfaSettings(&c.clientInfo),
 	}
 
 	return common.WriteFiles(exportableResources, format, outputDir, overwriteExport)

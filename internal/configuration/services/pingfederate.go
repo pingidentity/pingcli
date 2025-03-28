@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package configuration_services
 
 import (
@@ -136,7 +138,7 @@ func initInsecureTrustAllTLSOption() {
 			Name: cobraParamName,
 			Usage: "Trust any certificate when connecting to the PingFederate server admin API. " +
 				"(default false)" +
-				"\nThis is insecure and should not be enabled outside of testing.",
+				"\nThis is insecure and shouldn't be enabled outside of testing.",
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},

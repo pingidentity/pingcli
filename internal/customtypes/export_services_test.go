@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package customtypes_test
 
 import (
@@ -91,5 +93,13 @@ func Test_ExportServices_String(t *testing.T) {
 	actual := es.String()
 	if actual != expected {
 		t.Errorf("String returned: %s, expected: %s", actual, expected)
+	}
+}
+
+// Test ExportServicePingOneValidValues
+func Test_ExportServicesPingOneValidValues(t *testing.T) {
+	pingOneServiceGroupValidValues := customtypes.ExportServicesPingOneValidValues()
+	if len(pingOneServiceGroupValidValues) != 5 {
+		t.Errorf("ExportServicesPingOneValidValues returned: %v, expected: %v", len(pingOneServiceGroupValidValues), 5)
 	}
 }

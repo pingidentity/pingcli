@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package configuration_platform
 
 import (
@@ -12,6 +14,7 @@ import (
 func InitPlatformExportOptions() {
 	initFormatOption()
 	initServicesOption()
+	initServiceGroupOption()
 	initOutputDirectoryOption()
 	initOverwriteOption()
 	initPingOneEnvironmentIDOption()
@@ -45,12 +48,39 @@ func initFormatOption() {
 	}
 }
 
+func initServiceGroupOption() {
+	cobraParamName := "service-group"
+	cobraValue := new(customtypes.ExportServiceGroup)
+	defaultValue := customtypes.ExportServiceGroup("")
+	envVar := "PINGCLI_EXPORT_SERVICE_GROUP"
+	options.PlatformExportServiceGroupOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:      cobraParamName,
+			Shorthand: "g",
+			Usage: fmt.Sprintf(
+				"Specifies the service group to export. "+
+					"\nOptions are: %s."+
+					"\nExample: '%s'",
+				strings.Join(customtypes.ExportServiceGroupValidValues(), ", "),
+				customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
+			),
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.ENUM_EXPORT_SERVICE_GROUP,
+		ViperKey:  "export.serviceGroup",
+	}
+}
+
 func initServicesOption() {
 	cobraParamName := "services"
 	cobraValue := new(customtypes.ExportServices)
-	defaultValue := customtypes.ExportServices(customtypes.ExportServicesValidValues())
+	defaultValue := customtypes.ExportServices([]string{})
 	envVar := "PINGCLI_EXPORT_SERVICES"
-
 	options.PlatformExportServiceOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
@@ -61,14 +91,12 @@ func initServicesOption() {
 			Shorthand: "s",
 			Usage: fmt.Sprintf(
 				"Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services. "+
-					"(default %s)"+
 					"\nOptions are: %s."+
 					"\nExample: '%s,%s,%s'",
 				strings.Join(customtypes.ExportServicesValidValues(), ", "),
-				strings.Join(customtypes.ExportServicesValidValues(), ", "),
-				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO),
-				string(customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA),
-				string(customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE),
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO,
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA,
+				customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 			),
 			Value: cobraValue,
 		},
@@ -117,7 +145,7 @@ func initOverwriteOption() {
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
 			Shorthand: "o",
-			Usage: "Overwrite the existing generated exports in output directory. " +
+			Usage: "Overwrites the existing generated exports in output directory. " +
 				"(default false)",
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag

@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package testutils_viper
 
 import (
@@ -8,6 +10,7 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
@@ -24,6 +27,8 @@ default:
     outputFormat: text
     export:
         outputDirectory: %s
+        serviceGroup: %s
+        services: ["%s"]
     service:
         pingone:
             regionCode: %s
@@ -34,15 +39,13 @@ default:
                     clientsecret: %s
                     environmentid: %s
         pingfederate:
-            adminapipath: %s
+            adminapipath: /pf-admin-api/v1
             authentication:
-                type: clientcredentialsauth
-                clientcredentialsauth:
-                    clientid: %s
-                    clientsecret: %s
-                    scopes: %s
-                    tokenurl: %s
-            httpshost: %s
+                type: basicauth
+                basicauth:
+                    username: Administrator
+                    password: 2FederateM0re
+            httpshost: https://localhost:9999
             insecureTrustAllTLS: true
             xBypassExternalValidationHeader: true
 production:
@@ -78,6 +81,7 @@ func configureMainViper(t *testing.T) {
 	// Give main viper instance a file location to write to
 	mainViper := profiles.GetMainConfig().ViperInstance()
 	mainViper.SetConfigFile(configFilepath)
+	mainViper.SetConfigType("yaml")
 	if err := mainViper.ReadInConfig(); err != nil {
 		t.Fatal(err)
 	}
@@ -109,14 +113,11 @@ func InitVipersCustomFile(t *testing.T, fileContents string) {
 func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
-		os.Getenv(options.PingOneRegionCodeOption.EnvVar),
-		os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
-		os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
-		os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar),
-		os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
-		os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
-		os.Getenv(options.PingFederateClientCredentialsAuthScopesOption.EnvVar),
-		os.Getenv(options.PingFederateClientCredentialsAuthTokenURLOption.EnvVar),
-		os.Getenv(options.PingFederateHTTPSHostOption.EnvVar))
+		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
+		customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		os.Getenv("TEST_PINGONE_REGION_CODE"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+	)
 }

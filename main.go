@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package main
 
 import (
@@ -23,6 +25,7 @@ func main() {
 			for _, setting := range info.Settings {
 				if setting.Key == "vcs.revision" {
 					commit = setting.Value
+
 					break
 				}
 			}
@@ -35,5 +38,16 @@ func main() {
 	if err != nil {
 		output.UserError(fmt.Sprintf("Failed to execute pingcli: %v", err), nil)
 		os.Exit(1)
+	}
+
+	detailedExitCodeWarnLogged, err := output.DetailedExitCodeWarnLogged()
+	if err != nil {
+		output.UserError(fmt.Sprintf("Failed to execute pingcli: %v", err), nil)
+		os.Exit(1)
+	}
+	if detailedExitCodeWarnLogged {
+		os.Exit(2)
+	} else {
+		os.Exit(0)
 	}
 }

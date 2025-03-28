@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package platform_test
 
 import (
@@ -16,8 +18,8 @@ func TestPlatformExportCmd_Execute(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite")
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -46,21 +48,41 @@ func TestPlatformExportCmd_HelpFlag(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
-// Test Platform Export Command --services flag
-func TestPlatformExportCmd_ServiceFlag(t *testing.T) {
+// Test Platform Export Command --service-group, -g flag
+func TestPlatformExportCmd_ServiceGroupFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingone-protect")
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceGroupOption.CobraParamName, "pingone")
+	testutils.CheckExpectedError(t, err, nil)
+}
+
+// Test Platform Export Command --service-group with non-supported service group
+func TestPlatformExportCmd_ServiceGroupFlagInvalidServiceGroup(t *testing.T) {
+	expectedErrorPattern := `^invalid argument ".*" for "-g, --service-group" flag: unrecognized service group '.*'\. Must be one of: .*$`
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportServiceGroupOption.CobraParamName, "invalid")
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Platform Export Command --services flag
+func TestPlatformExportCmd_ServicesFlag(t *testing.T) {
+	outputDir := t.TempDir()
+
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Platform Export Command --services flag with invalid service
-func TestPlatformExportCmd_ServiceFlagInvalidService(t *testing.T) {
+func TestPlatformExportCmd_ServicesFlagInvalidService(t *testing.T) {
 	expectedErrorPattern := `^invalid argument ".*" for "-s, --services" flag: failed to set ExportServices: Invalid service: .*\. Allowed services: .*$`
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export", "--services", "invalid")
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportServiceOption.CobraParamName, "invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -69,17 +91,18 @@ func TestPlatformExportCmd_ExportFormatFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--format", "HCL",
-		"--overwrite",
-		"--services", "pingone-protect")
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportExportFormatOption.CobraParamName, customtypes.ENUM_EXPORT_FORMAT_HCL,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Platform Export Command --format flag with invalid format
 func TestPlatformExportCmd_ExportFormatFlagInvalidFormat(t *testing.T) {
 	expectedErrorPattern := `^invalid argument ".*" for "-f, --format" flag: unrecognized export format '.*'\. Must be one of: .*$`
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export", "--format", "invalid")
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportExportFormatOption.CobraParamName, "invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -88,16 +111,17 @@ func TestPlatformExportCmd_OutputDirectoryFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingone-protect")
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Platform Export Command --output-directory flag with invalid directory
 func TestPlatformExportCmd_OutputDirectoryFlagInvalidDirectory(t *testing.T) {
 	expectedErrorPattern := `^failed to create output directory '\/invalid': mkdir \/invalid: .+$`
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export", "--output-directory", "/invalid")
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, "/invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -106,9 +130,9 @@ func TestPlatformExportCmd_OverwriteFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingone-protect")
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -117,16 +141,16 @@ func TestPlatformExportCmd_OverwriteFlag(t *testing.T) {
 func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T) {
 	outputDir := t.TempDir()
 
-	_, err := os.Create(outputDir + "/file")
+	_, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
 	if err != nil {
 		t.Errorf("Error creating file in output directory: %v", err)
 	}
 
 	expectedErrorPattern := `^output directory '[A-Za-z0-9_\-\/]+' is not empty\. Use --overwrite to overwrite existing export data$`
 	err = testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--services", "pingone-protect",
-		"--overwrite=false")
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName+"=false")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -135,15 +159,15 @@ func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T)
 func TestPlatformExportCmd_OverwriteFlagTrueWithExistingDirectory(t *testing.T) {
 	outputDir := t.TempDir()
 
-	_, err := os.Create(outputDir + "/file")
+	_, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
 	if err != nil {
 		t.Errorf("Error creating file in output directory: %v", err)
 	}
 
 	err = testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--services", "pingone-protect",
-		"--overwrite")
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -156,13 +180,13 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingone-protect",
-		"--pingone-worker-environment-id", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		"--pingone-worker-client-id", os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
-		"--pingone-worker-client-secret", os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
-		"--pingone-region-code", os.Getenv(options.PingOneRegionCodeOption.EnvVar))
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
+		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		"--"+options.PingOneAuthenticationWorkerClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -170,7 +194,7 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlagRequiredTogether(t *testing.T) {
 	expectedErrorPattern := `^if any flags in the group \[pingone-worker-environment-id pingone-worker-client-id pingone-worker-client-secret pingone-region-code] are set they must all be set; missing \[pingone-region-code pingone-worker-client-id pingone-worker-client-secret]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--pingone-worker-environment-id", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar))
+		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -179,12 +203,12 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlags(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		"--pingfederate-authentication-type", "basicAuth",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -193,7 +217,7 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlags(t *testing.T) {
 func TestPlatformExportCmd_PingFederateBasicAuthFlagsRequiredTogether(t *testing.T) {
 	expectedErrorPattern := `^if any flags in the group \[pingfederate-username pingfederate-password] are set they must all be set; missing \[pingfederate-password]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--pingfederate-username", "Administrator")
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -203,13 +227,13 @@ func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
 
 	expectedErrorPattern := `^failed to initialize pingone API client\. Check worker client ID, worker client secret, worker environment ID, and pingone region code configuration values\. oauth2: \"invalid_client\" \"Request denied: Unsupported authentication method \(Correlation ID: .*\)\"$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingone-protect",
-		"--pingone-worker-environment-id", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		"--pingone-worker-client-id", os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
-		"--pingone-worker-client-secret", "invalid",
-		"--pingone-region-code", os.Getenv(options.PingOneRegionCodeOption.EnvVar),
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
+		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		"--"+options.PingOneAuthenticationWorkerClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName, "invalid",
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -220,38 +244,21 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsInvalid(t *testing.T) {
 
 	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-username", "Administrator",
-		"--pingfederate-password", "invalid",
-		"--pingfederate-authentication-type", "basicAuth",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "invalid",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Platform Export command with PingFederate Client Credentials Auth flags
-func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlags(t *testing.T) {
-	outputDir := t.TempDir()
-
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-client-id", os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
-		"--pingfederate-client-secret", os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
-		"--pingfederate-scopes", os.Getenv(options.PingFederateClientCredentialsAuthScopesOption.EnvVar),
-		"--pingfederate-token-url", os.Getenv(options.PingFederateClientCredentialsAuthTokenURLOption.EnvVar),
-		"--pingfederate-authentication-type", "clientCredentialsAuth",
-	)
-	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Platform Export Command fails when not provided required PingFederate Client Credentials Auth flags together
 func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsRequiredTogether(t *testing.T) {
 	expectedErrorPattern := `^if any flags in the group \[pingfederate-client-id pingfederate-client-secret pingfederate-token-url] are set they must all be set; missing \[pingfederate-client-secret pingfederate-token-url]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--pingfederate-client-id", "test")
+		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, "test")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -261,13 +268,14 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalid(t *test
 
 	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-client-id", "test",
-		"--pingfederate-client-secret", "invalid",
-		"--pingfederate-token-url", "https://localhost:9031/as/token.oauth2",
-		"--pingfederate-authentication-type", "clientCredentialsAuth",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, "test",
+		"--"+options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamName, "invalid",
+		"--"+options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamName, "https://localhost:9031/as/token.oauth2",
+		"--"+options.PingFederateClientCredentialsAuthScopesOption.CobraParamName, "email",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -278,13 +286,13 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalidTokenURL
 
 	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-client-id", os.Getenv(options.PingFederateClientCredentialsAuthClientIDOption.EnvVar),
-		"--pingfederate-client-secret", os.Getenv(options.PingFederateClientCredentialsAuthClientSecretOption.EnvVar),
-		"--pingfederate-token-url", "https://localhost:9031/as/invalid",
-		"--pingfederate-authentication-type", "clientCredentialsAuth",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, "test",
+		"--"+options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamName, "2FederateM0re!",
+		"--"+options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamName, "https://localhost:9031/as/invalid",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -294,13 +302,13 @@ func TestPlatformExportCmd_PingFederateXBypassHeaderFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-x-bypass-external-validation-header",
-		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		"--pingfederate-authentication-type", "basicAuth",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateXBypassExternalValidationHeaderOption.CobraParamName,
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -310,13 +318,13 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-insecure-trust-all-tls",
-		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		"--pingfederate-authentication-type", "basicAuth",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateInsecureTrustAllTLSOption.CobraParamName,
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -327,13 +335,13 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
 
 	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-insecure-trust-all-tls=false",
-		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		"--pingfederate-authentication-type", "basicAuth",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateInsecureTrustAllTLSOption.CobraParamName+"=false",
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -345,14 +353,14 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--output-directory", outputDir,
-		"--overwrite",
-		"--services", "pingfederate",
-		"--pingfederate-insecure-trust-all-tls=false",
-		"--pingfederate-ca-certificate-pem-files", "testdata/ssl-server-crt.pem",
-		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		"--pingfederate-authentication-type", customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateInsecureTrustAllTLSOption.CobraParamName+"=true",
+		"--"+options.PingFederateCACertificatePemFilesOption.CobraParamName, "testdata/ssl-server-crt.pem",
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -361,11 +369,11 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
 func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T) {
 	expectedErrorPattern := `^failed to read CA certificate PEM file '.*': open .*: no such file or directory$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--services", "pingfederate",
-		"--pingfederate-ca-certificate-pem-files", "invalid/crt.pem",
-		"--pingfederate-username", os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		"--pingfederate-password", os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		"--pingfederate-authentication-type", "basicAuth",
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		"--"+options.PingFederateCACertificatePemFilesOption.CobraParamName, "invalid/crt.pem",
+		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator",
+		"--"+options.PingFederateBasicAuthPasswordOption.CobraParamName, "2FederateM0re",
+		"--"+options.PingFederateAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

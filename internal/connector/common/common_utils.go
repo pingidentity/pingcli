@@ -1,20 +1,22 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package common
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"slices"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
-func WriteFiles(exportableResources []connector.ExportableResource, format, outputDir string, overwriteExport bool) error {
+func WriteFiles(exportableResources []connector.ExportableResource, format, outputDir string, overwriteExport bool) (err error) {
 	l := logger.Get()
 
 	// Parse the HCL import block template
@@ -32,6 +34,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		if len(*importBlocks) == 0 {
 			// No resources exported. Avoid creating an empty import.tf file
 			l.Debug().Msgf("Nothing exported for resource %s. Skipping import file generation...", exportableResource.ResourceType())
+
 			continue
 		}
 
@@ -44,6 +47,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 
 		outputFileName := fmt.Sprintf("%s.tf", exportableResource.ResourceType())
 		outputFilePath := filepath.Join(outputDir, filepath.Base(outputFileName))
+		outputFilePath = filepath.Clean(outputFilePath)
 
 		// Check to see if outputFile already exists.
 		// If so, default behavior is to exit and not overwrite.
@@ -57,7 +61,12 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		if err != nil {
 			return fmt.Errorf("failed to create export file %q. err: %s", outputFilePath, err.Error())
 		}
-		defer outputFile.Close()
+		defer func() {
+			cErr := outputFile.Close()
+			if cErr != nil {
+				err = errors.Join(err, cErr)
+			}
+		}()
 
 		err = writeHeader(format, outputFilePath, outputFile)
 		if err != nil {
@@ -79,6 +88,7 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 			}
 		}
 	}
+
 	return nil
 }
 
@@ -89,15 +99,9 @@ func writeHeader(format, outputFilePath string, outputFile *os.File) error {
 		return fmt.Errorf("failed to parse HCL import header template. err: %s", err.Error())
 	}
 
-	header := struct {
-		DateTime string
-	}{
-		DateTime: time.Now().Format(time.RFC1123),
-	}
-
 	switch format {
 	case customtypes.ENUM_EXPORT_FORMAT_HCL:
-		err := hclImportHeaderTemplate.Execute(outputFile, header)
+		err := hclImportHeaderTemplate.Execute(outputFile, nil)
 		if err != nil {
 			return fmt.Errorf("failed to write import template to file %q. err: %s", outputFilePath, err.Error())
 		}

@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package platform_internal
 
 import (
@@ -26,7 +28,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1210/configurationapi"
+	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 var (
@@ -48,6 +50,10 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if err != nil {
 		return err
 	}
+	exportServiceGroup, err := profiles.GetOptionValue(options.PlatformExportServiceGroupOption)
+	if err != nil {
+		return err
+	}
 	exportServices, err := profiles.GetOptionValue(options.PlatformExportServiceOption)
 	if err != nil {
 		return err
@@ -61,8 +67,23 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		return err
 	}
 
+	var exportableConnectors *[]connector.Exportable
 	es := new(customtypes.ExportServices)
 	if err = es.Set(exportServices); err != nil {
+		return err
+	}
+
+	esg := new(customtypes.ExportServiceGroup)
+	if err = esg.Set(exportServiceGroup); err != nil {
+		return err
+	}
+
+	es2 := new(customtypes.ExportServices)
+	if err = es2.SetServicesByServiceGroup(esg); err != nil {
+		return err
+	}
+
+	if err = es.Merge(*es2); err != nil {
 		return err
 	}
 
@@ -78,6 +99,8 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		}
 	}
 
+	exportableConnectors = getExportableConnectors(es)
+
 	overwriteExportBool, err := strconv.ParseBool(overwriteExport)
 	if err != nil {
 		return err
@@ -85,8 +108,6 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if outputDir, err = createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
 		return err
 	}
-
-	exportableConnectors := getExportableConnectors(es)
 
 	if err := exportConnectors(exportableConnectors, exportFormat, outputDir, overwriteExportBool); err != nil {
 		return err
@@ -119,7 +140,7 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		caCertPemFile := filepath.Clean(caCertPemFile)
 		caCert, err := os.ReadFile(caCertPemFile)
 		if err != nil {
-			return fmt.Errorf("failed to read CA certificate PEM file '%s': %v", caCertPemFile, err)
+			return fmt.Errorf("failed to read CA certificate PEM file '%s': %w", caCertPemFile, err)
 		}
 
 		ok := caCertPool.AppendCertsFromPEM(caCert)
@@ -366,7 +387,7 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 	if !filepath.IsAbs(outputDir) {
 		pwd, err := os.Getwd()
 		if err != nil {
-			return "", fmt.Errorf("failed to get present working directory: %v", err)
+			return "", fmt.Errorf("failed to get present working directory: %w", err)
 		}
 
 		outputDir = filepath.Join(pwd, outputDir)
@@ -377,27 +398,25 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 	l.Debug().Msgf("Validating export output directory '%s'", outputDir)
 	_, err = os.Stat(outputDir)
 	if err != nil {
-		output.Warn(fmt.Sprintf("Output directory does not exist. Creating the directory at filepath '%s'", outputDir), nil)
+		output.Message(fmt.Sprintf("Output directory does not exist. Creating the directory at filepath '%s'", outputDir), nil)
 
-		err = os.MkdirAll(outputDir, os.ModePerm)
+		err = os.MkdirAll(outputDir, os.FileMode(0700))
 		if err != nil {
 			return "", fmt.Errorf("failed to create output directory '%s': %s", outputDir, err.Error())
 		}
 
 		output.Success(fmt.Sprintf("Output directory '%s' created", outputDir), nil)
-	} else {
+	} else if !overwriteExport {
 		// Check if the output directory is empty
 		// If not, default behavior is to exit and not overwrite.
 		// This can be changed with the --overwrite export parameter
-		if !overwriteExport {
-			dirEntries, err := os.ReadDir(outputDir)
-			if err != nil {
-				return "", fmt.Errorf("failed to read contents of output directory '%s': %v", outputDir, err)
-			}
+		dirEntries, err := os.ReadDir(outputDir)
+		if err != nil {
+			return "", fmt.Errorf("failed to read contents of output directory '%s': %w", outputDir, err)
+		}
 
-			if len(dirEntries) > 0 {
-				return "", fmt.Errorf("output directory '%s' is not empty. Use --overwrite to overwrite existing export data", outputDir)
-			}
+		if len(dirEntries) > 0 {
+			return "", fmt.Errorf("output directory '%s' is not empty. Use --overwrite to overwrite existing export data", outputDir)
 		}
 	}
 
@@ -419,7 +438,7 @@ func getPingOneExportEnvID() (err error) {
 			return fmt.Errorf("failed to determine pingone export environment ID")
 		}
 
-		output.Warn("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
+		output.Message("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
 	}
 
 	return nil

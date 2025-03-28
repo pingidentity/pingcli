@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package profiles
 
 import (
@@ -29,7 +31,7 @@ func Validate() (err error) {
 	activeProfileName, err := GetOptionValue(options.RootActiveProfileOption)
 	activeProfileName = strings.ToLower(activeProfileName)
 	if err != nil {
-		return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
+		return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 	}
 	if !slices.Contains(profileNames, activeProfileName) {
 		return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration "+
@@ -40,15 +42,15 @@ func Validate() (err error) {
 	for _, pName := range profileNames {
 		subViper, err := GetMainConfig().GetProfileViper(pName)
 		if err != nil {
-			return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
+			return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 		}
 
 		if err := validateProfileKeys(pName, subViper); err != nil {
-			return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
+			return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 		}
 
 		if err := validateProfileValues(pName, subViper); err != nil {
-			return fmt.Errorf("failed to validate Ping CLI configuration: %v", err)
+			return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 		}
 	}
 
@@ -61,6 +63,7 @@ func validateProfileNames(profileNames []string) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -82,8 +85,10 @@ func validateProfileKeys(profileName string, profileViper *viper.Viper) error {
 	if len(invalidKeys) > 0 {
 		invalidKeysStr := strings.Join(invalidKeys, ", ")
 		validKeysStr := strings.Join(validProfileKeys, ", ")
+
 		return fmt.Errorf("invalid configuration key(s) found in profile %s: %s\nMust use one of: %s", profileName, invalidKeysStr, validKeysStr)
 	}
+
 	return nil
 }
 
@@ -104,7 +109,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				b := new(customtypes.Bool)
 				if err = b.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a boolean value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a boolean value: %w", pName, typedValue, key, err)
 				}
 			case bool:
 				continue
@@ -118,7 +123,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				u := new(customtypes.UUID)
 				if err = u.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a UUID value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a UUID value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a UUID value", pName, typedValue, key)
@@ -130,7 +135,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				o := new(customtypes.OutputFormat)
 				if err = o.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not an output format value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not an output format value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not an output format value", pName, typedValue, key)
@@ -142,7 +147,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				prc := new(customtypes.PingOneRegionCode)
 				if err = prc.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingOne Region Code value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingOne Region Code value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a PingOne Region Code value", pName, typedValue, key)
@@ -154,7 +159,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				s := new(customtypes.String)
 				if err = s.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a string value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a string value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a string value", pName, typedValue, key)
@@ -166,7 +171,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				ss := new(customtypes.StringSlice)
 				if err = ss.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a string slice value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a string slice value: %w", pName, typedValue, key, err)
 				}
 			case []any:
 				ss := new(customtypes.StringSlice)
@@ -174,7 +179,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 					switch innerTypedValue := v.(type) {
 					case string:
 						if err = ss.Set(innerTypedValue); err != nil {
-							return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a string slice value: %v", pName, typedValue, key, err)
+							return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a string slice value: %w", pName, typedValue, key, err)
 						}
 					default:
 						return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a string slice value", pName, typedValue, key)
@@ -183,6 +188,18 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a string slice value", pName, typedValue, key)
 			}
+		case options.ENUM_EXPORT_SERVICE_GROUP:
+			switch typedValue := vValue.(type) {
+			case *customtypes.ExportServiceGroup:
+				continue
+			case string:
+				esg := new(customtypes.ExportServiceGroup)
+				if err = esg.Set(typedValue); err != nil {
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a export service group value: %w", pName, typedValue, key, err)
+				}
+			default:
+				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a export service group value", pName, typedValue, key)
+			}
 		case options.ENUM_EXPORT_SERVICES:
 			switch typedValue := vValue.(type) {
 			case *customtypes.ExportServices:
@@ -190,7 +207,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				es := new(customtypes.ExportServices)
 				if err = es.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a export service value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a export service value: %w", pName, typedValue, key, err)
 				}
 			case []any:
 				es := new(customtypes.ExportServices)
@@ -198,12 +215,11 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 					switch innerTypedValue := v.(type) {
 					case string:
 						if err = es.Set(innerTypedValue); err != nil {
-							return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a export service value: %v", pName, typedValue, key, err)
+							return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a export service value: %w", pName, typedValue, key, err)
 						}
 					default:
 						return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a export service value", pName, typedValue, key)
 					}
-
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a export service value", pName, typedValue, key)
@@ -215,7 +231,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				ef := new(customtypes.ExportFormat)
 				if err = ef.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not an export format value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not an export format value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not an export format value", pName, typedValue, key)
@@ -227,7 +243,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				hm := new(customtypes.HTTPMethod)
 				if err = hm.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not an HTTP method value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not an HTTP method value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not an HTTP method value", pName, typedValue, key)
@@ -239,7 +255,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				rs := new(customtypes.RequestService)
 				if err = rs.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a request service value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a request service value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a request service value", pName, typedValue, key)
@@ -255,7 +271,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				i := new(customtypes.Int)
 				if err = i.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not an int value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not an int value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not an int value", pName, typedValue, key)
@@ -267,7 +283,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				pfa := new(customtypes.PingFederateAuthenticationType)
 				if err = pfa.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingFederate Authentication Type value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingFederate Authentication Type value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a PingFederate Authentication Type value", pName, typedValue, key)
@@ -279,7 +295,7 @@ func validateProfileValues(pName string, profileViper *viper.Viper) (err error) 
 			case string:
 				pat := new(customtypes.PingOneAuthenticationType)
 				if err = pat.Set(typedValue); err != nil {
-					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingOne Authentication Type value: %v", pName, typedValue, key, err)
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingOne Authentication Type value: %w", pName, typedValue, key, err)
 				}
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a PingOne Authentication Type value", pName, typedValue, key)

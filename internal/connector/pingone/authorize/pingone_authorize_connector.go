@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package authorize
 
 import (
@@ -21,17 +23,17 @@ var (
 )
 
 type PingoneAuthorizeConnector struct {
-	clientInfo connector.PingOneClientInfo
+	clientInfo connector.ClientInfo
 }
 
 // Utility method for creating a PingoneAuthorizeConnector
 func AuthorizeConnector(ctx context.Context, apiClient *pingoneGoClient.Client, apiClientId *string, exportEnvironmentID string) *PingoneAuthorizeConnector {
 	return &PingoneAuthorizeConnector{
-		clientInfo: connector.PingOneClientInfo{
-			Context:             ctx,
-			ApiClient:           apiClient,
-			ApiClientId:         apiClientId,
-			ExportEnvironmentID: exportEnvironmentID,
+		clientInfo: connector.ClientInfo{
+			PingOneContext:             ctx,
+			PingOneApiClient:           apiClient,
+			PingOneApiClientId:         *apiClientId,
+			PingOneExportEnvironmentID: exportEnvironmentID,
 		},
 	}
 }
@@ -42,11 +44,11 @@ func (c *PingoneAuthorizeConnector) Export(format, outputDir string, overwriteEx
 	l.Debug().Msgf("Exporting all PingOne Authorize Resources...")
 
 	exportableResources := []connector.ExportableResource{
-		resources.AuthorizeAPIService(&c.clientInfo),
-		resources.AuthorizeAPIServiceDeployment(&c.clientInfo),
-		resources.AuthorizeAPIServiceOperation(&c.clientInfo),
+		resources.AuthorizeApiService(&c.clientInfo),
+		resources.AuthorizeApiServiceDeployment(&c.clientInfo),
+		resources.AuthorizeApiServiceOperation(&c.clientInfo),
 		resources.ApplicationResource(&c.clientInfo),
-		resources.AuthorizeApplicationResourcePermission(&c.clientInfo),
+		resources.ApplicationResourcePermission(&c.clientInfo),
 		resources.AuthorizeApplicationRole(&c.clientInfo),
 		resources.AuthorizeApplicationRolePermission(&c.clientInfo),
 		resources.AuthorizeDecisionEndpoint(&c.clientInfo),

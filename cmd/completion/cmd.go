@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package completion
 
 import (
@@ -72,5 +74,6 @@ func Command() *cobra.Command {
 		Args:      cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 		RunE:      completionCmdRunE,
 	}
+
 	return cmd
 }

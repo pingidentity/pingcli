@@ -1,7 +1,6 @@
 # Ping CLI HCL Export Services Support
 
-The platform export command exports configuration-as-code packages for the Ping Platform. The CLI can export
-Terraform HCL to use with released Terraform providers.
+The platform export command exports Configuration as Code packages for the Ping Platform. The CLI can export Terraform HCL to use with released Terraform providers.
 
 The following describes the CLI's support of each of these Ping platform services for HCL export.
 

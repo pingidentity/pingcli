@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package customtypes
 
 import (
@@ -44,6 +46,7 @@ func (hm *HTTPMethod) Set(httpMethod string) error {
 	default:
 		return fmt.Errorf("unrecognized HTTP Method: '%s'. Must be one of: %s", httpMethod, strings.Join(HTTPMethodValidValues(), ", "))
 	}
+
 	return nil
 }
 

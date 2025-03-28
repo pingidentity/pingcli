@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package customtypes
 
 import (
@@ -31,6 +33,7 @@ func (rs *RequestService) Set(service string) error {
 	default:
 		return fmt.Errorf("unrecognized Request Service: '%s'. Must be one of: %s", service, strings.Join(RequestServiceValidValues(), ", "))
 	}
+
 	return nil
 }
 

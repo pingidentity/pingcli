@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package cmd
 
 import (
@@ -53,6 +55,9 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	// --config, -C
 	cmd.PersistentFlags().AddFlag(options.RootConfigOption.Flag)
 
+	// --detailed-exitcode, -D
+	cmd.PersistentFlags().AddFlag(options.RootDetailedExitCodeOption.Flag)
+
 	// --profile, -P
 	cmd.PersistentFlags().AddFlag(options.RootProfileOption.Flag)
 	// auto-completion
@@ -94,7 +99,7 @@ func initViperProfile() {
 
 	l.Debug().Msgf("Validated configuration file location at: %s", cfgFile)
 
-	//Configure the main viper instance
+	// Configure the main viper instance
 	initMainViper(cfgFile)
 
 	userDefinedProfile, err := profiles.GetOptionValue(options.RootProfileOption)
@@ -129,7 +134,7 @@ func checkCfgFileLocation(cfgFile string) {
 	if os.IsNotExist(err) {
 		// Only create a new configuration file if it is the default configuration file location
 		if cfgFile == options.RootConfigOption.DefaultValue.String() {
-			output.Warn(fmt.Sprintf("Ping CLI configuration file '%s' does not exist.", cfgFile), nil)
+			output.Message(fmt.Sprintf("Ping CLI configuration file '%s' does not exist.", cfgFile), nil)
 
 			createConfigFile(options.RootConfigOption.DefaultValue.String())
 		} else {
@@ -144,7 +149,7 @@ func createConfigFile(cfgFile string) {
 	output.Message(fmt.Sprintf("Creating new Ping CLI configuration file at: %s", cfgFile), nil)
 
 	// MkdirAll does nothing if directories already exist. Create needed directories for config file location.
-	err := os.MkdirAll(filepath.Dir(cfgFile), os.ModePerm)
+	err := os.MkdirAll(filepath.Dir(cfgFile), os.FileMode(0700))
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Failed to make the directory for the new configuration file '%s': %v", cfgFile, err), nil)
 	}
@@ -183,6 +188,7 @@ func loadMainViperConfig(cfgFile string) {
 	mainViper := profiles.GetMainConfig().ViperInstance()
 	// Use config file from the flag.
 	mainViper.SetConfigFile(cfgFile)
+	mainViper.SetConfigType("yaml")
 
 	// If a config file is found, read it in.
 	if err := mainViper.ReadInConfig(); err != nil {

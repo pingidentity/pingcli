@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package autocompletion
 
 import (
@@ -30,5 +32,6 @@ func ConfigReturnNonActiveProfilesFunc(cmd *cobra.Command, args []string, toComp
 			nonActiveProfiles = append(nonActiveProfiles, p)
 		}
 	}
+
 	return nonActiveProfiles, cobra.ShellCompDirectiveNoFileComp
 }
