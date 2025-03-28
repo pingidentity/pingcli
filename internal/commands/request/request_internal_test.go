@@ -44,7 +44,7 @@ func Test_RunInternalRequestWithFail(t *testing.T) {
 		err := cmd.Run()
 
 		var exitErr *exec.ExitError
-		if !errors.As(err, &exitErr) {
+		if errors.As(err, &exitErr) {
 			if !exitErr.Success() {
 				return
 			}

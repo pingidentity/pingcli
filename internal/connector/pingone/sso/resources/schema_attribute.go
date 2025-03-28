@@ -52,6 +52,8 @@ func (r *PingOneSchemaAttributeResource) ExportAll() (*[]connector.ImportBlock, 
 
 		for schemaAttributeId, schemaAttributeName := range schemaAttributeData {
 			commentData := map[string]string{
+				"Schema ID":             schemaId,
+				"Schema Name":           schemaName,
 				"Schema Attribute ID":   schemaAttributeId,
 				"Schema Attribute Name": schemaAttributeName,
 				"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,

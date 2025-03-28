@@ -83,7 +83,7 @@ func (r *PingOneApplicationAttributeMappingResource) getApplicationData() (map[s
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
+	for _, innerObj := range apiObjs {
 		var (
 			applicationId     *string
 			applicationIdOk   bool
@@ -92,12 +92,12 @@ func (r *PingOneApplicationAttributeMappingResource) getApplicationData() (map[s
 		)
 
 		switch {
-		case inner.ApplicationOIDC != nil:
-			applicationId, applicationIdOk = inner.ApplicationOIDC.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationOIDC.GetNameOk()
-		case inner.ApplicationSAML != nil:
-			applicationId, applicationIdOk = inner.ApplicationSAML.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationSAML.GetNameOk()
+		case innerObj.ApplicationOIDC != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationOIDC.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationOIDC.GetNameOk()
+		case innerObj.ApplicationSAML != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationSAML.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationSAML.GetNameOk()
 		default:
 			continue
 		}

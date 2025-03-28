@@ -52,6 +52,8 @@ func (r *PingOneSignOnPolicyActionResource) ExportAll() (*[]connector.ImportBloc
 
 		for signOnPolicysignOnPolicyActionId, signOnPolicyActionType := range signOnPolicyActionData {
 			commentData := map[string]string{
+				"Sign On Policy ID":          signOnPolicyId,
+				"Sign On Policy Name":        signOnPolicyName,
 				"Sign On Policy Action ID":   signOnPolicysignOnPolicyActionId,
 				"Sign On Policy Action Type": signOnPolicyActionType,
 				"Export Environment ID":      r.clientInfo.PingOneExportEnvironmentID,
@@ -102,7 +104,7 @@ func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyActionData(signOnPoli
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
+	for _, innerObj := range apiObjs {
 		var (
 			signOnPolicyActionId     *string
 			signOnPolicyActionIdOk   bool
@@ -111,30 +113,30 @@ func (r *PingOneSignOnPolicyActionResource) getSignOnPolicyActionData(signOnPoli
 		)
 
 		switch {
-		case inner.SignOnPolicyActionAgreement != nil:
-			signOnPolicyActionId, signOnPolicyActionIdOk = inner.SignOnPolicyActionAgreement.GetIdOk()
-			signOnPolicyActionType, signOnPolicyActionTypeOk = inner.SignOnPolicyActionAgreement.GetTypeOk()
-		case inner.SignOnPolicyActionCommon != nil:
-			signOnPolicyActionId, signOnPolicyActionIdOk = inner.SignOnPolicyActionCommon.GetIdOk()
-			signOnPolicyActionType, signOnPolicyActionTypeOk = inner.SignOnPolicyActionCommon.GetTypeOk()
-		case inner.SignOnPolicyActionIDFirst != nil:
-			signOnPolicyActionId, signOnPolicyActionIdOk = inner.SignOnPolicyActionIDFirst.GetIdOk()
-			signOnPolicyActionType, signOnPolicyActionTypeOk = inner.SignOnPolicyActionIDFirst.GetTypeOk()
-		case inner.SignOnPolicyActionIDP != nil:
-			signOnPolicyActionId, signOnPolicyActionIdOk = inner.SignOnPolicyActionIDP.GetIdOk()
-			signOnPolicyActionType, signOnPolicyActionTypeOk = inner.SignOnPolicyActionIDP.GetTypeOk()
-		case inner.SignOnPolicyActionLogin != nil:
-			signOnPolicyActionId, signOnPolicyActionIdOk = inner.SignOnPolicyActionLogin.GetIdOk()
-			signOnPolicyActionType, signOnPolicyActionTypeOk = inner.SignOnPolicyActionLogin.GetTypeOk()
-		case inner.SignOnPolicyActionMFA != nil:
-			signOnPolicyActionId, signOnPolicyActionIdOk = inner.SignOnPolicyActionMFA.GetIdOk()
-			signOnPolicyActionType, signOnPolicyActionTypeOk = inner.SignOnPolicyActionMFA.GetTypeOk()
-		case inner.SignOnPolicyActionPingIDWinLoginPasswordless != nil:
-			signOnPolicyActionId, signOnPolicyActionIdOk = inner.SignOnPolicyActionPingIDWinLoginPasswordless.GetIdOk()
-			signOnPolicyActionType, signOnPolicyActionTypeOk = inner.SignOnPolicyActionPingIDWinLoginPasswordless.GetTypeOk()
-		case inner.SignOnPolicyActionProgressiveProfiling != nil:
-			signOnPolicyActionId, signOnPolicyActionIdOk = inner.SignOnPolicyActionProgressiveProfiling.GetIdOk()
-			signOnPolicyActionType, signOnPolicyActionTypeOk = inner.SignOnPolicyActionProgressiveProfiling.GetTypeOk()
+		case innerObj.SignOnPolicyActionAgreement != nil:
+			signOnPolicyActionId, signOnPolicyActionIdOk = innerObj.SignOnPolicyActionAgreement.GetIdOk()
+			signOnPolicyActionType, signOnPolicyActionTypeOk = innerObj.SignOnPolicyActionAgreement.GetTypeOk()
+		case innerObj.SignOnPolicyActionCommon != nil:
+			signOnPolicyActionId, signOnPolicyActionIdOk = innerObj.SignOnPolicyActionCommon.GetIdOk()
+			signOnPolicyActionType, signOnPolicyActionTypeOk = innerObj.SignOnPolicyActionCommon.GetTypeOk()
+		case innerObj.SignOnPolicyActionIDFirst != nil:
+			signOnPolicyActionId, signOnPolicyActionIdOk = innerObj.SignOnPolicyActionIDFirst.GetIdOk()
+			signOnPolicyActionType, signOnPolicyActionTypeOk = innerObj.SignOnPolicyActionIDFirst.GetTypeOk()
+		case innerObj.SignOnPolicyActionIDP != nil:
+			signOnPolicyActionId, signOnPolicyActionIdOk = innerObj.SignOnPolicyActionIDP.GetIdOk()
+			signOnPolicyActionType, signOnPolicyActionTypeOk = innerObj.SignOnPolicyActionIDP.GetTypeOk()
+		case innerObj.SignOnPolicyActionLogin != nil:
+			signOnPolicyActionId, signOnPolicyActionIdOk = innerObj.SignOnPolicyActionLogin.GetIdOk()
+			signOnPolicyActionType, signOnPolicyActionTypeOk = innerObj.SignOnPolicyActionLogin.GetTypeOk()
+		case innerObj.SignOnPolicyActionMFA != nil:
+			signOnPolicyActionId, signOnPolicyActionIdOk = innerObj.SignOnPolicyActionMFA.GetIdOk()
+			signOnPolicyActionType, signOnPolicyActionTypeOk = innerObj.SignOnPolicyActionMFA.GetTypeOk()
+		case innerObj.SignOnPolicyActionPingIDWinLoginPasswordless != nil:
+			signOnPolicyActionId, signOnPolicyActionIdOk = innerObj.SignOnPolicyActionPingIDWinLoginPasswordless.GetIdOk()
+			signOnPolicyActionType, signOnPolicyActionTypeOk = innerObj.SignOnPolicyActionPingIDWinLoginPasswordless.GetTypeOk()
+		case innerObj.SignOnPolicyActionProgressiveProfiling != nil:
+			signOnPolicyActionId, signOnPolicyActionIdOk = innerObj.SignOnPolicyActionProgressiveProfiling.GetIdOk()
+			signOnPolicyActionType, signOnPolicyActionTypeOk = innerObj.SignOnPolicyActionProgressiveProfiling.GetTypeOk()
 		default:
 			continue
 		}

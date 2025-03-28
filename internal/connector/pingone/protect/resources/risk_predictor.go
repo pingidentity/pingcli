@@ -78,7 +78,7 @@ func (r *PingOneRiskPredictorResource) getRiskPredictorData() (map[string][]stri
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
+	for _, innerObj := range apiObjs {
 		var (
 			riskPredictorId     *string
 			riskPredictorIdOk   bool
@@ -89,58 +89,58 @@ func (r *PingOneRiskPredictorResource) getRiskPredictorData() (map[string][]stri
 		)
 
 		switch {
-		case inner.RiskPredictorAdversaryInTheMiddle != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorAdversaryInTheMiddle.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorAdversaryInTheMiddle.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorAdversaryInTheMiddle.GetTypeOk()
-		case inner.RiskPredictorAnonymousNetwork != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorAnonymousNetwork.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorAnonymousNetwork.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorAnonymousNetwork.GetTypeOk()
-		case inner.RiskPredictorBotDetection != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorBotDetection.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorBotDetection.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorBotDetection.GetTypeOk()
-		case inner.RiskPredictorCommon != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorCommon.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorCommon.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorCommon.GetTypeOk()
-		case inner.RiskPredictorComposite != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorComposite.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorComposite.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorComposite.GetTypeOk()
-		case inner.RiskPredictorCustom != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorCustom.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorCustom.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorCustom.GetTypeOk()
-		case inner.RiskPredictorDevice != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorDevice.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorDevice.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorDevice.GetTypeOk()
-		case inner.RiskPredictorEmailReputation != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorEmailReputation.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorEmailReputation.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorEmailReputation.GetTypeOk()
-		case inner.RiskPredictorGeovelocity != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorGeovelocity.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorGeovelocity.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorGeovelocity.GetTypeOk()
-		case inner.RiskPredictorIPReputation != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorIPReputation.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorIPReputation.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorIPReputation.GetTypeOk()
-		case inner.RiskPredictorUserLocationAnomaly != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorUserLocationAnomaly.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorUserLocationAnomaly.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorUserLocationAnomaly.GetTypeOk()
-		case inner.RiskPredictorUserRiskBehavior != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorUserRiskBehavior.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorUserRiskBehavior.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorUserRiskBehavior.GetTypeOk()
-		case inner.RiskPredictorVelocity != nil:
-			riskPredictorId, riskPredictorIdOk = inner.RiskPredictorVelocity.GetIdOk()
-			riskPredictorName, riskPredictorNameOk = inner.RiskPredictorVelocity.GetNameOk()
-			riskPredictorType, riskPredictorTypeOk = inner.RiskPredictorVelocity.GetTypeOk()
+		case innerObj.RiskPredictorAdversaryInTheMiddle != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorAdversaryInTheMiddle.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorAdversaryInTheMiddle.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorAdversaryInTheMiddle.GetTypeOk()
+		case innerObj.RiskPredictorAnonymousNetwork != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorAnonymousNetwork.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorAnonymousNetwork.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorAnonymousNetwork.GetTypeOk()
+		case innerObj.RiskPredictorBotDetection != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorBotDetection.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorBotDetection.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorBotDetection.GetTypeOk()
+		case innerObj.RiskPredictorCommon != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorCommon.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorCommon.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorCommon.GetTypeOk()
+		case innerObj.RiskPredictorComposite != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorComposite.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorComposite.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorComposite.GetTypeOk()
+		case innerObj.RiskPredictorCustom != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorCustom.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorCustom.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorCustom.GetTypeOk()
+		case innerObj.RiskPredictorDevice != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorDevice.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorDevice.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorDevice.GetTypeOk()
+		case innerObj.RiskPredictorEmailReputation != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorEmailReputation.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorEmailReputation.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorEmailReputation.GetTypeOk()
+		case innerObj.RiskPredictorGeovelocity != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorGeovelocity.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorGeovelocity.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorGeovelocity.GetTypeOk()
+		case innerObj.RiskPredictorIPReputation != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorIPReputation.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorIPReputation.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorIPReputation.GetTypeOk()
+		case innerObj.RiskPredictorUserLocationAnomaly != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorUserLocationAnomaly.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorUserLocationAnomaly.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorUserLocationAnomaly.GetTypeOk()
+		case innerObj.RiskPredictorUserRiskBehavior != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorUserRiskBehavior.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorUserRiskBehavior.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorUserRiskBehavior.GetTypeOk()
+		case innerObj.RiskPredictorVelocity != nil:
+			riskPredictorId, riskPredictorIdOk = innerObj.RiskPredictorVelocity.GetIdOk()
+			riskPredictorName, riskPredictorNameOk = innerObj.RiskPredictorVelocity.GetNameOk()
+			riskPredictorType, riskPredictorTypeOk = innerObj.RiskPredictorVelocity.GetTypeOk()
 		default:
 			continue
 		}

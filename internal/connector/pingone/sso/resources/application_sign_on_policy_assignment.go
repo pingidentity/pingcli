@@ -92,7 +92,7 @@ func (r *PingOneApplicationSignOnPolicyAssignmentResource) getApplicationData() 
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
+	for _, innerObj := range apiObjs {
 		var (
 			applicationId     *string
 			applicationIdOk   bool
@@ -101,15 +101,15 @@ func (r *PingOneApplicationSignOnPolicyAssignmentResource) getApplicationData() 
 		)
 
 		switch {
-		case inner.ApplicationOIDC != nil:
-			applicationId, applicationIdOk = inner.ApplicationOIDC.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationOIDC.GetNameOk()
-		case inner.ApplicationSAML != nil:
-			applicationId, applicationIdOk = inner.ApplicationSAML.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationSAML.GetNameOk()
-		case inner.ApplicationExternalLink != nil:
-			applicationId, applicationIdOk = inner.ApplicationExternalLink.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationExternalLink.GetNameOk()
+		case innerObj.ApplicationOIDC != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationOIDC.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationOIDC.GetNameOk()
+		case innerObj.ApplicationSAML != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationSAML.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationSAML.GetNameOk()
+		case innerObj.ApplicationExternalLink != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationExternalLink.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationExternalLink.GetNameOk()
 		default:
 			continue
 		}

@@ -84,12 +84,12 @@ func (r *PingOneMfaApplicationPushCredentialResource) getApplicationData() (map[
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
+	for _, innerObj := range apiObjs {
 		// MFa application push credentials are only for OIDC Native Apps
-		if inner.ApplicationOIDC != nil {
-			applicationId, applicationIdOk := inner.ApplicationOIDC.GetIdOk()
-			applicationName, applicationNameOk := inner.ApplicationOIDC.GetNameOk()
-			applicationType, applicationTypeOk := inner.ApplicationOIDC.GetTypeOk()
+		if innerObj.ApplicationOIDC != nil {
+			applicationId, applicationIdOk := innerObj.ApplicationOIDC.GetIdOk()
+			applicationName, applicationNameOk := innerObj.ApplicationOIDC.GetNameOk()
+			applicationType, applicationTypeOk := innerObj.ApplicationOIDC.GetTypeOk()
 
 			if applicationIdOk && applicationNameOk && applicationTypeOk {
 				if *applicationType == management.ENUMAPPLICATIONTYPE_NATIVE_APP {

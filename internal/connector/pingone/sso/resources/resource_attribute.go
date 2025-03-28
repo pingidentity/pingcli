@@ -86,11 +86,11 @@ func (r *PingOneResourceAttributeResource) getResourceData() (map[string][]strin
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
-		if inner.Resource != nil {
-			resourceId, resourceIdOk := inner.Resource.GetIdOk()
-			resourceName, resourceNameOk := inner.Resource.GetNameOk()
-			resourceType, resourceTypeOk := inner.Resource.GetTypeOk()
+	for _, innerObj := range apiObjs {
+		if innerObj.Resource != nil {
+			resourceId, resourceIdOk := innerObj.Resource.GetIdOk()
+			resourceName, resourceNameOk := innerObj.Resource.GetNameOk()
+			resourceType, resourceTypeOk := innerObj.Resource.GetTypeOk()
 
 			if resourceIdOk && resourceNameOk && resourceTypeOk {
 				resourceData[*resourceId] = []string{*resourceName, string(*resourceType)}
@@ -110,11 +110,11 @@ func (r *PingOneResourceAttributeResource) getResourceAttributeData(resourceId, 
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
-		if inner.ResourceAttribute != nil {
-			resourceAttributeId, resourceAttributeIdOk := inner.ResourceAttribute.GetIdOk()
-			resourceAttributeName, resourceAttributeNameOk := inner.ResourceAttribute.GetNameOk()
-			resourceAttributeType, resourceAttributeTypeOk := inner.ResourceAttribute.GetTypeOk()
+	for _, innerObj := range apiObjs {
+		if innerObj.ResourceAttribute != nil {
+			resourceAttributeId, resourceAttributeIdOk := innerObj.ResourceAttribute.GetIdOk()
+			resourceAttributeName, resourceAttributeNameOk := innerObj.ResourceAttribute.GetNameOk()
+			resourceAttributeType, resourceAttributeTypeOk := innerObj.ResourceAttribute.GetTypeOk()
 
 			if resourceAttributeIdOk && resourceAttributeNameOk && resourceAttributeTypeOk {
 				// Any CORE attribute is required and cannot be overridden

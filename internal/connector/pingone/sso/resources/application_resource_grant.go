@@ -92,7 +92,7 @@ func (r *PingOneApplicationResourceGrantResource) getApplicationData() (map[stri
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
+	for _, innerObj := range apiObjs {
 		var (
 			applicationId     *string
 			applicationIdOk   bool
@@ -101,21 +101,21 @@ func (r *PingOneApplicationResourceGrantResource) getApplicationData() (map[stri
 		)
 
 		switch {
-		case inner.ApplicationPingOnePortal != nil:
-			applicationId, applicationIdOk = inner.ApplicationPingOnePortal.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationPingOnePortal.GetNameOk()
-		case inner.ApplicationPingOneSelfService != nil:
-			applicationId, applicationIdOk = inner.ApplicationPingOneSelfService.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationPingOneSelfService.GetNameOk()
-		case inner.ApplicationExternalLink != nil:
-			applicationId, applicationIdOk = inner.ApplicationExternalLink.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationExternalLink.GetNameOk()
-		case inner.ApplicationOIDC != nil:
-			applicationId, applicationIdOk = inner.ApplicationOIDC.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationOIDC.GetNameOk()
-		case inner.ApplicationSAML != nil:
-			applicationId, applicationIdOk = inner.ApplicationSAML.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationSAML.GetNameOk()
+		case innerObj.ApplicationPingOnePortal != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationPingOnePortal.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationPingOnePortal.GetNameOk()
+		case innerObj.ApplicationPingOneSelfService != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationPingOneSelfService.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationPingOneSelfService.GetNameOk()
+		case innerObj.ApplicationExternalLink != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationExternalLink.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationExternalLink.GetNameOk()
+		case innerObj.ApplicationOIDC != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationOIDC.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationOIDC.GetNameOk()
+		case innerObj.ApplicationSAML != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationSAML.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationSAML.GetNameOk()
 		default:
 			continue
 		}

@@ -117,7 +117,9 @@ func getValidatedActualImportBlocks(t *testing.T, resource connector.ExportableR
 
 	importBlocks, err := resource.ExportAll()
 	if err != nil {
-		t.Fatalf("Failed to export %s: %s", resource.ResourceType(), err.Error())
+		t.Errorf("Failed to export %s: %s", resource.ResourceType(), err.Error())
+
+		return nil
 	}
 
 	// Make sure the resource name and id in each import block is unique across all import blocks
@@ -126,11 +128,15 @@ func getValidatedActualImportBlocks(t *testing.T, resource connector.ExportableR
 	for _, importBlock := range *importBlocks {
 		if resourceNames[importBlock.ResourceName] {
 			t.Errorf("Resource name %s is not unique", importBlock.ResourceName)
+
+			return nil
 		}
 		resourceNames[importBlock.ResourceName] = true
 
 		if resourceIDs[importBlock.ResourceID] {
 			t.Errorf("Resource ID %s is not unique", importBlock.ResourceID)
+
+			return nil
 		}
 		resourceIDs[importBlock.ResourceID] = true
 	}
@@ -179,7 +185,9 @@ func ValidateImportBlocks(t *testing.T, resource connector.ExportableResource, e
 	expectedNumberOfBlocks := len(*expectedImportBlocks)
 	actualNumberOfBlocks := len(*actualImportBlocks)
 	if actualNumberOfBlocks != expectedNumberOfBlocks {
-		t.Fatalf("Expected %d import blocks, got %d", expectedNumberOfBlocks, actualNumberOfBlocks)
+		t.Errorf("Expected %d import blocks, got %d", expectedNumberOfBlocks, actualNumberOfBlocks)
+
+		return
 	}
 
 	// Make sure the import blocks match the expected import blocks
@@ -215,10 +223,14 @@ func ValidateImportBlockSubset(t *testing.T, resource connector.ExportableResour
 	expectedNumberOfBlocks := len(*expectedImportBlocks)
 	actualNumberOfBlocks := len(*actualImportBlocks)
 	if actualNumberOfBlocks < expectedNumberOfBlocks {
-		t.Fatalf("Expected import blocks count (%d) is greater than Actual import blocks count (%d)", expectedNumberOfBlocks, actualNumberOfBlocks)
+		t.Errorf("Expected import blocks count (%d) is greater than Actual import blocks count (%d)", expectedNumberOfBlocks, actualNumberOfBlocks)
+
+		return
 	}
 	if expectedNumberOfBlocks == 0 {
-		t.Fatalf("Expected import blocks count is 0")
+		t.Errorf("Expected import blocks count is 0")
+
+		return
 	}
 
 	// For each expected import block, make sure it matches an actual import block

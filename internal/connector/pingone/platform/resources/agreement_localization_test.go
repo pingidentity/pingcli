@@ -17,10 +17,11 @@ func Test_AgreementLocalization(t *testing.T) {
 	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingone_platform_testable_resources.AgreementLocalization(t, clientInfo)
-	agreementTr := tr.Dependencies[0]
 
 	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
+
+	agreementTr := tr.Dependencies[0]
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

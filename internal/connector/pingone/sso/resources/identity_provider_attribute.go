@@ -83,7 +83,7 @@ func (r *PingOneIdentityProviderAttributeResource) getProviderData() (map[string
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
+	for _, innerObj := range apiObjs {
 		var (
 			providerId     *string
 			providerIdOk   bool
@@ -92,24 +92,24 @@ func (r *PingOneIdentityProviderAttributeResource) getProviderData() (map[string
 		)
 
 		switch {
-		case inner.IdentityProviderApple != nil:
-			providerId, providerIdOk = inner.IdentityProviderApple.GetIdOk()
-			providerName, providerNameOk = inner.IdentityProviderApple.GetNameOk()
-		case inner.IdentityProviderClientIDClientSecret != nil:
-			providerId, providerIdOk = inner.IdentityProviderClientIDClientSecret.GetIdOk()
-			providerName, providerNameOk = inner.IdentityProviderClientIDClientSecret.GetNameOk()
-		case inner.IdentityProviderFacebook != nil:
-			providerId, providerIdOk = inner.IdentityProviderFacebook.GetIdOk()
-			providerName, providerNameOk = inner.IdentityProviderFacebook.GetNameOk()
-		case inner.IdentityProviderOIDC != nil:
-			providerId, providerIdOk = inner.IdentityProviderOIDC.GetIdOk()
-			providerName, providerNameOk = inner.IdentityProviderOIDC.GetNameOk()
-		case inner.IdentityProviderPaypal != nil:
-			providerId, providerIdOk = inner.IdentityProviderPaypal.GetIdOk()
-			providerName, providerNameOk = inner.IdentityProviderPaypal.GetNameOk()
-		case inner.IdentityProviderSAML != nil:
-			providerId, providerIdOk = inner.IdentityProviderSAML.GetIdOk()
-			providerName, providerNameOk = inner.IdentityProviderSAML.GetNameOk()
+		case innerObj.IdentityProviderApple != nil:
+			providerId, providerIdOk = innerObj.IdentityProviderApple.GetIdOk()
+			providerName, providerNameOk = innerObj.IdentityProviderApple.GetNameOk()
+		case innerObj.IdentityProviderClientIDClientSecret != nil:
+			providerId, providerIdOk = innerObj.IdentityProviderClientIDClientSecret.GetIdOk()
+			providerName, providerNameOk = innerObj.IdentityProviderClientIDClientSecret.GetNameOk()
+		case innerObj.IdentityProviderFacebook != nil:
+			providerId, providerIdOk = innerObj.IdentityProviderFacebook.GetIdOk()
+			providerName, providerNameOk = innerObj.IdentityProviderFacebook.GetNameOk()
+		case innerObj.IdentityProviderOIDC != nil:
+			providerId, providerIdOk = innerObj.IdentityProviderOIDC.GetIdOk()
+			providerName, providerNameOk = innerObj.IdentityProviderOIDC.GetNameOk()
+		case innerObj.IdentityProviderPaypal != nil:
+			providerId, providerIdOk = innerObj.IdentityProviderPaypal.GetIdOk()
+			providerName, providerNameOk = innerObj.IdentityProviderPaypal.GetNameOk()
+		case innerObj.IdentityProviderSAML != nil:
+			providerId, providerIdOk = innerObj.IdentityProviderSAML.GetIdOk()
+			providerName, providerNameOk = innerObj.IdentityProviderSAML.GetNameOk()
 		default:
 			continue
 		}

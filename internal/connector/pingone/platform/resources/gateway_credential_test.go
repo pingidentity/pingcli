@@ -17,10 +17,11 @@ func Test_GatewayCredential(t *testing.T) {
 	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingone_platform_testable_resources.GatewayCredential(t, clientInfo)
-	gatewayTr := tr.Dependencies[0]
 
 	tr.CreateResource(t)
 	defer tr.DeleteResource(t)
+
+	gatewayTr := tr.Dependencies[0]
 
 	expectedImportBlocks := []connector.ImportBlock{
 		{

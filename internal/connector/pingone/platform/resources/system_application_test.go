@@ -20,7 +20,7 @@ func TestSystemApplicationExport(t *testing.T) {
 
 	expectedImportBlocks := []connector.ImportBlock{}
 
-	// Every environmnt has pre-configured system applications, so we need to get them all.
+	// Every environment has pre-configured system applications, so we need to get them all.
 	iter := clientInfo.PingOneApiClient.ManagementAPIClient.ApplicationsApi.ReadAllApplications(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID).Execute()
 	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.ReadOneApplication200Response](iter, "ReadAllApplications", "GetApplications", tr.ExportableResource.ResourceType())
 	if err != nil {

@@ -92,7 +92,7 @@ func (r *PingOneApplicationRoleAssignmentResource) getApplicationData() (map[str
 		return nil, err
 	}
 
-	for _, inner := range apiObjs {
+	for _, innerObj := range apiObjs {
 		var (
 			applicationId                  *string
 			applicationIdOk                bool
@@ -103,23 +103,23 @@ func (r *PingOneApplicationRoleAssignmentResource) getApplicationData() (map[str
 		)
 
 		switch {
-		case inner.ApplicationOIDC != nil:
-			applicationId, applicationIdOk = inner.ApplicationOIDC.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationOIDC.GetNameOk()
-			if inner.ApplicationOIDC.AccessControl != nil {
-				applicationAccessControlRole, applicationAccessControlRoleOk = inner.ApplicationOIDC.AccessControl.GetRoleOk()
+		case innerObj.ApplicationOIDC != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationOIDC.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationOIDC.GetNameOk()
+			if innerObj.ApplicationOIDC.AccessControl != nil {
+				applicationAccessControlRole, applicationAccessControlRoleOk = innerObj.ApplicationOIDC.AccessControl.GetRoleOk()
 			}
-		case inner.ApplicationSAML != nil:
-			applicationId, applicationIdOk = inner.ApplicationSAML.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationSAML.GetNameOk()
-			if inner.ApplicationSAML.AccessControl != nil {
-				applicationAccessControlRole, applicationAccessControlRoleOk = inner.ApplicationSAML.AccessControl.GetRoleOk()
+		case innerObj.ApplicationSAML != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationSAML.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationSAML.GetNameOk()
+			if innerObj.ApplicationSAML.AccessControl != nil {
+				applicationAccessControlRole, applicationAccessControlRoleOk = innerObj.ApplicationSAML.AccessControl.GetRoleOk()
 			}
-		case inner.ApplicationExternalLink != nil:
-			applicationId, applicationIdOk = inner.ApplicationExternalLink.GetIdOk()
-			applicationName, applicationNameOk = inner.ApplicationExternalLink.GetNameOk()
-			if inner.ApplicationExternalLink.AccessControl != nil {
-				applicationAccessControlRole, applicationAccessControlRoleOk = inner.ApplicationExternalLink.AccessControl.GetRoleOk()
+		case innerObj.ApplicationExternalLink != nil:
+			applicationId, applicationIdOk = innerObj.ApplicationExternalLink.GetIdOk()
+			applicationName, applicationNameOk = innerObj.ApplicationExternalLink.GetNameOk()
+			if innerObj.ApplicationExternalLink.AccessControl != nil {
+				applicationAccessControlRole, applicationAccessControlRoleOk = innerObj.ApplicationExternalLink.AccessControl.GetRoleOk()
 			}
 		default:
 			continue

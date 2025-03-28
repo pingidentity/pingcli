@@ -44,18 +44,18 @@ func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) 
 		return nil, err
 	}
 
-	for langaugeId, langaugeName := range languageData {
+	for languageId, languageName := range languageData {
 		commentData := map[string]string{
-			"Language ID":           langaugeId,
-			"Language Name":         langaugeName,
+			"Language ID":           languageId,
+			"Language Name":         languageName,
 			"Export Environment ID": r.clientInfo.PingOneExportEnvironmentID,
 			"Resource Type":         r.ResourceType(),
 		}
 
 		importBlock := connector.ImportBlock{
 			ResourceType:       r.ResourceType(),
-			ResourceName:       langaugeName,
-			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, langaugeId),
+			ResourceName:       languageName,
+			ResourceID:         fmt.Sprintf("%s/%s", r.clientInfo.PingOneExportEnvironmentID, languageId),
 			CommentInformation: common.GenerateCommentInformation(commentData),
 		}
 
@@ -66,7 +66,7 @@ func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) 
 }
 
 func (r *PingOneLanguageResource) getLanguageData() (map[string]string, error) {
-	langaugeData := make(map[string]string)
+	languageData := make(map[string]string)
 
 	iter := r.clientInfo.PingOneApiClient.ManagementAPIClient.LanguagesApi.ReadLanguages(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
 	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedLanguagesInner](iter, "ReadLanguages", "GetLanguages", r.ResourceType())
@@ -80,10 +80,10 @@ func (r *PingOneLanguageResource) getLanguageData() (map[string]string, error) {
 			languageName, languageNameOk := innerObj.Language.GetNameOk()
 
 			if languageIdOk && languageNameOk {
-				langaugeData[*languageId] = *languageName
+				languageData[*languageId] = *languageName
 			}
 		}
 	}
 
-	return langaugeData, nil
+	return languageData, nil
 }
