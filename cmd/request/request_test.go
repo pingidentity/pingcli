@@ -131,12 +131,35 @@ func TestRequestCmd_Execute_HeaderFlag(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
+// Test Request Command with Header Flag with and without spacing
+func TestRequestCmd_Execute_HeaderFlagSpacing(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "request",
+		"--"+options.RequestServiceOption.CobraParamName, "pingone",
+		"--"+options.RequestHTTPMethodOption.CobraParamName, "GET",
+		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header:TestValue",
+		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header:\tTestValue",
+		fmt.Sprintf("environments/%s/users", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+	)
+	testutils.CheckExpectedError(t, err, nil)
+}
+
 // Test Request Command with invalid Header Flag
 func TestRequestCmd_Execute_InvalidHeaderFlag(t *testing.T) {
-	expectedErrorPattern := `^invalid argument ".*" for "-H, --header" flag: failed to set Headers: Invalid header: invalid=header. Headers must be in the proper format$`
+	expectedErrorPattern := `^invalid argument ".*" for "-r, --header" flag: failed to set Headers: Invalid header: invalid=header. Headers must be in the proper format. Expected regex pattern: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--"+options.RequestServiceOption.CobraParamName, "pingone",
 		"--"+options.RequestHeaderOption.CobraParamName, "invalid=header",
+		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+	)
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Request Command with disallowed Authorization Header Flag
+func TestRequestCmd_Execute_DisallowedAuthorizationFlag(t *testing.T) {
+	expectedErrorPattern := `^invalid argument ".*" for "-r, --header" flag: failed to set Headers: Invalid header: Authorization. Authorization header is not allowed$`
+	err := testutils_cobra.ExecutePingcli(t, "request",
+		"--"+options.RequestServiceOption.CobraParamName, "pingone",
+		"--"+options.RequestHeaderOption.CobraParamName, "Authorization: Bearer token",
 		fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)

@@ -71,17 +71,16 @@ func initDataRawOption() {
 func initHeaderOption() {
 	cobraParamName := "header"
 	cobraValue := new(customtypes.HeaderSlice)
-	defaultValue := customtypes.StringSlice([]string{})
-	envVar := "PINGCLI_REQUEST_HEADER"
+	defaultValue := customtypes.HeaderSlice{}
 
 	options.RequestHeaderOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
+		EnvVar:          "", // No environment variable
 		Flag: &pflag.Flag{
 			Name:      cobraParamName,
-			Shorthand: "H",
+			Shorthand: "r",
 			Usage: fmt.Sprintf(
 				"A custom header to send in the request." +
 					"\nExample: --header \"Content-Type: application/vnd.pingidentity.user.import+json\"",

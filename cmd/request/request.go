@@ -57,7 +57,7 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 	// --fail, -f
 	cmd.Flags().AddFlag(options.RequestFailOption.Flag)
 
-	// --header, -H
+	// --header, -r
 	cmd.Flags().AddFlag(options.RequestHeaderOption.Flag)
 
 	// --http-method, -m
