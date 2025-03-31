@@ -88,8 +88,30 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return err
 	}
 
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	req.Header.Add("Content-Type", "application/json")
+	headers, err := profiles.GetOptionValue(options.RequestHeaderOption)
+	if err != nil {
+		return err
+	}
+
+	requestHeaders := new(customtypes.HeaderSlice)
+	err = requestHeaders.Set(headers)
+	if err != nil {
+		return err
+	}
+
+	requestHeaders.SetHttpRequestHeaders(req)
+
+	// Set default content type if not provided
+	if req.Header.Get("Content-Type") == "" {
+		req.Header.Add("Content-Type", "application/json")
+	}
+
+	// Set default authorization header if not provided
+	if req.Header.Get("Authorization") != "" {
+		output.Warn(fmt.Sprintf("'Authorization' header has been supplied via --%s flag. Default 'Authorization' header will not be used.", options.RequestHeaderOption.CobraParamName), nil)
+	} else {
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+	}
 
 	res, err := client.Do(req)
 	if err != nil {

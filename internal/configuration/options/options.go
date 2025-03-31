@@ -15,6 +15,7 @@ type OptionType string
 const (
 	ENUM_BOOL                   OptionType = "ENUM_BOOL"
 	ENUM_EXPORT_FORMAT          OptionType = "ENUM_EXPORT_FORMAT"
+	ENUM_HEADER                 OptionType = "ENUM_HEADER"
 	ENUM_INT                    OptionType = "ENUM_INT"
 	ENUM_EXPORT_SERVICE_GROUP   OptionType = "ENUM_EXPORT_SERVICE_GROUP"
 	ENUM_EXPORT_SERVICES        OptionType = "ENUM_EXPORT_SERVICES"
@@ -87,6 +88,7 @@ func Options() []Option {
 
 		RequestDataOption,
 		RequestDataRawOption,
+		RequestHeaderOption,
 		RequestHTTPMethodOption,
 		RequestServiceOption,
 		RequestAccessTokenOption,
@@ -170,6 +172,7 @@ var (
 var (
 	RequestDataOption              Option
 	RequestDataRawOption           Option
+	RequestHeaderOption            Option
 	RequestHTTPMethodOption        Option
 	RequestServiceOption           Option
 	RequestAccessTokenOption       Option

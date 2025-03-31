@@ -20,10 +20,10 @@ func (ss *StringSlice) Set(val string) error {
 	}
 
 	if val == "" || val == "[]" {
-		*ss = StringSlice([]string{})
+		return nil
 	} else {
 		valSs := strings.Split(val, ",")
-		*ss = StringSlice(valSs)
+		*ss = append(*ss, valSs...)
 	}
 
 	return nil

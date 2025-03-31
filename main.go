@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"runtime/debug"
+	"slices"
 
 	"github.com/pingidentity/pingcli/cmd"
 	"github.com/pingidentity/pingcli/internal/output"
@@ -39,14 +40,20 @@ func main() {
 		os.Exit(1)
 	}
 
-	detailedExitCodeWarnLogged, err := output.DetailedExitCodeWarnLogged()
-	if err != nil {
-		output.UserError(fmt.Sprintf("Failed to execute pingcli: %v", err), nil)
-		os.Exit(1)
+	if !slices.Contains(os.Args, "--version") &&
+		!slices.Contains(os.Args, "-v") &&
+		!slices.Contains(os.Args, "--help") &&
+		!slices.Contains(os.Args, "-h") {
+		detailedExitCodeWarnLogged, err := output.DetailedExitCodeWarnLogged()
+		if err != nil {
+			output.UserError(fmt.Sprintf("Failed to execute pingcli: %v", err), nil)
+			os.Exit(1)
+		}
+		if detailedExitCodeWarnLogged {
+			os.Exit(2)
+		}
 	}
-	if detailedExitCodeWarnLogged {
-		os.Exit(2)
-	} else {
-		os.Exit(0)
-	}
+
+	os.Exit(0)
+
 }

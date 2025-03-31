@@ -24,6 +24,9 @@ const (
   Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment with JSON data sourced from a file.
     pingcli request --service pingone --http-method POST --data ./my-environment.json environments
 	
+  Send a custom API request to the configured PingOne tenant, making a POST request using a custom header to create users with JSON data sourced from a file.
+    pingcli request --service pingone --http-method POST --header "Content-Type: application/vnd.pingidentity.user.import+json" --data ./users.json environments/$MY_ENVIRONMENT_ID/users
+  
   Send a custom API request to the configured PingOne tenant, making a POST request to create a new environment using raw JSON data.
     pingcli request --service pingone --http-method POST --data-raw '{"name": "My environment"}' environments
 
@@ -53,6 +56,9 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 
 	// --fail, -f
 	cmd.Flags().AddFlag(options.RequestFailOption.Flag)
+
+	// --header, -H
+	cmd.Flags().AddFlag(options.RequestHeaderOption.Flag)
 
 	// --http-method, -m
 	cmd.Flags().AddFlag(options.RequestHTTPMethodOption.Flag)
