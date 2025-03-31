@@ -34,11 +34,7 @@ func (ss StringSlice) Type() string {
 }
 
 func (ss StringSlice) String() string {
-	if ss == nil {
-		return ""
-	}
-
-	return strings.Join(ss, ",")
+	return strings.Join(ss.StringSlice(), ",")
 }
 
 func (ss StringSlice) StringSlice() []string {

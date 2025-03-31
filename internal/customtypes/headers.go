@@ -73,15 +73,7 @@ func (h HeaderSlice) Type() string {
 }
 
 func (h HeaderSlice) String() string {
-	if h == nil {
-		return ""
-	}
-
-	for _, header := range h {
-		headers = append(headers, fmt.Sprintf("%s:%s", header.Key, header.Value))
-	}
-
-	return strings.Join(headers, ",")
+	return strings.Join(h.StringSlice(), ",")
 }
 
 func (h HeaderSlice) StringSlice() []string {
