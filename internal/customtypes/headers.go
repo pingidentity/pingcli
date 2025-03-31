@@ -22,19 +22,19 @@ type HeaderSlice []Header
 // Verify that the custom type satisfies the pflag.Value interface
 var _ pflag.Value = (*HeaderSlice)(nil)
 
-func NewHeader(header string) (*Header, error) {
+func NewHeader(header string) (Header, error) {
 	regexPattern := `(^[^\s]+):[\t ]{0,1}(.*)$`
 	headerNameRegex := regexp.MustCompile(regexPattern)
 	matches := headerNameRegex.FindStringSubmatch(header)
 	if len(matches) != 3 {
-		return nil, fmt.Errorf("failed to set Headers: Invalid header: %s. Headers must be in the proper format. Expected regex pattern: %s", header, regexPattern)
+		return Header{}, fmt.Errorf("failed to set Headers: Invalid header: %s. Headers must be in the proper format. Expected regex pattern: %s", header, regexPattern)
 	}
 
 	if matches[1] == "Authorization" {
-		return nil, fmt.Errorf("failed to set Headers: Invalid header: %s. Authorization header is not allowed", matches[1])
+		return Header{}, fmt.Errorf("failed to set Headers: Invalid header: %s. Authorization header is not allowed", matches[1])
 	}
 
-	return &Header{
+	return Header{
 		Key:   matches[1],
 		Value: matches[2],
 	}, nil
@@ -54,7 +54,7 @@ func (h *HeaderSlice) Set(val string) error {
 			if err != nil {
 				return err
 			}
-			*h = append(*h, *headerVal)
+			*h = append(*h, headerVal)
 		}
 	}
 
