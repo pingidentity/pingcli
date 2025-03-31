@@ -6,12 +6,11 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/spf13/pflag"
 )
-
-var headers []string
 
 type Header struct {
 	Key   string
@@ -81,9 +80,12 @@ func (h HeaderSlice) StringSlice() []string {
 		return []string{}
 	}
 
+	headers := []string{}
 	for _, header := range h {
 		headers = append(headers, fmt.Sprintf("%s:%s", header.Key, header.Value))
 	}
+
+	slices.Sort(headers)
 
 	return headers
 }

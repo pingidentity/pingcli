@@ -71,7 +71,7 @@ func initDataRawOption() {
 func initHeaderOption() {
 	cobraParamName := "header"
 	cobraValue := new(customtypes.HeaderSlice)
-	defaultValue := customtypes.HeaderSlice{}
+	defaultValue := customtypes.HeaderSlice([]customtypes.Header{})
 
 	options.RequestHeaderOption = options.Option{
 		CobraParamName:  cobraParamName,

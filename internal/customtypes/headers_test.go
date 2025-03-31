@@ -34,8 +34,7 @@ func Test_Headers_Set_InvalidValue(t *testing.T) {
 func Test_Headers_Set_Nil(t *testing.T) {
 	var hs *customtypes.HeaderSlice
 
-	service := customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA
 	expectedErrorPattern := `^failed to set Headers value: .* Headers is nil$`
-	err := hs.Set(service)
+	err := hs.Set("key: value")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

@@ -137,7 +137,7 @@ func TestRequestCmd_Execute_HeaderFlagSpacing(t *testing.T) {
 		"--"+options.RequestServiceOption.CobraParamName, "pingone",
 		"--"+options.RequestHTTPMethodOption.CobraParamName, "GET",
 		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header:TestValue",
-		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header:\tTestValue",
+		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header-Two:\tTestValue",
 		fmt.Sprintf("environments/%s/users", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
 	)
 	testutils.CheckExpectedError(t, err, nil)
