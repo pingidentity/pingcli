@@ -25,7 +25,7 @@ func Test_Headers_Set_InvalidValue(t *testing.T) {
 	hs := new(customtypes.HeaderSlice)
 
 	invalidValue := "invalid=value"
-	expectedErrorPattern := `^failed to set Headers: Invalid header: .*\. Headers must be in the proper format$`
+	expectedErrorPattern := `^failed to set Headers: Invalid header: .*\. Headers must be in the proper format. Expected regex pattern: .*$`
 	err := hs.Set(invalidValue)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
