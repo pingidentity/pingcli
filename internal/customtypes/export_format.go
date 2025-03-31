@@ -34,6 +34,7 @@ func (ef *ExportFormat) Set(format string) error {
 	default:
 		return fmt.Errorf("unrecognized export format '%s'. Must be one of: %s", format, strings.Join(ExportFormatValidValues(), ", "))
 	}
+
 	return nil
 }
 

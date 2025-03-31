@@ -14,12 +14,12 @@ import (
 
 func RunInternalConfigGet(viperKey string) (err error) {
 	if err = configuration.ValidateParentViperKey(viperKey); err != nil {
-		return fmt.Errorf("failed to get configuration: %v", err)
+		return fmt.Errorf("failed to get configuration: %w", err)
 	}
 
 	pName, err := readConfigGetOptions()
 	if err != nil {
-		return fmt.Errorf("failed to get configuration: %v", err)
+		return fmt.Errorf("failed to get configuration: %w", err)
 	}
 
 	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", strings.ToLower(pName), viperKey)
@@ -31,7 +31,7 @@ func RunInternalConfigGet(viperKey string) (err error) {
 
 		vVal, _, err := profiles.ViperValueFromOption(opt)
 		if err != nil {
-			return fmt.Errorf("failed to get configuration: %v", err)
+			return fmt.Errorf("failed to get configuration: %w", err)
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)

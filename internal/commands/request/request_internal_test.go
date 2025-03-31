@@ -3,6 +3,7 @@
 package request_internal
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -26,7 +27,6 @@ func Test_RunInternalRequest(t *testing.T) {
 
 // Test RunInternalRequest function with fail
 func Test_RunInternalRequestWithFail(t *testing.T) {
-
 	if os.Getenv("RUN_INTERNAL_FAIL_TEST") == "true" {
 		testutils_viper.InitVipers(t)
 		t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
@@ -39,12 +39,17 @@ func Test_RunInternalRequestWithFail(t *testing.T) {
 		t.Fatal("This should never run due to internal request resulting in os.Exit(1)")
 	} else {
 		cmdName := os.Args[0]
-		cmd := exec.Command(cmdName, "-test.run=Test_RunInternalRequestWithFail")
+		cmd := exec.Command(cmdName, "-test.run=Test_RunInternalRequestWithFail") //#nosec G204 -- This is a test
 		cmd.Env = append(os.Environ(), "RUN_INTERNAL_FAIL_TEST=true")
 		err := cmd.Run()
-		if exitError, ok := err.(*exec.ExitError); ok && !exitError.Success() {
-			return
+
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			if !exitErr.Success() {
+				return
+			}
 		}
+
 		t.Fatalf("The process did not exit with a non-zero: %s", err)
 	}
 }
@@ -53,9 +58,12 @@ func Test_RunInternalRequestWithFail(t *testing.T) {
 func Test_RunInternalRequest_EmptyService(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
-	os.Unsetenv(options.RequestServiceOption.EnvVar)
+	err := os.Unsetenv(options.RequestServiceOption.EnvVar)
+	if err != nil {
+		t.Fatalf("failed to unset environment variable: %v", err)
+	}
 
-	err := RunInternalRequest("environments")
+	err = RunInternalRequest("environments")
 	expectedErrorPattern := "failed to send custom request: service is required"
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -169,13 +177,13 @@ func Test_pingoneAuth_InvalidCredentials(t *testing.T) {
 }
 
 // Test getData function
-func Test_getData(t *testing.T) {
+func Test_getDataRaw(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
 	expectedData := "{data: 'json'}"
 	t.Setenv(options.RequestDataRawOption.EnvVar, expectedData)
 
-	data, err := getData()
+	data, err := getDataRaw()
 	testutils.CheckExpectedError(t, err, nil)
 
 	if data != expectedData {
@@ -184,12 +192,12 @@ func Test_getData(t *testing.T) {
 }
 
 // Test getData function with empty data
-func Test_getData_EmptyData(t *testing.T) {
+func Test_getDataRaw_EmptyData(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
 	t.Setenv(options.RequestDataRawOption.EnvVar, "")
 
-	data, err := getData()
+	data, err := getDataRaw()
 	testutils.CheckExpectedError(t, err, nil)
 
 	if data != "" {
@@ -198,7 +206,7 @@ func Test_getData_EmptyData(t *testing.T) {
 }
 
 // Test getData function with file input
-func Test_getData_FileInput(t *testing.T) {
+func Test_getDataFile_FileInput(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
 	expectedData := "{data: 'json from file'}"
@@ -211,7 +219,7 @@ func Test_getData_FileInput(t *testing.T) {
 
 	t.Setenv(options.RequestDataOption.EnvVar, testFile)
 
-	data, err := getData()
+	data, err := getDataFile()
 	testutils.CheckExpectedError(t, err, nil)
 
 	if data != expectedData {
@@ -220,12 +228,12 @@ func Test_getData_FileInput(t *testing.T) {
 }
 
 // Test getData function with non-existent file input
-func Test_getData_NonExistentFileInput(t *testing.T) {
+func Test_getDataFile_NonExistentFileInput(t *testing.T) {
 	testutils_viper.InitVipers(t)
 
 	t.Setenv(options.RequestDataOption.EnvVar, "non_existent_file.json")
 
-	_, err := getData()
+	_, err := getDataFile()
 	expectedErrorPattern := `^open .*: no such file or directory$`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

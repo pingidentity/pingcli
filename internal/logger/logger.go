@@ -5,6 +5,7 @@ package logger
 import (
 	"io"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -20,7 +21,6 @@ var (
 // Create a get function for a standardized zerolog logger
 func Get() zerolog.Logger {
 	once.Do(func() {
-
 		// Viper config is not initialized yet, so read environment variables directly
 		logLevelEnv := os.Getenv("PINGCLI_LOG_LEVEL")
 		logPathEnv := os.Getenv("PINGCLI_LOG_PATH")
@@ -52,14 +52,13 @@ func Get() zerolog.Logger {
 
 		// Handle log file creation when PINGCLI_LOG_PATH is defined
 		if logPathEnv != "" && logLevel != zerolog.Disabled {
-
 			var err error
+			logPathEnv = filepath.Clean(logPathEnv)
 			output, err = os.Create(logPathEnv)
 			if err != nil {
 				// Most likely the directory specified for the log path does not exist
 				log.Fatal().Err(err).Msgf("Unable to create log file at: %s", logPathEnv)
 			}
-
 		} else {
 			output = zerolog.ConsoleWriter{
 				Out:        os.Stdout,
@@ -73,5 +72,6 @@ func Get() zerolog.Logger {
 			Timestamp().
 			Logger()
 	})
+
 	return logger
 }

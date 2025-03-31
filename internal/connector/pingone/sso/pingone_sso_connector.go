@@ -59,7 +59,7 @@ func (c *PingOneSSOConnector) Export(format, outputDir string, overwriteExport b
 		resources.PasswordPolicy(&c.clientInfo),
 		resources.Population(&c.clientInfo),
 		resources.PopulationDefault(&c.clientInfo),
-		resources.PopulationDefaultIdp(&c.clientInfo),
+		resources.PopulationDefaultIdentityProvider(&c.clientInfo),
 		resources.Resource(&c.clientInfo),
 		resources.ResourceAttribute(&c.clientInfo),
 		resources.ResourceSecret(&c.clientInfo),

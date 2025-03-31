@@ -1,7 +1,6 @@
 # Ping CLI Native Export Services Support
 
-The platform export command exports configuration-as-code packages for the Ping Platform. The CLI plans to export
-natively from Ping platform services.
+The platform export command exports Configuration as Code packages for the Ping Platform. The CLI plans to export natively from Ping platform services.
 
 The following describes the CLI's support of each of these Ping platform services for native export.
 

@@ -17,7 +17,6 @@ func InitPingOneServiceOptions() {
 	initAuthenticationWorkerClientSecretOption()
 	initAuthenticationWorkerEnvironmentIDOption()
 	initRegionCodeOption()
-
 }
 
 func initAuthenticationWorkerClientIDOption() {

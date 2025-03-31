@@ -39,13 +39,13 @@ default:
                     clientsecret: %s
                     environmentid: %s
         pingfederate:
-            adminapipath: %s
+            adminapipath: /pf-admin-api/v1
             authentication:
                 type: basicauth
                 basicauth:
-                    username: %s
-                    password: %s
-            httpshost: %s
+                    username: Administrator
+                    password: 2FederateM0re
+            httpshost: https://localhost:9999
             insecureTrustAllTLS: true
             xBypassExternalValidationHeader: true
 production:
@@ -115,12 +115,9 @@ func getDefaultConfigFileContents() string {
 		outputDirectoryReplacement,
 		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
 		customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
-		os.Getenv(options.PingOneRegionCodeOption.EnvVar),
-		os.Getenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar),
-		os.Getenv(options.PingOneAuthenticationWorkerClientSecretOption.EnvVar),
-		os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar),
-		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar),
-		os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		os.Getenv(options.PingFederateHTTPSHostOption.EnvVar))
+		os.Getenv("TEST_PINGONE_REGION_CODE"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+	)
 }

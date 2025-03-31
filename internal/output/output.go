@@ -44,14 +44,14 @@ func SetColorize() {
 func Message(message string, fields map[string]interface{}) {
 	l := logger.Get()
 
-	print(message, fields, white, l.Info)
+	printOutput(message, fields, white, l.Info)
 }
 
 // This function outputs green text to inform the user of success
 func Success(message string, fields map[string]interface{}) {
 	l := logger.Get()
 
-	print(fmt.Sprintf("SUCCESS: %s", message), fields, green, l.Info)
+	printOutput(fmt.Sprintf("SUCCESS: %s", message), fields, green, l.Info)
 }
 
 // This function outputs yellow text to inform the user of a warning
@@ -59,7 +59,7 @@ func Warn(message string, fields map[string]interface{}) {
 	l := logger.Get()
 	detailedExitCodeWarnLogged = true
 
-	print(fmt.Sprintf("WARNING: %s", message), fields, yellow, l.Warn)
+	printOutput(fmt.Sprintf("WARNING: %s", message), fields, yellow, l.Warn)
 }
 
 func DetailedExitCodeWarnLogged() (bool, error) {
@@ -71,6 +71,7 @@ func DetailedExitCodeWarnLogged() (bool, error) {
 	if detailedExitCodeEnabled == "true" {
 		return detailedExitCodeWarnLogged, nil
 	}
+
 	return false, nil
 }
 
@@ -78,14 +79,14 @@ func DetailedExitCodeWarnLogged() (bool, error) {
 // or input to pingcli has caused an error.
 func UserError(message string, fields map[string]interface{}) {
 	l := logger.Get()
-	print(fmt.Sprintf("ERROR: %s", message), fields, red, l.Error)
+	printOutput(fmt.Sprintf("ERROR: %s", message), fields, red, l.Error)
 }
 
 // This functions is used to inform the user their configuration
 // or input to pingcli has caused an fatal error that exits the program immediately.
 func UserFatal(message string, fields map[string]interface{}) {
 	l := logger.Get()
-	print(fmt.Sprintf("FATAL: %s", message), fields, boldRed, l.Fatal)
+	printOutput(fmt.Sprintf("FATAL: %s", message), fields, boldRed, l.Fatal)
 }
 
 // This function is used to inform the user a system-level error
@@ -102,10 +103,10 @@ Please raise an issue at https://github.com/pingidentity/pingcli`,
 
 	// l.Fatal() exits the program prematurely before the message is printed
 	// pass nil to print the message before exiting
-	print(systemMsg, fields, boldRed, l.Fatal)
+	printOutput(systemMsg, fields, boldRed, l.Fatal)
 }
 
-func print(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string,
+func printOutput(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string,
 	logEventFunc func() *zerolog.Event) {
 	SetColorize()
 
@@ -116,18 +117,17 @@ func print(message string, fields map[string]interface{}, colorFunc func(format 
 
 	switch outputFormat {
 	case customtypes.ENUM_OUTPUT_FORMAT_TEXT:
-		printText(message, fields, colorFunc, logEventFunc)
+		printTextOutput(message, fields, colorFunc, logEventFunc)
 	case customtypes.ENUM_OUTPUT_FORMAT_JSON:
-		printJson(message, fields, logEventFunc)
+		printJsonOutput(message, fields, logEventFunc)
 	default:
 		l := logger.Get()
-		printText(fmt.Sprintf("Output format %q is not recognized. Defaulting to \"text\" output", outputFormat), nil, yellow, l.Warn)
-		printText(message, fields, colorFunc, logEventFunc)
+		printTextOutput(fmt.Sprintf("Output format %q is not recognized. Defaulting to \"text\" output", outputFormat), nil, yellow, l.Warn)
+		printTextOutput(message, fields, colorFunc, logEventFunc)
 	}
-
 }
 
-func printText(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string,
+func printTextOutput(message string, fields map[string]interface{}, colorFunc func(format string, a ...interface{}) string,
 	logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
 
@@ -147,7 +147,7 @@ func printText(message string, fields map[string]interface{}, colorFunc func(for
 	logEventFunc().Msg(colorFunc(message))
 }
 
-func printJson(message string, fields map[string]interface{}, logEventFunc func() *zerolog.Event) {
+func printJsonOutput(message string, fields map[string]interface{}, logEventFunc func() *zerolog.Event) {
 	l := logger.Get()
 
 	if fields == nil {
@@ -164,6 +164,7 @@ func printJson(message string, fields map[string]interface{}, logEventFunc func(
 	jsonOut, err := json.MarshalIndent(fields, "", "  ")
 	if err != nil {
 		l.Error().Err(err).Msgf("Failed to serialize output as JSON")
+
 		return
 	}
 

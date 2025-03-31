@@ -33,6 +33,7 @@ func (rs *RequestService) Set(service string) error {
 	default:
 		return fmt.Errorf("unrecognized Request Service: '%s'. Must be one of: %s", service, strings.Join(RequestServiceValidValues(), ", "))
 	}
+
 	return nil
 }
 

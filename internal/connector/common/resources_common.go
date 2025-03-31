@@ -3,6 +3,7 @@
 package common
 
 import (
+	"errors"
 	"fmt"
 	"maps"
 	"net/http"
@@ -24,20 +25,21 @@ func CheckSingletonResource(response *http.Response, err error, apiFuncName, res
 		return false, nil
 	}
 
-	if response.StatusCode == 204 {
+	if response.StatusCode == http.StatusNoContent {
 		output.Warn("API client 204 No Content response.", map[string]interface{}{
 			"API Function Name": apiFuncName,
 			"Resource Type":     resourceType,
 			"Response Code":     response.Status,
 			"Response Body":     response.Body,
 		})
+
 		return false, nil
 	}
 
 	return true, nil
 }
 
-func HandleClientResponse(response *http.Response, err error, apiFunctionName string, resourceType string) (bool, error) {
+func HandleClientResponse(response *http.Response, err error, apiFunctionName string, resourceType string) (b bool, rErr error) {
 	if err != nil {
 		// Only warn the user on client error and skip export of resource
 		output.Warn("API client error.", map[string]interface{}{
@@ -52,10 +54,16 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 	if response == nil {
 		return false, fmt.Errorf("%s Request for resource '%s' was not successful. Response is nil", apiFunctionName, resourceType)
 	}
-	defer response.Body.Close()
+
+	defer func() {
+		cErr := response.Body.Close()
+		if cErr != nil {
+			rErr = errors.Join(rErr, cErr)
+		}
+	}()
 
 	// When the client returns forbidden, warn user and skip export of resource
-	if response.StatusCode == 403 {
+	if response.StatusCode == http.StatusForbidden {
 		output.Warn("API client 403 forbidden response.", map[string]interface{}{
 			"API Function Name": apiFunctionName,
 			"Resource Type":     resourceType,

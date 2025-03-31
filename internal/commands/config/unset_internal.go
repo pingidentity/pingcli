@@ -14,35 +14,35 @@ import (
 
 func RunInternalConfigUnset(viperKey string) (err error) {
 	if err = configuration.ValidateViperKey(viperKey); err != nil {
-		return fmt.Errorf("failed to unset configuration: %v", err)
+		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
 	pName, err := readConfigUnsetOptions()
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %v", err)
+		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
 	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %v", err)
+		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
 	opt, err := configuration.OptionFromViperKey(viperKey)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %v", err)
+		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
 	subViper.Set(viperKey, opt.DefaultValue)
 
 	if err = profiles.GetMainConfig().SaveProfile(pName, subViper); err != nil {
-		return fmt.Errorf("failed to unset configuration: %v", err)
+		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
 	msgStr := "Configuration unset successfully:\n"
 
 	vVal, _, err := profiles.ViperValueFromOption(opt)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %v", err)
+		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
 	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)

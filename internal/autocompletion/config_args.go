@@ -32,5 +32,6 @@ func ConfigReturnNonActiveProfilesFunc(cmd *cobra.Command, args []string, toComp
 			nonActiveProfiles = append(nonActiveProfiles, p)
 		}
 	}
+
 	return nonActiveProfiles, cobra.ShellCompDirectiveNoFileComp
 }

@@ -34,12 +34,12 @@ type ExportableResource interface {
 }
 
 func (b *ImportBlock) Sanitize() {
-	// Hexidecimal encode special characters
+	// Hexadecimal encode special characters
 	b.ResourceName = regexp.MustCompile(`[^0-9A-Za-z_\-]`).ReplaceAllStringFunc(b.ResourceName, func(s string) string {
 		return fmt.Sprintf("-%04X-", s)
 	})
-	// Prefix resource names with pingcli--
-	b.ResourceName = "pingcli--" + b.ResourceName
+	// Prefix resource names with pingcli__
+	b.ResourceName = "pingcli__" + b.ResourceName
 }
 
 func (b *ImportBlock) Equals(a ImportBlock) bool {
@@ -65,5 +65,6 @@ import {
 	to = %s.%s
 	id = "%s"
 }`
+
 	return fmt.Sprintf(pattern, b.CommentInformation, b.ResourceType, b.ResourceName, b.ResourceID)
 }

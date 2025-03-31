@@ -44,10 +44,10 @@ func (c *PingOneMFAConnector) Export(format, outputDir string, overwriteExport b
 	l.Debug().Msgf("Exporting all PingOne MFA Resources...")
 
 	exportableResources := []connector.ExportableResource{
-		resources.MFAApplicationPushCredential(&c.clientInfo),
-		resources.MFAFido2Policy(&c.clientInfo),
-		resources.MFADevicePolicy(&c.clientInfo),
-		resources.MFASettings(&c.clientInfo),
+		resources.MfaApplicationPushCredential(&c.clientInfo),
+		resources.MfaDevicePolicy(&c.clientInfo),
+		resources.MfaFido2Policy(&c.clientInfo),
+		resources.MfaSettings(&c.clientInfo),
 	}
 
 	return common.WriteFiles(exportableResources, format, outputDir, overwriteExport)

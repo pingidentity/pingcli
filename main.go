@@ -26,6 +26,7 @@ func main() {
 			for _, setting := range info.Settings {
 				if setting.Key == "vcs.revision" {
 					commit = setting.Value
+
 					break
 				}
 			}
@@ -55,5 +56,4 @@ func main() {
 	}
 
 	os.Exit(0)
-
 }

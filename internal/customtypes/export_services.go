@@ -48,8 +48,10 @@ func (es *ExportServices) Set(services string) error {
 				if !slices.Contains(returnServiceList, validService) {
 					returnServiceList = append(returnServiceList, validService)
 				}
+
 				return true
 			}
+
 			return false
 		}) {
 			return fmt.Errorf("failed to set ExportServices: Invalid service: %s. Allowed services: %s", service, strings.Join(validServices, ", "))
@@ -58,7 +60,8 @@ func (es *ExportServices) Set(services string) error {
 
 	slices.Sort(returnServiceList)
 
-	*es = ExportServices(returnServiceList)
+	*es = returnServiceList
+
 	return nil
 }
 
@@ -152,5 +155,6 @@ func (es *ExportServices) Merge(es2 ExportServices) error {
 	}
 
 	slices.Sort(mergedServices)
+
 	return es.Set(strings.Join(mergedServices, ","))
 }

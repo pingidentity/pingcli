@@ -17,12 +17,12 @@ import (
 func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 	newProfileName, newDescription, setActive, err := readConfigAddProfileOptions(rc)
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %v", err)
+		return fmt.Errorf("failed to add profile: %w", err)
 	}
 
 	err = profiles.GetMainConfig().ValidateNewProfileName(newProfileName)
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %v", err)
+		return fmt.Errorf("failed to add profile: %w", err)
 	}
 
 	output.Message(fmt.Sprintf("Adding new profile '%s'...", newProfileName), nil)
@@ -31,14 +31,14 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 	subViper.Set(options.ProfileDescriptionOption.ViperKey, newDescription)
 
 	if err = profiles.GetMainConfig().SaveProfile(newProfileName, subViper); err != nil {
-		return fmt.Errorf("failed to add profile: %v", err)
+		return fmt.Errorf("failed to add profile: %w", err)
 	}
 
 	output.Success(fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetMainConfig().ViperInstance().ConfigFileUsed()), nil)
 
 	if setActive {
 		if err = profiles.GetMainConfig().ChangeActiveProfile(newProfileName); err != nil {
-			return fmt.Errorf("failed to set active profile: %v", err)
+			return fmt.Errorf("failed to set active profile: %w", err)
 		}
 
 		output.Success(fmt.Sprintf("Profile '%s' set as active.", newProfileName), nil)
@@ -46,7 +46,7 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 
 	err = profiles.GetMainConfig().DefaultMissingViperKeys()
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %v", err)
+		return fmt.Errorf("failed to add profile: %w", err)
 	}
 
 	return nil

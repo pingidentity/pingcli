@@ -17,11 +17,11 @@ import (
 func RunInternalConfigSet(kvPair string) (err error) {
 	pName, vKey, vValue, err := readConfigSetOptions(kvPair)
 	if err != nil {
-		return fmt.Errorf("failed to set configuration: %v", err)
+		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
 	if err = configuration.ValidateViperKey(vKey); err != nil {
-		return fmt.Errorf("failed to set configuration: %v", err)
+		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
 	// Make sure value is not empty, and suggest unset command if it is
@@ -31,27 +31,27 @@ func RunInternalConfigSet(kvPair string) (err error) {
 
 	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
 	if err != nil {
-		return fmt.Errorf("failed to set configuration: %v", err)
+		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
 	opt, err := configuration.OptionFromViperKey(vKey)
 	if err != nil {
-		return fmt.Errorf("failed to set configuration: %v", err)
+		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
 	if err = setValue(subViper, vKey, vValue, opt.Type); err != nil {
-		return fmt.Errorf("failed to set configuration: %v", err)
+		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
 	if err = profiles.GetMainConfig().SaveProfile(pName, subViper); err != nil {
-		return fmt.Errorf("failed to set configuration: %v", err)
+		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
 	msgStr := "Configuration set successfully:\n"
 
 	vVal, _, err := profiles.ViperValueFromOption(opt)
 	if err != nil {
-		return fmt.Errorf("failed to set configuration: %v", err)
+		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
 	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -112,87 +112,87 @@ func parseKeyValuePair(kvPair string) (string, string, error) {
 func setValue(profileViper *viper.Viper, vKey, vValue string, valueType options.OptionType) (err error) {
 	switch valueType {
 	case options.ENUM_BOOL:
-		bool := new(customtypes.Bool)
-		if err = bool.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a boolean. Allowed [true, false]: %v", vKey, err)
+		b := new(customtypes.Bool)
+		if err = b.Set(vValue); err != nil {
+			return fmt.Errorf("value for key '%s' must be a boolean. Allowed [true, false]: %w", vKey, err)
 		}
-		profileViper.Set(vKey, bool)
+		profileViper.Set(vKey, b)
 	case options.ENUM_EXPORT_FORMAT:
 		exportFormat := new(customtypes.ExportFormat)
 		if err = exportFormat.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid export format. Allowed [%s]: %v", vKey, strings.Join(customtypes.ExportFormatValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid export format. Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportFormatValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, exportFormat)
 	case options.ENUM_EXPORT_SERVICE_GROUP:
 		exportServiceGroup := new(customtypes.ExportServiceGroup)
 		if err = exportServiceGroup.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be valid export service group. Allowed [%s]: %v", vKey, strings.Join(customtypes.ExportServiceGroupValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be valid export service group. Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportServiceGroupValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, exportServiceGroup)
 	case options.ENUM_EXPORT_SERVICES:
 		exportServices := new(customtypes.ExportServices)
 		if err = exportServices.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be valid export service(s). Allowed [%s]: %v", vKey, strings.Join(customtypes.ExportServicesValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be valid export service(s). Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportServicesValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, exportServices)
 	case options.ENUM_OUTPUT_FORMAT:
 		outputFormat := new(customtypes.OutputFormat)
 		if err = outputFormat.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid output format. Allowed [%s]: %v", vKey, strings.Join(customtypes.OutputFormatValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid output format. Allowed [%s]: %w", vKey, strings.Join(customtypes.OutputFormatValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, outputFormat)
 	case options.ENUM_PINGONE_REGION_CODE:
 		region := new(customtypes.PingOneRegionCode)
 		if err = region.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid PingOne Region Code. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid PingOne Region Code. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, region)
 	case options.ENUM_STRING:
 		str := new(customtypes.String)
 		if err = str.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a string: %v", vKey, err)
+			return fmt.Errorf("value for key '%s' must be a string: %w", vKey, err)
 		}
 		profileViper.Set(vKey, str)
 	case options.ENUM_STRING_SLICE:
 		strSlice := new(customtypes.StringSlice)
 		if err = strSlice.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a string slice: %v", vKey, err)
+			return fmt.Errorf("value for key '%s' must be a string slice: %w", vKey, err)
 		}
 		profileViper.Set(vKey, strSlice)
 	case options.ENUM_UUID:
 		uuid := new(customtypes.UUID)
 		if err = uuid.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid UUID: %v", vKey, err)
+			return fmt.Errorf("value for key '%s' must be a valid UUID: %w", vKey, err)
 		}
 		profileViper.Set(vKey, uuid)
 	case options.ENUM_PINGONE_AUTH_TYPE:
 		authType := new(customtypes.PingOneAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid PingOne Authentication Type. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid PingOne Authentication Type. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, authType)
 	case options.ENUM_PINGFEDERATE_AUTH_TYPE:
 		authType := new(customtypes.PingFederateAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid PingFederate Authentication Type. Allowed [%s]: %v", vKey, strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid PingFederate Authentication Type. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, authType)
 	case options.ENUM_INT:
 		intValue := new(customtypes.Int)
 		if err = intValue.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be an integer: %v", vKey, err)
+			return fmt.Errorf("value for key '%s' must be an integer: %w", vKey, err)
 		}
 		profileViper.Set(vKey, intValue)
 	case options.ENUM_REQUEST_HTTP_METHOD:
 		httpMethod := new(customtypes.HTTPMethod)
 		if err = httpMethod.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid HTTP method. Allowed [%s]: %v", vKey, strings.Join(customtypes.HTTPMethodValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid HTTP method. Allowed [%s]: %w", vKey, strings.Join(customtypes.HTTPMethodValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, httpMethod)
 	case options.ENUM_REQUEST_SERVICE:
 		service := new(customtypes.RequestService)
 		if err = service.Set(vValue); err != nil {
-			return fmt.Errorf("value for key '%s' must be a valid request service. Allowed [%s]: %v", vKey, strings.Join(customtypes.RequestServiceValidValues(), ", "), err)
+			return fmt.Errorf("value for key '%s' must be a valid request service. Allowed [%s]: %w", vKey, strings.Join(customtypes.RequestServiceValidValues(), ", "), err)
 		}
 		profileViper.Set(vKey, service)
 	default:

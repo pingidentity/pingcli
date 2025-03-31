@@ -21,6 +21,7 @@ func (u *UUID) Set(val string) error {
 
 	if val == "" {
 		*u = UUID(val)
+
 		return nil
 	}
 

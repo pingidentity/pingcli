@@ -50,7 +50,7 @@ func (m MainConfig) ViperInstance() *viper.Viper {
 	return m.viperInstance
 }
 
-func (m *MainConfig) ChangeActiveProfile(pName string) (err error) {
+func (m MainConfig) ChangeActiveProfile(pName string) (err error) {
 	if err = m.ValidateExistingProfileName(pName); err != nil {
 		return err
 	}
@@ -180,7 +180,7 @@ func (m MainConfig) ProfileNames() (profileNames []string) {
 	keySet := make(map[string]struct{})
 	mainViperKeys := m.ViperInstance().AllKeys()
 	for _, key := range mainViperKeys {
-		//Do not add Active profile viper key to profileNames
+		// Do not add Active profile viper key to profileNames
 		if strings.EqualFold(key, options.RootActiveProfileOption.ViperKey) {
 			continue
 		}
@@ -296,7 +296,7 @@ func (m MainConfig) ProfileToString(pName string) (yamlStr string, err error) {
 
 	yaml, err := yaml.Marshal(subViper.AllSettings())
 	if err != nil {
-		return "", fmt.Errorf("failed to yaml marshal active profile: %v", err)
+		return "", fmt.Errorf("failed to yaml marshal active profile: %w", err)
 	}
 
 	return string(yaml), nil
@@ -318,7 +318,7 @@ func (m MainConfig) ProfileViperValue(pName, viperKey string) (yamlStr string, e
 
 	yaml, err := yaml.Marshal(subViper.Get(viperKey))
 	if err != nil {
-		return "", fmt.Errorf("failed to yaml marshal configuration value from key '%s': %v", viperKey, err)
+		return "", fmt.Errorf("failed to yaml marshal configuration value from key '%s': %w", viperKey, err)
 	}
 
 	return string(yaml), nil
@@ -342,7 +342,7 @@ func (m MainConfig) DefaultMissingViperKeys() (err error) {
 		}
 		err = m.SaveProfile(pName, subViper)
 		if err != nil {
-			return fmt.Errorf("Failed to save profile '%s': %v", pName, err)
+			return fmt.Errorf("failed to save profile '%s': %w", pName, err)
 		}
 	}
 
@@ -374,6 +374,7 @@ func GetOptionValue(opt options.Option) (pFlagValue string, err error) {
 	// 4th priority: default value
 	if opt.DefaultValue != nil {
 		pFlagValue = opt.DefaultValue.String()
+
 		return pFlagValue, nil
 	}
 
@@ -446,6 +447,7 @@ func ViperValueFromOption(opt options.Option) (value string, ok bool, err error)
 			for _, v := range typedValue {
 				strSlice = append(strSlice, fmt.Sprintf("%v", v))
 			}
+
 			return strings.Join(strSlice, ","), true, nil
 		default:
 			return fmt.Sprintf("%v", typedValue), true, nil

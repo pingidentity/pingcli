@@ -4,6 +4,7 @@ package testutils_terraform
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -13,7 +14,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -43,6 +43,7 @@ func ValidateTerraformPlan(t *testing.T, resource connector.ExportableResource, 
 				if output["@message"] == ignoredError {
 					usedIgnoreErrors[ignoredError] = true
 					ignore = true
+
 					break
 				}
 			}
@@ -108,6 +109,8 @@ func singleResourceTerraformPlanGenerateConfigOut(t *testing.T, resource connect
 
 // Helper function to run terraform plan --generate-config-out
 func runTerraformPlanGenerateConfigOut(t *testing.T, terraformExecutableFilepath, exportDir string) string {
+	t.Helper()
+
 	// Create the os.exec Command
 	terraformPlanCmd := exec.Command(terraformExecutableFilepath)
 	// Add the arguments to the command
@@ -134,8 +137,10 @@ func runTerraformPlanGenerateConfigOut(t *testing.T, terraformExecutableFilepath
 
 	// Wait for the command to finish
 	if err := terraformPlanCmd.Wait(); err != nil {
+		var exitErr *exec.ExitError
+
 		// If err is of type *exec.ExitError, ignore the error
-		if _, ok := err.(*exec.ExitError); !ok {
+		if !errors.As(err, &exitErr) {
 			t.Fatalf("Failed to run terraform plan: %v", err)
 		}
 	}
@@ -157,13 +162,23 @@ func InitPingOneTerraform(t *testing.T) {
 	required_providers {
 		pingone = {
 		source = "pingidentity/pingone"
-		version = "%s"
+		version = "1.6.0"
 		}
 	}
 }
 	
-provider "pingone" {}
-`, os.Getenv("PINGCLI_PINGONE_PROVIDER_VERSION"))
+provider "pingone" {
+  client_id = "%s"
+  client_secret = "%s"
+  environment_id = "%s"
+  region_code = "%s"
+}
+`,
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		os.Getenv("TEST_PINGONE_REGION_CODE"),
+	)
 
 	// Write main.tf to testing directory
 	mainTFFilepath := filepath.Join(exportDir, "main.tf")
@@ -172,7 +187,7 @@ provider "pingone" {}
 	}
 
 	// Run terraform init in testing directory
-	initCmd := exec.Command(terraformExecutableFilepath)
+	initCmd := exec.Command(terraformExecutableFilepath) //#nosec G204 -- This is a test
 	initCmd.Args = append(initCmd.Args, "init")
 	initCmd.Dir = exportDir
 
@@ -192,30 +207,25 @@ func InitPingFederateTerraform(t *testing.T) {
 	// Check if terraform is installed
 	checkTerraformInstallPath(t)
 
-	mainTFFileContents := fmt.Sprintf(`terraform {
+	mainTFFileContents := `terraform {
 	required_providers {
 		pingfederate = {
 		source = "pingidentity/pingfederate"
-		version = "%s"
+		version = "1.4.3"
 		}
 	}
 }
 
 provider "pingfederate" {
-  username = "%s"
-  password = "%s"
-  https_host = "%s"
-  admin_api_path = "%s"
+  username = "Administrator"
+  password = "2FederateM0re"
+  https_host = "https://localhost:9999"
+  admin_api_path = "/pf-admin-api/v1"
   product_version = "12.2"
   insecure_trust_all_tls = true
   x_bypass_external_validation_header = true
 }
-`,
-		os.Getenv("PINGCLI_PINGFEDERATE_PROVIDER_VERSION"),
-		os.Getenv(options.PingFederateBasicAuthUsernameOption.EnvVar),
-		os.Getenv(options.PingFederateBasicAuthPasswordOption.EnvVar),
-		os.Getenv(options.PingFederateHTTPSHostOption.EnvVar),
-		os.Getenv(options.PingFederateAdminAPIPathOption.EnvVar))
+`
 
 	// Write main.tf to testing directory
 	mainTFFilepath := filepath.Join(exportDir, "main.tf")
@@ -224,7 +234,7 @@ provider "pingfederate" {
 	}
 
 	// Run terraform init in testing directory
-	initCmd := exec.Command(terraformExecutableFilepath)
+	initCmd := exec.Command(terraformExecutableFilepath) //#nosec G204 -- This is a test
 	initCmd.Args = append(initCmd.Args, "init")
 	initCmd.Dir = exportDir
 
