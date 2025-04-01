@@ -47,7 +47,7 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 }
 
 func promptUserToDeleteProfile(rc io.ReadCloser) (pName string, err error) {
-	pName, err = input.RunPromptSelect("Select profile to delete: ", profiles.GetMainConfig().ProfileNames(), rc)
+	pName, err = input.RunPromptSelect("Select profile to delete", profiles.GetMainConfig().ProfileNames(), rc)
 
 	if err != nil {
 		return pName, err
@@ -69,7 +69,7 @@ func promptUserToConfirmDelete(pName string, rc io.ReadCloser) (confirmed bool, 
 		return true, nil
 	}
 
-	return input.RunPromptConfirm(fmt.Sprintf("Are you sure you want to delete profile '%s'?", pName), rc)
+	return input.RunPromptConfirm(fmt.Sprintf("Are you sure you want to delete profile '%s'", pName), rc)
 }
 
 func deleteProfile(pName string) (err error) {

@@ -70,7 +70,7 @@ func readConfigAddProfileOptions(rc io.ReadCloser) (newProfileName, newDescripti
 
 func readConfigAddProfileNameOption(rc io.ReadCloser) (newProfileName string, err error) {
 	if !options.ConfigAddProfileNameOption.Flag.Changed {
-		newProfileName, err = input.RunPrompt("New profile name: ", profiles.GetMainConfig().ValidateNewProfileName, rc)
+		newProfileName, err = input.RunPrompt("New profile name", profiles.GetMainConfig().ValidateNewProfileName, rc)
 		if err != nil {
 			return newProfileName, err
 		}
