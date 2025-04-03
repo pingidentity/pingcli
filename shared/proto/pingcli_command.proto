@@ -1,0 +1,21 @@
+syntax = "proto3";
+package proto;
+option go_package = "./proto";
+
+service ProtoPingCliCommand {
+  rpc Configuration (Empty) returns (ConfigurationResponse);
+  rpc Run (RunRequest) returns (Empty);
+}
+
+message Empty {}
+
+message ConfigurationResponse {
+  string example = 3;
+  string long = 4;
+  string short = 5;
+  string use = 6;
+}
+
+message RunRequest {
+  repeated string args = 1;
+}

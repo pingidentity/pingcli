@@ -56,6 +56,8 @@ func Options() []Option {
 		PlatformExportOverwriteOption,
 		PlatformExportPingOneEnvironmentIDOption,
 
+		PluginExecutablesOption,
+
 		PingFederateHTTPSHostOption,
 		PingFederateAdminAPIPathOption,
 		PingFederateXBypassExternalValidationHeaderOption,
@@ -151,6 +153,11 @@ var (
 	PlatformExportOutputDirectoryOption      Option
 	PlatformExportOverwriteOption            Option
 	PlatformExportPingOneEnvironmentIDOption Option
+)
+
+// 'pingcli plugin' command options
+var (
+	PluginExecutablesOption Option
 )
 
 // Generic viper profile options

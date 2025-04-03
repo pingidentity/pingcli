@@ -158,8 +158,8 @@ func initAccessTokenOption() {
 		CobraParamName:  "",  // No cobra param name
 		CobraParamValue: nil, // No cobra param value
 		DefaultValue:    &defaultValue,
-		EnvVar:          "", // No environment variable
-		Flag:            nil,
+		EnvVar:          "",  // No environment variable
+		Flag:            nil, // No flag
 		Sensitive:       true,
 		Type:            options.ENUM_STRING,
 		ViperKey:        "request.accessToken",

@@ -186,3 +186,12 @@ openapp:
 		echo " FAILED"; \
 		exit 1; \
 	fi
+
+protogen:
+	@echo -n "Running 'protoc' to generate Go code from proto files..."
+	@if protoc --proto_path=./shared/proto --go_out=./shared --go-grpc_out=./shared ./shared/proto/*.proto; then \
+		echo " SUCCESS"; \
+	else \
+		echo " FAILED"; \
+		exit 1; \
+	fi
