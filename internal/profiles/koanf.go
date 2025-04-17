@@ -226,18 +226,24 @@ func (k KoanfConfig) GetProfileKoanf(pName string) (subKoanf *koanf.Koanf, err e
 	return subKoanf, nil
 }
 
+func closeFile(f *os.File) {
+	if err := f.Close(); err != nil {
+		fmt.Printf("error closing file (%s): %v", f.Name(), err)
+	}
+}
+
 func (k KoanfConfig) WriteFile() (err error) {
 	encodedConfig, err := k.KoanfInstance().Marshal(yaml.Parser())
 	if err != nil {
 		return fmt.Errorf("error marshalling koanf: %w", err)
 	}
 
-	f, err := os.OpenFile(k.GetKoanfConfigFile(), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(k.GetKoanfConfigFile(), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
 	if err != nil {
 		return fmt.Errorf("error opening file (%s): %w", k.GetKoanfConfigFile(), err)
 	}
 
-	defer f.Close()
+	defer closeFile(f)
 
 	_, err = f.Write(encodedConfig)
 	if err != nil {
