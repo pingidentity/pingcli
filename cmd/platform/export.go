@@ -45,6 +45,7 @@ const (
 
 func NewExportCommand() *cobra.Command {
 	cmd := &cobra.Command{
+		Aliases:               []string{"export"},
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               commandExamples,
@@ -68,12 +69,12 @@ func NewExportCommand() *cobra.Command {
 	// auto-completion
 	err := cmd.RegisterFlagCompletionFunc(options.PlatformExportExportFormatOption.CobraParamName, autocompletion.PlatformExportFormatFunc)
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag %s: %v", options.PlatformExportExportFormatOption.CobraParamName, err), nil)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag format: %v", err), nil)
 	}
 
 	err = cmd.RegisterFlagCompletionFunc(options.PlatformExportServiceOption.CobraParamName, autocompletion.PlatformExportServicesFunc)
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag %s: %v", options.PlatformExportServiceOption.CobraParamName, err), nil)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag services: %v", err), nil)
 	}
 
 	err = cmd.RegisterFlagCompletionFunc(options.PingOneAuthenticationTypeOption.CobraParamName, autocompletion.PlatformExportPingOneAuthenticationTypeFunc)

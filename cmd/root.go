@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
 	"github.com/pingidentity/pingcli/cmd/completion"
 	"github.com/pingidentity/pingcli/cmd/config"
 	"github.com/pingidentity/pingcli/cmd/feedback"
@@ -19,7 +21,6 @@ import (
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func init() {
@@ -29,7 +30,7 @@ func init() {
 	configuration.InitAllOptions()
 
 	l.Debug().Msgf("Initializing Root command...")
-	cobra.OnInitialize(initViperProfile)
+	cobra.OnInitialize(initKoanfProfile)
 }
 
 // rootCmd represents the base command when called without any subcommands
@@ -84,7 +85,7 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	return cmd
 }
 
-func initViperProfile() {
+func initKoanfProfile() {
 	l := logger.Get()
 
 	cfgFile, err := profiles.GetOptionValue(options.RootConfigOption)
@@ -99,13 +100,14 @@ func initViperProfile() {
 
 	l.Debug().Msgf("Validated configuration file location at: %s", cfgFile)
 
-	// Configure the main viper instance
-	initMainViper(cfgFile)
+	// Configure the koanf instance
+	initKoanf(cfgFile)
 
 	userDefinedProfile, err := profiles.GetOptionValue(options.RootProfileOption)
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Failed to get user-defined profile: %v", err), nil)
 	}
+
 	configFileActiveProfile, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Failed to get active profile from configuration file: %v", err), nil)
@@ -117,14 +119,18 @@ func initViperProfile() {
 		l.Debug().Msgf("Using configuration profile: %s", configFileActiveProfile)
 	}
 
-	// Configure the profile viper instance
-	if err := profiles.GetMainConfig().ChangeActiveProfile(configFileActiveProfile); err != nil {
+	// Configure the profile koanf instance
+	if err := profiles.GetKoanfConfig().ChangeActiveProfile(configFileActiveProfile); err != nil {
 		output.UserFatal(fmt.Sprintf("Failed to set active profile: %v", err), nil)
 	}
 
 	// Validate the configuration
 	if err := profiles.Validate(); err != nil {
 		output.UserFatal(fmt.Sprintf("%v", err), nil)
+	}
+
+	if err := profiles.GetKoanfConfig().WriteFile(); err != nil {
+		output.SystemError(fmt.Sprintf("Failed to write configuration file '%s': %v", cfgFile, err), nil)
 	}
 }
 
@@ -154,46 +160,58 @@ func createConfigFile(cfgFile string) {
 		output.SystemError(fmt.Sprintf("Failed to make the directory for the new configuration file '%s': %v", cfgFile, err), nil)
 	}
 
-	tempViper := viper.New()
-	tempViper.Set(options.RootActiveProfileOption.ViperKey, "default")
-	tempViper.Set(fmt.Sprintf("default.%v", options.ProfileDescriptionOption.ViperKey), "Default profile created by Ping CLI")
-
-	err = tempViper.WriteConfigAs(cfgFile)
+	tempKoanf := profiles.NewKoanfConfig(cfgFile)
+	err = tempKoanf.KoanfInstance().Set(options.RootActiveProfileOption.KoanfKey, "default")
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Failed to create configuration file '%s': %v", cfgFile, err), nil)
+		output.SystemError(fmt.Sprintf("Failed to set active profile in new configuration file '%s': %v", cfgFile, err), nil)
+	}
+
+	err = tempKoanf.KoanfInstance().Set(fmt.Sprintf("default.%v", options.ProfileDescriptionOption.KoanfKey), "Default profile created by Ping CLI")
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Failed to set default profile description in new configuration file '%s': %v", cfgFile, err), nil)
+	}
+
+	err = tempKoanf.WriteFile()
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Failed to create new configuration file '%s': %v", cfgFile, err), nil)
 	}
 }
 
-func initMainViper(cfgFile string) {
+func initKoanf(cfgFile string) {
 	l := logger.Get()
 
-	loadMainViperConfig(cfgFile)
+	loadKoanfConfig(cfgFile)
 
 	// If there are no profiles in the configuration file, seed the default profile
-	if len(profiles.GetMainConfig().ProfileNames()) == 0 {
+	if len(profiles.GetKoanfConfig().ProfileNames()) == 0 {
 		l.Debug().Msgf("No profiles found in configuration file. Creating default profile in configuration file '%s'", cfgFile)
 		createConfigFile(cfgFile)
-		loadMainViperConfig(cfgFile)
+		loadKoanfConfig(cfgFile)
 	}
 
-	err := profiles.GetMainConfig().DefaultMissingViperKeys()
+	err := profiles.GetKoanfConfig().DefaultMissingKoanfKeys()
 	if err != nil {
 		output.SystemError(err.Error(), nil)
 	}
 }
 
-func loadMainViperConfig(cfgFile string) {
+func loadKoanfConfig(cfgFile string) {
 	l := logger.Get()
 
-	mainViper := profiles.GetMainConfig().ViperInstance()
-	// Use config file from the flag.
-	mainViper.SetConfigFile(cfgFile)
-	mainViper.SetConfigType("yaml")
+	koanfConfig := profiles.GetKoanfConfig()
+	if err := koanfConfig.SetKoanfConfigFile(cfgFile); err != nil {
+		output.SystemError(fmt.Sprintf("Failed to set configuration file '%s': %v", cfgFile, err), nil)
+	}
 
-	// If a config file is found, read it in.
-	if err := mainViper.ReadInConfig(); err != nil {
-		output.SystemError(fmt.Sprintf("Failed to read configuration from file '%s': %v", cfgFile, err), nil)
+	// Use config file from the flag.
+	if err := koanfConfig.KoanfInstance().Load(file.Provider(cfgFile), yaml.Parser()); err != nil {
+		output.SystemError(fmt.Sprintf("Failed to load configuration from file '%s': %v", cfgFile, err), nil)
 	} else {
-		l.Info().Msgf("Using configuration file: %s", mainViper.ConfigFileUsed())
+		l.Info().Msgf("Using configuration file: %s", cfgFile)
+	}
+
+	_, err := koanfConfig.KoanfInstance().Marshal(yaml.Parser())
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Failed to marshal configuration file '%s': %v", cfgFile, err), nil)
 	}
 }

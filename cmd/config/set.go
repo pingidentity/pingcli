@@ -15,10 +15,10 @@ const (
     pingcli config set color=true
 
   Set the PingOne tenant region code setting to 'AP' for the profile named 'myprofile'.
-    pingcli config set --profile myprofile service.pingone.regionCode=AP
+    pingcli config set --profile myprofile service.pingOne.regionCode=AP
 
   Set the PingFederate basic authentication password with unmasked output
-    pingcli config set --profile myprofile --unmask-values service.pingfederate.authentication.basicAuth.password=1234`
+    pingcli config set --profile myprofile --unmask-values service.pingFederate.authentication.basicAuth.password=1234`
 )
 
 func NewConfigSetCommand() *cobra.Command {
@@ -32,7 +32,7 @@ func NewConfigSetCommand() *cobra.Command {
 		RunE:      configSetRunE,
 		Short:     "Set stored configuration settings for the CLI.",
 		Use:       "set [flags] key=value",
-		ValidArgs: configuration.ViperKeys(),
+		ValidArgs: configuration.KoanfKeys(),
 	}
 
 	return cmd

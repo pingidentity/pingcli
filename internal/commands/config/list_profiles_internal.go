@@ -3,8 +3,6 @@
 package config_internal
 
 import (
-	"strings"
-
 	"github.com/fatih/color"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -15,7 +13,7 @@ import (
 func RunInternalConfigListProfiles() (err error) {
 	l := logger.Get()
 
-	profileNames := profiles.GetMainConfig().ProfileNames()
+	profileNames := profiles.GetKoanfConfig().ProfileNames()
 	activeProfileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
 		return err
@@ -28,21 +26,19 @@ func RunInternalConfigListProfiles() (err error) {
 	activeFmt := color.New(color.Bold, color.FgGreen).SprintFunc()
 
 	for _, profileName := range profileNames {
-		if strings.EqualFold(profileName, activeProfileName) {
+		if profileName == activeProfileName {
 			listStr += "- " + profileName + activeFmt(" (active)") + " \n"
 		} else {
 			listStr += "- " + profileName + "\n"
 		}
 
-		description, err := profiles.GetMainConfig().ProfileViperValue(profileName, "description")
-		if err != nil {
+		description, ok := profiles.GetKoanfConfig().KoanfInstance().Get(profileName + "." + "description").(string)
+		if ok {
+			listStr += "    " + description
+		} else {
 			l.Warn().Msgf("Cannot retrieve profile description for profile %s: %v", profileName, err)
 
 			continue
-		}
-
-		if description != "" {
-			listStr += "    " + description
 		}
 	}
 

@@ -12,8 +12,8 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-func RunInternalConfigGet(viperKey string) (err error) {
-	if err = configuration.ValidateParentViperKey(viperKey); err != nil {
+func RunInternalConfigGet(koanfKey string) (err error) {
+	if err = configuration.ValidateParentKoanfKey(koanfKey); err != nil {
 		return fmt.Errorf("failed to get configuration: %w", err)
 	}
 
@@ -22,14 +22,14 @@ func RunInternalConfigGet(viperKey string) (err error) {
 		return fmt.Errorf("failed to get configuration: %w", err)
 	}
 
-	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", strings.ToLower(pName), viperKey)
+	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", pName, koanfKey)
 
 	for _, opt := range options.Options() {
-		if opt.ViperKey == "" || !strings.Contains(opt.ViperKey, viperKey) {
+		if opt.KoanfKey == "" || !strings.Contains(opt.KoanfKey, koanfKey) {
 			continue
 		}
 
-		vVal, _, err := profiles.ViperValueFromOption(opt)
+		vVal, _, err := profiles.KoanfValueFromOption(opt)
 		if err != nil {
 			return fmt.Errorf("failed to get configuration: %w", err)
 		}
@@ -39,10 +39,10 @@ func RunInternalConfigGet(viperKey string) (err error) {
 			unmaskOptionVal = "false"
 		}
 
-		if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
-			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
+		if opt.Sensitive && unmaskOptionVal == "false" {
+			msgStr += fmt.Sprintf("%s=%s\n", opt.KoanfKey, profiles.MaskValue(vVal))
 		} else {
-			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)
+			msgStr += fmt.Sprintf("%s=%s\n", opt.KoanfKey, vVal)
 		}
 	}
 

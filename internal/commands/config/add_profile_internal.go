@@ -7,11 +7,11 @@ import (
 	"io"
 	"strconv"
 
+	"github.com/knadh/koanf/v2"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/input"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
-	"github.com/spf13/viper"
 )
 
 func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
@@ -20,33 +20,41 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 		return fmt.Errorf("failed to add profile: %w", err)
 	}
 
-	err = profiles.GetMainConfig().ValidateNewProfileName(newProfileName)
+	err = profiles.GetKoanfConfig().ValidateNewProfileName(newProfileName)
 	if err != nil {
 		return fmt.Errorf("failed to add profile: %w", err)
 	}
 
 	output.Message(fmt.Sprintf("Adding new profile '%s'...", newProfileName), nil)
 
-	subViper := viper.New()
-	subViper.Set(options.ProfileDescriptionOption.ViperKey, newDescription)
-
-	if err = profiles.GetMainConfig().SaveProfile(newProfileName, subViper); err != nil {
+	subKoanf := koanf.New(".")
+	err = subKoanf.Set(options.ProfileDescriptionOption.KoanfKey, newDescription)
+	if err != nil {
 		return fmt.Errorf("failed to add profile: %w", err)
 	}
 
-	output.Success(fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetMainConfig().ViperInstance().ConfigFileUsed()), nil)
+	if err = profiles.GetKoanfConfig().SaveProfile(newProfileName, subKoanf); err != nil {
+		return fmt.Errorf("failed to add profile: %w", err)
+	}
+
+	output.Success(fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetKoanfConfig().GetKoanfConfigFile()), nil)
 
 	if setActive {
-		if err = profiles.GetMainConfig().ChangeActiveProfile(newProfileName); err != nil {
+		if err = profiles.GetKoanfConfig().ChangeActiveProfile(newProfileName); err != nil {
 			return fmt.Errorf("failed to set active profile: %w", err)
 		}
 
 		output.Success(fmt.Sprintf("Profile '%s' set as active.", newProfileName), nil)
 	}
 
-	err = profiles.GetMainConfig().DefaultMissingViperKeys()
+	err = profiles.GetKoanfConfig().DefaultMissingKoanfKeys()
 	if err != nil {
 		return fmt.Errorf("failed to add profile: %w", err)
+	}
+
+	err = profiles.GetKoanfConfig().WriteFile()
+	if err != nil {
+		return fmt.Errorf("failed to write config file for add profile: %w", err)
 	}
 
 	return nil
@@ -70,7 +78,7 @@ func readConfigAddProfileOptions(rc io.ReadCloser) (newProfileName, newDescripti
 
 func readConfigAddProfileNameOption(rc io.ReadCloser) (newProfileName string, err error) {
 	if !options.ConfigAddProfileNameOption.Flag.Changed {
-		newProfileName, err = input.RunPrompt("New profile name", profiles.GetMainConfig().ValidateNewProfileName, rc)
+		newProfileName, err = input.RunPrompt("New profile name", profiles.GetKoanfConfig().ValidateNewProfileName, rc)
 		if err != nil {
 			return newProfileName, err
 		}

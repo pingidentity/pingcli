@@ -43,8 +43,8 @@ func initFormatOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
-		ViperKey:  "export.format",
+		Type:      options.ENUM_EXPORT_FORMAT,
+		KoanfKey:  "export.format",
 	}
 }
 
@@ -71,8 +71,8 @@ func initServiceGroupOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
+		KoanfKey:  "export.serviceGroup",
 		Type:      options.ENUM_EXPORT_SERVICE_GROUP,
-		ViperKey:  "export.serviceGroup",
 	}
 }
 
@@ -87,6 +87,9 @@ func initServicesOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
+			Annotations: map[string][]string{
+				"KoanfKey": {"export.services"},
+			},
 			Name:      cobraParamName,
 			Shorthand: "s",
 			Usage: fmt.Sprintf(
@@ -102,7 +105,7 @@ func initServicesOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_EXPORT_SERVICES,
-		ViperKey:  "export.services",
+		KoanfKey:  "export.services",
 	}
 }
 
@@ -118,6 +121,9 @@ func initOutputDirectoryOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
+			Annotations: map[string][]string{
+				"KoanfKey": {"export.outputDirectory"},
+			},
 			Name:      cobraParamName,
 			Shorthand: "d",
 			Usage: "Specifies the output directory for export. Can be an absolute filepath or a relative filepath of" +
@@ -128,7 +134,7 @@ func initOutputDirectoryOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "export.outputDirectory",
+		KoanfKey:  "export.outputDirectory",
 	}
 }
 
@@ -143,6 +149,9 @@ func initOverwriteOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "PINGCLI_EXPORT_OVERWRITE",
 		Flag: &pflag.Flag{
+			Annotations: map[string][]string{
+				"KoanfKey": {"export.overwrite"},
+			},
 			Name:      cobraParamName,
 			Shorthand: "o",
 			Usage: "Overwrites the existing generated exports in output directory. " +
@@ -151,8 +160,8 @@ func initOverwriteOption() {
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
+		KoanfKey:  "export.overwrite",
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "export.overwrite",
 	}
 }
 
@@ -168,12 +177,14 @@ func initPingOneEnvironmentIDOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
+			Annotations: map[string][]string{
+				"KoanfKey": {"pingone.environmentID"},
+			},
 			Name:  cobraParamName,
 			Usage: "The ID of the PingOne environment to export. Must be a valid PingOne UUID.",
 			Value: cobraValue,
 		},
-		Sensitive: false,
-		Type:      options.ENUM_UUID,
-		ViperKey:  "export.pingone.environmentID",
+		KoanfKey: "export.pingOne.environmentID",
+		Type:     options.ENUM_UUID,
 	}
 }

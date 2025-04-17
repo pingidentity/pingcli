@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	ENUM_EXPORT_SERVICE_PINGONE_PLATFORM  string = "pingone-platform"
-	ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE string = "pingone-authorize"
-	ENUM_EXPORT_SERVICE_PINGONE_SSO       string = "pingone-sso"
-	ENUM_EXPORT_SERVICE_PINGONE_MFA       string = "pingone-mfa"
-	ENUM_EXPORT_SERVICE_PINGONE_PROTECT   string = "pingone-protect"
-	ENUM_EXPORT_SERVICE_PINGFEDERATE      string = "pingfederate"
+	ENUM_EXPORT_SERVICE_PINGONE_PLATFORM  string = "pingOne-platform"
+	ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE string = "pingOne-authorize"
+	ENUM_EXPORT_SERVICE_PINGONE_SSO       string = "pingOne-sso"
+	ENUM_EXPORT_SERVICE_PINGONE_MFA       string = "pingOne-mfa"
+	ENUM_EXPORT_SERVICE_PINGONE_PROTECT   string = "pingOne-protect"
+	ENUM_EXPORT_SERVICE_PINGFEDERATE      string = "pingFederate"
 )
 
 type ExportServices []string
