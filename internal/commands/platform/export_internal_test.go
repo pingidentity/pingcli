@@ -14,13 +14,13 @@ import (
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
 
 // Test RunInternalExport function
 func TestRunInternalExport(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := RunInternalExport(t.Context(), "v1.2.3")
 	testutils.CheckExpectedError(t, err, nil)
@@ -63,7 +63,7 @@ func TestRunInternalExportNilContext(t *testing.T) {
 
 // Test initPingFederateServices function
 func TestInitPingFederateServices(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := initPingFederateServices(t.Context(), "v1.2.3")
 	testutils.CheckExpectedError(t, err, nil)
@@ -88,7 +88,7 @@ func TestInitPingFederateServicesNilContext(t *testing.T) {
 
 // Test initPingOneServices function
 func TestInitPingOneServices(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := initPingOneServices(t.Context(), "v1.2.3")
 	testutils.CheckExpectedError(t, err, nil)
@@ -101,7 +101,7 @@ func TestInitPingOneServices(t *testing.T) {
 
 // Test initPingFederateApiClient function
 func TestInitPingFederateApiClient(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	tr := &http.Transport{
 		TLSClientConfig: &tls.Config{
@@ -127,7 +127,7 @@ func TestInitPingFederateApiClientNilTransport(t *testing.T) {
 
 // Test initPingOneApiClient function
 func TestInitPingOneApiClient(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := initPingOneApiClient(t.Context(), "v1.2.3")
 	testutils.CheckExpectedError(t, err, nil)
@@ -147,7 +147,7 @@ func TestInitPingOneApiClientNilContext(t *testing.T) {
 
 // Test createOrValidateOutputDir function with non-existent directory
 func TestCreateOrValidateOutputDir(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	outputDir := os.TempDir() + "/nonexistantdir"
 
@@ -157,7 +157,7 @@ func TestCreateOrValidateOutputDir(t *testing.T) {
 
 // Test createOrValidateOutputDir function with existent directory
 func TestCreateOrValidateOutputDirExistentDir(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	outputDir := t.TempDir()
 
@@ -168,7 +168,7 @@ func TestCreateOrValidateOutputDirExistentDir(t *testing.T) {
 // Test createOrValidateOutputDir function with existent directory and overwrite flag
 // when there is a file in the directory
 func TestCreateOrValidateOutputDirExistentDirWithFile(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	outputDir := t.TempDir()
 
@@ -188,7 +188,7 @@ func TestCreateOrValidateOutputDirExistentDirWithFile(t *testing.T) {
 // Test createOrValidateOutputDir function fails with existent directory and no overwrite flag
 // when there is a file in the directory
 func TestCreateOrValidateOutputDirExistentDirWithFileNoOverwrite(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	outputDir := t.TempDir()
 
@@ -208,7 +208,7 @@ func TestCreateOrValidateOutputDirExistentDirWithFileNoOverwrite(t *testing.T) {
 
 // Test getPingOneExportEnvID function
 func TestGetPingOneExportEnvID(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	if err := getPingOneExportEnvID(); err != nil {
 		t.Errorf("getPingOneExportEnvID() error = %v, want nil", err)
@@ -222,7 +222,7 @@ func TestGetPingOneExportEnvID(t *testing.T) {
 
 // Test validatePingOneExportEnvID function
 func TestValidatePingOneExportEnvID(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	if err := initPingOneApiClient(t.Context(), "v1.2.3"); err != nil {
 		t.Errorf("initPingOneApiClient() error = %v, want nil", err)
@@ -245,7 +245,7 @@ func TestValidatePingOneExportEnvIDNilContext(t *testing.T) {
 
 // Test getExportableConnectors function
 func TestGetExportableConnectors(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	es := new(customtypes.ExportServices)
 	err := es.Set(customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
@@ -277,7 +277,7 @@ func TestGetExportableConnectorsNilMultiService(t *testing.T) {
 
 // Test exportConnectors function
 func TestExportConnectors(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := initPingOneServices(t.Context(), "v1.2.3")
 	if err != nil {
@@ -314,7 +314,7 @@ func TestExportConnectorsEmptyExportableConnectors(t *testing.T) {
 
 // Test exportConnectors function with invalid export format
 func TestExportConnectorsInvalidExportFormat(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := initPingOneServices(t.Context(), "v1.2.3")
 	if err != nil {
@@ -337,7 +337,7 @@ func TestExportConnectorsInvalidExportFormat(t *testing.T) {
 
 // Test exportConnectors function with invalid output directory
 func TestExportConnectorsInvalidOutputDir(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := initPingOneServices(t.Context(), "v1.2.3")
 	if err != nil {

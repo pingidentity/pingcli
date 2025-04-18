@@ -6,12 +6,12 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/profiles"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test Validate function
 func TestValidate(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := profiles.Validate()
 	if err != nil {
@@ -24,11 +24,11 @@ func TestValidateInvalidProfile(t *testing.T) {
 	fileContents := `activeProfile: default
 default:
     description: "default description"
-    pingone:
+    pingOne:
         export:
-            environmentid: "invalid"`
+            environmentID: "invalid"`
 
-	testutils_viper.InitVipersCustomFile(t, fileContents)
+	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
 
 	err := profiles.Validate()
 	if err == nil {
@@ -41,10 +41,10 @@ func TestValidateInvalidRegion(t *testing.T) {
 	fileContents := `activeProfile: default
 default:
     description: "default description"
-    pingone:
+    pingOne:
         region: "invalid"`
 
-	testutils_viper.InitVipersCustomFile(t, fileContents)
+	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
 
 	err := profiles.Validate()
 	if err == nil {
@@ -60,7 +60,7 @@ default:
     pingcli:
         noColor: invalid`
 
-	testutils_viper.InitVipersCustomFile(t, fileContents)
+	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
 
 	err := profiles.Validate()
 	if err == nil {
@@ -76,7 +76,7 @@ default:
     pingcli:
         outputFormat: invalid`
 
-	testutils_viper.InitVipersCustomFile(t, fileContents)
+	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
 
 	err := profiles.Validate()
 	if err == nil {
@@ -92,7 +92,7 @@ default:
 invalid(&*^&*^&*^**$):
     description: "default description"`
 
-	testutils_viper.InitVipersCustomFile(t, fileContents)
+	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
 
 	err := profiles.Validate()
 	if err == nil {

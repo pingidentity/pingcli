@@ -12,7 +12,7 @@ import (
 )
 
 func RunInternalConfigViewProfile(args []string) (err error) {
-	var pName string
+	var msgStr, pName string
 	if len(args) == 1 {
 		pName = args[0]
 	} else {
@@ -23,21 +23,30 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 	}
 
 	// Validate the profile name
-	err = profiles.GetMainConfig().ValidateExistingProfileName(pName)
+	err = profiles.GetKoanfConfig().ValidateExistingProfileName(pName)
 	if err != nil {
 		return fmt.Errorf("failed to view profile: %w", err)
 	}
 
-	msgStr := fmt.Sprintf("Configuration for profile '%s':\n", pName)
+	// Get the Koanf configuration for the specified profile
+	koanfProfile, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
+	if err != nil {
+		return fmt.Errorf("failed to get config from profile: %w", err)
+	}
 
+	// Iterate over the options in profile and print them
 	for _, opt := range options.Options() {
-		if opt.ViperKey == "" {
+		if !koanfProfile.Exists(opt.KoanfKey) {
 			continue
 		}
 
-		vVal, _, err := profiles.ViperValueFromOption(opt)
+		vVal, ok, err := profiles.KoanfValueFromOption(opt, pName)
+		if !ok {
+			continue
+		}
+
 		if err != nil {
-			return fmt.Errorf("failed to view profile: %w", err)
+			return fmt.Errorf("failed to get koanf value from option: %w", err)
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -46,13 +55,13 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 		}
 
 		if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
-			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, profiles.MaskValue(vVal))
+			msgStr += fmt.Sprintf("%s=%s\n", opt.KoanfKey, profiles.MaskValue(vVal))
 		} else {
-			msgStr += fmt.Sprintf("%s=%s\n", opt.ViperKey, vVal)
+			msgStr += fmt.Sprintf("%s=%s\n", opt.KoanfKey, vVal)
 		}
 	}
 
-	output.Message(msgStr, nil)
+	output.Message(fmt.Sprintf("Configuration for profile '%s':\n", pName)+msgStr, nil)
 
 	return nil
 }

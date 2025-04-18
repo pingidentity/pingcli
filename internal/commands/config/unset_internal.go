@@ -12,8 +12,8 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-func RunInternalConfigUnset(viperKey string) (err error) {
-	if err = configuration.ValidateViperKey(viperKey); err != nil {
+func RunInternalConfigUnset(koanfKey string) (err error) {
+	if err = configuration.ValidateKoanfKey(koanfKey); err != nil {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
@@ -22,25 +22,28 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
-	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
+	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
 	if err != nil {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
-	opt, err := configuration.OptionFromViperKey(viperKey)
+	opt, err := configuration.OptionFromKoanfKey(koanfKey)
 	if err != nil {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
-	subViper.Set(viperKey, opt.DefaultValue)
+	err = subKoanf.Set(koanfKey, opt.DefaultValue)
+	if err != nil {
+		return fmt.Errorf("failed to unset configuration: %w", err)
+	}
 
-	if err = profiles.GetMainConfig().SaveProfile(pName, subViper); err != nil {
+	if err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf); err != nil {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
 	msgStr := "Configuration unset successfully:\n"
 
-	vVal, _, err := profiles.ViperValueFromOption(opt)
+	vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 	if err != nil {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
@@ -51,9 +54,9 @@ func RunInternalConfigUnset(viperKey string) (err error) {
 	}
 
 	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
-		msgStr += fmt.Sprintf("%s=%s", viperKey, profiles.MaskValue(vVal))
+		msgStr += fmt.Sprintf("%s=%s", koanfKey, profiles.MaskValue(vVal))
 	} else {
-		msgStr += fmt.Sprintf("%s=%s", viperKey, vVal)
+		msgStr += fmt.Sprintf("%s=%s", koanfKey, vVal)
 	}
 
 	output.Success(msgStr, nil)

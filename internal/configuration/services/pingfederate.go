@@ -46,7 +46,7 @@ func initHTTPSHostOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingfederate.httpsHost",
+		KoanfKey:  "service.pingFederate.httpsHost",
 	}
 }
 
@@ -69,7 +69,7 @@ func initAdminAPIPathOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingfederate.adminAPIPath",
+		KoanfKey:  "service.pingFederate.adminAPIPath",
 	}
 }
 
@@ -94,7 +94,7 @@ func initXBypassExternalValidationHeaderOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "service.pingfederate.xBypassExternalValidationHeader",
+		KoanfKey:  "service.pingFederate.xBypassExternalValidationHeader",
 	}
 }
 
@@ -119,7 +119,7 @@ func initCACertificatePemFilesOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING_SLICE,
-		ViperKey:  "service.pingfederate.caCertificatePemFiles",
+		KoanfKey:  "service.pingFederate.caCertificatePEMFiles",
 	}
 }
 
@@ -144,7 +144,7 @@ func initInsecureTrustAllTLSOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "service.pingfederate.insecureTrustAllTLS",
+		KoanfKey:  "service.pingFederate.insecureTrustAllTLS",
 	}
 }
 
@@ -168,7 +168,7 @@ func initUsernameOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingfederate.authentication.basicAuth.username",
+		KoanfKey:  "service.pingFederate.authentication.basicAuth.username",
 	}
 }
 
@@ -191,7 +191,7 @@ func initPasswordOption() {
 		},
 		Sensitive: true,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingfederate.authentication.basicAuth.password",
+		KoanfKey:  "service.pingFederate.authentication.basicAuth.password",
 	}
 }
 
@@ -214,7 +214,7 @@ func initAccessTokenOption() {
 		},
 		Sensitive: true,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingfederate.authentication.accessTokenAuth.accessToken",
+		KoanfKey:  "service.pingFederate.authentication.accessTokenAuth.accessToken",
 	}
 }
 
@@ -237,7 +237,7 @@ func initClientIDOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.clientID",
+		KoanfKey:  "service.pingFederate.authentication.clientCredentialsAuth.clientID",
 	}
 }
 
@@ -260,7 +260,7 @@ func initClientSecretOption() {
 		},
 		Sensitive: true,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.clientSecret",
+		KoanfKey:  "service.pingFederate.authentication.clientCredentialsAuth.clientSecret",
 	}
 }
 
@@ -283,7 +283,7 @@ func initTokenURLOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.tokenURL",
+		KoanfKey:  "service.pingFederate.authentication.clientCredentialsAuth.tokenURL",
 	}
 }
 
@@ -309,7 +309,7 @@ func initScopesOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING_SLICE,
-		ViperKey:  "service.pingfederate.authentication.clientCredentialsAuth.scopes",
+		KoanfKey:  "service.pingFederate.authentication.clientCredentialsAuth.scopes",
 	}
 }
 
@@ -337,6 +337,6 @@ func initPingFederateAuthenticationTypeOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_PINGFEDERATE_AUTH_TYPE,
-		ViperKey:  "service.pingfederate.authentication.type",
+		KoanfKey:  "service.pingFederate.authentication.type",
 	}
 }

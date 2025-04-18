@@ -6,12 +6,12 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test RunInternalConfigViewProfile function
 func Test_RunInternalConfigViewProfile(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := RunInternalConfigViewProfile([]string{})
 	testutils.CheckExpectedError(t, err, nil)
@@ -19,7 +19,7 @@ func Test_RunInternalConfigViewProfile(t *testing.T) {
 
 // Test RunInternalConfigViewProfile function fails with invalid profile name
 func Test_RunInternalConfigViewProfile_InvalidProfileName(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*' profile does not exist$`
 	err := RunInternalConfigViewProfile([]string{"invalid"})
@@ -28,7 +28,7 @@ func Test_RunInternalConfigViewProfile_InvalidProfileName(t *testing.T) {
 
 // Test RunInternalConfigViewProfile function with different profile
 func Test_RunInternalConfigViewProfile_DifferentProfile(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := RunInternalConfigViewProfile([]string{"production"})
 	testutils.CheckExpectedError(t, err, nil)

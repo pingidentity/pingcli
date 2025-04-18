@@ -37,7 +37,7 @@ func TestConfigListKeysCmd_HelpFlag(t *testing.T) {
 // Test Config List Keys Command fails when provided too many arguments
 func TestConfigListKeysCmd_TooManyArgs(t *testing.T) {
 	expectedErrorPattern := `^failed to execute 'pingcli config list-keys': command accepts 0 arg\(s\), received 1$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "list-keys", options.RootColorOption.ViperKey)
+	err := testutils_cobra.ExecutePingcli(t, "config", "list-keys", options.RootColorOption.KoanfKey)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -54,7 +54,7 @@ func Example_listKeysValue() {
 	// - export.format
 	// - export.outputDirectory
 	// - export.overwrite
-	// - export.pingone.environmentID
+	// - export.pingOne.environmentID
 	// - export.serviceGroup
 	// - export.services
 	// - noColor
@@ -63,22 +63,22 @@ func Example_listKeysValue() {
 	// - request.accessTokenExpiry
 	// - request.fail
 	// - request.service
-	// - service.pingfederate.adminAPIPath
-	// - service.pingfederate.authentication.accessTokenAuth.accessToken
-	// - service.pingfederate.authentication.basicAuth.password
-	// - service.pingfederate.authentication.basicAuth.username
-	// - service.pingfederate.authentication.clientCredentialsAuth.clientID
-	// - service.pingfederate.authentication.clientCredentialsAuth.clientSecret
-	// - service.pingfederate.authentication.clientCredentialsAuth.scopes
-	// - service.pingfederate.authentication.clientCredentialsAuth.tokenURL
-	// - service.pingfederate.authentication.type
-	// - service.pingfederate.caCertificatePemFiles
-	// - service.pingfederate.httpsHost
-	// - service.pingfederate.insecureTrustAllTLS
-	// - service.pingfederate.xBypassExternalValidationHeader
-	// - service.pingone.authentication.type
-	// - service.pingone.authentication.worker.clientID
-	// - service.pingone.authentication.worker.clientSecret
-	// - service.pingone.authentication.worker.environmentID
-	// - service.pingone.regionCode
+	// - service.pingFederate.adminAPIPath
+	// - service.pingFederate.authentication.accessTokenAuth.accessToken
+	// - service.pingFederate.authentication.basicAuth.password
+	// - service.pingFederate.authentication.basicAuth.username
+	// - service.pingFederate.authentication.clientCredentialsAuth.clientID
+	// - service.pingFederate.authentication.clientCredentialsAuth.clientSecret
+	// - service.pingFederate.authentication.clientCredentialsAuth.scopes
+	// - service.pingFederate.authentication.clientCredentialsAuth.tokenURL
+	// - service.pingFederate.authentication.type
+	// - service.pingFederate.caCertificatePEMFiles
+	// - service.pingFederate.httpsHost
+	// - service.pingFederate.insecureTrustAllTLS
+	// - service.pingFederate.xBypassExternalValidationHeader
+	// - service.pingOne.authentication.type
+	// - service.pingOne.authentication.worker.clientID
+	// - service.pingOne.authentication.worker.clientSecret
+	// - service.pingOne.authentication.worker.environmentID
+	// - service.pingOne.regionCode
 }

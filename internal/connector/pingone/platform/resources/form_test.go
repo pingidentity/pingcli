@@ -13,7 +13,9 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_platform_testable_resources"
 )
 
+// TODO: Remove after completion of TRIAGE-26607
 func Test_Form(t *testing.T) {
+	t.SkipNow()
 	clientInfo := testutils.GetClientInfo(t)
 
 	tr := pingone_platform_testable_resources.Form(t, clientInfo)

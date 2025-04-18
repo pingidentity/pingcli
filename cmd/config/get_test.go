@@ -19,19 +19,19 @@ func TestConfigGetCmd_Execute(t *testing.T) {
 // Test Config Get Command fails when provided too many arguments
 func TestConfigGetCmd_TooManyArgs(t *testing.T) {
 	expectedErrorPattern := `^failed to execute 'pingcli config get': command accepts 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", options.RootColorOption.ViperKey, options.RootOutputFormatOption.ViperKey)
+	err := testutils_cobra.ExecutePingcli(t, "config", "get", options.RootColorOption.KoanfKey, options.RootOutputFormatOption.KoanfKey)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // Test Config Get Command Executes when provided a full key
 func TestConfigGetCmd_FullKey(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", options.PingOneAuthenticationWorkerClientIDOption.ViperKey)
+	err := testutils_cobra.ExecutePingcli(t, "config", "get", options.PingOneAuthenticationWorkerClientIDOption.KoanfKey)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Config Get Command Executes when provided a partial key
 func TestConfigGetCmd_PartialKey(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", "service.pingone")
+	err := testutils_cobra.ExecutePingcli(t, "config", "get", "service.pingOne")
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -68,7 +68,7 @@ func TestConfigGetCmd_NoKey(t *testing.T) {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_getEmptyMaskedValue() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.RequestAccessTokenOption.ViperKey)
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.RequestAccessTokenOption.KoanfKey)
 
 	// Output:
 	// Configuration values for profile 'default' and key 'request.accessToken':
@@ -79,17 +79,17 @@ func Example_getEmptyMaskedValue() {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_getMaskedValue() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.PingFederateBasicAuthPasswordOption.ViperKey)
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.PingFederateBasicAuthPasswordOption.KoanfKey)
 
 	// Output:
-	// Configuration values for profile 'default' and key 'service.pingfederate.authentication.basicAuth.password':
-	// service.pingfederate.authentication.basicAuth.password=********
+	// Configuration values for profile 'default' and key 'service.pingFederate.authentication.basicAuth.password':
+	// service.pingFederate.authentication.basicAuth.password=********
 }
 
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_getUnmaskedValue() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.RootColorOption.ViperKey)
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.RootColorOption.KoanfKey)
 
 	// Output:
 	// Configuration values for profile 'default' and key 'noColor':
@@ -99,7 +99,7 @@ func Example_getUnmaskedValue() {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_get_UnmaskValuesFlag() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", "--unmask-values", options.RequestAccessTokenOption.ViperKey)
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", "--unmask-values", options.RequestAccessTokenOption.KoanfKey)
 
 	// Output:
 	// Configuration values for profile 'default' and key 'request.accessToken':

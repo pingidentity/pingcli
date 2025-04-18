@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/knadh/koanf/v2"
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
-	"github.com/spf13/viper"
 )
 
 func RunInternalConfigSet(kvPair string) (err error) {
@@ -20,7 +20,7 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
-	if err = configuration.ValidateViperKey(vKey); err != nil {
+	if err = configuration.ValidateKoanfKey(vKey); err != nil {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
@@ -29,27 +29,27 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: value for key '%s' is empty. Use 'pingcli config unset %s' to unset the key", vKey, vKey)
 	}
 
-	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
+	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
 	if err != nil {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
-	opt, err := configuration.OptionFromViperKey(vKey)
+	opt, err := configuration.OptionFromKoanfKey(vKey)
 	if err != nil {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
-	if err = setValue(subViper, vKey, vValue, opt.Type); err != nil {
+	if err = setValue(subKoanf, vKey, vValue, opt.Type); err != nil {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
-	if err = profiles.GetMainConfig().SaveProfile(pName, subViper); err != nil {
+	if err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf); err != nil {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
 	msgStr := "Configuration set successfully:\n"
 
-	vVal, _, err := profiles.ViperValueFromOption(opt)
+	vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 	if err != nil {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
@@ -109,92 +109,134 @@ func parseKeyValuePair(kvPair string) (string, string, error) {
 	return parsedInput[0], parsedInput[1], nil
 }
 
-func setValue(profileViper *viper.Viper, vKey, vValue string, valueType options.OptionType) (err error) {
+func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.OptionType) (err error) {
 	switch valueType {
 	case options.ENUM_BOOL:
 		b := new(customtypes.Bool)
 		if err = b.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a boolean. Allowed [true, false]: %w", vKey, err)
 		}
-		profileViper.Set(vKey, b)
+		err = profileKoanf.Set(vKey, b)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_EXPORT_FORMAT:
 		exportFormat := new(customtypes.ExportFormat)
 		if err = exportFormat.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid export format. Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportFormatValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, exportFormat)
+		err = profileKoanf.Set(vKey, exportFormat)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_EXPORT_SERVICE_GROUP:
 		exportServiceGroup := new(customtypes.ExportServiceGroup)
 		if err = exportServiceGroup.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be valid export service group. Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportServiceGroupValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, exportServiceGroup)
+		err = profileKoanf.Set(vKey, exportServiceGroup)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_EXPORT_SERVICES:
 		exportServices := new(customtypes.ExportServices)
 		if err = exportServices.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be valid export service(s). Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportServicesValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, exportServices)
+		err = profileKoanf.Set(vKey, exportServices)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_OUTPUT_FORMAT:
 		outputFormat := new(customtypes.OutputFormat)
 		if err = outputFormat.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid output format. Allowed [%s]: %w", vKey, strings.Join(customtypes.OutputFormatValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, outputFormat)
+		err = profileKoanf.Set(vKey, outputFormat)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_PINGONE_REGION_CODE:
 		region := new(customtypes.PingOneRegionCode)
 		if err = region.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid PingOne Region Code. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, region)
+		err = profileKoanf.Set(vKey, region)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_STRING:
 		str := new(customtypes.String)
 		if err = str.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a string: %w", vKey, err)
 		}
-		profileViper.Set(vKey, str)
+		err = profileKoanf.Set(vKey, str)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_STRING_SLICE:
 		strSlice := new(customtypes.StringSlice)
 		if err = strSlice.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a string slice: %w", vKey, err)
 		}
-		profileViper.Set(vKey, strSlice)
+		err = profileKoanf.Set(vKey, strSlice)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_UUID:
 		uuid := new(customtypes.UUID)
 		if err = uuid.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid UUID: %w", vKey, err)
 		}
-		profileViper.Set(vKey, uuid)
+		err = profileKoanf.Set(vKey, uuid)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_PINGONE_AUTH_TYPE:
 		authType := new(customtypes.PingOneAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid PingOne Authentication Type. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, authType)
+		err = profileKoanf.Set(vKey, authType)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_PINGFEDERATE_AUTH_TYPE:
 		authType := new(customtypes.PingFederateAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid PingFederate Authentication Type. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, authType)
+		err = profileKoanf.Set(vKey, authType)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_INT:
 		intValue := new(customtypes.Int)
 		if err = intValue.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be an integer: %w", vKey, err)
 		}
-		profileViper.Set(vKey, intValue)
+		err = profileKoanf.Set(vKey, intValue)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_REQUEST_HTTP_METHOD:
 		httpMethod := new(customtypes.HTTPMethod)
 		if err = httpMethod.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid HTTP method. Allowed [%s]: %w", vKey, strings.Join(customtypes.HTTPMethodValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, httpMethod)
+		err = profileKoanf.Set(vKey, httpMethod)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	case options.ENUM_REQUEST_SERVICE:
 		service := new(customtypes.RequestService)
 		if err = service.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid request service. Allowed [%s]: %w", vKey, strings.Join(customtypes.RequestServiceValidValues(), ", "), err)
 		}
-		profileViper.Set(vKey, service)
+		err = profileKoanf.Set(vKey, service)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
 	default:
 		return fmt.Errorf("failed to set configuration: variable type for key '%s' is not recognized", vKey)
 	}

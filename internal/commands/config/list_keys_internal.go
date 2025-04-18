@@ -15,19 +15,19 @@ import (
 
 func returnKeysYamlString() (string, error) {
 	var err error
-	viperKeys := configuration.ViperKeys()
+	koanfKeys := configuration.KoanfKeys()
 
-	if len(viperKeys) == 0 {
+	if len(koanfKeys) == 0 {
 		return "", fmt.Errorf("unable to retrieve valid keys")
 	}
 
 	// Split the input string into individual keys
 	keyMap := make(map[string]interface{})
 
-	// Iterate over each viper key
-	for _, viperKey := range viperKeys {
+	// Iterate over each koanf key
+	for _, koanfKey := range koanfKeys {
 		// Skip the "activeProfile" key
-		if viperKey == "activeProfile" {
+		if koanfKey == "activeProfile" {
 			continue
 		}
 
@@ -36,7 +36,7 @@ func returnKeysYamlString() (string, error) {
 			currentMap   = keyMap
 			currentMapOk bool
 		)
-		yamlKeys := strings.Split(viperKey, ".")
+		yamlKeys := strings.Split(koanfKey, ".")
 		for i, k := range yamlKeys {
 			// If it's the last yaml key, set an empty map
 			if i == len(yamlKeys)-1 {
@@ -48,7 +48,7 @@ func returnKeysYamlString() (string, error) {
 				}
 				currentMap, currentMapOk = currentMap[k].(map[string]interface{})
 				if !currentMapOk {
-					return "", fmt.Errorf("failed to get configuration keys list: error creating nested map for key %s", viperKey)
+					return "", fmt.Errorf("failed to get configuration keys list: error creating nested map for key %s", koanfKey)
 				}
 			}
 		}
@@ -65,7 +65,7 @@ func returnKeysYamlString() (string, error) {
 
 func returnKeysString() (string, error) {
 	// var err error
-	validKeys := configuration.ViperKeys()
+	validKeys := configuration.KoanfKeys()
 
 	if len(validKeys) == 0 {
 		return "", fmt.Errorf("unable to retrieve valid keys")

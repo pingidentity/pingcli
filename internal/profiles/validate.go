@@ -7,20 +7,15 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/knadh/koanf/v2"
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/spf13/viper"
 )
 
 func Validate() (err error) {
 	// Get a slice of all profile names configured in the config.yaml file
-	profileNames := GetMainConfig().ProfileNames()
-
-	// Iterate over the profileNames and convert each to lowercase
-	for i := range profileNames {
-		profileNames[i] = strings.ToLower(profileNames[i])
-	}
+	profileNames := GetKoanfConfig().ProfileNames()
 
 	// Validate profile names
 	if err = validateProfileNames(profileNames); err != nil {
@@ -29,27 +24,27 @@ func Validate() (err error) {
 
 	// Make sure selected active profile is in the configuration file
 	activeProfileName, err := GetOptionValue(options.RootActiveProfileOption)
-	activeProfileName = strings.ToLower(activeProfileName)
 	if err != nil {
 		return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 	}
+
 	if !slices.Contains(profileNames, activeProfileName) {
 		return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration "+
-			"file %s", activeProfileName, GetMainConfig().ViperInstance().ConfigFileUsed())
+			"file %s", activeProfileName, GetKoanfConfig().GetKoanfConfigFile())
 	}
 
-	// for each profile key, validate the profile viper
+	// for each profile key, validate the profile koanf
 	for _, pName := range profileNames {
-		subViper, err := GetMainConfig().GetProfileViper(pName)
+		subKoanf, err := GetKoanfConfig().GetProfileKoanf(pName)
 		if err != nil {
 			return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 		}
 
-		if err := validateProfileKeys(pName, subViper); err != nil {
+		if err := validateProfileKeys(pName, subKoanf); err != nil {
 			return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 		}
 
-		if err := validateProfileValues(pName, subViper); err != nil {
+		if err := validateProfileValues(pName, subKoanf); err != nil {
 			return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 		}
 	}
@@ -59,7 +54,7 @@ func Validate() (err error) {
 
 func validateProfileNames(profileNames []string) error {
 	for _, profileName := range profileNames {
-		if err := GetMainConfig().ValidateProfileNameFormat(profileName); err != nil {
+		if err := GetKoanfConfig().ValidateProfileNameFormat(profileName); err != nil {
 			return err
 		}
 	}
@@ -67,16 +62,16 @@ func validateProfileNames(profileNames []string) error {
 	return nil
 }
 
-func validateProfileKeys(profileName string, profileViper *viper.Viper) error {
-	validProfileKeys := configuration.ViperKeys()
+func validateProfileKeys(profileName string, profileKoanf *koanf.Koanf) error {
+	validProfileKeys := configuration.KoanfKeys()
 
-	// Get all keys viper has loaded from config file.
-	// If a key found in the config file is not in the viperKeys list,
+	// Get all keys koanf has loaded from config file.
+	// If a key found in the config file is not in the koanfKeys list,
 	// it is an invalid key.
 	var invalidKeys []string
-	for _, key := range profileViper.AllKeys() {
+	for key := range profileKoanf.All() {
 		if !slices.ContainsFunc(validProfileKeys, func(v string) bool {
-			return strings.EqualFold(v, key)
+			return v == key
 		}) {
 			invalidKeys = append(invalidKeys, key)
 		}
@@ -92,14 +87,14 @@ func validateProfileKeys(profileName string, profileViper *viper.Viper) error {
 	return nil
 }
 
-func validateProfileValues(pName string, profileViper *viper.Viper) (err error) {
-	for _, key := range profileViper.AllKeys() {
-		opt, err := configuration.OptionFromViperKey(key)
+func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) {
+	for key := range profileKoanf.All() {
+		opt, err := configuration.OptionFromKoanfKey(key)
 		if err != nil {
 			return err
 		}
 
-		vValue := profileViper.Get(key)
+		vValue := profileKoanf.Get(key)
 
 		switch opt.Type {
 		case options.ENUM_BOOL:

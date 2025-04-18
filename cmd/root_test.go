@@ -10,7 +10,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test Root Command Executes without issue
@@ -139,7 +139,7 @@ func TestRootCmd_DetailedExitCodeFlag(t *testing.T) {
 
 // // Test Root Command Detailed Exit Code Flag with output Warn
 func TestRootCmd_DetailedExitCodeWarnLoggedFunc(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 	t.Setenv(options.RootDetailedExitCodeOption.EnvVar, "true")
 	output.Warn("test warning", nil)
 

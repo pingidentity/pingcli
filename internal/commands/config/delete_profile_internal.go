@@ -23,7 +23,7 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 		}
 	}
 
-	if err = profiles.GetMainConfig().ValidateExistingProfileName(pName); err != nil {
+	if err = profiles.GetKoanfConfig().ValidateExistingProfileName(pName); err != nil {
 		return fmt.Errorf("failed to delete profile: %w", err)
 	}
 
@@ -47,7 +47,7 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 }
 
 func promptUserToDeleteProfile(rc io.ReadCloser) (pName string, err error) {
-	pName, err = input.RunPromptSelect("Select profile to delete", profiles.GetMainConfig().ProfileNames(), rc)
+	pName, err = input.RunPromptSelect("Select profile to delete", profiles.GetKoanfConfig().ProfileNames(), rc)
 
 	if err != nil {
 		return pName, err
@@ -75,7 +75,7 @@ func promptUserToConfirmDelete(pName string, rc io.ReadCloser) (confirmed bool, 
 func deleteProfile(pName string) (err error) {
 	output.Message(fmt.Sprintf("Deleting profile '%s'...", pName), nil)
 
-	if err = profiles.GetMainConfig().DeleteProfile(pName); err != nil {
+	if err = profiles.GetKoanfConfig().DeleteProfile(pName); err != nil {
 		return err
 	}
 

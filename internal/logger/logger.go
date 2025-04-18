@@ -21,7 +21,7 @@ var (
 // Create a get function for a standardized zerolog logger
 func Get() zerolog.Logger {
 	once.Do(func() {
-		// Viper config is not initialized yet, so read environment variables directly
+		// Koanf config is not initialized yet, so read environment variables directly
 		logLevelEnv := os.Getenv("PINGCLI_LOG_LEVEL")
 		logPathEnv := os.Getenv("PINGCLI_LOG_PATH")
 

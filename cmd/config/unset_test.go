@@ -9,12 +9,12 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test Config Unset Command Executes without issue
 func TestConfigUnsetCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", options.RootColorOption.ViperKey)
+	err := testutils_cobra.ExecutePingcli(t, "config", "unset", options.RootColorOption.KoanfKey)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -28,7 +28,7 @@ func TestConfigUnsetCmd_TooFewArgs(t *testing.T) {
 // Test Config Set Command Fails when provided too many arguments
 func TestConfigUnsetCmd_TooManyArgs(t *testing.T) {
 	expectedErrorPattern := `^failed to execute 'pingcli config unset': command accepts 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", options.RootColorOption.ViperKey, options.RootOutputFormatOption.ViperKey)
+	err := testutils_cobra.ExecutePingcli(t, "config", "unset", options.RootColorOption.KoanfKey, options.RootOutputFormatOption.KoanfKey)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -39,27 +39,26 @@ func TestConfigUnsetCmd_InvalidKey(t *testing.T) {
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test Config Unset Command for key 'pingone.worker.clientId' updates viper configuration
-func TestConfigUnsetCmd_CheckViperConfig(t *testing.T) {
-	testutils_viper.InitVipers(t)
+// Test Config Unset Command for key 'pingone.worker.clientId' updates koanf configuration
+func TestConfigUnsetCmd_CheckKoanfConfig(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	mainViper := profiles.GetMainConfig().ViperInstance()
-	viperKey := options.PingOneAuthenticationWorkerClientIDOption.ViperKey
-	profileViperKey := "default." + viperKey
+	koanfConfig := profiles.GetKoanfConfig().KoanfInstance()
+	koanfKey := options.PingOneAuthenticationWorkerClientIDOption.KoanfKey
+	profileKoanfKey := "default." + koanfKey
 
-	viperOldValue := mainViper.GetString(profileViperKey)
+	koanfOldValue := koanfConfig.String(profileKoanfKey)
 
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", viperKey)
+	err := testutils_cobra.ExecutePingcli(t, "config", "unset", koanfKey)
 	testutils.CheckExpectedError(t, err, nil)
 
-	viperNewValue := mainViper.GetString(profileViperKey)
-
-	if viperOldValue == viperNewValue {
-		t.Errorf("Expected viper configuration value to be updated. Old: %s, New: %s", viperOldValue, viperNewValue)
+	koanfNewValue := koanfConfig.String(profileKoanfKey)
+	if koanfOldValue == koanfNewValue {
+		t.Errorf("Expected koanf configuration value to be updated. Old: %s, New: %s", koanfOldValue, koanfNewValue)
 	}
 
-	if viperNewValue != "" {
-		t.Errorf("Expected viper configuration value to be empty. Got: %s", viperNewValue)
+	if koanfNewValue != "" {
+		t.Errorf("Expected koanf configuration value to be empty. Got: %s", koanfNewValue)
 	}
 }
 
@@ -82,17 +81,17 @@ func TestConfigUnsetCmd_HelpFlag(t *testing.T) {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_unsetMaskedValue() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.PingFederateBasicAuthUsernameOption.ViperKey)
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.PingFederateBasicAuthUsernameOption.KoanfKey)
 
 	// Output:
 	// SUCCESS: Configuration unset successfully:
-	// service.pingfederate.authentication.basicAuth.username=
+	// service.pingFederate.authentication.basicAuth.username=
 }
 
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_unsetUnmaskedValue() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.RootOutputFormatOption.ViperKey)
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.RootOutputFormatOption.KoanfKey)
 
 	// Output:
 	// SUCCESS: Configuration unset successfully:

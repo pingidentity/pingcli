@@ -20,6 +20,6 @@ func initDescriptionOption() {
 		Flag:            nil, // No flag
 		Sensitive:       false,
 		Type:            options.ENUM_STRING,
-		ViperKey:        "description",
+		KoanfKey:        "description",
 	}
 }

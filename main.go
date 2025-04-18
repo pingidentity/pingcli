@@ -34,7 +34,6 @@ func main() {
 	}
 
 	rootCmd := cmd.NewRootCommand(version, commit)
-
 	err := rootCmd.Execute()
 	if err != nil {
 		output.UserError(fmt.Sprintf("Failed to execute pingcli: %v", err), nil)

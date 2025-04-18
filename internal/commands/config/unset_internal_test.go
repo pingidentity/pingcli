@@ -8,12 +8,12 @@ import (
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test RunInternalConfigUnset function
 func Test_RunInternalConfigUnset(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := RunInternalConfigUnset("noColor")
 	if err != nil {
@@ -23,7 +23,7 @@ func Test_RunInternalConfigUnset(t *testing.T) {
 
 // Test RunInternalConfigUnset function fails with invalid key
 func Test_RunInternalConfigUnset_InvalidKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^failed to unset configuration: key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := RunInternalConfigUnset("invalid-key")
@@ -32,7 +32,7 @@ func Test_RunInternalConfigUnset_InvalidKey(t *testing.T) {
 
 // Test RunInternalConfigUnset function with different profile
 func Test_RunInternalConfigUnset_DifferentProfile(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	var (
 		profileName = customtypes.String("production")
@@ -49,7 +49,7 @@ func Test_RunInternalConfigUnset_DifferentProfile(t *testing.T) {
 
 // Test RunInternalConfigUnset function fails with invalid profile name
 func Test_RunInternalConfigUnset_InvalidProfileName(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	var (
 		profileName = customtypes.String("invalid")

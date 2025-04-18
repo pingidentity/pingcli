@@ -32,6 +32,6 @@ func initDeleteAutoAcceptOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }

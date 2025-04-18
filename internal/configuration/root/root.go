@@ -34,7 +34,7 @@ func initActiveProfileOption() {
 		Flag:            nil, // No flag
 		Sensitive:       false,
 		Type:            options.ENUM_STRING,
-		ViperKey:        "activeProfile",
+		KoanfKey:        "activeProfile",
 	}
 }
 
@@ -56,7 +56,7 @@ func initProfileOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
 
@@ -78,7 +78,7 @@ func initColorOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "noColor",
+		KoanfKey:  "noColor",
 	}
 }
 
@@ -101,7 +101,7 @@ func initConfigOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
 
@@ -127,7 +127,7 @@ func initDetailedExitCodeOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "detailedExitCode",
+		KoanfKey:  "detailedExitCode",
 	}
 }
 
@@ -155,7 +155,7 @@ func initOutputFormatOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_OUTPUT_FORMAT,
-		ViperKey:  "outputFormat",
+		KoanfKey:  "outputFormat",
 	}
 }
 
@@ -178,7 +178,7 @@ func initUnmaskSecretValuesOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "", // No ViperKey
+		KoanfKey:  "", // No KoanfKey
 	}
 }
 

@@ -16,10 +16,10 @@ import (
 	configuration_services "github.com/pingidentity/pingcli/internal/configuration/services"
 )
 
-func ViperKeys() (keys []string) {
+func KoanfKeys() (keys []string) {
 	for _, opt := range options.Options() {
-		if opt.ViperKey != "" {
-			keys = append(keys, opt.ViperKey)
+		if opt.KoanfKey != "" {
+			keys = append(keys, opt.KoanfKey)
 		}
 	}
 
@@ -28,29 +28,29 @@ func ViperKeys() (keys []string) {
 	return keys
 }
 
-func ValidateViperKey(viperKey string) error {
-	validKeys := ViperKeys()
+func ValidateKoanfKey(koanfKey string) error {
+	validKeys := KoanfKeys()
 	for _, vKey := range validKeys {
-		if strings.EqualFold(vKey, viperKey) {
+		if vKey == koanfKey {
 			return nil
 		}
 	}
 
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", viperKey)
+	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", koanfKey)
 }
 
-// Return a list of all viper keys from Options
+// Return a list of all koanf keys from Options
 // Including all substrings of parent keys.
 // For example, the option key export.environmentID adds the keys
 // 'export' and 'export.environmentID' to the list.
-func ExpandedViperKeys() (keys []string) {
-	leafKeys := ViperKeys()
+func ExpandedKoanfKeys() (keys []string) {
+	leafKeys := KoanfKeys()
 	for _, key := range leafKeys {
 		keySplit := strings.Split(key, ".")
 		for i := range keySplit {
 			curKey := strings.Join(keySplit[:i+1], ".")
 			if !slices.ContainsFunc(keys, func(v string) bool {
-				return strings.EqualFold(v, curKey)
+				return v == curKey
 			}) {
 				keys = append(keys, curKey)
 			}
@@ -62,25 +62,25 @@ func ExpandedViperKeys() (keys []string) {
 	return keys
 }
 
-func ValidateParentViperKey(viperKey string) error {
-	validKeys := ExpandedViperKeys()
+func ValidateParentKoanfKey(koanfKey string) error {
+	validKeys := ExpandedKoanfKeys()
 	for _, vKey := range validKeys {
-		if strings.EqualFold(vKey, viperKey) {
+		if vKey == koanfKey {
 			return nil
 		}
 	}
 
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", viperKey)
+	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", koanfKey)
 }
 
-func OptionFromViperKey(viperKey string) (opt options.Option, err error) {
+func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
 	for _, opt := range options.Options() {
-		if strings.EqualFold(opt.ViperKey, viperKey) {
+		if opt.KoanfKey == koanfKey {
 			return opt, nil
 		}
 	}
 
-	return opt, fmt.Errorf("failed to get option: no option found for viper key: %s", viperKey)
+	return opt, fmt.Errorf("failed to get option: no option found for koanf key: %s", koanfKey)
 }
 
 func InitAllOptions() {

@@ -12,12 +12,12 @@ import (
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test RunInternalRequest function
 func Test_RunInternalRequest(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
 
@@ -28,7 +28,7 @@ func Test_RunInternalRequest(t *testing.T) {
 // Test RunInternalRequest function with fail
 func Test_RunInternalRequestWithFail(t *testing.T) {
 	if os.Getenv("RUN_INTERNAL_FAIL_TEST") == "true" {
-		testutils_viper.InitVipers(t)
+		testutils_koanf.InitKoanfs(t)
 		t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
 		options.RequestFailOption.Flag.Changed = true
 		err := options.RequestFailOption.Flag.Value.Set("true")
@@ -56,7 +56,7 @@ func Test_RunInternalRequestWithFail(t *testing.T) {
 
 // Test RunInternalRequest function with empty service
 func Test_RunInternalRequest_EmptyService(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := os.Unsetenv(options.RequestServiceOption.EnvVar)
 	if err != nil {
@@ -70,7 +70,7 @@ func Test_RunInternalRequest_EmptyService(t *testing.T) {
 
 // Test RunInternalRequest function with unrecognized service
 func Test_RunInternalRequest_UnrecognizedService(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	t.Setenv(options.RequestServiceOption.EnvVar, "invalid-service")
 
@@ -82,7 +82,7 @@ func Test_RunInternalRequest_UnrecognizedService(t *testing.T) {
 // Test RunInternalRequest function with valid service but invalid URI
 // This should not error, but rather print a failure message with Body and status of response
 func Test_RunInternalRequest_ValidService_InvalidURI(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
 
@@ -92,7 +92,7 @@ func Test_RunInternalRequest_ValidService_InvalidURI(t *testing.T) {
 
 // Test runInternalPingOneRequest function
 func Test_runInternalPingOneRequest(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := runInternalPingOneRequest("environments")
 	testutils.CheckExpectedError(t, err, nil)
@@ -101,7 +101,7 @@ func Test_runInternalPingOneRequest(t *testing.T) {
 // Test runInternalPingOneRequest function with invalid URI
 // This should not error, but rather print a failure message with Body and status of response
 func Test_runInternalPingOneRequest_InvalidURI(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := runInternalPingOneRequest("invalid-uri")
 	testutils.CheckExpectedError(t, err, nil)
@@ -109,7 +109,7 @@ func Test_runInternalPingOneRequest_InvalidURI(t *testing.T) {
 
 // Test getTopLevelDomain function
 func Test_getTopLevelDomain(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	t.Setenv(options.PingOneRegionCodeOption.EnvVar, customtypes.ENUM_PINGONE_REGION_CODE_CA)
 
@@ -124,7 +124,7 @@ func Test_getTopLevelDomain(t *testing.T) {
 
 // Test getTopLevelDomain function with invalid region code
 func Test_getTopLevelDomain_InvalidRegionCode(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	t.Setenv(options.PingOneRegionCodeOption.EnvVar, "invalid-region")
 
@@ -135,7 +135,7 @@ func Test_getTopLevelDomain_InvalidRegionCode(t *testing.T) {
 
 // Test pingoneAccessToken function
 func Test_pingoneAccessToken(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	firstToken, err := pingoneAccessToken()
 	testutils.CheckExpectedError(t, err, nil)
@@ -151,7 +151,7 @@ func Test_pingoneAccessToken(t *testing.T) {
 
 // Test pingoneAuth function
 func Test_pingoneAuth(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	firstToken, err := pingoneAuth()
 	testutils.CheckExpectedError(t, err, nil)
@@ -167,7 +167,7 @@ func Test_pingoneAuth(t *testing.T) {
 
 // Test pingoneAuth function with invalid credentials
 func Test_pingoneAuth_InvalidCredentials(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	t.Setenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar, "invalid")
 
@@ -178,7 +178,7 @@ func Test_pingoneAuth_InvalidCredentials(t *testing.T) {
 
 // Test getData function
 func Test_getDataRaw(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedData := "{data: 'json'}"
 	t.Setenv(options.RequestDataRawOption.EnvVar, expectedData)
@@ -193,7 +193,7 @@ func Test_getDataRaw(t *testing.T) {
 
 // Test getData function with empty data
 func Test_getDataRaw_EmptyData(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	t.Setenv(options.RequestDataRawOption.EnvVar, "")
 
@@ -207,7 +207,7 @@ func Test_getDataRaw_EmptyData(t *testing.T) {
 
 // Test getData function with file input
 func Test_getDataFile_FileInput(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedData := "{data: 'json from file'}"
 	testDir := t.TempDir()
@@ -229,7 +229,7 @@ func Test_getDataFile_FileInput(t *testing.T) {
 
 // Test getData function with non-existent file input
 func Test_getDataFile_NonExistentFileInput(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	t.Setenv(options.RequestDataOption.EnvVar, "non_existent_file.json")
 

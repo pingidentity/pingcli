@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
@@ -14,7 +15,7 @@ import (
 
 // Test Config Set Command Executes without issue
 func TestConfigSetCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=false", options.RootColorOption.ViperKey))
+	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=false", options.RootColorOption.KoanfKey))
 	testutils.CheckExpectedError(t, err, nil)
 }
 
@@ -28,7 +29,7 @@ func TestConfigSetCmd_TooFewArgs(t *testing.T) {
 // Test Config Set Command Fails when provided too many arguments
 func TestConfigSetCmd_TooManyArgs(t *testing.T) {
 	expectedErrorPattern := `^failed to execute 'pingcli config set': command accepts 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=false", options.RootColorOption.ViperKey), fmt.Sprintf("%s=true", options.RootColorOption.ViperKey))
+	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=false", options.RootColorOption.KoanfKey), fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -42,31 +43,31 @@ func TestConfigSetCmd_InvalidKey(t *testing.T) {
 // Test Config Set Command Fails when an invalid value type is provided
 func TestConfigSetCmd_InvalidValueType(t *testing.T) {
 	expectedErrorPattern := `^failed to set configuration: value for key '.*' must be a boolean\. Allowed .*: strconv\.ParseBool: parsing ".*": invalid syntax$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=invalid", options.RootColorOption.ViperKey))
+	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=invalid", options.RootColorOption.KoanfKey))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // Test Config Set Command Fails when no value is provided
 func TestConfigSetCmd_NoValueProvided(t *testing.T) {
 	expectedErrorPattern := `^failed to set configuration: value for key '.*' is empty\. Use 'pingcli config unset .*' to unset the key$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=", options.RootColorOption.ViperKey))
+	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=", options.RootColorOption.KoanfKey))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test Config Set Command for key 'pingone.worker.clientId' updates viper configuration
-func TestConfigSetCmd_CheckViperConfig(t *testing.T) {
-	viperKey := options.PingOneAuthenticationWorkerClientIDOption.ViperKey
-	viperNewUUID := "12345678-1234-1234-1234-123456789012"
+// Test Config Set Command for key 'pingone.worker.clientId' updates koanf configuration
+func TestConfigSetCmd_CheckKoanfConfig(t *testing.T) {
+	koanfKey := options.PingOneAuthenticationWorkerClientIDOption.KoanfKey
+	koanfNewUUID := "12345678-1234-1234-1234-123456789012"
 
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=%s", viperKey, viperNewUUID))
+	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=%s", koanfKey, koanfNewUUID))
 	testutils.CheckExpectedError(t, err, nil)
 
-	mainViper := profiles.GetMainConfig().ViperInstance()
-	profileViperKey := "default." + viperKey
+	koanf := profiles.GetKoanfConfig().KoanfInstance()
+	profileKoanfKey := "default." + koanfKey
 
-	viperNewValue := mainViper.GetString(profileViperKey)
-	if viperNewValue != viperNewUUID {
-		t.Errorf("Expected viper configuration value to be updated")
+	koanfNewValue, ok := koanf.Get(profileKoanfKey).(*customtypes.UUID)
+	if ok && koanfNewValue.String() != koanfNewUUID {
+		t.Errorf("Expected koanf configuration value to be updated")
 	}
 }
 
@@ -89,27 +90,27 @@ func TestConfigSetCmd_InvalidFlag(t *testing.T) {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_setMaskedValue() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.ViperKey, "1234"))
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.KoanfKey, "1234"))
 
 	// Output:
 	// SUCCESS: Configuration set successfully:
-	// service.pingfederate.authentication.basicAuth.password=********
+	// service.pingFederate.authentication.basicAuth.password=********
 }
 
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_set_UnmaskedValuesFlag() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", "--unmask-values", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.ViperKey, "1234"))
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", "--unmask-values", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.KoanfKey, "1234"))
 
 	// Output:
 	// SUCCESS: Configuration set successfully:
-	// service.pingfederate.authentication.basicAuth.password=1234
+	// service.pingFederate.authentication.basicAuth.password=1234
 }
 
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_setUnmaskedValue() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.RootColorOption.ViperKey, "true"))
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.RootColorOption.KoanfKey, "true"))
 
 	// Output:
 	// SUCCESS: Configuration set successfully:

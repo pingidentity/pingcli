@@ -32,7 +32,7 @@ func initAddProfileDescriptionOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
 
@@ -54,7 +54,7 @@ func initAddProfileNameOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
 
@@ -78,6 +78,6 @@ func initAddProfileSetActiveOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
