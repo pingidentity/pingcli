@@ -5,14 +5,11 @@ package config_internal
 import (
 	"github.com/fatih/color"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
 func RunInternalConfigListProfiles() (err error) {
-	l := logger.Get()
-
 	profileNames := profiles.GetKoanfConfig().ProfileNames()
 	activeProfileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
