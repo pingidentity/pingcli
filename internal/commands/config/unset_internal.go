@@ -4,6 +4,7 @@ package config_internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -42,7 +43,7 @@ func RunInternalConfigUnset(koanfKey string) (err error) {
 
 	msgStr := "Configuration unset successfully:\n"
 
-	vVal, _, err := profiles.KoanfValueFromOption(opt)
+	vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 	if err != nil {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
@@ -52,7 +53,7 @@ func RunInternalConfigUnset(koanfKey string) (err error) {
 		unmaskOptionVal = "false"
 	}
 
-	if opt.Sensitive && unmaskOptionVal == "false" {
+	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
 		msgStr += fmt.Sprintf("%s=%s", koanfKey, profiles.MaskValue(vVal))
 	} else {
 		msgStr += fmt.Sprintf("%s=%s", koanfKey, vVal)

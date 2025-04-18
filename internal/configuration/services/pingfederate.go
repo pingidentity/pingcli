@@ -39,12 +39,9 @@ func initHTTPSHostOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.httpsHost"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate HTTPS host used to communicate with PingFederate's admin API." +
-				"\nExample: 'https://pingFederate-admin.bxretail.org'",
+				"\nExample: 'https://pingfederate-admin.bxretail.org'",
 			Value: cobraValue,
 		},
 		Sensitive: false,
@@ -65,9 +62,6 @@ func initAdminAPIPathOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.adminAPIPath"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate API URL path used to communicate with PingFederate's admin API. " +
 				"(default /pf-admin-api/v1)",
@@ -91,9 +85,6 @@ func initXBypassExternalValidationHeaderOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.xBypassExternalValidationHeader"},
-			},
 			Name: cobraParamName,
 			Usage: "Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header " +
 				"when using PingFederate's admin API). " +
@@ -119,9 +110,6 @@ func initCACertificatePemFilesOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.caCertificatePemFiles"},
-			},
 			Name: cobraParamName,
 			Usage: "Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when " +
 				"connecting to the PingFederate server over HTTPS. " +
@@ -147,9 +135,6 @@ func initInsecureTrustAllTLSOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.insecureTrustAllTLS"},
-			},
 			Name: cobraParamName,
 			Usage: "Trust any certificate when connecting to the PingFederate server admin API. " +
 				"(default false)" +
@@ -175,9 +160,6 @@ func initUsernameOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.authentication.basicAuth.username"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate username used to authenticate to the PingFederate admin API when using basic " +
 				"authentication." +
@@ -202,9 +184,6 @@ func initPasswordOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.authentication.basicAuth.password"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate password used to authenticate to the PingFederate admin API when using basic " +
 				"authentication.",
@@ -228,9 +207,6 @@ func initAccessTokenOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.authentication.accessTokenAuth.accessToken"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate access token used to authenticate to the PingFederate admin API when using a " +
 				"custom OAuth 2.0 token method.",
@@ -254,9 +230,6 @@ func initClientIDOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.authentication.clientCredentialsAuth.clientID"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate OAuth client ID used to authenticate to the PingFederate admin API when using " +
 				"the OAuth 2.0 client credentials grant type.",
@@ -280,9 +253,6 @@ func initClientSecretOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.authentication.clientCredentialsAuth.clientSecret"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate OAuth client secret used to authenticate to the PingFederate admin API when " +
 				"using the OAuth 2.0 client credentials grant type.",
@@ -306,9 +276,6 @@ func initTokenURLOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.authentication.clientCredentialsAuth.tokenURL"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate OAuth token URL used to authenticate to the PingFederate admin API when using " +
 				"the OAuth 2.0 client credentials grant type.",
@@ -332,9 +299,6 @@ func initScopesOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.authentication.clientCredentialsAuth.scopes"},
-			},
 			Name: cobraParamName,
 			Usage: "The PingFederate OAuth scopes used to authenticate to the PingFederate admin API when using " +
 				"the OAuth 2.0 client credentials grant type. " +
@@ -361,9 +325,6 @@ func initPingFederateAuthenticationTypeOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"service.pingFederate.authentication.type"},
-			},
 			Name: cobraParamName,
 			Usage: fmt.Sprintf(
 				"The authentication type to use when connecting to the PingFederate admin API."+

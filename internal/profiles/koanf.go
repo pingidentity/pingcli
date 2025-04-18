@@ -37,13 +37,8 @@ func (k KoanfConfig) GetKoanfConfigFile() string {
 	return *k.configFilePath
 }
 
-func (k *KoanfConfig) SetKoanfConfigFile(cnfFilePath string) error {
+func (k *KoanfConfig) SetKoanfConfigFile(cnfFilePath string) {
 	k.configFilePath = &cnfFilePath
-	if k.configFilePath != &cnfFilePath {
-		return fmt.Errorf("failed to set koanf config file path: %s", cnfFilePath)
-	}
-
-	return nil
 }
 
 func (k *KoanfConfig) KoanfInstance() *koanf.Koanf {
@@ -66,7 +61,7 @@ func GetActiveProfileName(k *koanf.Koanf) string {
 	return ""
 }
 
-func KoanfValueFromOption(opt options.Option) (value string, ok bool, err error) {
+func KoanfValueFromOption(opt options.Option, pName string) (value string, ok bool, err error) {
 	if opt.KoanfKey != "" {
 		var (
 			kValue            any
@@ -80,14 +75,16 @@ func KoanfValueFromOption(opt options.Option) (value string, ok bool, err error)
 			// // Case 2: --profile flag has been set, get value from set profile koanf instance
 			// // Case 3: no --profile flag set, get value from active profile koanf instance defined in main koanf instance
 			// // This recursive call is safe, as options.RootProfileOption.KoanfKey is not set
-			pName, err := GetOptionValue(options.RootProfileOption)
-			if err != nil {
-				return "", false, err
-			}
 			if pName == "" {
-				pName, err = GetOptionValue(options.RootActiveProfileOption)
+				pName, err = GetOptionValue(options.RootProfileOption)
 				if err != nil {
 					return "", false, err
+				}
+				if pName == "" {
+					pName, err = GetOptionValue(options.RootActiveProfileOption)
+					if err != nil {
+						return "", false, err
+					}
 				}
 			}
 
@@ -221,33 +218,15 @@ func (k KoanfConfig) GetProfileKoanf(pName string) (subKoanf *koanf.Koanf, err e
 	return subKoanf, nil
 }
 
-func closeFile(f *os.File) {
-	if err := f.Close(); err != nil {
-		fmt.Printf("error closing file (%s): %v", f.Name(), err)
-	}
-}
-
 func (k KoanfConfig) WriteFile() (err error) {
 	encodedConfig, err := k.KoanfInstance().Marshal(yaml.Parser())
 	if err != nil {
 		return fmt.Errorf("error marshalling koanf: %w", err)
 	}
 
-	f, err := os.OpenFile(k.GetKoanfConfigFile(), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0600)
+	err = os.WriteFile(k.GetKoanfConfigFile(), encodedConfig, 0600)
 	if err != nil {
 		return fmt.Errorf("error opening file (%s): %w", k.GetKoanfConfigFile(), err)
-	}
-
-	defer closeFile(f)
-
-	_, err = f.Write(encodedConfig)
-	if err != nil {
-		return fmt.Errorf("error writing to file (%s): %w", k.GetKoanfConfigFile(), err)
-	}
-
-	err = f.Sync()
-	if err != nil {
-		return fmt.Errorf("error syncing file (%s): %w", k.GetKoanfConfigFile(), err)
 	}
 
 	return nil
@@ -333,7 +312,7 @@ func GetOptionValue(opt options.Option) (string, error) {
 	}
 
 	// 3rd priority: koanf value
-	koanfValue, ok, _ := KoanfValueFromOption(opt)
+	koanfValue, ok, _ := KoanfValueFromOption(opt, "")
 	if ok {
 		return koanfValue, nil
 	}

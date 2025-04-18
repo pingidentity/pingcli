@@ -87,9 +87,6 @@ func initServicesOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"export.services"},
-			},
 			Name:      cobraParamName,
 			Shorthand: "s",
 			Usage: fmt.Sprintf(
@@ -121,9 +118,6 @@ func initOutputDirectoryOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"export.outputDirectory"},
-			},
 			Name:      cobraParamName,
 			Shorthand: "d",
 			Usage: "Specifies the output directory for export. Can be an absolute filepath or a relative filepath of" +
@@ -149,9 +143,6 @@ func initOverwriteOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          "PINGCLI_EXPORT_OVERWRITE",
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"export.overwrite"},
-			},
 			Name:      cobraParamName,
 			Shorthand: "o",
 			Usage: "Overwrites the existing generated exports in output directory. " +
@@ -177,9 +168,6 @@ func initPingOneEnvironmentIDOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Annotations: map[string][]string{
-				"KoanfKey": {"pingone.environmentID"},
-			},
 			Name:  cobraParamName,
 			Usage: "The ID of the PingOne environment to export. Must be a valid PingOne UUID.",
 			Value: cobraValue,

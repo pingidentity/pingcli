@@ -30,7 +30,9 @@ func RunInternalConfigListProfiles() (err error) {
 		}
 
 		description := profiles.GetKoanfConfig().KoanfInstance().String(profileName + "." + "description")
-		listStr += "    " + description
+		if description != "" {
+			listStr += "    " + description
+		}
 	}
 
 	output.Message(listStr, nil)

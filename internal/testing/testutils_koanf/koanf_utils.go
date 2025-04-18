@@ -80,12 +80,10 @@ func configureMainKoanf(t *testing.T) {
 
 	configFilePath = CreateConfigFile(t)
 	mainKoanf := profiles.GetKoanfConfig()
-	if err := mainKoanf.SetKoanfConfigFile(configFilePath); err != nil {
-		t.Fatalf("Failed to set configuration file '%s': %v", configFilePath, err)
-	}
+	mainKoanf.SetKoanfConfigFile(configFilePath)
 
 	if err := mainKoanf.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
-		t.Fatalf("Failed to load configuration from file '%s': %v", configFilePath, err)
+		t.Fatalf("Failed to load configurationhere from file '%s': %v", configFilePath, err)
 	}
 }
 

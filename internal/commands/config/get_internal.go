@@ -29,7 +29,7 @@ func RunInternalConfigGet(koanfKey string) (err error) {
 			continue
 		}
 
-		vVal, _, err := profiles.KoanfValueFromOption(opt)
+		vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 		if err != nil {
 			return fmt.Errorf("failed to get configuration: %w", err)
 		}
@@ -39,7 +39,7 @@ func RunInternalConfigGet(koanfKey string) (err error) {
 			unmaskOptionVal = "false"
 		}
 
-		if opt.Sensitive && unmaskOptionVal == "false" {
+		if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.KoanfKey, profiles.MaskValue(vVal))
 		} else {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.KoanfKey, vVal)

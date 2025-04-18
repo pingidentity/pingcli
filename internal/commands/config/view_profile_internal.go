@@ -4,6 +4,7 @@ package config_internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/output"
@@ -27,11 +28,6 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 		return fmt.Errorf("failed to view profile: %w", err)
 	}
 
-	// Set the active profile to the one specified
-	if err := profiles.GetKoanfConfig().ChangeActiveProfile(pName); err != nil {
-		return fmt.Errorf("failed to set profile to %s for  view profile: %w", pName, err)
-	}
-
 	// Get the Koanf configuration for the specified profile
 	koanfProfile, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
 	if err != nil {
@@ -44,9 +40,13 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 			continue
 		}
 
-		vVal, ok, _ := profiles.KoanfValueFromOption(opt)
+		vVal, ok, err := profiles.KoanfValueFromOption(opt, pName)
 		if !ok {
 			continue
+		}
+
+		if err != nil {
+			return fmt.Errorf("failed to get koanf value from option: %w", err)
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -54,15 +54,14 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 			unmaskOptionVal = "false"
 		}
 
-		if opt.Sensitive && unmaskOptionVal == "false" {
+		if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.KoanfKey, profiles.MaskValue(vVal))
 		} else {
 			msgStr += fmt.Sprintf("%s=%s\n", opt.KoanfKey, vVal)
 		}
 	}
 
-	output.Message(fmt.Sprintf("Configuration for profile '%s':", pName), nil)
-	output.Message(msgStr, nil)
+	output.Message(fmt.Sprintf("Configuration for profile '%s':\n", pName)+msgStr, nil)
 
 	return nil
 }

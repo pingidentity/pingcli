@@ -47,7 +47,7 @@ func TestConfigUnsetCmd_CheckKoanfConfig(t *testing.T) {
 	koanfKey := options.PingOneAuthenticationWorkerClientIDOption.KoanfKey
 	profileKoanfKey := "default." + koanfKey
 
-	koanfOldValue := koanfConfig.Get(profileKoanfKey)
+	koanfOldValue := koanfConfig.String(profileKoanfKey)
 
 	err := testutils_cobra.ExecutePingcli(t, "config", "unset", koanfKey)
 	testutils.CheckExpectedError(t, err, nil)

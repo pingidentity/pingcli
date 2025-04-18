@@ -128,10 +128,6 @@ func initKoanfProfile() {
 	if err := profiles.Validate(); err != nil {
 		output.UserFatal(fmt.Sprintf("%v", err), nil)
 	}
-
-	if err := profiles.GetKoanfConfig().WriteFile(); err != nil {
-		output.SystemError(fmt.Sprintf("Failed to write configuration file '%s': %v", cfgFile, err), nil)
-	}
 }
 
 func checkCfgFileLocation(cfgFile string) {
@@ -199,9 +195,7 @@ func loadKoanfConfig(cfgFile string) {
 	l := logger.Get()
 
 	koanfConfig := profiles.GetKoanfConfig()
-	if err := koanfConfig.SetKoanfConfigFile(cfgFile); err != nil {
-		output.SystemError(fmt.Sprintf("Failed to set configuration file '%s': %v", cfgFile, err), nil)
-	}
+	koanfConfig.SetKoanfConfigFile(cfgFile)
 
 	// Use config file from the flag.
 	if err := koanfConfig.KoanfInstance().Load(file.Provider(cfgFile), yaml.Parser()); err != nil {

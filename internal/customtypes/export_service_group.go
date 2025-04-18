@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	ENUM_EXPORT_SERVICE_GROUP_PINGONE string = "pingOne"
+	ENUM_EXPORT_SERVICE_GROUP_PINGONE string = "pingone"
 )
 
 type ExportServiceGroup string
