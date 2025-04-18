@@ -59,13 +59,8 @@ func cobraParamValueFromOption(opt options.Option) (value string, ok bool) {
 }
 
 func GetActiveProfileName(k *koanf.Koanf) string {
-	if k.Exists(options.RootActiveProfileOption.CobraParamName) && k.Get(options.RootActiveProfileOption.CobraParamName) != nil {
-		activeProfileOption, ok := k.Get(options.RootActiveProfileOption.CobraParamName).(string)
-		if ok {
-			return activeProfileOption
-		}
-
-		return ""
+	if k.Exists(options.RootActiveProfileOption.CobraParamName) {
+		return k.String(options.RootActiveProfileOption.CobraParamName)
 	}
 
 	return ""

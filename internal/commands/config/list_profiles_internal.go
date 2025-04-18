@@ -32,14 +32,8 @@ func RunInternalConfigListProfiles() (err error) {
 			listStr += "- " + profileName + "\n"
 		}
 
-		description, ok := profiles.GetKoanfConfig().KoanfInstance().Get(profileName + "." + "description").(string)
-		if ok {
-			listStr += "    " + description
-		} else {
-			l.Warn().Msgf("Cannot retrieve profile description for profile %s: %v", profileName, err)
-
-			continue
-		}
+		description := profiles.GetKoanfConfig().KoanfInstance().String(profileName + "." + "description")
+		listStr += "    " + description
 	}
 
 	output.Message(listStr, nil)
