@@ -37,7 +37,7 @@ func initAuthenticationWorkerClientIDOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_UUID,
-		ViperKey:  "service.pingone.authentication.worker.clientID",
+		KoanfKey:  "service.pingOne.authentication.worker.clientID",
 	}
 }
 
@@ -59,7 +59,7 @@ func initAuthenticationWorkerClientSecretOption() {
 		},
 		Sensitive: true,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "service.pingone.authentication.worker.clientSecret",
+		KoanfKey:  "service.pingOne.authentication.worker.clientSecret",
 	}
 }
 
@@ -82,7 +82,7 @@ func initAuthenticationWorkerEnvironmentIDOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_UUID,
-		ViperKey:  "service.pingone.authentication.worker.environmentID",
+		KoanfKey:  "service.pingOne.authentication.worker.environmentID",
 	}
 }
 
@@ -109,7 +109,7 @@ func initPingOneAuthenticationTypeOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_PINGONE_AUTH_TYPE,
-		ViperKey:  "service.pingone.authentication.type",
+		KoanfKey:  "service.pingOne.authentication.type",
 	}
 }
 
@@ -137,6 +137,6 @@ func initRegionCodeOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_PINGONE_REGION_CODE,
-		ViperKey:  "service.pingone.regionCode",
+		KoanfKey:  "service.pingOne.regionCode",
 	}
 }

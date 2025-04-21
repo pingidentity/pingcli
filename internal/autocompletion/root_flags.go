@@ -9,7 +9,7 @@ import (
 )
 
 func RootProfileFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return profiles.GetMainConfig().ProfileNames(), cobra.ShellCompDirectiveNoFileComp
+	return profiles.GetKoanfConfig().ProfileNames(), cobra.ShellCompDirectiveNoFileComp
 }
 
 func RootOutputFormatFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

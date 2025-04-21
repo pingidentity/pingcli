@@ -1,7 +1,7 @@
 ## Example Ping CLI configuration file
 
 ```
-activeprofile: default
+activeProfile: default
 default:
     noColor: true
     description: Default profile created by pingcli

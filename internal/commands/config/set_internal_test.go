@@ -8,12 +8,12 @@ import (
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test RunInternalConfigSet function
 func Test_RunInternalConfigSet(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := RunInternalConfigSet("noColor=true")
 	if err != nil {
@@ -23,7 +23,7 @@ func Test_RunInternalConfigSet(t *testing.T) {
 
 // Test RunInternalConfigSet function fails with invalid key
 func Test_RunInternalConfigSet_InvalidKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^failed to set configuration: key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := RunInternalConfigSet("invalid-key=false")
@@ -32,7 +32,7 @@ func Test_RunInternalConfigSet_InvalidKey(t *testing.T) {
 
 // Test RunInternalConfigSet function fails with invalid value
 func Test_RunInternalConfigSet_InvalidValue(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^failed to set configuration: value for key '.*' must be a boolean. Allowed .*: strconv.ParseBool: parsing ".*": invalid syntax$`
 	err := RunInternalConfigSet("noColor=invalid")
@@ -41,7 +41,7 @@ func Test_RunInternalConfigSet_InvalidValue(t *testing.T) {
 
 // Test RunInternalConfigSet function fails with non-existent profile name
 func Test_RunInternalConfigSet_NonExistentProfileName(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	var (
 		profileName = customtypes.String("non-existent")
@@ -57,7 +57,7 @@ func Test_RunInternalConfigSet_NonExistentProfileName(t *testing.T) {
 
 // Test RunInternalConfigSet function with different profile
 func Test_RunInternalConfigSet_DifferentProfile(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	var (
 		profileName = customtypes.String("production")
@@ -74,7 +74,7 @@ func Test_RunInternalConfigSet_DifferentProfile(t *testing.T) {
 
 // Test RunInternalConfigSet function fails with invalid profile name
 func Test_RunInternalConfigSet_InvalidProfileName(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	var (
 		profileName = customtypes.String("*&%*&")
@@ -90,7 +90,7 @@ func Test_RunInternalConfigSet_InvalidProfileName(t *testing.T) {
 
 // Test RunInternalConfigSet function fails with no value provided
 func Test_RunInternalConfigSet_NoValue(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^failed to set configuration: value for key '.*' is empty. Use 'pingcli config unset .*' to unset the key$`
 	err := RunInternalConfigSet("noColor=")
@@ -99,7 +99,7 @@ func Test_RunInternalConfigSet_NoValue(t *testing.T) {
 
 // Test RunInternalConfigSet function fails with no keyValue provided
 func Test_RunInternalConfigSet_NoKeyValue(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^failed to set configuration: invalid assignment format ''\. Expect 'key=value' format$`
 	err := RunInternalConfigSet("")

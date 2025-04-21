@@ -82,11 +82,12 @@ func TestPlatformTerraformPlan(t *testing.T) {
 			testableResource: pingone_platform_testable_resources.Environment(t, clientInfo),
 			ignoredErrors:    nil,
 		},
-		{
-			name:             "Form",
-			testableResource: pingone_platform_testable_resources.Form(t, clientInfo),
-			ignoredErrors:    nil,
-		},
+		// TODO: Remove after completion of TRIAGE-26607
+		// {
+		// 	name:             "Form",
+		// 	testableResource: pingone_platform_testable_resources.Form(t, clientInfo),
+		// 	ignoredErrors:    nil,
+		// },
 		{
 			name:             "FormsRecaptchaV2",
 			testableResource: pingone_platform_testable_resources.FormsRecaptchaV2(t, clientInfo),

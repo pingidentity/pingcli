@@ -10,7 +10,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test Platform Export Command Executes without issue
@@ -25,7 +25,7 @@ func TestPlatformExportCmd_Execute(t *testing.T) {
 
 // Test Platform Export Command fails when provided too many arguments
 func TestPlatformExportCmd_TooManyArgs(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^failed to execute 'pingcli platform export': command accepts 0 arg\(s\), received 1$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export", "extra-arg")

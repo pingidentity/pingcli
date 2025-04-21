@@ -8,7 +8,7 @@ import (
 
 	"github.com/pingidentity/pingcli/cmd"
 	"github.com/pingidentity/pingcli/internal/configuration"
-	testutils_viper "github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	testutils_koanf "github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // ExecutePingcli executes the pingcli command with the provided arguments
@@ -22,7 +22,7 @@ func ExecutePingcli(t *testing.T, args ...string) (err error) {
 	root := cmd.NewRootCommand("test-version", "test-commit")
 
 	// Add config location to the root command
-	configFilepath := testutils_viper.CreateConfigFile(t)
+	configFilepath := testutils_koanf.CreateConfigFile(t)
 	args = append([]string{"--config", configFilepath}, args...)
 	root.SetArgs(args)
 
@@ -44,7 +44,7 @@ func ExecutePingcliCaptureCobraOutput(t *testing.T, args ...string) (output stri
 	root := cmd.NewRootCommand("test-version", "test-commit")
 
 	// Add config location to the root command
-	configFilepath := testutils_viper.CreateConfigFile(t)
+	configFilepath := testutils_koanf.CreateConfigFile(t)
 	args = append([]string{"--config", configFilepath}, args...)
 	root.SetArgs(args)
 
