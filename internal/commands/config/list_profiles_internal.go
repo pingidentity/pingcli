@@ -22,7 +22,7 @@ func RunInternalConfigListProfiles() (err error) {
 	output.SetColorize()
 	activeFmt := color.New(color.Bold, color.FgGreen).SprintFunc()
 
-	for _, profileName := range profileNames {
+	for i, profileName := range profileNames {
 		if profileName == activeProfileName {
 			listStr += "- " + profileName + activeFmt(" (active)") + " \n"
 		} else {
@@ -32,6 +32,10 @@ func RunInternalConfigListProfiles() (err error) {
 		description := profiles.GetKoanfConfig().KoanfInstance().String(profileName + "." + "description")
 		if description != "" {
 			listStr += "    " + description
+		}
+
+		if i < len(profileNames)-1 {
+			listStr += "\n"
 		}
 	}
 

@@ -52,11 +52,6 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 		return fmt.Errorf("failed to add profile: %w", err)
 	}
 
-	err = profiles.GetKoanfConfig().SaveProfile(newProfileName, subKoanf)
-	if err != nil {
-		return fmt.Errorf("failed to save added profile: %w", err)
-	}
-
 	return nil
 }
 

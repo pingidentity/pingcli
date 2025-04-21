@@ -137,6 +137,9 @@ func (k KoanfConfig) ProfileNames() (profileNames []string) {
 		}
 	}
 
+	// Sort the profile names
+	slices.Sort(profileNames)
+
 	return profileNames
 }
 
@@ -163,6 +166,10 @@ func (k KoanfConfig) ChangeActiveProfile(pName string) (err error) {
 	err = k.KoanfInstance().Set(options.RootActiveProfileOption.KoanfKey, pName)
 	if err != nil {
 		return fmt.Errorf("error setting active profile: %w", err)
+	}
+
+	if err = k.WriteFile(); err != nil {
+		return fmt.Errorf("failed to write config file for set active profile: %w", err)
 	}
 
 	return nil

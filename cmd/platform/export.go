@@ -73,7 +73,7 @@ func NewExportCommand() *cobra.Command {
 
 	err = cmd.RegisterFlagCompletionFunc(options.PlatformExportServiceOption.CobraParamName, autocompletion.PlatformExportServicesFunc)
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag services: %v", err), nil)
+		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag %s: %v", options.PlatformExportServiceOption.CobraParamName, err), nil)
 	}
 
 	err = cmd.RegisterFlagCompletionFunc(options.PingOneAuthenticationTypeOption.CobraParamName, autocompletion.PlatformExportPingOneAuthenticationTypeFunc)

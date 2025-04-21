@@ -28,10 +28,6 @@ func RunInternalConfigSetActiveProfile(args []string, rc io.ReadCloser) (err err
 		return fmt.Errorf("failed to set active profile: %w", err)
 	}
 
-	if err = profiles.GetKoanfConfig().WriteFile(); err != nil {
-		return fmt.Errorf("failed to write config file for set active profile: %w", err)
-	}
-
 	output.Success(fmt.Sprintf("Active profile set to '%s'", pName), nil)
 
 	return nil
