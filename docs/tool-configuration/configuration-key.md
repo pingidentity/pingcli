@@ -24,7 +24,7 @@ The following parameters can be configured in Ping CLI's static configuration fi
 | service.pingFederate.authentication.clientCredentialsAuth.scopes | ENUM_STRING_SLICE | --pingfederate-scopes | The PingFederate OAuth scopes used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.<br><br>Accepts a comma-separated string to delimit multiple scopes.<br><br>Example: `openid,profile` |
 | service.pingFederate.authentication.clientCredentialsAuth.tokenURL | ENUM_STRING | --pingfederate-token-url | The PingFederate OAuth token URL used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type. |
 | service.pingFederate.authentication.type | ENUM_PINGFEDERATE_AUTH_TYPE | --pingfederate-authentication-type | The authentication type to use when connecting to the PingFederate admin API.<br><br>Options are: accessTokenAuth, basicAuth, clientCredentialsAuth.<br><br>Example: `basicAuth` |
-| service.pingFederate.caCertificatePemFiles | ENUM_STRING_SLICE | --pingfederate-ca-certificate-pem-files | Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS.<br><br>Accepts a comma-separated string to delimit multiple PEM files. |
+| service.pingFederate.caCertificatePEMFiles | ENUM_STRING_SLICE | --pingfederate-ca-certificate-pem-files | Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS.<br><br>Accepts a comma-separated string to delimit multiple PEM files. |
 | service.pingFederate.httpsHost | ENUM_STRING | --pingfederate-https-host | The PingFederate HTTPS host used to communicate with PingFederate's admin API.<br><br>Example: `https://pingfederate-admin.bxretail.org` |
 | service.pingFederate.insecureTrustAllTLS | ENUM_BOOL | --pingfederate-insecure-trust-all-tls | Trust any certificate when connecting to the PingFederate server admin API.<br><br>This is insecure and shouldn't be enabled outside of testing. |
 | service.pingFederate.xBypassExternalValidationHeader | ENUM_BOOL | --pingfederate-x-bypass-external-validation-header | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). |
@@ -38,7 +38,7 @@ The following parameters can be configured in Ping CLI's static configuration fi
 
 | Config File Property | Type | Equivalent Parameter | Purpose |
 |---|---|---|---|
-| export.format | ENUM_STRING | --format / -f | Specifies the export format.<br><br>Options are: HCL.<br><br>Example: `HCL` |
+| export.format | ENUM_EXPORT_FORMAT | --format / -f | Specifies the export format.<br><br>Options are: HCL.<br><br>Example: `HCL` |
 | export.outputDirectory | ENUM_STRING | --output-directory / -d | Specifies the output directory for export. Example: `$HOME/pingcli-export` |
 | export.overwrite | ENUM_BOOL | --overwrite / -o | Overwrites the existing generated exports in output directory. |
 | export.pingone.environmentID | ENUM_UUID | --pingone-export-environment-id | The ID of the PingOne environment to export. Must be a valid PingOne UUID. |
@@ -49,4 +49,5 @@ The following parameters can be configured in Ping CLI's static configuration fi
 
 | Config File Property | Type | Equivalent Parameter | Purpose |
 |---|---|---|---|
+| request.fail | ENUM_BOOL | --fail / -f | Return non-zero exit code when HTTP custom request returns a failure status code. |
 | request.service | ENUM_REQUEST_SERVICE | --service / -s | The Ping service (configured in the active profile) to send the custom request to.<br><br>Options are: pingone.<br><br>Example: `pingone` |
