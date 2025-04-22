@@ -40,12 +40,10 @@ func Validate() (err error) {
 		return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 	}
 
-	if activeProfileName != "" {
-		// Make sure selected active profile is in the configuration file
-		if !slices.Contains(profileNames, activeProfileName) {
-			return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration "+
-				"file %s", activeProfileName, GetKoanfConfig().GetKoanfConfigFile())
-		}
+	// Make sure selected active profile is in the configuration file
+	if !slices.Contains(profileNames, activeProfileName) {
+		return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration "+
+			"file %s", activeProfileName, GetKoanfConfig().GetKoanfConfigFile())
 	}
 
 	// for each profile key, validate the profile koanf
