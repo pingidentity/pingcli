@@ -22,11 +22,6 @@ func Validate() (err error) {
 		return err
 	}
 
-	activeProfileName, err := GetOptionValue(options.RootActiveProfileOption)
-	if err != nil {
-		return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
-	}
-
 	profileName, err := GetOptionValue(options.RootProfileOption)
 	if err != nil {
 		return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
@@ -38,7 +33,14 @@ func Validate() (err error) {
 			return fmt.Errorf("failed to validate Ping CLI configuration: '%s' profile not found in configuration "+
 				"file %s", profileName, GetKoanfConfig().GetKoanfConfigFile())
 		}
-	} else {
+	}
+
+	activeProfileName, err := GetOptionValue(options.RootActiveProfileOption)
+	if err != nil {
+		return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
+	}
+
+	if activeProfileName != "" {
 		// Make sure selected active profile is in the configuration file
 		if !slices.Contains(profileNames, activeProfileName) {
 			return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration "+
