@@ -106,6 +106,10 @@ func parseKeyValuePair(kvPair string) (string, string, error) {
 		return "", "", fmt.Errorf("invalid assignment format '%s'. Expect 'key=value' format", kvPair)
 	}
 
+	if strings.EqualFold(parsedInput[0], options.RootActiveProfileOption.KoanfKey) {
+		return "", "", fmt.Errorf("invalid assignment. Please use the 'pingcli config set active-profile <profile-name>' command to set the active profile")
+	}
+
 	return parsedInput[0], parsedInput[1], nil
 }
 

@@ -68,3 +68,13 @@ func TestConfigAddProfileCmd_InvalidSetActiveValue(t *testing.T) {
 		"--set-active=invalid-value")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
+
+// Test config add profile command fails when using activeprofile as the profile name
+func TestConfigSetCmd_InvalidAddActiveProfile(t *testing.T) {
+	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'. name cannot be the same as the active profile key$`
+	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
+		"--name", "activeprofile",
+		"--description", "test description",
+		"--set-active=true")
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}

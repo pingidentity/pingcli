@@ -83,7 +83,7 @@ func configureMainKoanf(t *testing.T) {
 	mainKoanf.SetKoanfConfigFile(configFilePath)
 
 	if err := mainKoanf.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
-		t.Fatalf("Failed to load configurationhere from file '%s': %v", configFilePath, err)
+		t.Fatalf("Failed to load configuration from file '%s': %v", configFilePath, err)
 	}
 }
 

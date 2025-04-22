@@ -5,6 +5,7 @@ package feedback_test
 import (
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 )
@@ -36,4 +37,10 @@ func TestFeedbackCmd_InvalidFlag(t *testing.T) {
 	expectedErrorPattern := `^unknown flag: --invalid$`
 	err := testutils_cobra.ExecutePingcli(t, "feedback", "--invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Feedback Command with valid profile
+func TestFeedbackCmd_Profile(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "feedback", "--"+options.RootProfileOption.CobraParamName, "default")
+	testutils.CheckExpectedError(t, err, nil)
 }
