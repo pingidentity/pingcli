@@ -211,7 +211,7 @@ func InitPingFederateTerraform(t *testing.T) {
 	required_providers {
 		pingfederate = {
 		source = "pingidentity/pingfederate"
-		version = "1.4.3"
+		version = "1.4.4"
 		}
 	}
 }

@@ -189,7 +189,7 @@ openapp:
 
 protogen:
 	@echo -n "Running 'protoc' to generate Go code from proto files..."
-	@if protoc --proto_path=./shared/proto --go_out=./shared --go-grpc_out=./shared ./shared/proto/*.proto; then \
+	@if protoc --proto_path=./shared/proto --go_out=./shared --go-grpc_out=./shared --python_out=./shared --grpc_python_out=./shared ./shared/proto/*.proto; then \
 		echo " SUCCESS"; \
 	else \
 		echo " FAILED"; \
