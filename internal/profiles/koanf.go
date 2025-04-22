@@ -70,15 +70,8 @@ func KoanfValueFromOption(opt options.Option, pName string) (value string, ok bo
 
 		// Case 1: Koanf Key is the ActiveProfile Key, get value from main koanf instance
 		if opt.KoanfKey != "" && strings.EqualFold(opt.KoanfKey, options.RootActiveProfileOption.KoanfKey) && mainKoanfInstance != nil {
-			oldActiveProfileKey := mainKoanfInstance.KoanfInstance().Get("activeprofile")
-			if oldActiveProfileKey != nil {
-				kStringValue, ok := oldActiveProfileKey.(string)
-				if ok {
-					kValue = mainKoanfInstance.KoanfInstance().Get(kStringValue)
-				} else {
-					return "", false, fmt.Errorf("error getting koanf string value for key %s: %w", opt.KoanfKey, err)
-				}
-			} else {
+			kValue = mainKoanfInstance.KoanfInstance().Get("activeprofile")
+			if kValue == nil {
 				kValue = mainKoanfInstance.KoanfInstance().Get(opt.KoanfKey)
 			}
 		} else {
