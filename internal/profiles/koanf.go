@@ -155,6 +155,10 @@ func (k KoanfConfig) ValidateProfileNameFormat(pName string) (err error) {
 		return fmt.Errorf("invalid profile name: '%s'. name must contain only alphanumeric characters, underscores, and dashes", pName)
 	}
 
+	if strings.EqualFold(pName, options.RootActiveProfileOption.KoanfKey) {
+		return fmt.Errorf("invalid profile name: '%s'. name cannot be the same as the active profile key", pName)
+	}
+
 	return nil
 }
 

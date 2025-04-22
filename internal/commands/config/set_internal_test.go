@@ -21,6 +21,21 @@ func Test_RunInternalConfigSet(t *testing.T) {
 	}
 }
 
+// Test RunInternalConfigSet function fails when active profile is set
+func Test_RunInternalConfigSet_InvalidActiveProfileUse(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	var (
+		profileName = customtypes.String("default")
+	)
+
+	options.RootProfileOption.Flag.Changed = true
+	options.RootProfileOption.CobraParamValue = &profileName
+	expectedErrorPattern := `^failed to set configuration: invalid assignment. Please use the 'pingcli config set active-profile <profile-name>' command to set the active profile`
+	err := RunInternalConfigSet("activeProfile=myNewProfile")
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
 // Test RunInternalConfigSet function fails with invalid key
 func Test_RunInternalConfigSet_InvalidKey(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
