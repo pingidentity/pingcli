@@ -233,6 +233,36 @@ func (k KoanfConfig) GetProfileKoanf(pName string) (subKoanf *koanf.Koanf, err e
 }
 
 func (k KoanfConfig) WriteFile() (err error) {
+	// TODO - Remove this for loop prior to v0.7.0 release
+	for _, profileName := range k.ProfileNames() {
+		for key, val := range k.KoanfInstance().All() {
+			if profileName == key || !strings.Contains(key, profileName) {
+				continue
+			}
+			for _, opt := range options.Options() {
+				fullKoanfKeyValue := fmt.Sprintf("%s.%s", profileName, opt.KoanfKey)
+				if fullKoanfKeyValue == key {
+					continue
+				}
+				if strings.ToLower(fullKoanfKeyValue) == key {
+					err = k.KoanfInstance().Set(fullKoanfKeyValue, val)
+					if err != nil {
+						return fmt.Errorf("error setting koanf key %s: %w", fullKoanfKeyValue, err)
+					}
+					k.KoanfInstance().Delete(key)
+				}
+			}
+		}
+	}
+
+	// TODO - Remove this originalActiveProfileKey logic prior to v0.7.0 release
+	// Delete the original active profile key if it exists
+	// and the new active profile key if it exists
+	originalActiveProfileKey := strings.ToLower(options.RootActiveProfileOption.KoanfKey)
+	if k.KoanfInstance().Exists(originalActiveProfileKey) && k.KoanfInstance().Exists(options.RootActiveProfileOption.KoanfKey) {
+		k.KoanfInstance().Delete(strings.ToLower(originalActiveProfileKey))
+	}
+
 	encodedConfig, err := k.KoanfInstance().Marshal(yaml.Parser())
 	if err != nil {
 		return fmt.Errorf("error marshalling koanf: %w", err)
