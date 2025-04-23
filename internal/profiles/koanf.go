@@ -256,8 +256,7 @@ func (k KoanfConfig) WriteFile() (err error) {
 	}
 
 	// TODO - Remove this originalActiveProfileKey logic prior to v0.7.0 release
-	// Delete the original active profile key if it exists
-	// and the new active profile key if it exists
+	// Delete the original active profile key if it exists and the new activeProfile exists
 	originalActiveProfileKey := strings.ToLower(options.RootActiveProfileOption.KoanfKey)
 	if k.KoanfInstance().Exists(originalActiveProfileKey) && k.KoanfInstance().Exists(options.RootActiveProfileOption.KoanfKey) {
 		k.KoanfInstance().Delete(strings.ToLower(originalActiveProfileKey))
