@@ -69,8 +69,11 @@ func KoanfValueFromOption(opt options.Option, pName string) (value string, ok bo
 		)
 
 		// Case 1: Koanf Key is the ActiveProfile Key, get value from main koanf instance
-		if opt.KoanfKey != "" && opt.KoanfKey == options.RootActiveProfileOption.KoanfKey && mainKoanfInstance != nil {
-			kValue = mainKoanfInstance.KoanfInstance().Get(opt.KoanfKey)
+		if opt.KoanfKey != "" && strings.EqualFold(opt.KoanfKey, options.RootActiveProfileOption.KoanfKey) && mainKoanfInstance != nil {
+			kValue = mainKoanfInstance.KoanfInstance().Get("activeprofile")
+			if kValue == nil {
+				kValue = mainKoanfInstance.KoanfInstance().Get(opt.KoanfKey)
+			}
 		} else {
 			// // Case 2: --profile flag has been set, get value from set profile koanf instance
 			// // Case 3: no --profile flag set, get value from active profile koanf instance defined in main koanf instance
@@ -126,7 +129,7 @@ func (k KoanfConfig) ProfileNames() (profileNames []string) {
 	mainKoanfKeys := k.KoanfInstance().All()
 	for key := range mainKoanfKeys {
 		// Do not add Active profile koanf key to profileNames
-		if key == options.RootActiveProfileOption.KoanfKey {
+		if strings.EqualFold(key, options.RootActiveProfileOption.KoanfKey) {
 			continue
 		}
 
@@ -291,7 +294,7 @@ func (k KoanfConfig) DefaultMissingKoanfKeys() (err error) {
 		}
 
 		for _, opt := range options.Options() {
-			if opt.KoanfKey == "" || opt.KoanfKey == options.RootActiveProfileOption.KoanfKey {
+			if opt.KoanfKey == "" || strings.EqualFold(opt.KoanfKey, options.RootActiveProfileOption.KoanfKey) {
 				continue
 			}
 
