@@ -70,6 +70,7 @@ func (e OptionType) String() string {
 	if s, ok := optionTypeString[e]; ok {
 		return s
 	}
+
 	return "ENUM_UNKNOWN"
 }
 
@@ -77,6 +78,7 @@ func (e OptionType) FriendlyString() string {
 	if s, ok := optionTypeFriendlyString[e]; ok {
 		return s
 	}
+
 	return "Unknown"
 }
 
