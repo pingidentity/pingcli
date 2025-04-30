@@ -27,9 +27,9 @@ func Test_outputOptionsMDInfo(t *testing.T) {
 
 		var flagInfo string
 		if option.Flag.Shorthand != "" {
-			flagInfo = fmt.Sprintf("--%s / -%s", option.CobraParamName, option.Flag.Shorthand)
+			flagInfo = fmt.Sprintf("`--%s` / `-%s`", option.CobraParamName, option.Flag.Shorthand)
 		} else {
-			flagInfo = fmt.Sprintf("--%s", option.CobraParamName)
+			flagInfo = fmt.Sprintf("`--%s`", option.CobraParamName)
 		}
 
 		usageString := option.Flag.Usage
