@@ -2,9 +2,6 @@
 
 The following parameters can be configured in Ping CLI's static configuration file, usually located at $HOME/.pingcli/config.yaml. The following describes the properties that can be set, and an example can be found at [example-configuration.md](./example-configuration.md)
 
-
-#### General Properties
-
 #### General Properties
 
 | Configuration Key | Type | Equivalent Parameter | Purpose |
