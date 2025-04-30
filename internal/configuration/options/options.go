@@ -9,26 +9,76 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type OptionType string
+type OptionType int
 
 // OptionType enums
 const (
-	ENUM_BOOL                   OptionType = "ENUM_BOOL"
-	ENUM_EXPORT_FORMAT          OptionType = "ENUM_EXPORT_FORMAT"
-	ENUM_HEADER                 OptionType = "ENUM_HEADER"
-	ENUM_INT                    OptionType = "ENUM_INT"
-	ENUM_EXPORT_SERVICE_GROUP   OptionType = "ENUM_EXPORT_SERVICE_GROUP"
-	ENUM_EXPORT_SERVICES        OptionType = "ENUM_EXPORT_SERVICES"
-	ENUM_OUTPUT_FORMAT          OptionType = "ENUM_OUTPUT_FORMAT"
-	ENUM_PINGFEDERATE_AUTH_TYPE OptionType = "ENUM_PINGFEDERATE_AUTH_TYPE"
-	ENUM_PINGONE_AUTH_TYPE      OptionType = "ENUM_PINGONE_AUTH_TYPE"
-	ENUM_PINGONE_REGION_CODE    OptionType = "ENUM_PINGONE_REGION_CODE"
-	ENUM_REQUEST_HTTP_METHOD    OptionType = "ENUM_REQUEST_HTTP_METHOD"
-	ENUM_REQUEST_SERVICE        OptionType = "ENUM_REQUEST_SERVICE"
-	ENUM_STRING                 OptionType = "ENUM_STRING"
-	ENUM_STRING_SLICE           OptionType = "ENUM_STRING_SLICE"
-	ENUM_UUID                   OptionType = "ENUM_UUID"
+	ENUM_BOOL OptionType = iota
+	ENUM_EXPORT_FORMAT
+	ENUM_HEADER
+	ENUM_INT
+	ENUM_EXPORT_SERVICE_GROUP
+	ENUM_EXPORT_SERVICES
+	ENUM_OUTPUT_FORMAT
+	ENUM_PINGFEDERATE_AUTH_TYPE
+	ENUM_PINGONE_AUTH_TYPE
+	ENUM_PINGONE_REGION_CODE
+	ENUM_REQUEST_HTTP_METHOD
+	ENUM_REQUEST_SERVICE
+	ENUM_STRING
+	ENUM_STRING_SLICE
+	ENUM_UUID
 )
+
+var optionTypeString = map[OptionType]string{
+	ENUM_BOOL:                   "ENUM_BOOL",
+	ENUM_EXPORT_FORMAT:          "ENUM_EXPORT_FORMAT",
+	ENUM_HEADER:                 "ENUM_HEADER",
+	ENUM_INT:                    "ENUM_INT",
+	ENUM_EXPORT_SERVICE_GROUP:   "ENUM_EXPORT_SERVICE_GROUP",
+	ENUM_EXPORT_SERVICES:        "ENUM_EXPORT_SERVICES",
+	ENUM_OUTPUT_FORMAT:          "ENUM_OUTPUT_FORMAT",
+	ENUM_PINGFEDERATE_AUTH_TYPE: "ENUM_PINGFEDERATE_AUTH_TYPE",
+	ENUM_PINGONE_AUTH_TYPE:      "ENUM_PINGONE_AUTH_TYPE",
+	ENUM_PINGONE_REGION_CODE:    "ENUM_PINGONE_REGION_CODE",
+	ENUM_REQUEST_HTTP_METHOD:    "ENUM_REQUEST_HTTP_METHOD",
+	ENUM_REQUEST_SERVICE:        "ENUM_REQUEST_SERVICE",
+	ENUM_STRING:                 "ENUM_STRING",
+	ENUM_STRING_SLICE:           "ENUM_STRING_SLICE",
+	ENUM_UUID:                   "ENUM_UUID",
+}
+
+var optionTypeFriendlyString = map[OptionType]string{
+	ENUM_BOOL:                   "Boolean",
+	ENUM_EXPORT_FORMAT:          "String (enum)",
+	ENUM_HEADER:                 "Boolean",
+	ENUM_INT:                    "Number",
+	ENUM_EXPORT_SERVICE_GROUP:   "String (enum)",
+	ENUM_EXPORT_SERVICES:        "String Array (enum)",
+	ENUM_OUTPUT_FORMAT:          "String (enum)",
+	ENUM_PINGFEDERATE_AUTH_TYPE: "String (enum)",
+	ENUM_PINGONE_AUTH_TYPE:      "String (enum)",
+	ENUM_PINGONE_REGION_CODE:    "String (enum)",
+	ENUM_REQUEST_HTTP_METHOD:    "String (enum)",
+	ENUM_REQUEST_SERVICE:        "String (enum)",
+	ENUM_STRING:                 "String",
+	ENUM_STRING_SLICE:           "String Array",
+	ENUM_UUID:                   "String (UUID Format)",
+}
+
+func (e OptionType) String() string {
+	if s, ok := optionTypeString[e]; ok {
+		return s
+	}
+	return "ENUM_UNKNOWN"
+}
+
+func (e OptionType) FriendlyString() string {
+	if s, ok := optionTypeFriendlyString[e]; ok {
+		return s
+	}
+	return "Unknown"
+}
 
 type Option struct {
 	CobraParamName  string

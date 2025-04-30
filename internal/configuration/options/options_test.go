@@ -14,7 +14,7 @@ import (
 
 func Test_outputOptionsMDInfo(t *testing.T) {
 	// Skip this test. Use only to generate markdown table for documentation
-	t.SkipNow()
+	// t.SkipNow()
 
 	testutils_koanf.InitKoanfs(t)
 
@@ -37,18 +37,19 @@ func Test_outputOptionsMDInfo(t *testing.T) {
 		usageString = strings.ReplaceAll(usageString, "\n", "<br><br>")
 
 		if !strings.Contains(option.KoanfKey, ".") {
-			propertyCategoryInformation["general"] = append(propertyCategoryInformation["general"], fmt.Sprintf("| %s | %s | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
+			propertyCategoryInformation["general"] = append(propertyCategoryInformation["general"], fmt.Sprintf("| `%s` | %s | %s | %s |", option.KoanfKey, option.Type.FriendlyString(), flagInfo, usageString))
 		} else {
 			rootKey := strings.Split(option.KoanfKey, ".")[0]
-			propertyCategoryInformation[rootKey] = append(propertyCategoryInformation[rootKey], fmt.Sprintf("| %s | %s | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
+			propertyCategoryInformation[rootKey] = append(propertyCategoryInformation[rootKey], fmt.Sprintf("| `%s` | %s | %s | %s |", option.KoanfKey, option.Type.FriendlyString(), flagInfo, usageString))
 		}
 	}
 
 	var outputString string
 	for category, properties := range propertyCategoryInformation {
-		outputString += fmt.Sprintf("#### %s Properties\n\n", category)
+		capitalizedCategory := strings.ToUpper(category[:1]) + category[1:]
+		outputString += fmt.Sprintf("#### %s Properties\n\n", capitalizedCategory)
 
-		outputString += "| Config File Property | Type | Equivalent Parameter | Purpose |\n"
+		outputString += "| Configuration Key | Type | Equivalent Parameter | Purpose |\n"
 		outputString += "|---|---|---|---|\n"
 
 		slices.Sort(properties)
