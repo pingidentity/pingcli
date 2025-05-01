@@ -146,8 +146,8 @@ func initOutputFormatOption() {
 			Shorthand: "O",
 			Usage: fmt.Sprintf(
 				"Specify the console output format. "+
-					"(default %s)"+
-					"\nOptions are: %s.",
+					"(default `%s`)"+
+					"\nOptions are: `%s`.",
 				customtypes.ENUM_OUTPUT_FORMAT_TEXT,
 				strings.Join(customtypes.OutputFormatValidValues(), ", "),
 			),

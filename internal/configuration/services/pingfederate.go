@@ -64,7 +64,7 @@ func initAdminAPIPathOption() {
 		Flag: &pflag.Flag{
 			Name: cobraParamName,
 			Usage: "The PingFederate API URL path used to communicate with PingFederate's admin API. " +
-				"(default /pf-admin-api/v1)",
+				"(default `/pf-admin-api/v1`)",
 			Value: cobraValue,
 		},
 		Sensitive: false,
@@ -328,8 +328,8 @@ func initPingFederateAuthenticationTypeOption() {
 			Name: cobraParamName,
 			Usage: fmt.Sprintf(
 				"The authentication type to use when connecting to the PingFederate admin API."+
-					"\nOptions are: %s."+
-					"\nExample: '%s'",
+					"\nOptions are: `%s`."+
+					"\nExample: %s`",
 				strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "),
 				customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
 			),

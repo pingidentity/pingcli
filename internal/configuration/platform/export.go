@@ -35,8 +35,8 @@ func initFormatOption() {
 			Name:      cobraParamName,
 			Shorthand: "f",
 			Usage: fmt.Sprintf(
-				"Specifies the export format. (default %s)"+
-					"\nOptions are: %s.",
+				"Specifies the export format. (default `%s`)"+
+					"\nOptions are: `%s`.",
 				customtypes.ENUM_EXPORT_FORMAT_HCL,
 				strings.Join(customtypes.ExportFormatValidValues(), ", "),
 			),
@@ -63,8 +63,8 @@ func initServiceGroupOption() {
 			Shorthand: "g",
 			Usage: fmt.Sprintf(
 				"Specifies the service group to export. "+
-					"\nOptions are: %s."+
-					"\nExample: '%s'",
+					"\nOptions are: `%s`."+
+					"\nExample: `%s`",
 				strings.Join(customtypes.ExportServiceGroupValidValues(), ", "),
 				customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
 			),
@@ -91,8 +91,8 @@ func initServicesOption() {
 			Shorthand: "s",
 			Usage: fmt.Sprintf(
 				"Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services. "+
-					"\nOptions are: %s."+
-					"\nExample: '%s,%s,%s'",
+					"\nOptions are: `%s`."+
+					"\nExample: `%s,%s,%s`",
 				strings.Join(customtypes.ExportServicesValidValues(), ", "),
 				customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO,
 				customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA,
