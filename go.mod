@@ -4,7 +4,7 @@ go 1.24.1
 
 tool (
 	github.com/golangci/golangci-lint/cmd/golangci-lint
-	github.com/pavius/impi
+	github.com/pavius/impi/cmd/impi
 )
 
 require (
