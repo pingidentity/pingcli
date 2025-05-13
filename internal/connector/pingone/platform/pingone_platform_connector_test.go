@@ -78,6 +78,11 @@ func TestPlatformTerraformPlan(t *testing.T) {
 			ignoredErrors:    nil,
 		},
 		{
+			name:             "CustomRole",
+			testableResource: pingone_platform_testable_resources.CustomRole(t, clientInfo),
+			ignoredErrors:    nil,
+		},
+		{
 			name:             "Environment",
 			testableResource: pingone_platform_testable_resources.Environment(t, clientInfo),
 			ignoredErrors:    nil,
