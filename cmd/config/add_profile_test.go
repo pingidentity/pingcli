@@ -21,7 +21,13 @@ func TestConfigAddProfileCmd_Execute(t *testing.T) {
 // Test config add profile with multiple case-insensitive profile names
 func TestConfigAddProfileCmd_CaseInsensitiveProfileNamesExecute(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "TEST-PROFILE",
+		"--name", "same-profile",
+		"--description", "test description",
+		"--set-active=false")
+	testutils.CheckExpectedError(t, err, nil)
+
+	err = testutils_cobra.ExecutePingcli(t, "config", "add-profile",
+		"--name", "SAME-PROFILE",
 		"--description", "test description",
 		"--set-active=false")
 	testutils.CheckExpectedError(t, err, nil)
