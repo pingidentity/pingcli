@@ -18,6 +18,21 @@ func TestConfigAddProfileCmd_Execute(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
+// Test config add profile with multiple case-insensitive profile names
+func TestConfigAddProfileCmd_CaseInsensitiveProfileNamesExecute(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
+		"--name", "same-profile",
+		"--description", "test description",
+		"--set-active=false")
+	testutils.CheckExpectedError(t, err, nil)
+
+	err = testutils_cobra.ExecutePingcli(t, "config", "add-profile",
+		"--name", "SAME-PROFILE",
+		"--description", "test description",
+		"--set-active=false")
+	testutils.CheckExpectedError(t, err, nil)
+}
+
 // Test config add profile command fails when provided too many arguments
 func TestConfigAddProfileCmd_TooManyArgs(t *testing.T) {
 	expectedErrorPattern := `^failed to execute 'pingcli config add-profile': command accepts 0 arg\(s\), received 1$`

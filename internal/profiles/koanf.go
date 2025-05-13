@@ -69,11 +69,8 @@ func KoanfValueFromOption(opt options.Option, pName string) (value string, ok bo
 		)
 
 		// Case 1: Koanf Key is the ActiveProfile Key, get value from main koanf instance
-		if opt.KoanfKey != "" && strings.EqualFold(opt.KoanfKey, options.RootActiveProfileOption.KoanfKey) && mainKoanfInstance != nil {
-			kValue = mainKoanfInstance.KoanfInstance().Get("activeprofile")
-			if kValue == nil {
-				kValue = mainKoanfInstance.KoanfInstance().Get(opt.KoanfKey)
-			}
+		if opt.KoanfKey != "" && opt.KoanfKey == options.RootActiveProfileOption.KoanfKey && mainKoanfInstance != nil {
+			kValue = mainKoanfInstance.KoanfInstance().Get(opt.KoanfKey)
 		} else {
 			// // Case 2: --profile flag has been set, get value from set profile koanf instance
 			// // Case 3: no --profile flag set, get value from active profile koanf instance defined in main koanf instance
@@ -129,7 +126,7 @@ func (k KoanfConfig) ProfileNames() (profileNames []string) {
 	mainKoanfKeys := k.KoanfInstance().All()
 	for key := range mainKoanfKeys {
 		// Do not add Active profile koanf key to profileNames
-		if strings.EqualFold(key, options.RootActiveProfileOption.KoanfKey) {
+		if key == options.RootActiveProfileOption.KoanfKey {
 			continue
 		}
 
@@ -233,35 +230,6 @@ func (k KoanfConfig) GetProfileKoanf(pName string) (subKoanf *koanf.Koanf, err e
 }
 
 func (k KoanfConfig) WriteFile() (err error) {
-	// TODO - Remove this for loop prior to v0.7.0 release
-	for _, profileName := range k.ProfileNames() {
-		for key, val := range k.KoanfInstance().All() {
-			if profileName == key || !strings.Contains(key, profileName) {
-				continue
-			}
-			for _, opt := range options.Options() {
-				fullKoanfKeyValue := fmt.Sprintf("%s.%s", profileName, opt.KoanfKey)
-				if fullKoanfKeyValue == key {
-					continue
-				}
-				if strings.ToLower(fullKoanfKeyValue) == key {
-					err = k.KoanfInstance().Set(fullKoanfKeyValue, val)
-					if err != nil {
-						return fmt.Errorf("error setting koanf key %s: %w", fullKoanfKeyValue, err)
-					}
-					k.KoanfInstance().Delete(key)
-				}
-			}
-		}
-	}
-
-	// TODO - Remove this originalActiveProfileKey logic prior to v0.7.0 release
-	// Delete the original active profile key if it exists and the new activeProfile exists
-	originalActiveProfileKey := strings.ToLower(options.RootActiveProfileOption.KoanfKey)
-	if k.KoanfInstance().Exists(originalActiveProfileKey) && k.KoanfInstance().Exists(options.RootActiveProfileOption.KoanfKey) {
-		k.KoanfInstance().Delete(strings.ToLower(originalActiveProfileKey))
-	}
-
 	encodedConfig, err := k.KoanfInstance().Marshal(yaml.Parser())
 	if err != nil {
 		return fmt.Errorf("error marshalling koanf: %w", err)
@@ -323,7 +291,7 @@ func (k KoanfConfig) DefaultMissingKoanfKeys() (err error) {
 		}
 
 		for _, opt := range options.Options() {
-			if opt.KoanfKey == "" || strings.EqualFold(opt.KoanfKey, options.RootActiveProfileOption.KoanfKey) {
+			if opt.KoanfKey == "" || opt.KoanfKey == options.RootActiveProfileOption.KoanfKey {
 				continue
 			}
 
