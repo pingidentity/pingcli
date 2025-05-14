@@ -62,5 +62,6 @@ func (r *PingOneAdministratorSecurityResource) ExportAll() (*[]connector.ImportB
 
 func (r *PingOneAdministratorSecurityResource) checkAdministratorSecurityData() (bool, error) {
 	_, response, err := r.clientInfo.PingOneApiClient.ManagementAPIClient.AdministratorSecurityApi.ReadAdministratorSecurity(r.clientInfo.PingOneContext, r.clientInfo.PingOneExportEnvironmentID).Execute()
+
 	return common.CheckSingletonResource(response, err, "ReadAdministratorSecurity", r.ResourceType())
 }
