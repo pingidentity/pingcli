@@ -22,6 +22,11 @@ func TestPlatformTerraformPlan(t *testing.T) {
 		ignoredErrors    []string
 	}{
 		{
+			name:             "AdministratorSecurity",
+			testableResource: pingone_platform_testable_resources.AdministratorSecurity(t, clientInfo),
+			ignoredErrors:    nil,
+		},
+		{
 			name:             "Agreement",
 			testableResource: pingone_platform_testable_resources.Agreement(t, clientInfo),
 			ignoredErrors:    nil,
