@@ -44,12 +44,13 @@ func (c *PingOnePlatformConnector) Export(format, outputDir string, overwriteExp
 	l.Debug().Msgf("Exporting all PingOne Platform Resources...")
 
 	exportableResources := []connector.ExportableResource{
-		resources.AlertChannel(&c.clientInfo),
+		resources.AdministratorSecurity(&c.clientInfo),
 		resources.Agreement(&c.clientInfo),
 		resources.AgreementEnable(&c.clientInfo),
 		resources.AgreementLocalization(&c.clientInfo),
 		resources.AgreementLocalizationEnable(&c.clientInfo),
 		resources.AgreementLocalizationRevision(&c.clientInfo),
+		resources.AlertChannel(&c.clientInfo),
 		resources.BrandingSettings(&c.clientInfo),
 		resources.BrandingTheme(&c.clientInfo),
 		resources.BrandingThemeDefault(&c.clientInfo),
