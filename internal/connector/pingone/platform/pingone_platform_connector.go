@@ -56,6 +56,7 @@ func (c *PingOnePlatformConnector) Export(format, outputDir string, overwriteExp
 		resources.BrandingThemeDefault(&c.clientInfo),
 		resources.Certificate(&c.clientInfo),
 		resources.CustomDomain(&c.clientInfo),
+		resources.CustomRole(&c.clientInfo),
 		resources.Environment(&c.clientInfo),
 		resources.Form(&c.clientInfo),
 		resources.FormsRecaptchaV2(&c.clientInfo),
