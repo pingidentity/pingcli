@@ -101,7 +101,7 @@ func initPingOneAuthenticationTypeOption() {
 			Name: cobraParamName,
 			Usage: fmt.Sprintf(
 				"The authentication type to use to authenticate to the PingOne management API. (default %s)"+
-					"\nOptions are: %s.",
+					"\nOptions are: `%s`.",
 				customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER,
 				strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "),
 			),
@@ -128,8 +128,8 @@ func initRegionCodeOption() {
 			Name: cobraParamName,
 			Usage: fmt.Sprintf(
 				"The region code of the PingOne tenant."+
-					"\nOptions are: %s."+
-					"\nExample: '%s'",
+					"\nOptions are: `%s`."+
+					"\nExample: `%s`",
 				strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "),
 				customtypes.ENUM_PINGONE_REGION_CODE_NA,
 			),
