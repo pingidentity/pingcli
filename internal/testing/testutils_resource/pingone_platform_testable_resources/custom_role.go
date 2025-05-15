@@ -9,6 +9,7 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/connector/pingone"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/platform/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 )
@@ -34,6 +35,31 @@ func createCustomRole(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 		return testutils_resource.ResourceInfo{}
 	}
 
+	iter := clientInfo.PingOneApiClient.ManagementAPIClient.RolesApi.ReadAllRoles(clientInfo.PingOneContext).Execute()
+	apiObjs, err := pingone.GetManagementAPIObjectsFromIterator[management.EntityArrayEmbeddedRolesInner](iter, "ReadAllRoles", "GetRoles", resourceType)
+	if err != nil {
+		t.Errorf("Failed to execute PingOne client function\nError: %v", err)
+
+		return testutils_resource.ResourceInfo{}
+	}
+	if len(apiObjs) == 0 {
+		t.Fatal("Failed to execute PingOne client function\n No built-in roles returned from ReadAllRoles()")
+	}
+
+	var (
+		roleId string
+	)
+
+	for _, role := range apiObjs {
+		if role.Role != nil {
+			if role.Role.Name != nil && *role.Role.Name == management.ENUMROLENAME_APPLICATION_OWNER {
+				roleId = *role.Role.Id
+
+				break
+			}
+		}
+	}
+
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.CustomAdminRolesApi.CreateCustomAdminRole(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
 	clientStruct := management.CustomAdminRole{
 		Name: "Custom Role",
@@ -43,7 +69,7 @@ func createCustomRole(t *testing.T, clientInfo *connector.ClientInfo, resourceTy
 		},
 		CanBeAssignedBy: []management.CustomAdminRoleCanAssignInner{
 			{
-				Id: "29ddce68-cd7f-4b2a-b6fc-f7a19553b496",
+				Id: roleId,
 			},
 		},
 		Permissions: []management.CustomAdminRolePermissionsInner{
