@@ -13,7 +13,11 @@ func NewPluginCommand() *cobra.Command {
 		Use:   "plugin",
 	}
 
-	cmd.AddCommand(NewPluginAddCommand())
+	cmd.AddCommand(
+		NewPluginAddCommand(),
+		NewPluginListCommand(),
+		NewPluginRemoveCommand(),
+	)
 
 	return cmd
 }

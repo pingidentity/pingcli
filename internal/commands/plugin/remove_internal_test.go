@@ -10,8 +10,8 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
-// Test RunInternalPluginAdd function
-func Test_RunInternalPluginAdd(t *testing.T) {
+// Test RunInternalPluginRemove function
+func Test_RunInternalPluginRemove(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Create a temporary $PATH for a test plugin
@@ -40,11 +40,18 @@ func Test_RunInternalPluginAdd(t *testing.T) {
 	if err != nil {
 		t.Errorf("RunInternalPluginAdd returned error: %v", err)
 	}
+
+	err = RunInternalPluginRemove(testPlugin.Name())
+	if err != nil {
+		t.Errorf("RunInternalPluginRemove returned error: %v", err)
+	}
 }
 
-// Test RunInternalPluginAdd function fails with non-existent plugin
-func Test_RunInternalPluginAdd_NonExistentPlugin(t *testing.T) {
-	expectedErrorPattern := `^failed to add plugin: exec: .*: executable file not found in \$PATH$`
-	err := RunInternalPluginAdd("non-existent-plugin")
+// Test RunInternalPluginRemove function fails with non-existent plugin
+func Test_RunInternalPluginRemove_NonExistentPlugin(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	expectedErrorPattern := `^failed to remove plugin: plugin executable '.*' not found in profile '.*' plugins$`
+	err := RunInternalPluginRemove("non-existent-plugin")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

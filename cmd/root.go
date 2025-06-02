@@ -5,40 +5,36 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 
-	"github.com/hashicorp/go-hclog"
-	hplugin "github.com/hashicorp/go-plugin"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 	"github.com/pingidentity/pingcli/cmd/completion"
 	"github.com/pingidentity/pingcli/cmd/config"
 	"github.com/pingidentity/pingcli/cmd/platform"
 	"github.com/pingidentity/pingcli/cmd/plugin"
-	"github.com/pingidentity/pingcli/cmd/request"
 	"github.com/pingidentity/pingcli/internal/autocompletion"
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
+	"github.com/pingidentity/pingcli/internal/plugins"
 	"github.com/pingidentity/pingcli/internal/profiles"
-	"github.com/pingidentity/pingcli/shared"
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
-func NewRootCommand(version string, commit string) *cobra.Command {
+func init() {
 	l := logger.Get()
 
 	l.Debug().Msgf("Initializing Ping CLI options...")
 	configuration.InitAllOptions()
 
 	l.Debug().Msgf("Initializing Root command...")
+	cobra.OnInitialize(initKoanfProfile)
+}
 
-	initKoanfProfile()
-
+// rootCmd represents the base command when called without any subcommands
+func NewRootCommand(version string, commit string) *cobra.Command {
 	cmd := &cobra.Command{
 		Long:          "A CLI tool for managing the configuration of Ping Identity products.",
 		Short:         "A CLI tool for managing the configuration of Ping Identity products.",
@@ -53,10 +49,10 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 		config.NewConfigCommand(),
 		platform.NewPlatformCommand(),
 		plugin.NewPluginCommand(),
-		request.NewRequestCommand(),
+		// request.NewRequestCommand(),
 	)
 
-	err := addPluginCommands(cmd)
+	err := plugins.AddAllPluginToCmd(cmd)
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Failed to add plugin commands: %v", err), nil)
 	}
@@ -217,82 +213,4 @@ func loadKoanfConfig(cfgFile string) {
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Failed to marshal configuration file '%s': %v", cfgFile, err), nil)
 	}
-}
-
-func addPluginCommands(cmd *cobra.Command) error {
-	l := logger.Get()
-	pluginExecutables, err := profiles.GetOptionValue(options.PluginExecutablesOption)
-	if err != nil {
-		return fmt.Errorf("failed to get configured plugin executables: %w", err)
-	}
-
-	if pluginExecutables == "" {
-		return nil
-	}
-
-	pluginLogger := hclog.New(&hclog.LoggerOptions{
-		Name:   "pingcli",
-		Output: os.Stdout,
-		Level:  hclog.Warn,
-	})
-
-	for _, pluginExecutable := range strings.Split(pluginExecutables, ",") {
-		client := hplugin.NewClient(&hplugin.ClientConfig{
-			HandshakeConfig: shared.HandshakeConfig,
-			Plugins:         shared.PluginMap,
-			Cmd:             exec.Command(pluginExecutable),
-			AllowedProtocols: []hplugin.Protocol{
-				hplugin.ProtocolGRPC,
-			},
-			Logger:     pluginLogger,
-			SyncStdout: os.Stdout,
-			SyncStderr: os.Stderr,
-		})
-
-		rpcClient, err := client.Client()
-		if err != nil {
-			return fmt.Errorf("failed to create Plugin RPC client: %w", err)
-		}
-
-		raw, err := rpcClient.Dispense(shared.ENUM_PINGCLI_COMMAND_GRPC)
-		if err != nil {
-			return fmt.Errorf("failed to dispense Plugin: %w", err)
-		}
-
-		plugin, ok := raw.(shared.PingCliCommand)
-		if !ok {
-			return fmt.Errorf("failed to cast Plugin to PingCliCommand Interface")
-		}
-
-		resp, err := plugin.Configuration()
-		if err != nil {
-			return fmt.Errorf("failed to run command from Plugin: %w", err)
-		}
-
-		pluginCmd := &cobra.Command{
-			Use:                   resp.Use,
-			Short:                 resp.Short,
-			Long:                  resp.Long,
-			Example:               resp.Example,
-			DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
-			RunE: func(cmd *cobra.Command, args []string) error {
-				// TODO: Right now, this means we only cleanup the plugin after the command is run
-				// TODO: This leaves all other plugins added uncleaned up
-				defer client.Kill()
-
-				err := plugin.Run(args)
-				if err != nil {
-					return fmt.Errorf("failed to execute plugin command: %w", err)
-				}
-
-				return nil
-			},
-		}
-
-		cmd.AddCommand(pluginCmd)
-
-		l.Info().Msgf("Loaded plugin executable: %s", pluginExecutable)
-	}
-
-	return nil
 }

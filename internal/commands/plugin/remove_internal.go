@@ -2,7 +2,6 @@ package plugin_internal
 
 import (
 	"fmt"
-	"os/exec"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -10,30 +9,23 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-func RunInternalPluginAdd(pluginExecutable string) error {
+func RunInternalPluginRemove(pluginExecutable string) error {
 	if pluginExecutable == "" {
 		return fmt.Errorf("plugin executable is required")
 	}
 
-	// Check if plugin executable is in PATH
-	_, err := exec.LookPath(pluginExecutable)
+	err := removePluginExecutable(pluginExecutable)
 	if err != nil {
-		// exec error contains executable name and $PATH error message
-		return fmt.Errorf("failed to add plugin: %w", err)
+		return fmt.Errorf("failed to remove plugin: %w", err)
 	}
 
-	err = addPluginExecutable(pluginExecutable)
-	if err != nil {
-		return fmt.Errorf("failed to add plugin: %w", err)
-	}
-
-	output.Success(fmt.Sprintf("Plugin '%s' added.", pluginExecutable), nil)
+	output.Success(fmt.Sprintf("Plugin '%s' removed.", pluginExecutable), nil)
 
 	return nil
 }
 
-func addPluginExecutable(pluginExecutable string) error {
-	pName, err := readPluginAddProfileName()
+func removePluginExecutable(pluginExecutable string) error {
+	pName, err := readPluginRemoveProfileName()
 	if err != nil {
 		return fmt.Errorf("failed to read profile name: %w", err)
 	}
@@ -52,8 +44,13 @@ func addPluginExecutable(pluginExecutable string) error {
 	if err = strSlice.Set(existingPluginExectuables); err != nil {
 		return err
 	}
-	if err = strSlice.Set(pluginExecutable); err != nil {
+	removed, err := strSlice.Remove(pluginExecutable)
+	if err != nil {
 		return err
+	}
+
+	if !removed {
+		return fmt.Errorf("plugin executable '%s' not found in profile '%s' plugins", pluginExecutable, pName)
 	}
 
 	err = subKoanf.Set(options.PluginExecutablesOption.KoanfKey, strSlice)
@@ -68,7 +65,7 @@ func addPluginExecutable(pluginExecutable string) error {
 	return nil
 }
 
-func readPluginAddProfileName() (pName string, err error) {
+func readPluginRemoveProfileName() (pName string, err error) {
 	if !options.RootProfileOption.Flag.Changed {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 	} else {
