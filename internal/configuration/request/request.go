@@ -41,7 +41,7 @@ func initDataOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
 
@@ -64,7 +64,7 @@ func initDataRawOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_STRING,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
 
@@ -89,7 +89,7 @@ func initHeaderOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_HEADER,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
 
@@ -118,7 +118,7 @@ func initHTTPMethodOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_REQUEST_HTTP_METHOD,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }
 
@@ -147,7 +147,7 @@ func initServiceOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_REQUEST_SERVICE,
-		ViperKey:  "request.service",
+		KoanfKey:  "request.service",
 	}
 }
 
@@ -162,7 +162,7 @@ func initAccessTokenOption() {
 		Flag:            nil, // No flag
 		Sensitive:       true,
 		Type:            options.ENUM_STRING,
-		ViperKey:        "request.accessToken",
+		KoanfKey:        "request.accessToken",
 	}
 }
 
@@ -177,7 +177,7 @@ func initAccessTokenExpiryOption() {
 		Flag:            nil, // No flag
 		Sensitive:       false,
 		Type:            options.ENUM_INT,
-		ViperKey:        "request.accessTokenExpiry",
+		KoanfKey:        "request.accessTokenExpiry",
 	}
 }
 
@@ -199,6 +199,6 @@ func initFailOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "request.fail",
+		KoanfKey:  "request.fail",
 	}
 }

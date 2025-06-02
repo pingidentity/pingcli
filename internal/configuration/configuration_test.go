@@ -7,75 +7,75 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
-// Test ValidateViperKey function
-func Test_ValidateViperKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+// Test ValidateKoanfKey function
+func Test_ValidateKoanfKey(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	err := configuration.ValidateViperKey("noColor")
+	err := configuration.ValidateKoanfKey("noColor")
 	if err != nil {
-		t.Errorf("ValidateViperKey returned error: %v", err)
+		t.Errorf("ValidateKoanfKey returned error: %v", err)
 	}
 }
 
-// Test ValidateViperKey function fails with invalid key
-func Test_ValidateViperKey_InvalidKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+// Test ValidateKoanfKey function fails with invalid key
+func Test_ValidateKoanfKey_InvalidKey(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := configuration.ValidateViperKey("invalid-key")
+	err := configuration.ValidateKoanfKey("invalid-key")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test ValidateViperKey function fails with empty key
-func Test_ValidateViperKey_EmptyKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+// Test ValidateKoanfKey function fails with empty key
+func Test_ValidateKoanfKey_EmptyKey(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^key '' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := configuration.ValidateViperKey("")
+	err := configuration.ValidateKoanfKey("")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test ValidateParentViperKey function
-func Test_ValidateParentViperKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+// Test ValidateParentKoanfKey function
+func Test_ValidateParentKoanfKey(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	err := configuration.ValidateParentViperKey("service")
+	err := configuration.ValidateParentKoanfKey("service")
 	if err != nil {
-		t.Errorf("ValidateParentViperKey returned error: %v", err)
+		t.Errorf("ValidateParentKoanfKey returned error: %v", err)
 	}
 }
 
-// Test ValidateParentViperKey function fails with invalid key
-func Test_ValidateParentViperKey_InvalidKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+// Test ValidateParentKoanfKey function fails with invalid key
+func Test_ValidateParentKoanfKey_InvalidKey(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := configuration.ValidateParentViperKey("invalid-key")
+	err := configuration.ValidateParentKoanfKey("invalid-key")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test ValidateParentViperKey function fails with empty key
-func Test_ValidateParentViperKey_EmptyKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+// Test ValidateParentKoanfKey function fails with empty key
+func Test_ValidateParentKoanfKey_EmptyKey(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `^key '' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := configuration.ValidateParentViperKey("")
+	err := configuration.ValidateParentKoanfKey("")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test OptionFromViperKey function
-func Test_OptionFromViperKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+// Test OptionFromKoanfKey function
+func Test_OptionFromKoanfKey(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	opt, err := configuration.OptionFromViperKey("noColor")
+	opt, err := configuration.OptionFromKoanfKey("noColor")
 	if err != nil {
-		t.Errorf("OptionFromViperKey returned error: %v", err)
+		t.Errorf("OptionFromKoanfKey returned error: %v", err)
 	}
 
-	if opt.ViperKey != "noColor" {
-		t.Errorf("OptionFromViperKey returned invalid option: %v", opt)
+	if opt.KoanfKey != "noColor" {
+		t.Errorf("OptionFromKoanfKey returned invalid option: %v", opt)
 	}
 }

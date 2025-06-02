@@ -5,12 +5,12 @@ package plugin_internal
 import (
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test RunInternalConfigGet function
 func Test_RunInternalConfigGet(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := RunInternalPluginAdd("pingcli-feedback-plugin")
 	if err != nil {

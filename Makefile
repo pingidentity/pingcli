@@ -101,7 +101,7 @@ devcheck: devchecknotest spincontainer test removetestcontainer
 
 importfmtlint:
 	@echo -n "Running 'impi' to format import ordering..."
-	@if impi --local . --scheme stdThirdPartyLocal ./...; then \
+	@if go tool impi --local . --scheme stdThirdPartyLocal ./...; then \
 		echo " SUCCESS"; \
 	else \
 		echo " FAILED"; \
@@ -111,7 +111,7 @@ importfmtlint:
 golangcilint:
 	@echo -n "Running 'golangci-lint' to check for code quality issues... "
 	@# Clear the cache for every run, so that the linter outputs the same results as the GH Actions workflow
-	@golangci-lint cache clean && golangci-lint run --timeout 5m ./...
+	@go tool golangci-lint cache clean && go tool golangci-lint run --timeout 5m ./...
 
 starttestcontainer: --checkpfcontainerenvvars --checkdocker --dockerrunpf --waitforpfhealthy
 

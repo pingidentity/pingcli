@@ -9,18 +9,18 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 func Test_outputOptionsMDInfo(t *testing.T) {
 	// Skip this test. Use only to generate markdown table for documentation
 
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	propertyCategoryInformation := make(map[string][]string)
 
 	for _, option := range options.Options() {
-		if option.ViperKey == "" || option.Flag == nil {
+		if option.KoanfKey == "" || option.Flag == nil {
 			continue
 		}
 
@@ -35,11 +35,11 @@ func Test_outputOptionsMDInfo(t *testing.T) {
 		// Replace newlines with '<br><br>'
 		usageString = strings.ReplaceAll(usageString, "\n", "<br><br>")
 
-		if !strings.Contains(option.ViperKey, ".") {
-			propertyCategoryInformation["general"] = append(propertyCategoryInformation["general"], fmt.Sprintf("| %s | %s | %s | %s |", option.ViperKey, option.Type, flagInfo, usageString))
+		if !strings.Contains(option.KoanfKey, ".") {
+			propertyCategoryInformation["general"] = append(propertyCategoryInformation["general"], fmt.Sprintf("| %s | %s | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
 		} else {
-			rootKey := strings.Split(option.ViperKey, ".")[0]
-			propertyCategoryInformation[rootKey] = append(propertyCategoryInformation[rootKey], fmt.Sprintf("| %s | %s | %s | %s |", option.ViperKey, option.Type, flagInfo, usageString))
+			rootKey := strings.Split(option.KoanfKey, ".")[0]
+			propertyCategoryInformation[rootKey] = append(propertyCategoryInformation[rootKey], fmt.Sprintf("| %s | %s | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
 		}
 	}
 

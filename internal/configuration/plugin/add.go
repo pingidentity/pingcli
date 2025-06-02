@@ -22,6 +22,6 @@ func initPluginExecutablesOption() {
 		Flag:            nil, // No flag
 		Sensitive:       false,
 		Type:            options.ENUM_STRING_SLICE,
-		ViperKey:        "plugins",
+		KoanfKey:        "plugins",
 	}
 }

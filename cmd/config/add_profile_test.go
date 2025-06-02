@@ -18,6 +18,21 @@ func TestConfigAddProfileCmd_Execute(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
+// Test config add profile with multiple case-insensitive profile names
+func TestConfigAddProfileCmd_CaseInsensitiveProfileNamesExecute(t *testing.T) {
+	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
+		"--name", "same-profile",
+		"--description", "test description",
+		"--set-active=false")
+	testutils.CheckExpectedError(t, err, nil)
+
+	err = testutils_cobra.ExecutePingcli(t, "config", "add-profile",
+		"--name", "SAME-PROFILE",
+		"--description", "test description",
+		"--set-active=false")
+	testutils.CheckExpectedError(t, err, nil)
+}
+
 // Test config add profile command fails when provided too many arguments
 func TestConfigAddProfileCmd_TooManyArgs(t *testing.T) {
 	expectedErrorPattern := `^failed to execute 'pingcli config add-profile': command accepts 0 arg\(s\), received 1$`
@@ -51,19 +66,9 @@ func TestConfigAddProfileCmd_DuplicateProfileName(t *testing.T) {
 
 // Test config add profile command fails when provided an invalid profile name
 func TestConfigAddProfileCmd_InvalidProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'\. name must be lowercase and contain only alphanumeric characters, underscores, and dashes$`
+	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
 	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
 		"--name", "pname&*^*&^$&@!",
-		"--description", "test description",
-		"--set-active=false")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Root Command fails when provided an invalid value containing uppercase character for profile name
-func TestConfigAddProfileCmd_InvalidUpperCaseProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'\. name must be lowercase and contain only alphanumeric characters, underscores, and dashes$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "myProfile",
 		"--description", "test description",
 		"--set-active=false")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -76,5 +81,15 @@ func TestConfigAddProfileCmd_InvalidSetActiveValue(t *testing.T) {
 		"--name", "test-profile",
 		"--description", "test description",
 		"--set-active=invalid-value")
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test config add profile command fails when using activeprofile as the profile name
+func TestConfigSetCmd_InvalidAddActiveProfile(t *testing.T) {
+	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'. name cannot be the same as the active profile key$`
+	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
+		"--name", "activeprofile",
+		"--description", "test description",
+		"--set-active=true")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

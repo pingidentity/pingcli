@@ -308,14 +308,20 @@ func pingoneAuth() (accessToken string, err error) {
 		}
 	}
 
-	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
+	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
 	if err != nil {
 		return "", err
 	}
 
-	subViper.Set(options.RequestAccessTokenOption.ViperKey, pingoneAuthResponse.AccessToken)
-	subViper.Set(options.RequestAccessTokenExpiryOption.ViperKey, tokenExpiry)
-	err = profiles.GetMainConfig().SaveProfile(pName, subViper)
+	err = subKoanf.Set(options.RequestAccessTokenOption.KoanfKey, pingoneAuthResponse.AccessToken)
+	if err != nil {
+		return "", err
+	}
+	err = subKoanf.Set(options.RequestAccessTokenExpiryOption.KoanfKey, tokenExpiry)
+	if err != nil {
+		return "", err
+	}
+	err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf)
 	if err != nil {
 		return "", err
 	}

@@ -8,12 +8,12 @@ import (
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
-	"github.com/pingidentity/pingcli/internal/testing/testutils_viper"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test RunInternalConfigGet function
 func Test_RunInternalConfigGet(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	err := RunInternalConfigGet("service")
 	if err != nil {
@@ -23,7 +23,7 @@ func Test_RunInternalConfigGet(t *testing.T) {
 
 // Test RunInternalConfigGet function fails with invalid key
 func Test_RunInternalConfigGet_InvalidKey(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	expectedErrorPattern := `(?s)^failed to get configuration: key '.*' is not recognized as a valid configuration key\.\s*Use 'pingcli config list-keys' to view all available keys`
 	err := RunInternalConfigGet("invalid-key")
@@ -32,7 +32,7 @@ func Test_RunInternalConfigGet_InvalidKey(t *testing.T) {
 
 // Test RunInternalConfigGet function with different profile
 func Test_RunInternalConfigGet_DifferentProfile(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	var (
 		profileName = customtypes.String("production")
@@ -49,7 +49,7 @@ func Test_RunInternalConfigGet_DifferentProfile(t *testing.T) {
 
 // Test RunInternalConfigGet function fails with invalid profile name
 func Test_RunInternalConfigGet_InvalidProfileName(t *testing.T) {
-	testutils_viper.InitVipers(t)
+	testutils_koanf.InitKoanfs(t)
 
 	var (
 		profileName = customtypes.String("invalid")

@@ -32,6 +32,6 @@ func initConfigListKeysYAMLOption() {
 		},
 		Sensitive: false,
 		Type:      options.ENUM_BOOL,
-		ViperKey:  "", // No viper key
+		KoanfKey:  "", // No koanf key
 	}
 }

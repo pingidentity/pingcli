@@ -38,7 +38,7 @@ type Option struct {
 	Flag            *pflag.Flag
 	Sensitive       bool
 	Type            OptionType
-	ViperKey        string
+	KoanfKey        string
 }
 
 func Options() []Option {
@@ -98,9 +98,9 @@ func Options() []Option {
 		RequestFailOption,
 	}
 
-	// Sort the options list by viper key
+	// Sort the options list by koanf key
 	slices.SortFunc(optList, func(opt1, opt2 Option) int {
-		return strings.Compare(opt1.ViperKey, opt2.ViperKey)
+		return strings.Compare(opt1.KoanfKey, opt2.KoanfKey)
 	})
 
 	return optList
@@ -160,7 +160,7 @@ var (
 	PluginExecutablesOption Option
 )
 
-// Generic viper profile options
+// Generic koanf profile options
 var (
 	ProfileDescriptionOption Option
 )

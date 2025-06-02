@@ -1,6 +1,6 @@
 // Copyright © 2025 Ping Identity Corporation
 
-package testutils_viper
+package testutils_koanf
 
 import (
 	"fmt"
@@ -8,8 +8,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
 	"github.com/pingidentity/pingcli/internal/configuration"
-	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
@@ -20,6 +21,7 @@ const (
 
 var (
 	configFileContents               string
+	configFilePath                   string
 	defaultConfigFileContentsPattern string = `activeProfile: default
 default:
     description: "default description"
@@ -30,22 +32,22 @@ default:
         serviceGroup: %s
         services: ["%s"]
     service:
-        pingone:
+        pingOne:
             regionCode: %s
             authentication:
                 type: worker
                 worker:
-                    clientid: %s
-                    clientsecret: %s
-                    environmentid: %s
-        pingfederate:
-            adminapipath: /pf-admin-api/v1
+                    clientID: %s
+                    clientSecret: %s
+                    environmentID: %s
+        pingFederate:
+            adminAPIPath: /pf-admin-api/v1
             authentication:
-                type: basicauth
-                basicauth:
+                type: basicAuth
+                basicAuth:
                     username: Administrator
                     password: 2FederateM0re
-            httpshost: https://localhost:9999
+            httpsHost: https://localhost:9999
             insecureTrustAllTLS: true
             xBypassExternalValidationHeader: true
 production:
@@ -53,7 +55,7 @@ production:
     noColor: true
     outputFormat: text
     service:
-        pingfederate:
+        pingFederate:
             insecureTrustAllTLS: false
             xBypassExternalValidationHeader: false`
 )
@@ -65,49 +67,41 @@ func CreateConfigFile(t *testing.T) string {
 		configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
 	}
 
-	configFilepath := t.TempDir() + "/config.yaml"
-	if err := os.WriteFile(configFilepath, []byte(configFileContents), 0600); err != nil {
+	configFilePath := t.TempDir() + "/config.yaml"
+	if err := os.WriteFile(configFilePath, []byte(configFileContents), 0600); err != nil {
 		t.Fatalf("Failed to create config file: %s", err)
 	}
 
-	return configFilepath
+	return configFilePath
 }
 
-func configureMainViper(t *testing.T) {
+func configureMainKoanf(t *testing.T) {
 	t.Helper()
 
-	// Create and write to a temporary config file
-	configFilepath := CreateConfigFile(t)
-	// Give main viper instance a file location to write to
-	mainViper := profiles.GetMainConfig().ViperInstance()
-	mainViper.SetConfigFile(configFilepath)
-	mainViper.SetConfigType("yaml")
-	if err := mainViper.ReadInConfig(); err != nil {
-		t.Fatal(err)
-	}
+	configFilePath = CreateConfigFile(t)
+	mainKoanf := profiles.GetKoanfConfig()
+	mainKoanf.SetKoanfConfigFile(configFilePath)
 
-	activePName := profiles.GetMainConfig().ViperInstance().GetString(options.RootActiveProfileOption.ViperKey)
-
-	if err := profiles.GetMainConfig().ChangeActiveProfile(activePName); err != nil {
-		t.Fatal(err)
+	if err := mainKoanf.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
+		t.Fatalf("Failed to load configuration from file '%s': %v", configFilePath, err)
 	}
 }
 
-func InitVipers(t *testing.T) {
+func InitKoanfs(t *testing.T) {
 	t.Helper()
 
 	configuration.InitAllOptions()
 
-	configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
+	configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
 
-	configureMainViper(t)
+	configureMainKoanf(t)
 }
 
-func InitVipersCustomFile(t *testing.T, fileContents string) {
+func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 	t.Helper()
 
 	configFileContents = fileContents
-	configureMainViper(t)
+	configureMainKoanf(t)
 }
 
 func getDefaultConfigFileContents() string {

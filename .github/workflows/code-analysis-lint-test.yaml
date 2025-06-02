@@ -117,7 +117,7 @@ jobs:
         with:
           go-version-file: "go.mod"
           cache: true
-      - run: go install github.com/pavius/impi/cmd/impi && make importfmtlint
+      - run: make importfmtlint
   test:
     name: go test
     needs: [build]
@@ -143,3 +143,19 @@ jobs:
         with:
           terraform_wrapper: false
       - run: make starttestcontainer && make test && make removetestcontainer
+
+  onfailure:
+    if: ${{ always() && github.event_name == 'schedule' && contains(needs.*.result, 'failure') }}
+    needs: [test]
+    name: Send failure webhook
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl --silent --request POST "${{ secrets.FAILURE_WEBHOOK_URL }}" \
+          --header 'Accept: application/json' \
+          --header 'Content-Type: text/plain' \
+          --data-raw '{
+              "WorkflowName": "${{ github.workflow }}",
+              "WorkflowURL": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+              "RepoName" : "${{ github.repository }}",
+          }'

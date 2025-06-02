@@ -37,27 +37,27 @@ func addPluginExecutable(pluginExecutable string) error {
 		return fmt.Errorf("failed to read profile name: %w", err)
 	}
 
-	subViper, err := profiles.GetMainConfig().GetProfileViper(pName)
+	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
 	if err != nil {
-		return fmt.Errorf("failed to get profile viper: %w", err)
+		return fmt.Errorf("failed to get profile: %w", err)
 	}
 
-	existingPluginExectuables, _, err := profiles.ViperValueFromOption(options.PluginExecutablesOption)
+	existingPluginExectuables, _, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, "")
 	if err != nil {
 		return fmt.Errorf("failed to get existing plugin configuration: %w", err)
 	}
 
 	strSlice := new(customtypes.StringSlice)
 	if err = strSlice.Set(existingPluginExectuables); err != nil {
-		return fmt.Errorf("failed to validate existing executables of key '%s': %w", options.PluginExecutablesOption.ViperKey, err)
+		return fmt.Errorf("failed to validate existing executables of key '%s': %w", options.PluginExecutablesOption.KoanfKey, err)
 	}
 	if err = strSlice.Set(pluginExecutable); err != nil {
-		return fmt.Errorf("failed to add new executable to key '%s': %w", options.PluginExecutablesOption.ViperKey, err)
+		return fmt.Errorf("failed to add new executable to key '%s': %w", options.PluginExecutablesOption.KoanfKey, err)
 	}
 
-	subViper.Set(options.PluginExecutablesOption.ViperKey, strSlice)
+	subKoanf.Set(options.PluginExecutablesOption.KoanfKey, strSlice)
 
-	if err = profiles.GetMainConfig().SaveProfile(pName, subViper); err != nil {
+	if err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf); err != nil {
 		return err
 	}
 

@@ -13,12 +13,10 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource/pingone_platform_testable_resources"
 )
 
-// TODO: Remove after completion of TRIAGE-26607
-func Test_Form(t *testing.T) {
-	t.SkipNow()
+func Test_CustomRole(t *testing.T) {
 	clientInfo := testutils.GetClientInfo(t)
 
-	tr := pingone_platform_testable_resources.Form(t, clientInfo)
+	tr := pingone_platform_testable_resources.CustomRole(t, clientInfo)
 
 	tr.CreateResource(t)
 	defer tr.DeleteResource(t)

@@ -24,7 +24,7 @@ func RunInternalConfigSetActiveProfile(args []string, rc io.ReadCloser) (err err
 
 	output.Message(fmt.Sprintf("Setting active profile to '%s'...", pName), nil)
 
-	if err = profiles.GetMainConfig().ChangeActiveProfile(pName); err != nil {
+	if err = profiles.GetKoanfConfig().ChangeActiveProfile(pName); err != nil {
 		return fmt.Errorf("failed to set active profile: %w", err)
 	}
 
@@ -34,7 +34,7 @@ func RunInternalConfigSetActiveProfile(args []string, rc io.ReadCloser) (err err
 }
 
 func promptUserToSelectActiveProfile(rc io.ReadCloser) (pName string, err error) {
-	pName, err = input.RunPromptSelect("Select profile to set as active: ", profiles.GetMainConfig().ProfileNames(), rc)
+	pName, err = input.RunPromptSelect("Select profile to set as active: ", profiles.GetKoanfConfig().ProfileNames(), rc)
 
 	if err != nil {
 		return pName, err

@@ -12,11 +12,11 @@ import (
 )
 
 func ConfigViewProfileFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return profiles.GetMainConfig().ProfileNames(), cobra.ShellCompDirectiveNoFileComp
+	return profiles.GetKoanfConfig().ProfileNames(), cobra.ShellCompDirectiveNoFileComp
 }
 
 func ConfigReturnNonActiveProfilesFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	profileNames := profiles.GetMainConfig().ProfileNames()
+	profileNames := profiles.GetKoanfConfig().ProfileNames()
 	if len(args) != 0 {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}

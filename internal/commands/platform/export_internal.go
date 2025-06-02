@@ -380,7 +380,7 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 			"via the '--%s' flag, '%s' environment variable, or key '%s' in the configuration file",
 			options.PlatformExportOutputDirectoryOption.CobraParamName,
 			options.PlatformExportOutputDirectoryOption.EnvVar,
-			options.PlatformExportOutputDirectoryOption.ViperKey)
+			options.PlatformExportOutputDirectoryOption.KoanfKey)
 	}
 
 	// Check if path is absolute. If not, make it absolute using the present working directory
