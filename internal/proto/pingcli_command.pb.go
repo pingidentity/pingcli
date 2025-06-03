@@ -59,8 +59,8 @@ func (*Empty) Descriptor() ([]byte, []int) {
 
 type LoggerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	Fields        map[string]string      `protobuf:"bytes,2,rep,name=fields,proto3" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Message       *string                `protobuf:"bytes,1,opt,name=message" json:"message,omitempty"`
+	Fields        map[string]string      `protobuf:"bytes,2,rep,name=fields" json:"fields,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -96,8 +96,8 @@ func (*LoggerRequest) Descriptor() ([]byte, []int) {
 }
 
 func (x *LoggerRequest) GetMessage() string {
-	if x != nil {
-		return x.Message
+	if x != nil && x.Message != nil {
+		return *x.Message
 	}
 	return ""
 }
@@ -111,10 +111,10 @@ func (x *LoggerRequest) GetFields() map[string]string {
 
 type PingCliCommandConfigurationResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Example       string                 `protobuf:"bytes,1,opt,name=example,proto3" json:"example,omitempty"`
-	Long          string                 `protobuf:"bytes,2,opt,name=long,proto3" json:"long,omitempty"`
-	Short         string                 `protobuf:"bytes,3,opt,name=short,proto3" json:"short,omitempty"`
-	Use           string                 `protobuf:"bytes,4,opt,name=use,proto3" json:"use,omitempty"`
+	Example       *string                `protobuf:"bytes,1,opt,name=example" json:"example,omitempty"`
+	Long          *string                `protobuf:"bytes,2,opt,name=long" json:"long,omitempty"`
+	Short         *string                `protobuf:"bytes,3,opt,name=short" json:"short,omitempty"`
+	Use           *string                `protobuf:"bytes,4,opt,name=use" json:"use,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -150,37 +150,37 @@ func (*PingCliCommandConfigurationResponse) Descriptor() ([]byte, []int) {
 }
 
 func (x *PingCliCommandConfigurationResponse) GetExample() string {
-	if x != nil {
-		return x.Example
+	if x != nil && x.Example != nil {
+		return *x.Example
 	}
 	return ""
 }
 
 func (x *PingCliCommandConfigurationResponse) GetLong() string {
-	if x != nil {
-		return x.Long
+	if x != nil && x.Long != nil {
+		return *x.Long
 	}
 	return ""
 }
 
 func (x *PingCliCommandConfigurationResponse) GetShort() string {
-	if x != nil {
-		return x.Short
+	if x != nil && x.Short != nil {
+		return *x.Short
 	}
 	return ""
 }
 
 func (x *PingCliCommandConfigurationResponse) GetUse() string {
-	if x != nil {
-		return x.Use
+	if x != nil && x.Use != nil {
+		return *x.Use
 	}
 	return ""
 }
 
 type PingCliCommandRunRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Args          []string               `protobuf:"bytes,1,rep,name=args,proto3" json:"args,omitempty"`
-	Logger        uint32                 `protobuf:"varint,2,opt,name=logger,proto3" json:"logger,omitempty"`
+	Args          []string               `protobuf:"bytes,1,rep,name=args" json:"args,omitempty"`
+	Logger        *uint32                `protobuf:"varint,2,opt,name=logger" json:"logger,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -223,8 +223,8 @@ func (x *PingCliCommandRunRequest) GetArgs() []string {
 }
 
 func (x *PingCliCommandRunRequest) GetLogger() uint32 {
-	if x != nil {
-		return x.Logger
+	if x != nil && x.Logger != nil {
+		return *x.Logger
 	}
 	return 0
 }
@@ -233,11 +233,11 @@ var File_pingcli_command_proto protoreflect.FileDescriptor
 
 const file_pingcli_command_proto_rawDesc = "" +
 	"\n" +
-	"\x15pingcli_command.proto\x12\x05proto\"\a\n" +
-	"\x05Empty\"\x9e\x01\n" +
+	"\x15pingcli_command.proto\"\a\n" +
+	"\x05Empty\"\x98\x01\n" +
 	"\rLoggerRequest\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\x128\n" +
-	"\x06fields\x18\x02 \x03(\v2 .proto.LoggerRequest.FieldsEntryR\x06fields\x1a9\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\x122\n" +
+	"\x06fields\x18\x02 \x03(\v2\x1a.LoggerRequest.FieldsEntryR\x06fields\x1a9\n" +
 	"\vFieldsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"{\n" +
@@ -248,17 +248,17 @@ const file_pingcli_command_proto_rawDesc = "" +
 	"\x03use\x18\x04 \x01(\tR\x03use\"F\n" +
 	"\x18PingCliCommandRunRequest\x12\x12\n" +
 	"\x04args\x18\x01 \x03(\tR\x04args\x12\x16\n" +
-	"\x06logger\x18\x02 \x01(\rR\x06logger2\x91\x01\n" +
-	"\x0ePingCliCommand\x12I\n" +
-	"\rConfiguration\x12\f.proto.Empty\x1a*.proto.PingCliCommandConfigurationResponse\x124\n" +
-	"\x03Run\x12\x1f.proto.PingCliCommandRunRequest\x1a\f.proto.Empty2\xa7\x02\n" +
-	"\x06Logger\x12-\n" +
-	"\aMessage\x12\x14.proto.LoggerRequest\x1a\f.proto.Empty\x12-\n" +
-	"\aSuccess\x12\x14.proto.LoggerRequest\x1a\f.proto.Empty\x12*\n" +
-	"\x04Warn\x12\x14.proto.LoggerRequest\x1a\f.proto.Empty\x12/\n" +
-	"\tUserError\x12\x14.proto.LoggerRequest\x1a\f.proto.Empty\x12/\n" +
-	"\tUserFatal\x12\x14.proto.LoggerRequest\x1a\f.proto.Empty\x121\n" +
-	"\vPluginError\x12\x14.proto.LoggerRequest\x1a\f.proto.EmptyB\tZ\a./protob\x06proto3"
+	"\x06logger\x18\x02 \x01(\rR\x06logger2y\n" +
+	"\x0ePingCliCommand\x12=\n" +
+	"\rConfiguration\x12\x06.Empty\x1a$.PingCliCommandConfigurationResponse\x12(\n" +
+	"\x03Run\x12\x19.PingCliCommandRunRequest\x1a\x06.Empty2\xdf\x01\n" +
+	"\x06Logger\x12!\n" +
+	"\aMessage\x12\x0e.LoggerRequest\x1a\x06.Empty\x12!\n" +
+	"\aSuccess\x12\x0e.LoggerRequest\x1a\x06.Empty\x12\x1e\n" +
+	"\x04Warn\x12\x0e.LoggerRequest\x1a\x06.Empty\x12#\n" +
+	"\tUserError\x12\x0e.LoggerRequest\x1a\x06.Empty\x12#\n" +
+	"\tUserFatal\x12\x0e.LoggerRequest\x1a\x06.Empty\x12%\n" +
+	"\vPluginError\x12\x0e.LoggerRequest\x1a\x06.EmptyB\tZ\a./protob\beditionsp\xe8\a"
 
 var (
 	file_pingcli_command_proto_rawDescOnce sync.Once
@@ -274,30 +274,30 @@ func file_pingcli_command_proto_rawDescGZIP() []byte {
 
 var file_pingcli_command_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_pingcli_command_proto_goTypes = []any{
-	(*Empty)(nil),         // 0: proto.Empty
-	(*LoggerRequest)(nil), // 1: proto.LoggerRequest
-	(*PingCliCommandConfigurationResponse)(nil), // 2: proto.PingCliCommandConfigurationResponse
-	(*PingCliCommandRunRequest)(nil),            // 3: proto.PingCliCommandRunRequest
-	nil,                                         // 4: proto.LoggerRequest.FieldsEntry
+	(*Empty)(nil),         // 0: Empty
+	(*LoggerRequest)(nil), // 1: LoggerRequest
+	(*PingCliCommandConfigurationResponse)(nil), // 2: PingCliCommandConfigurationResponse
+	(*PingCliCommandRunRequest)(nil),            // 3: PingCliCommandRunRequest
+	nil,                                         // 4: LoggerRequest.FieldsEntry
 }
 var file_pingcli_command_proto_depIdxs = []int32{
-	4, // 0: proto.LoggerRequest.fields:type_name -> proto.LoggerRequest.FieldsEntry
-	0, // 1: proto.PingCliCommand.Configuration:input_type -> proto.Empty
-	3, // 2: proto.PingCliCommand.Run:input_type -> proto.PingCliCommandRunRequest
-	1, // 3: proto.Logger.Message:input_type -> proto.LoggerRequest
-	1, // 4: proto.Logger.Success:input_type -> proto.LoggerRequest
-	1, // 5: proto.Logger.Warn:input_type -> proto.LoggerRequest
-	1, // 6: proto.Logger.UserError:input_type -> proto.LoggerRequest
-	1, // 7: proto.Logger.UserFatal:input_type -> proto.LoggerRequest
-	1, // 8: proto.Logger.PluginError:input_type -> proto.LoggerRequest
-	2, // 9: proto.PingCliCommand.Configuration:output_type -> proto.PingCliCommandConfigurationResponse
-	0, // 10: proto.PingCliCommand.Run:output_type -> proto.Empty
-	0, // 11: proto.Logger.Message:output_type -> proto.Empty
-	0, // 12: proto.Logger.Success:output_type -> proto.Empty
-	0, // 13: proto.Logger.Warn:output_type -> proto.Empty
-	0, // 14: proto.Logger.UserError:output_type -> proto.Empty
-	0, // 15: proto.Logger.UserFatal:output_type -> proto.Empty
-	0, // 16: proto.Logger.PluginError:output_type -> proto.Empty
+	4, // 0: LoggerRequest.fields:type_name -> LoggerRequest.FieldsEntry
+	0, // 1: PingCliCommand.Configuration:input_type -> Empty
+	3, // 2: PingCliCommand.Run:input_type -> PingCliCommandRunRequest
+	1, // 3: Logger.Message:input_type -> LoggerRequest
+	1, // 4: Logger.Success:input_type -> LoggerRequest
+	1, // 5: Logger.Warn:input_type -> LoggerRequest
+	1, // 6: Logger.UserError:input_type -> LoggerRequest
+	1, // 7: Logger.UserFatal:input_type -> LoggerRequest
+	1, // 8: Logger.PluginError:input_type -> LoggerRequest
+	2, // 9: PingCliCommand.Configuration:output_type -> PingCliCommandConfigurationResponse
+	0, // 10: PingCliCommand.Run:output_type -> Empty
+	0, // 11: Logger.Message:output_type -> Empty
+	0, // 12: Logger.Success:output_type -> Empty
+	0, // 13: Logger.Warn:output_type -> Empty
+	0, // 14: Logger.UserError:output_type -> Empty
+	0, // 15: Logger.UserFatal:output_type -> Empty
+	0, // 16: Logger.PluginError:output_type -> Empty
 	9, // [9:17] is the sub-list for method output_type
 	1, // [1:9] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

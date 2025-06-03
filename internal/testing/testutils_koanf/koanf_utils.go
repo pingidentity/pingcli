@@ -29,7 +29,6 @@ default:
     outputFormat: text
     export:
         outputDirectory: %s
-        serviceGroup: %s
         services: ["%s"]
     service:
         pingOne:
@@ -79,8 +78,7 @@ func configureMainKoanf(t *testing.T) {
 	t.Helper()
 
 	configFilePath = CreateConfigFile(t)
-	mainKoanf := profiles.GetKoanfConfig()
-	mainKoanf.SetKoanfConfigFile(configFilePath)
+	mainKoanf := profiles.NewKoanfConfig(configFilePath)
 
 	if err := mainKoanf.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
 		t.Fatalf("Failed to load configuration from file '%s': %v", configFilePath, err)
@@ -107,8 +105,7 @@ func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
-		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
-		customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),

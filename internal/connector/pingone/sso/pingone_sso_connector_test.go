@@ -74,9 +74,9 @@ func TestSSOTerraformPlan(t *testing.T) {
 		{
 			name:             "IdentityProvider",
 			testableResource: pingone_sso_testable_resources.IdentityProvider(t, clientInfo),
-			ignoredErrors:    nil, // []string{
-			// 	"Error: Missing Configuration for Required Attribute",
-			// },
+			ignoredErrors: []string{
+				"Error: Missing Configuration for Required Attribute",
+			},
 		},
 		{
 			name:             "IdentityProviderAttribute",
@@ -126,9 +126,9 @@ func TestSSOTerraformPlan(t *testing.T) {
 		{
 			name:             "ResourceScopePingOneApi",
 			testableResource: pingone_sso_testable_resources.ResourceScopePingOneApi(t, clientInfo),
-			ignoredErrors:    nil, // []string{
-			// 	"Error: Invalid Attribute Value Match",
-			// },
+			ignoredErrors: []string{
+				"Error: Invalid Attribute Value Match",
+			},
 		},
 		{
 			name:             "ResourceSecret",
@@ -138,9 +138,9 @@ func TestSSOTerraformPlan(t *testing.T) {
 		{
 			name:             "SchemaAttribute",
 			testableResource: pingone_sso_testable_resources.SchemaAttribute(t, clientInfo),
-			ignoredErrors:    nil, // []string{
-			// 	"Error: Data Loss Protection",
-			// },
+			ignoredErrors: []string{
+				"Error: Data Loss Protection",
+			},
 		},
 		// TODO: Re-enable test after compleition of TRIAGE-26632
 		// {

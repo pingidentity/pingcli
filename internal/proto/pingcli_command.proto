@@ -1,5 +1,5 @@
-syntax = "proto3";
-package proto;
+edition = "2023";
+
 option go_package = "./proto";
 
 message Empty {}

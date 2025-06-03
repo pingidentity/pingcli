@@ -24,12 +24,11 @@ func (c *PingCliCommandGRPCClient) Configuration() (*PingCliCommandConfiguration
 	}
 
 	return &PingCliCommandConfiguration{
-		Example: resp.Example,
-		Long:    resp.Long,
-		Short:   resp.Short,
-		Use:     resp.Use,
+		Example: resp.GetExample(),
+		Long:    resp.GetLong(),
+		Short:   resp.GetShort(),
+		Use:     resp.GetUse(),
 	}, nil
-
 }
 
 func (c *PingCliCommandGRPCClient) Run(args []string, l Logger) error {
@@ -50,7 +49,7 @@ func (c *PingCliCommandGRPCClient) Run(args []string, l Logger) error {
 
 	_, err := c.client.Run(context.Background(), &proto.PingCliCommandRunRequest{
 		Args:   args,
-		Logger: brokerId,
+		Logger: &brokerId,
 	})
 
 	return err

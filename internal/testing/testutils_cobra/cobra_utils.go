@@ -4,10 +4,12 @@ package testutils_cobra
 
 import (
 	"bytes"
+	"os"
 	"testing"
 
 	"github.com/pingidentity/pingcli/cmd"
 	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	testutils_koanf "github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
@@ -19,10 +21,17 @@ func ExecutePingcli(t *testing.T, args ...string) (err error) {
 	// Reset options for testing individual executions of pingcli
 	configuration.InitAllOptions()
 
-	root := cmd.NewRootCommand("test-version", "test-commit")
-
-	// Add config location to the root command
+	// Create a temporary config file for the test
 	configFilepath := testutils_koanf.CreateConfigFile(t)
+
+	// Set the config file in the test env so it is used in creation of the root command
+	t.Setenv(options.RootConfigOption.EnvVar, configFilepath)
+	test := os.Getenv(options.RootConfigOption.EnvVar)
+	if test != configFilepath {
+		t.Fatalf("Expected config file path %s, got %s", configFilepath, test)
+	}
+
+	root := cmd.NewRootCommand("test-version", "test-commit")
 	args = append([]string{"--config", configFilepath}, args...)
 	root.SetArgs(args)
 

@@ -42,6 +42,7 @@ func (ss *StringSlice) Remove(val string) (bool, error) {
 	for i, v := range *ss {
 		if v == val {
 			*ss = slices.Delete(*ss, i, i+1)
+
 			return true, nil
 		}
 	}

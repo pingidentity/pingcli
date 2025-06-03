@@ -13,10 +13,13 @@ import (
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
 // Test Request Command Executes without issue
 func TestRequestCmd_Execute(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	originalStdout := os.Stdout
 	pipeReader, pipeWriter, err := os.Pipe()
 	if err != nil {
@@ -93,6 +96,8 @@ func TestRequestCmd_Execute_Help(t *testing.T) {
 
 // Test Request Command with Invalid Service
 func TestRequestCmd_Execute_InvalidService(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^invalid argument ".*" for "-s, --service" flag: unrecognized Request Service: '.*'. Must be one of: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--"+options.RequestServiceOption.CobraParamName, "invalid-service",
@@ -104,6 +109,8 @@ func TestRequestCmd_Execute_InvalidService(t *testing.T) {
 
 // Test Request Command with Invalid HTTP Method
 func TestRequestCmd_Execute_InvalidHTTPMethod(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^invalid argument ".*" for "-m, --http-method" flag: unrecognized HTTP Method: '.*'. Must be one of: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--"+options.RequestServiceOption.CobraParamName, "pingone",
@@ -122,29 +129,37 @@ func TestRequestCmd_Execute_MissingRequiredServiceFlag(t *testing.T) {
 
 // Test Request Command with Header Flag
 func TestRequestCmd_Execute_HeaderFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--"+options.RequestServiceOption.CobraParamName, "pingone",
 		"--"+options.RequestHTTPMethodOption.CobraParamName, "GET",
 		"--"+options.RequestHeaderOption.CobraParamName, "Content-Type: application/vnd.pingidentity.user.import+json",
-		fmt.Sprintf("environments/%s/users", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+		"--"+options.RequestFailOption.CobraParamName,
+		fmt.Sprintf("environments/%s/users", os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")),
 	)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Request Command with Header Flag with and without spacing
 func TestRequestCmd_Execute_HeaderFlagSpacing(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--"+options.RequestServiceOption.CobraParamName, "pingone",
 		"--"+options.RequestHTTPMethodOption.CobraParamName, "GET",
 		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header:TestValue",
 		"--"+options.RequestHeaderOption.CobraParamName, "Test-Header-Two:\tTestValue",
-		fmt.Sprintf("environments/%s/users", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)),
+		"--"+options.RequestFailOption.CobraParamName,
+		fmt.Sprintf("environments/%s/users", os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")),
 	)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Request Command with invalid Header Flag
 func TestRequestCmd_Execute_InvalidHeaderFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^invalid argument ".*" for "-r, --header" flag: failed to set Headers: Invalid header: invalid=header. Headers must be in the proper format. Expected regex pattern: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--"+options.RequestServiceOption.CobraParamName, "pingone",
@@ -156,6 +171,8 @@ func TestRequestCmd_Execute_InvalidHeaderFlag(t *testing.T) {
 
 // Test Request Command with disallowed Authorization Header Flag
 func TestRequestCmd_Execute_DisallowedAuthorizationFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^invalid argument ".*" for "-r, --header" flag: failed to set Headers: Invalid header: Authorization. Authorization header is not allowed$`
 	err := testutils_cobra.ExecutePingcli(t, "request",
 		"--"+options.RequestServiceOption.CobraParamName, "pingone",

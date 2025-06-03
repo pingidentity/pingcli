@@ -11,8 +11,10 @@ import (
 	"github.com/knadh/koanf/providers/file"
 	"github.com/pingidentity/pingcli/cmd/completion"
 	"github.com/pingidentity/pingcli/cmd/config"
+	"github.com/pingidentity/pingcli/cmd/feedback"
 	"github.com/pingidentity/pingcli/cmd/platform"
 	"github.com/pingidentity/pingcli/cmd/plugin"
+	"github.com/pingidentity/pingcli/cmd/request"
 	"github.com/pingidentity/pingcli/internal/autocompletion"
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -23,18 +25,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
+// rootCmd represents the base command when called without any subcommands
+func NewRootCommand(version string, commit string) *cobra.Command {
 	l := logger.Get()
 
 	l.Debug().Msgf("Initializing Ping CLI options...")
 	configuration.InitAllOptions()
 
 	l.Debug().Msgf("Initializing Root command...")
-	cobra.OnInitialize(initKoanfProfile)
-}
+	initKoanfProfile()
 
-// rootCmd represents the base command when called without any subcommands
-func NewRootCommand(version string, commit string) *cobra.Command {
 	cmd := &cobra.Command{
 		Long:          "A CLI tool for managing the configuration of Ping Identity products.",
 		Short:         "A CLI tool for managing the configuration of Ping Identity products.",
@@ -47,9 +47,10 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 		// auth.NewAuthCommand(),
 		completion.Command(),
 		config.NewConfigCommand(),
+		feedback.NewFeedbackCommand(),
 		platform.NewPlatformCommand(),
 		plugin.NewPluginCommand(),
-		// request.NewRequestCommand(),
+		request.NewRequestCommand(),
 	)
 
 	err := plugins.AddAllPluginToCmd(cmd)
@@ -199,8 +200,7 @@ func initKoanf(cfgFile string) {
 func loadKoanfConfig(cfgFile string) {
 	l := logger.Get()
 
-	koanfConfig := profiles.GetKoanfConfig()
-	koanfConfig.SetKoanfConfigFile(cfgFile)
+	koanfConfig := profiles.NewKoanfConfig(cfgFile)
 
 	// Use config file from the flag.
 	if err := koanfConfig.KoanfInstance().Load(file.Provider(cfgFile), yaml.Parser()); err != nil {

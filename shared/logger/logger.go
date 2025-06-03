@@ -11,6 +11,7 @@ func (gl SharedLogger) convertFields(fields map[string]string) map[string]interf
 	for k, v := range fields {
 		convertedFields[k] = v
 	}
+
 	return convertedFields
 }
 

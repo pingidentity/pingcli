@@ -24,10 +24,10 @@ func (s *PingCliCommandGRPCServer) Configuration(ctx context.Context, req *proto
 	}
 
 	return &proto.PingCliCommandConfigurationResponse{
-		Example: cmd.Example,
-		Long:    cmd.Long,
-		Short:   cmd.Short,
-		Use:     cmd.Use,
+		Example: &cmd.Example,
+		Long:    &cmd.Long,
+		Short:   &cmd.Short,
+		Use:     &cmd.Use,
 	}, nil
 }
 
@@ -43,5 +43,6 @@ func (s *PingCliCommandGRPCServer) Run(ctx context.Context, req *proto.PingCliCo
 	}
 
 	err = s.Impl.Run(req.GetArgs(), loggerClient)
+
 	return &proto.Empty{}, err
 }

@@ -5,10 +5,9 @@ package grpc
 import (
 	"context"
 
-	"google.golang.org/grpc"
-
 	"github.com/hashicorp/go-plugin"
 	"github.com/pingidentity/pingcli/internal/proto"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -63,6 +62,7 @@ func (p *PingCliCommandGrpcPlugin) GRPCServer(broker *plugin.GRPCBroker, s *grpc
 		broker: broker,
 		Impl:   p.Impl,
 	})
+
 	return nil
 }
 

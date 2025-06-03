@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	k *KoanfConfig = NewKoanfConfig("")
+	k *KoanfConfig
 )
 
 type KoanfConfig struct {
@@ -23,10 +23,12 @@ type KoanfConfig struct {
 }
 
 func NewKoanfConfig(cnfFilePath string) *KoanfConfig {
-	return &KoanfConfig{
+	k = &KoanfConfig{
 		koanfInstance:  koanf.New("."),
 		configFilePath: &cnfFilePath,
 	}
+
+	return k
 }
 
 func GetKoanfConfig() *KoanfConfig {

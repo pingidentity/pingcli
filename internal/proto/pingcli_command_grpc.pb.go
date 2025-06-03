@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PingCliCommand_Configuration_FullMethodName = "/proto.PingCliCommand/Configuration"
-	PingCliCommand_Run_FullMethodName           = "/proto.PingCliCommand/Run"
+	PingCliCommand_Configuration_FullMethodName = "/PingCliCommand/Configuration"
+	PingCliCommand_Run_FullMethodName           = "/PingCliCommand/Run"
 )
 
 // PingCliCommandClient is the client API for PingCliCommand service.
@@ -142,7 +142,7 @@ func _PingCliCommand_Run_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var PingCliCommand_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.PingCliCommand",
+	ServiceName: "PingCliCommand",
 	HandlerType: (*PingCliCommandServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -159,12 +159,12 @@ var PingCliCommand_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Logger_Message_FullMethodName     = "/proto.Logger/Message"
-	Logger_Success_FullMethodName     = "/proto.Logger/Success"
-	Logger_Warn_FullMethodName        = "/proto.Logger/Warn"
-	Logger_UserError_FullMethodName   = "/proto.Logger/UserError"
-	Logger_UserFatal_FullMethodName   = "/proto.Logger/UserFatal"
-	Logger_PluginError_FullMethodName = "/proto.Logger/PluginError"
+	Logger_Message_FullMethodName     = "/Logger/Message"
+	Logger_Success_FullMethodName     = "/Logger/Success"
+	Logger_Warn_FullMethodName        = "/Logger/Warn"
+	Logger_UserError_FullMethodName   = "/Logger/UserError"
+	Logger_UserFatal_FullMethodName   = "/Logger/UserFatal"
+	Logger_PluginError_FullMethodName = "/Logger/PluginError"
 )
 
 // LoggerClient is the client API for Logger service.
@@ -418,7 +418,7 @@ func _Logger_PluginError_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Logger_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Logger",
+	ServiceName: "Logger",
 	HandlerType: (*LoggerServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
