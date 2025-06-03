@@ -96,13 +96,26 @@ func SystemError(message string, fields map[string]interface{}) {
 	l := logger.Get()
 	systemMsg := fmt.Sprintf(`FATAL: %s
 		
-This is a bug in the Ping CLI and needs reporting to our team.
+This is a bug in PingCLI and needs reporting to our team.
 		
 Please raise an issue at https://github.com/pingidentity/pingcli`,
 		message)
 
-	// l.Fatal() exits the program prematurely before the message is printed
-	// pass nil to print the message before exiting
+	printOutput(systemMsg, fields, boldRed, l.Fatal)
+}
+
+// This function is used to inform the user a plugin-level error
+// has occurred. These errors should indicate a bug or bad behavior
+// of the plugin.
+func PluginError(message string, fields map[string]interface{}) {
+	l := logger.Get()
+	systemMsg := fmt.Sprintf(`FATAL: %s
+		
+This is a bug in the plugin and needs reporting to the plugin maintainers.
+		
+Consider raising an issue at the plugin's issue tracker.`,
+		message)
+
 	printOutput(systemMsg, fields, boldRed, l.Fatal)
 }
 

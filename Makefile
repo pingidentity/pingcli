@@ -101,7 +101,7 @@ devcheck: devchecknotest spincontainer test removetestcontainer
 
 importfmtlint:
 	@echo -n "Running 'impi' to format import ordering..."
-	@if go tool impi --local . --scheme stdThirdPartyLocal ./...; then \
+	@if go tool impi --skip internal/proto/pingcli_command --local . --scheme stdThirdPartyLocal ./...; then \
 		echo " SUCCESS"; \
 	else \
 		echo " FAILED"; \
@@ -111,7 +111,12 @@ importfmtlint:
 golangcilint:
 	@echo -n "Running 'golangci-lint' to check for code quality issues... "
 	@# Clear the cache for every run, so that the linter outputs the same results as the GH Actions workflow
-	@go tool golangci-lint cache clean && go tool golangci-lint run --timeout 5m ./...
+	@if go tool golangci-lint cache clean && go tool golangci-lint run --timeout 5m ./...; then \
+		echo "SUCCESS"; \
+	else \
+		echo "FAILED"; \
+		exit 1; \
+	fi
 
 starttestcontainer: --checkpfcontainerenvvars --checkdocker --dockerrunpf --waitforpfhealthy
 
@@ -181,6 +186,15 @@ openlocalwebapi:
 openapp:
 	@echo -n "Opening the PingFederate Admin Console in the default web browser..."
 	@if open "https://localhost:9999/pingfederate/app"; then \
+		echo " SUCCESS"; \
+	else \
+		echo " FAILED"; \
+		exit 1; \
+	fi
+
+protogen:
+	@echo -n "Running 'protoc' to generate Go code from proto files..."
+	@if protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto; then \
 		echo " SUCCESS"; \
 	else \
 		echo " FAILED"; \

@@ -15,6 +15,7 @@ import (
 
 // Test Platform Export Command Executes without issue
 func TestPlatformExportCmd_Execute(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -25,8 +26,6 @@ func TestPlatformExportCmd_Execute(t *testing.T) {
 
 // Test Platform Export Command fails when provided too many arguments
 func TestPlatformExportCmd_TooManyArgs(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
 	expectedErrorPattern := `^failed to execute 'pingcli platform export': command accepts 0 arg\(s\), received 1$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export", "extra-arg")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -50,6 +49,7 @@ func TestPlatformExportCmd_HelpFlag(t *testing.T) {
 
 // Test Platform Export Command --service-group, -g flag
 func TestPlatformExportCmd_ServiceGroupFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -61,6 +61,8 @@ func TestPlatformExportCmd_ServiceGroupFlag(t *testing.T) {
 
 // Test Platform Export Command --service-group with non-supported service group
 func TestPlatformExportCmd_ServiceGroupFlagInvalidServiceGroup(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^invalid argument ".*" for "-g, --service-group" flag: unrecognized service group '.*'\. Must be one of: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportServiceGroupOption.CobraParamName, "invalid")
@@ -69,6 +71,7 @@ func TestPlatformExportCmd_ServiceGroupFlagInvalidServiceGroup(t *testing.T) {
 
 // Test Platform Export Command --services flag
 func TestPlatformExportCmd_ServicesFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -80,6 +83,8 @@ func TestPlatformExportCmd_ServicesFlag(t *testing.T) {
 
 // Test Platform Export Command --services flag with invalid service
 func TestPlatformExportCmd_ServicesFlagInvalidService(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^invalid argument ".*" for "-s, --services" flag: failed to set ExportServices: Invalid service: .*\. Allowed services: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportServiceOption.CobraParamName, "invalid")
@@ -88,6 +93,7 @@ func TestPlatformExportCmd_ServicesFlagInvalidService(t *testing.T) {
 
 // Test Platform Export Command --format flag
 func TestPlatformExportCmd_ExportFormatFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -100,6 +106,8 @@ func TestPlatformExportCmd_ExportFormatFlag(t *testing.T) {
 
 // Test Platform Export Command --format flag with invalid format
 func TestPlatformExportCmd_ExportFormatFlagInvalidFormat(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^invalid argument ".*" for "-f, --format" flag: unrecognized export format '.*'\. Must be one of: .*$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportExportFormatOption.CobraParamName, "invalid")
@@ -108,6 +116,7 @@ func TestPlatformExportCmd_ExportFormatFlagInvalidFormat(t *testing.T) {
 
 // Test Platform Export Command --output-directory flag
 func TestPlatformExportCmd_OutputDirectoryFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -119,6 +128,8 @@ func TestPlatformExportCmd_OutputDirectoryFlag(t *testing.T) {
 
 // Test Platform Export Command --output-directory flag with invalid directory
 func TestPlatformExportCmd_OutputDirectoryFlagInvalidDirectory(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^failed to create output directory '\/invalid': mkdir \/invalid: .+$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, "/invalid")
@@ -127,6 +138,7 @@ func TestPlatformExportCmd_OutputDirectoryFlagInvalidDirectory(t *testing.T) {
 
 // Test Platform Export Command --overwrite flag
 func TestPlatformExportCmd_OverwriteFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -139,6 +151,7 @@ func TestPlatformExportCmd_OverwriteFlag(t *testing.T) {
 // Test Platform Export Command --overwrite flag false with existing directory
 // where the directory already contains a file
 func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	_, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
@@ -157,6 +170,7 @@ func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T)
 // Test Platform Export Command --overwrite flag true with existing directory
 // where the directory already contains a file
 func TestPlatformExportCmd_OverwriteFlagTrueWithExistingDirectory(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	_, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
@@ -177,6 +191,7 @@ func TestPlatformExportCmd_OverwriteFlagTrueWithExistingDirectory(t *testing.T) 
 // --pingone-worker-client-secret flag
 // --pingone-region flag
 func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -192,6 +207,8 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 
 // Test Platform Export Command fails when not provided required pingone flags together
 func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlagRequiredTogether(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^if any flags in the group \[pingone-worker-environment-id pingone-worker-client-id pingone-worker-client-secret pingone-region-code] are set they must all be set; missing \[pingone-region-code pingone-worker-client-id pingone-worker-client-secret]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"))
@@ -200,6 +217,7 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlagRequiredTogether(t *tes
 
 // Test Platform Export command with PingFederate Basic Auth flags
 func TestPlatformExportCmd_PingFederateBasicAuthFlags(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -215,6 +233,8 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlags(t *testing.T) {
 
 // Test Platform Export Command fails when not provided required PingFederate Basic Auth flags together
 func TestPlatformExportCmd_PingFederateBasicAuthFlagsRequiredTogether(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^if any flags in the group \[pingfederate-username pingfederate-password] are set they must all be set; missing \[pingfederate-password]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PingFederateBasicAuthUsernameOption.CobraParamName, "Administrator")
@@ -223,6 +243,7 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsRequiredTogether(t *testing
 
 // Test Platform Export Command fails when provided invalid PingOne Client Credential flags
 func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	expectedErrorPattern := `^failed to initialize pingone API client\. Check worker client ID, worker client secret, worker environment ID, and pingone region code configuration values\. oauth2: \"invalid_client\" \"Request denied: Unsupported authentication method \(Correlation ID: .*\)\"$`
@@ -240,6 +261,7 @@ func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
 
 // Test Platform Export Command fails when provided invalid PingFederate Basic Auth flags
 func TestPlatformExportCmd_PingFederateBasicAuthFlagsInvalid(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
@@ -256,6 +278,8 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsInvalid(t *testing.T) {
 
 // Test Platform Export Command fails when not provided required PingFederate Client Credentials Auth flags together
 func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsRequiredTogether(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^if any flags in the group \[pingfederate-client-id pingfederate-client-secret pingfederate-token-url] are set they must all be set; missing \[pingfederate-client-secret pingfederate-token-url]$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName, "test")
@@ -264,6 +288,7 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsRequiredTogethe
 
 // Test Platform Export Command fails when provided invalid PingFederate Client Credentials Auth flags
 func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalid(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
@@ -282,6 +307,7 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalid(t *test
 
 // Test Platform Export Command fails when provided invalid PingFederate OAuth2 Token URL
 func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalidTokenURL(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
@@ -299,6 +325,7 @@ func TestPlatformExportCmd_PingFederateClientCredentialsAuthFlagsInvalidTokenURL
 
 // Test Platform Export command with PingFederate X-Bypass Header set to true
 func TestPlatformExportCmd_PingFederateXBypassHeaderFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -315,6 +342,7 @@ func TestPlatformExportCmd_PingFederateXBypassHeaderFlag(t *testing.T) {
 
 // Test Platform Export command with PingFederate --pingfederate-insecure-trust-all-tls flag set to true
 func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -331,6 +359,7 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlag(t *testing.T) {
 
 // Test Platform Export command fails with PingFederate --pingfederate-insecure-trust-all-tls flag set to false
 func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	expectedErrorPattern := `^failed to initialize PingFederate Go Client. Check authentication type and credentials$`
@@ -350,6 +379,7 @@ func TestPlatformExportCmd_PingFederateTrustAllTLSFlagFalse(t *testing.T) {
 // --pingfederate-insecure-trust-all-tls=false
 // and --pingfederate-ca-certificate-pem-files set
 func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -367,6 +397,8 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
 
 // Test Platform Export command fails with --pingfederate-ca-certificate-pem-files set to non-existent file.
 func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	expectedErrorPattern := `^failed to read CA certificate PEM file '.*': open .*: no such file or directory$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,

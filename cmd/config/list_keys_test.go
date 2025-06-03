@@ -59,6 +59,7 @@ func Example_listKeysValue() {
 	// - export.services
 	// - noColor
 	// - outputFormat
+	// - plugins
 	// - request.accessToken
 	// - request.accessTokenExpiry
 	// - request.fail

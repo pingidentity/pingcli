@@ -162,7 +162,7 @@ func InitPingOneTerraform(t *testing.T) {
 	required_providers {
 		pingone = {
 		source = "pingidentity/pingone"
-		version = "1.6.0"
+		version = "1.8.0"
 		}
 	}
 }
@@ -211,7 +211,7 @@ func InitPingFederateTerraform(t *testing.T) {
 	required_providers {
 		pingfederate = {
 		source = "pingidentity/pingfederate"
-		version = "1.4.3"
+		version = "1.5.0"
 		}
 	}
 }
