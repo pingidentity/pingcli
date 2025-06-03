@@ -14,6 +14,7 @@ import (
 
 func Test_outputOptionsMDInfo(t *testing.T) {
 	// Skip this test. Use only to generate markdown table for documentation
+	t.SkipNow()
 
 	testutils_koanf.InitKoanfs(t)
 

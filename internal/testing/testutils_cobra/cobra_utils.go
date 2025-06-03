@@ -4,7 +4,6 @@ package testutils_cobra
 
 import (
 	"bytes"
-	"os"
 	"testing"
 
 	"github.com/pingidentity/pingcli/cmd"
@@ -26,10 +25,6 @@ func ExecutePingcli(t *testing.T, args ...string) (err error) {
 
 	// Set the config file in the test env so it is used in creation of the root command
 	t.Setenv(options.RootConfigOption.EnvVar, configFilepath)
-	test := os.Getenv(options.RootConfigOption.EnvVar)
-	if test != configFilepath {
-		t.Fatalf("Expected config file path %s, got %s", configFilepath, test)
-	}
 
 	root := cmd.NewRootCommand("test-version", "test-commit")
 	args = append([]string{"--config", configFilepath}, args...)
