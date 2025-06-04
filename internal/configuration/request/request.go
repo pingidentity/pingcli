@@ -108,8 +108,8 @@ func initHTTPMethodOption() {
 			Shorthand: "m",
 			Usage: fmt.Sprintf(
 				"The HTTP method to use for the request. (default %s)"+
-					"\nOptions are: %s."+
-					"\nExample: '%s'",
+					"\nOptions are: `%s`."+
+					"\nExample: `%s`",
 				customtypes.ENUM_HTTP_METHOD_GET,
 				strings.Join(customtypes.HTTPMethodValidValues(), ", "),
 				customtypes.ENUM_HTTP_METHOD_POST,
@@ -137,9 +137,9 @@ func initServiceOption() {
 			Name:      cobraParamName,
 			Shorthand: "s",
 			Usage: fmt.Sprintf(
-				"The Ping service (configured in the active profile) to send the custom request to."+
-					"\nOptions are: %s."+
-					"\nExample: '%s'",
+				"The Ping Identity service (configured in the active profile) to send the custom request to."+
+					"\nOptions are: `%s`."+
+					"\nExample: `%s`",
 				strings.Join(customtypes.RequestServiceValidValues(), ", "),
 				customtypes.ENUM_REQUEST_SERVICE_PINGONE,
 			),
@@ -194,7 +194,7 @@ func initFailOption() {
 			Name:        cobraParamName,
 			NoOptDefVal: "true",
 			Shorthand:   "f",
-			Usage:       "Return non-zero exit code when HTTP custom request returns a failure status code.",
+			Usage:       "Return non-zero exit code when HTTP request returns a failure status code.",
 			Value:       cobraValue,
 		},
 		Sensitive: false,
