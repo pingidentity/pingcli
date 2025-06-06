@@ -58,6 +58,43 @@ production:
         pingFederate:
             insecureTrustAllTLS: false
             xBypassExternalValidationHeader: false`
+
+	defaultLegacyConfigFileContentsPattern string = `activeprofile: default
+default:
+    description: "default description"
+    nocolor: true
+    outputformat: text
+    export:
+        outputdirectory: %s
+        servicegroup: %s
+        services: ["%s"]
+    service:
+        pingone:
+            regioncode: %s
+            authentication:
+                type: worker
+                worker:
+                    clientid: %s
+                    clientsecret: %s
+                    environmentid: %s
+        pingfederate:
+            adminapipath: /pf-admin-api/v1
+            authentication:
+                type: basicauth
+                basicauth:
+                    username: Administrator
+                    password: 2FederateM0re
+            httpshost: https://localhost:9999
+            insecuretrustalltls: true
+            xbypassexternalvalidationheader: true
+production:
+    description: "test profile description"
+    nocolor: true
+    outputformat: text
+    service:
+        pingfederate:
+            insecuretrustalltls: false
+            xbypassexternalvalidationheader: false`
 )
 
 func CreateConfigFile(t *testing.T) string {
@@ -106,6 +143,18 @@ func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 
 func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
+		outputDirectoryReplacement,
+		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
+		customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+		os.Getenv("TEST_PINGONE_REGION_CODE"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+	)
+}
+
+func ReturnDefaultLegacyConfigFileContents() string {
+	return fmt.Sprintf(defaultLegacyConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,
 		customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,

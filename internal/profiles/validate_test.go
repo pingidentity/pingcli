@@ -19,6 +19,16 @@ func TestValidate(t *testing.T) {
 	}
 }
 
+// Test Validate function with legacy profile
+func TestValidateLegacyProfile(t *testing.T) {
+	testutils_koanf.InitKoanfsCustomFile(t, testutils_koanf.ReturnDefaultLegacyConfigFileContents())
+
+	err := profiles.Validate()
+	if err == nil {
+		t.Errorf("Validate returned nil, expected error")
+	}
+}
+
 // Test Validate function with invalid uuid
 func TestValidateInvalidProfile(t *testing.T) {
 	fileContents := `activeProfile: default
