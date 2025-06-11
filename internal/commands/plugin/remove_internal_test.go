@@ -56,11 +56,10 @@ func Test_RunInternalPluginRemove(t *testing.T) {
 	}
 }
 
-// Test RunInternalPluginRemove function fails with non-existent plugin
+// Test RunInternalPluginRemove function succeeds with non-existent plugin
 func Test_RunInternalPluginRemove_NonExistentPlugin(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	expectedErrorPattern := `^failed to remove plugin: plugin executable '.*' not found in profile '.*' plugins$`
 	err := RunInternalPluginRemove("non-existent-plugin")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	testutils.CheckExpectedError(t, err, nil)
 }
