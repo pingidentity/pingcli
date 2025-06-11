@@ -18,11 +18,10 @@ func TestPluginRemoveCmd_Execute(t *testing.T) {
 	// We can probably use a future plugin for testing once made.
 }
 
-// Test Plugin remove Command fails when provided a non-existent plugin
+// Test Plugin remove Command succeeds when provided a non-existent plugin
 func TestPluginRemoveCmd_NonExistentPlugin(t *testing.T) {
-	expectedErrorPattern := `^failed to remove plugin: plugin executable '.*' not found in profile '.*' plugins$`
 	err := testutils_cobra.ExecutePingcli(t, "plugin", "remove", "non-existent-plugin")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Plugin remove Command fails when provided too many arguments
