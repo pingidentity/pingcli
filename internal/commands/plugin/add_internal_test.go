@@ -22,7 +22,13 @@ func Test_RunInternalPluginAdd(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temporary plugin file: %v", err)
 	}
-	defer os.Remove(testPlugin.Name())
+
+	defer func() {
+		err = os.Remove(testPlugin.Name())
+		if err != nil {
+			t.Fatalf("Failed to remove temporary plugin file: %v", err)
+		}
+	}()
 
 	_, err = testPlugin.WriteString("#!/usr/bin/env sh\necho \"Hello, world!\"\nexit 0\n")
 	if err != nil {
@@ -34,7 +40,10 @@ func Test_RunInternalPluginAdd(t *testing.T) {
 		t.Fatalf("Failed to set permissions on temporary plugin file: %v", err)
 	}
 
-	testPlugin.Close()
+	err = testPlugin.Close()
+	if err != nil {
+		t.Fatalf("Failed to close temporary plugin file: %v", err)
+	}
 
 	err = RunInternalPluginAdd(testPlugin.Name())
 	if err != nil {

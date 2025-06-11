@@ -9,21 +9,21 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 )
 
-// Test Platform Command Executes without issue
-func TestPlatformCmd_Execute(t *testing.T) {
+// Test Plugin Command Executes without issue
+func TestPluginCmd_Execute(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "plugin")
 	testutils.CheckExpectedError(t, err, nil)
 }
 
-// Test Platform Command fails when provided invalid flag
-func TestPlatformCmd_InvalidFlag(t *testing.T) {
+// Test Plugin Command fails when provided invalid flag
+func TestPluginCmd_InvalidFlag(t *testing.T) {
 	expectedErrorPattern := `^unknown flag: --invalid$`
 	err := testutils_cobra.ExecutePingcli(t, "plugin", "--invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test Platform Command --help, -h flag
-func TestPlatformCmd_HelpFlag(t *testing.T) {
+// Test Plugin Command --help, -h flag
+func TestPluginCmd_HelpFlag(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "plugin", "--help")
 	testutils.CheckExpectedError(t, err, nil)
 

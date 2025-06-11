@@ -4,6 +4,7 @@ package grpc
 
 import (
 	"context"
+	"errors"
 
 	"github.com/hashicorp/go-plugin"
 	"github.com/pingidentity/pingcli/internal/proto"
@@ -31,12 +32,17 @@ func (s *PingCliCommandGRPCServer) Configuration(ctx context.Context, req *proto
 	}, nil
 }
 
-func (s *PingCliCommandGRPCServer) Run(ctx context.Context, req *proto.PingCliCommandRunRequest) (*proto.Empty, error) {
+func (s *PingCliCommandGRPCServer) Run(ctx context.Context, req *proto.PingCliCommandRunRequest) (em *proto.Empty, err error) {
 	conn, err := s.broker.Dial(req.GetLogger())
 	if err != nil {
 		return nil, err
 	}
-	defer conn.Close()
+	defer func() {
+		cErr := conn.Close()
+		if cErr != nil {
+			err = errors.Join(err, cErr)
+		}
+	}()
 
 	loggerClient := &LoggerGRPCClient{
 		proto.NewLoggerClient(conn),

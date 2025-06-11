@@ -11,7 +11,7 @@ import (
 
 const (
 	addPluginCommandExamples = `  Add a plugin to use with PingCLI.
-    pingcli plugin add plugin-executable`
+    pingcli plugin add pingcli-plugin-executable`
 )
 
 func NewPluginAddCommand() *cobra.Command {

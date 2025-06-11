@@ -50,7 +50,7 @@ func removePluginExecutable(pluginExecutable string) error {
 	}
 
 	if !removed {
-		return fmt.Errorf("plugin executable '%s' not found in profile '%s' plugins", pluginExecutable, pName)
+		output.Warn(fmt.Sprintf("plugin executable '%s' not found in profile '%s' plugins", pluginExecutable, pName), nil)
 	}
 
 	err = subKoanf.Set(options.PluginExecutablesOption.KoanfKey, strSlice)

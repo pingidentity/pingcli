@@ -11,7 +11,7 @@ import (
 
 const (
 	removePluginCommandExamples = `  Remove a plugin from PingCLI.
-    pingcli plugin remove plugin-executable`
+    pingcli plugin remove pingcli-plugin-executable`
 )
 
 func NewPluginRemoveCommand() *cobra.Command {
