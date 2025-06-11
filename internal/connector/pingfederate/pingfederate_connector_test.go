@@ -69,9 +69,7 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 		{
 			name:             "PingFederateCertificateCa",
 			testableResource: pingfederate_testable_resources.CertificateCa(t, pingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid Attribute Value Length",
-			},
+			ignoredErrors:    nil,
 		},
 		{
 			name:             "PingFederateCertificatesRevocationOcspCertificate",
@@ -338,9 +336,7 @@ func TestPingFederateTerraformPlan(t *testing.T) {
 		{
 			name:             "PingFederateServerSettingsWsTrustStsSettingsIssuerCertificate",
 			testableResource: pingfederate_testable_resources.ServerSettingsWsTrustStsSettingsIssuerCertificate(t, pingFederateClientInfo),
-			ignoredErrors: []string{
-				"Error: Missing Configuration for Required Attribute",
-			},
+			ignoredErrors:    nil,
 		},
 		{
 			name:             "PingFederateServiceAuthentication",

@@ -1,0 +1,36 @@
+edition = "2023";
+
+option go_package = "./proto";
+
+message Empty {}
+
+message LoggerRequest {
+  string message = 1;
+  map<string, string> fields = 2;
+}
+
+message PingCliCommandConfigurationResponse {
+  string example = 1;
+  string long = 2;
+  string short = 3;
+  string use = 4;
+}
+
+message PingCliCommandRunRequest {
+  repeated string args = 1;
+  uint32 logger = 2;
+}
+
+service PingCliCommand {
+  rpc Configuration (Empty) returns (PingCliCommandConfigurationResponse);
+  rpc Run (PingCliCommandRunRequest) returns (Empty);
+}
+
+service Logger {
+  rpc Message(LoggerRequest) returns (Empty);
+  rpc Success(LoggerRequest) returns (Empty);
+  rpc Warn(LoggerRequest) returns (Empty);
+  rpc UserError(LoggerRequest) returns (Empty);
+  rpc UserFatal(LoggerRequest) returns (Empty);
+  rpc PluginError(LoggerRequest) returns (Empty);
+}

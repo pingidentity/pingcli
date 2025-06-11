@@ -4,6 +4,7 @@ package customtypes
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/spf13/pflag"
@@ -27,6 +28,26 @@ func (ss *StringSlice) Set(val string) error {
 	}
 
 	return nil
+}
+
+func (ss *StringSlice) Remove(val string) (bool, error) {
+	if ss == nil {
+		return false, fmt.Errorf("failed to remove StringSlice value: %s. StringSlice is nil", val)
+	}
+
+	if val == "" || val == "[]" {
+		return false, nil
+	}
+
+	for i, v := range *ss {
+		if v == val {
+			*ss = slices.Delete(*ss, i, i+1)
+
+			return true, nil
+		}
+	}
+
+	return false, nil
 }
 
 func (ss StringSlice) Type() string {

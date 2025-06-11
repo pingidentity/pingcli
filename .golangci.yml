@@ -34,7 +34,6 @@ linters:
     - ineffassign
     - interfacebloat
     - intrange
-    - ireturn
     - makezero
     - mirror
     - misspell

@@ -52,6 +52,8 @@ func TestConfigUnsetCmd_CheckKoanfConfig(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "config", "unset", koanfKey)
 	testutils.CheckExpectedError(t, err, nil)
 
+	koanfConfig = profiles.GetKoanfConfig().KoanfInstance()
+
 	koanfNewValue := koanfConfig.String(profileKoanfKey)
 	if koanfOldValue == koanfNewValue {
 		t.Errorf("Expected koanf configuration value to be updated. Old: %s, New: %s", koanfOldValue, koanfNewValue)
