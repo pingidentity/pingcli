@@ -122,12 +122,13 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 OR
 
 Use the following single-line PowerShell 7.4 command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
+>**_NOTE:_** You will need to modify your PATH environment variable to call `pingcli` directly in your terminal
 ```powershell
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
 $RELEASE_VERSION_NO_PREFIX = $RELEASE_VERSION -replace "^v", ""; `
 $HARDWARE_PLATFORM = $env:PROCESSOR_ARCHITECTURE -replace "ARM64", "arm64" -replace "x86", "386" -replace "AMD64", "amd64" -replace "EM64T", "amd64"; `
-$URL = "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_${HARDWARE_PLATFORM}"
+$URL = "https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION_NO_PREFIX}_windows_${HARDWARE_PLATFORM}.exe"
 Invoke-WebRequest -Uri $URL -OutFile "pingcli.exe"; `
 Move-Item -Path pingcli.exe -Destination "${env:LOCALAPPDATA}\Programs"
 ```
@@ -155,7 +156,7 @@ gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
 
 ##### Verify Artifact via Signature File
 
-```shell 
+```shell
 gpg --verify <artifact-name>.sig <artifact-name>
 ```
 
@@ -212,7 +213,7 @@ The generated import blocks are organized into one folder with a file per resour
 
 ### Custom Request
 
-The `pingcli request` command uses your configured settings to authenticate to the desired ping service before executing your API request. 
+The `pingcli request` command uses your configured settings to authenticate to the desired ping service before executing your API request.
 
 An example command to view PingOne Environments looks like:
 
