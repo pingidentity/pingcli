@@ -68,14 +68,23 @@ func (c *PingCliCommand) Configuration() (*grpc.PingCliCommandConfiguration, err
 // messages back to the host process, ensuring that all output is displayed
 // consistently through the main pingcli interface.
 func (c *PingCliCommand) Run(args []string, logger grpc.Logger) error {
-	logger.Message("Message from plugin", nil)
+	err := logger.Message("Message from plugin", nil)
+	if err != nil {
+		return err
+	}
 
-	logger.Warn("Warning from plugin", nil)
+	err = logger.Warn("Warning from plugin", nil)
+	if err != nil {
+		return err
+	}
 
-	logger.PluginError("Error from plugin", map[string]string{
+	err = logger.PluginError("Error from plugin", map[string]string{
 		"key":   "value",
 		"debug": "info",
 	})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -84,7 +93,7 @@ func (c *PingCliCommand) Run(args []string, logger grpc.Logger) error {
 // launches this plugin, this function starts a gRPC server that serves the
 // PingCliCommand implementation. The go-plugin library handles the handshake
 // and communication between the host and the plugin process.
-func main() {
+func main() { //nolint:unused
 	plugin.Serve(&plugin.ServeConfig{
 		// HandshakeConfig is a shared configuration used to verify that the host
 		// and plugin are compatible.
