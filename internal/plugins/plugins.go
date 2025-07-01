@@ -1,7 +1,8 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package plugins
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"os/exec"
@@ -85,11 +86,11 @@ func createHPluginClient(pluginExecutable string) *hplugin.Client {
 
 // dispensePlugin connects to the plugin via RPC and dispenses the grpc.PingCliCommand interface.
 // the caller is responsible for closing the client connection after use.
-func dispensePlugin(client *hplugin.Client, pluginExecutable string) (hplugin.ClientProtocol, grpc.PingCliCommand, error) {
+func dispensePlugin(client *hplugin.Client, pluginExecutable string) (grpc.PingCliCommand, error) {
 	// Connect via RPC
 	clientProtocol, err := client.Client()
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create Plugin RPC client: %w", err)
+		return nil, fmt.Errorf("failed to create Plugin RPC client: %w", err)
 	}
 
 	// All PingCLI plugins are expected to serve the ENUM_PINGCLI_COMMAND_GRPC plugin via
@@ -98,31 +99,24 @@ func dispensePlugin(client *hplugin.Client, pluginExecutable string) (hplugin.Cl
 	// raw value of ENUM_PINGCLI_COMMAND_GRPC "pingcli_command_grpc" for the PluginMap key.
 	raw, err := clientProtocol.Dispense(grpc.ENUM_PINGCLI_COMMAND_GRPC)
 	if err != nil {
-		return nil, nil, fmt.Errorf("the rpc client failed to dispense plugin executable '%s': %w", pluginExecutable, err)
+		return nil, fmt.Errorf("the rpc client failed to dispense plugin executable '%s': %w", pluginExecutable, err)
 	}
 
 	// Cast the dispensed plugin to the interface we expect to work with: grpc.PingCliCommand.
 	// However, this is not a normal interface, but rather implemeted over the RPC connection.
 	plugin, ok := raw.(grpc.PingCliCommand)
 	if !ok {
-		return nil, nil, fmt.Errorf("failed to cast plugin executable '%s' to grpc.PingCliCommand interface", pluginExecutable)
+		return nil, fmt.Errorf("failed to cast plugin executable '%s' to grpc.PingCliCommand interface", pluginExecutable)
 	}
 
-	return clientProtocol, plugin, nil
+	return plugin, nil
 }
 
 func pluginConfiguration(pluginExecutable string) (conf *grpc.PingCliCommandConfiguration, err error) {
 	client := createHPluginClient(pluginExecutable)
 	defer client.Kill()
 
-	clientProtocol, plugin, err := dispensePlugin(client, pluginExecutable)
-	defer func() {
-		cErr := clientProtocol.Close()
-		if cErr != nil {
-			err = errors.Join(err, cErr)
-		}
-	}()
-
+	plugin, err := dispensePlugin(client, pluginExecutable)
 	if err != nil {
 		return nil, err
 	}
@@ -145,14 +139,7 @@ func createCmdRunE(pluginExecutable string) func(cmd *cobra.Command, args []stri
 		client := createHPluginClient(pluginExecutable)
 		defer client.Kill()
 
-		clientProtocol, plugin, err := dispensePlugin(client, pluginExecutable)
-		defer func() {
-			cErr := clientProtocol.Close()
-			if cErr != nil {
-				err = errors.Join(err, cErr)
-			}
-		}()
-
+		plugin, err := dispensePlugin(client, pluginExecutable)
 		if err != nil {
 			return err
 		}
