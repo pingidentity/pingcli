@@ -70,9 +70,13 @@ func KoanfValueFromOption(opt options.Option, pName string) (value string, ok bo
 			mainKoanfInstance = GetKoanfConfig()
 		)
 
+		if mainKoanfInstance == nil || mainKoanfInstance.KoanfInstance() == nil {
+			return "", false, fmt.Errorf("failed to get option value: koanf instance is not initialized")
+		}
+
 		// Case 1: Koanf Key is the ActiveProfile Key, get value from main koanf instance
-		if opt.KoanfKey != "" && strings.EqualFold(opt.KoanfKey, options.RootActiveProfileOption.KoanfKey) && mainKoanfInstance != nil {
-			kValue = mainKoanfInstance.KoanfInstance().Get("activeprofile")
+		if strings.EqualFold(opt.KoanfKey, options.RootActiveProfileOption.KoanfKey) {
+			kValue = mainKoanfInstance.KoanfInstance().Get(options.RootActiveProfileOption.KoanfKey)
 			if kValue == nil {
 				kValue = mainKoanfInstance.KoanfInstance().Get(opt.KoanfKey)
 			}

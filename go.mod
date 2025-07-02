@@ -12,16 +12,16 @@ require (
 	github.com/hashicorp/go-hclog v1.6.3
 	github.com/hashicorp/go-plugin v1.6.3
 	github.com/hashicorp/go-uuid v1.0.3
-	github.com/knadh/koanf/parsers/yaml v1.0.0
+	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/confmap v1.0.0
 	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.2.1
 	github.com/manifoldco/promptui v0.9.0
-	github.com/patrickcping/pingone-go-sdk-v2 v0.12.17
-	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.0
-	github.com/patrickcping/pingone-go-sdk-v2/management v0.57.0
-	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.0
-	github.com/patrickcping/pingone-go-sdk-v2/risk v0.19.0
+	github.com/patrickcping/pingone-go-sdk-v2 v0.13.0
+	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.1
+	github.com/patrickcping/pingone-go-sdk-v2/management v0.59.0
+	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.1
+	github.com/patrickcping/pingone-go-sdk-v2/risk v0.19.1
 	github.com/pingidentity/pingfederate-go-client/v1220 v1220.0.0
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.9.1
@@ -160,8 +160,8 @@ require (
 	github.com/nunnatsa/ginkgolinter v0.19.1 // indirect
 	github.com/oklog/run v1.0.0 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.11.0 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/verify v0.9.0 // indirect
+	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.11.1 // indirect
+	github.com/patrickcping/pingone-go-sdk-v2/verify v0.9.1 // indirect
 	github.com/pavius/impi v0.0.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -222,6 +222,7 @@ require (
 	go.uber.org/automaxprocs v1.6.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
+	go.yaml.in/yaml/v3 v3.0.3 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250210185358-939b2ce775ac // indirect
 	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/oauth2 v0.30.0 // indirect
