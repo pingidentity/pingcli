@@ -36,7 +36,7 @@ func createCustomDomain(t *testing.T, clientInfo *connector.ClientInfo, resource
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.CustomDomainsApi.CreateDomain(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
 	clientStruct := management.CustomDomain{
-		DomainName: "custom-domain.example.com",
+		DomainName: "custom-domain.pingcli-test.com",
 	}
 
 	request = request.CustomDomain(clientStruct)
