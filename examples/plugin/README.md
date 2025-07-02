@@ -87,9 +87,9 @@ To create a valid plugin, you must implement the `grpc.PingCliCommand` interface
 
 #### `Configuration() (*grpc.PingCliCommandConfiguration, error)`
 
-This method is called by the `pingcli` host to get metadata about your command. This allows `pingcli` to display your command in the help text (`pingcli --help`) and provide detailed help for your specific command (`pingcli your-command --help`) without having to execute its main logic.
+This method is called by the `pingcli` host to get metadata about your command. This allows `pingcli` to display your command in the help text (`pingcli --help`).
 
-The `PingCliCommandConfiguration` struct has the following fields, which correspond directly to properties of a `cobra` command:
+The `PingCliCommandConfiguration` struct has the following fields, which correspond directly to properties of a [Cobra](https://github.com/spf13/cobra) command:
 
 -   `Use`: The one-line usage message for the command (e.g., `my-command [flags]`).
 -   `Short`: A short description of the command.
