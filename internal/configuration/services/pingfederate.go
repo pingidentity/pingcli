@@ -45,7 +45,7 @@ func initHTTPSHostOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingFederate.httpsHost",
 	}
 }
@@ -68,7 +68,7 @@ func initAdminAPIPathOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingFederate.adminAPIPath",
 	}
 }
@@ -93,7 +93,7 @@ func initXBypassExternalValidationHeaderOption() {
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 		KoanfKey:  "service.pingFederate.xBypassExternalValidationHeader",
 	}
 }
@@ -118,7 +118,7 @@ func initCACertificatePemFilesOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING_SLICE,
+		Type:      options.STRING_SLICE,
 		KoanfKey:  "service.pingFederate.caCertificatePEMFiles",
 	}
 }
@@ -143,7 +143,7 @@ func initInsecureTrustAllTLSOption() {
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 		KoanfKey:  "service.pingFederate.insecureTrustAllTLS",
 	}
 }
@@ -167,7 +167,7 @@ func initUsernameOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingFederate.authentication.basicAuth.username",
 	}
 }
@@ -190,7 +190,7 @@ func initPasswordOption() {
 			Value: cobraValue,
 		},
 		Sensitive: true,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingFederate.authentication.basicAuth.password",
 	}
 }
@@ -213,7 +213,7 @@ func initAccessTokenOption() {
 			Value: cobraValue,
 		},
 		Sensitive: true,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingFederate.authentication.accessTokenAuth.accessToken",
 	}
 }
@@ -236,7 +236,7 @@ func initClientIDOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingFederate.authentication.clientCredentialsAuth.clientID",
 	}
 }
@@ -259,7 +259,7 @@ func initClientSecretOption() {
 			Value: cobraValue,
 		},
 		Sensitive: true,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingFederate.authentication.clientCredentialsAuth.clientSecret",
 	}
 }
@@ -282,7 +282,7 @@ func initTokenURLOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingFederate.authentication.clientCredentialsAuth.tokenURL",
 	}
 }
@@ -308,7 +308,7 @@ func initScopesOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING_SLICE,
+		Type:      options.STRING_SLICE,
 		KoanfKey:  "service.pingFederate.authentication.clientCredentialsAuth.scopes",
 	}
 }
@@ -336,7 +336,7 @@ func initPingFederateAuthenticationTypeOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_PINGFEDERATE_AUTH_TYPE,
+		Type:      options.PINGFEDERATE_AUTH_TYPE,
 		KoanfKey:  "service.pingFederate.authentication.type",
 	}
 }

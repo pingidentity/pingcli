@@ -31,7 +31,7 @@ func initDeleteAutoAcceptOption() {
 			NoOptDefVal: "true", // Make the flag a boolean flag
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "", // No koanf key
 	}
 }

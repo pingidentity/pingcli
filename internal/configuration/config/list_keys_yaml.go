@@ -31,7 +31,7 @@ func initConfigListKeysYAMLOption() {
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 		KoanfKey:  "", // No koanf key
 	}
 }

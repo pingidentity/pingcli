@@ -12,6 +12,7 @@ import (
 	"github.com/pingidentity/pingcli/cmd/completion"
 	"github.com/pingidentity/pingcli/cmd/config"
 	"github.com/pingidentity/pingcli/cmd/feedback"
+	"github.com/pingidentity/pingcli/cmd/license"
 	"github.com/pingidentity/pingcli/cmd/platform"
 	"github.com/pingidentity/pingcli/cmd/plugin"
 	"github.com/pingidentity/pingcli/cmd/request"
@@ -51,6 +52,7 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 		platform.NewPlatformCommand(),
 		plugin.NewPluginCommand(),
 		request.NewRequestCommand(),
+		license.NewLicenseCommand(),
 	)
 
 	err := plugins.AddAllPluginToCmd(cmd)

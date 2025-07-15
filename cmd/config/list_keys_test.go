@@ -57,6 +57,8 @@ func Example_listKeysValue() {
 	// - export.pingOne.environmentID
 	// - export.serviceGroup
 	// - export.services
+	// - license.devopsKey
+	// - license.devopsUser
 	// - noColor
 	// - outputFormat
 	// - plugins

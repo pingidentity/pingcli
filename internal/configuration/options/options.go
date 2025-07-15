@@ -9,25 +9,27 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type OptionType string
+type OptionType int
 
 // OptionType enums
 const (
-	ENUM_BOOL                   OptionType = "ENUM_BOOL"
-	ENUM_EXPORT_FORMAT          OptionType = "ENUM_EXPORT_FORMAT"
-	ENUM_HEADER                 OptionType = "ENUM_HEADER"
-	ENUM_INT                    OptionType = "ENUM_INT"
-	ENUM_EXPORT_SERVICE_GROUP   OptionType = "ENUM_EXPORT_SERVICE_GROUP"
-	ENUM_EXPORT_SERVICES        OptionType = "ENUM_EXPORT_SERVICES"
-	ENUM_OUTPUT_FORMAT          OptionType = "ENUM_OUTPUT_FORMAT"
-	ENUM_PINGFEDERATE_AUTH_TYPE OptionType = "ENUM_PINGFEDERATE_AUTH_TYPE"
-	ENUM_PINGONE_AUTH_TYPE      OptionType = "ENUM_PINGONE_AUTH_TYPE"
-	ENUM_PINGONE_REGION_CODE    OptionType = "ENUM_PINGONE_REGION_CODE"
-	ENUM_REQUEST_HTTP_METHOD    OptionType = "ENUM_REQUEST_HTTP_METHOD"
-	ENUM_REQUEST_SERVICE        OptionType = "ENUM_REQUEST_SERVICE"
-	ENUM_STRING                 OptionType = "ENUM_STRING"
-	ENUM_STRING_SLICE           OptionType = "ENUM_STRING_SLICE"
-	ENUM_UUID                   OptionType = "ENUM_UUID"
+	BOOL OptionType = iota
+	EXPORT_FORMAT
+	EXPORT_SERVICE_GROUP
+	EXPORT_SERVICES
+	HEADER
+	INT
+	LICENSE_PRODUCT
+	LICENSE_VERSION
+	OUTPUT_FORMAT
+	PINGFEDERATE_AUTH_TYPE
+	PINGONE_AUTH_TYPE
+	PINGONE_REGION_CODE
+	REQUEST_HTTP_METHOD
+	REQUEST_SERVICE
+	STRING
+	STRING_SLICE
+	UUID
 )
 
 type Option struct {
@@ -43,44 +45,6 @@ type Option struct {
 
 func Options() []Option {
 	optList := []Option{
-		PingOneAuthenticationTypeOption,
-		PingOneAuthenticationWorkerClientIDOption,
-		PingOneAuthenticationWorkerClientSecretOption,
-		PingOneAuthenticationWorkerEnvironmentIDOption,
-		PingOneRegionCodeOption,
-
-		PlatformExportExportFormatOption,
-		PlatformExportServiceGroupOption,
-		PlatformExportServiceOption,
-		PlatformExportOutputDirectoryOption,
-		PlatformExportOverwriteOption,
-		PlatformExportPingOneEnvironmentIDOption,
-
-		PluginExecutablesOption,
-
-		PingFederateHTTPSHostOption,
-		PingFederateAdminAPIPathOption,
-		PingFederateXBypassExternalValidationHeaderOption,
-		PingFederateCACertificatePemFilesOption,
-		PingFederateInsecureTrustAllTLSOption,
-		PingFederateBasicAuthUsernameOption,
-		PingFederateBasicAuthPasswordOption,
-		PingFederateAccessTokenAuthAccessTokenOption,
-		PingFederateClientCredentialsAuthClientIDOption,
-		PingFederateClientCredentialsAuthClientSecretOption,
-		PingFederateClientCredentialsAuthTokenURLOption,
-		PingFederateClientCredentialsAuthScopesOption,
-		PingFederateAuthenticationTypeOption,
-
-		RootActiveProfileOption,
-		RootProfileOption,
-		RootColorOption,
-		RootConfigOption,
-		RootDetailedExitCodeOption,
-		RootOutputFormatOption,
-
-		ProfileDescriptionOption,
-
 		ConfigAddProfileDescriptionOption,
 		ConfigAddProfileNameOption,
 		ConfigAddProfileSetActiveOption,
@@ -88,14 +52,57 @@ func Options() []Option {
 		ConfigListKeysYamlOption,
 		ConfigUnmaskSecretValueOption,
 
+		LicenseProductOption,
+		LicenseVersionOption,
+		LicenseDevopsUserOption,
+		LicenseDevopsKeyOption,
+
+		PingFederateAccessTokenAuthAccessTokenOption,
+		PingFederateAdminAPIPathOption,
+		PingFederateAuthenticationTypeOption,
+		PingFederateBasicAuthPasswordOption,
+		PingFederateBasicAuthUsernameOption,
+		PingFederateCACertificatePemFilesOption,
+		PingFederateClientCredentialsAuthClientIDOption,
+		PingFederateClientCredentialsAuthClientSecretOption,
+		PingFederateClientCredentialsAuthTokenURLOption,
+		PingFederateClientCredentialsAuthScopesOption,
+		PingFederateHTTPSHostOption,
+		PingFederateInsecureTrustAllTLSOption,
+		PingFederateXBypassExternalValidationHeaderOption,
+
+		PingOneAuthenticationTypeOption,
+		PingOneAuthenticationWorkerClientIDOption,
+		PingOneAuthenticationWorkerClientSecretOption,
+		PingOneAuthenticationWorkerEnvironmentIDOption,
+		PingOneRegionCodeOption,
+
+		PlatformExportExportFormatOption,
+		PlatformExportOutputDirectoryOption,
+		PlatformExportOverwriteOption,
+		PlatformExportPingOneEnvironmentIDOption,
+		PlatformExportServiceGroupOption,
+		PlatformExportServiceOption,
+
+		PluginExecutablesOption,
+
+		ProfileDescriptionOption,
+
+		RequestAccessTokenExpiryOption,
+		RequestAccessTokenOption,
 		RequestDataOption,
 		RequestDataRawOption,
+		RequestFailOption,
 		RequestHeaderOption,
 		RequestHTTPMethodOption,
 		RequestServiceOption,
-		RequestAccessTokenOption,
-		RequestAccessTokenExpiryOption,
-		RequestFailOption,
+
+		RootActiveProfileOption,
+		RootColorOption,
+		RootConfigOption,
+		RootDetailedExitCodeOption,
+		RootOutputFormatOption,
+		RootProfileOption,
 	}
 
 	// Sort the options list by koanf key
@@ -106,6 +113,41 @@ func Options() []Option {
 	return optList
 }
 
+// 'pingcli config' command options
+var (
+	ConfigAddProfileDescriptionOption Option
+	ConfigAddProfileNameOption        Option
+	ConfigAddProfileSetActiveOption   Option
+	ConfigDeleteAutoAcceptOption      Option
+	ConfigListKeysYamlOption          Option
+	ConfigUnmaskSecretValueOption     Option
+)
+
+// License options
+var (
+	LicenseProductOption    Option
+	LicenseVersionOption    Option
+	LicenseDevopsUserOption Option
+	LicenseDevopsKeyOption  Option
+)
+
+// pingfederate service options
+var (
+	PingFederateAccessTokenAuthAccessTokenOption        Option
+	PingFederateAdminAPIPathOption                      Option
+	PingFederateAuthenticationTypeOption                Option
+	PingFederateBasicAuthPasswordOption                 Option
+	PingFederateBasicAuthUsernameOption                 Option
+	PingFederateCACertificatePemFilesOption             Option
+	PingFederateClientCredentialsAuthClientIDOption     Option
+	PingFederateClientCredentialsAuthClientSecretOption Option
+	PingFederateClientCredentialsAuthScopesOption       Option
+	PingFederateClientCredentialsAuthTokenURLOption     Option
+	PingFederateHTTPSHostOption                         Option
+	PingFederateInsecureTrustAllTLSOption               Option
+	PingFederateXBypassExternalValidationHeaderOption   Option
+)
+
 // pingone service options
 var (
 	PingOneAuthenticationTypeOption                Option
@@ -115,44 +157,14 @@ var (
 	PingOneRegionCodeOption                        Option
 )
 
-// pingfederate service options
-var (
-	PingFederateHTTPSHostOption                         Option
-	PingFederateAdminAPIPathOption                      Option
-	PingFederateXBypassExternalValidationHeaderOption   Option
-	PingFederateCACertificatePemFilesOption             Option
-	PingFederateInsecureTrustAllTLSOption               Option
-	PingFederateBasicAuthUsernameOption                 Option
-	PingFederateBasicAuthPasswordOption                 Option
-	PingFederateAccessTokenAuthAccessTokenOption        Option
-	PingFederateClientCredentialsAuthClientIDOption     Option
-	PingFederateClientCredentialsAuthClientSecretOption Option
-	PingFederateClientCredentialsAuthTokenURLOption     Option
-	PingFederateClientCredentialsAuthScopesOption       Option
-	PingFederateAuthenticationTypeOption                Option
-)
-
-// 'pingcli config' command options
-var (
-	ConfigAddProfileDescriptionOption Option
-	ConfigAddProfileNameOption        Option
-	ConfigAddProfileSetActiveOption   Option
-
-	ConfigListKeysYamlOption Option
-
-	ConfigDeleteAutoAcceptOption Option
-
-	ConfigUnmaskSecretValueOption Option
-)
-
 // 'pingcli platform export' command options
 var (
 	PlatformExportExportFormatOption         Option
-	PlatformExportServiceOption              Option
-	PlatformExportServiceGroupOption         Option
 	PlatformExportOutputDirectoryOption      Option
 	PlatformExportOverwriteOption            Option
 	PlatformExportPingOneEnvironmentIDOption Option
+	PlatformExportServiceGroupOption         Option
+	PlatformExportServiceOption              Option
 )
 
 // 'pingcli plugin' command options
@@ -168,21 +180,21 @@ var (
 // Root Command Options
 var (
 	RootActiveProfileOption    Option
-	RootDetailedExitCodeOption Option
-	RootProfileOption          Option
 	RootColorOption            Option
 	RootConfigOption           Option
+	RootDetailedExitCodeOption Option
 	RootOutputFormatOption     Option
+	RootProfileOption          Option
 )
 
 // 'pingcli request' command options
 var (
+	RequestAccessTokenExpiryOption Option
+	RequestAccessTokenOption       Option
 	RequestDataOption              Option
 	RequestDataRawOption           Option
+	RequestFailOption              Option
 	RequestHeaderOption            Option
 	RequestHTTPMethodOption        Option
 	RequestServiceOption           Option
-	RequestAccessTokenOption       Option
-	RequestAccessTokenExpiryOption Option
-	RequestFailOption              Option
 )

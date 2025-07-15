@@ -110,7 +110,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 		vValue := profileKoanf.Get(key)
 
 		switch opt.Type {
-		case options.ENUM_BOOL:
+		case options.BOOL:
 			switch typedValue := vValue.(type) {
 			case *customtypes.Bool:
 				continue
@@ -124,7 +124,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a boolean value", pName, typedValue, key)
 			}
-		case options.ENUM_UUID:
+		case options.UUID:
 			switch typedValue := vValue.(type) {
 			case *customtypes.UUID:
 				continue
@@ -136,7 +136,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a UUID value", pName, typedValue, key)
 			}
-		case options.ENUM_OUTPUT_FORMAT:
+		case options.OUTPUT_FORMAT:
 			switch typedValue := vValue.(type) {
 			case *customtypes.OutputFormat:
 				continue
@@ -148,7 +148,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not an output format value", pName, typedValue, key)
 			}
-		case options.ENUM_PINGONE_REGION_CODE:
+		case options.PINGONE_REGION_CODE:
 			switch typedValue := vValue.(type) {
 			case *customtypes.PingOneRegionCode:
 				continue
@@ -160,7 +160,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a PingOne Region Code value", pName, typedValue, key)
 			}
-		case options.ENUM_STRING:
+		case options.STRING:
 			switch typedValue := vValue.(type) {
 			case *customtypes.String:
 				continue
@@ -172,7 +172,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a string value", pName, typedValue, key)
 			}
-		case options.ENUM_STRING_SLICE:
+		case options.STRING_SLICE:
 			switch typedValue := vValue.(type) {
 			case *customtypes.StringSlice:
 				continue
@@ -196,7 +196,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a string slice value", pName, typedValue, key)
 			}
-		case options.ENUM_EXPORT_SERVICE_GROUP:
+		case options.EXPORT_SERVICE_GROUP:
 			switch typedValue := vValue.(type) {
 			case *customtypes.ExportServiceGroup:
 				continue
@@ -208,7 +208,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a export service group value", pName, typedValue, key)
 			}
-		case options.ENUM_EXPORT_SERVICES:
+		case options.EXPORT_SERVICES:
 			switch typedValue := vValue.(type) {
 			case *customtypes.ExportServices:
 				continue
@@ -232,7 +232,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a export service value", pName, typedValue, key)
 			}
-		case options.ENUM_EXPORT_FORMAT:
+		case options.EXPORT_FORMAT:
 			switch typedValue := vValue.(type) {
 			case *customtypes.ExportFormat:
 				continue
@@ -244,7 +244,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not an export format value", pName, typedValue, key)
 			}
-		case options.ENUM_REQUEST_HTTP_METHOD:
+		case options.REQUEST_HTTP_METHOD:
 			switch typedValue := vValue.(type) {
 			case *customtypes.HTTPMethod:
 				continue
@@ -256,7 +256,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not an HTTP method value", pName, typedValue, key)
 			}
-		case options.ENUM_REQUEST_SERVICE:
+		case options.REQUEST_SERVICE:
 			switch typedValue := vValue.(type) {
 			case *customtypes.RequestService:
 				continue
@@ -268,7 +268,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a request service value", pName, typedValue, key)
 			}
-		case options.ENUM_INT:
+		case options.INT:
 			switch typedValue := vValue.(type) {
 			case *customtypes.Int:
 				continue
@@ -284,7 +284,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not an int value", pName, typedValue, key)
 			}
-		case options.ENUM_PINGFEDERATE_AUTH_TYPE:
+		case options.PINGFEDERATE_AUTH_TYPE:
 			switch typedValue := vValue.(type) {
 			case *customtypes.PingFederateAuthenticationType:
 				continue
@@ -296,7 +296,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a PingFederate Authentication Type value", pName, typedValue, key)
 			}
-		case options.ENUM_PINGONE_AUTH_TYPE:
+		case options.PINGONE_AUTH_TYPE:
 			switch typedValue := vValue.(type) {
 			case *customtypes.PingOneAuthenticationType:
 				continue
@@ -308,8 +308,32 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a PingOne Authentication Type value", pName, typedValue, key)
 			}
+		case options.LICENSE_PRODUCT:
+			switch typedValue := vValue.(type) {
+			case *customtypes.LicenseProduct:
+				continue
+			case string:
+				lp := new(customtypes.LicenseProduct)
+				if err = lp.Set(typedValue); err != nil {
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a License Product value: %w", pName, typedValue, key, err)
+				}
+			default:
+				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a License Product value", pName, typedValue, key)
+			}
+		case options.LICENSE_VERSION:
+			switch typedValue := vValue.(type) {
+			case *customtypes.LicenseVersion:
+				continue
+			case string:
+				lv := new(customtypes.LicenseVersion)
+				if err = lv.Set(typedValue); err != nil {
+					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a License Version value: %w", pName, typedValue, key, err)
+				}
+			default:
+				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a License Version value", pName, typedValue, key)
+			}
 		default:
-			return fmt.Errorf("profile '%s': variable type '%s' for key '%s' is not recognized", pName, opt.Type, key)
+			return fmt.Errorf("profile '%s': variable type '%d' for key '%s' is not recognized", pName, opt.Type, key)
 		}
 	}
 

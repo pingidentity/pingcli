@@ -30,6 +30,9 @@ default:
     export:
         outputDirectory: %s
         services: ["%s"]
+    license:
+        devopsUser: %s
+        devopsKey: %s
     service:
         pingOne:
             regionCode: %s
@@ -143,6 +146,8 @@ func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
+		os.Getenv("TEST_PINGCLI_DEVOPS_USER"),
+		os.Getenv("TEST_PINGCLI_DEVOPS_KEY"),
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),

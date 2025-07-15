@@ -6,9 +6,11 @@
 // command that can be dynamically loaded and executed by the main pingcli
 // application. This includes implementing the PingCliCommand interface and
 // serving it over gRPC using Hashicorp's `go-plugin“ library.
-package plugin
+package main
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/go-plugin"
 	"github.com/pingidentity/pingcli/shared/grpc"
 )
@@ -68,7 +70,7 @@ func (c *PingCliCommand) Configuration() (*grpc.PingCliCommandConfiguration, err
 // messages back to the host process, ensuring that all output is displayed
 // consistently through the main pingcli interface.
 func (c *PingCliCommand) Run(args []string, logger grpc.Logger) error {
-	err := logger.Message("Message from plugin", nil)
+	err := logger.Message(fmt.Sprintf("Args to plugin: %v", args), nil)
 	if err != nil {
 		return err
 	}
@@ -93,7 +95,7 @@ func (c *PingCliCommand) Run(args []string, logger grpc.Logger) error {
 // launches this plugin, this function starts a gRPC server that serves the
 // PingCliCommand implementation. The go-plugin library handles the handshake
 // and communication between the host and the plugin process.
-func main() { //nolint:unused
+func main() {
 	plugin.Serve(&plugin.ServeConfig{
 		// HandshakeConfig is a shared configuration used to verify that the host
 		// and plugin are compatible.

@@ -7,7 +7,6 @@ linters:
     - canonicalheader
     - copyloopvar
     - decorder
-    - dogsled
     - dupword
     - durationcheck
     - errcheck

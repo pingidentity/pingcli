@@ -36,7 +36,7 @@ func initAuthenticationWorkerClientIDOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_UUID,
+		Type:      options.UUID,
 		KoanfKey:  "service.pingOne.authentication.worker.clientID",
 	}
 }
@@ -58,7 +58,7 @@ func initAuthenticationWorkerClientSecretOption() {
 			Value: cobraValue,
 		},
 		Sensitive: true,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "service.pingOne.authentication.worker.clientSecret",
 	}
 }
@@ -81,7 +81,7 @@ func initAuthenticationWorkerEnvironmentIDOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_UUID,
+		Type:      options.UUID,
 		KoanfKey:  "service.pingOne.authentication.worker.environmentID",
 	}
 }
@@ -108,7 +108,7 @@ func initPingOneAuthenticationTypeOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_PINGONE_AUTH_TYPE,
+		Type:      options.PINGONE_AUTH_TYPE,
 		KoanfKey:  "service.pingOne.authentication.type",
 	}
 }
@@ -136,7 +136,7 @@ func initRegionCodeOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_PINGONE_REGION_CODE,
+		Type:      options.PINGONE_REGION_CODE,
 		KoanfKey:  "service.pingOne.regionCode",
 	}
 }

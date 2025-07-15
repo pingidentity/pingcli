@@ -33,6 +33,7 @@ func AddAllPluginToCmd(cmd *cobra.Command) error {
 	}
 
 	for pluginExecutable := range strings.SplitSeq(pluginExecutables, ",") {
+		pluginExecutable = strings.TrimSpace(pluginExecutable)
 		if pluginExecutable == "" {
 			continue
 		}
@@ -49,6 +50,7 @@ func AddAllPluginToCmd(cmd *cobra.Command) error {
 			Example:               conf.Example,
 			DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 			RunE:                  createCmdRunE(pluginExecutable),
+			DisableFlagParsing:    true, // The plugin command will handle its own flags
 		}
 
 		cmd.AddCommand(pluginCmd)
