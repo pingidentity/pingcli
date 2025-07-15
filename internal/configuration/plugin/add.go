@@ -21,7 +21,7 @@ func initPluginExecutablesOption() {
 		EnvVar:          "",  // No env var
 		Flag:            nil, // No flag
 		Sensitive:       false,
-		Type:            options.ENUM_STRING_SLICE,
+		Type:            options.STRING_SLICE,
 		KoanfKey:        "plugins",
 	}
 }

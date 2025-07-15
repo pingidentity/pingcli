@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	configuration_config "github.com/pingidentity/pingcli/internal/configuration/config"
+	configuration_license "github.com/pingidentity/pingcli/internal/configuration/license"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	configuration_platform "github.com/pingidentity/pingcli/internal/configuration/platform"
 	configuration_plugin "github.com/pingidentity/pingcli/internal/configuration/plugin"
@@ -101,4 +102,6 @@ func InitAllOptions() {
 
 	configuration_services.InitPingFederateServiceOptions()
 	configuration_services.InitPingOneServiceOptions()
+
+	configuration_license.InitLicenseOptions()
 }

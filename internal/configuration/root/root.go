@@ -33,7 +33,7 @@ func initActiveProfileOption() {
 		EnvVar:          "",  // No env var
 		Flag:            nil, // No flag
 		Sensitive:       false,
-		Type:            options.ENUM_STRING,
+		Type:            options.STRING,
 		KoanfKey:        "activeProfile",
 	}
 }
@@ -55,7 +55,7 @@ func initProfileOption() {
 			Value:     cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "", // No koanf key
 	}
 }
@@ -77,7 +77,7 @@ func initColorOption() {
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 		KoanfKey:  "noColor",
 	}
 }
@@ -100,7 +100,7 @@ func initConfigOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "", // No koanf key
 	}
 }
@@ -126,7 +126,7 @@ func initDetailedExitCodeOption() {
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 		KoanfKey:  "detailedExitCode",
 	}
 }
@@ -154,7 +154,7 @@ func initOutputFormatOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_OUTPUT_FORMAT,
+		Type:      options.OUTPUT_FORMAT,
 		KoanfKey:  "outputFormat",
 	}
 }
@@ -177,7 +177,7 @@ func initUnmaskSecretValuesOption() {
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 		KoanfKey:  "", // No KoanfKey
 	}
 }

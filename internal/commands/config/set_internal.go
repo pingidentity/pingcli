@@ -115,7 +115,7 @@ func parseKeyValuePair(kvPair string) (string, string, error) {
 
 func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.OptionType) (err error) {
 	switch valueType {
-	case options.ENUM_BOOL:
+	case options.BOOL:
 		b := new(customtypes.Bool)
 		if err = b.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a boolean. Allowed [true, false]: %w", vKey, err)
@@ -124,7 +124,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_EXPORT_FORMAT:
+	case options.EXPORT_FORMAT:
 		exportFormat := new(customtypes.ExportFormat)
 		if err = exportFormat.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid export format. Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportFormatValidValues(), ", "), err)
@@ -133,7 +133,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_EXPORT_SERVICE_GROUP:
+	case options.EXPORT_SERVICE_GROUP:
 		exportServiceGroup := new(customtypes.ExportServiceGroup)
 		if err = exportServiceGroup.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be valid export service group. Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportServiceGroupValidValues(), ", "), err)
@@ -142,7 +142,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_EXPORT_SERVICES:
+	case options.EXPORT_SERVICES:
 		exportServices := new(customtypes.ExportServices)
 		if err = exportServices.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be valid export service(s). Allowed [%s]: %w", vKey, strings.Join(customtypes.ExportServicesValidValues(), ", "), err)
@@ -151,7 +151,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_OUTPUT_FORMAT:
+	case options.OUTPUT_FORMAT:
 		outputFormat := new(customtypes.OutputFormat)
 		if err = outputFormat.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid output format. Allowed [%s]: %w", vKey, strings.Join(customtypes.OutputFormatValidValues(), ", "), err)
@@ -160,7 +160,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_PINGONE_REGION_CODE:
+	case options.PINGONE_REGION_CODE:
 		region := new(customtypes.PingOneRegionCode)
 		if err = region.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid PingOne Region Code. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "), err)
@@ -169,7 +169,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_STRING:
+	case options.STRING:
 		str := new(customtypes.String)
 		if err = str.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a string: %w", vKey, err)
@@ -178,7 +178,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_STRING_SLICE:
+	case options.STRING_SLICE:
 		strSlice := new(customtypes.StringSlice)
 		if err = strSlice.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a string slice: %w", vKey, err)
@@ -187,7 +187,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_UUID:
+	case options.UUID:
 		uuid := new(customtypes.UUID)
 		if err = uuid.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid UUID: %w", vKey, err)
@@ -196,7 +196,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_PINGONE_AUTH_TYPE:
+	case options.PINGONE_AUTH_TYPE:
 		authType := new(customtypes.PingOneAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid PingOne Authentication Type. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "), err)
@@ -205,7 +205,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_PINGFEDERATE_AUTH_TYPE:
+	case options.PINGFEDERATE_AUTH_TYPE:
 		authType := new(customtypes.PingFederateAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid PingFederate Authentication Type. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "), err)
@@ -214,7 +214,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_INT:
+	case options.INT:
 		intValue := new(customtypes.Int)
 		if err = intValue.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be an integer: %w", vKey, err)
@@ -223,7 +223,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_REQUEST_HTTP_METHOD:
+	case options.REQUEST_HTTP_METHOD:
 		httpMethod := new(customtypes.HTTPMethod)
 		if err = httpMethod.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid HTTP method. Allowed [%s]: %w", vKey, strings.Join(customtypes.HTTPMethodValidValues(), ", "), err)
@@ -232,12 +232,30 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
-	case options.ENUM_REQUEST_SERVICE:
+	case options.REQUEST_SERVICE:
 		service := new(customtypes.RequestService)
 		if err = service.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid request service. Allowed [%s]: %w", vKey, strings.Join(customtypes.RequestServiceValidValues(), ", "), err)
 		}
 		err = profileKoanf.Set(vKey, service)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
+	case options.LICENSE_PRODUCT:
+		licenseProduct := new(customtypes.LicenseProduct)
+		if err = licenseProduct.Set(vValue); err != nil {
+			return fmt.Errorf("value for key '%s' must be a valid license product. Allowed [%s]: %w", vKey, strings.Join(customtypes.LicenseProductValidValues(), ", "), err)
+		}
+		err = profileKoanf.Set(vKey, licenseProduct)
+		if err != nil {
+			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
+		}
+	case options.LICENSE_VERSION:
+		licenseVersion := new(customtypes.LicenseVersion)
+		if err = licenseVersion.Set(vValue); err != nil {
+			return fmt.Errorf("value for key '%s' must be a valid license version. Must be of the form 'major.minor': %w", vKey, err)
+		}
+		err = profileKoanf.Set(vKey, licenseVersion)
 		if err != nil {
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}

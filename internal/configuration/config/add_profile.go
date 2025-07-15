@@ -31,7 +31,7 @@ func initAddProfileDescriptionOption() {
 			Value:     cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "", // No koanf key
 	}
 }
@@ -53,7 +53,7 @@ func initAddProfileNameOption() {
 			Value:     cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "", // No koanf key
 	}
 }
@@ -77,7 +77,7 @@ func initAddProfileSetActiveOption() {
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 		KoanfKey:  "", // No koanf key
 	}
 }

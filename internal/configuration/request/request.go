@@ -40,7 +40,7 @@ func initDataOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "", // No koanf key
 	}
 }
@@ -63,7 +63,7 @@ func initDataRawOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "", // No koanf key
 	}
 }
@@ -88,7 +88,7 @@ func initHeaderOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_HEADER,
+		Type:      options.HEADER,
 		KoanfKey:  "", // No koanf key
 	}
 }
@@ -117,7 +117,7 @@ func initHTTPMethodOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_REQUEST_HTTP_METHOD,
+		Type:      options.REQUEST_HTTP_METHOD,
 		KoanfKey:  "", // No koanf key
 	}
 }
@@ -146,7 +146,7 @@ func initServiceOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_REQUEST_SERVICE,
+		Type:      options.REQUEST_SERVICE,
 		KoanfKey:  "request.service",
 	}
 }
@@ -161,7 +161,7 @@ func initAccessTokenOption() {
 		EnvVar:          "",  // No environment variable
 		Flag:            nil, // No flag
 		Sensitive:       true,
-		Type:            options.ENUM_STRING,
+		Type:            options.STRING,
 		KoanfKey:        "request.accessToken",
 	}
 }
@@ -176,7 +176,7 @@ func initAccessTokenExpiryOption() {
 		EnvVar:          "",  // No environment variable
 		Flag:            nil, // No flag
 		Sensitive:       false,
-		Type:            options.ENUM_INT,
+		Type:            options.INT,
 		KoanfKey:        "request.accessTokenExpiry",
 	}
 }
@@ -198,7 +198,7 @@ func initFailOption() {
 			Value:       cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 		KoanfKey:  "request.fail",
 	}
 }

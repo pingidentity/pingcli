@@ -43,7 +43,7 @@ func initFormatOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_EXPORT_FORMAT,
+		Type:      options.EXPORT_FORMAT,
 		KoanfKey:  "export.format",
 	}
 }
@@ -72,7 +72,7 @@ func initServiceGroupOption() {
 		},
 		Sensitive: false,
 		KoanfKey:  "export.serviceGroup",
-		Type:      options.ENUM_EXPORT_SERVICE_GROUP,
+		Type:      options.EXPORT_SERVICE_GROUP,
 	}
 }
 
@@ -101,7 +101,7 @@ func initServicesOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_EXPORT_SERVICES,
+		Type:      options.EXPORT_SERVICES,
 		KoanfKey:  "export.services",
 	}
 }
@@ -127,7 +127,7 @@ func initOutputDirectoryOption() {
 			Value: cobraValue,
 		},
 		Sensitive: false,
-		Type:      options.ENUM_STRING,
+		Type:      options.STRING,
 		KoanfKey:  "export.outputDirectory",
 	}
 }
@@ -152,7 +152,7 @@ func initOverwriteOption() {
 		},
 		Sensitive: false,
 		KoanfKey:  "export.overwrite",
-		Type:      options.ENUM_BOOL,
+		Type:      options.BOOL,
 	}
 }
 
@@ -173,6 +173,6 @@ func initPingOneEnvironmentIDOption() {
 			Value: cobraValue,
 		},
 		KoanfKey: "export.pingOne.environmentID",
-		Type:     options.ENUM_UUID,
+		Type:     options.UUID,
 	}
 }

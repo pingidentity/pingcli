@@ -37,10 +37,10 @@ func Test_outputOptionsMDInfo(t *testing.T) {
 		usageString = strings.ReplaceAll(usageString, "\n", "<br><br>")
 
 		if !strings.Contains(option.KoanfKey, ".") {
-			propertyCategoryInformation["general"] = append(propertyCategoryInformation["general"], fmt.Sprintf("| %s | %s | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
+			propertyCategoryInformation["general"] = append(propertyCategoryInformation["general"], fmt.Sprintf("| %s | %d | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
 		} else {
 			rootKey := strings.Split(option.KoanfKey, ".")[0]
-			propertyCategoryInformation[rootKey] = append(propertyCategoryInformation[rootKey], fmt.Sprintf("| %s | %s | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
+			propertyCategoryInformation[rootKey] = append(propertyCategoryInformation[rootKey], fmt.Sprintf("| %s | %d | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
 		}
 	}
 
