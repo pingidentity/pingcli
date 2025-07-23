@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	addPluginCommandExamples = `  Add a plugin to use with PingCLI.
+	addPluginCommandExamples = `  Add a plugin to use with Ping CLI.
     pingcli plugin add pingcli-plugin-executable`
 )
 
@@ -19,9 +19,9 @@ func NewPluginAddCommand() *cobra.Command {
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               addPluginCommandExamples,
-		Long:                  `Add a plugin to use with PingCLI.`,
+		Long:                  `Add a plugin to use with Ping CLI.`,
 		RunE:                  pluginAddRunE,
-		Short:                 "Add a plugin to use with PingCLI",
+		Short:                 "Add a plugin to use with Ping CLI",
 		Use:                   "add plugin-executable",
 	}
 

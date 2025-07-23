@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	removePluginCommandExamples = `  Remove a plugin from PingCLI.
+	removePluginCommandExamples = `  Remove a plugin from Ping CLI.
     pingcli plugin remove pingcli-plugin-executable`
 )
 
@@ -19,9 +19,9 @@ func NewPluginRemoveCommand() *cobra.Command {
 		Args:                  common.ExactArgs(1),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               removePluginCommandExamples,
-		Long:                  `Remove a plugin from PingCLI.`,
+		Long:                  `Remove a plugin from Ping CLI.`,
 		RunE:                  pluginRemoveRunE,
-		Short:                 "Remove a plugin from PingCLI",
+		Short:                 "Remove a plugin from Ping CLI",
 		Use:                   "remove plugin-executable",
 	}
 

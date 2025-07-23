@@ -71,7 +71,7 @@ func runLicenseRequest(ctx context.Context, product, version, devopsUser, devops
 
 	req.Header.Set("Devops-User", devopsUser)
 	req.Header.Set("Devops-Key", devopsKey)
-	req.Header.Set("Devops-App", "PingCLI")
+	req.Header.Set("Devops-App", "Ping CLI")
 	req.Header.Set("Devops-Purpose", "download-license")
 	req.Header.Set("Product", product)
 	req.Header.Set("Version", version)

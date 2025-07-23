@@ -72,7 +72,7 @@ func createHPluginClient(pluginExecutable string) *hplugin.Client {
 		Level:  hclog.Debug,
 	})
 
-	// PingCLI is the host process. Start the plugin process
+	// Ping CLI is the host process. Start the plugin process
 	client := hplugin.NewClient(&hplugin.ClientConfig{
 		HandshakeConfig: grpc.HandshakeConfig,
 		Plugins:         grpc.PluginMap,
@@ -95,7 +95,7 @@ func dispensePlugin(client *hplugin.Client, pluginExecutable string) (grpc.PingC
 		return nil, fmt.Errorf("failed to create Plugin RPC client: %w", err)
 	}
 
-	// All PingCLI plugins are expected to serve the ENUM_PINGCLI_COMMAND_GRPC plugin via
+	// All Ping CLI plugins are expected to serve the ENUM_PINGCLI_COMMAND_GRPC plugin via
 	// the PluginMap within the plugin.Serve() method.
 	// Non-Golang plugins unable to use the shared grpc module should supply the
 	// raw value of ENUM_PINGCLI_COMMAND_GRPC "pingcli_command_grpc" for the PluginMap key.
@@ -126,7 +126,7 @@ func pluginConfiguration(pluginExecutable string) (conf *grpc.PingCliCommandConf
 	// The configuration method is defined by the protobuf definition.
 	// The plugin should return relevant cobra command information
 	// even if the plugin does not use cobra commands internally.
-	// This allows the host process PingCLI to present the plugin command
+	// This allows the host process Ping CLI to present the plugin command
 	// in the help output.
 	resp, err := plugin.Configuration()
 	if err != nil {

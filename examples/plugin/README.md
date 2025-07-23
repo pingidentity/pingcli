@@ -1,4 +1,4 @@
-# PingCLI Plugin Development Guide
+# Ping CLI Plugin Development Guide
 
 Welcome to the developer guide for creating `pingcli` plugins! This document provides all the information you need to build, test, and distribute your own custom commands to extend the functionality of the `pingcli` tool.
 
@@ -27,7 +27,7 @@ The `pingcli` plugin system allows developers to create new commands that integr
 
 - **Go 1.24+** (for building Go plugins)
 - [HashiCorp go-plugin](https://github.com/hashicorp/go-plugin) (used by both host and plugin)
-- **PingCLI v0.7.0+** installed and configured
+- **Ping CLI v0.7.0+** installed and configured
 
 ## How Plugins Work
 

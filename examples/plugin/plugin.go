@@ -1,6 +1,6 @@
 // Copyright © 2025 Ping Identity Corporation
 
-// Package 'plugin' provides an example implementation of a PingCLI command plugin.
+// Package 'plugin' provides an example implementation of a Ping CLI command plugin.
 //
 // It demonstrates the required structure and interfaces for building a new
 // command that can be dynamically loaded and executed by the main pingcli

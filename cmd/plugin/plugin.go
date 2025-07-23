@@ -8,8 +8,8 @@ import (
 
 func NewPluginCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Long:  `Manage PingCLI plugins.`,
-		Short: "Manage PingCLI plugins.",
+		Long:  `Manage Ping CLI plugins.`,
+		Short: "Manage Ping CLI plugins.",
 		Use:   "plugin",
 	}
 
