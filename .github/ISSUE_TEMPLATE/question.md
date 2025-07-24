@@ -7,11 +7,11 @@ labels: type/question,status/needs-triage
 
 ### Description
 
-<!-- Please provide details of your question within the context of PingCLI usage or documentation here -->
+<!-- Please provide details of your question within the context of Ping CLI usage or documentation here -->
 
 ### Additional Context
 
-<!-- Use this space for any relevant background information including PingCLI version, Terraform Providers/Version -->
+<!-- Use this space for any relevant background information including Ping CLI version, Terraform Providers/Version -->
 
 ### References
 

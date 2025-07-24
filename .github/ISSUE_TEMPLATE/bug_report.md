@@ -17,7 +17,7 @@ labels: type/bug,status/needs-triage
 ### Description
 <!--- Please provide a thorough description of the bug you are experiencing here. --->
 
-### PingCLI Version
+### Ping CLI Version
 <!--- Check the version you have configured with `pingcli --version`. If you are not running the latest version of the cli, please upgrade because your issue may have already been fixed. -->
 
 ### Affected Command(s)
@@ -29,7 +29,7 @@ labels: type/bug,status/needs-triage
 <!--- Please provide your debug output with `PING_LOG_LEVEL=DEBUG` enabled on your relevant command(s) -->
 
 ### Panic Output
-<!--- If PingCLI produced a panic, please provide your debug output from the GO panic -->
+<!--- If Ping CLI produced a panic, please provide your debug output from the GO panic -->
 
 ### Expected Behavior
 <!--- What should have happened? -->

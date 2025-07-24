@@ -96,7 +96,7 @@ func SystemError(message string, fields map[string]interface{}) {
 	l := logger.Get()
 	systemMsg := fmt.Sprintf(`FATAL: %s
 		
-This is a bug in PingCLI and needs reporting to our team.
+This is a bug in Ping CLI and needs reporting to our team.
 		
 Please raise an issue at https://github.com/pingidentity/pingcli`,
 		message)

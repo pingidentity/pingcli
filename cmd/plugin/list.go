@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	listPluginCommandExamples = `  List all plugins currently in use with PingCLI.
+	listPluginCommandExamples = `  List all plugins currently in use with Ping CLI.
     pingcli plugin list`
 )
 
@@ -19,9 +19,9 @@ func NewPluginListCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               listPluginCommandExamples,
-		Long:                  `List all plugins currently in use with PingCLI.`,
+		Long:                  `List all plugins currently in use with Ping CLI.`,
 		RunE:                  pluginListRunE,
-		Short:                 "List all plugins currently in use with PingCLI",
+		Short:                 "List all plugins currently in use with Ping CLI",
 		Use:                   "list",
 	}
 

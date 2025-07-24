@@ -43,10 +43,10 @@ test: --checktestenvvars --test-cmd --test-internal-commands --test-internal-con
 
 --checktestenvvars:
 	@echo -n "Checking for required environment variables to run pingcli tests..."
-	@test -n "$$TEST_PINGONE_ENVIRONMENT_ID" || { echo " FAILED"; echo "TEST_PINGONE_ENVIRONMENT_ID environment variable is not set.\n\nCreate/Specify an unconfigured PingOne environment to test PingCLI with. The following services are required: PingOne SSO, PingOne MFA, PingOne Protect, PingOne DaVinci, PingOne Authorize, and PingFederate"; exit 1; }
-	@test -n "$$TEST_PINGONE_REGION_CODE" || { echo " FAILED"; echo "TEST_PINGONE_REGION_CODE environment variable is not set.\n\nCreate/Specify an unconfigured PingOne environment to test PingCLI with. The following services are required: PingOne SSO, PingOne MFA, PingOne Protect, PingOne DaVinci, PingOne Authorize, and PingFederate"; exit 1; }
-	@test -n "$$TEST_PINGONE_WORKER_CLIENT_ID" || { echo " FAILED"; echo "TEST_PINGONE_WORKER_CLIENT_ID environment variable is not set.\n\nCreate/Specify a worker applicaiton in the unconfigured PingOne environment with all admin roles to test PingCLI with"; exit 1; }
-	@test -n "$$TEST_PINGONE_WORKER_CLIENT_SECRET" || { echo " FAILED"; echo "TEST_PINGONE_WORKER_CLIENT_SECRET environment variable is not set.\n\nCreate/Specify a worker applicaiton in an unconfigured PingOne environment with all admin roles to test PingCLI with"; exit 1; }
+	@test -n "$$TEST_PINGONE_ENVIRONMENT_ID" || { echo " FAILED"; echo "TEST_PINGONE_ENVIRONMENT_ID environment variable is not set.\n\nCreate/Specify an unconfigured PingOne environment to test Ping CLI with. The following services are required: PingOne SSO, PingOne MFA, PingOne Protect, PingOne DaVinci, PingOne Authorize, and PingFederate"; exit 1; }
+	@test -n "$$TEST_PINGONE_REGION_CODE" || { echo " FAILED"; echo "TEST_PINGONE_REGION_CODE environment variable is not set.\n\nCreate/Specify an unconfigured PingOne environment to test Ping CLI with. The following services are required: PingOne SSO, PingOne MFA, PingOne Protect, PingOne DaVinci, PingOne Authorize, and PingFederate"; exit 1; }
+	@test -n "$$TEST_PINGONE_WORKER_CLIENT_ID" || { echo " FAILED"; echo "TEST_PINGONE_WORKER_CLIENT_ID environment variable is not set.\n\nCreate/Specify a worker applicaiton in the unconfigured PingOne environment with all admin roles to test Ping CLI with"; exit 1; }
+	@test -n "$$TEST_PINGONE_WORKER_CLIENT_SECRET" || { echo " FAILED"; echo "TEST_PINGONE_WORKER_CLIENT_SECRET environment variable is not set.\n\nCreate/Specify a worker applicaiton in an unconfigured PingOne environment with all admin roles to test Ping CLI with"; exit 1; }
 	@echo " SUCCESS"
 
 --test-cmd:
