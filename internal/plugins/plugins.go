@@ -3,6 +3,7 @@
 package plugins
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os/exec"
@@ -77,7 +78,7 @@ func createHPluginClient(pluginExecutable string) *hplugin.Client {
 	client := hplugin.NewClient(&hplugin.ClientConfig{
 		HandshakeConfig: grpc.HandshakeConfig,
 		Plugins:         grpc.PluginMap,
-		Cmd:             exec.Command(pluginExecutable),
+		Cmd:             exec.CommandContext(context.Background(), pluginExecutable),
 		AllowedProtocols: []hplugin.Protocol{
 			hplugin.ProtocolGRPC,
 		},

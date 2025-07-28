@@ -112,7 +112,7 @@ func runTerraformPlanGenerateConfigOut(t *testing.T, terraformExecutableFilepath
 	t.Helper()
 
 	// Create the os.exec Command
-	terraformPlanCmd := exec.Command(terraformExecutableFilepath)
+	terraformPlanCmd := exec.CommandContext(t.Context(), terraformExecutableFilepath)
 	// Add the arguments to the command
 	terraformPlanCmd.Args = append(terraformPlanCmd.Args, "plan", "-generate-config-out=generated.tf", "-json")
 	// Change directories for the command to the testing directory
@@ -187,7 +187,7 @@ provider "pingone" {
 	}
 
 	// Run terraform init in testing directory
-	initCmd := exec.Command(terraformExecutableFilepath) //#nosec G204 -- This is a test
+	initCmd := exec.CommandContext(t.Context(), terraformExecutableFilepath) //#nosec G204 -- This is a test
 	initCmd.Args = append(initCmd.Args, "init")
 	initCmd.Dir = exportDir
 
@@ -234,7 +234,7 @@ provider "pingfederate" {
 	}
 
 	// Run terraform init in testing directory
-	initCmd := exec.Command(terraformExecutableFilepath) //#nosec G204 -- This is a test
+	initCmd := exec.CommandContext(t.Context(), terraformExecutableFilepath) //#nosec G204 -- This is a test
 	initCmd.Args = append(initCmd.Args, "init")
 	initCmd.Dir = exportDir
 
