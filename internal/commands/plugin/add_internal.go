@@ -5,6 +5,7 @@ package plugin_internal
 import (
 	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -54,6 +55,14 @@ func addPluginExecutable(pluginExecutable string) error {
 	if err = strSlice.Set(existingPluginExectuables); err != nil {
 		return err
 	}
+
+	// Check if the plugin is already added
+	for _, existingPlugin := range strSlice.StringSlice() {
+		if strings.EqualFold(existingPlugin, pluginExecutable) {
+			return fmt.Errorf("plugin '%s' is already added to profile '%s'", pluginExecutable, pName)
+		}
+	}
+
 	if err = strSlice.Set(pluginExecutable); err != nil {
 		return err
 	}

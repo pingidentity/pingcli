@@ -16,6 +16,7 @@ import (
 	"github.com/pingidentity/pingcli/shared/grpc"
 	shared_logger "github.com/pingidentity/pingcli/shared/logger"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 func AddAllPluginToCmd(cmd *cobra.Command) error {
@@ -49,8 +50,8 @@ func AddAllPluginToCmd(cmd *cobra.Command) error {
 			Long:                  conf.Long,
 			Example:               conf.Example,
 			DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
+			DisableFlagParsing:    true, // Let all flags pass through to plugin
 			RunE:                  createCmdRunE(pluginExecutable),
-			DisableFlagParsing:    true, // The plugin command will handle its own flags
 		}
 
 		cmd.AddCommand(pluginCmd)
@@ -138,6 +139,13 @@ func pluginConfiguration(pluginExecutable string) (conf *grpc.PingCliCommandConf
 
 func createCmdRunE(pluginExecutable string) func(cmd *cobra.Command, args []string) (err error) {
 	return func(cmd *cobra.Command, args []string) error {
+		// Extract global flags before passing args to the plugin
+		// This allows the host process to handle global flags and only pass plugin-specific args
+		pluginArgs, err := filterRootFlags(args, cmd.Root().PersistentFlags())
+		if err != nil {
+			return fmt.Errorf("failed to execute plugin command: %w", err)
+		}
+
 		client := createHPluginClient(pluginExecutable)
 		defer client.Kill()
 
@@ -146,11 +154,86 @@ func createCmdRunE(pluginExecutable string) func(cmd *cobra.Command, args []stri
 			return err
 		}
 
-		err = plugin.Run(args, &shared_logger.SharedLogger{})
+		err = plugin.Run(pluginArgs, &shared_logger.SharedLogger{})
 		if err != nil {
 			return fmt.Errorf("failed to execute plugin command: %w", err)
 		}
 
 		return nil
 	}
+}
+
+// filterRootFlags filters out any flags that were parsed by the root command's persistent flags
+// and processes them for the host application, returning only plugin-specific args.
+func filterRootFlags(args []string, persistentFlags *pflag.FlagSet) ([]string, error) {
+	pluginArgs := []string{}
+
+	var (
+		previousArgFlagName     = ""
+		handlePreviousArgAsFlag = false
+	)
+
+	for _, arg := range args {
+		switch {
+		case handlePreviousArgAsFlag && previousArgFlagName != "":
+			err := persistentFlags.Set(previousArgFlagName, arg)
+			if err != nil {
+				return nil, fmt.Errorf("failed to set persistent flag '%s' with value '%s': %w", previousArgFlagName, arg, err)
+			}
+			handlePreviousArgAsFlag = false
+		case len(arg) > 0 && arg[0] == '-':
+			// The argument is a flag, remove leading dashes
+			flagArg := strings.TrimLeft(arg, "-")
+
+			// Handle flags in the format --flag=value
+			if strings.Contains(flagArg, "=") {
+				parts := strings.SplitN(flagArg, "=", 2)
+				flagName := parts[0]
+
+				if flag := persistentFlags.Lookup(flagName); flag != nil {
+					err := persistentFlags.Set(flagName, parts[1])
+					if err != nil {
+						return nil, fmt.Errorf("failed to set persistent flag '%s' with value '%s': %w", flagName, parts[1], err)
+					}
+				} else if len(flagName) == 1 && persistentFlags.ShorthandLookup(flagName) != nil {
+					flag := persistentFlags.ShorthandLookup(flagName)
+					err := persistentFlags.Set(flag.Name, parts[1])
+					if err != nil {
+						return nil, fmt.Errorf("failed to set persistent flag '%s' with value '%s': %w", flag.Name, parts[1], err)
+					}
+				} else {
+					pluginArgs = append(pluginArgs, arg)
+				}
+			} else {
+				if flag := persistentFlags.Lookup(flagArg); flag != nil {
+					if flag.Value.Type() == "bool" {
+						err := persistentFlags.Set(flagArg, "true")
+						if err != nil {
+							return nil, fmt.Errorf("failed to set persistent flag '%s' with value 'true': %w", flagArg, err)
+						}
+					} else {
+						previousArgFlagName = flagArg
+						handlePreviousArgAsFlag = true
+					}
+				} else if len(flagArg) == 1 && persistentFlags.ShorthandLookup(flagArg) != nil {
+					flag := persistentFlags.ShorthandLookup(flagArg)
+					if flag.Value.Type() == "bool" {
+						err := persistentFlags.Set(flag.Name, "true")
+						if err != nil {
+							return nil, fmt.Errorf("failed to set persistent flag '%s' with value 'true': %w", flag.Name, err)
+						}
+					} else {
+						previousArgFlagName = flag.Name
+						handlePreviousArgAsFlag = true
+					}
+				} else {
+					pluginArgs = append(pluginArgs, arg)
+				}
+			}
+		default:
+			pluginArgs = append(pluginArgs, arg)
+		}
+	}
+
+	return pluginArgs, nil
 }
