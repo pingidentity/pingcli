@@ -31,7 +31,7 @@ func RunInternalConfigGet(koanfKey string) (err error) {
 		}
 
 		// Match the koanfKey (which can be a "parent key". E.g 'service.pingOne' would match all options like 'service.pingone.authentication.type') to all options.
-		if !strings.Contains(strings.ToLower(opt.KoanfKey), strings.ToLower(koanfKey)) {
+		if !strings.HasPrefix(strings.ToLower(opt.KoanfKey), strings.ToLower(koanfKey)) {
 			continue
 		}
 
