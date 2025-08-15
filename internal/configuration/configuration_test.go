@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
@@ -38,6 +39,16 @@ func Test_ValidateKoanfKey_EmptyKey(t *testing.T) {
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
+// Test ValidateKoanfKey supports case-insensitive keys
+func Test_ValidateKoanfKey_CaseInsensitive(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	err := configuration.ValidateKoanfKey("NoCoLoR")
+	if err != nil {
+		t.Errorf("ValidateKoanfKey returned error: %v", err)
+	}
+}
+
 // Test ValidateParentKoanfKey function
 func Test_ValidateParentKoanfKey(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
@@ -66,6 +77,16 @@ func Test_ValidateParentKoanfKey_EmptyKey(t *testing.T) {
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
+// Test ValidateParentKoanfKey supports case-insensitive keys
+func Test_ValidateParentKoanfKey_CaseInsensitive(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	err := configuration.ValidateParentKoanfKey("SeRvIcE")
+	if err != nil {
+		t.Errorf("ValidateParentKoanfKey returned error: %v", err)
+	}
+}
+
 // Test OptionFromKoanfKey function
 func Test_OptionFromKoanfKey(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
@@ -76,6 +97,20 @@ func Test_OptionFromKoanfKey(t *testing.T) {
 	}
 
 	if opt.KoanfKey != "noColor" {
+		t.Errorf("OptionFromKoanfKey returned invalid option: %v", opt)
+	}
+}
+
+// Test OptionFromKoanfKey supports case-insensitive keys
+func Test_OptionFromKoanfKey_CaseInsensitive(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	opt, err := configuration.OptionFromKoanfKey("NoCoLoR")
+	if err != nil {
+		t.Errorf("OptionFromKoanfKey returned error: %v", err)
+	}
+
+	if opt.KoanfKey != options.RootColorOption.KoanfKey {
 		t.Errorf("OptionFromKoanfKey returned invalid option: %v", opt)
 	}
 }

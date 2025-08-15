@@ -120,3 +120,13 @@ func Test_RunInternalConfigSet_NoKeyValue(t *testing.T) {
 	err := RunInternalConfigSet("")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
+
+// Test Test_RunInternalConfigSet function succeeds with case-insensitive keys
+func Test_RunInternalConfigSet_CaseInsensitiveKeys(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	err := RunInternalConfigSet("NoCoLoR=true")
+	if err != nil {
+		t.Errorf("RunInternalConfigSet returned error: %v", err)
+	}
+}

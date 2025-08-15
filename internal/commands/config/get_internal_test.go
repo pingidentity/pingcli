@@ -62,3 +62,13 @@ func Test_RunInternalConfigGet_InvalidProfileName(t *testing.T) {
 	err := RunInternalConfigGet("service")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
+
+// Test RunInternalConfigGet function with case-insensitive keys
+func Test_RunInternalConfigGet_CaseInsensitiveKeys(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	err := RunInternalConfigGet("SeRvIcE")
+	if err != nil {
+		t.Errorf("RunInternalConfigGet returned error: %v", err)
+	}
+}
