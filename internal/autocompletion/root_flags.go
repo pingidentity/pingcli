@@ -3,13 +3,21 @@
 package autocompletion
 
 import (
+	"fmt"
+
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
 )
 
 func RootProfileFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return profiles.GetKoanfConfig().ProfileNames(), cobra.ShellCompDirectiveNoFileComp
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Unable to get configuration: %v", err), nil)
+	}
+
+	return koanfConfig.ProfileNames(), cobra.ShellCompDirectiveNoFileComp
 }
 
 func RootOutputFormatFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {

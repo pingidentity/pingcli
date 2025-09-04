@@ -3,33 +3,57 @@
 package config_internal
 
 import (
+	"errors"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
 )
 
-// Test RunInternalConfigViewProfile function
 func Test_RunInternalConfigViewProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	testCases := []struct {
+		name          string
+		profileName   []string
+		expectedError error
+	}{
+		{
+			name:        "View active profile by providing no profile",
+			profileName: []string{},
+		},
+		{
+			name:          "View non-existent profile",
+			profileName:   []string{"nonexistent"},
+			expectedError: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:        "View profile by providing one",
+			profileName: []string{"production"},
+		},
+		{
+			name:          "View empty name profile",
+			profileName:   []string{""},
+			expectedError: profiles.ErrProfileNameEmpty,
+		},
+	}
 
-	err := RunInternalConfigViewProfile([]string{})
-	testutils.CheckExpectedError(t, err, nil)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test RunInternalConfigViewProfile function fails with invalid profile name
-func Test_RunInternalConfigViewProfile_InvalidProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+			err := RunInternalConfigViewProfile(tc.profileName)
 
-	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*' profile does not exist$`
-	err := RunInternalConfigViewProfile([]string{"invalid"})
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigViewProfile function with different profile
-func Test_RunInternalConfigViewProfile_DifferentProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := RunInternalConfigViewProfile([]string{"production"})
-	testutils.CheckExpectedError(t, err, nil)
+			if tc.expectedError != nil {
+				assert.Error(t, err)
+				var viewError *ViewProfileError
+				if errors.As(err, &viewError) {
+					assert.ErrorIs(t, viewError.Unwrap(), tc.expectedError)
+				} else {
+					assert.Fail(t, "Expected error to be of type ViewProfileError")
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }

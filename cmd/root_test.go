@@ -3,6 +3,7 @@
 package cmd_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -104,6 +105,9 @@ func TestRootCmd_InvalidColorFlag(t *testing.T) {
 
 // Test Root Command Executes when provided the --config flag
 func TestRootCmd_ConfigFlag(t *testing.T) {
+	// Add the --config args to os.Args
+	os.Args = append(os.Args, "--"+options.RootConfigOption.CobraParamName, "config.yaml")
+
 	err := testutils_cobra.ExecutePingcli(t, "--"+options.RootConfigOption.CobraParamName, "config.yaml")
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -112,6 +116,13 @@ func TestRootCmd_ConfigFlag(t *testing.T) {
 func TestRootCmd_NoValueConfigFlag(t *testing.T) {
 	expectedErrorPattern := `^flag needs an argument: --config$`
 	err := testutils_cobra.ExecutePingcli(t, "--"+options.RootConfigOption.CobraParamName)
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Root Command fails on non-existent configuration file
+func TestRootCmd_NonExistentConfigFile(t *testing.T) {
+	expectedErrorPattern := `^Configuration file '.*' does not exist. Use the default configuration file location or specify a valid configuration file location with the --config flag\.$`
+	err := testutils_cobra.ExecutePingcli(t, "--"+options.RootConfigOption.CobraParamName, "non_existent.yaml")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -128,7 +139,7 @@ func TestRootCmd_NoValueProfileFlag(t *testing.T) {
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// // Test Root Command Detailed Exit Code Flag
+// Test Root Command Detailed Exit Code Flag
 func TestRootCmd_DetailedExitCodeFlag(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "--"+options.RootDetailedExitCodeOption.CobraParamName)
 	testutils.CheckExpectedError(t, err, nil)
@@ -137,7 +148,7 @@ func TestRootCmd_DetailedExitCodeFlag(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 }
 
-// // Test Root Command Detailed Exit Code Flag with output Warn
+// Test Root Command Detailed Exit Code Flag with output Warn
 func TestRootCmd_DetailedExitCodeWarnLoggedFunc(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	t.Setenv(options.RootDetailedExitCodeOption.EnvVar, "true")

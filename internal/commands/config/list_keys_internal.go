@@ -3,6 +3,7 @@
 package config_internal
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -13,12 +14,37 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func returnKeysYamlString() (string, error) {
-	var err error
+var (
+	ErrRetrieveKeys = errors.New("failed to retrieve configuration keys")
+	ErrNestedMap    = errors.New("failed to create nested map for key")
+	ErrMarshalKeys  = errors.New("failed to marshal keys to YAML format")
+)
+
+type ListKeysError struct {
+	Err error
+}
+
+func (e *ListKeysError) Error() string {
+	var err *ListKeysError
+	if errors.As(e.Err, &err) {
+		return err.Error()
+	}
+	return fmt.Sprintf("failed to get configuration keys list: %s", e.Err.Error())
+}
+
+func (e *ListKeysError) Unwrap() error {
+	var err *ListKeysError
+	if errors.As(e.Err, &err) {
+		return err.Unwrap()
+	}
+	return e.Err
+}
+
+func returnKeysYamlString() (keysYamlStr string, err error) {
 	koanfKeys := configuration.KoanfKeys()
 
 	if len(koanfKeys) == 0 {
-		return "", fmt.Errorf("unable to retrieve valid keys")
+		return keysYamlStr, &ListKeysError{Err: ErrRetrieveKeys}
 	}
 
 	// Split the input string into individual keys
@@ -48,7 +74,7 @@ func returnKeysYamlString() (string, error) {
 				}
 				currentMap, currentMapOk = currentMap[k].(map[string]interface{})
 				if !currentMapOk {
-					return "", fmt.Errorf("failed to get configuration keys list: error creating nested map for key %s", koanfKey)
+					return keysYamlStr, &ListKeysError{Err: ErrNestedMap}
 				}
 			}
 		}
@@ -57,18 +83,18 @@ func returnKeysYamlString() (string, error) {
 	// Marshal the result into YAML
 	yamlData, err := yaml.Marshal(keyMap)
 	if err != nil {
-		return "", fmt.Errorf("error marshaling keys to YAML format")
+		return keysYamlStr, &ListKeysError{Err: ErrMarshalKeys}
 	}
 
-	return string(yamlData), nil
+	keysYamlStr = string(yamlData)
+	return keysYamlStr, nil
 }
 
 func returnKeysString() (string, error) {
-	// var err error
 	validKeys := configuration.KoanfKeys()
 
 	if len(validKeys) == 0 {
-		return "", fmt.Errorf("unable to retrieve valid keys")
+		return "", &ListKeysError{Err: ErrRetrieveKeys}
 	} else {
 		validKeysJoined := strings.Join(validKeys, "\n- ")
 
@@ -80,19 +106,19 @@ func RunInternalConfigListKeys() (err error) {
 	var outputMessageString string
 	yamlFlagStr, err := profiles.GetOptionValue(options.ConfigListKeysYamlOption)
 	if err != nil {
-		return err
+		return &ListKeysError{Err: err}
 	}
 	if yamlFlagStr == "true" {
 		// Output the YAML data as a string
 		outputMessageString, err = returnKeysYamlString()
 		if err != nil {
-			return err
+			return &ListKeysError{Err: err}
 		}
 	} else {
 		// Output data list string
 		outputMessageString, err = returnKeysString()
 		if err != nil {
-			return err
+			return &ListKeysError{Err: err}
 		}
 	}
 

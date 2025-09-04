@@ -3,120 +3,102 @@
 package config_internal
 
 import (
+	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
 )
 
-// Test RunInternalConfigSet function
 func Test_RunInternalConfigSet(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	err := RunInternalConfigSet("noColor=true")
-	if err != nil {
-		t.Errorf("RunInternalConfigSet returned error: %v", err)
+	testCases := []struct {
+		name          string
+		profileName   customtypes.String
+		kvPair        string
+		expectedError error
+	}{
+		{
+			name:   "Set noColor to True",
+			kvPair: fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+		},
+		{
+			name:          "Set active profile",
+			kvPair:        fmt.Sprintf("%s=production", options.RootActiveProfileOption.KoanfKey),
+			expectedError: ErrActiveProfileAssignment,
+		},
+		{
+			name:          "Set non-existant key",
+			kvPair:        "nonExistantKey=true",
+			expectedError: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:          "Set boolean key with invalid variable type",
+			kvPair:        fmt.Sprintf("%s=invalid", options.RootColorOption.KoanfKey),
+			expectedError: ErrMustBeBoolean,
+		},
+		{
+			name:          "Set key on non-existent profile",
+			profileName:   "non-existent",
+			kvPair:        fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+			expectedError: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:        "Set noColor to True on different profile",
+			profileName: "production",
+			kvPair:      fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+		},
+		{
+			name:          "Set key on invalid profile name format",
+			profileName:   "(*#&)",
+			kvPair:        fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+			expectedError: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:          "Set key with empty value",
+			kvPair:        fmt.Sprintf("%s=", options.RootColorOption.KoanfKey),
+			expectedError: ErrEmptyValue,
+		},
+		{
+			name:          "Run set command with no key-value pair provided",
+			kvPair:        "",
+			expectedError: ErrKeyAssignmentFormat,
+		},
+		{
+			name:          "Run set with invalid key-value assignment format",
+			kvPair:        "key::value",
+			expectedError: ErrKeyAssignmentFormat,
+		},
 	}
-}
 
-// Test RunInternalConfigSet function fails when active profile is set
-func Test_RunInternalConfigSet_InvalidActiveProfileUse(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-	var (
-		profileName = customtypes.String("default")
-	)
+			if tc.profileName != "" {
+				options.RootProfileOption.Flag.Changed = true
+				options.RootProfileOption.CobraParamValue = &tc.profileName
+			}
 
-	options.RootProfileOption.Flag.Changed = true
-	options.RootProfileOption.CobraParamValue = &profileName
-	expectedErrorPattern := `^failed to set configuration: invalid assignment. Please use the 'pingcli config set active-profile <profile-name>' command to set the active profile`
-	err := RunInternalConfigSet("activeProfile=myNewProfile")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			err := RunInternalConfigSet(tc.kvPair)
 
-// Test RunInternalConfigSet function fails with invalid key
-func Test_RunInternalConfigSet_InvalidKey(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set configuration: key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := RunInternalConfigSet("invalid-key=false")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with invalid value
-func Test_RunInternalConfigSet_InvalidValue(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set configuration: value for key '.*' must be a boolean. Allowed .*: strconv.ParseBool: parsing ".*": invalid syntax$`
-	err := RunInternalConfigSet("noColor=invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with non-existent profile name
-func Test_RunInternalConfigSet_NonExistentProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	var (
-		profileName = customtypes.String("non-existent")
-	)
-
-	options.RootProfileOption.Flag.Changed = true
-	options.RootProfileOption.CobraParamValue = &profileName
-
-	expectedErrorPattern := `^failed to set configuration: invalid profile name: '.*' profile does not exist$`
-	err := RunInternalConfigSet("noColor=true")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function with different profile
-func Test_RunInternalConfigSet_DifferentProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	var (
-		profileName = customtypes.String("production")
-	)
-
-	options.RootProfileOption.Flag.Changed = true
-	options.RootProfileOption.CobraParamValue = &profileName
-
-	err := RunInternalConfigSet("noColor=true")
-	if err != nil {
-		t.Errorf("RunInternalConfigSet returned error: %v", err)
+			if tc.expectedError != nil {
+				assert.Error(t, err)
+				var setError *SetError
+				if errors.As(err, &setError) {
+					assert.ErrorIs(t, setError.Unwrap(), tc.expectedError)
+				} else {
+					assert.Fail(t, "Expected error to be of type SetError")
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
 	}
-}
-
-// Test RunInternalConfigSet function fails with invalid profile name
-func Test_RunInternalConfigSet_InvalidProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	var (
-		profileName = customtypes.String("*&%*&")
-	)
-
-	options.RootProfileOption.Flag.Changed = true
-	options.RootProfileOption.CobraParamValue = &profileName
-
-	expectedErrorPattern := `^failed to set configuration: invalid profile name: '.*' profile does not exist$`
-	err := RunInternalConfigSet("noColor=true")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with no value provided
-func Test_RunInternalConfigSet_NoValue(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set configuration: value for key '.*' is empty. Use 'pingcli config unset .*' to unset the key$`
-	err := RunInternalConfigSet("noColor=")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with no keyValue provided
-func Test_RunInternalConfigSet_NoKeyValue(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set configuration: invalid assignment format ''\. Expect 'key=value' format$`
-	err := RunInternalConfigSet("")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

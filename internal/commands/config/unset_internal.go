@@ -3,6 +3,7 @@
 package config_internal
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -12,40 +13,67 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var ErrDetermineProfileUnset = errors.New("unable to determine profile to unset configuration from")
+
+type UnsetError struct {
+	Err error
+}
+
+func (e *UnsetError) Error() string {
+	var err *UnsetError
+	if errors.As(e.Err, &err) {
+		return err.Error()
+	}
+	return fmt.Sprintf("failed to unset configuration: %s", e.Err.Error())
+}
+
+func (e *UnsetError) Unwrap() error {
+	var err *UnsetError
+	if errors.As(e.Err, &err) {
+		return err.Unwrap()
+	}
+	return e.Err
+}
+
 func RunInternalConfigUnset(koanfKey string) (err error) {
 	if err = configuration.ValidateKoanfKey(koanfKey); err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &UnsetError{Err: err}
 	}
 
 	pName, err := readConfigUnsetOptions()
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &UnsetError{Err: err}
 	}
 
-	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
+	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &UnsetError{Err: err}
+	}
+
+	subKoanf, err := koanfConfig.GetProfileKoanf(pName)
+	if err != nil {
+		return &UnsetError{Err: err}
 	}
 
 	opt, err := configuration.OptionFromKoanfKey(koanfKey)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &UnsetError{Err: err}
 	}
 
 	err = subKoanf.Set(koanfKey, opt.DefaultValue)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &UnsetError{Err: err}
 	}
 
-	if err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf); err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+	if err = koanfConfig.SaveProfile(pName, subKoanf); err != nil {
+		return &UnsetError{Err: err}
 	}
 
 	msgStr := "Configuration unset successfully:\n"
 
 	vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &UnsetError{Err: err}
 	}
 
 	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -72,11 +100,11 @@ func readConfigUnsetOptions() (pName string, err error) {
 	}
 
 	if err != nil {
-		return pName, err
+		return pName, &UnsetError{Err: err}
 	}
 
 	if pName == "" {
-		return pName, fmt.Errorf("unable to determine profile to unset configuration from")
+		return pName, &UnsetError{Err: ErrDetermineProfileUnset}
 	}
 
 	return pName, nil

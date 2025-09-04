@@ -12,11 +12,21 @@ import (
 )
 
 func ConfigViewProfileFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	return profiles.GetKoanfConfig().ProfileNames(), cobra.ShellCompDirectiveNoFileComp
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Unable to get configuration: %v", err), nil)
+	}
+
+	return koanfConfig.ProfileNames(), cobra.ShellCompDirectiveNoFileComp
 }
 
 func ConfigReturnNonActiveProfilesFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-	profileNames := profiles.GetKoanfConfig().ProfileNames()
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Unable to get configuration: %v", err), nil)
+	}
+
+	profileNames := koanfConfig.ProfileNames()
 	if len(args) != 0 {
 		return nil, cobra.ShellCompDirectiveNoFileComp
 	}

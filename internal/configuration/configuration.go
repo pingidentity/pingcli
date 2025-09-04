@@ -3,6 +3,7 @@
 package configuration
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -17,6 +18,31 @@ import (
 	configuration_root "github.com/pingidentity/pingcli/internal/configuration/root"
 	configuration_services "github.com/pingidentity/pingcli/internal/configuration/services"
 )
+
+var (
+	ErrInvalidConfigurationKey = errors.New("provided key is not recognized as a valid configuration key.\nuse 'pingcli config list-keys' to view all available keys")
+	ErrNoOptionForKey          = errors.New("no option found for the provided configuration key")
+)
+
+type ConfigurationError struct {
+	Err error
+}
+
+func (e *ConfigurationError) Error() string {
+	var err *ConfigurationError
+	if errors.As(e.Err, &err) {
+		return err.Error()
+	}
+	return fmt.Sprintf("configuration options error: %s", e.Err.Error())
+}
+
+func (e *ConfigurationError) Unwrap() error {
+	var err *ConfigurationError
+	if errors.As(e.Err, &err) {
+		return err.Unwrap()
+	}
+	return e.Err
+}
 
 func KoanfKeys() (keys []string) {
 	for _, opt := range options.Options() {
@@ -38,7 +64,7 @@ func ValidateKoanfKey(koanfKey string) error {
 		}
 	}
 
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", koanfKey)
+	return &ConfigurationError{Err: ErrInvalidConfigurationKey}
 }
 
 // Return a list of all koanf keys from Options
@@ -72,7 +98,7 @@ func ValidateParentKoanfKey(koanfKey string) error {
 		}
 	}
 
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", koanfKey)
+	return &ConfigurationError{Err: ErrInvalidConfigurationKey}
 }
 
 func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
@@ -82,7 +108,7 @@ func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
 		}
 	}
 
-	return opt, fmt.Errorf("failed to get option: no option found for koanf key: %s", koanfKey)
+	return opt, &ConfigurationError{Err: ErrNoOptionForKey}
 }
 
 func InitAllOptions() {

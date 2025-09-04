@@ -3,6 +3,7 @@
 package config_internal
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -11,6 +12,26 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+type ViewProfileError struct {
+	Err error
+}
+
+func (e *ViewProfileError) Error() string {
+	var err *ViewProfileError
+	if errors.As(e.Err, &err) {
+		return err.Error()
+	}
+	return fmt.Sprintf("failed to view profile: %s", e.Err.Error())
+}
+
+func (e *ViewProfileError) Unwrap() error {
+	var err *ViewProfileError
+	if errors.As(e.Err, &err) {
+		return err.Unwrap()
+	}
+	return e.Err
+}
+
 func RunInternalConfigViewProfile(args []string) (err error) {
 	var msgStr, pName string
 	if len(args) == 1 {
@@ -18,20 +39,25 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 	} else {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 		if err != nil {
-			return fmt.Errorf("failed to view profile: %w", err)
+			return &ViewProfileError{Err: err}
 		}
 	}
 
-	// Validate the profile name
-	err = profiles.GetKoanfConfig().ValidateExistingProfileName(pName)
+	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return fmt.Errorf("failed to view profile: %w", err)
+		return &ViewProfileError{Err: err}
+	}
+
+	// Validate the profile name
+	err = koanfConfig.ValidateExistingProfileName(pName)
+	if err != nil {
+		return &ViewProfileError{Err: err}
 	}
 
 	// Get the Koanf configuration for the specified profile
-	koanfProfile, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
+	koanfProfile, err := koanfConfig.GetProfileKoanf(pName)
 	if err != nil {
-		return fmt.Errorf("failed to get config from profile: %w", err)
+		return &ViewProfileError{Err: err}
 	}
 
 	// Iterate over the options in profile and print them
@@ -46,7 +72,7 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 		}
 
 		if err != nil {
-			return fmt.Errorf("failed to get koanf value from option: %w", err)
+			return &ViewProfileError{Err: err}
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)

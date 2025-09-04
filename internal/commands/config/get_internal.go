@@ -3,6 +3,7 @@
 package config_internal
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -12,14 +13,36 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var ErrUndeterminedProfile = errors.New("unable to determine profile to get configuration from")
+
+type GetError struct {
+	Err error
+}
+
+func (e *GetError) Error() string {
+	var err *GetError
+	if errors.As(e.Err, &err) {
+		return err.Error()
+	}
+	return fmt.Sprintf("failed to get configuration: %s", e.Err.Error())
+}
+
+func (e *GetError) Unwrap() error {
+	var err *GetError
+	if errors.As(e.Err, &err) {
+		return err.Unwrap()
+	}
+	return e.Err
+}
+
 func RunInternalConfigGet(koanfKey string) (err error) {
 	if err = configuration.ValidateParentKoanfKey(koanfKey); err != nil {
-		return fmt.Errorf("failed to get configuration: %w", err)
+		return &GetError{Err: err}
 	}
 
 	pName, err := readConfigGetOptions()
 	if err != nil {
-		return fmt.Errorf("failed to get configuration: %w", err)
+		return &GetError{Err: err}
 	}
 
 	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", pName, koanfKey)
@@ -31,7 +54,7 @@ func RunInternalConfigGet(koanfKey string) (err error) {
 
 		vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 		if err != nil {
-			return fmt.Errorf("failed to get configuration: %w", err)
+			return &GetError{Err: err}
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -59,11 +82,11 @@ func readConfigGetOptions() (pName string, err error) {
 	}
 
 	if err != nil {
-		return "", err
+		return pName, &GetError{Err: err}
 	}
 
 	if pName == "" {
-		return "", fmt.Errorf("unable to determine profile to get configuration from")
+		return pName, &GetError{Err: ErrUndeterminedProfile}
 	}
 
 	return pName, nil

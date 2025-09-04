@@ -3,6 +3,7 @@
 package config_internal
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -14,15 +15,45 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var (
+	ErrProfileNameNotProvided = errors.New("unable to determine profile name")
+	ErrSetActiveInvalid       = errors.New("invalid value for set-active flag. must be 'true' or 'false'")
+)
+
+type AddProfileError struct {
+	Err error
+}
+
+func (e *AddProfileError) Error() string {
+	var err *AddProfileError
+	if errors.As(e.Err, &err) {
+		return err.Error()
+	}
+	return fmt.Sprintf("failed to add profile: %s", e.Err.Error())
+}
+
+func (e *AddProfileError) Unwrap() error {
+	var err *AddProfileError
+	if errors.As(e.Err, &err) {
+		return err.Unwrap()
+	}
+	return e.Err
+}
+
 func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 	newProfileName, newDescription, setActive, err := readConfigAddProfileOptions(rc)
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+		return &AddProfileError{Err: err}
 	}
 
-	err = profiles.GetKoanfConfig().ValidateNewProfileName(newProfileName)
+	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+		return &AddProfileError{Err: err}
+	}
+
+	err = koanfConfig.ValidateNewProfileName(newProfileName)
+	if err != nil {
+		return &AddProfileError{Err: err}
 	}
 
 	output.Message(fmt.Sprintf("Adding new profile '%s'...", newProfileName), nil)
@@ -30,26 +61,26 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 	subKoanf := koanf.New(".")
 	err = subKoanf.Set(options.ProfileDescriptionOption.KoanfKey, newDescription)
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+		return &AddProfileError{Err: err}
 	}
 
-	if err = profiles.GetKoanfConfig().SaveProfile(newProfileName, subKoanf); err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+	if err = koanfConfig.SaveProfile(newProfileName, subKoanf); err != nil {
+		return &AddProfileError{Err: err}
 	}
 
-	output.Success(fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetKoanfConfig().GetKoanfConfigFile()), nil)
+	output.Success(fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", koanfConfig.GetKoanfConfigFile()), nil)
 
 	if setActive {
-		if err = profiles.GetKoanfConfig().ChangeActiveProfile(newProfileName); err != nil {
-			return fmt.Errorf("failed to set active profile: %w", err)
+		if err = koanfConfig.ChangeActiveProfile(newProfileName); err != nil {
+			return &AddProfileError{Err: err}
 		}
 
 		output.Success(fmt.Sprintf("Profile '%s' set as active.", newProfileName), nil)
 	}
 
-	err = profiles.GetKoanfConfig().DefaultMissingKoanfKeys()
+	err = koanfConfig.DefaultMissingKoanfKeys()
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+		return &AddProfileError{Err: err}
 	}
 
 	return nil
@@ -57,15 +88,15 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 
 func readConfigAddProfileOptions(rc io.ReadCloser) (newProfileName, newDescription string, setActive bool, err error) {
 	if newProfileName, err = readConfigAddProfileNameOption(rc); err != nil {
-		return newProfileName, newDescription, setActive, err
+		return newProfileName, newDescription, setActive, &AddProfileError{Err: err}
 	}
 
 	if newDescription, err = readConfigAddProfileDescriptionOption(rc); err != nil {
-		return newProfileName, newDescription, setActive, err
+		return newProfileName, newDescription, setActive, &AddProfileError{Err: err}
 	}
 
 	if setActive, err = readConfigAddProfileSetActiveOption(rc); err != nil {
-		return newProfileName, newDescription, setActive, err
+		return newProfileName, newDescription, setActive, &AddProfileError{Err: err}
 	}
 
 	return newProfileName, newDescription, setActive, nil
@@ -73,22 +104,27 @@ func readConfigAddProfileOptions(rc io.ReadCloser) (newProfileName, newDescripti
 
 func readConfigAddProfileNameOption(rc io.ReadCloser) (newProfileName string, err error) {
 	if !options.ConfigAddProfileNameOption.Flag.Changed {
-		newProfileName, err = input.RunPrompt("New profile name", profiles.GetKoanfConfig().ValidateNewProfileName, rc)
+		koanfConfig, err := profiles.GetKoanfConfig()
 		if err != nil {
-			return newProfileName, err
+			return newProfileName, &AddProfileError{Err: err}
+		}
+
+		newProfileName, err = input.RunPrompt("New profile name", koanfConfig.ValidateNewProfileName, rc)
+		if err != nil {
+			return newProfileName, &AddProfileError{Err: err}
 		}
 
 		if newProfileName == "" {
-			return newProfileName, fmt.Errorf("unable to determine profile name")
+			return newProfileName, &AddProfileError{Err: ErrProfileNameNotProvided}
 		}
 	} else {
 		newProfileName, err = profiles.GetOptionValue(options.ConfigAddProfileNameOption)
 		if err != nil {
-			return newProfileName, err
+			return newProfileName, &AddProfileError{Err: err}
 		}
 
 		if newProfileName == "" {
-			return newProfileName, fmt.Errorf("unable to determine profile name")
+			return newProfileName, &AddProfileError{Err: ErrProfileNameNotProvided}
 		}
 	}
 
@@ -97,21 +133,37 @@ func readConfigAddProfileNameOption(rc io.ReadCloser) (newProfileName string, er
 
 func readConfigAddProfileDescriptionOption(rc io.ReadCloser) (newDescription string, err error) {
 	if !options.ConfigAddProfileDescriptionOption.Flag.Changed {
-		return input.RunPrompt("New profile description: ", nil, rc)
+		newDescription, err = input.RunPrompt("New profile description: ", nil, rc)
+		if err != nil {
+			return newDescription, &AddProfileError{Err: err}
+		}
 	} else {
-		return profiles.GetOptionValue(options.ConfigAddProfileDescriptionOption)
+		newDescription, err = profiles.GetOptionValue(options.ConfigAddProfileDescriptionOption)
+		if err != nil {
+			return newDescription, &AddProfileError{Err: err}
+		}
 	}
+
+	return newDescription, nil
 }
 
 func readConfigAddProfileSetActiveOption(rc io.ReadCloser) (setActive bool, err error) {
 	if !options.ConfigAddProfileSetActiveOption.Flag.Changed {
-		return input.RunPromptConfirm("Set new profile as active: ", rc)
+		setActive, err = input.RunPromptConfirm("Set new profile as active: ", rc)
+		if err != nil {
+			return setActive, &AddProfileError{Err: err}
+		}
 	} else {
 		boolStr, err := profiles.GetOptionValue(options.ConfigAddProfileSetActiveOption)
 		if err != nil {
-			return setActive, err
+			return setActive, &AddProfileError{Err: err}
 		}
 
-		return strconv.ParseBool(boolStr)
+		setActive, err = strconv.ParseBool(boolStr)
+		if err != nil {
+			return setActive, &AddProfileError{Err: ErrSetActiveInvalid}
+		}
 	}
+
+	return setActive, nil
 }

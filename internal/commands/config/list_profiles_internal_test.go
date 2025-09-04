@@ -3,16 +3,40 @@
 package config_internal
 
 import (
+	"errors"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
 )
 
-// Test RunInternalConfigListProfiles function
 func Test_RunInternalConfigListProfiles(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	testCases := []struct {
+		name          string
+		expectedError error
+	}{
+		{
+			name: "Get List of Profiles",
+		},
+	}
 
-	err := RunInternalConfigListProfiles()
-	testutils.CheckExpectedError(t, err, nil)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := RunInternalConfigListProfiles()
+
+			if tc.expectedError != nil {
+				assert.Error(t, err)
+				var listProfilesErr *ListProfilesError
+				if errors.As(err, &listProfilesErr) {
+					assert.ErrorIs(t, listProfilesErr.Unwrap(), tc.expectedError)
+				} else {
+					assert.Fail(t, "Expected error to be of type ListProfilesError")
+				}
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }

@@ -4,10 +4,23 @@ package input
 
 import (
 	"errors"
+	"fmt"
 	"io"
 
 	"github.com/manifoldco/promptui"
 )
+
+type InputPromptError struct {
+	Err error
+}
+
+func (e *InputPromptError) Error() string {
+	return fmt.Sprintf("input prompt failed: %s", e.Err.Error())
+}
+
+func (e *InputPromptError) Unwrap() error {
+	return e.Err
+}
 
 func RunPrompt(message string, validateFunc func(string) error, rc io.ReadCloser) (string, error) {
 	p := promptui.Prompt{
@@ -16,7 +29,12 @@ func RunPrompt(message string, validateFunc func(string) error, rc io.ReadCloser
 		Stdin:    rc,
 	}
 
-	return p.Run()
+	userInput, err := p.Run()
+	if err != nil {
+		return "", &InputPromptError{Err: err}
+	}
+
+	return userInput, nil
 }
 
 func RunPromptConfirm(message string, rc io.ReadCloser) (bool, error) {
@@ -34,7 +52,7 @@ func RunPromptConfirm(message string, rc io.ReadCloser) (bool, error) {
 			return false, nil
 		}
 
-		return false, err
+		return false, &InputPromptError{Err: err}
 	}
 
 	return true, nil
@@ -49,6 +67,9 @@ func RunPromptSelect(message string, items []string, rc io.ReadCloser) (selectio
 	}
 
 	_, selection, err = p.Run()
+	if err != nil {
+		return "", &InputPromptError{Err: err}
+	}
 
-	return selection, err
+	return selection, nil
 }

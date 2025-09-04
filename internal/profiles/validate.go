@@ -14,8 +14,13 @@ import (
 )
 
 func Validate() (err error) {
+	koanfConfig, err := GetKoanfConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get koanf config: %w", err)
+	}
+
 	// Get a slice of all profile names configured in the config.yaml file
-	profileNames := GetKoanfConfig().ProfileNames()
+	profileNames := koanfConfig.ProfileNames()
 
 	// Validate profile names
 	if err = validateProfileNames(profileNames); err != nil {
@@ -31,7 +36,7 @@ func Validate() (err error) {
 		// Make sure selected profile is in the configuration file
 		if !slices.Contains(profileNames, profileName) {
 			return fmt.Errorf("failed to validate Ping CLI configuration: '%s' profile not found in configuration "+
-				"file %s", profileName, GetKoanfConfig().GetKoanfConfigFile())
+				"file %s", profileName, koanfConfig.GetKoanfConfigFile())
 		}
 	}
 
@@ -43,12 +48,12 @@ func Validate() (err error) {
 	// Make sure selected active profile is in the configuration file
 	if !slices.Contains(profileNames, activeProfileName) {
 		return fmt.Errorf("failed to validate Ping CLI configuration: active profile '%s' not found in configuration "+
-			"file %s", activeProfileName, GetKoanfConfig().GetKoanfConfigFile())
+			"file %s", activeProfileName, koanfConfig.GetKoanfConfigFile())
 	}
 
 	// for each profile key, validate the profile koanf
 	for _, pName := range profileNames {
-		subKoanf, err := GetKoanfConfig().GetProfileKoanf(pName)
+		subKoanf, err := koanfConfig.GetProfileKoanf(pName)
 		if err != nil {
 			return fmt.Errorf("failed to validate Ping CLI configuration: %w", err)
 		}
@@ -66,8 +71,13 @@ func Validate() (err error) {
 }
 
 func validateProfileNames(profileNames []string) error {
+	koanfConfig, err := GetKoanfConfig()
+	if err != nil {
+		return fmt.Errorf("failed to get koanf config: %w", err)
+	}
+
 	for _, profileName := range profileNames {
-		if err := GetKoanfConfig().ValidateProfileNameFormat(profileName); err != nil {
+		if err := koanfConfig.ValidateProfileNameFormat(profileName); err != nil {
 			return err
 		}
 	}

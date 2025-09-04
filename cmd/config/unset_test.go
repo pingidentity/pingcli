@@ -43,18 +43,23 @@ func TestConfigUnsetCmd_InvalidKey(t *testing.T) {
 func TestConfigUnsetCmd_CheckKoanfConfig(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	koanfConfig := profiles.GetKoanfConfig().KoanfInstance()
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		t.Errorf("Error getting koanf configuration: %v", err)
+	}
+
+	koanfInstance := koanfConfig.KoanfInstance()
 	koanfKey := options.PingOneAuthenticationWorkerClientIDOption.KoanfKey
 	profileKoanfKey := "default." + koanfKey
 
-	koanfOldValue := koanfConfig.String(profileKoanfKey)
+	koanfOldValue := koanfInstance.String(profileKoanfKey)
 
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", koanfKey)
+	err = testutils_cobra.ExecutePingcli(t, "config", "unset", koanfKey)
 	testutils.CheckExpectedError(t, err, nil)
 
-	koanfConfig = profiles.GetKoanfConfig().KoanfInstance()
+	koanfInstance = koanfConfig.KoanfInstance()
 
-	koanfNewValue := koanfConfig.String(profileKoanfKey)
+	koanfNewValue := koanfInstance.String(profileKoanfKey)
 	if koanfOldValue == koanfNewValue {
 		t.Errorf("Expected koanf configuration value to be updated. Old: %s, New: %s", koanfOldValue, koanfNewValue)
 	}

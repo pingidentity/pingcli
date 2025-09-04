@@ -62,10 +62,15 @@ func TestConfigSetCmd_CheckKoanfConfig(t *testing.T) {
 	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=%s", koanfKey, koanfNewUUID))
 	testutils.CheckExpectedError(t, err, nil)
 
-	koanf := profiles.GetKoanfConfig().KoanfInstance()
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		t.Errorf("Error getting koanf configuration: %v", err)
+	}
+
+	koanfInstance := koanfConfig.KoanfInstance()
 	profileKoanfKey := "default." + koanfKey
 
-	koanfNewValue, ok := koanf.Get(profileKoanfKey).(*customtypes.UUID)
+	koanfNewValue, ok := koanfInstance.Get(profileKoanfKey).(*customtypes.UUID)
 	if ok && koanfNewValue.String() != koanfNewUUID {
 		t.Errorf("Expected koanf configuration value to be updated")
 	}

@@ -34,7 +34,12 @@ func removePluginExecutable(pluginExecutable string) (bool, error) {
 		return false, fmt.Errorf("failed to read profile name: %w", err)
 	}
 
-	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return false, fmt.Errorf("failed to get koanf config: %w", err)
+	}
+
+	subKoanf, err := koanfConfig.GetProfileKoanf(pName)
 	if err != nil {
 		return false, fmt.Errorf("failed to get profile: %w", err)
 	}
@@ -64,7 +69,7 @@ func removePluginExecutable(pluginExecutable string) (bool, error) {
 		return false, err
 	}
 
-	if err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf); err != nil {
+	if err = koanfConfig.SaveProfile(pName, subKoanf); err != nil {
 		return false, err
 	}
 

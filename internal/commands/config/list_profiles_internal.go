@@ -3,17 +3,45 @@
 package config_internal
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/fatih/color"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+type ListProfilesError struct {
+	Err error
+}
+
+func (e *ListProfilesError) Error() string {
+	var err *ListProfilesError
+	if errors.As(e.Err, &err) {
+		return err.Error()
+	}
+	return fmt.Sprintf("failed to list profiles: %s", e.Err.Error())
+}
+
+func (e *ListProfilesError) Unwrap() error {
+	var err *ListProfilesError
+	if errors.As(e.Err, &err) {
+		return err.Unwrap()
+	}
+	return e.Err
+}
+
 func RunInternalConfigListProfiles() (err error) {
-	profileNames := profiles.GetKoanfConfig().ProfileNames()
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return &ListProfilesError{Err: err}
+	}
+
+	profileNames := koanfConfig.ProfileNames()
 	activeProfileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
-		return err
+		return &ListProfilesError{Err: err}
 	}
 
 	listStr := "Profiles:\n"
@@ -29,7 +57,7 @@ func RunInternalConfigListProfiles() (err error) {
 			listStr += "- " + profileName + "\n"
 		}
 
-		description := profiles.GetKoanfConfig().KoanfInstance().String(profileName + "." + "description")
+		description := koanfConfig.KoanfInstance().String(profileName + "." + options.ProfileDescriptionOption.KoanfKey)
 		if description != "" {
 			listStr += "    " + description
 		}

@@ -308,7 +308,12 @@ func pingoneAuth() (accessToken string, err error) {
 		}
 	}
 
-	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return "", err
+	}
+
+	subKoanf, err := koanfConfig.GetProfileKoanf(pName)
 	if err != nil {
 		return "", err
 	}
@@ -321,7 +326,7 @@ func pingoneAuth() (accessToken string, err error) {
 	if err != nil {
 		return "", err
 	}
-	err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf)
+	err = koanfConfig.SaveProfile(pName, subKoanf)
 	if err != nil {
 		return "", err
 	}
