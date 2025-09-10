@@ -32,7 +32,7 @@ func RunInternalConfigUnset(koanfKey string) (err error) {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
 
-	err = subKoanf.Set(koanfKey, opt.DefaultValue)
+	err = subKoanf.Set(opt.KoanfKey, opt.DefaultValue)
 	if err != nil {
 		return fmt.Errorf("failed to unset configuration: %w", err)
 	}
@@ -54,9 +54,9 @@ func RunInternalConfigUnset(koanfKey string) (err error) {
 	}
 
 	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
-		msgStr += fmt.Sprintf("%s=%s", koanfKey, profiles.MaskValue(vVal))
+		msgStr += fmt.Sprintf("%s=%s", opt.KoanfKey, profiles.MaskValue(vVal))
 	} else {
-		msgStr += fmt.Sprintf("%s=%s", koanfKey, vVal)
+		msgStr += fmt.Sprintf("%s=%s", opt.KoanfKey, vVal)
 	}
 
 	output.Success(msgStr, nil)

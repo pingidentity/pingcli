@@ -39,7 +39,7 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
-	if err = setValue(subKoanf, vKey, vValue, opt.Type); err != nil {
+	if err = setValue(subKoanf, opt.KoanfKey, vValue, opt.Type); err != nil {
 		return fmt.Errorf("failed to set configuration: %w", err)
 	}
 
@@ -60,9 +60,9 @@ func RunInternalConfigSet(kvPair string) (err error) {
 	}
 
 	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
-		msgStr += fmt.Sprintf("%s=%s", vKey, profiles.MaskValue(vVal))
+		msgStr += fmt.Sprintf("%s=%s", opt.KoanfKey, profiles.MaskValue(vVal))
 	} else {
-		msgStr += fmt.Sprintf("%s=%s", vKey, vVal)
+		msgStr += fmt.Sprintf("%s=%s", opt.KoanfKey, vVal)
 	}
 
 	output.Success(msgStr, nil)
