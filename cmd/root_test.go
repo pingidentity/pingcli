@@ -3,8 +3,10 @@
 package cmd_test
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/pingidentity/pingcli/cmd"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/output"
@@ -147,5 +149,78 @@ func TestRootCmd_DetailedExitCodeWarnLoggedFunc(t *testing.T) {
 	testutils.CheckExpectedError(t, err, nil)
 	if !warnLogged {
 		t.Errorf("Expected DetailedExitCodeWarnLogged to return true")
+	}
+}
+
+func TestParseArgsForConfigFile(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	defaultCfgFile := options.RootConfigOption.DefaultValue.String()
+
+	testCases := []struct {
+		name     string
+		args     []string
+		envVar   string
+		expected string
+	}{
+		{
+			name:     "no flags or env var",
+			args:     []string{"pingcli"},
+			expected: defaultCfgFile,
+		},
+		{
+			name:     "config flag with equals",
+			args:     []string{"pingcli", fmt.Sprintf("--%s=test.yaml", options.RootConfigOption.CobraParamName)},
+			expected: "test.yaml",
+		},
+		{
+			name:     "config flag with space",
+			args:     []string{"pingcli", fmt.Sprintf("--%s", options.RootConfigOption.CobraParamName), "test2.yaml"},
+			expected: "test2.yaml",
+		},
+		{
+			name:     "short config flag with equals",
+			args:     []string{"pingcli", fmt.Sprintf("-%s=test3.yaml", options.RootConfigOption.Flag.Shorthand)},
+			expected: "test3.yaml",
+		},
+		{
+			name:     "short config flag with space",
+			args:     []string{"pingcli", fmt.Sprintf("-%s", options.RootConfigOption.Flag.Shorthand), "test4.yaml"},
+			expected: "test4.yaml",
+		},
+		{
+			name:     "env var",
+			args:     []string{"pingcli"},
+			envVar:   "test5.yaml",
+			expected: "test5.yaml",
+		},
+		{
+			name:     "flag overrides env var",
+			args:     []string{"pingcli", fmt.Sprintf("--%s", options.RootConfigOption.CobraParamName), "flag.yaml"},
+			envVar:   "env.yaml",
+			expected: "flag.yaml",
+		},
+		{
+			name:     "invalid format defaults to default",
+			args:     []string{"pingcli", fmt.Sprintf("--%s::test.yaml", options.RootConfigOption.CobraParamName)},
+			expected: defaultCfgFile,
+		},
+		{
+			name:     "invalid flag name is ignored",
+			args:     []string{"pingcli", "--confi=test.yaml"},
+			expected: defaultCfgFile,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.envVar != "" {
+				t.Setenv(options.RootConfigOption.EnvVar, tc.envVar)
+			}
+
+			result := cmd.ParseArgsForConfigFile(tc.args)
+			if result != tc.expected {
+				t.Errorf("expected %s, got %s", tc.expected, result)
+			}
+		})
 	}
 }

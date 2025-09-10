@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
@@ -96,11 +97,7 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 func initKoanfProfile() {
 	l := logger.Get()
 
-	cfgFile, err := profiles.GetOptionValue(options.RootConfigOption)
-	if err != nil {
-		output.SystemError(fmt.Sprintf("Failed to get configuration file location: %v", err), nil)
-	}
-
+	cfgFile := ParseArgsForConfigFile(os.Args)
 	l.Debug().Msgf("Using configuration file location for initialization: %s", cfgFile)
 
 	// Handle the config file location
@@ -136,6 +133,36 @@ func initKoanfProfile() {
 	if err := profiles.Validate(); err != nil {
 		output.UserFatal(fmt.Sprintf("%v", err), nil)
 	}
+}
+
+// ParseArgsForConfigFile parses the command line arguments for the configuration file flag.
+func ParseArgsForConfigFile(args []string) string {
+	for i, arg := range args {
+		// Handle --config=value format
+		if strings.HasPrefix(arg, fmt.Sprintf("--%s=", options.RootConfigOption.CobraParamName)) {
+			return strings.TrimPrefix(arg, fmt.Sprintf("--%s=", options.RootConfigOption.CobraParamName))
+		}
+		// Handle -C=value format
+		if strings.HasPrefix(arg, fmt.Sprintf("-%s=", options.RootConfigOption.Flag.Shorthand)) {
+			return strings.TrimPrefix(arg, fmt.Sprintf("-%s=", options.RootConfigOption.Flag.Shorthand))
+		}
+		// Handle --config value format
+		if arg == fmt.Sprintf("--%s", options.RootConfigOption.CobraParamName) && i+1 < len(args) {
+			return args[i+1]
+		}
+		// Handle -C value format
+		if arg == fmt.Sprintf("-%s", options.RootConfigOption.Flag.Shorthand) && i+1 < len(args) {
+			return args[i+1]
+		}
+	}
+
+	// No --config flag found, check environment variable
+	if envValue := os.Getenv(options.RootConfigOption.EnvVar); envValue != "" {
+		return envValue
+	}
+
+	// Fall back to default value
+	return options.RootConfigOption.DefaultValue.String()
 }
 
 func checkCfgFileLocation(cfgFile string) {
