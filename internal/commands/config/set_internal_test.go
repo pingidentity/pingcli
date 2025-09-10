@@ -7,6 +7,7 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
@@ -128,5 +129,15 @@ func Test_RunInternalConfigSet_CaseInsensitiveKeys(t *testing.T) {
 	err := RunInternalConfigSet("NoCoLoR=true")
 	if err != nil {
 		t.Errorf("RunInternalConfigSet returned error: %v", err)
+	}
+
+	//Make sure the actual correct key was set, not the case-insensitive one
+	vVal, err := profiles.GetOptionValue(options.RootColorOption)
+	if err != nil {
+		t.Errorf("GetOptionValue returned error: %v", err)
+	}
+
+	if vVal != "true" {
+		t.Errorf("Expected %s to be true, got %v", options.RootColorOption.KoanfKey, vVal)
 	}
 }
