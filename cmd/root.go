@@ -97,7 +97,7 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 func initKoanfProfile() {
 	l := logger.Get()
 
-	cfgFile := parseArgsForConfigFile()
+	cfgFile := ParseArgsForConfigFile(os.Args)
 	l.Debug().Msgf("Using configuration file location for initialization: %s", cfgFile)
 
 	// Handle the config file location
@@ -135,8 +135,8 @@ func initKoanfProfile() {
 	}
 }
 
-func parseArgsForConfigFile() string {
-	args := os.Args
+// ParseArgsForConfigFile parses the command line arguments for the configuration file flag.
+func ParseArgsForConfigFile(args []string) string {
 	for i, arg := range args {
 		// Handle --config=value format
 		if strings.HasPrefix(arg, fmt.Sprintf("--%s=", options.RootConfigOption.CobraParamName)) {
