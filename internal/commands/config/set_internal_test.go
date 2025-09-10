@@ -102,3 +102,23 @@ func Test_RunInternalConfigSet(t *testing.T) {
 		})
 	}
 }
+
+// Test Test_RunInternalConfigSet function succeeds with case-insensitive keys
+func Test_RunInternalConfigSet_CaseInsensitiveKeys(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	err := RunInternalConfigSet("NoCoLoR=true")
+	if err != nil {
+		t.Errorf("RunInternalConfigSet returned error: %v", err)
+	}
+
+	// Make sure the actual correct key was set, not the case-insensitive one
+	vVal, err := profiles.GetOptionValue(options.RootColorOption)
+	if err != nil {
+		t.Errorf("GetOptionValue returned error: %v", err)
+	}
+
+	if vVal != "true" {
+		t.Errorf("Expected %s to be true, got %v", options.RootColorOption.KoanfKey, vVal)
+	}
+}

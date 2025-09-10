@@ -22,20 +22,20 @@ var (
 	ErrActiveProfileAssignment    = errors.New("invalid active profile assignment. Please use the 'pingcli config set active-profile <profile-name>' command to set the active profile")
 	ErrSetKey                     = errors.New("unable to set key in configuration profile")
 	ErrMustBeBoolean              = errors.New("the value assignment must be a boolean. Allowed [true, false]")
-	ErrMustBeExportFormat         = errors.New(fmt.Sprintf("the value assignment must be a valid export format. Allowed [%s]", strings.Join(customtypes.ExportFormatValidValues(), ", ")))
-	ErrMustBeExportServiceGroup   = errors.New(fmt.Sprintf("the value assignment must be a valid export service group. Allowed [%s]", strings.Join(customtypes.ExportServiceGroupValidValues(), ", ")))
-	ErrMustBeExportService        = errors.New(fmt.Sprintf("the value assignment must be valid export service(s). Allowed [%s]", strings.Join(customtypes.ExportServicesValidValues(), ", ")))
-	ErrMustBeOutputFormat         = errors.New(fmt.Sprintf("the value assignment must be a valid output format. Allowed [%s]", strings.Join(customtypes.OutputFormatValidValues(), ", ")))
-	ErrMustBePingoneRegionCode    = errors.New(fmt.Sprintf("the value assignment must be a valid PingOne region code. Allowed [%s]", strings.Join(customtypes.PingOneRegionCodeValidValues(), ", ")))
+	ErrMustBeExportFormat         = fmt.Errorf("the value assignment must be a valid export format. Allowed [%s]", strings.Join(customtypes.ExportFormatValidValues(), ", "))
+	ErrMustBeExportServiceGroup   = fmt.Errorf("the value assignment must be a valid export service group. Allowed [%s]", strings.Join(customtypes.ExportServiceGroupValidValues(), ", "))
+	ErrMustBeExportService        = fmt.Errorf("the value assignment must be valid export service(s). Allowed [%s]", strings.Join(customtypes.ExportServicesValidValues(), ", "))
+	ErrMustBeOutputFormat         = fmt.Errorf("the value assignment must be a valid output format. Allowed [%s]", strings.Join(customtypes.OutputFormatValidValues(), ", "))
+	ErrMustBePingoneRegionCode    = fmt.Errorf("the value assignment must be a valid PingOne region code. Allowed [%s]", strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "))
 	ErrMustBeString               = errors.New("the value assignment must be a string")
 	ErrMustBeStringSlice          = errors.New("the value assignment must be a string slice")
 	ErrMustBeUUID                 = errors.New("the value assignment must be a valid UUID")
-	ErrMustBePingoneAuthType      = errors.New(fmt.Sprintf("the value assignment must be a valid PingOne Authentication Type. Allowed [%s]", strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", ")))
-	ErrMustBePingfederateAuthType = errors.New(fmt.Sprintf("the value assignment must be a valid PingFederate Authentication Type. Allowed [%s]", strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", ")))
+	ErrMustBePingoneAuthType      = fmt.Errorf("the value assignment must be a valid PingOne Authentication Type. Allowed [%s]", strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "))
+	ErrMustBePingfederateAuthType = fmt.Errorf("the value assignment must be a valid PingFederate Authentication Type. Allowed [%s]", strings.Join(customtypes.PingFederateAuthenticationTypeValidValues(), ", "))
 	ErrMustBeInteger              = errors.New("the value assignment must be an integer")
-	ErrMustBeHttpMethod           = errors.New(fmt.Sprintf("the value assignment must be a valid HTTP method. Allowed [%s]", strings.Join(customtypes.HTTPMethodValidValues(), ", ")))
-	ErrMustBeRequestService       = errors.New(fmt.Sprintf("the value assignment must be a valid request service. Allowed [%s]", strings.Join(customtypes.RequestServiceValidValues(), ", ")))
-	ErrMustBeLicenseProduct       = errors.New(fmt.Sprintf("the value assignment must be a valid license product. Allowed [%s]", strings.Join(customtypes.LicenseProductValidValues(), ", ")))
+	ErrMustBeHttpMethod           = fmt.Errorf("the value assignment must be a valid HTTP method. Allowed [%s]", strings.Join(customtypes.HTTPMethodValidValues(), ", "))
+	ErrMustBeRequestService       = fmt.Errorf("the value assignment must be a valid request service. Allowed [%s]", strings.Join(customtypes.RequestServiceValidValues(), ", "))
+	ErrMustBeLicenseProduct       = fmt.Errorf("the value assignment must be a valid license product. Allowed [%s]", strings.Join(customtypes.LicenseProductValidValues(), ", "))
 	ErrMustBeLicenseVersion       = errors.New("the value assignment must be a valid license version. Must be of the form 'major.minor'")
 	ErrTypeNotRecognized          = errors.New("the variable type for the configuration key is not recognized or supported")
 )
@@ -90,7 +90,7 @@ func RunInternalConfigSet(kvPair string) (err error) {
 		return &SetError{Err: err}
 	}
 
-	if err = setValue(subKoanf, vKey, vValue, opt.Type); err != nil {
+	if err = setValue(subKoanf, opt.KoanfKey, vValue, opt.Type); err != nil {
 		return &SetError{Err: err}
 	}
 
@@ -111,9 +111,9 @@ func RunInternalConfigSet(kvPair string) (err error) {
 	}
 
 	if opt.Sensitive && strings.EqualFold(unmaskOptionVal, "false") {
-		msgStr += fmt.Sprintf("%s=%s", vKey, profiles.MaskValue(vVal))
+		msgStr += fmt.Sprintf("%s=%s", opt.KoanfKey, profiles.MaskValue(vVal))
 	} else {
-		msgStr += fmt.Sprintf("%s=%s", vKey, vVal)
+		msgStr += fmt.Sprintf("%s=%s", opt.KoanfKey, vVal)
 	}
 
 	output.Success(msgStr, nil)

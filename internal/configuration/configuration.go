@@ -59,7 +59,7 @@ func KoanfKeys() (keys []string) {
 func ValidateKoanfKey(koanfKey string) error {
 	validKeys := KoanfKeys()
 	for _, vKey := range validKeys {
-		if vKey == koanfKey {
+		if strings.EqualFold(vKey, koanfKey) {
 			return nil
 		}
 	}
@@ -93,7 +93,7 @@ func ExpandedKoanfKeys() (keys []string) {
 func ValidateParentKoanfKey(koanfKey string) error {
 	validKeys := ExpandedKoanfKeys()
 	for _, vKey := range validKeys {
-		if vKey == koanfKey {
+		if strings.EqualFold(vKey, koanfKey) {
 			return nil
 		}
 	}
@@ -103,7 +103,7 @@ func ValidateParentKoanfKey(koanfKey string) error {
 
 func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
 	for _, opt := range options.Options() {
-		if opt.KoanfKey == koanfKey {
+		if strings.EqualFold(opt.KoanfKey, koanfKey) {
 			return opt, nil
 		}
 	}

@@ -68,3 +68,13 @@ func Test_RunInternalConfigGet(t *testing.T) {
 		})
 	}
 }
+
+// Test RunInternalConfigGet function with case-insensitive keys
+func Test_RunInternalConfigGet_CaseInsensitiveKeys(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	err := RunInternalConfigGet("SeRvIcE")
+	if err != nil {
+		t.Errorf("RunInternalConfigGet returned error: %v", err)
+	}
+}

@@ -48,7 +48,13 @@ func RunInternalConfigGet(koanfKey string) (err error) {
 	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", pName, koanfKey)
 
 	for _, opt := range options.Options() {
-		if opt.KoanfKey == "" || !strings.Contains(opt.KoanfKey, koanfKey) {
+		// We only want options that have a key in the configuration file
+		if opt.KoanfKey == "" {
+			continue
+		}
+
+		// Match the koanfKey (which can be a "parent key". E.g 'service.pingOne' would match all options like 'service.pingone.authentication.type') to all options.
+		if !strings.HasPrefix(strings.ToLower(opt.KoanfKey), strings.ToLower(koanfKey)) {
 			continue
 		}
 
