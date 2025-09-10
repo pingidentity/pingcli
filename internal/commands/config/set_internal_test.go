@@ -21,12 +21,16 @@ func Test_RunInternalConfigSet(t *testing.T) {
 	testCases := []struct {
 		name          string
 		profileName   customtypes.String
+		checkOption   *options.Option
+		checkValue    string
 		kvPair        string
 		expectedError error
 	}{
 		{
-			name:   "Set noColor to True",
-			kvPair: fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+			name:        "Set noColor to True",
+			checkOption: &options.RootColorOption,
+			checkValue:  "true",
+			kvPair:      fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
 		},
 		{
 			name:          "Set active profile",
@@ -34,7 +38,7 @@ func Test_RunInternalConfigSet(t *testing.T) {
 			expectedError: ErrActiveProfileAssignment,
 		},
 		{
-			name:          "Set non-existant key",
+			name:          "Set non-existent key",
 			kvPair:        "nonExistantKey=true",
 			expectedError: configuration.ErrInvalidConfigurationKey,
 		},
@@ -52,6 +56,8 @@ func Test_RunInternalConfigSet(t *testing.T) {
 		{
 			name:        "Set noColor to True on different profile",
 			profileName: "production",
+			checkOption: &options.RootColorOption,
+			checkValue:  "true",
 			kvPair:      fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
 		},
 		{
@@ -74,6 +80,12 @@ func Test_RunInternalConfigSet(t *testing.T) {
 			name:          "Run set with invalid key-value assignment format",
 			kvPair:        "key::value",
 			expectedError: ErrKeyAssignmentFormat,
+		},
+		{
+			name:        "Set value with case-insensitive key",
+			kvPair:      "nOcOlOr=true",
+			checkOption: &options.RootColorOption,
+			checkValue:  "true",
 		},
 	}
 
@@ -99,26 +111,17 @@ func Test_RunInternalConfigSet(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+
+			if tc.checkOption != nil {
+				vVal, err := profiles.GetOptionValue(*tc.checkOption)
+				if err != nil {
+					assert.Fail(t, "GetOptionValue returned error: %v", err)
+				}
+
+				if vVal != tc.checkValue {
+					assert.Fail(t, "Expected %s to be %s, got %v", tc.checkOption.KoanfKey, tc.checkValue, vVal)
+				}
+			}
 		})
-	}
-}
-
-// Test Test_RunInternalConfigSet function succeeds with case-insensitive keys
-func Test_RunInternalConfigSet_CaseInsensitiveKeys(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := RunInternalConfigSet("NoCoLoR=true")
-	if err != nil {
-		t.Errorf("RunInternalConfigSet returned error: %v", err)
-	}
-
-	// Make sure the actual correct key was set, not the case-insensitive one
-	vVal, err := profiles.GetOptionValue(options.RootColorOption)
-	if err != nil {
-		t.Errorf("GetOptionValue returned error: %v", err)
-	}
-
-	if vVal != "true" {
-		t.Errorf("Expected %s to be true, got %v", options.RootColorOption.KoanfKey, vVal)
 	}
 }

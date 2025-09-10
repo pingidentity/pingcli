@@ -21,11 +21,13 @@ func Test_RunInternalConfigUnset(t *testing.T) {
 		name          string
 		profileName   customtypes.String
 		koanfKey      string
+		checkOption   *options.Option
 		expectedError error
 	}{
 		{
-			name:     "Unset noColor",
-			koanfKey: options.RootColorOption.KoanfKey,
+			name:        "Unset noColor",
+			koanfKey:    options.RootColorOption.KoanfKey,
+			checkOption: &options.RootColorOption,
 		},
 		{
 			name:          "Unset on non-existant key",
@@ -36,6 +38,7 @@ func Test_RunInternalConfigUnset(t *testing.T) {
 			name:        "Unset key on a different profile",
 			profileName: customtypes.String("production"),
 			koanfKey:    options.RootColorOption.KoanfKey,
+			checkOption: &options.RootColorOption,
 		},
 		{
 			name:          "Unset key with a non-existant profile",
@@ -47,6 +50,11 @@ func Test_RunInternalConfigUnset(t *testing.T) {
 			name:          "Run Unset with no key provided",
 			koanfKey:      "",
 			expectedError: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:        "Unset with case-insensitive key",
+			koanfKey:    "nOcOlOr",
+			checkOption: &options.RootColorOption,
 		},
 	}
 
@@ -72,26 +80,17 @@ func Test_RunInternalConfigUnset(t *testing.T) {
 			} else {
 				assert.NoError(t, err)
 			}
+
+			if tc.checkOption != nil {
+				vVal, err := profiles.GetOptionValue(*tc.checkOption)
+				if err != nil {
+					assert.Fail(t, "GetOptionValue returned error: %v", err)
+				}
+
+				if vVal != tc.checkOption.DefaultValue.String() {
+					assert.Fail(t, "Expected %s to be %s, got %v", tc.checkOption.KoanfKey, tc.checkOption.DefaultValue.String(), vVal)
+				}
+			}
 		})
-	}
-}
-
-// Test RunInternalConfigUnset function succeeds with case-insensitive key
-func Test_RunInternalConfigUnset_CaseInsensitiveKeys(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := RunInternalConfigUnset("NoCoLoR")
-	if err != nil {
-		t.Errorf("RunInternalConfigUnset returned error: %v", err)
-	}
-
-	// Make sure the actual correct key was unset, not the case-insensitive one
-	vVal, err := profiles.GetOptionValue(options.RootColorOption)
-	if err != nil {
-		t.Errorf("GetOptionValue returned error: %v", err)
-	}
-
-	if vVal != options.RootColorOption.DefaultValue.String() {
-		t.Errorf("Expected %s to be %s, got %v", options.RootColorOption.KoanfKey, options.RootColorOption.DefaultValue.String(), vVal)
 	}
 }

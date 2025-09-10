@@ -43,6 +43,11 @@ func Test_RunInternalConfigGet(t *testing.T) {
 			koanfKey:      "service",
 			expectedError: profiles.ErrProfileNameNotExist,
 		},
+		{
+			name:        "Get configuration with a case-insensitive key",
+			profileName: "default",
+			koanfKey:    "SeRvIcE",
+		},
 	}
 
 	for _, tc := range testCases {
@@ -66,15 +71,5 @@ func Test_RunInternalConfigGet(t *testing.T) {
 				assert.NoError(t, err)
 			}
 		})
-	}
-}
-
-// Test RunInternalConfigGet function with case-insensitive keys
-func Test_RunInternalConfigGet_CaseInsensitiveKeys(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := RunInternalConfigGet("SeRvIcE")
-	if err != nil {
-		t.Errorf("RunInternalConfigGet returned error: %v", err)
 	}
 }
