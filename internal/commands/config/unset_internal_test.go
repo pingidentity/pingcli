@@ -73,7 +73,7 @@ func Test_RunInternalConfigUnset_CaseInsensitiveKeys(t *testing.T) {
 		t.Errorf("RunInternalConfigUnset returned error: %v", err)
 	}
 
-	//Make sure the actual correct key was unset, not the case-insensitive one
+	// Make sure the actual correct key was unset, not the case-insensitive one
 	vVal, err := profiles.GetOptionValue(options.RootColorOption)
 	if err != nil {
 		t.Errorf("GetOptionValue returned error: %v", err)
