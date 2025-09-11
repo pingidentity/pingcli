@@ -1,5 +1,3 @@
-# See GitHub's docs for more information on this file:
-# https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/configuration-options-for-dependency-updates
 version: 2
 updates:
   # Maintain dependencies for GitHub Actions
@@ -7,11 +5,18 @@ updates:
     directory: "/"
     schedule:
       # Check for updates to GitHub Actions every week
-      interval: "weekly"
+      interval: "daily"
 
   # Maintain dependencies for Go modules
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       # Check for updates to Go modules every week
-      interval: "weekly"
+      interval: "daily"
+
+  # Maintain dependencies for Docker
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      # Check for updates to Docker every week
+      interval: "daily"
