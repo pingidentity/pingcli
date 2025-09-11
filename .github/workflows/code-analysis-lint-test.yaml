@@ -76,7 +76,7 @@ jobs:
           go-version-file: "go.mod"
           cache: true
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v8
         with:
           # Require: The version of golangci-lint to use.
           # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
@@ -148,7 +148,7 @@ jobs:
 
   onfailure:
     if: ${{ always() && github.event_name == 'schedule' && contains(needs.*.result, 'failure') }}
-    needs: [test]
+    needs: [fmt, vet, golangci, importfmt, test]
     name: Send failure webhook
     runs-on: ubuntu-latest
     steps:
