@@ -5,18 +5,18 @@ updates:
     directory: "/"
     schedule:
       # Check for updates to GitHub Actions every week
-      interval: "daily"
+      interval: "weekly"
 
   # Maintain dependencies for Go modules
   - package-ecosystem: "gomod"
     directory: "/"
     schedule:
       # Check for updates to Go modules every week
-      interval: "daily"
+      interval: "weekly"
 
   # Maintain dependencies for Docker
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       # Check for updates to Docker every week
-      interval: "daily"
+      interval: "weekly"
