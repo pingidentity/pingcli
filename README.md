@@ -1,6 +1,27 @@
 # Ping CLI
 
+[![Code Analysis and Tests](https://github.com/pingidentity/pingcli/actions/workflows/code-analysis-lint-test.yaml/badge.svg)](https://github.com/pingidentity/pingcli/actions/workflows/code-analysis-lint-test.yaml)
+[![CodeQL](https://github.com/pingidentity/pingcli/actions/workflows/codeql.yaml/badge.svg)](https://github.com/pingidentity/pingcli/actions/workflows/codeql.yaml)
+[![Docker Pulls](https://img.shields.io/docker/pulls/pingidentity/pingcli.svg)](https://hub.docker.com/r/pingidentity/pingcli)
+[![GitHub release](https://img.shields.io/github/v/release/pingidentity/pingcli?include_prereleases&sort=semver)](https://github.com/pingidentity/pingcli/releases)
+
 The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services.
+
+## Table of Contents
+
+- [Install](#install)
+	- [Docker](#docker)
+	- [macOS](#macos)
+	- [Linux](#linux)
+	- [Windows](#windows)
+- [Verify](#verify)
+	- [Checksums](#checksums)
+	- [GPG Signatures](#gpg-signatures)
+- [Configure Ping CLI](#configure-ping-cli)
+- [Commands](#commands)
+	- [Platform Export](#platform-export)
+	- [Custom Request](#custom-request)
+- [Getting Help](#getting-help)
 
 ## Install
 
@@ -15,9 +36,9 @@ docker pull pingidentity/pingcli:latest
 
 Example Commands:
 ```shell
-docker run <Image ID> <sub commands>
+docker run --rm pingidentity/pingcli:latest <sub commands>
 
-docker run <Image ID> --version
+docker run --rm pingidentity/pingcli:latest --version
 ```
 
 ### macOS
@@ -26,10 +47,6 @@ docker run <Image ID> --version
 
 Use PingIdentity's Homebrew tap to install Ping CLI
 
-```shell
-brew install pingidentity/tap/pingcli
-```
-OR
 ``` shell
 brew tap pingidentity/tap
 brew install pingcli
@@ -49,7 +66,8 @@ OS_NAME=$(uname -s); \
 HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
 URL="https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}"; \
 curl -Ls -o pingcli "${URL}"; \
-mv pingcli /usr/local/bin/pingcli;
+chmod +x pingcli; \
+sudo mv pingcli /usr/local/bin/pingcli;
 ```
 
 ### Linux
@@ -58,10 +76,6 @@ mv pingcli /usr/local/bin/pingcli;
 
 Use PingIdentity's Homebrew tap to install Ping CLI
 
-```shell
-brew install pingidentity/tap/pingcli
-```
-OR
 ``` shell
 brew tap pingidentity/tap
 brew install pingcli
@@ -71,30 +85,44 @@ brew install pingcli
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for Alpine (.apk) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
+> **_NOTE:_** The following commands may require `sudo` if not run as the root user.
 ```shell
-apk add --allow-untrusted pingcli_<version>_linux_amd64.apk
-apk add --allow-untrusted pingcli_<version>_linux_arm64.apk
+apk add --allow-untrusted ./pingcli_<version>_linux_amd64.apk
+apk add --allow-untrusted ./pingcli_<version>_linux_arm64.apk
 ```
 
 ##### Debian/Ubuntu (.deb)
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for Debian (.deb) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
+> **_NOTE:_** The following commands may require `sudo` if not run as the root user.
 ```shell
-apt-get install pingcli_<version>_linux_amd64.deb
-apt-get install pingcli_<version>_linux_arm64.deb
+apt install ./pingcli_<version>_linux_amd64.deb
+apt install ./pingcli_<version>_linux_arm64.deb
 ```
 
 ##### CentOS/Fedora/RHEL (.rpm)
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for RPM (.rpm) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
+> **_NOTE:_** The following commands may require `sudo` if not run as the root user.
 ```shell
-yum install pingcli_<version>_linux_amd64.rpm
-yum install pingcli_<version>_linux_arm64.rpm
-dnf install pingcli_<version>_linux_amd64.rpm
-dnf install pingcli_<version>_linux_arm64.rpm
+yum install ./pingcli_<version>_linux_amd64.rpm
+yum install ./pingcli_<version>_linux_arm64.rpm
 ```
+
+OR
+
+> **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+```shell
+dnf install ./pingcli_<version>_linux_amd64.rpm
+dnf install ./pingcli_<version>_linux_arm64.rpm
+```
+
+> **_NOTE:_**
+> - Use `yum` for CentOS/RHEL 7 and earlier, and for older Fedora systems.
+> - Use `dnf` for Fedora 22+ and CentOS/RHEL 8+.
+> Both commands achieve the same result; use the one appropriate for your distribution.
 
 ##### Manual Installation
 
@@ -110,7 +138,8 @@ OS_NAME=$(uname -s); \
 HARDWARE_PLATFORM=$(uname -m | sed s/aarch64/arm64/ | sed s/x86_64/amd64/); \
 URL="https://github.com/pingidentity/pingcli/releases/download/${RELEASE_VERSION}/pingcli_${RELEASE_VERSION#v}_${OS_NAME}_${HARDWARE_PLATFORM}"; \
 curl -Ls -o pingcli "${URL}"; \
-mv pingcli /usr/local/bin/pingcli;
+chmod +x pingcli; \
+sudo mv pingcli /usr/local/bin/pingcli;
 ```
 
 ### Windows
@@ -122,7 +151,7 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 OR
 
 Use the following single-line PowerShell 7.4 command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
->**_NOTE:_** You will need to modify your PATH environment variable to call `pingcli` directly in your terminal
+>**_NOTE:_** After installation, ensure that `%LOCALAPPDATA%\Programs` is included in your PATH environment variable. If it is not already present, add it so you can call `pingcli` directly in your terminal.
 ```powershell
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
@@ -149,9 +178,11 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
 ```
 
+OR
+
 ##### Add our public GPG Key via MIT PGP Public Key Server
 ```shell
-gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
+gpg --keyserver pgp.mit.edu --recv-key 0x6703FFB15B36A7AC
 ```
 
 ##### Verify Artifact via Signature File
@@ -166,19 +197,19 @@ Before using the Ping CLI, you need to configure your Ping Identity Service prof
 
 Start by running the command to create a new profile and answering the prompts.
 
-```text
+```shell
 $ pingcli config add-profile
-Pingcli configuration file '/Users/<me>/.pingcli/config.yaml' does not exist. - No Action (Warning)
-Creating new Ping CLI configuration file at: /Users/<me>/.pingcli/config.yaml
+Ping CLI configuration file '$HOME/.pingcli/config.yaml' does not exist. - No Action (Warning)
+Creating new Ping CLI configuration file at: $HOME/.pingcli/config.yaml
 New profile name: : dev
 New profile description: : configuration for development environment
 Set new profile as active: : y
 Adding new profile 'dev'...
-Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '/Users/<me>/.pingcli/config.yaml' - Success
+Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '$HOME/.pingcli/config.yaml' - Success
 Profile 'dev' set as active. - Success
 ```
 
-The newly create profile can now be configured via the `pingcli config set` command. General Ping Identity service connection settings are found under the `service` key, and settings relevant to individual commands are found under their command names e.g. `export` and `request`.
+The newly created profile can now be configured via the `pingcli config set` command. General Ping Identity service connection settings are found under the `service` key, and settings relevant to individual commands are found under their command names e.g. `export` and `request`.
 
 See [Configuration Key Documentation](./docs/tool-configuration/configuration-key.md) for more information on configuration keys
 and their purposes.
