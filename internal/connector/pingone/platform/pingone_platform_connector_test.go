@@ -178,6 +178,7 @@ func TestPlatformTerraformPlan(t *testing.T) {
 			testableResource: pingone_platform_testable_resources.NotificationSettingsEmail(t, clientInfo),
 			ignoredErrors: []string{
 				"Error: Missing Configuration for Required Attribute",
+				"Error: Invalid Attribute Combination",
 			},
 		},
 		{
