@@ -14,6 +14,7 @@
     "ms-azuretools.vscode-docker",
     // Markdown support for documentation
     "yzhang.markdown-all-in-one",
+    "davidanson.vscode-markdownlint",
     // JSON support with schema validation
     "ms-vscode.vscode-json",
     // Code spell checker
