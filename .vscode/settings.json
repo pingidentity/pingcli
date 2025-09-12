@@ -1,0 +1,120 @@
+{
+  // Go-specific settings
+  "go.lintTool": "golangci-lint",
+  "go.generateTestsFlags": [
+    "-parallel"
+  ],
+  "gopls": {
+    "build.buildFlags": [
+      // uncomment to build compile beta functionality in vscode
+      //"-tags=beta"
+    ]
+  },
+  // File associations
+  "files.associations": {
+    "*.proto": "proto3",
+    "Makefile": "makefile",
+    "*.mk": "makefile",
+    "*.tmpl": "go-template"
+  },
+  // Exclude common Go build artifacts and vendor directories
+  "files.exclude": {
+    "**/vendor": true,
+    "**/pingcli": true,
+    "**/*.exe": true
+  },
+  // Search exclusions
+  "search.exclude": {
+    "**/vendor": true,
+  },
+  // Markdown settings for documentation
+  "markdown.preview.breaks": true,
+  "markdown.preview.linkify": true,
+  // YAML settings for configuration files
+  "yaml.format.enable": true,
+  "yaml.validate": true,
+  // JSON settings
+  "json.format.enable": true,
+  // Git settings
+  "git.ignoreLimitWarning": true,
+  // Spell checker settings
+  "cSpell.words": [
+    "authn",
+    "authz",
+    "cobra",
+    "davinci",
+    "devcheck",
+    "devchecknotest",
+    "Getenv",
+    "godoc",
+    "goimports",
+    "golang",
+    "golangci",
+    "golangcilint",
+    "gomod",
+    "GOPATH",
+    "gosec",
+    "grpc",
+    "hclog",
+    "importfmtlint",
+    "InitKoanfs",
+    "koanf",
+    "mfas",
+    "oauth",
+    "oidc",
+    "patrickcping",
+    "pflag",
+    "pingcli",
+    "pingfederate",
+    "pingidentity",
+    "pingone",
+    "protobuf",
+    "removetestcontainer",
+    "saml",
+    "scim",
+    "spincontainer",
+    "testutils",
+    "zerolog"
+  ],
+  "cSpell.ignoreWords": [
+    "bool",
+    "func",
+    "int64",
+    "string",
+    "struct",
+    "testdata",
+    "uint",
+  ],
+  "cSpell.languageSettings": [
+    {
+      "languageId": "go",
+      "caseSensitive": true
+    }
+  ],
+  // Language-specific settings
+  "[go]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false,
+    "editor.formatOnSave": true,
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  },
+  "[yaml]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[jsonc]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  }
+}

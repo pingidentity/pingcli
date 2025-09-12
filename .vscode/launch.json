@@ -1,0 +1,101 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch pingcli",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "args": [
+        "--help"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug config command",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "args": [
+        "config",
+        "--help"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug platform export",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "args": [
+        "platform",
+        "export",
+        "--help"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug request command",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "args": [
+        "request",
+        "--help"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug version",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "args": [
+        "--version"
+      ],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Debug with custom args",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}",
+      "args": [],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Test Current Package",
+      "type": "go",
+      "request": "launch",
+      "mode": "test",
+      "program": "${fileDirname}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Test Current File",
+      "type": "go",
+      "request": "launch",
+      "mode": "test",
+      "program": "${fileDirname}",
+      "args": [
+        "-test.run",
+        "${input:testName}"
+      ],
+      "console": "integratedTerminal"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "testName",
+      "description": "Enter test function name pattern",
+      "default": "TestExample",
+      "type": "promptString"
+    }
+  ]
+}
