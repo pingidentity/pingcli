@@ -103,8 +103,8 @@ func Test_runLicenseRequest_Success(t *testing.T) {
 		t.Context(),
 		customtypes.ENUM_LICENSE_PRODUCT_PING_FEDERATE,
 		"13.0",
-		os.Getenv("TEST_PINGCLI_DEVOPS_USER"),
-		os.Getenv("TEST_PINGCLI_DEVOPS_KEY"))
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_USER"),
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_KEY"))
 
 	testutils.CheckExpectedError(t, err, nil)
 	if licenseData == "" {
