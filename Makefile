@@ -165,5 +165,4 @@ _wait_for_pf:
 _stop_pf_container:
 	@echo "  > Docker: Stopping and removing previous container..."
 	# Using '|| true' correctly prevents an error if the container doesn't exist.
-	# Removed output redirection to see potential errors from the docker daemon.
 	@$(DOCKER) rm -f $(CONTAINER_NAME) 2>/dev/null || true
