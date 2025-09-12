@@ -13,7 +13,7 @@ GOTIDY := $(GOCMD) mod tidy
 GOINSTALL := $(GOCMD) install .
 GOFMT := $(GOCMD) fmt ./...
 GOVET := $(GOCMD) vet ./...
-GOTEST := $(GOCMD) test -v -count=1 -timeout=15m
+GOTEST := $(GOCMD) test -count=1
 GOLANGCI_LINT := $(GOCMD) tool golangci-lint
 IMPI := $(GOCMD) tool impi
 
@@ -56,30 +56,37 @@ help: ## Display this help message
 
 install: ## Install the application binaries
 	@echo "  > Tidy: Ensuring dependencies are up to date..."
-	@$(GOTIDY)
-	@echo "  > Install: Building and installing application..."
-	@$(GOINSTALL)
+	$(GOTIDY)
+	echo "✅ Dependencies are up to date."
+	echo "  > Install: Building and installing application..."
+	$(GOINSTALL)
+	echo "✅ Application installed."
 
 fmt: ## Format Go source code
 	@echo "  > Fmt: Formatting Go code..."
-	@$(GOFMT)
+	$(GOFMT)
+	echo "✅ Go code formatted."
 
 vet: ## Run go vet to catch suspicious constructs
 	@echo "  > Vet: Analyzing source code for potential issues..."
-	@$(GOVET)
+	$(GOVET)
+	echo "✅ No issues found."
 
 importfmtlint: ## Format Go import ordering
 	@echo "  > ImportFmt: Formatting import statements..."
-	@$(IMPI) --skip internal/proto/pingcli_command --local . --scheme stdThirdPartyLocal ./...
+	$(IMPI) --skip internal/proto/pingcli_command --local . --scheme stdThirdPartyLocal ./...
+	echo "✅ Import statements formatted."
 
 golangcilint: ## Run golangci-lint for comprehensive code analysis
 	@echo "  > Lint: Running golangci-lint..."
-	@$(GOLANGCI_LINT) cache clean
-	@$(GOLANGCI_LINT) run --timeout 5m ./...
+	$(GOLANGCI_LINT) cache clean
+	$(GOLANGCI_LINT) run --timeout 5m ./...
+	echo "✅ No linting issues found."
 
 protogen: ## Generate Go code from .proto files
 	@echo "  > Protogen: Generating gRPC code from proto files..."
-	@protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto
+	protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto
+	echo "✅ gRPC code generated."
 
 test: _check_ping_env ## Run all tests
 	@echo "  > Test: Running all Go tests..."
@@ -88,7 +95,7 @@ test: _check_ping_env ## Run all tests
 		echo "    -> $$dir"
 		$(GOTEST) $$dir
 	done
-	@echo "  > Test: All tests passed."
+	echo "✅ All tests passed."
 
 devcheck: install importfmtlint fmt vet golangcilint spincontainer test removetestcontainer ## Run the full suite of development checks and tests
 	@echo "✅ All development checks passed successfully."
@@ -106,11 +113,13 @@ spincontainer: removetestcontainer starttestcontainer ## Re-spin the test contai
 
 openlocalwebapi: ## Open the PingFederate Admin API docs in a browser
 	@echo "  > Browser: Opening PingFederate Admin API docs..."
-	@$(OPEN_CMD) "https://localhost:9999/pf-admin-api/api-docs/#/"
+	$(OPEN_CMD) "https://localhost:9999/pf-admin-api/api-docs/#/"
+	echo "✅ Opened PingFederate Admin API docs."
 
 openapp: ## Open the PingFederate Admin Console in a browser
 	@echo "  > Browser: Opening PingFederate Admin Console..."
-	@$(OPEN_CMD) "https://localhost:9999/pingfederate/app"
+	$(OPEN_CMD) "https://localhost:9999/pingfederate/app"
+	echo "✅ Opened PingFederate Admin Console."
 
 # ====================================================================================
 # INTERNAL HELPER TARGETS (Not intended for direct use)
@@ -118,25 +127,27 @@ openapp: ## Open the PingFederate Admin Console in a browser
 
 _check_env:
 	@echo "  > Env: Checking Docker container variables..."
-	@$(call check_env,TEST_PING_IDENTITY_DEVOPS_USER,See https://devops.pingidentity.com/how-to/devopsRegistration/)
-	@$(call check_env,TEST_PING_IDENTITY_DEVOPS_KEY,See https://devops.pingidentity.com/how-to/devopsRegistration/)
-	@$(call check_env,TEST_PING_IDENTITY_ACCEPT_EULA,Set to 'YES' to accept the EULA.)
+	$(call check_env,TEST_PING_IDENTITY_DEVOPS_USER,See https://devops.pingidentity.com/how-to/devopsRegistration/)
+	$(call check_env,TEST_PING_IDENTITY_DEVOPS_KEY,See https://devops.pingidentity.com/how-to/devopsRegistration/)
+	$(call check_env,TEST_PING_IDENTITY_ACCEPT_EULA,Set to 'YES' to accept the EULA.)
+	echo "✅ Required Docker variables are set."
 
 _check_ping_env:
 	@echo "  > Env: Checking PingOne test variables..."
-	@$(call check_env,TEST_PINGONE_ENVIRONMENT_ID,Specify an unconfigured PingOne environment.)
-	@$(call check_env,TEST_PINGONE_REGION_CODE,Specify the region for the PingOne environment.)
-	@$(call check_env,TEST_PINGONE_WORKER_CLIENT_ID,Specify a worker app client ID with admin roles.)
-	@$(call check_env,TEST_PINGONE_WORKER_CLIENT_SECRET,Specify the secret for the worker app.)
+	$(call check_env,TEST_PINGONE_ENVIRONMENT_ID,Specify an unconfigured PingOne environment.)
+	$(call check_env,TEST_PINGONE_REGION_CODE,Specify the region for the PingOne environment.)
+	$(call check_env,TEST_PINGONE_WORKER_CLIENT_ID,Specify a worker app client ID with admin roles.)
+	$(call check_env,TEST_PINGONE_WORKER_CLIENT_SECRET,Specify the secret for the worker app.)
+	echo "✅ Required PingOne test variables are set."
 
 _check_docker:
 	@echo "  > Docker: Checking if the Docker daemon is running..."
-	@$(DOCKER) info > /dev/null 2>&1
+	$(DOCKER) info > /dev/null 2>&1
+	echo "✅ Docker daemon is running."
 
 _run_pf_container:
 	@echo "  > Docker: Starting the PingFederate container..."
-	# Removed '> /dev/null' to ensure docker errors are visible for easier debugging.
-	@$(DOCKER) run --name $(CONTAINER_NAME) \
+	$(DOCKER) run --name $(CONTAINER_NAME) \
 		-d -p 9031:9031 -p 9999:9999 \
 		--env PING_IDENTITY_DEVOPS_USER="$(TEST_PING_IDENTITY_DEVOPS_USER)" \
 		--env PING_IDENTITY_DEVOPS_KEY="$(TEST_PING_IDENTITY_DEVOPS_KEY)" \
@@ -144,6 +155,7 @@ _run_pf_container:
 		--env CREATE_INITIAL_ADMIN_USER="true" \
 		-v $$(pwd)/internal/testing/pingfederate_container_files/deploy:/opt/in/instance/server/default/deploy \
 		pingidentity/pingfederate:latest
+	echo "✅ PingFederate container started."
 
 _wait_for_pf:
 	@echo "  > Docker: Waiting for container to become healthy (up to 4 minutes)..."
@@ -152,7 +164,7 @@ _wait_for_pf:
 	while test $$timeout -gt 0; do
 		status=$$(docker inspect --format='{{json .State.Health.Status}}' $(CONTAINER_NAME) 2>/dev/null || echo "")
 		if test "$$status" = '"healthy"'; then
-			echo "  > Docker: Container is healthy."
+			echo "✅ Docker: Container is healthy."
 			exit 0
 		fi
 		sleep 1
@@ -165,4 +177,5 @@ _wait_for_pf:
 _stop_pf_container:
 	@echo "  > Docker: Stopping and removing previous container..."
 	# Using '|| true' correctly prevents an error if the container doesn't exist.
-	@$(DOCKER) rm -f $(CONTAINER_NAME) 2>/dev/null || true
+	$(DOCKER) rm -f $(CONTAINER_NAME) 2>/dev/null || true
+	echo "✅ Previous container removed."
