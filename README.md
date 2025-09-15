@@ -216,6 +216,28 @@ and their purposes.
 
 See [Autocompletion Documentation](./docs/autocompletion/autocompletion.md) for information on loading autocompletion for select command flags.
 
+### Generating Configuration Options Documentation
+
+To regenerate the markdown table of configuration options used in documentation, use the provided Makefile target instead of the previous ad-hoc test:
+
+```shell
+make generate-options-docs
+```
+
+This prints the markdown to stdout. To write it directly to a file (for example updating docs/options.md):
+
+```shell
+make generate-options-docs OUTPUT='-o docs/options.md'
+```
+
+The generator code lives in `cmd/generate-options-docs` and can be invoked manually as well:
+
+```shell
+go run ./cmd/generate-options-docs -o /path/to/file.md
+```
+
+The logic was migrated from the skipped test `internal/configuration/options/options_test.go` (Test_outputOptionsMDInfo) to make doc generation an explicit developer action.
+
 ## Commands
 
 Ping CLI commands have the following structure:

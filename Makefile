@@ -40,7 +40,7 @@ endef
 # PHONY TARGETS
 # ====================================================================================
 
-.PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest
+.PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest generate-options-docs
 .PHONY: starttestcontainer removetestcontainer spincontainer openlocalwebapi openapp protogen
 .PHONY: _check_env _check_ping_env _check_docker _run_pf_container _wait_for_pf _stop_pf_container
 
@@ -82,6 +82,11 @@ golangcilint: ## Run golangci-lint for comprehensive code analysis
 	$(GOLANGCI_LINT) cache clean
 	$(GOLANGCI_LINT) run --timeout 5m ./...
 	echo "✅ No linting issues found."
+
+generate-options-docs: ## Generate markdown documentation for configuration options
+	@echo "  > Docs: Generating options documentation markdown..."
+	$(GOCMD) run ./cmd/generate-options-docs $(OUTPUT)
+	echo "✅ Documentation generated. Use: make generate-options-docs OUTPUT='-o docs/options.md' to write to file."
 
 protogen: ## Generate Go code from .proto files
 	@echo "  > Protogen: Generating gRPC code from proto files..."
