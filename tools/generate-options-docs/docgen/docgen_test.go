@@ -37,14 +37,20 @@ func TestOptionsDocGeneration(t *testing.T) {
 
 	for _, tc := range cases {
 		goldenPath := filepath.Join(goldenDir, tc.name)
+		// Validate golden file path remains within goldenDir to mitigate G304
+		cleanGolden := filepath.Clean(goldenPath)
+		if !strings.HasPrefix(cleanGolden+string(os.PathSeparator), filepath.Clean(goldenDir)+string(os.PathSeparator)) {
+			t.Fatalf("invalid golden file path: %s", goldenPath)
+		}
 		if *update {
-			if err := os.WriteFile(goldenPath, []byte(tc.content), 0o600); err != nil { // restrict world perms
+			if err := os.WriteFile(cleanGolden, []byte(tc.content), 0o600); err != nil { // restrict world perms
 				t.Fatalf("write golden %s: %v", tc.name, err)
 			}
 			t.Logf("updated golden: %s", tc.name)
+
 			continue
 		}
-		wantBytes, err := os.ReadFile(goldenPath)
+		wantBytes, err := os.ReadFile(cleanGolden) // #nosec G304 path validated
 		if err != nil {
 			t.Fatalf("read golden %s: %v (run with -update to create)", tc.name, err)
 		}

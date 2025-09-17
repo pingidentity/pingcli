@@ -47,6 +47,7 @@ func TestCommandDocGeneration(t *testing.T) {
 				t.Fatalf("write golden %s: %v", f, err)
 			}
 			t.Logf("updated golden: %s", f)
+
 			continue
 		}
 		wantBytes, err := os.ReadFile(goldenPath) // #nosec G304 reading vetted golden path

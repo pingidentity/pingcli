@@ -36,7 +36,7 @@ func main() {
 		file := filepath.Join(*outDir, base+".adoc")
 		content := renderSingle(c, *date, *resourcePrefix)
 		// Restrict file permissions (no world access) for consistency with directory perms.
-		if err := os.WriteFile(file, []byte(content), 0o600); err != nil { //nolint:gosec // docs non-sensitive; restricting world perms intentionally
+		if err := os.WriteFile(file, []byte(content), 0o600); err != nil {
 			fail("write file "+file, err)
 		}
 	})
@@ -44,7 +44,7 @@ func main() {
 	// Always (re)generate navigation file for documentation portal ingestion.
 	navPath := filepath.Join(*outDir, "nav.adoc")
 	navContent := renderNav(root)
-	if err := os.WriteFile(navPath, []byte(navContent), 0o600); err != nil { //nolint:gosec
+	if err := os.WriteFile(navPath, []byte(navContent), 0o600); err != nil {
 		fail("write nav file", err)
 	}
 }
@@ -142,7 +142,7 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 		return si < sj
 	})
 	type line struct{ spec, desc string }
-	var lines []line
+	lines := make([]line, 0, len(flags))
 	for _, f := range flags {
 		var spec string
 		if f.Shorthand != "" {
@@ -174,6 +174,7 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 		for _, l := range lines {
 			if strings.Contains(l.spec, "--help") {
 				found = true
+
 				break
 			}
 		}
@@ -217,8 +218,9 @@ func firstLine(short, long string) string {
 }
 
 func visibleSubcommands(c *cobra.Command) []*cobra.Command {
-	var subs []*cobra.Command
-	for _, sc := range c.Commands() {
+	cmds := c.Commands()
+	subs := make([]*cobra.Command, 0, len(cmds))
+	for _, sc := range cmds {
 		if sc.Hidden {
 			continue
 		}
