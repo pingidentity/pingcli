@@ -163,31 +163,7 @@ func sanitizeUsage(opt options.Option) string {
 	usage = strings.ReplaceAll(usage, "\n", " ")
 	usage = strings.TrimSpace(usage)
 
-	// Word wrap at approximately 100 characters
-	if len(usage) > 100 {
-		words := strings.Fields(usage)
-		var wrapped strings.Builder
-		lineLength := 0
-
-		for i, word := range words {
-			// If adding this word exceeds our limit and it's not the first word in the line
-			if lineLength+len(word) > 100 && lineLength > 0 {
-				wrapped.WriteString("\n")
-				lineLength = 0
-			}
-
-			// Add the word
-			if i > 0 && lineLength > 0 {
-				wrapped.WriteString(" ")
-				lineLength++
-			}
-			wrapped.WriteString(word)
-			lineLength += len(word)
-		}
-
-		return wrapped.String()
-	}
-
+	// No manual wrapping or hard line break insertion; return collapsed single-line usage.
 	return usage
 }
 

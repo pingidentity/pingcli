@@ -162,7 +162,10 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 		} else if f.DefValue != "" && f.DefValue != "<nil>" && f.DefValue != "0" && !strings.Contains(desc, "(default") {
 			desc = fmt.Sprintf("%s (default %s)", desc, f.DefValue)
 		}
+
+		// Collapse internal newlines but otherwise keep original spacing; no manual wrapping.
 		desc = strings.ReplaceAll(desc, "\n", " ")
+
 		lines = append(lines, line{spec: spec, desc: desc})
 	}
 	if includeHelp {
