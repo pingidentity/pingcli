@@ -84,7 +84,7 @@ golangcilint: ## Run golangci-lint for comprehensive code analysis
 	$(GOLANGCI_LINT) run --timeout 5m ./...
 	echo "✅ No linting issues found."
 
-generate-options-docs: ## Generate configuration options documentation (default: AsciiDoc into docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc)
+generate-options-docs: ## Generate configuration options documentation then validate via golden tests
 	@echo "  > Docs: Generating options documentation..."
 	@if [ -z "$(OUTPUT)" ]; then \
 		mkdir -p ./docs/dev-ux-portal-docs/general; \
@@ -94,20 +94,24 @@ generate-options-docs: ## Generate configuration options documentation (default:
 		$(GOCMD) run ./tools/generate-options-docs $(OUTPUT); \
 		echo "✅ Documentation generated with custom OUTPUT $(OUTPUT)"; \
 	fi
+	@echo "  > Docs: Running golden tests for options docs..."
+	@$(GOCMD) test ./tools/generate-options-docs/docgen -run TestOptionsDocGeneration >/dev/null && echo "✅ Options documentation golden test passed."
 
-generate-command-docs: ## Generate per-command AsciiDoc pages (and nav.adoc) into docs/dev-ux-portal-docs
+generate-command-docs: ## Generate per-command AsciiDoc pages then validate via golden tests
 	@echo "  > Docs: Generating command documentation..."
 	mkdir -p ./docs/dev-ux-portal-docs
 	$(GOCMD) run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs $(COMMAND_DOCS_ARGS)
-	echo "✅ Command docs generated in docs/dev-ux-portal-docs" 
+	echo "✅ Command docs generated in docs/dev-ux-portal-docs"
+	@echo "  > Docs: Running golden tests for command docs..."
+	@$(GOCMD) test ./tools/generate-command-docs -run TestCommandDocGeneration >/dev/null && echo "✅ Command documentation golden test passed."
 
-generate-all-docs: ## Rebuild ALL docs from scratch (cleans doc directory, then generates options + command reference)
+generate-all-docs: ## Rebuild ALL docs then run golden tests for both sets
 	@echo "  > Docs: Rebuilding all documentation (clean + regenerate)..."
 	rm -rf ./docs/dev-ux-portal-docs
 	mkdir -p ./docs/dev-ux-portal-docs/general
 	$(MAKE) generate-options-docs OUTPUT='-o docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc'
 	$(MAKE) generate-command-docs
-	@echo "✅ All documentation rebuilt."
+	@echo "✅ All documentation rebuilt and validated via golden tests."
 
 protogen: ## Generate Go code from .proto files
 	@echo "  > Protogen: Generating gRPC code from proto files..."

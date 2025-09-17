@@ -10,17 +10,17 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 ## Table of Contents
 
 - [Install](#install)
-	- [Docker](#docker)
-	- [macOS](#macos)
-	- [Linux](#linux)
-	- [Windows](#windows)
+  - [Docker](#docker)
+  - [macOS](#macos)
+  - [Linux](#linux)
+  - [Windows](#windows)
 - [Verify](#verify)
-	- [Checksums](#checksums)
-	- [GPG Signatures](#gpg-signatures)
+  - [Checksums](#checksums)
+  - [GPG Signatures](#gpg-signatures)
 - [Configure Ping CLI](#configure-ping-cli)
 - [Commands](#commands)
-	- [Platform Export](#platform-export)
-	- [Custom Request](#custom-request)
+  - [Platform Export](#platform-export)
+  - [Custom Request](#custom-request)
 - [Getting Help](#getting-help)
 
 ## Install
@@ -30,11 +30,13 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 Use the [Ping CLI Docker image](https://hub.docker.com/r/pingidentity/pingcli)
 
 Pull Image:
+
 ```shell
 docker pull pingidentity/pingcli:latest
 ```
 
 Example Commands:
+
 ```shell
 docker run --rm pingidentity/pingcli:latest <sub commands>
 
@@ -43,7 +45,7 @@ docker run --rm pingidentity/pingcli:latest --version
 
 ### macOS
 
-##### Homebrew
+#### Homebrew
 
 Use PingIdentity's Homebrew tap to install Ping CLI
 
@@ -52,7 +54,7 @@ brew tap pingidentity/tap
 brew install pingcli
 ```
 
-##### Manual Installation
+#### Manual Installation
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
 
@@ -86,6 +88,7 @@ brew install pingcli
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for Alpine (.apk) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
 > **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+
 ```shell
 apk add --allow-untrusted ./pingcli_<version>_linux_amd64.apk
 apk add --allow-untrusted ./pingcli_<version>_linux_arm64.apk
@@ -96,6 +99,7 @@ apk add --allow-untrusted ./pingcli_<version>_linux_arm64.apk
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for Debian (.deb) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
 > **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+
 ```shell
 apt install ./pingcli_<version>_linux_amd64.deb
 apt install ./pingcli_<version>_linux_arm64.deb
@@ -106,6 +110,7 @@ apt install ./pingcli_<version>_linux_arm64.deb
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for RPM (.rpm) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
 > **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+
 ```shell
 yum install ./pingcli_<version>_linux_amd64.rpm
 yum install ./pingcli_<version>_linux_arm64.rpm
@@ -114,6 +119,7 @@ yum install ./pingcli_<version>_linux_arm64.rpm
 OR
 
 > **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+
 ```shell
 dnf install ./pingcli_<version>_linux_amd64.rpm
 dnf install ./pingcli_<version>_linux_arm64.rpm
@@ -124,7 +130,7 @@ dnf install ./pingcli_<version>_linux_arm64.rpm
 > - Use `dnf` for Fedora 22+ and CentOS/RHEL 8+.
 > Both commands achieve the same result; use the one appropriate for your distribution.
 
-##### Manual Installation
+#### Manual Installation
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
 
@@ -144,7 +150,7 @@ sudo mv pingcli /usr/local/bin/pingcli;
 
 ### Windows
 
-##### Manual Installation
+#### Manual Installation
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
 
@@ -173,7 +179,7 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for the artifact downloads and signature files.
 
-##### Add our public GPG Key via OpenPGP Public Key Server
+#### Add our public GPG Key via OpenPGP Public Key Server
 
 ```shell
 gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
@@ -182,6 +188,7 @@ gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
 OR
 
 ##### Add our public GPG Key via MIT PGP Public Key Server
+
 ```shell
 gpg --keyserver pgp.mit.edu --recv-key 0x6703FFB15B36A7AC
 ```
@@ -217,75 +224,12 @@ and their purposes.
 
 See [Autocompletion Documentation](./docs/autocompletion/autocompletion.md) for information on loading autocompletion for select command flags.
 
-### Generating Configuration Options Documentation
+### Documentation Generation
 
-Use the Makefile target to generate documentation for all configuration options. By default it now writes AsciiDoc to `docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc` for portal ingestion:
+Documentation generation instructions (configuration options reference, per-command pages, navigation, rebuild workflow, and golden test usage) have moved to a dedicated guide:
 
-```shell
-make generate-options-docs
-```
+See: `tools/README_DocumentGeneration.md`
 
-Without arguments the Makefile target writes to the portal path above. You can override by providing OUTPUT arguments; without the Makefile (invoking the tool directly) omitting -o still prints to stdout. Provide an output file to write it:
-
-```shell
-make generate-options-docs OUTPUT='-o docs/options.md'
-```
-
-AsciiDoc is also supported (and is the default when using the Makefile target). The format is auto-detected from the file extension (`.adoc` / `.asciidoc`) or you can force it with `-asciidoc`:
-
-```shell
-make generate-options-docs OUTPUT='-o docs/options.adoc'
-```
-
-Or run directly:
-
-```shell
-go run ./tools/generate-options-docs -o docs/options.md
-go run ./tools/generate-options-docs -o docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc
-go run ./tools/generate-options-docs -asciidoc > docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc
-```
-
-The generated AsciiDoc mirrors the manual reference ordering (General, Service, Export, License, Request). The file `cli-configuration-settings-reference.generated.adoc` can be diffed against the manually curated `cli-configuration-settings-reference.adoc` to discover undocumented options.
-
-### Generating Command Reference Pages
-
-You can generate AsciiDoc pages for every command and subcommand. These pages include AsciiDoc attributes (:created-date:, :revdate:, :resourceid:) just below the title to match the formatting used elsewhere.
-
-In addition to the individual command pages, a hierarchical navigation file `nav.adoc` is always regenerated in `docs/dev-ux-portal-docs`. This file is intended for ingestion by the documentation portal (it provides the bullet + xref structure) and should not be edited manually—changes will be overwritten the next time the generator runs.
-
-Generate the full set into `docs/dev-ux-portal-docs`:
-
-```shell
-make generate-command-docs
-```
-
-Clean up generated pages:
-
-```shell
-make clean-command-docs
-```
-
-You can also invoke the generator directly (advanced use):
-
-```shell
-go run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs
-```
-
-By default the date used in the headers is today; override with `-date "March 23, 2025"` if you need a stable revision date:
-
-### Generating All Documentation
-
-To force a clean rebuild of both the configuration options reference and the full command reference (including nav.adoc) in a single step (the target deletes `docs/dev-ux-portal-docs` first):
-
-```shell
-make generate-all-docs
-```
-
-This target removes any existing `docs/dev-ux-portal-docs` directory, then runs `generate-options-docs` (writing the AsciiDoc configuration reference into `docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc`) followed by `generate-command-docs` (writing per-command pages plus `nav.adoc`).
-
-```shell
-go run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs
-```
 
 ## Commands
 
