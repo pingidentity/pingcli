@@ -244,6 +244,12 @@ func fail(doing string, err error) {
 func renderNav(root *cobra.Command) string {
 	var b strings.Builder
 	b.WriteString("* Command Reference\n")
+
+	// Add root command first
+	rootFile := strings.ReplaceAll(root.CommandPath(), " ", "_") + ".adoc"
+	fmt.Fprintf(&b, "** xref:command_reference:%s[]\n", rootFile)
+
+	// Add all other commands
 	walkVisible(root, func(c *cobra.Command) {
 		if c == root {
 			return

@@ -56,7 +56,7 @@ pingcli platform export [flags]
   -h, --help                                               help for export
   -f, --format string                                      Specifies the export format. (default HCL) Options are: HCL.
   -g, --service-group string                               Specifies the service group to export.  Options are: pingone. Example: 'pingone'
-  -o, --overwrite                                          Overwrites the existing generated exports in output directory. (default false) (default )
+  -o, --overwrite                                          Overwrites the existing generated exports in output directory. (default false)
   -s, --services []string                                  Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services.  Options are: pingfederate, pingone-authorize, pingone-mfa, pingone-platform, pingone-protect, pingone-sso. Example: 'pingone-sso,pingone-mfa,pingfederate'
       --pingfederate-access-token string                   The PingFederate access token used to authenticate to the PingFederate admin API when using a custom OAuth 2.0 token method.
       --pingfederate-admin-api-path string                 The PingFederate API URL path used to communicate with PingFederate's admin API. (default /pf-admin-api/v1)
@@ -65,12 +65,12 @@ pingcli platform export [flags]
       --pingfederate-client-id string                      The PingFederate OAuth client ID used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
       --pingfederate-client-secret string                  The PingFederate OAuth client secret used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
       --pingfederate-https-host string                     The PingFederate HTTPS host used to communicate with PingFederate's admin API. Example: 'https://pingfederate-admin.bxretail.org'
-      --pingfederate-insecure-trust-all-tls                Trust any certificate when connecting to the PingFederate server admin API. (default false) This is insecure and shouldn't be enabled outside of testing. (default )
+      --pingfederate-insecure-trust-all-tls                Trust any certificate when connecting to the PingFederate server admin API. (default false) This is insecure and shouldn't be enabled outside of testing.
       --pingfederate-password string                       The PingFederate password used to authenticate to the PingFederate admin API when using basic authentication.
       --pingfederate-scopes []string                       The PingFederate OAuth scopes used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type. (default []) Accepts a comma-separated string to delimit multiple scopes. Example: 'openid,profile'
       --pingfederate-token-url string                      The PingFederate OAuth token URL used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
       --pingfederate-username string                       The PingFederate username used to authenticate to the PingFederate admin API when using basic authentication. Example: 'administrator'
-      --pingfederate-x-bypass-external-validation-header   Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false) (default )
+      --pingfederate-x-bypass-external-validation-header   Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false)
       --pingone-authentication-type string                 The authentication type to use to authenticate to the PingOne management API. (default worker) Options are: worker.
       --pingone-export-environment-id string               The ID of the PingOne environment to export. Must be a valid PingOne UUID.
       --pingone-region-code string                         The region code of the PingOne tenant. Options are: AP, AU, CA, EU, NA. Example: 'NA'
@@ -83,10 +83,10 @@ pingcli platform export [flags]
 
 ----
   -C, --config string          The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
-  -D, --detailed-exitcode      Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. (default )
+  -D, --detailed-exitcode      Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings.
   -O, --output-format string   Specify the console output format. (default text) Options are: json, text.
   -P, --profile string         The name of a configuration profile to use.
-      --no-color               Disable text output in color. (default false) (default )
+      --no-color               Disable text output in color. (default false)
 ----
 
 == More information

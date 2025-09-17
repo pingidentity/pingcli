@@ -1,4 +1,5 @@
 * Command Reference
+** xref:command_reference:pingcli.adoc[]
 ** xref:command_reference:pingcli_completion.adoc[]
 ** xref:command_reference:pingcli_config.adoc[]
 *** xref:command_reference:pingcli_config_add-profile.adoc[]
