@@ -1,0 +1,54 @@
+= pingcli config add-profile
+:created-date: September 17, 2025
+:revdate: September 17, 2025
+:resourceid: pingcli_command_reference_pingcli_config_add-profile
+
+Add a new custom configuration profile.
+
+== Synopsis
+
+Add a new custom configuration profile to the CLI.
+
+The new configuration profile will be stored in the CLI configuration file.
+
+----
+pingcli config add-profile [flags]
+----
+
+== Examples
+
+----
+  Add a new configuration profile with a guided experience.
+    pingcli config add-profile
+
+  Add a new configuration profile with a specific name and description.
+    pingcli config add-profile --name myprofile --description "My awesome new profile for my development environment"
+
+  Add a new configuration profile with a guided experience and set it as the active profile.
+    pingcli config add-profile --set-active
+----
+
+== Options
+
+----
+  -d, --description string   The description of the new configuration profile.
+  -h, --help                 help for add-profile
+  -n, --name string          The name of the new configuration profile.
+  -s, --set-active           Set the new configuration profile as the active profile. (default false) (default )
+----
+
+== Options inherited from parent commands
+
+----
+  -C, --config string          The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
+  -D, --detailed-exitcode      Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. (default )
+  -O, --output-format string   Specify the console output format. (default text) Options are: json, text.
+  -P, --profile string         The name of a configuration profile to use.
+  -U, --unmask-values          Unmask secret values. (default false) (default )
+      --no-color               Disable text output in color. (default false) (default )
+----
+
+== More information
+
+* xref:pingcli_config.adoc[]	 - Manage the CLI configuration.
+

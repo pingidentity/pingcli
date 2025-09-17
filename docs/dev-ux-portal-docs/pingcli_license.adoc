@@ -1,0 +1,51 @@
+= pingcli license
+:created-date: September 17, 2025
+:revdate: September 17, 2025
+:resourceid: pingcli_command_reference_pingcli_license
+
+Request a new evaluation license.
+
+== Synopsis
+
+Request a new evaluation license for a specific product and version.
+
+The new license request will be sent to the Ping Identity license server.
+
+----
+pingcli license [flags]
+----
+
+== Examples
+
+----
+  Request a new evaluation license for PingFederate 12.0.
+    pingcli license request --product pingfederate --version 12.0
+	
+	  Request a new evaluation license for PingAccess 6.3.
+	pingcli license request --product pingaccess --version 6.3
+----
+
+== Options
+
+----
+  -k, --devops-key string    The DevOps key for the license request.   See https://developer.pingidentity.com/devops/how-to/devopsRegistration.html on how to register a DevOps user.   You can save the DevOps user and key in your profile using the 'pingcli config' commands.
+  -h, --help                 help for license
+  -p, --product string       The product for which to request a license.  Options are: pingaccess, pingauthorize, pingauthorize-policy-editor, pingcentral, pingdirectory, pingdirectoryproxy, pingfederate. Example: 'pingfederate'
+  -u, --devops-user string   The DevOps user for the license request.   See https://developer.pingidentity.com/devops/how-to/devopsRegistration.html on how to register a DevOps user.   You can save the DevOps user and key in your profile using the 'pingcli config' commands.
+  -v, --version string       The version of the product for which to request a license. Must be of the form 'major.minor'.  Example: '12.3'
+----
+
+== Options inherited from parent commands
+
+----
+  -C, --config string          The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
+  -D, --detailed-exitcode      Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. (default )
+  -O, --output-format string   Specify the console output format. (default text) Options are: json, text.
+  -P, --profile string         The name of a configuration profile to use.
+      --no-color               Disable text output in color. (default false) (default )
+----
+
+== More information
+
+* xref:pingcli.adoc[]	 - A CLI tool for managing the configuration of Ping Identity products.
+

@@ -1,0 +1,66 @@
+= pingcli completion
+:created-date: September 17, 2025
+:revdate: September 17, 2025
+:resourceid: pingcli_command_reference_pingcli_completion
+
+Prints shell completion scripts
+
+== Synopsis
+
+To load completions:
+
+Bash:
+
+  $ source <(pingcli completion bash)
+
+  # To load completions for each session, execute once:
+  # Linux:
+  $ pingcli completion bash > /etc/bash_completion.d/pingcli
+  # macOS:
+  $ source <(pingcli completion zsh)
+
+Zsh:
+
+  # If shell completion is not already enabled in your environment,
+  # you will need to enable it.  You can execute the following once:
+
+  $ echo "autoload -U compinit; compinit" >> ~/.zshrc
+
+  # To load completions for each session, execute once:
+  $ pingcli completion zsh > "${fpath[1]}/_pingcli"
+
+  # You will need to start a new shell for this setup to take effect.
+
+fish:
+
+  $ pingcli completion fish | source
+
+  # To load completions for each session, execute once:
+  $ pingcli completion fish > ~/.config/fish/completions/pingcli.fish
+
+PowerShell:
+
+  PS> pingcli completion powershell | Out-String | Invoke-Expression
+
+  # To load completions for every new session, run:
+  PS> pingcli completion powershell > pingcli.ps1
+  # and source this file from your PowerShell profile.
+
+----
+pingcli completion [SHELL]
+----
+
+== Options inherited from parent commands
+
+----
+  -C, --config string          The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
+  -D, --detailed-exitcode      Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. (default )
+  -O, --output-format string   Specify the console output format. (default text) Options are: json, text.
+  -P, --profile string         The name of a configuration profile to use.
+      --no-color               Disable text output in color. (default false) (default )
+----
+
+== More information
+
+* xref:pingcli.adoc[]	 - A CLI tool for managing the configuration of Ping Identity products.
+

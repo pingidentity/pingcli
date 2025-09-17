@@ -1,0 +1,35 @@
+= pingcli plugin
+:created-date: September 17, 2025
+:revdate: September 17, 2025
+:resourceid: pingcli_command_reference_pingcli_plugin
+
+Manage Ping CLI plugins.
+
+== Synopsis
+
+Manage Ping CLI plugins.
+
+----
+pingcli plugin
+----
+
+== Options inherited from parent commands
+
+----
+  -C, --config string          The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
+  -D, --detailed-exitcode      Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. (default )
+  -O, --output-format string   Specify the console output format. (default text) Options are: json, text.
+  -P, --profile string         The name of a configuration profile to use.
+      --no-color               Disable text output in color. (default false) (default )
+----
+
+== More information
+
+* xref:pingcli.adoc[]	 - A CLI tool for managing the configuration of Ping Identity products.
+
+== Subcommands
+
+* xref:pingcli_plugin_add.adoc[] - Add a plugin to use with Ping CLI
+* xref:pingcli_plugin_list.adoc[] - List all plugins currently in use with Ping CLI
+* xref:pingcli_plugin_remove.adoc[] - Remove a plugin from Ping CLI
+

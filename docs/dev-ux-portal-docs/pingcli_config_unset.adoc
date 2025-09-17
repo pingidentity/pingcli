@@ -1,0 +1,43 @@
+= pingcli config unset
+:created-date: September 17, 2025
+:revdate: September 17, 2025
+:resourceid: pingcli_command_reference_pingcli_config_unset
+
+Unset stored configuration settings for the CLI.
+
+== Synopsis
+
+Unset stored configuration settings for the CLI.
+
+The `--profile` parameter can be used to unset configuration settings for a specified custom configuration profile.
+Where `--profile` is not specified, configuration settings will be unset for the currently active profile.
+
+----
+pingcli config unset [flags] key
+----
+
+== Examples
+
+----
+  Unset the color setting for the currently active profile.
+    pingcli config unset color
+
+  Unset the PingOne tenant region code setting for the profile named 'myprofile'.
+    pingcli config unset --profile myprofile service.pingOne.regionCode
+----
+
+== Options inherited from parent commands
+
+----
+  -C, --config string          The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
+  -D, --detailed-exitcode      Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. (default )
+  -O, --output-format string   Specify the console output format. (default text) Options are: json, text.
+  -P, --profile string         The name of a configuration profile to use.
+  -U, --unmask-values          Unmask secret values. (default false) (default )
+      --no-color               Disable text output in color. (default false) (default )
+----
+
+== More information
+
+* xref:pingcli_config.adoc[]	 - Manage the CLI configuration.
+
