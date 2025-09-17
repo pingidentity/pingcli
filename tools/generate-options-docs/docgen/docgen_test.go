@@ -1,4 +1,4 @@
-package docgen
+package docgen_test
 
 import (
 	"flag"
@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	docgen "github.com/pingidentity/pingcli/tools/generate-options-docs/docgen"
 )
 
 var update = flag.Bool("update", false, "update golden files for options docs")
@@ -14,11 +16,11 @@ var update = flag.Bool("update", false, "update golden files for options docs")
 func TestOptionsDocGeneration(t *testing.T) {
 	flag.Parse()
 
-	md := GenerateMarkdown()
-	adoc := GenerateAsciiDoc()
+	md := docgen.GenerateMarkdown()
+	adoc := docgen.GenerateAsciiDoc()
 
 	goldenDir := filepath.Join("testdata", "golden")
-	if err := os.MkdirAll(goldenDir, 0o755); err != nil {
+	if err := os.MkdirAll(goldenDir, 0o750); err != nil { // tighter perms
 		t.Fatalf("mkdir golden: %v", err)
 	}
 
@@ -36,7 +38,7 @@ func TestOptionsDocGeneration(t *testing.T) {
 	for _, tc := range cases {
 		goldenPath := filepath.Join(goldenDir, tc.name)
 		if *update {
-			if err := os.WriteFile(goldenPath, []byte(tc.content), 0o644); err != nil {
+			if err := os.WriteFile(goldenPath, []byte(tc.content), 0o600); err != nil { // restrict world perms
 				t.Fatalf("write golden %s: %v", tc.name, err)
 			}
 			t.Logf("updated golden: %s", tc.name)
@@ -55,7 +57,7 @@ func TestOptionsDocGeneration(t *testing.T) {
 
 // normalizeDynamic removes lines containing :created-date: or :revdate: tokens.
 func normalizeDynamic(s string) string {
-	var out []string
+	out := make([]string, 0, 128)
 	for _, line := range strings.Split(s, "\n") {
 		if strings.HasPrefix(line, ":created-date:") || strings.HasPrefix(line, ":revdate:") {
 			continue

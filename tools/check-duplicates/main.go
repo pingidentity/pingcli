@@ -48,6 +48,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -89,7 +90,7 @@ func main() {
 	var collisions [][2]string
 	for _, locs := range funcMap {
 		if len(locs) > 1 {
-			for i := 0; i < len(locs); i++ {
+			for i := range locs {
 				for j := i + 1; j < len(locs); j++ {
 					collisions = append(collisions, [2]string{locs[i], locs[j]})
 				}
@@ -120,16 +121,31 @@ func withinIncluded(path string) bool {
 
 // addFile parses a Go file, hashes each function body, and records its location under that hash key.
 func addFile(path string, funcMap map[string][]string) {
-	src, err := os.ReadFile(path)
+	// Sanitize and restrict the path before opening (addresses gosec G304 false positive).
+	clean := filepath.Clean(path)
+	if filepath.IsAbs(clean) || strings.Contains(clean, "..") {
+		return // reject unexpected absolute or parent traversals
+	}
+	if !withinIncluded(clean) || !strings.HasSuffix(clean, ".go") || ignoreFiles.MatchString(clean) {
+		return
+	}
+
+	f, err := os.Open(clean) // #nosec G304: path origin is controlled by WalkDir + allowlist + sanitization above
 	if err != nil {
 		return // Silent skip; traversal reports aggregate errors only.
 	}
+	defer func() { _ = f.Close() }()
+	src, err := io.ReadAll(f)
+	if err != nil {
+		return
+	}
+
 	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, path, src, parser.ParseComments)
+	parsed, err := parser.ParseFile(fset, clean, src, parser.ParseComments)
 	if err != nil {
 		return // Skip unreadable / invalid Go sources.
 	}
-	for _, d := range f.Decls {
+	for _, d := range parsed.Decls {
 		fd, ok := d.(*ast.FuncDecl)
 		if !ok || fd.Body == nil { // Skip declarations without bodies (interfaces, externs).
 			continue
@@ -140,7 +156,7 @@ func addFile(path string, funcMap map[string][]string) {
 		}
 		h := sha256.Sum256(buf.Bytes())
 		key := fmt.Sprintf("%x", h)
-		loc := fmt.Sprintf("%s:%s", path, fd.Name.Name)
+		loc := fmt.Sprintf("%s:%s", clean, fd.Name.Name)
 		funcMap[key] = append(funcMap[key], loc)
 	}
 }

@@ -25,7 +25,8 @@ func main() {
 	root := cmd.NewRootCommand(*version, *commit)
 	root.DisableAutoGenTag = true
 
-	if err := os.MkdirAll(*outDir, 0o755); err != nil {
+	// Use tighter directory permissions (group readable/executable only) to satisfy gosec G301.
+	if err := os.MkdirAll(*outDir, 0o750); err != nil {
 		fail("create out dir", err)
 	}
 
@@ -33,9 +34,9 @@ func main() {
 	walkVisible(root, func(c *cobra.Command) {
 		base := strings.ReplaceAll(c.CommandPath(), " ", "_")
 		file := filepath.Join(*outDir, base+".adoc")
-		depth := depthOf(c)
-		content := renderSingle(c, depth, *date, *resourcePrefix)
-		if err := os.WriteFile(file, []byte(content), 0o644); err != nil {
+		content := renderSingle(c, *date, *resourcePrefix)
+		// Restrict file permissions (no world access) for consistency with directory perms.
+		if err := os.WriteFile(file, []byte(content), 0o600); err != nil { //nolint:gosec // docs non-sensitive; restricting world perms intentionally
 			fail("write file "+file, err)
 		}
 	})
@@ -43,12 +44,12 @@ func main() {
 	// Always (re)generate navigation file for documentation portal ingestion.
 	navPath := filepath.Join(*outDir, "nav.adoc")
 	navContent := renderNav(root)
-	if err := os.WriteFile(navPath, []byte(navContent), 0o644); err != nil {
+	if err := os.WriteFile(navPath, []byte(navContent), 0o600); err != nil { //nolint:gosec
 		fail("write nav file", err)
 	}
 }
 
-func renderSingle(c *cobra.Command, depth int, date, resourcePrefix string) string {
+func renderSingle(c *cobra.Command, date, resourcePrefix string) string {
 	// Manual style: always use top-level title '=' regardless of hierarchy.
 	base := strings.ReplaceAll(c.CommandPath(), " ", "_")
 	b := &strings.Builder{}
@@ -143,7 +144,7 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 	type line struct{ spec, desc string }
 	var lines []line
 	for _, f := range flags {
-		spec := ""
+		var spec string
 		if f.Shorthand != "" {
 			spec = fmt.Sprintf("-%s, --%s", f.Shorthand, f.Name)
 		} else {
