@@ -41,7 +41,7 @@ go run ./tools/generate-options-docs -o docs/dev-ux-portal-docs/general/cli-conf
 go run ./tools/generate-options-docs -asciidoc > docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc
 ```
 
-The AsciiDoc generator orders sections as: General, Service, Export, License, Request.
+The AsciiDoc generator orders sections as: General, Service, Export, License, Request (as of September 2025 - new options may change this order).
 
 ## Command Reference Pages & Navigation
 

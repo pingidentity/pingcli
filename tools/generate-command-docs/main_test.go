@@ -32,7 +32,7 @@ func TestCommandDocGeneration(t *testing.T) {
 		gotPath := filepath.Join(tmp, f)
 		// Validate generated file path stays within temporary directory (mitigates G304)
 		cleanGot := filepath.Clean(gotPath)
-		if !strings.HasPrefix(cleanGot+string(os.PathSeparator), filepath.Clean(tmp)+string(os.PathSeparator)) { // safety check
+		if !strings.HasPrefix(cleanGot+string(os.PathSeparator), filepath.Clean(tmp)+string(os.PathSeparator)) {
 			t.Fatalf("generated file path %s is outside of temp directory", gotPath)
 		}
 		gotBytes, err := os.ReadFile(cleanGot) // #nosec G304 path validated above
@@ -43,14 +43,14 @@ func TestCommandDocGeneration(t *testing.T) {
 
 		goldenPath := filepath.Join(goldenDir, f)
 		if *update {
-			if err := os.WriteFile(goldenPath, []byte(got), 0o600); err != nil { // restrict world perms
+			if err := os.WriteFile(goldenPath, []byte(got), 0o600); err != nil {
 				t.Fatalf("write golden %s: %v", f, err)
 			}
 			t.Logf("updated golden: %s", f)
 
 			continue
 		}
-		wantBytes, err := os.ReadFile(goldenPath) // #nosec G304 reading vetted golden path
+		wantBytes, err := os.ReadFile(goldenPath) // #nosec G304 path validated above
 		if err != nil {
 			t.Fatalf("read golden %s: %v (run with -update to create)", f, err)
 		}

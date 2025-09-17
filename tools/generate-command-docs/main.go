@@ -26,6 +26,7 @@ func main() {
 	root.DisableAutoGenTag = true
 
 	// Use tighter directory permissions (group readable/executable only) to satisfy gosec G301.
+	// Not huge since these are just docs, but still better to be consistent.
 	if err := os.MkdirAll(*outDir, 0o750); err != nil {
 		fail("create out dir", err)
 	}
@@ -87,6 +88,8 @@ func renderSingle(c *cobra.Command, date, resourcePrefix string) string {
 		b.WriteString("----\n\n")
 	}
 
+	// TODO: See how to render line breaks for readability when generating AsciiDoc to portal
+	// Attempts to do so thus far have not worked
 	// Options (non-inherited) including help flag.
 	local := c.NonInheritedFlags()
 	inherited := c.InheritedFlags()

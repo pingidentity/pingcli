@@ -29,7 +29,7 @@ func main() {
 		return
 	}
 
-	if err := os.WriteFile(*outFile, []byte(content), 0o600); err != nil { // restrict world perms
+	if err := os.WriteFile(*outFile, []byte(content), 0o600); err != nil {
 		fmt.Fprintf(os.Stderr, "failed to write file: %v\n", err)
 		os.Exit(1)
 	}

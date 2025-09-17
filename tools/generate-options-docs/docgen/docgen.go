@@ -163,7 +163,6 @@ func sanitizeUsage(opt options.Option) string {
 	usage = strings.ReplaceAll(usage, "\n", " ")
 	usage = strings.TrimSpace(usage)
 
-	// No manual wrapping or hard line break insertion; return collapsed single-line usage.
 	return usage
 }
 

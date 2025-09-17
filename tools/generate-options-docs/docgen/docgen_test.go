@@ -43,7 +43,7 @@ func TestOptionsDocGeneration(t *testing.T) {
 			t.Fatalf("invalid golden file path: %s", goldenPath)
 		}
 		if *update {
-			if err := os.WriteFile(cleanGolden, []byte(tc.content), 0o600); err != nil { // restrict world perms
+			if err := os.WriteFile(cleanGolden, []byte(tc.content), 0o600); err != nil {
 				t.Fatalf("write golden %s: %v", tc.name, err)
 			}
 			t.Logf("updated golden: %s", tc.name)
