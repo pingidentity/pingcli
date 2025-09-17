@@ -162,7 +162,7 @@ func InitPingOneTerraform(t *testing.T) {
 	required_providers {
 		pingone = {
 		source = "pingidentity/pingone"
-		version = "1.8.0"
+		version = "1.12.0"
 		}
 	}
 }
@@ -211,7 +211,7 @@ func InitPingFederateTerraform(t *testing.T) {
 	required_providers {
 		pingfederate = {
 		source = "pingidentity/pingfederate"
-		version = "1.5.0"
+		version = "1.6.1"
 		}
 	}
 }
@@ -221,7 +221,7 @@ provider "pingfederate" {
   password = "2FederateM0re"
   https_host = "https://localhost:9999"
   admin_api_path = "/pf-admin-api/v1"
-  product_version = "12.2"
+  product_version = "12.3"
   insecure_trust_all_tls = true
   x_bypass_external_validation_header = true
 }
