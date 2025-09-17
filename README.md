@@ -281,11 +281,10 @@ To force a clean rebuild of both the configuration options reference and the ful
 make generate-all-docs
 ```
 
-This target removes any existing `docs/dev-ux-portal-docs` directory, then runs `generate-options-docs` (writing the AsciiDoc configuration reference into `docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc`) followed by `generate-command-docs` (writing per-command pages plus `nav.adoc`).  You can optionally inject a 
-
+This target removes any existing `docs/dev-ux-portal-docs` directory, then runs `generate-options-docs` (writing the AsciiDoc configuration reference into `docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc`) followed by `generate-command-docs` (writing per-command pages plus `nav.adoc`).
 
 ```shell
-go run ./tools/generate-command-docs -date "March 23, 2025" -o ./docs/dev-ux-portal-docs
+go run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs
 ```
 
 ## Commands
