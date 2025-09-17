@@ -152,6 +152,7 @@ OR
 
 Use the following single-line PowerShell 7.4 command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
 >**_NOTE:_** After installation, ensure that `%LOCALAPPDATA%\Programs` is included in your PATH environment variable. If it is not already present, add it so you can call `pingcli` directly in your terminal.
+
 ```powershell
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
@@ -218,25 +219,74 @@ See [Autocompletion Documentation](./docs/autocompletion/autocompletion.md) for 
 
 ### Generating Configuration Options Documentation
 
-To regenerate the markdown table of configuration options used in documentation, use the provided Makefile target instead of the previous ad-hoc test:
+Use the Makefile target to generate documentation for all configuration options. By default it now writes AsciiDoc to `docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc` for portal ingestion:
 
 ```shell
 make generate-options-docs
 ```
 
-This prints the markdown to stdout. To write it directly to a file (for example updating docs/options.md):
+Without arguments the Makefile target writes to the portal path above. You can override by providing OUTPUT arguments; without the Makefile (invoking the tool directly) omitting -o still prints to stdout. Provide an output file to write it:
 
 ```shell
 make generate-options-docs OUTPUT='-o docs/options.md'
 ```
 
-The generator code lives in `cmd/generate-options-docs` and can be invoked manually as well:
+AsciiDoc is also supported (and is the default when using the Makefile target). The format is auto-detected from the file extension (`.adoc` / `.asciidoc`) or you can force it with `-asciidoc`:
 
 ```shell
-go run ./cmd/generate-options-docs -o /path/to/file.md
+make generate-options-docs OUTPUT='-o docs/options.adoc'
 ```
 
-The logic was migrated from the skipped test `internal/configuration/options/options_test.go` (Test_outputOptionsMDInfo) to make doc generation an explicit developer action.
+Or run directly:
+
+```shell
+go run ./tools/generate-options-docs -o docs/options.md
+go run ./tools/generate-options-docs -o docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc
+go run ./tools/generate-options-docs -asciidoc > docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc
+```
+
+The generated AsciiDoc mirrors the manual reference ordering (General, Service, Export, License, Request). The file `cli-configuration-settings-reference.generated.adoc` can be diffed against the manually curated `cli-configuration-settings-reference.adoc` to discover undocumented options.
+
+### Generating Command Reference Pages
+
+You can generate AsciiDoc pages for every command and subcommand. These pages include AsciiDoc attributes (:created-date:, :revdate:, :resourceid:) just below the title to match the formatting used elsewhere.
+
+In addition to the individual command pages, a hierarchical navigation file `nav.adoc` is always regenerated in `docs/dev-ux-portal-docs`. This file is intended for ingestion by the documentation portal (it provides the bullet + xref structure) and should not be edited manually—changes will be overwritten the next time the generator runs.
+
+Generate the full set into `docs/dev-ux-portal-docs`:
+
+```shell
+make generate-command-docs
+```
+
+Clean up generated pages:
+
+```shell
+make clean-command-docs
+```
+
+You can also invoke the generator directly (advanced use):
+
+```shell
+go run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs
+```
+
+By default the date used in the headers is today; override with `-date "March 23, 2025"` if you need a stable revision date:
+
+### Generating All Documentation
+
+To force a clean rebuild of both the configuration options reference and the full command reference (including nav.adoc) in a single step (the target deletes `docs/dev-ux-portal-docs` first):
+
+```shell
+make generate-all-docs
+```
+
+This target removes any existing `docs/dev-ux-portal-docs` directory, then runs `generate-options-docs` (writing the AsciiDoc configuration reference into `docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc`) followed by `generate-command-docs` (writing per-command pages plus `nav.adoc`).  You can optionally inject a 
+
+
+```shell
+go run ./tools/generate-command-docs -date "March 23, 2025" -o ./docs/dev-ux-portal-docs
+```
 
 ## Commands
 

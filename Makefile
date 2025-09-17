@@ -40,9 +40,10 @@ endef
 # PHONY TARGETS
 # ====================================================================================
 
-.PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest generate-options-docs
+.PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest 
 .PHONY: starttestcontainer removetestcontainer spincontainer openlocalwebapi openapp protogen
 .PHONY: _check_env _check_ping_env _check_docker _run_pf_container _wait_for_pf _stop_pf_container
+.PHONY: generate-options-docs generate-command-docs generate-all-docs
 
 # ====================================================================================
 # USER-FACING COMMANDS
@@ -83,10 +84,30 @@ golangcilint: ## Run golangci-lint for comprehensive code analysis
 	$(GOLANGCI_LINT) run --timeout 5m ./...
 	echo "✅ No linting issues found."
 
-generate-options-docs: ## Generate markdown documentation for configuration options
-	@echo "  > Docs: Generating options documentation markdown..."
-	$(GOCMD) run ./cmd/generate-options-docs $(OUTPUT)
-	echo "✅ Documentation generated. Use: make generate-options-docs OUTPUT='-o docs/options.md' to write to file."
+generate-options-docs: ## Generate configuration options documentation (default: AsciiDoc into docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc)
+	@echo "  > Docs: Generating options documentation..."
+	@if [ -z "$(OUTPUT)" ]; then \
+		mkdir -p ./docs/dev-ux-portal-docs/general; \
+		$(GOCMD) run ./tools/generate-options-docs -asciidoc -o ./docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc; \
+		echo "✅ Documentation generated at docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc"; \
+	else \
+		$(GOCMD) run ./tools/generate-options-docs $(OUTPUT); \
+		echo "✅ Documentation generated with custom OUTPUT $(OUTPUT)"; \
+	fi
+
+generate-command-docs: ## Generate per-command AsciiDoc pages (and nav.adoc) into docs/dev-ux-portal-docs
+	@echo "  > Docs: Generating command documentation..."
+	mkdir -p ./docs/dev-ux-portal-docs
+	$(GOCMD) run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs $(COMMAND_DOCS_ARGS)
+	echo "✅ Command docs generated in docs/dev-ux-portal-docs" 
+
+generate-all-docs: ## Rebuild ALL docs from scratch (cleans doc directory, then generates options + command reference)
+	@echo "  > Docs: Rebuilding all documentation (clean + regenerate)..."
+	rm -rf ./docs/dev-ux-portal-docs
+	mkdir -p ./docs/dev-ux-portal-docs/general
+	$(MAKE) generate-options-docs OUTPUT='-o docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc'
+	$(MAKE) generate-command-docs
+	@echo "✅ All documentation rebuilt."
 
 protogen: ## Generate Go code from .proto files
 	@echo "  > Protogen: Generating gRPC code from proto files..."
