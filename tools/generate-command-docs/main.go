@@ -155,7 +155,10 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 		}
 		desc := f.Usage
 		if typeName == "bool" {
-			desc = fmt.Sprintf("%s (default %s)", desc, f.DefValue)
+			// Add only if usage text does not already contain a default and DefValue is meaningful.
+			if !strings.Contains(desc, "(default") && f.DefValue != "" {
+				desc = fmt.Sprintf("%s (default %s)", desc, f.DefValue)
+			}
 		} else if f.DefValue != "" && f.DefValue != "<nil>" && f.DefValue != "0" && !strings.Contains(desc, "(default") {
 			desc = fmt.Sprintf("%s (default %s)", desc, f.DefValue)
 		}
