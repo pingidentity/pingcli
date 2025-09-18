@@ -1,6 +1,6 @@
 = Configuration Settings Reference
 :created-date: March 23, 2025
-:revdate: September 17, 2025
+:revdate: September 18, 2025
 :resourceid: pingcli_configuration_settings_reference
 
 The following configuration settings can be applied when using Ping CLI.

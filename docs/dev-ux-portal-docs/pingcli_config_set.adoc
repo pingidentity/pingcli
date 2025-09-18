@@ -1,6 +1,6 @@
 = pingcli config set
-:created-date: September 17, 2025
-:revdate: September 17, 2025
+:created-date: September 18, 2025
+:revdate: September 18, 2025
 :resourceid: pingcli_command_reference_pingcli_config_set
 
 Set stored configuration settings for the CLI.

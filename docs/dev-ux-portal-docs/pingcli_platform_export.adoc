@@ -1,6 +1,6 @@
 = pingcli platform export
-:created-date: September 17, 2025
-:revdate: September 17, 2025
+:created-date: September 18, 2025
+:revdate: September 18, 2025
 :resourceid: pingcli_command_reference_pingcli_platform_export
 
 Export Configuration as Code packages for the Ping Platform.

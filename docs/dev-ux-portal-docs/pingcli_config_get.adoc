@@ -1,6 +1,6 @@
 = pingcli config get
-:created-date: September 17, 2025
-:revdate: September 17, 2025
+:created-date: September 18, 2025
+:revdate: September 18, 2025
 :resourceid: pingcli_command_reference_pingcli_config_get
 
 Read stored configuration settings for the CLI.

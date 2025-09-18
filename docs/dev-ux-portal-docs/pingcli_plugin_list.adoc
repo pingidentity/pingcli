@@ -1,6 +1,6 @@
 = pingcli plugin list
-:created-date: September 17, 2025
-:revdate: September 17, 2025
+:created-date: September 18, 2025
+:revdate: September 18, 2025
 :resourceid: pingcli_command_reference_pingcli_plugin_list
 
 List all plugins currently in use with Ping CLI

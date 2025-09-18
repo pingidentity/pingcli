@@ -40,7 +40,7 @@ endef
 # PHONY TARGETS
 # ====================================================================================
 
-.PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest 
+.PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest
 .PHONY: starttestcontainer removetestcontainer spincontainer openlocalwebapi openapp protogen
 .PHONY: _check_env _check_ping_env _check_docker _run_pf_container _wait_for_pf _stop_pf_container
 .PHONY: generate-options-docs generate-command-docs generate-all-docs
