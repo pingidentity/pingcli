@@ -49,6 +49,7 @@ func GenerateMarkdown() string {
 		}
 		outputBuilder.WriteString("\n")
 	}
+
 	return outputBuilder.String()
 }
 
@@ -110,6 +111,7 @@ func GenerateAsciiDoc() string {
 		}
 		b.WriteString("|===\n\n")
 	}
+
 	return b.String()
 }
 
@@ -119,6 +121,7 @@ func ShouldOutputAsciiDoc(outPath string, explicit bool) bool {
 		return true
 	}
 	ext := strings.ToLower(filepath.Ext(outPath))
+
 	return ext == ".adoc" || ext == ".asciidoc"
 }
 
@@ -130,6 +133,7 @@ func asciiDocEquivalentParameter(opt options.Option) string {
 	if opt.Flag.Shorthand != "" {
 		return fmt.Sprintf("`--%s` / `-%s`", opt.CobraParamName, opt.Flag.Shorthand)
 	}
+
 	return fmt.Sprintf("`--%s`", opt.CobraParamName)
 }
 
@@ -170,5 +174,6 @@ func normalizeAsciiDocKey(key string) string {
 	key = strings.ReplaceAll(key, "pingFederate", "pingfederate")
 	key = strings.ReplaceAll(key, "pingOne", "pingone")
 	key = strings.ReplaceAll(key, "PEMFiles", "PemFiles")
+
 	return key
 }

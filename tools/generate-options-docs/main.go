@@ -26,6 +26,7 @@ func main() {
 
 	if *outFile == "" {
 		fmt.Print(content)
+
 		return
 	}
 

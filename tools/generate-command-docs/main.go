@@ -142,6 +142,7 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 		if sj == "" {
 			return true
 		}
+
 		return si < sj
 	})
 	type line struct{ spec, desc string }
@@ -206,6 +207,7 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 		fmt.Fprintf(&b, "  %s%s   %s\n", l.spec, strings.Repeat(" ", pad), l.desc)
 	}
 	b.WriteString("----\n")
+
 	return b.String()
 }
 
@@ -217,6 +219,7 @@ func firstLine(short, long string) string {
 	if strings.TrimSpace(long) != "" {
 		return strings.SplitN(strings.TrimSpace(long), "\n", 2)[0]
 	}
+
 	return ""
 }
 
@@ -229,6 +232,7 @@ func visibleSubcommands(c *cobra.Command) []*cobra.Command {
 		}
 		subs = append(subs, sc)
 	}
+
 	return subs
 }
 
@@ -268,5 +272,6 @@ func renderNav(root *cobra.Command) string {
 		fmt.Fprintf(&b, "%s xref:command_reference:%s[]\n", stars, file)
 	})
 	b.WriteString("\n")
+
 	return b.String()
 }

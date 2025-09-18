@@ -70,5 +70,6 @@ func normalizeDynamic(s string) string {
 		}
 		out = append(out, line)
 	}
+
 	return strings.Join(out, "\n")
 }

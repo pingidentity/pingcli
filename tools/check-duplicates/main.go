@@ -79,6 +79,7 @@ func main() {
 			return nil
 		}
 		addFile(path, funcMap)
+
 		return nil
 	})
 	if err != nil {
@@ -100,6 +101,7 @@ func main() {
 
 	if len(collisions) == 0 {
 		fmt.Println("No duplicate functions found.")
+
 		return
 	}
 	fmt.Println("Duplicate functions detected:")
@@ -116,6 +118,7 @@ func withinIncluded(path string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -167,5 +170,6 @@ func normalize(s string) string {
 	s = strings.ToLower(s)                   // case-insensitive
 	s = strings.Join(strings.Fields(s), " ") // collapse all whitespace runs
 	s = strings.ReplaceAll(s, "\n", " ")     // remove line breaks entirely
+
 	return s
 }
