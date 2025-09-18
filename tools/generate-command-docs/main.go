@@ -38,7 +38,7 @@ func main() {
 
 		// If file exists, extract existing created-date so it is preserved.
 		var existingCreated string
-		if oldRaw, err := os.ReadFile(file); err == nil {
+		if oldRaw, err := readFileIfWithin(file, *outDir); err == nil {
 			existingCreated = extractDateLine(string(oldRaw), ":created-date:")
 		}
 		createdDate := *date
@@ -50,7 +50,7 @@ func main() {
 
 		// Determine if underlying (non-date) content actually changed; if not, skip rewrite.
 		var prevBody string
-		if oldRaw, err := os.ReadFile(file); err == nil {
+		if oldRaw, err := readFileIfWithin(file, *outDir); err == nil {
 			prevBody = normalizeForCompare(string(oldRaw))
 		}
 		newBody := normalizeForCompare(content)
@@ -68,7 +68,7 @@ func main() {
 	// Navigation file: only write if changed to keep diffs minimal.
 	navPath := filepath.Join(*outDir, "nav.adoc")
 	navContent := renderNav(root)
-	if oldNav, err := os.ReadFile(navPath); err == nil {
+	if oldNav, err := readFileIfWithin(navPath, *outDir); err == nil {
 		if string(oldNav) == navContent {
 			// Unchanged
 			return
@@ -314,6 +314,7 @@ func normalizeForCompare(s string) string {
 		}
 		out = append(out, line)
 	}
+
 	return strings.Join(out, "\n")
 }
 
@@ -328,5 +329,21 @@ func extractDateLine(content, prefix string) string {
 			}
 		}
 	}
+
 	return ""
+}
+
+// readFileIfWithin validates that path is within base before reading to satisfy gosec G304.
+func readFileIfWithin(path, base string) ([]byte, error) {
+	cleanBase := filepath.Clean(base)
+	cleanPath := filepath.Clean(path)
+	if !strings.HasPrefix(cleanPath+string(os.PathSeparator), cleanBase+string(os.PathSeparator)) {
+		return nil, fmt.Errorf("refusing to read path outside base directory: %s", path)
+	}
+	data, err := os.ReadFile(cleanPath) // #nosec G304 path validated above
+	if err != nil {
+		return nil, err
+	}
+
+	return data, nil
 }

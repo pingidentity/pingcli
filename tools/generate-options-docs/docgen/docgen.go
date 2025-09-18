@@ -57,6 +57,7 @@ func GenerateMarkdown() string {
 func GenerateAsciiDoc() string { // backward-compatible wrapper using legacy date behavior
 	created := "March 23, 2025"
 	revdate := time.Now().Format("January 2, 2006")
+
 	return GenerateAsciiDocWithDates(created, revdate)
 }
 

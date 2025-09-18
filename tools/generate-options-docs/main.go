@@ -38,6 +38,7 @@ func main() {
 
 	if *outFile == "" {
 		fmt.Print(content)
+
 		return
 	}
 
@@ -64,6 +65,7 @@ func normalizeForCompare(s string) string {
 		}
 		out = append(out, line)
 	}
+
 	return strings.Join(out, "\n")
 }
 
@@ -77,5 +79,6 @@ func extractDateLine(content, prefix string) string {
 			}
 		}
 	}
+
 	return ""
 }
