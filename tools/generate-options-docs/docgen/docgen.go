@@ -54,7 +54,14 @@ func GenerateMarkdown() string {
 }
 
 // GenerateAsciiDoc generates a configuration reference in AsciiDoc format.
-func GenerateAsciiDoc() string {
+func GenerateAsciiDoc() string { // backward-compatible wrapper using legacy date behavior
+	created := "March 23, 2025"
+	revdate := time.Now().Format("January 2, 2006")
+	return GenerateAsciiDocWithDates(created, revdate)
+}
+
+// GenerateAsciiDocWithDates renders AsciiDoc with explicit created and revision dates.
+func GenerateAsciiDocWithDates(created, revdate string) string {
 	configuration.InitAllOptions()
 	catMap := map[string][]options.Option{}
 	for _, opt := range options.Options() {
@@ -84,8 +91,6 @@ func GenerateAsciiDoc() string {
 		slices.SortFunc(catMap[k], func(a, b options.Option) int { return strings.Compare(a.KoanfKey, b.KoanfKey) })
 	}
 	var b strings.Builder
-	created := "March 23, 2025"
-	revdate := time.Now().Format("January 2, 2006")
 	b.WriteString("= Configuration Settings Reference\n")
 	b.WriteString(fmt.Sprintf(":created-date: %s\n", created))
 	b.WriteString(fmt.Sprintf(":revdate: %s\n", revdate))

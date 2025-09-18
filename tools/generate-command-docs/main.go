@@ -31,31 +31,60 @@ func main() {
 		fail("create out dir", err)
 	}
 
-	// One file per command path.
+	// One file per command path with deterministic, content-based updates.
 	walkVisible(root, func(c *cobra.Command) {
 		base := strings.ReplaceAll(c.CommandPath(), " ", "_")
 		file := filepath.Join(*outDir, base+".adoc")
-		content := renderSingle(c, *date, *resourcePrefix)
+
+		// If file exists, extract existing created-date so it is preserved.
+		var existingCreated string
+		if oldRaw, err := os.ReadFile(file); err == nil {
+			existingCreated = extractDateLine(string(oldRaw), ":created-date:")
+		}
+		createdDate := *date
+		if existingCreated != "" {
+			createdDate = existingCreated
+		}
+
+		content := renderSingle(c, createdDate, *date, *resourcePrefix)
+
+		// Determine if underlying (non-date) content actually changed; if not, skip rewrite.
+		var prevBody string
+		if oldRaw, err := os.ReadFile(file); err == nil {
+			prevBody = normalizeForCompare(string(oldRaw))
+		}
+		newBody := normalizeForCompare(content)
+		if prevBody == newBody && prevBody != "" {
+			// Skip updating revision date to avoid needless churn.
+			return
+		}
+
 		// Restrict file permissions (no world access) for consistency with directory perms.
 		if err := os.WriteFile(file, []byte(content), 0o600); err != nil {
 			fail("write file "+file, err)
 		}
 	})
 
-	// Always (re)generate navigation file for documentation portal ingestion.
+	// Navigation file: only write if changed to keep diffs minimal.
 	navPath := filepath.Join(*outDir, "nav.adoc")
 	navContent := renderNav(root)
+	if oldNav, err := os.ReadFile(navPath); err == nil {
+		if string(oldNav) == navContent {
+			// Unchanged
+			return
+		}
+	}
 	if err := os.WriteFile(navPath, []byte(navContent), 0o600); err != nil {
 		fail("write nav file", err)
 	}
 }
 
-func renderSingle(c *cobra.Command, date, resourcePrefix string) string {
+func renderSingle(c *cobra.Command, createdDate, revDate, resourcePrefix string) string {
 	// Manual style: always use top-level title '=' regardless of hierarchy.
 	base := strings.ReplaceAll(c.CommandPath(), " ", "_")
 	b := &strings.Builder{}
 	fmt.Fprintf(b, "= %s\n", c.CommandPath())
-	fmt.Fprintf(b, ":created-date: %s\n:revdate: %s\n:resourceid: %s%s\n\n", date, date, resourcePrefix, base)
+	fmt.Fprintf(b, ":created-date: %s\n:revdate: %s\n:resourceid: %s%s\n\n", createdDate, revDate, resourcePrefix, base)
 
 	// Short description (first paragraph only)
 	if s := strings.TrimSpace(firstLine(c.Short, c.Long)); s != "" {
@@ -274,4 +303,30 @@ func renderNav(root *cobra.Command) string {
 	b.WriteString("\n")
 
 	return b.String()
+}
+
+// normalizeForCompare removes date lines so that comparisons ignore purely date-based churn.
+func normalizeForCompare(s string) string {
+	out := make([]string, 0, 128)
+	for _, line := range strings.Split(s, "\n") {
+		if strings.HasPrefix(line, ":created-date:") || strings.HasPrefix(line, ":revdate:") {
+			continue
+		}
+		out = append(out, line)
+	}
+	return strings.Join(out, "\n")
+}
+
+// extractDateLine returns the value (sans prefix) of the first matching date line.
+func extractDateLine(content, prefix string) string {
+	for _, line := range strings.Split(content, "\n") {
+		if strings.HasPrefix(line, prefix) {
+			// format: :created-date: VALUE
+			parts := strings.SplitN(line, ": ", 2)
+			if len(parts) == 2 {
+				return parts[1]
+			}
+		}
+	}
+	return ""
 }

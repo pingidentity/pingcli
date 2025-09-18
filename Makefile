@@ -107,7 +107,6 @@ generate-command-docs: ## Generate per-command AsciiDoc pages then validate via 
 
 generate-all-docs: ## Rebuild ALL docs then run golden tests for both sets
 	@echo "  > Docs: Rebuilding all documentation (clean + regenerate)..."
-	rm -rf ./docs/dev-ux-portal-docs
 	mkdir -p ./docs/dev-ux-portal-docs/general
 	$(MAKE) generate-options-docs OUTPUT='-o docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc'
 	$(MAKE) generate-command-docs
