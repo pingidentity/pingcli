@@ -3,7 +3,6 @@
 package config_internal
 
 import (
-	"errors"
 	"fmt"
 	"testing"
 
@@ -12,7 +11,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalConfigSet(t *testing.T) {
@@ -101,25 +100,20 @@ func Test_RunInternalConfigSet(t *testing.T) {
 			err := RunInternalConfigSet(tc.kvPair)
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var setError *SetError
-				if errors.As(err, &setError) {
-					assert.ErrorIs(t, setError.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type SetError")
-				}
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 
 			if tc.checkOption != nil {
 				vVal, err := profiles.GetOptionValue(*tc.checkOption)
 				if err != nil {
-					assert.Fail(t, "GetOptionValue returned error: %v", err)
+					require.Fail(t, "GetOptionValue returned error: %v", err)
 				}
 
 				if vVal != tc.checkValue {
-					assert.Fail(t, "Expected %s to be %s, got %v", tc.checkOption.KoanfKey, tc.checkValue, vVal)
+					require.Fail(t, "Expected %s to be %s, got %v", tc.checkOption.KoanfKey, tc.checkValue, vVal)
 				}
 			}
 		})

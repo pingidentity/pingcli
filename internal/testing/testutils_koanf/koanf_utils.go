@@ -114,25 +114,27 @@ func CreateConfigFile(t *testing.T) string {
 	return configFilePath
 }
 
-func configureMainKoanf(t *testing.T) {
+func configureMainKoanf(t *testing.T) *profiles.KoanfConfig {
 	t.Helper()
 
 	configFilePath = CreateConfigFile(t)
-	mainKoanf := profiles.NewKoanfConfig(configFilePath)
+	koanfConfig := profiles.NewKoanfConfig(configFilePath)
 
-	if err := mainKoanf.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
+	if err := koanfConfig.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
 		t.Fatalf("Failed to load configuration from file '%s': %v", configFilePath, err)
 	}
+
+	return koanfConfig
 }
 
-func InitKoanfs(t *testing.T) {
+func InitKoanfs(t *testing.T) *profiles.KoanfConfig {
 	t.Helper()
 
 	configuration.InitAllOptions()
 
 	configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
 
-	configureMainKoanf(t)
+	return configureMainKoanf(t)
 }
 
 func InitKoanfsCustomFile(t *testing.T, fileContents string) {

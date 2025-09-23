@@ -7,14 +7,23 @@ import (
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var (
+	listErrorPrefix = "failed to list plugins"
+)
+
 func RunInternalPluginList() error {
-	existingPluginExectuables, _, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, "")
+	existingPluginExectuables, ok, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, "")
 	if err != nil {
-		return fmt.Errorf("failed to get existing plugin configuration: %w", err)
+		return &errs.PingCLIError{Prefix: listErrorPrefix, Err: fmt.Errorf("%w: %v", ErrReadPluginNamesConfig, err)}
+	}
+	if !ok {
+		output.Message("No plugins configured.", nil)
+		return nil
 	}
 
 	listStr := "Plugins:\n"

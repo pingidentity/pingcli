@@ -3,7 +3,6 @@
 package config_internal
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
@@ -12,6 +11,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalConfigGet(t *testing.T) {
@@ -60,13 +60,8 @@ func Test_RunInternalConfigGet(t *testing.T) {
 			err := RunInternalConfigGet(tc.koanfKey)
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var getErr *GetError
-				if errors.As(err, &getErr) {
-					assert.ErrorIs(t, getErr.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type GetError")
-				}
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}

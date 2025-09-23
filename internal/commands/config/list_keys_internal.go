@@ -4,47 +4,29 @@ package config_internal
 
 import (
 	"errors"
-	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"gopkg.in/yaml.v3"
 )
 
 var (
-	ErrRetrieveKeys = errors.New("failed to retrieve configuration keys")
-	ErrNestedMap    = errors.New("failed to create nested map for key")
-	ErrMarshalKeys  = errors.New("failed to marshal keys to YAML format")
+	ErrRetrieveKeys     = errors.New("failed to retrieve configuration keys")
+	ErrNestedMap        = errors.New("failed to create nested map for key")
+	ErrMarshalKeys      = errors.New("failed to marshal keys to YAML format")
+	listKeysErrorPrefix = "failed to get configuration keys list"
 )
-
-type ListKeysError struct {
-	Err error
-}
-
-func (e *ListKeysError) Error() string {
-	var err *ListKeysError
-	if errors.As(e.Err, &err) {
-		return err.Error()
-	}
-	return fmt.Sprintf("failed to get configuration keys list: %s", e.Err.Error())
-}
-
-func (e *ListKeysError) Unwrap() error {
-	var err *ListKeysError
-	if errors.As(e.Err, &err) {
-		return err.Unwrap()
-	}
-	return e.Err
-}
 
 func returnKeysYamlString() (keysYamlStr string, err error) {
 	koanfKeys := configuration.KoanfKeys()
 
 	if len(koanfKeys) == 0 {
-		return keysYamlStr, &ListKeysError{Err: ErrRetrieveKeys}
+		return keysYamlStr, &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: ErrRetrieveKeys}
 	}
 
 	// Split the input string into individual keys
@@ -53,7 +35,7 @@ func returnKeysYamlString() (keysYamlStr string, err error) {
 	// Iterate over each koanf key
 	for _, koanfKey := range koanfKeys {
 		// Skip the "activeProfile" key
-		if koanfKey == "activeProfile" {
+		if koanfKey == options.RootActiveProfileOption.KoanfKey {
 			continue
 		}
 
@@ -74,7 +56,7 @@ func returnKeysYamlString() (keysYamlStr string, err error) {
 				}
 				currentMap, currentMapOk = currentMap[k].(map[string]interface{})
 				if !currentMapOk {
-					return keysYamlStr, &ListKeysError{Err: ErrNestedMap}
+					return keysYamlStr, &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: ErrNestedMap}
 				}
 			}
 		}
@@ -83,7 +65,7 @@ func returnKeysYamlString() (keysYamlStr string, err error) {
 	// Marshal the result into YAML
 	yamlData, err := yaml.Marshal(keyMap)
 	if err != nil {
-		return keysYamlStr, &ListKeysError{Err: ErrMarshalKeys}
+		return keysYamlStr, &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: ErrMarshalKeys}
 	}
 
 	keysYamlStr = string(yamlData)
@@ -94,31 +76,36 @@ func returnKeysString() (string, error) {
 	validKeys := configuration.KoanfKeys()
 
 	if len(validKeys) == 0 {
-		return "", &ListKeysError{Err: ErrRetrieveKeys}
-	} else {
-		validKeysJoined := strings.Join(validKeys, "\n- ")
-
-		return "Valid Keys:\n- " + validKeysJoined, nil
+		return "", &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: ErrRetrieveKeys}
 	}
+
+	// Remove the "activeProfile" key from the list
+	validKeys = slices.DeleteFunc(validKeys, func(s string) bool {
+		return s == options.RootActiveProfileOption.KoanfKey
+	})
+
+	validKeysJoined := strings.Join(validKeys, "\n- ")
+
+	return "Valid Keys:\n- " + validKeysJoined, nil
 }
 
 func RunInternalConfigListKeys() (err error) {
 	var outputMessageString string
 	yamlFlagStr, err := profiles.GetOptionValue(options.ConfigListKeysYamlOption)
 	if err != nil {
-		return &ListKeysError{Err: err}
+		return &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: err}
 	}
 	if yamlFlagStr == "true" {
 		// Output the YAML data as a string
 		outputMessageString, err = returnKeysYamlString()
 		if err != nil {
-			return &ListKeysError{Err: err}
+			return &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: err}
 		}
 	} else {
 		// Output data list string
 		outputMessageString, err = returnKeysString()
 		if err != nil {
-			return &ListKeysError{Err: err}
+			return &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: err}
 		}
 	}
 

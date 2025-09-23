@@ -3,13 +3,13 @@
 package license_internal
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalLicense(t *testing.T) {
@@ -77,13 +77,8 @@ func Test_RunInternalLicense(t *testing.T) {
 			err := RunInternalLicense()
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var licenseError *LicenseError
-				if errors.As(err, &licenseError) {
-					assert.ErrorIs(t, licenseError.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type LicenseError")
-				}
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}

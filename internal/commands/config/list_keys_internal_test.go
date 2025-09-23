@@ -3,20 +3,56 @@
 package config_internal
 
 import (
-	"errors"
+	"io"
+	"os"
+	"strings"
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalConfigListKeys(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	testCases := []struct {
 		name          string
+		contains      []string
+		notContains   []string
+		enableYaml    customtypes.Bool
 		expectedError error
 	}{
 		{
 			name: "Get List of Keys",
+			contains: []string{
+				options.RootColorOption.KoanfKey,
+				options.RootOutputFormatOption.KoanfKey,
+				options.ProfileDescriptionOption.KoanfKey,
+				options.PlatformExportServiceGroupOption.KoanfKey,
+				options.PingFederateAdminAPIPathOption.KoanfKey,
+				options.PingOneAuthenticationWorkerClientIDOption.KoanfKey,
+			},
+			notContains: []string{
+				options.RootActiveProfileOption.KoanfKey,
+			},
+		},
+		{
+			name:       "Get List of Keys in YAML format",
+			enableYaml: true,
+			contains: []string{
+				strings.Split(options.PlatformExportServiceGroupOption.KoanfKey, ".")[0] + ":",
+				strings.Split(options.PingFederateAdminAPIPathOption.KoanfKey, ".")[0] + ":",
+				strings.Split(options.PingOneAuthenticationWorkerClientIDOption.KoanfKey, ".")[0] + ":",
+			},
+			notContains: []string{
+				options.PlatformExportServiceGroupOption.KoanfKey,
+				options.PingFederateAdminAPIPathOption.KoanfKey,
+				options.PingOneAuthenticationWorkerClientIDOption.KoanfKey,
+				options.RootActiveProfileOption.KoanfKey,
+			},
 		},
 	}
 
@@ -24,18 +60,38 @@ func Test_RunInternalConfigListKeys(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			testutils_koanf.InitKoanfs(t)
 
+			if tc.enableYaml {
+				options.ConfigListKeysYamlOption.Flag.Changed = true
+				options.ConfigListKeysYamlOption.CobraParamValue = &tc.enableYaml
+			}
+
+			originalStdout := os.Stdout
+			r, w, _ := os.Pipe()
+			os.Stdout = w
+
+			t.Cleanup(func() {
+				os.Stdout = originalStdout
+			})
+
 			err := RunInternalConfigListKeys()
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var listKeysErr *ListKeysError
-				if errors.As(err, &listKeysErr) {
-					assert.ErrorIs(t, listKeysErr.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type ListKeysError")
-				}
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
+			}
+
+			w.Close()
+			capturedOutputBytes, _ := io.ReadAll(r)
+			capturedOutput := string(capturedOutputBytes)
+
+			for _, expected := range tc.contains {
+				assert.Contains(t, capturedOutput, expected)
+			}
+
+			for _, notExpected := range tc.notContains {
+				assert.NotContains(t, capturedOutput, notExpected)
 			}
 		})
 	}

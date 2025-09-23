@@ -11,13 +11,13 @@ import (
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
 var (
 	ErrEmptyValue                 = errors.New("the set value provided is empty. Use 'pingcli config unset %s' to unset a key's configuration")
-	ErrDetermineProfileSet        = errors.New("unable to determine profile to set configuration to")
 	ErrKeyAssignmentFormat        = errors.New("invalid key-value assignment. Expect 'key=value' format")
 	ErrActiveProfileAssignment    = errors.New("invalid active profile assignment. Please use the 'pingcli config set active-profile <profile-name>' command to set the active profile")
 	ErrSetKey                     = errors.New("unable to set key in configuration profile")
@@ -38,71 +38,52 @@ var (
 	ErrMustBeLicenseProduct       = fmt.Errorf("the value assignment must be a valid license product. Allowed [%s]", strings.Join(customtypes.LicenseProductValidValues(), ", "))
 	ErrMustBeLicenseVersion       = errors.New("the value assignment must be a valid license version. Must be of the form 'major.minor'")
 	ErrTypeNotRecognized          = errors.New("the variable type for the configuration key is not recognized or supported")
+	setErrorPrefix                = "failed to set configuration"
 )
-
-type SetError struct {
-	Err error
-}
-
-func (e *SetError) Error() string {
-	var err *SetError
-	if errors.As(e.Err, &err) {
-		return err.Error()
-	}
-	return fmt.Sprintf("failed to set configuration: %s", e.Err.Error())
-}
-
-func (e *SetError) Unwrap() error {
-	var err *SetError
-	if errors.As(e.Err, &err) {
-		return err.Unwrap()
-	}
-	return e.Err
-}
 
 func RunInternalConfigSet(kvPair string) (err error) {
 	pName, vKey, vValue, err := readConfigSetOptions(kvPair)
 	if err != nil {
-		return &SetError{Err: err}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	if err = configuration.ValidateKoanfKey(vKey); err != nil {
-		return &SetError{Err: err}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	// Make sure value is not empty, and suggest unset command if it is
 	if vValue == "" {
-		return &SetError{Err: ErrEmptyValue}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: ErrEmptyValue}
 	}
 
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return &SetError{Err: err}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	subKoanf, err := koanfConfig.GetProfileKoanf(pName)
 	if err != nil {
-		return &SetError{Err: err}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	opt, err := configuration.OptionFromKoanfKey(vKey)
 	if err != nil {
-		return &SetError{Err: err}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	if err = setValue(subKoanf, opt.KoanfKey, vValue, opt.Type); err != nil {
-		return &SetError{Err: err}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	if err = koanfConfig.SaveProfile(pName, subKoanf); err != nil {
-		return &SetError{Err: err}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	msgStr := "Configuration set successfully:\n"
 
 	vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 	if err != nil {
-		return &SetError{Err: err}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -123,11 +104,11 @@ func RunInternalConfigSet(kvPair string) (err error) {
 
 func readConfigSetOptions(kvPair string) (pName string, vKey string, vValue string, err error) {
 	if pName, err = readConfigSetProfileName(); err != nil {
-		return pName, vKey, vValue, &SetError{Err: err}
+		return pName, vKey, vValue, &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	if vKey, vValue, err = parseKeyValuePair(kvPair); err != nil {
-		return pName, vKey, vValue, &SetError{Err: err}
+		return pName, vKey, vValue, &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	return pName, vKey, vValue, nil
@@ -141,11 +122,11 @@ func readConfigSetProfileName() (pName string, err error) {
 	}
 
 	if err != nil {
-		return pName, &SetError{Err: err}
+		return pName, &errs.PingCLIError{Prefix: setErrorPrefix, Err: err}
 	}
 
 	if pName == "" {
-		return pName, &SetError{Err: ErrDetermineProfileSet}
+		return pName, &errs.PingCLIError{Prefix: setErrorPrefix, Err: ErrUndeterminedProfile}
 	}
 
 	return pName, nil
@@ -154,11 +135,11 @@ func readConfigSetProfileName() (pName string, err error) {
 func parseKeyValuePair(kvPair string) (key string, value string, err error) {
 	parsedInput := strings.SplitN(kvPair, "=", 2)
 	if len(parsedInput) < 2 {
-		return key, value, &SetError{Err: ErrKeyAssignmentFormat}
+		return key, value, &errs.PingCLIError{Prefix: setErrorPrefix, Err: ErrKeyAssignmentFormat}
 	}
 
 	if strings.EqualFold(parsedInput[0], options.RootActiveProfileOption.KoanfKey) {
-		return key, value, &SetError{Err: ErrActiveProfileAssignment}
+		return key, value, &errs.PingCLIError{Prefix: setErrorPrefix, Err: ErrActiveProfileAssignment}
 	}
 
 	return parsedInput[0], parsedInput[1], nil
@@ -311,7 +292,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 			return fmt.Errorf("%w: %v", ErrSetKey, err)
 		}
 	default:
-		return &SetError{Err: ErrTypeNotRecognized}
+		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: ErrTypeNotRecognized}
 	}
 
 	return nil

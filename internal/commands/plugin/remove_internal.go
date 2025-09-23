@@ -7,22 +7,29 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var (
+	removeErrorPrefix = "failed to remove plugin"
+)
+
 func RunInternalPluginRemove(pluginExecutable string) error {
 	if pluginExecutable == "" {
-		return fmt.Errorf("plugin executable is required")
+		return &errs.PingCLIError{Prefix: removeErrorPrefix, Err: ErrPluginNameEmpty}
 	}
 
 	ok, err := removePluginExecutable(pluginExecutable)
 	if err != nil {
-		return fmt.Errorf("failed to remove plugin: %w", err)
+		return &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 
 	if ok {
 		output.Success(fmt.Sprintf("Plugin '%s' removed.", pluginExecutable), nil)
+	} else {
+		output.Warn(fmt.Sprintf("Plugin '%s' not found in configuration and was not removed.", pluginExecutable), nil)
 	}
 
 	return nil
@@ -31,46 +38,44 @@ func RunInternalPluginRemove(pluginExecutable string) error {
 func removePluginExecutable(pluginExecutable string) (bool, error) {
 	pName, err := readPluginRemoveProfileName()
 	if err != nil {
-		return false, fmt.Errorf("failed to read profile name: %w", err)
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return false, fmt.Errorf("failed to get koanf config: %w", err)
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 
 	subKoanf, err := koanfConfig.GetProfileKoanf(pName)
 	if err != nil {
-		return false, fmt.Errorf("failed to get profile: %w", err)
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 
 	existingPluginExectuables, _, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, pName)
 	if err != nil {
-		return false, fmt.Errorf("failed to get existing plugin configuration from profile '%s': %w", pName, err)
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: fmt.Errorf("%w: %v", ErrReadPluginNamesConfig, err)}
 	}
 
 	strSlice := new(customtypes.StringSlice)
 	if err = strSlice.Set(existingPluginExectuables); err != nil {
-		return false, err
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 	removed, err := strSlice.Remove(pluginExecutable)
 	if err != nil {
-		return false, err
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 
 	if !removed {
-		output.Warn(fmt.Sprintf("plugin executable '%s' not found in profile '%s' plugins", pluginExecutable, pName), nil)
-
 		return false, nil
 	}
 
 	err = subKoanf.Set(options.PluginExecutablesOption.KoanfKey, strSlice)
 	if err != nil {
-		return false, err
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 
 	if err = koanfConfig.SaveProfile(pName, subKoanf); err != nil {
-		return false, err
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 
 	return true, nil
@@ -84,11 +89,11 @@ func readPluginRemoveProfileName() (pName string, err error) {
 	}
 
 	if err != nil {
-		return pName, err
+		return pName, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: err}
 	}
 
 	if pName == "" {
-		return pName, fmt.Errorf("unable to determine active profile")
+		return pName, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: ErrUndeterminedProfile}
 	}
 
 	return pName, nil

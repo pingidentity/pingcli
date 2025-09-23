@@ -3,46 +3,28 @@
 package config_internal
 
 import (
-	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-var ErrUndeterminedProfile = errors.New("unable to determine profile to get configuration from")
-
-type GetError struct {
-	Err error
-}
-
-func (e *GetError) Error() string {
-	var err *GetError
-	if errors.As(e.Err, &err) {
-		return err.Error()
-	}
-	return fmt.Sprintf("failed to get configuration: %s", e.Err.Error())
-}
-
-func (e *GetError) Unwrap() error {
-	var err *GetError
-	if errors.As(e.Err, &err) {
-		return err.Unwrap()
-	}
-	return e.Err
-}
+var (
+	getErrorPrefix = "failed to get configuration"
+)
 
 func RunInternalConfigGet(koanfKey string) (err error) {
 	if err = configuration.ValidateParentKoanfKey(koanfKey); err != nil {
-		return &GetError{Err: err}
+		return &errs.PingCLIError{Prefix: getErrorPrefix, Err: err}
 	}
 
 	pName, err := readConfigGetOptions()
 	if err != nil {
-		return &GetError{Err: err}
+		return &errs.PingCLIError{Prefix: getErrorPrefix, Err: err}
 	}
 
 	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", pName, koanfKey)
@@ -60,7 +42,7 @@ func RunInternalConfigGet(koanfKey string) (err error) {
 
 		vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 		if err != nil {
-			return &GetError{Err: err}
+			return &errs.PingCLIError{Prefix: getErrorPrefix, Err: err}
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -88,11 +70,11 @@ func readConfigGetOptions() (pName string, err error) {
 	}
 
 	if err != nil {
-		return pName, &GetError{Err: err}
+		return pName, &errs.PingCLIError{Prefix: getErrorPrefix, Err: err}
 	}
 
 	if pName == "" {
-		return pName, &GetError{Err: ErrUndeterminedProfile}
+		return pName, &errs.PingCLIError{Prefix: getErrorPrefix, Err: ErrUndeterminedProfile}
 	}
 
 	return pName, nil

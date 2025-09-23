@@ -3,12 +3,12 @@
 package config_internal
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalConfigViewProfile(t *testing.T) {
@@ -44,13 +44,8 @@ func Test_RunInternalConfigViewProfile(t *testing.T) {
 			err := RunInternalConfigViewProfile(tc.profileName)
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var viewError *ViewProfileError
-				if errors.As(err, &viewError) {
-					assert.ErrorIs(t, viewError.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type ViewProfileError")
-				}
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}

@@ -3,11 +3,11 @@
 package config_internal
 
 import (
-	"errors"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalConfigListProfiles(t *testing.T) {
@@ -27,13 +27,8 @@ func Test_RunInternalConfigListProfiles(t *testing.T) {
 			err := RunInternalConfigListProfiles()
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var listProfilesErr *ListProfilesError
-				if errors.As(err, &listProfilesErr) {
-					assert.ErrorIs(t, listProfilesErr.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type ListProfilesError")
-				}
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}

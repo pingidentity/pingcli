@@ -3,13 +3,13 @@
 package config_internal
 
 import (
-	"errors"
 	"os"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalConfigSetActiveProfile(t *testing.T) {
@@ -50,13 +50,8 @@ func Test_RunInternalConfigSetActiveProfile(t *testing.T) {
 			err := RunInternalConfigSetActiveProfile([]string{tc.profileName}, os.Stdin)
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var setActiveProfileErr *SetActiveProfileError
-				if errors.As(err, &setActiveProfileErr) {
-					assert.ErrorIs(t, setActiveProfileErr.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type SetActiveProfileError")
-				}
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}

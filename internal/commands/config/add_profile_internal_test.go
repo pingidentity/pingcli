@@ -3,7 +3,6 @@
 package config_internal
 
 import (
-	"errors"
 	"os"
 	"testing"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalConfigAddProfile(t *testing.T) {
@@ -20,6 +20,7 @@ func Test_RunInternalConfigAddProfile(t *testing.T) {
 		profileName   customtypes.String
 		description   customtypes.String
 		setActive     customtypes.Bool
+		setKoanfNil   bool
 		expectedError error
 	}{
 		{
@@ -46,13 +47,25 @@ func Test_RunInternalConfigAddProfile(t *testing.T) {
 			profileName:   "",
 			description:   "test-description",
 			setActive:     customtypes.Bool(false),
-			expectedError: ErrProfileNameNotProvided,
+			expectedError: ErrNoProfileProvided,
+		},
+		{
+			name:          "Koanf Not Initialized",
+			profileName:   "new-profile",
+			description:   "test-description",
+			setActive:     customtypes.Bool(false),
+			setKoanfNil:   true,
+			expectedError: ErrKoanfNotInitialized,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			testutils_koanf.InitKoanfs(t)
+			koanfConfig := testutils_koanf.InitKoanfs(t)
+
+			if tc.setKoanfNil {
+				koanfConfig = nil
+			}
 
 			options.ConfigAddProfileNameOption.Flag.Changed = true
 			options.ConfigAddProfileNameOption.CobraParamValue = &tc.profileName
@@ -63,16 +76,11 @@ func Test_RunInternalConfigAddProfile(t *testing.T) {
 			options.ConfigAddProfileSetActiveOption.Flag.Changed = true
 			options.ConfigAddProfileSetActiveOption.CobraParamValue = &tc.setActive
 
-			err := RunInternalConfigAddProfile(os.Stdin)
+			err := RunInternalConfigAddProfile(os.Stdin, koanfConfig)
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var addProfileErr *AddProfileError
-				if errors.As(err, &addProfileErr) {
-					assert.ErrorIs(t, addProfileErr.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type AddProfileError")
-				}
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}

@@ -3,7 +3,6 @@
 package config_internal
 
 import (
-	"errors"
 	"os"
 	"testing"
 
@@ -12,6 +11,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_RunInternalConfigDeleteProfile(t *testing.T) {
@@ -62,13 +62,8 @@ func Test_RunInternalConfigDeleteProfile(t *testing.T) {
 			err := RunInternalConfigDeleteProfile([]string{tc.profileName}, os.Stdin)
 
 			if tc.expectedError != nil {
-				assert.Error(t, err)
-				var deleteProfileErr *DeleteProfileError
-				if errors.As(err, &deleteProfileErr) {
-					assert.ErrorIs(t, deleteProfileErr.Unwrap(), tc.expectedError)
-				} else {
-					assert.Fail(t, "Expected error to be of type DeleteProfileError")
-				}
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
 			} else {
 				assert.NoError(t, err)
 			}

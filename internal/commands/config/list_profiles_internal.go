@@ -3,45 +3,27 @@
 package config_internal
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/fatih/color"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-type ListProfilesError struct {
-	Err error
-}
-
-func (e *ListProfilesError) Error() string {
-	var err *ListProfilesError
-	if errors.As(e.Err, &err) {
-		return err.Error()
-	}
-	return fmt.Sprintf("failed to list profiles: %s", e.Err.Error())
-}
-
-func (e *ListProfilesError) Unwrap() error {
-	var err *ListProfilesError
-	if errors.As(e.Err, &err) {
-		return err.Unwrap()
-	}
-	return e.Err
-}
+var (
+	listProfilesErrorPrefix = "failed to list profiles"
+)
 
 func RunInternalConfigListProfiles() (err error) {
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return &ListProfilesError{Err: err}
+		return &errs.PingCLIError{Prefix: listProfilesErrorPrefix, Err: err}
 	}
 
 	profileNames := koanfConfig.ProfileNames()
 	activeProfileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
-		return &ListProfilesError{Err: err}
+		return &errs.PingCLIError{Prefix: listProfilesErrorPrefix, Err: err}
 	}
 
 	listStr := "Profiles:\n"
