@@ -30,7 +30,8 @@ func GenerateMarkdown() string {
 		if strings.Contains(option.KoanfKey, ".") {
 			category = strings.Split(option.KoanfKey, ".")[0]
 		}
-		propertyCategoryInformation[category] = append(propertyCategoryInformation[category], fmt.Sprintf("| %s | %d | %s | %s |", option.KoanfKey, option.Type, flagInfo, usageString))
+		// New column order: Config Key | Equivalent Parameter | Environment Variable | Type | Purpose
+		propertyCategoryInformation[category] = append(propertyCategoryInformation[category], fmt.Sprintf("| %s | %s | %s | %d | %s |", option.KoanfKey, flagInfo, formatEnvVar(option.EnvVar), option.Type, usageString))
 	}
 	var outputBuilder strings.Builder
 	cats := make([]string, 0, len(propertyCategoryInformation))
@@ -42,8 +43,8 @@ func GenerateMarkdown() string {
 		properties := propertyCategoryInformation[category]
 		slices.Sort(properties)
 		outputBuilder.WriteString(fmt.Sprintf("#### %s Properties\n\n", category))
-		outputBuilder.WriteString("| Config File Property | Type | Equivalent Parameter | Purpose |\n")
-		outputBuilder.WriteString("|---|---|---|---|\n")
+		outputBuilder.WriteString("| Config File Property | Equivalent Parameter | Environment Variable | Type | Purpose |\n")
+		outputBuilder.WriteString("|---|---|---|---|---|\n")
 		for _, property := range properties {
 			outputBuilder.WriteString(property + "\n")
 		}
@@ -106,14 +107,16 @@ func GenerateAsciiDocWithDates(created, revdate string) string {
 			continue
 		}
 		b.WriteString("== " + sec.title + "\n\n")
-		b.WriteString("[cols=\"2,1,2,2\"]\n|===\n")
-		b.WriteString("|Configuration Key |Data Type |Equivalent Parameter |Purpose\n\n")
+		// Column order updated: Configuration Key | Equivalent Parameter | Environment Variable | Data Type | Purpose
+		b.WriteString("[cols=\"2,2,2,1,3\"]\n|===\n")
+		b.WriteString("|Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose\n\n")
 		for _, opt := range opts {
 			key := normalizeAsciiDocKey(opt.KoanfKey)
 			dataType := asciiDocDataType(opt)
 			eqParam := asciiDocEquivalentParameter(opt)
+			envVar := opt.EnvVar
 			purpose := sanitizeUsage(opt)
-			b.WriteString(fmt.Sprintf("| `%s` | %s | %s | %s\n", key, dataType, eqParam, purpose))
+			b.WriteString(fmt.Sprintf("| `%s` | %s | %s | %s | %s\n", key, eqParam, formatEnvVar(envVar), dataType, purpose))
 		}
 		b.WriteString("|===\n\n")
 	}
@@ -182,4 +185,10 @@ func normalizeAsciiDocKey(key string) string {
 	key = strings.ReplaceAll(key, "PEMFiles", "PemFiles")
 
 	return key
+}
+
+// formatEnvVar returns the environment variable name or an empty string if not set.
+// This indirection keeps table generation simpler and allows future formatting changes.
+func formatEnvVar(s string) string {
+	return strings.TrimSpace(s)
 }

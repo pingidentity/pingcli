@@ -9,77 +9,77 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 
 == General Properties
 
-[cols="2,1,2,2"]
+[cols="2,2,2,1,3"]
 |===
-|Configuration Key |Data Type |Equivalent Parameter |Purpose
+|Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose
 
-| `activeProfile` | String |  | 
-| `description` | String |  | 
-| `detailedExitCode` | Boolean | `--detailed-exitcode` / `-D` | Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings.
-| `noColor` | Boolean | `--no-color` | Disable text output in color. (default false)
-| `outputFormat` | String (Enum) | `--output-format` / `-O` | Specify the console output format. (default text) Options are: json, text.
-| `plugins` | String Array |  | 
+| `activeProfile` |  |  | String | 
+| `description` |  |  | String | 
+| `detailedExitCode` | `--detailed-exitcode` / `-D` | PINGCLI_DETAILED_EXITCODE | Boolean | Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings.
+| `noColor` | `--no-color` | PINGCLI_NO_COLOR | Boolean | Disable text output in color. (default false)
+| `outputFormat` | `--output-format` / `-O` | PINGCLI_OUTPUT_FORMAT | String (Enum) | Specify the console output format. (default text) Options are: json, text.
+| `plugins` |  |  | String Array | 
 |===
 
 == Ping Identity platform service properties
 
-[cols="2,1,2,2"]
+[cols="2,2,2,1,3"]
 |===
-|Configuration Key |Data Type |Equivalent Parameter |Purpose
+|Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose
 
-| `service.pingfederate.adminAPIPath` | String | `--pingfederate-admin-api-path` | The PingFederate API URL path used to communicate with PingFederate's admin API. (default /pf-admin-api/v1)
-| `service.pingfederate.authentication.accessTokenAuth.accessToken` | String | `--pingfederate-access-token` | The PingFederate access token used to authenticate to the PingFederate admin API when using a custom OAuth 2.0 token method.
-| `service.pingfederate.authentication.basicAuth.password` | String | `--pingfederate-password` | The PingFederate password used to authenticate to the PingFederate admin API when using basic authentication.
-| `service.pingfederate.authentication.basicAuth.username` | String | `--pingfederate-username` | The PingFederate username used to authenticate to the PingFederate admin API when using basic authentication. Example: 'administrator'
-| `service.pingfederate.authentication.clientCredentialsAuth.clientID` | String | `--pingfederate-client-id` | The PingFederate OAuth client ID used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
-| `service.pingfederate.authentication.clientCredentialsAuth.clientSecret` | String | `--pingfederate-client-secret` | The PingFederate OAuth client secret used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
-| `service.pingfederate.authentication.clientCredentialsAuth.scopes` | String Array | `--pingfederate-scopes` | The PingFederate OAuth scopes used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type. (default []) Accepts a comma-separated string to delimit multiple scopes. Example: 'openid,profile'
-| `service.pingfederate.authentication.clientCredentialsAuth.tokenURL` | String | `--pingfederate-token-url` | The PingFederate OAuth token URL used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
-| `service.pingfederate.authentication.type` | String (Enum) | `--pingfederate-authentication-type` | The authentication type to use when connecting to the PingFederate admin API. Options are: accessTokenAuth, basicAuth, clientCredentialsAuth. Example: 'basicAuth'
-| `service.pingfederate.caCertificatePemFiles` | String Array | `--pingfederate-ca-certificate-pem-files` | Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS. (default []) Accepts a comma-separated string to delimit multiple PEM files.
-| `service.pingfederate.httpsHost` | String | `--pingfederate-https-host` | The PingFederate HTTPS host used to communicate with PingFederate's admin API. Example: 'https://pingfederate-admin.bxretail.org'
-| `service.pingfederate.insecureTrustAllTLS` | Boolean | `--pingfederate-insecure-trust-all-tls` | Trust any certificate when connecting to the PingFederate server admin API. (default false) This is insecure and shouldn't be enabled outside of testing.
-| `service.pingfederate.xBypassExternalValidationHeader` | Boolean | `--pingfederate-x-bypass-external-validation-header` | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false)
-| `service.pingone.authentication.type` | String (Enum) | `--pingone-authentication-type` | The authentication type to use to authenticate to the PingOne management API. (default worker) Options are: worker.
-| `service.pingone.authentication.worker.clientID` | String (UUID Format) | `--pingone-worker-client-id` | The worker client ID used to authenticate to the PingOne management API.
-| `service.pingone.authentication.worker.clientSecret` | String | `--pingone-worker-client-secret` | The worker client secret used to authenticate to the PingOne management API.
-| `service.pingone.authentication.worker.environmentID` | String (UUID Format) | `--pingone-worker-environment-id` | The ID of the PingOne environment that contains the worker client used to authenticate to the PingOne management API.
-| `service.pingone.regionCode` | String (Enum) | `--pingone-region-code` | The region code of the PingOne tenant. Options are: AP, AU, CA, EU, NA. Example: 'NA'
+| `service.pingfederate.adminAPIPath` | `--pingfederate-admin-api-path` | PINGCLI_PINGFEDERATE_ADMIN_API_PATH | String | The PingFederate API URL path used to communicate with PingFederate's admin API. (default /pf-admin-api/v1)
+| `service.pingfederate.authentication.accessTokenAuth.accessToken` | `--pingfederate-access-token` | PINGCLI_PINGFEDERATE_ACCESS_TOKEN | String | The PingFederate access token used to authenticate to the PingFederate admin API when using a custom OAuth 2.0 token method.
+| `service.pingfederate.authentication.basicAuth.password` | `--pingfederate-password` | PINGCLI_PINGFEDERATE_PASSWORD | String | The PingFederate password used to authenticate to the PingFederate admin API when using basic authentication.
+| `service.pingfederate.authentication.basicAuth.username` | `--pingfederate-username` | PINGCLI_PINGFEDERATE_USERNAME | String | The PingFederate username used to authenticate to the PingFederate admin API when using basic authentication. Example: 'administrator'
+| `service.pingfederate.authentication.clientCredentialsAuth.clientID` | `--pingfederate-client-id` | PINGCLI_PINGFEDERATE_CLIENT_ID | String | The PingFederate OAuth client ID used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
+| `service.pingfederate.authentication.clientCredentialsAuth.clientSecret` | `--pingfederate-client-secret` | PINGCLI_PINGFEDERATE_CLIENT_SECRET | String | The PingFederate OAuth client secret used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
+| `service.pingfederate.authentication.clientCredentialsAuth.scopes` | `--pingfederate-scopes` | PINGCLI_PINGFEDERATE_SCOPES | String Array | The PingFederate OAuth scopes used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type. (default []) Accepts a comma-separated string to delimit multiple scopes. Example: 'openid,profile'
+| `service.pingfederate.authentication.clientCredentialsAuth.tokenURL` | `--pingfederate-token-url` | PINGCLI_PINGFEDERATE_TOKEN_URL | String | The PingFederate OAuth token URL used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
+| `service.pingfederate.authentication.type` | `--pingfederate-authentication-type` | PINGCLI_PINGFEDERATE_AUTHENTICATION_TYPE | String (Enum) | The authentication type to use when connecting to the PingFederate admin API. Options are: accessTokenAuth, basicAuth, clientCredentialsAuth. Example: 'basicAuth'
+| `service.pingfederate.caCertificatePemFiles` | `--pingfederate-ca-certificate-pem-files` | PINGCLI_PINGFEDERATE_CA_CERTIFICATE_PEM_FILES | String Array | Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS. (default []) Accepts a comma-separated string to delimit multiple PEM files.
+| `service.pingfederate.httpsHost` | `--pingfederate-https-host` | PINGCLI_PINGFEDERATE_HTTPS_HOST | String | The PingFederate HTTPS host used to communicate with PingFederate's admin API. Example: 'https://pingfederate-admin.bxretail.org'
+| `service.pingfederate.insecureTrustAllTLS` | `--pingfederate-insecure-trust-all-tls` | PINGCLI_PINGFEDERATE_INSECURE_TRUST_ALL_TLS | Boolean | Trust any certificate when connecting to the PingFederate server admin API. (default false) This is insecure and shouldn't be enabled outside of testing.
+| `service.pingfederate.xBypassExternalValidationHeader` | `--pingfederate-x-bypass-external-validation-header` | PINGCLI_PINGFEDERATE_X_BYPASS_EXTERNAL_VALIDATION_HEADER | Boolean | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false)
+| `service.pingone.authentication.type` | `--pingone-authentication-type` | PINGCLI_PINGONE_AUTHENTICATION_TYPE | String (Enum) | The authentication type to use to authenticate to the PingOne management API. (default worker) Options are: worker.
+| `service.pingone.authentication.worker.clientID` | `--pingone-worker-client-id` | PINGCLI_PINGONE_WORKER_CLIENT_ID | String (UUID Format) | The worker client ID used to authenticate to the PingOne management API.
+| `service.pingone.authentication.worker.clientSecret` | `--pingone-worker-client-secret` | PINGCLI_PINGONE_WORKER_CLIENT_SECRET | String | The worker client secret used to authenticate to the PingOne management API.
+| `service.pingone.authentication.worker.environmentID` | `--pingone-worker-environment-id` | PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID | String (UUID Format) | The ID of the PingOne environment that contains the worker client used to authenticate to the PingOne management API.
+| `service.pingone.regionCode` | `--pingone-region-code` | PINGCLI_PINGONE_REGION_CODE | String (Enum) | The region code of the PingOne tenant. Options are: AP, AU, CA, EU, NA. Example: 'NA'
 |===
 
 == Platform export properties
 
-[cols="2,1,2,2"]
+[cols="2,2,2,1,3"]
 |===
-|Configuration Key |Data Type |Equivalent Parameter |Purpose
+|Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose
 
-| `export.format` | String (Enum) | `--format` / `-f` | Specifies the export format. (default HCL) Options are: HCL.
-| `export.outputDirectory` | String | `--output-directory` / `-d` | Specifies the output directory for export. Can be an absolute filepath or a relative filepath of the present working directory.  Example: '/Users/example/pingcli-export' Example: 'pingcli-export'
-| `export.overwrite` | Boolean | `--overwrite` / `-o` | Overwrites the existing generated exports in output directory. (default false)
-| `export.pingone.environmentID` | String (UUID Format) | `--pingone-export-environment-id` | The ID of the PingOne environment to export. Must be a valid PingOne UUID.
-| `export.serviceGroup` | String (Enum) | `--service-group` / `-g` | Specifies the service group to export.  Options are: pingone. Example: 'pingone'
-| `export.services` | String Array | `--services` / `-s` | Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services.  Options are: pingfederate, pingone-authorize, pingone-mfa, pingone-platform, pingone-protect, pingone-sso. Example: 'pingone-sso,pingone-mfa,pingfederate'
+| `export.format` | `--format` / `-f` | PINGCLI_EXPORT_FORMAT | String (Enum) | Specifies the export format. (default HCL) Options are: HCL.
+| `export.outputDirectory` | `--output-directory` / `-d` | PINGCLI_EXPORT_OUTPUT_DIRECTORY | String | Specifies the output directory for export. Can be an absolute filepath or a relative filepath of the present working directory.  Example: '/Users/example/pingcli-export' Example: 'pingcli-export'
+| `export.overwrite` | `--overwrite` / `-o` | PINGCLI_EXPORT_OVERWRITE | Boolean | Overwrites the existing generated exports in output directory. (default false)
+| `export.pingone.environmentID` | `--pingone-export-environment-id` | PINGCLI_PINGONE_EXPORT_ENVIRONMENT_ID | String (UUID Format) | The ID of the PingOne environment to export. Must be a valid PingOne UUID.
+| `export.serviceGroup` | `--service-group` / `-g` | PINGCLI_EXPORT_SERVICE_GROUP | String (Enum) | Specifies the service group to export.  Options are: pingone. Example: 'pingone'
+| `export.services` | `--services` / `-s` | PINGCLI_EXPORT_SERVICES | String Array | Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services.  Options are: pingfederate, pingone-authorize, pingone-mfa, pingone-platform, pingone-protect, pingone-sso. Example: 'pingone-sso,pingone-mfa,pingfederate'
 |===
 
 == License properties
 
-[cols="2,1,2,2"]
+[cols="2,2,2,1,3"]
 |===
-|Configuration Key |Data Type |Equivalent Parameter |Purpose
+|Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose
 
-| `license.devopsKey` | String | `--devops-key` / `-k` | The DevOps key for the license request.   See https://developer.pingidentity.com/devops/how-to/devopsRegistration.html on how to register a DevOps user.   You can save the DevOps user and key in your profile using the 'pingcli config' commands.
-| `license.devopsUser` | String | `--devops-user` / `-u` | The DevOps user for the license request.   See https://developer.pingidentity.com/devops/how-to/devopsRegistration.html on how to register a DevOps user.   You can save the DevOps user and key in your profile using the 'pingcli config' commands.
+| `license.devopsKey` | `--devops-key` / `-k` | PINGCLI_LICENSE_DEVOPS_KEY | String | The DevOps key for the license request.   See https://developer.pingidentity.com/devops/how-to/devopsRegistration.html on how to register a DevOps user.   You can save the DevOps user and key in your profile using the 'pingcli config' commands.
+| `license.devopsUser` | `--devops-user` / `-u` | PINGCLI_LICENSE_DEVOPS_USER | String | The DevOps user for the license request.   See https://developer.pingidentity.com/devops/how-to/devopsRegistration.html on how to register a DevOps user.   You can save the DevOps user and key in your profile using the 'pingcli config' commands.
 |===
 
 == Custom request properties
 
-[cols="2,1,2,2"]
+[cols="2,2,2,1,3"]
 |===
-|Configuration Key |Data Type |Equivalent Parameter |Purpose
+|Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose
 
-| `request.accessToken` | String |  | 
-| `request.accessTokenExpiry` | Integer |  | 
-| `request.fail` | Boolean | `--fail` / `-f` | Return non-zero exit code when HTTP custom request returns a failure status code.
-| `request.service` | String (Enum) | `--service` / `-s` | The Ping service (configured in the active profile) to send the custom request to. Options are: pingone. Example: 'pingone'
+| `request.accessToken` |  |  | String | 
+| `request.accessTokenExpiry` |  |  | Integer | 
+| `request.fail` | `--fail` / `-f` |  | Boolean | Return non-zero exit code when HTTP custom request returns a failure status code.
+| `request.service` | `--service` / `-s` | PINGCLI_REQUEST_SERVICE | String (Enum) | The Ping service (configured in the active profile) to send the custom request to. Options are: pingone. Example: 'pingone'
 |===
 
