@@ -126,6 +126,7 @@ dnf install ./pingcli_<version>_linux_arm64.rpm
 ```
 
 > **_NOTE:_**
+
 > - Use `yum` for CentOS/RHEL 7 and earlier, and for older Fedora systems.
 > - Use `dnf` for Fedora 22+ and CentOS/RHEL 8+.
 > Both commands achieve the same result; use the one appropriate for your distribution.
@@ -229,7 +230,6 @@ See [Autocompletion Documentation](./docs/autocompletion/autocompletion.md) for 
 Documentation generation instructions (configuration options reference, per-command pages, navigation, rebuild workflow, and golden test usage) have moved to a dedicated guide:
 
 See: `tools/README_DocumentGeneration.md`
-
 
 ## Commands
 
