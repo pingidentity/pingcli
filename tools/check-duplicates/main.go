@@ -68,6 +68,11 @@ var ignoreFiles = regexp.MustCompile(`_test\.go$`)
 func main() {
 	// Map: bodyHash -> list of locations (file:functionName)
 	funcMap := map[string][]string{}
+	// Collect non-fatal per-file errors (I/O, parse) to report after traversal.
+	var errs []string
+	// Counters for summary
+	var filesScanned int
+	var funcsHashed int
 	err := filepath.WalkDir(".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil || d.IsDir() {
 			return err
@@ -78,7 +83,12 @@ func main() {
 		if !withinIncluded(path) {
 			return nil
 		}
-		addFile(path, funcMap)
+		filesScanned++
+		if n, e := addFile(path, funcMap); e != nil {
+			errs = append(errs, fmt.Sprintf("%s: %v", path, e))
+		} else {
+			funcsHashed += n
+		}
 
 		return nil
 	})
@@ -99,12 +109,27 @@ func main() {
 		}
 	}
 
+	// Print summary and detailed output
+	fmt.Println("Summary:")
+	fmt.Printf("  Files scanned:    %d\n", filesScanned)
+	fmt.Printf("  Functions hashed: %d\n", funcsHashed)
+	fmt.Printf("  Duplicate pairs:  %d\n", len(collisions))
+	fmt.Printf("  Errors:           %d\n", len(errs))
+
+	if len(errs) > 0 {
+		fmt.Println("\nErrors during analysis:")
+		for _, e := range errs {
+			fmt.Println("  -", e)
+		}
+		os.Exit(1)
+	}
+
 	if len(collisions) == 0 {
-		fmt.Println("No duplicate functions found.")
+		fmt.Println("\nNo duplicate functions found.")
 
 		return
 	}
-	fmt.Println("Duplicate functions detected:")
+	fmt.Println("\nDuplicate functions detected:")
 	for _, c := range collisions {
 		fmt.Printf("  - %s == %s\n", c[0], c[1])
 	}
@@ -123,31 +148,33 @@ func withinIncluded(path string) bool {
 }
 
 // addFile parses a Go file, hashes each function body, and records its location under that hash key.
-func addFile(path string, funcMap map[string][]string) {
+// addFile returns the number of function bodies hashed from the file and any error encountered.
+func addFile(path string, funcMap map[string][]string) (int, error) {
 	// Sanitize and restrict the path before opening (addresses gosec G304 false positive).
 	clean := filepath.Clean(path)
 	if filepath.IsAbs(clean) || strings.Contains(clean, "..") {
-		return // reject unexpected absolute or parent traversals
+		return 0, nil // reject unexpected absolute or parent traversals
 	}
 	if !withinIncluded(clean) || !strings.HasSuffix(clean, ".go") || ignoreFiles.MatchString(clean) {
-		return
+		return 0, nil
 	}
 
 	f, err := os.Open(clean) // #nosec G304: path origin is controlled by WalkDir + allowlist + sanitization above
 	if err != nil {
-		return // Silent skip; traversal reports aggregate errors only.
+		return 0, fmt.Errorf("open: %w", err)
 	}
 	defer func() { _ = f.Close() }()
 	src, err := io.ReadAll(f)
 	if err != nil {
-		return
+		return 0, fmt.Errorf("read: %w", err)
 	}
 
 	fset := token.NewFileSet()
 	parsed, err := parser.ParseFile(fset, clean, src, parser.ParseComments)
 	if err != nil {
-		return // Skip unreadable / invalid Go sources.
+		return 0, fmt.Errorf("parse: %w", err)
 	}
+	var count int
 	for _, d := range parsed.Decls {
 		fd, ok := d.(*ast.FuncDecl)
 		if !ok || fd.Body == nil { // Skip declarations without bodies (interfaces, externs).
@@ -161,7 +188,10 @@ func addFile(path string, funcMap map[string][]string) {
 		key := fmt.Sprintf("%x", h)
 		loc := fmt.Sprintf("%s:%s", clean, fd.Name.Name)
 		funcMap[key] = append(funcMap[key], loc)
+		count++
 	}
+
+	return count, nil
 }
 
 // normalize reduces insignificant differences in the AST statement dump so that
