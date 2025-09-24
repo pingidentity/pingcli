@@ -60,6 +60,8 @@ func Test_RunInternalPluginAdd(t *testing.T) {
 }
 
 func createGoldenPlugin(t *testing.T) string {
+	t.Helper()
+
 	pathDir := t.TempDir()
 	t.Setenv("PATH", pathDir)
 

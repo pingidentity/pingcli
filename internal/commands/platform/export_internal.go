@@ -174,7 +174,7 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		if err != nil {
 			return &errs.PingCLIError{
 				Prefix: exportErrorPrefix,
-				Err:    fmt.Errorf("%w '%s': %v", ErrReadCaCertPemFile, caCertPemFile, err),
+				Err:    fmt.Errorf("%w '%s': %w", ErrReadCaCertPemFile, caCertPemFile, err),
 			}
 		}
 
@@ -182,7 +182,7 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		if !ok {
 			return &errs.PingCLIError{
 				Prefix: exportErrorPrefix,
-				Err:    fmt.Errorf("%w '%s': %v", ErrAppendToCertPool, caCertPemFile, err),
+				Err:    fmt.Errorf("%w '%s': %w", ErrAppendToCertPool, caCertPemFile, err),
 			}
 		}
 	}
@@ -400,7 +400,7 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
-		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: %v", ErrPingOneInit, err)}
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: %w", ErrPingOneInit, err)}
 	}
 
 	return nil
@@ -418,7 +418,7 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 	if !filepath.IsAbs(outputDir) {
 		pwd, err := os.Getwd()
 		if err != nil {
-			return resolvedOutputDir, &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: %v", ErrGetPresentWorkingDirectory, err)}
+			return resolvedOutputDir, &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetPresentWorkingDirectory, err)}
 		}
 
 		outputDir = filepath.Join(pwd, outputDir)
@@ -433,7 +433,7 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 
 		err = os.MkdirAll(outputDir, os.FileMode(0700))
 		if err != nil {
-			return resolvedOutputDir, &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %v", ErrCreateOutputDirectory, outputDir, err)}
+			return resolvedOutputDir, &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrCreateOutputDirectory, outputDir, err)}
 		}
 
 		output.Success(fmt.Sprintf("Output directory '%s' created", outputDir), nil)
@@ -443,7 +443,7 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 		// This can be changed with the --overwrite export parameter
 		dirEntries, err := os.ReadDir(outputDir)
 		if err != nil {
-			return resolvedOutputDir, &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %v", ErrReadOutputDirectory, outputDir, err)}
+			return resolvedOutputDir, &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrReadOutputDirectory, outputDir, err)}
 		}
 
 		if len(dirEntries) > 0 {
@@ -493,7 +493,7 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
 	}
 	if !ok {
-		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s'", ErrValidatePingOneEnvId, pingoneExportEnvID)}
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrValidatePingOneEnvId, pingoneExportEnvID)}
 	}
 
 	if environment == nil {
@@ -544,7 +544,7 @@ func exportConnectors(exportableConnectors *[]connector.Exportable, exportFormat
 
 		err := connector.Export(exportFormat, outputDir, overwriteExport)
 		if err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %v", ErrExportService, connector.ConnectorServiceName(), err)}
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrExportService, connector.ConnectorServiceName(), err)}
 		}
 	}
 

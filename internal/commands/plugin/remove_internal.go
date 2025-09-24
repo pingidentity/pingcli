@@ -53,7 +53,7 @@ func removePluginExecutable(pluginExecutable string) (bool, error) {
 
 	existingPluginExectuables, _, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, pName)
 	if err != nil {
-		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: fmt.Errorf("%w: %v", ErrReadPluginNamesConfig, err)}
+		return false, &errs.PingCLIError{Prefix: removeErrorPrefix, Err: fmt.Errorf("%w: %w", ErrReadPluginNamesConfig, err)}
 	}
 
 	strSlice := new(customtypes.StringSlice)

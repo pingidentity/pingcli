@@ -270,11 +270,10 @@ func setupTestCase(t *testing.T, tc testCase) {
 		originalWd, err := os.Getwd()
 		require.NoError(t, err)
 
-		err = os.Chdir(t.TempDir())
-		require.NoError(t, err)
+		t.Chdir(t.TempDir())
 
 		t.Cleanup(func() {
-			require.NoError(t, os.Chdir(originalWd))
+			t.Chdir(originalWd)
 		})
 	}
 
@@ -323,7 +322,7 @@ func createUnwriteableDir(t *testing.T) string {
 	t.Helper()
 
 	dir := t.TempDir()
-	err := os.Chmod(dir, 0444) // read-only
+	err := os.Chmod(dir, 0400) // read-only
 	require.NoError(t, err)
 
 	return fmt.Sprintf("%s/subdir", dir)

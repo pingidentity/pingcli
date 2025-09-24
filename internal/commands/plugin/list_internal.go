@@ -19,10 +19,11 @@ var (
 func RunInternalPluginList() error {
 	existingPluginExectuables, ok, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, "")
 	if err != nil {
-		return &errs.PingCLIError{Prefix: listErrorPrefix, Err: fmt.Errorf("%w: %v", ErrReadPluginNamesConfig, err)}
+		return &errs.PingCLIError{Prefix: listErrorPrefix, Err: fmt.Errorf("%w: %w", ErrReadPluginNamesConfig, err)}
 	}
 	if !ok {
 		output.Message("No plugins configured.", nil)
+
 		return nil
 	}
 

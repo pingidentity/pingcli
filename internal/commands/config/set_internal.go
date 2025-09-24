@@ -150,146 +150,146 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 	case options.BOOL:
 		b := new(customtypes.Bool)
 		if err = b.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeBoolean, err)
+			return fmt.Errorf("%w: %w", ErrMustBeBoolean, err)
 		}
 		err = profileKoanf.Set(vKey, b)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.EXPORT_FORMAT:
 		exportFormat := new(customtypes.ExportFormat)
 		if err = exportFormat.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeExportFormat, err)
+			return fmt.Errorf("%w: %w", ErrMustBeExportFormat, err)
 		}
 		err = profileKoanf.Set(vKey, exportFormat)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.EXPORT_SERVICE_GROUP:
 		exportServiceGroup := new(customtypes.ExportServiceGroup)
 		if err = exportServiceGroup.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeExportServiceGroup, err)
+			return fmt.Errorf("%w: %w", ErrMustBeExportServiceGroup, err)
 		}
 		err = profileKoanf.Set(vKey, exportServiceGroup)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.EXPORT_SERVICES:
 		exportServices := new(customtypes.ExportServices)
 		if err = exportServices.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeExportService, err)
+			return fmt.Errorf("%w: %w", ErrMustBeExportService, err)
 		}
 		err = profileKoanf.Set(vKey, exportServices)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.OUTPUT_FORMAT:
 		outputFormat := new(customtypes.OutputFormat)
 		if err = outputFormat.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeOutputFormat, err)
+			return fmt.Errorf("%w: %w", ErrMustBeOutputFormat, err)
 		}
 		err = profileKoanf.Set(vKey, outputFormat)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.PINGONE_REGION_CODE:
 		region := new(customtypes.PingOneRegionCode)
 		if err = region.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBePingoneRegionCode, err)
+			return fmt.Errorf("%w: %w", ErrMustBePingoneRegionCode, err)
 		}
 		err = profileKoanf.Set(vKey, region)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.STRING:
 		str := new(customtypes.String)
 		if err = str.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeString, err)
+			return fmt.Errorf("%w: %w", ErrMustBeString, err)
 		}
 		err = profileKoanf.Set(vKey, str)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.STRING_SLICE:
 		strSlice := new(customtypes.StringSlice)
 		if err = strSlice.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeStringSlice, err)
+			return fmt.Errorf("%w: %w", ErrMustBeStringSlice, err)
 		}
 		err = profileKoanf.Set(vKey, strSlice)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.UUID:
 		uuid := new(customtypes.UUID)
 		if err = uuid.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeUUID, err)
+			return fmt.Errorf("%w: %w", ErrMustBeUUID, err)
 		}
 		err = profileKoanf.Set(vKey, uuid)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.PINGONE_AUTH_TYPE:
 		authType := new(customtypes.PingOneAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBePingoneAuthType, err)
+			return fmt.Errorf("%w: %w", ErrMustBePingoneAuthType, err)
 		}
 		err = profileKoanf.Set(vKey, authType)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.PINGFEDERATE_AUTH_TYPE:
 		authType := new(customtypes.PingFederateAuthenticationType)
 		if err = authType.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBePingfederateAuthType, err)
+			return fmt.Errorf("%w: %w", ErrMustBePingfederateAuthType, err)
 		}
 		err = profileKoanf.Set(vKey, authType)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.INT:
 		intValue := new(customtypes.Int)
 		if err = intValue.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeInteger, err)
+			return fmt.Errorf("%w: %w", ErrMustBeInteger, err)
 		}
 		err = profileKoanf.Set(vKey, intValue)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.REQUEST_HTTP_METHOD:
 		httpMethod := new(customtypes.HTTPMethod)
 		if err = httpMethod.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeHttpMethod, err)
+			return fmt.Errorf("%w: %w", ErrMustBeHttpMethod, err)
 		}
 		err = profileKoanf.Set(vKey, httpMethod)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.REQUEST_SERVICE:
 		service := new(customtypes.RequestService)
 		if err = service.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeRequestService, err)
+			return fmt.Errorf("%w: %w", ErrMustBeRequestService, err)
 		}
 		err = profileKoanf.Set(vKey, service)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.LICENSE_PRODUCT:
 		licenseProduct := new(customtypes.LicenseProduct)
 		if err = licenseProduct.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeLicenseProduct, err)
+			return fmt.Errorf("%w: %w", ErrMustBeLicenseProduct, err)
 		}
 		err = profileKoanf.Set(vKey, licenseProduct)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	case options.LICENSE_VERSION:
 		licenseVersion := new(customtypes.LicenseVersion)
 		if err = licenseVersion.Set(vValue); err != nil {
-			return fmt.Errorf("%w: %v", ErrMustBeLicenseVersion, err)
+			return fmt.Errorf("%w: %w", ErrMustBeLicenseVersion, err)
 		}
 		err = profileKoanf.Set(vKey, licenseVersion)
 		if err != nil {
-			return fmt.Errorf("%w: %v", ErrSetKey, err)
+			return fmt.Errorf("%w: %w", ErrSetKey, err)
 		}
 	default:
 		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: ErrTypeNotRecognized}

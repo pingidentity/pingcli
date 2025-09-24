@@ -4,7 +4,6 @@ package configuration
 
 import (
 	"errors"
-	"fmt"
 	"slices"
 	"strings"
 
@@ -17,32 +16,14 @@ import (
 	configuration_request "github.com/pingidentity/pingcli/internal/configuration/request"
 	configuration_root "github.com/pingidentity/pingcli/internal/configuration/root"
 	configuration_services "github.com/pingidentity/pingcli/internal/configuration/services"
+	"github.com/pingidentity/pingcli/internal/errs"
 )
 
 var (
+	configurationErrorPrefix   = "configuration options error"
 	ErrInvalidConfigurationKey = errors.New("provided key is not recognized as a valid configuration key.\nuse 'pingcli config list-keys' to view all available keys")
 	ErrNoOptionForKey          = errors.New("no option found for the provided configuration key")
 )
-
-type ConfigurationError struct {
-	Err error
-}
-
-func (e *ConfigurationError) Error() string {
-	var err *ConfigurationError
-	if errors.As(e.Err, &err) {
-		return err.Error()
-	}
-	return fmt.Sprintf("configuration options error: %s", e.Err.Error())
-}
-
-func (e *ConfigurationError) Unwrap() error {
-	var err *ConfigurationError
-	if errors.As(e.Err, &err) {
-		return err.Unwrap()
-	}
-	return e.Err
-}
 
 func KoanfKeys() (keys []string) {
 	for _, opt := range options.Options() {
@@ -64,7 +45,7 @@ func ValidateKoanfKey(koanfKey string) error {
 		}
 	}
 
-	return &ConfigurationError{Err: ErrInvalidConfigurationKey}
+	return &errs.PingCLIError{Prefix: configurationErrorPrefix, Err: ErrInvalidConfigurationKey}
 }
 
 // Return a list of all koanf keys from Options
@@ -98,7 +79,7 @@ func ValidateParentKoanfKey(koanfKey string) error {
 		}
 	}
 
-	return &ConfigurationError{Err: ErrInvalidConfigurationKey}
+	return &errs.PingCLIError{Prefix: configurationErrorPrefix, Err: ErrInvalidConfigurationKey}
 }
 
 func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
@@ -108,7 +89,7 @@ func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
 		}
 	}
 
-	return opt, &ConfigurationError{Err: ErrNoOptionForKey}
+	return opt, &errs.PingCLIError{Prefix: configurationErrorPrefix, Err: ErrNoOptionForKey}
 }
 
 func InitAllOptions() {

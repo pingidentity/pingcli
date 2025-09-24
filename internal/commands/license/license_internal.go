@@ -50,22 +50,22 @@ func RunInternalLicense() (err error) {
 func readLicenseOptionValues() (product, version, devopsUser, devopsKey string, err error) {
 	product, err = profiles.GetOptionValue(options.LicenseProductOption)
 	if err != nil {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %v", ErrGetProduct, err)}
+		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetProduct, err)}
 	}
 
 	version, err = profiles.GetOptionValue(options.LicenseVersionOption)
 	if err != nil {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %v", ErrGetVersion, err)}
+		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetVersion, err)}
 	}
 
 	devopsUser, err = profiles.GetOptionValue(options.LicenseDevopsUserOption)
 	if err != nil {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %v", ErrGetDevopsUser, err)}
+		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetDevopsUser, err)}
 	}
 
 	devopsKey, err = profiles.GetOptionValue(options.LicenseDevopsKeyOption)
 	if err != nil {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %v", ErrGetDevopsKey, err)}
+		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetDevopsKey, err)}
 	}
 
 	if product == "" || version == "" || devopsUser == "" || devopsKey == "" {

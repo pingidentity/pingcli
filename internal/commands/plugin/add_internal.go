@@ -28,7 +28,7 @@ func RunInternalPluginAdd(pluginExecutable string) error {
 
 	_, err := exec.LookPath(pluginExecutable)
 	if err != nil {
-		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: fmt.Errorf("%w: %v", ErrPluginNotFound, err)}
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: fmt.Errorf("%w: %w", ErrPluginNotFound, err)}
 	}
 
 	err = addPluginExecutable(pluginExecutable)
@@ -59,7 +59,7 @@ func addPluginExecutable(pluginExecutable string) error {
 
 	existingPluginExectuables, ok, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, pName)
 	if err != nil {
-		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: fmt.Errorf("%w: %v", ErrReadPluginNamesConfig, err)}
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: fmt.Errorf("%w: %w", ErrReadPluginNamesConfig, err)}
 	}
 	if !ok {
 		existingPluginExectuables = ""

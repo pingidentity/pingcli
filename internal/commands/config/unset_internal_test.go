@@ -29,7 +29,7 @@ func Test_RunInternalConfigUnset(t *testing.T) {
 			checkOption: &options.RootColorOption,
 		},
 		{
-			name:          "Unset on non-existant key",
+			name:          "Unset on non-existent key",
 			koanfKey:      "nonExistantKey",
 			expectedError: configuration.ErrInvalidConfigurationKey,
 		},
@@ -40,7 +40,7 @@ func Test_RunInternalConfigUnset(t *testing.T) {
 			checkOption: &options.RootColorOption,
 		},
 		{
-			name:          "Unset key with a non-existant profile",
+			name:          "Unset key with a non-existent profile",
 			profileName:   customtypes.String("nonExistant"),
 			koanfKey:      options.RootColorOption.KoanfKey,
 			expectedError: profiles.ErrProfileNameNotExist,

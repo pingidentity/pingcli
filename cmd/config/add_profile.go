@@ -9,6 +9,7 @@ import (
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/logger"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
 )
 
@@ -47,7 +48,12 @@ func configAddProfileRunE(cmd *cobra.Command, args []string) error {
 	l := logger.Get()
 	l.Debug().Msgf("Config add-profile Subcommand Called.")
 
-	if err := config_internal.RunInternalConfigAddProfile(os.Stdin); err != nil {
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return err
+	}
+
+	if err := config_internal.RunInternalConfigAddProfile(os.Stdin, koanfConfig); err != nil {
 		return err
 	}
 

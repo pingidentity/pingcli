@@ -12,14 +12,29 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
+)
+
+var (
+	requestErrorPrefix               = "failed to send custom request"
+	ErrServiceEmpty                  = errors.New("service is not set")
+	ErrUnrecognizedService           = errors.New("unrecognized service")
+	ErrHttpMethodEmpty               = errors.New("http method is not set")
+	ErrUnrecognizedHttpMethod        = errors.New("unrecognized http method")
+	ErrPingOneRegionCodeEmpty        = errors.New("PingOne region code is not set")
+	ErrUnrecognizedPingOneRegionCode = errors.New("unrecognized PingOne region code")
+	ErrPingOneWorkerEnvIDEmpty       = errors.New("PingOne worker environment ID is not set")
+	ErrPingOneClientIDAndSecretEmpty = errors.New("PingOne client ID and/or client secret is not set")
+	ErrPingOneAuthenticate           = errors.New("failed to authenticate with PingOne")
 )
 
 type PingOneAuthResponse struct {
@@ -31,21 +46,21 @@ type PingOneAuthResponse struct {
 func RunInternalRequest(uri string) (err error) {
 	service, err := profiles.GetOptionValue(options.RequestServiceOption)
 	if err != nil {
-		return fmt.Errorf("failed to send custom request: %w", err)
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if service == "" {
-		return fmt.Errorf("failed to send custom request: service is required")
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: ErrServiceEmpty}
 	}
 
 	switch service {
 	case customtypes.ENUM_REQUEST_SERVICE_PINGONE:
 		err = runInternalPingOneRequest(uri)
 		if err != nil {
-			return fmt.Errorf("failed to send custom request: %w", err)
+			return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 		}
 	default:
-		return fmt.Errorf("failed to send custom request: unrecognized service '%s'", service)
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrUnrecognizedService, service)}
 	}
 
 	return nil
@@ -54,39 +69,43 @@ func RunInternalRequest(uri string) (err error) {
 func runInternalPingOneRequest(uri string) (err error) {
 	accessToken, err := pingoneAccessToken()
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	topLevelDomain, err := getTopLevelDomain()
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	failOption, err := profiles.GetOptionValue(options.RequestFailOption)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	apiURL := fmt.Sprintf("https://api.pingone.%s/v1/%s", topLevelDomain, uri)
 
 	httpMethod, err := profiles.GetOptionValue(options.RequestHTTPMethodOption)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if httpMethod == "" {
-		return fmt.Errorf("http method is required")
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: ErrHttpMethodEmpty}
+	}
+
+	if !slices.Contains(customtypes.HTTPMethodValidValues(), httpMethod) {
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrUnrecognizedHttpMethod, httpMethod)}
 	}
 
 	data, err := getDataRaw()
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if data == "" {
 		data, err = getDataFile()
 		if err != nil {
-			return err
+			return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 		}
 	}
 
@@ -95,18 +114,18 @@ func runInternalPingOneRequest(uri string) (err error) {
 	client := &http.Client{}
 	req, err := http.NewRequestWithContext(context.Background(), httpMethod, apiURL, payload)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	headers, err := profiles.GetOptionValue(options.RequestHeaderOption)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	requestHeaders := new(customtypes.HeaderSlice)
 	err = requestHeaders.Set(headers)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	requestHeaders.SetHttpRequestHeaders(req)
@@ -121,19 +140,20 @@ func runInternalPingOneRequest(uri string) (err error) {
 
 	res, err := client.Do(req)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	defer func() {
 		cErr := res.Body.Close()
 		if cErr != nil {
 			err = errors.Join(err, cErr)
+			err = &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 		}
 	}()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	fields := map[string]any{
@@ -159,11 +179,11 @@ func runInternalPingOneRequest(uri string) (err error) {
 func getTopLevelDomain() (topLevelDomain string, err error) {
 	pingoneRegionCode, err := profiles.GetOptionValue(options.PingOneRegionCodeOption)
 	if err != nil {
-		return "", err
+		return topLevelDomain, &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if pingoneRegionCode == "" {
-		return "", fmt.Errorf("PingOne region code is required")
+		return topLevelDomain, &errs.PingCLIError{Prefix: requestErrorPrefix, Err: ErrPingOneRegionCodeEmpty}
 	}
 
 	switch pingoneRegionCode {
@@ -178,7 +198,7 @@ func getTopLevelDomain() (topLevelDomain string, err error) {
 	case customtypes.ENUM_PINGONE_REGION_CODE_NA:
 		topLevelDomain = customtypes.ENUM_PINGONE_TLD_NA
 	default:
-		return "", fmt.Errorf("unrecognized PingOne region code: '%s'", pingoneRegionCode)
+		return topLevelDomain, &errs.PingCLIError{Prefix: requestErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrUnrecognizedPingOneRegionCode, pingoneRegionCode)}
 	}
 
 	return topLevelDomain, nil
@@ -188,13 +208,13 @@ func pingoneAccessToken() (accessToken string, err error) {
 	// Check if existing access token is available
 	accessToken, err = profiles.GetOptionValue(options.RequestAccessTokenOption)
 	if err != nil {
-		return "", err
+		return accessToken, &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if accessToken != "" {
 		accessTokenExpiry, err := profiles.GetOptionValue(options.RequestAccessTokenExpiryOption)
 		if err != nil {
-			return "", err
+			return accessToken, &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 		}
 
 		if accessTokenExpiry == "" {
@@ -204,7 +224,7 @@ func pingoneAccessToken() (accessToken string, err error) {
 		// convert expiry string to int
 		tokenExpiryInt, err := strconv.ParseInt(accessTokenExpiry, 10, 64)
 		if err != nil {
-			return "", err
+			return accessToken, &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 		}
 
 		// Get current Unix epoch time in seconds
@@ -225,31 +245,31 @@ func pingoneAccessToken() (accessToken string, err error) {
 func pingoneAuth() (accessToken string, err error) {
 	topLevelDomain, err := getTopLevelDomain()
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	workerEnvId, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if workerEnvId == "" {
-		return "", fmt.Errorf("PingOne worker environment ID is required")
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: ErrPingOneWorkerEnvIDEmpty}
 	}
 
 	authURL := fmt.Sprintf("https://auth.pingone.%s/%s/as/token", topLevelDomain, workerEnvId)
 
 	clientId, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 	clientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if clientId == "" || clientSecret == "" {
-		return "", fmt.Errorf("PingOne client ID and secret are required")
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: ErrPingOneClientIDAndSecretEmpty}
 	}
 
 	basicAuthBase64 := base64.StdEncoding.EncodeToString([]byte(clientId + ":" + clientSecret))
@@ -259,7 +279,7 @@ func pingoneAuth() (accessToken string, err error) {
 	client := &http.Client{}
 	req, err := http.NewRequestWithContext(context.Background(), customtypes.ENUM_HTTP_METHOD_POST, authURL, payload)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", basicAuthBase64))
@@ -267,29 +287,33 @@ func pingoneAuth() (accessToken string, err error) {
 
 	res, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	defer func() {
 		cErr := res.Body.Close()
 		if cErr != nil {
 			err = errors.Join(err, cErr)
+			err = &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 		}
 	}()
 
 	responseBodyBytes, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return "", fmt.Errorf("failed to authenticate with PingOne: Response Status %s: Response Body %s", res.Status, string(responseBodyBytes))
+		return "", &errs.PingCLIError{
+			Prefix: requestErrorPrefix,
+			Err:    fmt.Errorf("%w: Response Status %s: Response Body %s", ErrPingOneAuthenticate, res.Status, string(responseBodyBytes)),
+		}
 	}
 
 	pingoneAuthResponse := new(PingOneAuthResponse)
 	err = json.Unmarshal(responseBodyBytes, pingoneAuthResponse)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	currentTime := time.Now().Unix()
@@ -298,37 +322,37 @@ func pingoneAuth() (accessToken string, err error) {
 	// Store access token and expiry
 	pName, err := profiles.GetOptionValue(options.RootProfileOption)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if pName == "" {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 		if err != nil {
-			return "", err
+			return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 		}
 	}
 
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	subKoanf, err := koanfConfig.GetProfileKoanf(pName)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	err = subKoanf.Set(options.RequestAccessTokenOption.KoanfKey, pingoneAuthResponse.AccessToken)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 	err = subKoanf.Set(options.RequestAccessTokenExpiryOption.KoanfKey, tokenExpiry)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 	err = koanfConfig.SaveProfile(pName, subKoanf)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	return pingoneAuthResponse.AccessToken, nil
@@ -337,14 +361,14 @@ func pingoneAuth() (accessToken string, err error) {
 func getDataFile() (data string, err error) {
 	dataFilepath, err := profiles.GetOptionValue(options.RequestDataOption)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	if dataFilepath != "" {
 		dataFilepath = filepath.Clean(dataFilepath)
 		contents, err := os.ReadFile(dataFilepath)
 		if err != nil {
-			return "", err
+			return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 		}
 
 		return string(contents), nil
@@ -356,7 +380,7 @@ func getDataFile() (data string, err error) {
 func getDataRaw() (data string, err error) {
 	data, err = profiles.GetOptionValue(options.RequestDataRawOption)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{Prefix: requestErrorPrefix, Err: err}
 	}
 
 	return data, nil

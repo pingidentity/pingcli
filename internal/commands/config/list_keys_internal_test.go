@@ -82,7 +82,9 @@ func Test_RunInternalConfigListKeys(t *testing.T) {
 				require.NoError(t, err)
 			}
 
-			w.Close()
+			err = w.Close()
+			require.NoError(t, err)
+
 			capturedOutputBytes, _ := io.ReadAll(r)
 			capturedOutput := string(capturedOutputBytes)
 

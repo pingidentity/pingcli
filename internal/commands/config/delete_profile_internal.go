@@ -87,6 +87,7 @@ func promptUserToConfirmDelete(pName string, rc io.ReadCloser) (confirmed bool, 
 	if err != nil {
 		return false, &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
 	}
+
 	return confirmed, nil
 }
 

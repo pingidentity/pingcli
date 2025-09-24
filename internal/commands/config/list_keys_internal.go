@@ -69,6 +69,7 @@ func returnKeysYamlString() (keysYamlStr string, err error) {
 	}
 
 	keysYamlStr = string(yamlData)
+
 	return keysYamlStr, nil
 }
 

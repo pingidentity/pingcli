@@ -56,6 +56,7 @@ func GetKoanfConfig() (*KoanfConfig, error) {
 	if k == nil || k.koanfInstance == nil {
 		return nil, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrKoanfNotInitialized}
 	}
+
 	return k, nil
 }
 
@@ -200,7 +201,7 @@ func (k KoanfConfig) ChangeActiveProfile(pName string) (err error) {
 
 	err = k.KoanfInstance().Set(options.RootActiveProfileOption.KoanfKey, pName)
 	if err != nil {
-		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %v", ErrSetActiveProfile, err)}
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrSetActiveProfile, err)}
 	}
 
 	if err = k.WriteFile(); err != nil {
@@ -254,7 +255,7 @@ func (k KoanfConfig) GetProfileKoanf(pName string) (subKoanf *koanf.Koanf, err e
 	subKoanf = koanf.New(".")
 	err = subKoanf.Load(confmap.Provider(k.KoanfInstance().Cut(pName).All(), "."), nil)
 	if err != nil {
-		return nil, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %v", ErrKoanfProfileExtractAndLoad, err)}
+		return nil, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrKoanfProfileExtractAndLoad, err)}
 	}
 
 	return subKoanf, nil
@@ -275,7 +276,7 @@ func (k KoanfConfig) WriteFile() (err error) {
 				if strings.ToLower(fullKoanfKeyValue) == key {
 					err = k.KoanfInstance().Set(fullKoanfKeyValue, val)
 					if err != nil {
-						return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %v", ErrSetKoanfKeyValue, err)}
+						return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrSetKoanfKeyValue, err)}
 					}
 					k.KoanfInstance().Delete(key)
 				}
@@ -291,12 +292,12 @@ func (k KoanfConfig) WriteFile() (err error) {
 
 	encodedConfig, err := k.KoanfInstance().Marshal(yaml.Parser())
 	if err != nil {
-		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %v", ErrMarshalKoanf, err)}
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrMarshalKoanf, err)}
 	}
 
 	err = os.WriteFile(k.GetKoanfConfigFile(), encodedConfig, 0600)
 	if err != nil {
-		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %v", ErrWriteKoanfFile, err)}
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrWriteKoanfFile, err)}
 	}
 
 	return nil
@@ -305,7 +306,7 @@ func (k KoanfConfig) WriteFile() (err error) {
 func (k KoanfConfig) SaveProfile(pName string, subKoanf *koanf.Koanf) (err error) {
 	err = k.KoanfInstance().MergeAt(subKoanf, pName)
 	if err != nil {
-		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %v", ErrKoanfMerge, err)}
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrKoanfMerge, err)}
 	}
 
 	err = k.WriteFile()
@@ -357,7 +358,7 @@ func (k KoanfConfig) DefaultMissingKoanfKeys() (err error) {
 			if !subKoanf.Exists(opt.KoanfKey) {
 				err = subKoanf.Set(opt.KoanfKey, opt.DefaultValue)
 				if err != nil {
-					return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %v", ErrSetKoanfKeyDefaultValue, err)}
+					return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrSetKoanfKeyDefaultValue, err)}
 				}
 			}
 		}
