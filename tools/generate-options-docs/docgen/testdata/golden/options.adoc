@@ -21,7 +21,7 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 | `plugins` |  |  | String Array | 
 |===
 
-== Ping Identity platform service properties
+== Ping Identity Platform Service Properties
 
 [cols="2,2,2,1,3"]
 |===
@@ -47,7 +47,7 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 | `service.pingone.regionCode` | `--pingone-region-code` | PINGCLI_PINGONE_REGION_CODE | String (Enum) | The region code of the PingOne tenant. Options are: AP, AU, CA, EU, NA. Example: 'NA'
 |===
 
-== Platform export properties
+== Platform Export Properties
 
 [cols="2,2,2,1,3"]
 |===
@@ -61,7 +61,7 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 | `export.services` | `--services` / `-s` | PINGCLI_EXPORT_SERVICES | String Array | Specifies the service(s) to export. Accepts a comma-separated string to delimit multiple services.  Options are: pingfederate, pingone-authorize, pingone-mfa, pingone-platform, pingone-protect, pingone-sso. Example: 'pingone-sso,pingone-mfa,pingfederate'
 |===
 
-== License properties
+== License Properties
 
 [cols="2,2,2,1,3"]
 |===
@@ -71,7 +71,7 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 | `license.devopsUser` | `--devops-user` / `-u` | PINGCLI_LICENSE_DEVOPS_USER | String | The DevOps user for the license request.   See https://developer.pingidentity.com/devops/how-to/devopsRegistration.html on how to register a DevOps user.   You can save the DevOps user and key in your profile using the 'pingcli config' commands.
 |===
 
-== Custom request properties
+== Custom Request Properties
 
 [cols="2,2,2,1,3"]
 |===

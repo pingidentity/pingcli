@@ -65,29 +65,23 @@ func GenerateAsciiDoc() string { // backward-compatible wrapper using legacy dat
 // GenerateAsciiDocWithDates renders AsciiDoc with explicit created and revision dates.
 func GenerateAsciiDocWithDates(created, revdate string) string {
 	configuration.InitAllOptions()
+	// Dynamically detect categories from the first segment of KoanfKey (before '.')
+	// Use "general" for keys without a dot.
 	catMap := map[string][]options.Option{}
 	for _, opt := range options.Options() {
 		if opt.KoanfKey == "" {
 			continue
 		}
-		root := opt.KoanfKey
-		if strings.Contains(root, ".") {
-			root = strings.Split(root, ".")[0]
+		category := "general"
+		if i := strings.Index(opt.KoanfKey, "."); i > 0 {
+			category = opt.KoanfKey[:i]
+		} else if strings.Contains(opt.KoanfKey, ".") {
+			// Defensive: if dot at position 0 for some reason, fallback to general
+			category = "general"
+		} else if strings.Contains(opt.KoanfKey, ".") {
+			category = strings.Split(opt.KoanfKey, ".")[0]
 		}
-		switch root {
-		case "service":
-			catMap["service"] = append(catMap["service"], opt)
-		case "export":
-			catMap["export"] = append(catMap["export"], opt)
-		case "license":
-			catMap["license"] = append(catMap["license"], opt)
-		case "request":
-			catMap["request"] = append(catMap["request"], opt)
-		default:
-			if !strings.Contains(opt.KoanfKey, ".") {
-				catMap["general"] = append(catMap["general"], opt)
-			}
-		}
+		catMap[category] = append(catMap[category], opt)
 	}
 	for k := range catMap {
 		slices.SortFunc(catMap[k], func(a, b options.Option) int { return strings.Compare(a.KoanfKey, b.KoanfKey) })
@@ -100,13 +94,34 @@ func GenerateAsciiDocWithDates(created, revdate string) string {
 	b.WriteString("The following configuration settings can be applied when using Ping CLI.\n\n")
 	b.WriteString("The following configuration settings can be applied by using the xref:command_reference:pingcli_config_set.adoc[`config set` command] to persist the configuration value for a given **Configuration Key** in the Ping CLI configuration file.\n\n")
 	b.WriteString("The configuration file is created at `.pingcli/config.yaml` in the user's home directory.\n\n")
-	ordered := []struct{ key, title string }{{"general", "General Properties"}, {"service", "Ping Identity platform service properties"}, {"export", "Platform export properties"}, {"license", "License properties"}, {"request", "Custom request properties"}}
-	for _, sec := range ordered {
-		opts := catMap[sec.key]
+	// Determine output order: prefer known categories in a fixed order when present,
+	// then append any other categories sorted alphabetically. This keeps current
+	// docs stable while allowing new categories to appear without code changes.
+	preferred := []string{"general", "service", "export", "license", "request"}
+	seen := map[string]bool{}
+	var keys []string
+	for _, k := range preferred {
+		if _, ok := catMap[k]; ok {
+			keys = append(keys, k)
+			seen[k] = true
+		}
+	}
+	// Add any additional categories not in preferred, sorted.
+	var extras []string
+	for k := range catMap {
+		if !seen[k] {
+			extras = append(extras, k)
+		}
+	}
+	slices.Sort(extras)
+	keys = append(keys, extras...)
+
+	for _, k := range keys {
+		opts := catMap[k]
 		if len(opts) == 0 {
 			continue
 		}
-		b.WriteString("== " + sec.title + "\n\n")
+		b.WriteString("== " + sectionTitle(k) + "\n\n")
 		// Column order updated: Configuration Key | Equivalent Parameter | Environment Variable | Data Type | Purpose
 		b.WriteString("[cols=\"2,2,2,1,3\"]\n|===\n")
 		b.WriteString("|Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose\n\n")
@@ -122,6 +137,32 @@ func GenerateAsciiDocWithDates(created, revdate string) string {
 	}
 
 	return b.String()
+}
+
+// sectionTitle returns a friendly section title for a category key, with special
+// wording for well-known categories and a sensible default otherwise.
+func sectionTitle(key string) string {
+	switch key {
+	case "general":
+		return "General Properties"
+	case "service":
+		return "Ping Identity Platform Service Properties"
+	case "export":
+		return "Platform Export Properties"
+	case "license":
+		return "License Properties"
+	case "request":
+		return "Custom Request Properties"
+	default:
+		if key == "" {
+			return "Properties"
+		}
+		// Capitalize first rune; avoid pulling in extra deps.
+		r := []rune(key)
+		r[0] = []rune(strings.ToUpper(string(r[0])))[0]
+
+		return string(r) + " properties"
+	}
 }
 
 // ShouldOutputAsciiDoc determines if AsciiDoc format should be used based on file extension or explicit choice.
