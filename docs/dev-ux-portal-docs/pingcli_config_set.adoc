@@ -1,0 +1,46 @@
+= pingcli config set
+:created-date: September 18, 2025
+:revdate: September 18, 2025
+:resourceid: pingcli_command_reference_pingcli_config_set
+
+Set stored configuration settings for the CLI.
+
+== Synopsis
+
+Set stored configuration settings for the CLI.
+
+The `--profile` parameter can be used to set configuration settings for a specified custom configuration profile.
+Where `--profile` is not specified, configuration settings will be set for the currently active profile.
+
+----
+pingcli config set [flags] key=value
+----
+
+== Examples
+
+----
+  Set the color setting to true for the currently active profile.
+    pingcli config set color=true
+
+  Set the PingOne tenant region code setting to 'AP' for the profile named 'myprofile'.
+    pingcli config set --profile myprofile service.pingOne.regionCode=AP
+
+  Set the PingFederate basic authentication password with unmasked output
+    pingcli config set --profile myprofile --unmask-values service.pingFederate.authentication.basicAuth.password=1234
+----
+
+== Options inherited from parent commands
+
+----
+  -C, --config string          The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
+  -D, --detailed-exitcode      Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings.
+  -O, --output-format string   Specify the console output format. (default text) Options are: json, text.
+  -P, --profile string         The name of a configuration profile to use.
+  -U, --unmask-values          Unmask secret values. (default false)
+      --no-color               Disable text output in color. (default false)
+----
+
+== More information
+
+* xref:pingcli_config.adoc[]	 - Manage the CLI configuration.
+
