@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"text/template"
 	"time"
 
 	"github.com/pingidentity/pingcli/cmd"
@@ -81,80 +83,105 @@ func main() {
 }
 
 func renderSingle(c *cobra.Command, createdDate, revDate, resourcePrefix string) string {
-	// Manual style: always use top-level title '=' regardless of hierarchy.
+	type singlePageData struct {
+		CommandPath      string
+		CreatedDate      string
+		RevDate          string
+		ResourceID       string
+		Short            string
+		Synopsis         string
+		Use              string
+		ExampleBlock     string
+		HasLocal         bool
+		LocalOptions     string
+		HasInherited     bool
+		InheritedOptions string
+		ParentBlock      string
+		SubcommandsBlock string
+	}
+
+	// Precompute fields exactly matching previous output.
 	base := strings.ReplaceAll(c.CommandPath(), " ", "_")
-	b := &strings.Builder{}
-	fmt.Fprintf(b, "= %s\n", c.CommandPath())
-	fmt.Fprintf(b, ":created-date: %s\n:revdate: %s\n:resourceid: %s%s\n\n", createdDate, revDate, resourcePrefix, base)
-
-	// Short description (first paragraph only)
-	if s := strings.TrimSpace(firstLine(c.Short, c.Long)); s != "" {
-		b.WriteString(s)
-		b.WriteString("\n\n")
-	}
-
-	// Synopsis section: prefer full Long (without first line duplication) else Short.
-	b.WriteString("== Synopsis\n\n")
+	short := strings.TrimSpace(firstLine(c.Short, c.Long))
+	var synopsis string
 	if long := strings.TrimSpace(c.Long); long != "" {
-		// Keep full long description as-is.
-		b.WriteString(long)
-		b.WriteString("\n\n")
-	} else if short := strings.TrimSpace(c.Short); short != "" {
-		b.WriteString(short + "\n\n")
+		synopsis = long + "\n\n"
+	} else if s := strings.TrimSpace(c.Short); s != "" {
+		synopsis = s + "\n\n"
 	}
-	// Usage block
-	b.WriteString("----\n")
-	b.WriteString(strings.TrimSpace(c.UseLine()) + "\n")
-	b.WriteString("----\n\n")
-
-	// Examples section (if any) - preserve original indentation & spacing.
+	use := strings.TrimSpace(c.UseLine())
+	var exampleBlock string
 	if rawEx := c.Example; strings.TrimSpace(rawEx) != "" {
-		b.WriteString("== Examples\n\n")
-		b.WriteString("----\n")
-		b.WriteString(rawEx)
+		var eb strings.Builder
+		eb.WriteString("== Examples\n\n")
+		eb.WriteString("----\n")
+		eb.WriteString(rawEx)
 		if !strings.HasSuffix(rawEx, "\n") {
-			b.WriteString("\n")
+			eb.WriteString("\n")
 		}
-		b.WriteString("----\n\n")
+		eb.WriteString("----\n\n")
+		exampleBlock = eb.String()
 	}
 
-	// TODO: See how to render line breaks for readability when generating AsciiDoc to portal
-	// Attempts to do so thus far have not worked
-	// Options (non-inherited) including help flag.
 	local := c.NonInheritedFlags()
 	inherited := c.InheritedFlags()
-	if local != nil && local.HasAvailableFlags() {
-		b.WriteString("== Options\n\n")
-		b.WriteString(formatFlagBlock(local, true, c))
-		b.WriteString("\n")
+	hasLocal := local != nil && local.HasAvailableFlags()
+	hasInherited := inherited != nil && inherited.HasAvailableFlags()
+	var localBlock, inheritedBlock string
+	if hasLocal {
+		localBlock = formatFlagBlock(local, true, c)
 	}
-	if inherited != nil && inherited.HasAvailableFlags() {
-		b.WriteString("== Options inherited from parent commands\n\n")
-		b.WriteString(formatFlagBlock(inherited, false, c))
-		b.WriteString("\n")
+	if hasInherited {
+		inheritedBlock = formatFlagBlock(inherited, false, c)
 	}
 
-	// More information (link back to parent) if there is a parent (omit for root).
+	var parentBlock string
 	if p := c.Parent(); p != nil {
 		parentFile := strings.ReplaceAll(p.CommandPath(), " ", "_") + ".adoc"
-		b.WriteString("== More information\n\n")
-		fmt.Fprintf(b, "* xref:%s[]\t - %s\n", parentFile, firstLine(p.Short, p.Long))
-		b.WriteString("\n")
+		var pb strings.Builder
+		pb.WriteString("== More information\n\n")
+		fmt.Fprintf(&pb, "* xref:%s[]\t - %s\n\n", parentFile, firstLine(p.Short, p.Long))
+		parentBlock = pb.String()
 	}
 
-	// Subcommands listing (retain for commands that have them; use manual style heading depth)
+	var subcommandsBlock string
 	subs := visibleSubcommands(c)
 	if len(subs) > 0 {
-		b.WriteString("== Subcommands\n\n")
 		sort.Slice(subs, func(i, j int) bool { return subs[i].Name() < subs[j].Name() })
+		var sb strings.Builder
+		sb.WriteString("== Subcommands\n\n")
 		for _, sc := range subs {
 			name := strings.ReplaceAll(sc.CommandPath(), " ", "_") + ".adoc"
-			fmt.Fprintf(b, "* xref:%s[] - %s\n", name, firstLine(sc.Short, sc.Long))
+			fmt.Fprintf(&sb, "* xref:%s[] - %s\n", name, firstLine(sc.Short, sc.Long))
 		}
-		b.WriteString("\n")
+		sb.WriteString("\n")
+		subcommandsBlock = sb.String()
 	}
 
-	return b.String()
+	data := singlePageData{
+		CommandPath:      c.CommandPath(),
+		CreatedDate:      createdDate,
+		RevDate:          revDate,
+		ResourceID:       resourcePrefix + base,
+		Short:            short,
+		Synopsis:         synopsis,
+		Use:              use,
+		ExampleBlock:     exampleBlock,
+		HasLocal:         hasLocal,
+		LocalOptions:     localBlock,
+		HasInherited:     hasInherited,
+		InheritedOptions: inheritedBlock,
+		ParentBlock:      parentBlock,
+		SubcommandsBlock: subcommandsBlock,
+	}
+
+	var buf bytes.Buffer
+	if err := singlePageTpl.Execute(&buf, data); err != nil {
+		// Fallback should never happen; keep previous behavior if it does.
+		return ""
+	}
+
+	return buf.String()
 }
 
 // formatFlagBlock renders a flag set into a code-fenced block similar to manual pages.
@@ -175,7 +202,11 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 
 		return si < sj
 	})
-	type line struct{ spec, desc string }
+	type line struct {
+		Spec string
+		Pad  int
+		Desc string
+	}
 	lines := make([]line, 0, len(flags))
 	for _, f := range flags {
 		var spec string
@@ -201,19 +232,19 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 		// Collapse internal newlines but otherwise keep original spacing; no manual wrapping.
 		desc = strings.ReplaceAll(desc, "\n", " ")
 
-		lines = append(lines, line{spec: spec, desc: desc})
+		lines = append(lines, line{Spec: spec, Desc: desc})
 	}
 	if includeHelp {
 		found := false
 		for _, l := range lines {
-			if strings.Contains(l.spec, "--help") {
+			if strings.Contains(l.Spec, "--help") {
 				found = true
 
 				break
 			}
 		}
 		if !found {
-			helpLine := line{spec: "-h, --help", desc: fmt.Sprintf("help for %s", c.Name())}
+			helpLine := line{Spec: "-h, --help", Desc: fmt.Sprintf("help for %s", c.Name())}
 			if len(lines) == 0 {
 				lines = append(lines, helpLine)
 			} else {
@@ -223,22 +254,23 @@ func formatFlagBlock(fs *pflag.FlagSet, includeHelp bool, c *cobra.Command) stri
 	}
 	maxSpec := 0
 	for _, l := range lines {
-		if len(l.spec) > maxSpec {
-			maxSpec = len(l.spec)
+		if len(l.Spec) > maxSpec {
+			maxSpec = len(l.Spec)
 		}
 	}
-	var b strings.Builder
-	b.WriteString("----\n")
-	for _, l := range lines {
-		pad := maxSpec - len(l.spec)
+	for i := range lines {
+		pad := maxSpec - len(lines[i].Spec)
 		if pad < 0 {
 			pad = 0
 		}
-		fmt.Fprintf(&b, "  %s%s   %s\n", l.spec, strings.Repeat(" ", pad), l.desc)
+		lines[i].Pad = pad
 	}
-	b.WriteString("----\n")
+	var buf bytes.Buffer
+	if err := flagBlockTpl.Execute(&buf, struct{ Lines []line }{Lines: lines}); err != nil {
+		return ""
+	}
 
-	return b.String()
+	return buf.String()
 }
 
 // firstLine returns the first non-empty line from short or long description.
@@ -320,3 +352,32 @@ func readFileIfWithin(path, base string) ([]byte, error) {
 
 	return data, nil
 }
+
+// Templates and helpers
+var singlePageTpl = template.Must(template.New("single").Parse(`= {{.CommandPath}}
+:created-date: {{.CreatedDate}}
+:revdate: {{.RevDate}}
+:resourceid: {{.ResourceID}}
+
+{{if .Short}}{{.Short}}
+
+{{end}}== Synopsis
+
+{{.Synopsis}}----
+{{.Use}}
+----
+
+{{if .ExampleBlock}}{{.ExampleBlock}}{{end}}{{if .HasLocal}}== Options
+
+{{.LocalOptions}}
+{{end}}{{if .HasInherited}}== Options inherited from parent commands
+
+{{.InheritedOptions}}
+{{end}}{{if .ParentBlock}}{{.ParentBlock}}{{end}}{{if .SubcommandsBlock}}{{.SubcommandsBlock}}{{end}}`))
+
+func repeat(n int) string { return strings.Repeat(" ", n) }
+
+var flagBlockTpl = template.Must(template.New("flag").Funcs(template.FuncMap{"repeat": repeat}).Parse(`----
+{{range .Lines}}  {{.Spec}}{{repeat .Pad}}   {{.Desc}}
+{{end}}----
+`))
