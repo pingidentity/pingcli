@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/pingidentity/pingcli/tools/docutil"
 )
 
 var update = flag.Bool("update", false, "update golden files for command docs")
@@ -39,7 +41,7 @@ func TestCommandDocGeneration(t *testing.T) {
 		if err != nil {
 			t.Fatalf("read generated %s: %v", f, err)
 		}
-		got := normalizeDynamic(string(gotBytes))
+		got := docutil.NormalizeForCompare(string(gotBytes))
 
 		goldenPath := filepath.Join(goldenDir, f)
 		if *update {
@@ -54,22 +56,9 @@ func TestCommandDocGeneration(t *testing.T) {
 		if err != nil {
 			t.Fatalf("read golden %s: %v (run with -update to create)", f, err)
 		}
-		want := normalizeDynamic(string(wantBytes))
+		want := docutil.NormalizeForCompare(string(wantBytes))
 		if got != want {
 			t.Errorf("mismatch for %s\n--- got ---\n%s\n--- want ---\n%s", f, got, want)
 		}
 	}
-}
-
-// normalizeDynamic strips lines containing created / revision dates to avoid churn.
-func normalizeDynamic(s string) string {
-	out := make([]string, 0, 64)
-	for _, line := range strings.Split(s, "\n") {
-		if strings.HasPrefix(line, ":created-date:") || strings.HasPrefix(line, ":revdate:") {
-			continue
-		}
-		out = append(out, line)
-	}
-
-	return strings.Join(out, "\n")
 }

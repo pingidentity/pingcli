@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pingidentity/pingcli/tools/docutil"
 	docgen "github.com/pingidentity/pingcli/tools/generate-options-docs/docgen"
 )
 
@@ -25,7 +26,7 @@ func TestOptionsDocGeneration(t *testing.T) {
 	}
 
 	// Normalize dynamic date in AsciiDoc output before storing / comparing.
-	adocNorm := normalizeDynamic(adoc)
+	adocNorm := docutil.NormalizeForCompare(adoc)
 
 	cases := []struct {
 		name    string
@@ -59,17 +60,4 @@ func TestOptionsDocGeneration(t *testing.T) {
 			t.Errorf("mismatch for %s\n--- got ---\n%s\n--- want ---\n%s", tc.name, tc.content, want)
 		}
 	}
-}
-
-// normalizeDynamic removes lines containing :created-date: or :revdate: tokens.
-func normalizeDynamic(s string) string {
-	out := make([]string, 0, 128)
-	for _, line := range strings.Split(s, "\n") {
-		if strings.HasPrefix(line, ":created-date:") || strings.HasPrefix(line, ":revdate:") {
-			continue
-		}
-		out = append(out, line)
-	}
-
-	return strings.Join(out, "\n")
 }

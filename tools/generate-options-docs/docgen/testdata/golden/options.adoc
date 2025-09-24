@@ -82,4 +82,3 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 | `request.fail` | `--fail` / `-f` |  | Boolean | Return non-zero exit code when HTTP custom request returns a failure status code.
 | `request.service` | `--service` / `-s` | PINGCLI_REQUEST_SERVICE | String (Enum) | The Ping service (configured in the active profile) to send the custom request to. Options are: pingone. Example: 'pingone'
 |===
-

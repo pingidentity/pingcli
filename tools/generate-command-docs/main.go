@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/pingidentity/pingcli/cmd"
+	"github.com/pingidentity/pingcli/tools/docutil"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -39,7 +40,7 @@ func main() {
 		// If file exists, extract existing created-date so it is preserved.
 		var existingCreated string
 		if oldRaw, err := readFileIfWithin(file, *outDir); err == nil {
-			existingCreated = extractDateLine(string(oldRaw), ":created-date:")
+			existingCreated = docutil.ExtractDateLine(string(oldRaw), ":created-date:")
 		}
 		createdDate := *date
 		if existingCreated != "" {
@@ -51,9 +52,9 @@ func main() {
 		// Determine if underlying (non-date) content actually changed; if not, skip rewrite.
 		var prevBody string
 		if oldRaw, err := readFileIfWithin(file, *outDir); err == nil {
-			prevBody = normalizeForCompare(string(oldRaw))
+			prevBody = docutil.NormalizeForCompare(string(oldRaw))
 		}
-		newBody := normalizeForCompare(content)
+		newBody := docutil.NormalizeForCompare(content)
 		if prevBody == newBody && prevBody != "" {
 			// Skip updating revision date to avoid needless churn.
 			return
@@ -303,34 +304,6 @@ func renderNav(root *cobra.Command) string {
 	b.WriteString("\n")
 
 	return b.String()
-}
-
-// normalizeForCompare removes date lines so that comparisons ignore purely date-based churn.
-func normalizeForCompare(s string) string {
-	out := make([]string, 0, 128)
-	for _, line := range strings.Split(s, "\n") {
-		if strings.HasPrefix(line, ":created-date:") || strings.HasPrefix(line, ":revdate:") {
-			continue
-		}
-		out = append(out, line)
-	}
-
-	return strings.Join(out, "\n")
-}
-
-// extractDateLine returns the value (sans prefix) of the first matching date line.
-func extractDateLine(content, prefix string) string {
-	for _, line := range strings.Split(content, "\n") {
-		if strings.HasPrefix(line, prefix) {
-			// format: :created-date: VALUE
-			parts := strings.SplitN(line, ": ", 2)
-			if len(parts) == 2 {
-				return parts[1]
-			}
-		}
-	}
-
-	return ""
 }
 
 // readFileIfWithin validates that path is within base before reading to satisfy gosec G304.

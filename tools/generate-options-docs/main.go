@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
+	"github.com/pingidentity/pingcli/tools/docutil"
 	docgen "github.com/pingidentity/pingcli/tools/generate-options-docs/docgen"
 )
 
@@ -26,7 +26,7 @@ func main() {
 		created := *date
 		if *outFile != "" {
 			if raw, err := os.ReadFile(*outFile); err == nil {
-				if prevCreated := extractDateLine(string(raw), ":created-date:"); prevCreated != "" {
+				if prevCreated := docutil.ExtractDateLine(string(raw), ":created-date:"); prevCreated != "" {
 					created = prevCreated
 				}
 			}
@@ -44,7 +44,7 @@ func main() {
 
 	// Conditional write: only update if non-date content changed.
 	if oldRaw, err := os.ReadFile(*outFile); err == nil {
-		if normalizeForCompare(string(oldRaw)) == normalizeForCompare(content) {
+		if docutil.NormalizeForCompare(string(oldRaw)) == docutil.NormalizeForCompare(content) {
 			// No meaningful change; avoid updating revision date line.
 			return
 		}
@@ -54,31 +54,4 @@ func main() {
 		fmt.Fprintf(os.Stderr, "failed to write file: %v\n", err)
 		os.Exit(1)
 	}
-}
-
-// normalizeForCompare strips created / revision date lines for deterministic comparisons.
-func normalizeForCompare(s string) string {
-	out := make([]string, 0, 256)
-	for _, line := range strings.Split(s, "\n") {
-		if strings.HasPrefix(line, ":created-date:") || strings.HasPrefix(line, ":revdate:") {
-			continue
-		}
-		out = append(out, line)
-	}
-
-	return strings.Join(out, "\n")
-}
-
-// extractDateLine returns the value of a date line matching the prefix.
-func extractDateLine(content, prefix string) string {
-	for _, line := range strings.Split(content, "\n") {
-		if strings.HasPrefix(line, prefix) {
-			parts := strings.SplitN(line, ": ", 2)
-			if len(parts) == 2 {
-				return parts[1]
-			}
-		}
-	}
-
-	return ""
 }

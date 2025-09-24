@@ -23,3 +23,18 @@ func NormalizeForCompare(s string) string {
 	// Trim trailing newline for consistency with previous implementation.
 	return strings.TrimSuffix(b.String(), "\n")
 }
+
+// ExtractDateLine returns the value of a date-like header line matching the given prefix.
+// Example: prefix ":created-date:" matches a line like ":created-date: March 23, 2025" and returns "March 23, 2025".
+func ExtractDateLine(content, prefix string) string {
+	for _, line := range strings.Split(content, "\n") {
+		if strings.HasPrefix(line, prefix) {
+			parts := strings.SplitN(line, ": ", 2)
+			if len(parts) == 2 {
+				return parts[1]
+			}
+		}
+	}
+
+	return ""
+}
