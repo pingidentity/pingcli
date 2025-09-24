@@ -43,6 +43,8 @@ go run ./tools/generate-options-docs -asciidoc > docs/dev-ux-portal-docs/general
 
 The AsciiDoc generator orders sections as: General, Service, Export, License, Request (as of September 2025 - new options may change this order).
 
+Data types: If a Data Type cell shows "N/A", it means the option's data type hasn't been mapped in the generator yet. Review and add a mapping in `tools/generate-options-docs/docgen/docgen.go` (see `asciiDocDataType`). This is intentional to surface new or unknown types for review rather than silently defaulting.
+
 ## Command Reference Pages & Navigation
 
 Generate a page for every command and subcommand plus a hierarchical navigation file
@@ -138,6 +140,7 @@ make generate-all-docs
 | Golden test fails after code change | Run with `-update` to refresh fixtures if changes are intentional |
 | Navigation missing root command | Ensure `renderNav` includes the root (already implemented) |
 | Dates cause diffs | They are normalized in tests; ensure you did not alter attribute names |
+| "N/A" appears in Data Type column | The option type is not mapped in the generator. Update `asciiDocDataType` in `tools/generate-options-docs/docgen/docgen.go` (or introduce a new `options.Type` as appropriate). |
 
 ## See Also
 

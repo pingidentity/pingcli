@@ -191,20 +191,19 @@ func asciiDocDataType(opt options.Option) string {
 	switch opt.Type {
 	case options.BOOL:
 		return "Boolean"
-	case options.STRING:
+	case options.STRING, options.LICENSE_VERSION:
 		return "String"
 	case options.STRING_SLICE, options.EXPORT_SERVICES, options.HEADER:
 		return "String Array"
 	case options.UUID:
 		return "String (UUID Format)"
-	case options.EXPORT_FORMAT, options.OUTPUT_FORMAT, options.PINGFEDERATE_AUTH_TYPE, options.PINGONE_AUTH_TYPE, options.PINGONE_REGION_CODE, options.REQUEST_SERVICE, options.EXPORT_SERVICE_GROUP:
+	case options.EXPORT_FORMAT, options.OUTPUT_FORMAT, options.PINGFEDERATE_AUTH_TYPE, options.PINGONE_AUTH_TYPE, options.PINGONE_REGION_CODE, options.REQUEST_SERVICE, options.EXPORT_SERVICE_GROUP, options.LICENSE_PRODUCT:
 		return "String (Enum)"
 	case options.INT:
 		return "Integer"
-	case options.LICENSE_PRODUCT, options.LICENSE_VERSION:
-		return "String (Enum)"
 	default:
-		return "String"
+		// Use an explicit fallback so unmapped types surface during review.
+		return "N/A"
 	}
 }
 
