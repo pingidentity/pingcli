@@ -23,6 +23,7 @@ require (
 	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.1
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.19.1
 	github.com/pingidentity/pingfederate-go-client/v1220 v1220.0.0
+	github.com/pingidentity/pingone-go-client v0.2.0
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
@@ -31,6 +32,8 @@ require (
 	google.golang.org/protobuf v1.36.9
 	gopkg.in/yaml.v3 v3.0.1
 )
+
+replace github.com/pingidentity/pingone-go-client => ../pingone-go-client
 
 require (
 	4d63.com/gocheckcompilerdirectives v1.3.0 // indirect
@@ -112,6 +115,7 @@ require (
 	github.com/golangci/swaggoswag v0.0.0-20250504205917-77f2aca3143e // indirect
 	github.com/golangci/unconvert v0.0.0-20250410112200-a129a6e6413e // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gordonklaus/ineffassign v0.1.0 // indirect
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
 	github.com/gostaticanalysis/comment v1.5.0 // indirect
@@ -128,6 +132,7 @@ require (
 	github.com/jjti/go-spancheck v0.6.5 // indirect
 	github.com/julz/importas v0.2.0 // indirect
 	github.com/karamaru-alpha/copyloopvar v1.2.1 // indirect
+	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/kisielk/errcheck v1.9.0 // indirect
 	github.com/kisielk/gotool v1.0.0 // indirect
 	github.com/kkHAIKE/contextcheck v1.1.6 // indirect

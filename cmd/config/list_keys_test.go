@@ -79,6 +79,7 @@ func Example_listKeysValue() {
 	// - service.pingFederate.httpsHost
 	// - service.pingFederate.insecureTrustAllTLS
 	// - service.pingFederate.xBypassExternalValidationHeader
+	// - service.pingOne.authentication.environmentID
 	// - service.pingOne.authentication.type
 	// - service.pingOne.authentication.worker.clientID
 	// - service.pingOne.authentication.worker.clientSecret

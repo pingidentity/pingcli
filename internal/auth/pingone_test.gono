@@ -1,0 +1,36 @@
+package auth_internal
+
+import (
+	"testing"
+
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+)
+
+// Test pingoneAuth function
+func Test_pingoneAuth(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	firstToken, err := pingOneAuth()
+	testutils.CheckExpectedError(t, err, nil)
+
+	// Check token was cached
+	secondToken, err := PingOneAccessToken()
+	testutils.CheckExpectedError(t, err, nil)
+
+	if firstToken != secondToken {
+		t.Errorf("expected access token to be cached, got different tokens: %s and %s", firstToken, secondToken)
+	}
+}
+
+// Test pingoneAuth function with invalid credentials
+func Test_pingoneAuth_InvalidCredentials(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	t.Setenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar, "invalid")
+
+	_, err := pingOneAuth()
+	expectedErrorPattern := `(?s)^failed to authenticate with PingOne: Response Status 401 Unauthorized: Response Body .*$`
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}

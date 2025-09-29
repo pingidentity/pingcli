@@ -4,7 +4,6 @@ package request_internal
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,21 +11,14 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
-	"time"
 
+	auth_internal "github.com/pingidentity/pingcli/internal/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
-
-type PingOneAuthResponse struct {
-	AccessToken string `json:"access_token"`
-	TokenType   string `json:"token_type"`
-	ExpiresIn   int64  `json:"expires_in"`
-}
 
 func RunInternalRequest(uri string) (err error) {
 	service, err := profiles.GetOptionValue(options.RequestServiceOption)
@@ -52,12 +44,7 @@ func RunInternalRequest(uri string) (err error) {
 }
 
 func runInternalPingOneRequest(uri string) (err error) {
-	accessToken, err := pingoneAccessToken()
-	if err != nil {
-		return err
-	}
-
-	topLevelDomain, err := getTopLevelDomain()
+	pingOneClient, err := auth_internal.GetPingOneClient()
 	if err != nil {
 		return err
 	}
@@ -66,8 +53,6 @@ func runInternalPingOneRequest(uri string) (err error) {
 	if err != nil {
 		return err
 	}
-
-	apiURL := fmt.Sprintf("https://api.pingone.%s/v1/%s", topLevelDomain, uri)
 
 	httpMethod, err := profiles.GetOptionValue(options.RequestHTTPMethodOption)
 	if err != nil {
@@ -91,6 +76,11 @@ func runInternalPingOneRequest(uri string) (err error) {
 	}
 
 	payload := strings.NewReader(data)
+
+	apiURL, err := pingOneClient.GetConfig().Servers.)
+	if err != nil {
+		return err
+	}
 
 	client := &http.Client{}
 	req, err := http.NewRequestWithContext(context.Background(), httpMethod, apiURL, payload)
@@ -117,7 +107,7 @@ func runInternalPingOneRequest(uri string) (err error) {
 	}
 
 	// Set default authorization header
-	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", *pingOneClient.GetConfig().Service.Auth.AccessToken))
 
 	res, err := client.Do(req)
 	if err != nil {
@@ -182,151 +172,6 @@ func getTopLevelDomain() (topLevelDomain string, err error) {
 	}
 
 	return topLevelDomain, nil
-}
-
-func pingoneAccessToken() (accessToken string, err error) {
-	// Check if existing access token is available
-	accessToken, err = profiles.GetOptionValue(options.RequestAccessTokenOption)
-	if err != nil {
-		return "", err
-	}
-
-	if accessToken != "" {
-		accessTokenExpiry, err := profiles.GetOptionValue(options.RequestAccessTokenExpiryOption)
-		if err != nil {
-			return "", err
-		}
-
-		if accessTokenExpiry == "" {
-			accessTokenExpiry = "0"
-		}
-
-		// convert expiry string to int
-		tokenExpiryInt, err := strconv.ParseInt(accessTokenExpiry, 10, 64)
-		if err != nil {
-			return "", err
-		}
-
-		// Get current Unix epoch time in seconds
-		currentEpochSeconds := time.Now().Unix()
-
-		// Return access token if it is still valid
-		if currentEpochSeconds < tokenExpiryInt {
-			return accessToken, nil
-		}
-	}
-
-	output.Message("PingOne access token does not exist or is expired, requesting a new token...", nil)
-
-	// If no valid access token is available, login and get a new one
-	return pingoneAuth()
-}
-
-func pingoneAuth() (accessToken string, err error) {
-	topLevelDomain, err := getTopLevelDomain()
-	if err != nil {
-		return "", err
-	}
-
-	workerEnvId, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
-	if err != nil {
-		return "", err
-	}
-
-	if workerEnvId == "" {
-		return "", fmt.Errorf("PingOne worker environment ID is required")
-	}
-
-	authURL := fmt.Sprintf("https://auth.pingone.%s/%s/as/token", topLevelDomain, workerEnvId)
-
-	clientId, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
-	if err != nil {
-		return "", err
-	}
-	clientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
-	if err != nil {
-		return "", err
-	}
-
-	if clientId == "" || clientSecret == "" {
-		return "", fmt.Errorf("PingOne client ID and secret are required")
-	}
-
-	basicAuthBase64 := base64.StdEncoding.EncodeToString([]byte(clientId + ":" + clientSecret))
-
-	payload := strings.NewReader("grant_type=client_credentials")
-
-	client := &http.Client{}
-	req, err := http.NewRequestWithContext(context.Background(), customtypes.ENUM_HTTP_METHOD_POST, authURL, payload)
-	if err != nil {
-		return "", err
-	}
-
-	req.Header.Add("Authorization", fmt.Sprintf("Basic %s", basicAuthBase64))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-
-	res, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-
-	defer func() {
-		cErr := res.Body.Close()
-		if cErr != nil {
-			err = errors.Join(err, cErr)
-		}
-	}()
-
-	responseBodyBytes, err := io.ReadAll(res.Body)
-	if err != nil {
-		return "", err
-	}
-
-	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return "", fmt.Errorf("failed to authenticate with PingOne: Response Status %s: Response Body %s", res.Status, string(responseBodyBytes))
-	}
-
-	pingoneAuthResponse := new(PingOneAuthResponse)
-	err = json.Unmarshal(responseBodyBytes, pingoneAuthResponse)
-	if err != nil {
-		return "", err
-	}
-
-	currentTime := time.Now().Unix()
-	tokenExpiry := currentTime + pingoneAuthResponse.ExpiresIn
-
-	// Store access token and expiry
-	pName, err := profiles.GetOptionValue(options.RootProfileOption)
-	if err != nil {
-		return "", err
-	}
-
-	if pName == "" {
-		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
-		if err != nil {
-			return "", err
-		}
-	}
-
-	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
-	if err != nil {
-		return "", err
-	}
-
-	err = subKoanf.Set(options.RequestAccessTokenOption.KoanfKey, pingoneAuthResponse.AccessToken)
-	if err != nil {
-		return "", err
-	}
-	err = subKoanf.Set(options.RequestAccessTokenExpiryOption.KoanfKey, tokenExpiry)
-	if err != nil {
-		return "", err
-	}
-	err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf)
-	if err != nil {
-		return "", err
-	}
-
-	return pingoneAuthResponse.AccessToken, nil
 }
 
 func getDataFile() (data string, err error) {
