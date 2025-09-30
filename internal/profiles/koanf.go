@@ -20,6 +20,7 @@ import (
 var (
 	k *KoanfConfig
 
+	koanfErrorPrefix                     = "profile configuration error"
 	ErrNoOptionValue                     = errors.New("no option value found")
 	ErrKoanfNotInitialized               = errors.New("koanf instance is not initialized")
 	ErrProfileNameEmpty                  = errors.New("invalid profile name: profile name cannot be empty")
@@ -35,7 +36,6 @@ var (
 	ErrKoanfMerge                        = errors.New("failed to merge koanf configuration")
 	ErrDeleteActiveProfile               = errors.New("the active profile cannot be deleted")
 	ErrSetKoanfKeyDefaultValue           = errors.New("failed to set koanf key default value")
-	koanfErrorPrefix                     = "profile configuration error"
 )
 
 type KoanfConfig struct {

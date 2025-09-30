@@ -5,55 +5,83 @@ package config_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Config set-active-profile Command Executes without issue
-func TestConfigSetActiveProfileCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "production")
-	testutils.CheckExpectedError(t, err, nil)
-}
+func Test_ConfigSetActiveProfileCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-// Test Config set-active-profile Command fails when provided too many arguments
-func TestConfigSetActiveProfileCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute '.*': command accepts 0 to 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "extra-arg", "extra-arg2")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name:      "Happy Path",
+			args:      []string{"production"},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - set active to current active",
+			args:      []string{"default"},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - help",
+			args:      []string{"--help"},
+			expectErr: false,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{"extra-arg", "extra-arg2"},
+			expectErr:     true,
+			expectedErrIs: common.ErrRangeArgs,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+		{
+			name:          "Non-existent profile",
+			args:          []string{"nonexistent"},
+			expectErr:     true,
+			expectedErrIs: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:          "Invalid profile name format",
+			args:          []string{"pname&*^*&^$&@!"},
+			expectErr:     true,
+			expectedErrIs: profiles.ErrProfileNameNotExist,
+		},
+	}
 
-// Test Config set-active-profile Command fails when provided an invalid flag
-func TestConfigSetActiveProfileCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test Config set-active-profile Command fails when provided an non-existent profile name
-func TestConfigSetActiveProfileCmd_NonExistentProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to set active profile: invalid profile name: '.*' profile does not exist$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "nonexistent")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"config", "set-active-profile"}, tc.args...)...)
 
-// Test Config set-active-profile Command succeeds when provided the active profile
-func TestConfigSetActiveProfileCmd_ActiveProfile(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "default")
-	testutils.CheckExpectedError(t, err, nil)
-}
+			if !tc.expectErr {
+				require.NoError(t, err)
+				return
+			}
 
-// Test Config set-active-profile Command fails when provided an invalid profile name
-func TestConfigSetActiveProfileCmd_InvalidProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to set active profile: invalid profile name: '.*' profile does not exist$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "pname&*^*&^$&@!")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config set-active-profile Command --help, -h flag
-func TestConfigSetActiveProfileCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "--help")
-	testutils.CheckExpectedError(t, err, nil)
-
-	err = testutils_cobra.ExecutePingcli(t, "config", "set-active-profile", "-h")
-	testutils.CheckExpectedError(t, err, nil)
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }

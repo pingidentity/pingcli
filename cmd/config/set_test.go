@@ -6,95 +6,123 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Config Set Command Executes without issue
-func TestConfigSetCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=false", options.RootColorOption.KoanfKey))
-	testutils.CheckExpectedError(t, err, nil)
+func Test_ConfigSetCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name:      "Happy Path",
+			args:      []string{fmt.Sprintf("%s=false", options.RootColorOption.KoanfKey)},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - help",
+			args:      []string{"--help"},
+			expectErr: false,
+		},
+		{
+			name:          "Too few arguments",
+			args:          []string{},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{fmt.Sprintf("%s=false", options.RootColorOption.KoanfKey), fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey)},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:          "Invalid key",
+			args:          []string{"pingcli.invalid=true"},
+			expectErr:     true,
+			expectedErrIs: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:          "Invalid value type for key",
+			args:          []string{fmt.Sprintf("%s=invalid", options.RootColorOption.KoanfKey)},
+			expectErr:     true,
+			expectedErrIs: customtypes.ErrParseBool,
+		},
+		{
+			name:          "No value provided",
+			args:          []string{fmt.Sprintf("%s=", options.RootColorOption.KoanfKey)},
+			expectErr:     true,
+			expectedErrIs: config_internal.ErrEmptyValue,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"config", "set"}, tc.args...)...)
+
+			if !tc.expectErr {
+				require.NoError(t, err)
+				return
+			}
+
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }
 
-// Test Config Set Command Fails when provided too few arguments
-func TestConfigSetCmd_TooFewArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli config set': command accepts 1 arg\(s\), received 0$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Set Command Fails when provided too many arguments
-func TestConfigSetCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli config set': command accepts 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=false", options.RootColorOption.KoanfKey), fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey))
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Set Command Fails when an invalid key is provided
-func TestConfigSetCmd_InvalidKey(t *testing.T) {
-	expectedErrorPattern := `^failed to set configuration: key 'pingcli\.invalid' is not recognized as a valid configuration key\.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", "pingcli.invalid=true")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Set Command Fails when an invalid value type is provided
-func TestConfigSetCmd_InvalidValueType(t *testing.T) {
-	expectedErrorPattern := `^failed to set configuration: value for key '.*' must be a boolean\. Allowed .*: strconv\.ParseBool: parsing ".*": invalid syntax$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=invalid", options.RootColorOption.KoanfKey))
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Set Command Fails when no value is provided
-func TestConfigSetCmd_NoValueProvided(t *testing.T) {
-	expectedErrorPattern := `^failed to set configuration: value for key '.*' is empty\. Use 'pingcli config unset .*' to unset the key$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=", options.RootColorOption.KoanfKey))
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Set Command for key 'pingone.worker.clientId' updates koanf configuration
+// TestConfigSetCmd_CheckKoanfConfig verifies that the 'config set' command correctly updates the underlying koanf configuration.
 func TestConfigSetCmd_CheckKoanfConfig(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	koanfKey := options.PingOneAuthenticationWorkerClientIDOption.KoanfKey
 	koanfNewUUID := "12345678-1234-1234-1234-123456789012"
 
 	err := testutils_cobra.ExecutePingcli(t, "config", "set", fmt.Sprintf("%s=%s", koanfKey, koanfNewUUID))
-	testutils.CheckExpectedError(t, err, nil)
+	require.NoError(t, err)
 
 	koanfConfig, err := profiles.GetKoanfConfig()
-	if err != nil {
-		t.Errorf("Error getting koanf configuration: %v", err)
-	}
+	require.NoError(t, err, "Error getting koanf configuration")
 
 	koanfInstance := koanfConfig.KoanfInstance()
 	profileKoanfKey := "default." + koanfKey
 
 	koanfNewValue, ok := koanfInstance.Get(profileKoanfKey).(*customtypes.UUID)
-	if ok && koanfNewValue.String() != koanfNewUUID {
-		t.Errorf("Expected koanf configuration value to be updated")
-	}
-}
-
-// Test Config Set Command --help, -h flag
-func TestConfigSetCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", "--help")
-	testutils.CheckExpectedError(t, err, nil)
-
-	err = testutils_cobra.ExecutePingcli(t, "config", "set", "-h")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test Config Set Command Fails when provided an invalid flag
-func TestConfigSetCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "set", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	require.True(t, ok, "Koanf value is not of the expected type *customtypes.UUID")
+	assert.Equal(t, koanfNewUUID, koanfNewValue.String(), "Expected koanf configuration value to be updated")
 }
 
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_setMaskedValue() {
 	t := testing.T{}
+	testutils_koanf.InitKoanfs(&t)
 	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.KoanfKey, "1234"))
 
 	// Output:
@@ -105,7 +133,8 @@ func Example_setMaskedValue() {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_set_UnmaskedValuesFlag() {
 	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", "--unmask-values", fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.KoanfKey, "1234"))
+	testutils_koanf.InitKoanfs(&t)
+	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", "--"+options.ConfigUnmaskSecretValueOption.CobraParamName, fmt.Sprintf("%s=%s", options.PingFederateBasicAuthPasswordOption.KoanfKey, "1234"))
 
 	// Output:
 	// SUCCESS: Configuration set successfully:
@@ -115,6 +144,7 @@ func Example_set_UnmaskedValuesFlag() {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_setUnmaskedValue() {
 	t := testing.T{}
+	testutils_koanf.InitKoanfs(&t)
 	_ = testutils_cobra.ExecutePingcli(&t, "config", "set", fmt.Sprintf("%s=%s", options.RootColorOption.KoanfKey, "true"))
 
 	// Output:

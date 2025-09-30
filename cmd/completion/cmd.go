@@ -5,6 +5,7 @@ package completion
 import (
 	"fmt"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/cobra"
 )
 
@@ -53,13 +54,25 @@ PowerShell:
 func completionCmdRunE(cmd *cobra.Command, args []string) error {
 	switch args[0] {
 	case "bash":
-		_ = cmd.Root().GenBashCompletionV2(cmd.OutOrStdout(), true)
+		err := cmd.Root().GenBashCompletionV2(cmd.OutOrStdout(), true)
+		if err != nil {
+			return &errs.PingCLIError{Prefix: "", Err: err}
+		}
 	case "zsh":
-		_ = cmd.Root().GenZshCompletion(cmd.OutOrStdout())
+		err := cmd.Root().GenZshCompletion(cmd.OutOrStdout())
+		if err != nil {
+			return &errs.PingCLIError{Prefix: "", Err: err}
+		}
 	case "fish":
-		_ = cmd.Root().GenFishCompletion(cmd.OutOrStdout(), true)
+		err := cmd.Root().GenFishCompletion(cmd.OutOrStdout(), true)
+		if err != nil {
+			return &errs.PingCLIError{Prefix: "", Err: err}
+		}
 	case "powershell":
-		_ = cmd.Root().GenPowerShellCompletion(cmd.OutOrStdout())
+		err := cmd.Root().GenPowerShellCompletion(cmd.OutOrStdout())
+		if err != nil {
+			return &errs.PingCLIError{Prefix: "", Err: err}
+		}
 	}
 
 	return nil

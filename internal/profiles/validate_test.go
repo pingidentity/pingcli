@@ -3,109 +3,163 @@
 package profiles_test
 
 import (
+	"fmt"
+	"strings"
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Validate function
-func TestValidate(t *testing.T) {
+func Test_Validate(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	err := profiles.Validate()
-	if err != nil {
-		t.Errorf("Validate returned error: %v", err)
+	testCases := []struct {
+		name          string
+		fileContents  string
+		expectedError error
+	}{
+		{
+			name:          "Happy path - Default",
+			fileContents:  testutils_koanf.GetDefaultConfigFileContents(),
+			expectedError: nil,
+		},
+		{
+			name:         "Happy path - Legacy",
+			fileContents: testutils_koanf.GetDefaultLegacyConfigFileContents(),
+		},
+		{
+			name:          "Invalid uuid",
+			fileContents:  getInvalidUUIDFileContents(t),
+			expectedError: profiles.ErrValidateUUID,
+		},
+		{
+			name:          "Invalid region",
+			fileContents:  getInvalidRegionFileContents(t),
+			expectedError: profiles.ErrValidatePingOneRegionCode,
+		},
+		{
+			name:          "Invalid bool",
+			fileContents:  getInvalidBoolFileContents(t),
+			expectedError: profiles.ErrValidateBoolean,
+		},
+		{
+			name:          "Invalid output format",
+			fileContents:  getInvalidOutputFormatFileContents(t),
+			expectedError: profiles.ErrValidateOutputFormat,
+		},
+		{
+			name:          "Invalid profile name",
+			fileContents:  getInvalidProfileNameFileContents(t),
+			expectedError: profiles.ErrProfileNameFormat,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfsCustomFile(t, tc.fileContents)
+
+			err := profiles.Validate()
+
+			if tc.expectedError != nil {
+				assert.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test Validate function with legacy profile
-func TestValidateLegacyProfile(t *testing.T) {
-	testutils_koanf.InitKoanfsCustomFile(t, testutils_koanf.ReturnDefaultLegacyConfigFileContents())
+func getInvalidUUIDFileContents(t *testing.T) string {
+	t.Helper()
 
-	err := profiles.Validate()
-	if err == nil {
-		t.Errorf("Validate returned nil, expected error")
-	}
-}
+	pingoneEnvIdKeyParts := strings.Split(options.PlatformExportPingOneEnvironmentIDOption.KoanfKey, ".")
+	require.Equal(t, 3, len(pingoneEnvIdKeyParts))
 
-// Test Validate function with invalid uuid
-func TestValidateInvalidProfile(t *testing.T) {
-	fileContents := `activeProfile: default
+	invalidUUIDFileContents := fmt.Sprintf(`%s: default
 default:
-    description: "default description"
-    pingOne:
-        export:
-            environmentID: "invalid"`
+    %s: "default description"
+    %s:
+        %s:
+            %s: "invalid"`,
+		options.RootActiveProfileOption.KoanfKey,
+		options.ProfileDescriptionOption.KoanfKey,
+		pingoneEnvIdKeyParts[0],
+		pingoneEnvIdKeyParts[1],
+		pingoneEnvIdKeyParts[2],
+	)
 
-	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
-
-	err := profiles.Validate()
-	if err == nil {
-		t.Errorf("Validate returned nil, expected error")
-	}
+	return invalidUUIDFileContents
 }
 
-// Test Validate function with invalid region
-func TestValidateInvalidRegion(t *testing.T) {
-	fileContents := `activeProfile: default
+func getInvalidRegionFileContents(t *testing.T) string {
+	t.Helper()
+
+	pingoneRegionCodeKeyParts := strings.Split(options.PingOneRegionCodeOption.KoanfKey, ".")
+	require.Equal(t, 3, len(pingoneRegionCodeKeyParts))
+
+	invalidRegionFileContents := fmt.Sprintf(`%s: default
 default:
-    description: "default description"
-    pingOne:
-        region: "invalid"`
+    %s: "default description"
+    %s:
+        %s:
+            %s: "invalid"`,
+		options.RootActiveProfileOption.KoanfKey,
+		options.ProfileDescriptionOption.KoanfKey,
+		pingoneRegionCodeKeyParts[0],
+		pingoneRegionCodeKeyParts[1],
+		pingoneRegionCodeKeyParts[2],
+	)
 
-	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
-
-	err := profiles.Validate()
-	if err == nil {
-		t.Errorf("Validate returned nil, expected error")
-	}
+	return invalidRegionFileContents
 }
 
-// Test Validate function with invalid bool
-func TestValidateInvalidBool(t *testing.T) {
-	fileContents := `activeProfile: default
+func getInvalidBoolFileContents(t *testing.T) string {
+	t.Helper()
+
+	invalidBoolFileContents := fmt.Sprintf(`%s: default
 default:
-    description: "default description"
-    pingcli:
-        noColor: invalid`
+    %s: "default description"
+    %s: invalid`,
+		options.RootActiveProfileOption.KoanfKey,
+		options.ProfileDescriptionOption.KoanfKey,
+		options.RootColorOption.KoanfKey,
+	)
 
-	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
-
-	err := profiles.Validate()
-	if err == nil {
-		t.Errorf("Validate returned nil, expected error")
-	}
+	return invalidBoolFileContents
 }
 
-// Test Validate function with invalid output format
-func TestValidateInvalidOutputFormat(t *testing.T) {
-	fileContents := `activeProfile: default
+func getInvalidOutputFormatFileContents(t *testing.T) string {
+	t.Helper()
+
+	invalidOutputFormatFileContents := fmt.Sprintf(`%s: default
 default:
-    description: "default description"
-    pingcli:
-        outputFormat: invalid`
+    %s: "default description"
+    %s: invalid`,
+		options.RootActiveProfileOption.KoanfKey,
+		options.ProfileDescriptionOption.KoanfKey,
+		options.RootOutputFormatOption.KoanfKey,
+	)
 
-	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
-
-	err := profiles.Validate()
-	if err == nil {
-		t.Errorf("Validate returned nil, expected error")
-	}
+	return invalidOutputFormatFileContents
 }
 
-// Test Validate function with invalid profile name
-func TestValidateInvalidProfileName(t *testing.T) {
-	fileContents := `activeProfile: default
+func getInvalidProfileNameFileContents(t *testing.T) string {
+	t.Helper()
+
+	invalidProfileNameFileContents := fmt.Sprintf(`%s: default
 default:
-    description: "default description"
+    %s: "default description"
 invalid(&*^&*^&*^**$):
-    description: "default description"`
+    %s: "default description"`,
+		options.RootActiveProfileOption.KoanfKey,
+		options.ProfileDescriptionOption.KoanfKey,
+		options.ProfileDescriptionOption.KoanfKey,
+	)
 
-	testutils_koanf.InitKoanfsCustomFile(t, fileContents)
-
-	err := profiles.Validate()
-	if err == nil {
-		t.Errorf("Validate returned nil, expected error")
-	}
+	return invalidProfileNameFileContents
 }

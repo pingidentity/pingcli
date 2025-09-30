@@ -8,6 +8,7 @@ import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	"github.com/pingidentity/pingcli/internal/autocompletion"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -41,7 +42,7 @@ func configSetActiveProfileRunE(cmd *cobra.Command, args []string) error {
 	l.Debug().Msgf("Config set-active-profile Subcommand Called.")
 
 	if err := config_internal.RunInternalConfigSetActiveProfile(args, os.Stdin); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: "", Err: err}
 	}
 
 	return nil

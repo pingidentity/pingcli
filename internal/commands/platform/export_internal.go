@@ -115,7 +115,7 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
 	}
 
-	if err = es.Merge(*es2); err != nil {
+	if err = es.Merge(es2); err != nil {
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
 	}
 

@@ -5,35 +5,65 @@ package plugin_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/cmd/common"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Plugin list Command Executes without issue
-func TestPluginListCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "list")
-	testutils.CheckExpectedError(t, err, nil)
-}
+func Test_PluginListCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-// Test Plugin list Command fails when provided too many arguments
-func TestPluginListCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli plugin list': command accepts 0 arg\(s\), received 1$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "list", "extra-arg")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name:      "Happy Path",
+			args:      []string{},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - help",
+			args:      []string{"--help"},
+			expectErr: false,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{"extra-arg"},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+	}
 
-// Test Plugin list Command fails when provided an invalid flag
-func TestPluginListCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "list", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test Plugin list Command --help, -h flag
-func TestPluginListCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "list", "--help")
-	testutils.CheckExpectedError(t, err, nil)
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"plugin", "list"}, tc.args...)...)
 
-	err = testutils_cobra.ExecutePingcli(t, "plugin", "list", "-h")
-	testutils.CheckExpectedError(t, err, nil)
+			if !tc.expectErr {
+				require.NoError(t, err)
+				return
+			}
+
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }

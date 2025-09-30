@@ -103,7 +103,7 @@ func CreateConfigFile(t *testing.T) string {
 	t.Helper()
 
 	if configFileContents == "" {
-		configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
+		configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
 	}
 
 	configFilePath := t.TempDir() + "/config.yaml"
@@ -132,7 +132,7 @@ func InitKoanfs(t *testing.T) *profiles.KoanfConfig {
 
 	configuration.InitAllOptions()
 
-	configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
+	configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
 
 	return configureMainKoanf(t)
 }
@@ -140,11 +140,13 @@ func InitKoanfs(t *testing.T) *profiles.KoanfConfig {
 func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 	t.Helper()
 
-	configFileContents = fileContents
+	configuration.InitAllOptions()
+
+	configFileContents = strings.Replace(fileContents, outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
 	configureMainKoanf(t)
 }
 
-func getDefaultConfigFileContents() string {
+func GetDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
@@ -157,7 +159,7 @@ func getDefaultConfigFileContents() string {
 	)
 }
 
-func ReturnDefaultLegacyConfigFileContents() string {
+func GetDefaultLegacyConfigFileContents() string {
 	return fmt.Sprintf(defaultLegacyConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,

@@ -4,82 +4,110 @@ package plugin_test
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/cmd/common"
+	plugin_internal "github.com/pingidentity/pingcli/internal/commands/plugin"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Plugin add Command Executes without issue
-func TestPluginAddCmd_Execute(t *testing.T) {
-	// Create a temporary PATH for a test plugin
+func Test_PluginAddCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	goldenPlugin := createGoldenPluginExecutable(t)
+	pluginFilename := filepath.Base(goldenPlugin)
+	require.FileExists(t, goldenPlugin, "Test plugin executable does not exist")
+
+	defer os.Remove(goldenPlugin)
+
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name:      "Happy Path",
+			args:      []string{pluginFilename},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - help",
+			args:      []string{"--help"},
+			expectErr: false,
+		},
+		{
+			name: "Non-existent plugin",
+			args: []string{
+				"non-existent-plugin",
+			},
+			expectErr:     true,
+			expectedErrIs: plugin_internal.ErrPluginNotFound,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{"arg", "extra-arg"},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"test-plugin-name", "--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+		{
+			name:          "Too few arguments",
+			args:          []string{},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"plugin", "add"}, tc.args...)...)
+
+			if !tc.expectErr {
+				require.NoError(t, err)
+				return
+			}
+
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.Contains(t, err.Error(), tc.expectedErrContains)
+			}
+		})
+	}
+}
+
+func createGoldenPluginExecutable(t *testing.T) string {
+	t.Helper()
+
 	pathDir := t.TempDir()
 	t.Setenv("PATH", pathDir)
 
 	testPlugin, err := os.CreateTemp(pathDir, "test-plugin-*.sh")
-	if err != nil {
-		t.Fatalf("Failed to create temporary plugin file: %v", err)
-	}
-
-	defer func() {
-		err = os.Remove(testPlugin.Name())
-		if err != nil {
-			t.Fatalf("Failed to remove temporary plugin file: %v", err)
-		}
-	}()
+	require.NoError(t, err, "Failed to create temporary plugin file")
 
 	_, err = testPlugin.WriteString("#!/usr/bin/env sh\necho \"Hello, world!\"\nexit 0\n")
-	if err != nil {
-		t.Fatalf("Failed to write to temporary plugin file: %v", err)
-	}
+	require.NoError(t, err, "Failed to write to temporary plugin file")
 
 	err = testPlugin.Chmod(0755)
-	if err != nil {
-		t.Fatalf("Failed to set permissions on temporary plugin file: %v", err)
-	}
+	require.NoError(t, err, "Failed to set permissions on temporary plugin file")
 
 	err = testPlugin.Close()
-	if err != nil {
-		t.Fatalf("Failed to close temporary plugin file: %v", err)
-	}
+	require.NoError(t, err, "Failed to close temporary plugin file")
 
-	err = testutils_cobra.ExecutePingcli(t, "plugin", "add", testPlugin.Name())
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test Plugin add Command fails when provided a non-existent plugin
-func TestPluginAddCmd_NonExistentPlugin(t *testing.T) {
-	expectedErrorPattern := `^failed to add plugin: exec: .*: executable file not found in \$PATH$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "add", "non-existent-plugin")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Plugin add Command fails when provided too many arguments
-func TestPluginAddCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli plugin add': command accepts 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "add", "test-plugin-name", "extra-arg")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Plugin add Command fails when provided too few arguments
-func TestPluginAddCmd_TooFewArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli plugin add': command accepts 1 arg\(s\), received 0$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "add")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Plugin add Command fails when provided an invalid flag
-func TestPluginAddCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "add", "test-plugin-name", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Plugin add Command --help, -h flag
-func TestPluginAddCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "add", "--help")
-	testutils.CheckExpectedError(t, err, nil)
-
-	err = testutils_cobra.ExecutePingcli(t, "plugin", "add", "-h")
-	testutils.CheckExpectedError(t, err, nil)
+	return testPlugin.Name()
 }

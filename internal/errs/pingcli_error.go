@@ -1,3 +1,5 @@
+// Copyright © 2025 Ping Identity Corporation
+
 package errs
 
 import (
@@ -12,11 +14,15 @@ type PingCLIError struct {
 }
 
 func (e *PingCLIError) Error() string {
+	if e == nil || e.Err == nil {
+		return ""
+	}
+
 	// Check if the wrapped error is also a PingCLIError to avoid redundant prefixes
-	var err *PingCLIError
-	if errors.As(e.Err, &err) {
-		if strings.EqualFold(err.Prefix, e.Prefix) {
-			return err.Error()
+	var pingErr *PingCLIError
+	if errors.As(e.Err, &pingErr) {
+		if strings.EqualFold(pingErr.Prefix, e.Prefix) {
+			return pingErr.Error()
 		}
 	}
 
@@ -24,5 +30,9 @@ func (e *PingCLIError) Error() string {
 }
 
 func (e *PingCLIError) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+
 	return e.Err
 }

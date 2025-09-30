@@ -8,6 +8,7 @@ import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
@@ -50,11 +51,11 @@ func configAddProfileRunE(cmd *cobra.Command, args []string) error {
 
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: "", Err: err}
 	}
 
 	if err := config_internal.RunInternalConfigAddProfile(os.Stdin, koanfConfig); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: "", Err: err}
 	}
 
 	return nil

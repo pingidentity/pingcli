@@ -5,51 +5,76 @@ package plugin_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/cmd/common"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Plugin remove Command Executes without issue
-func TestPluginRemoveCmd_Execute(t *testing.T) {
-	t.SkipNow()
+func Test_PluginRemoveCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	// TODO: A test plugin that responds with a valid RPC configuration is needed
-	// for pingcli to execute when the plugin is listed as used in pingcli.
-	// We can probably use a future plugin for testing once made.
-}
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		// { TODO: A test plugin that can be installed is needed to properly test removal.
+		//	name:       "Happy Path - remove existing plugin",
+		//	args:       []string{"existing-plugin"},
+		//	expectErr:  false,
+		// },
+		{
+			name:      "Happy Path - remove non-existent plugin",
+			args:      []string{"non-existent-plugin"},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - help",
+			args:      []string{"--help"},
+			expectErr: false,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{"plugin-name", "extra-arg"},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:          "Too few arguments",
+			args:          []string{},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"plugin-name", "--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+	}
 
-// Test Plugin remove Command succeeds when provided a non-existent plugin
-func TestPluginRemoveCmd_NonExistentPlugin(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "remove", "non-existent-plugin")
-	testutils.CheckExpectedError(t, err, nil)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test Plugin remove Command fails when provided too many arguments
-func TestPluginRemoveCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli plugin remove': command accepts 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "remove", "test-plugin-name", "extra-arg")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"plugin", "remove"}, tc.args...)...)
 
-// Test Plugin remove Command fails when provided too few arguments
-func TestPluginRemoveCmd_TooFewArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli plugin remove': command accepts 1 arg\(s\), received 0$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "remove")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			if !tc.expectErr {
+				require.NoError(t, err)
+				return
+			}
 
-// Test Plugin remove Command fails when provided an invalid flag
-func TestPluginRemoveCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "remove", "test-plugin-name", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Plugin remove Command --help, -h flag
-func TestPluginRemoveCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "plugin", "remove", "--help")
-	testutils.CheckExpectedError(t, err, nil)
-
-	err = testutils_cobra.ExecutePingcli(t, "plugin", "remove", "-h")
-	testutils.CheckExpectedError(t, err, nil)
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }

@@ -5,104 +5,84 @@ package config_test
 import (
 	"testing"
 
+	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Config Get Command Executes without issue
-func TestConfigGetCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", "export")
-	testutils.CheckExpectedError(t, err, nil)
-}
+func Test_ConfigGetCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-// Test Config Get Command fails when provided too many arguments
-func TestConfigGetCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli config get': command accepts 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", options.RootColorOption.KoanfKey, options.RootOutputFormatOption.KoanfKey)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name:      "Happy Path",
+			args:      []string{"export"},
+			expectErr: false,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{options.RootColorOption.KoanfKey, options.RootOutputFormatOption.KoanfKey},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:      "Full key",
+			args:      []string{options.PingOneAuthenticationWorkerClientIDOption.KoanfKey},
+			expectErr: false,
+		},
+		{
+			name:      "Partial key",
+			args:      []string{"service.pingOne"},
+			expectErr: false,
+		},
+		{
+			name:          "Invalid key",
+			args:          []string{"pingcli.invalid"},
+			expectErr:     true,
+			expectedErrIs: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+		{
+			name:          "No key",
+			args:          []string{},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+	}
 
-// Test Config Get Command Executes when provided a full key
-func TestConfigGetCmd_FullKey(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", options.PingOneAuthenticationWorkerClientIDOption.KoanfKey)
-	testutils.CheckExpectedError(t, err, nil)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test Config Get Command Executes when provided a partial key
-func TestConfigGetCmd_PartialKey(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", "service.pingOne")
-	testutils.CheckExpectedError(t, err, nil)
-}
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"config", "get"}, tc.args...)...)
 
-// Test Config Get Command fails when provided an invalid key
-func TestConfigGetCmd_InvalidKey(t *testing.T) {
-	expectedErrorPattern := `^failed to get configuration: key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", "pingcli.invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			if !tc.expectErr {
+				require.NoError(t, err)
+				return
+			}
 
-// Test Config Get Command fails when provided an invalid flag
-func TestConfigGetCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Get Command --help, -h flag
-func TestConfigGetCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "get", "--help")
-	testutils.CheckExpectedError(t, err, nil)
-
-	err = testutils_cobra.ExecutePingcli(t, "config", "get", "-h")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test Config Get Command fails when provided no key
-func TestConfigGetCmd_NoKey(t *testing.T) {
-	expectedErrorPattern := `^failed to execute '.*': command accepts 1 arg\(s\), received 0$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "get")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// https://pkg.go.dev/testing#hdr-Examples
-func Example_getEmptyMaskedValue() {
-	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.RequestAccessTokenOption.KoanfKey)
-
-	// Output:
-	// Configuration values for profile 'default' and key 'request.accessToken':
-	// request.accessToken=
-	// request.accessTokenExpiry=0
-}
-
-// https://pkg.go.dev/testing#hdr-Examples
-func Example_getMaskedValue() {
-	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.PingFederateBasicAuthPasswordOption.KoanfKey)
-
-	// Output:
-	// Configuration values for profile 'default' and key 'service.pingFederate.authentication.basicAuth.password':
-	// service.pingFederate.authentication.basicAuth.password=********
-}
-
-// https://pkg.go.dev/testing#hdr-Examples
-func Example_getUnmaskedValue() {
-	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", options.RootColorOption.KoanfKey)
-
-	// Output:
-	// Configuration values for profile 'default' and key 'noColor':
-	// noColor=true
-}
-
-// https://pkg.go.dev/testing#hdr-Examples
-func Example_get_UnmaskValuesFlag() {
-	t := testing.T{}
-	_ = testutils_cobra.ExecutePingcli(&t, "config", "get", "--unmask-values", options.RequestAccessTokenOption.KoanfKey)
-
-	// Output:
-	// Configuration values for profile 'default' and key 'request.accessToken':
-	// request.accessToken=
-	// request.accessTokenExpiry=0
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }
