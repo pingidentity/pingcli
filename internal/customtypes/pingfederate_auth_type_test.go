@@ -6,44 +6,123 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/pingidentity/pingcli/internal/utils"
+	"github.com/stretchr/testify/require"
 )
 
-// Test PingFederateAuthType Set function
 func Test_PingFederateAuthType_Set(t *testing.T) {
-	// Create a new PingFederateAuthType
-	pingAuthType := new(customtypes.PingFederateAuthenticationType)
+	testutils_koanf.InitKoanfs(t)
 
-	err := pingAuthType.Set(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC)
-	testutils.CheckExpectedError(t, err, nil)
+	testCases := []struct {
+		name          string
+		cType         *customtypes.PingFederateAuthenticationType
+		value         string
+		expectedError error
+	}{
+		{
+			name:  "Happy path",
+			cType: new(customtypes.PingFederateAuthenticationType),
+			value: customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
+		},
+		{
+			name:  "Happy path - empty",
+			cType: new(customtypes.PingFederateAuthenticationType),
+			value: "",
+		},
+		{
+			name:          "Invalid value",
+			cType:         new(customtypes.PingFederateAuthenticationType),
+			value:         "invalid",
+			expectedError: customtypes.ErrUnrecognizedPingFederateAuth,
+		},
+		{
+			name:          "Nil custom type",
+			cType:         nil,
+			value:         customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
+			expectedError: customtypes.ErrCustomTypeNil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := tc.cType.Set(tc.value)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
 }
 
-// Test Set function fails with invalid value
-func Test_PingFederateAuthType_Set_InvalidValue(t *testing.T) {
-	pingAuthType := new(customtypes.PingFederateAuthenticationType)
+func Test_PingFederateAuthType_Type(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	invalidValue := "invalid"
-	expectedErrorPattern := `^unrecognized PingFederate Authentication Type: '.*'\. Must be one of: .*$`
-	err := pingAuthType.Set(invalidValue)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	testCases := []struct {
+		name         string
+		cType        *customtypes.PingFederateAuthenticationType
+		expectedType string
+	}{
+		{
+			name:         "Happy path",
+			cType:        utils.Pointer(customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC)),
+			expectedType: "string",
+		},
+		{
+			name:         "Nil custom type",
+			cType:        nil,
+			expectedType: "string",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualType := tc.cType.Type()
+
+			require.Equal(t, tc.expectedType, actualType)
+		})
+	}
 }
 
-// Test Set function fails with nil
-func Test_PingFederateAuthType_Set_Nil(t *testing.T) {
-	var pingAuthType *customtypes.PingFederateAuthenticationType
-
-	expectedErrorPattern := `^failed to set PingFederate Authentication Type value: .*\. PingFederate Authentication Type is nil$`
-	err := pingAuthType.Set(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test String function
 func Test_PingFederateAuthType_String(t *testing.T) {
-	pingAuthType := customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC)
+	testutils_koanf.InitKoanfs(t)
 
-	expected := customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC
-	actual := pingAuthType.String()
-	if actual != expected {
-		t.Errorf("String returned: %s, expected: %s", actual, expected)
+	testCases := []struct {
+		name        string
+		cType       *customtypes.PingFederateAuthenticationType
+		expectedStr string
+	}{
+		{
+			name:        "Happy path",
+			cType:       utils.Pointer(customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC)),
+			expectedStr: customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC,
+		},
+		{
+			name:        "Happy path - empty",
+			cType:       utils.Pointer(customtypes.PingFederateAuthenticationType("")),
+			expectedStr: "",
+		},
+		{
+			name:        "Nil custom type",
+			cType:       nil,
+			expectedStr: "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualStr := tc.cType.String()
+
+			require.Equal(t, tc.expectedStr, actualStr)
+		})
 	}
 }

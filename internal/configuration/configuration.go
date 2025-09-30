@@ -23,6 +23,7 @@ var (
 	configurationErrorPrefix   = "configuration options error"
 	ErrInvalidConfigurationKey = errors.New("provided key is not recognized as a valid configuration key.\nuse 'pingcli config list-keys' to view all available keys")
 	ErrNoOptionForKey          = errors.New("no option found for the provided configuration key")
+	ErrEmptyKeyForOptionSearch = errors.New("empty key provided for option search, too many matches with options not configured with a koanf key")
 )
 
 func KoanfKeys() (keys []string) {
@@ -83,6 +84,10 @@ func ValidateParentKoanfKey(koanfKey string) error {
 }
 
 func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
+	if koanfKey == "" {
+		return opt, &errs.PingCLIError{Prefix: configurationErrorPrefix, Err: ErrEmptyKeyForOptionSearch}
+	}
+
 	for _, opt := range options.Options() {
 		if strings.EqualFold(opt.KoanfKey, koanfKey) {
 			return opt, nil

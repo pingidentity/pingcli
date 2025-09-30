@@ -11,35 +11,35 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_ExportFormat_Set(t *testing.T) {
+func Test_LicenseVersion_Set(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	testCases := []struct {
 		name          string
-		cType         *customtypes.ExportFormat
-		formatStr     string
+		cType         *customtypes.LicenseVersion
+		value         string
 		expectedError error
 	}{
 		{
-			name:      "Happy path - HCL",
-			cType:     new(customtypes.ExportFormat),
-			formatStr: customtypes.ENUM_EXPORT_FORMAT_HCL,
+			name:  "Happy path",
+			cType: new(customtypes.LicenseVersion),
+			value: "12.3",
 		},
 		{
-			name:      "Happy path - empty",
-			cType:     new(customtypes.ExportFormat),
-			formatStr: "",
+			name:  "Happy path - empty",
+			cType: new(customtypes.LicenseVersion),
+			value: "",
 		},
 		{
 			name:          "Invalid value",
-			cType:         new(customtypes.ExportFormat),
-			formatStr:     "invalid",
-			expectedError: customtypes.ErrUnrecognisedFormat,
+			cType:         new(customtypes.LicenseVersion),
+			value:         "invalid",
+			expectedError: customtypes.ErrInvalidVersionFormat,
 		},
 		{
 			name:          "Nil custom type",
 			cType:         nil,
-			formatStr:     customtypes.ENUM_EXPORT_FORMAT_HCL,
+			value:         "12.3",
 			expectedError: customtypes.ErrCustomTypeNil,
 		},
 	}
@@ -48,7 +48,7 @@ func Test_ExportFormat_Set(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			testutils_koanf.InitKoanfs(t)
 
-			err := tc.cType.Set(tc.formatStr)
+			err := tc.cType.Set(tc.value)
 
 			if tc.expectedError != nil {
 				require.Error(t, err)
@@ -60,22 +60,17 @@ func Test_ExportFormat_Set(t *testing.T) {
 	}
 }
 
-func Test_ExportFormat_Type(t *testing.T) {
+func Test_LicenseVersion_Type(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	testCases := []struct {
 		name         string
-		cType        *customtypes.ExportFormat
+		cType        *customtypes.LicenseVersion
 		expectedType string
 	}{
 		{
-			name:         "Happy path - HCL",
-			cType:        utils.Pointer(customtypes.ExportFormat(customtypes.ENUM_EXPORT_FORMAT_HCL)),
-			expectedType: "string",
-		},
-		{
-			name:         "Happy path - empty",
-			cType:        utils.Pointer(customtypes.ExportFormat("")),
+			name:         "Happy path",
+			cType:        utils.Pointer(customtypes.LicenseVersion("12.3")),
 			expectedType: "string",
 		},
 		{
@@ -96,22 +91,22 @@ func Test_ExportFormat_Type(t *testing.T) {
 	}
 }
 
-func Test_ExportFormat_String(t *testing.T) {
+func Test_LicenseVersion_String(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	testCases := []struct {
 		name        string
-		cType       *customtypes.ExportFormat
+		cType       *customtypes.LicenseVersion
 		expectedStr string
 	}{
 		{
-			name:        "Happy path - HCL",
-			cType:       utils.Pointer(customtypes.ExportFormat(customtypes.ENUM_EXPORT_FORMAT_HCL)),
-			expectedStr: customtypes.ENUM_EXPORT_FORMAT_HCL,
+			name:        "Happy path",
+			cType:       utils.Pointer(customtypes.LicenseVersion("12.3")),
+			expectedStr: "12.3",
 		},
 		{
-			name:        "Happy path - Empty",
-			cType:       utils.Pointer(customtypes.ExportFormat("")),
+			name:        "Happy path - empty",
+			cType:       utils.Pointer(customtypes.LicenseVersion("")),
 			expectedStr: "",
 		},
 		{
@@ -130,16 +125,4 @@ func Test_ExportFormat_String(t *testing.T) {
 			require.Equal(t, tc.expectedStr, actualStr)
 		})
 	}
-}
-
-func Test_ExportFormatValidValues(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedValues := []string{
-		customtypes.ENUM_EXPORT_FORMAT_HCL,
-	}
-
-	actualValues := customtypes.ExportFormatValidValues()
-
-	require.Equal(t, expectedValues, actualValues)
 }

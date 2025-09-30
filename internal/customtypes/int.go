@@ -3,10 +3,17 @@
 package customtypes
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
+)
+
+var (
+	intErrorPrefix = "custom type int error"
+	ErrParseInt    = errors.New("failed to parse value as int")
 )
 
 type Int int64
@@ -16,26 +23,32 @@ var _ pflag.Value = (*Int)(nil)
 
 func (i *Int) Set(val string) error {
 	if i == nil {
-		return fmt.Errorf("failed to set Int value: %s. Int is nil", val)
+		return &errs.PingCLIError{Prefix: intErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	parsedInt, err := strconv.ParseInt(val, 10, 64)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: intErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrParseInt, val, err)}
 	}
 	*i = Int(parsedInt)
 
 	return nil
 }
 
-func (i Int) Type() string {
+func (i *Int) Type() string {
 	return "int64"
 }
 
-func (i Int) String() string {
-	return strconv.FormatInt(int64(i), 10)
+func (i *Int) String() string {
+	if i == nil {
+		return "0"
+	}
+	return strconv.FormatInt(int64(*i), 10)
 }
 
-func (i Int) Int64() int64 {
-	return int64(i)
+func (i *Int) Int64() int64 {
+	if i == nil {
+		return 0
+	}
+	return int64(*i)
 }

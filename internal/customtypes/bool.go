@@ -3,10 +3,17 @@
 package customtypes
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
+)
+
+var (
+	boolErrorPrefix = "custom type bool error"
+	ErrParseBool    = errors.New("failed to parse value as bool")
 )
 
 type Bool bool
@@ -16,26 +23,34 @@ var _ pflag.Value = (*Bool)(nil)
 
 func (b *Bool) Set(val string) error {
 	if b == nil {
-		return fmt.Errorf("failed to set Bool value: %s. Bool is nil", val)
+		return &errs.PingCLIError{Prefix: boolErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	parsedBool, err := strconv.ParseBool(val)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: boolErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrParseBool, val, err)}
 	}
 	*b = Bool(parsedBool)
 
 	return nil
 }
 
-func (b Bool) Type() string {
+func (b *Bool) Type() string {
 	return "bool"
 }
 
-func (b Bool) String() string {
-	return strconv.FormatBool(bool(b))
+func (b *Bool) String() string {
+	if b == nil {
+		return "false"
+	}
+
+	return strconv.FormatBool(bool(*b))
 }
 
-func (b Bool) Bool() bool {
-	return bool(b)
+func (b *Bool) Bool() bool {
+	if b == nil {
+		return false
+	}
+
+	return bool(*b)
 }

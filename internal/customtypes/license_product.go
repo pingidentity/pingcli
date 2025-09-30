@@ -3,10 +3,12 @@
 package customtypes
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
 )
 
@@ -20,6 +22,11 @@ const (
 	ENUM_LICENSE_PRODUCT_PING_FEDERATE                string = "pingfederate"
 )
 
+var (
+	licenseProductErrorPrefix = "custom type license product error"
+	ErrUnrecognizedProduct    = errors.New("unrecognized license product")
+)
+
 type LicenseProduct string
 
 // Verify that the custom type satisfies the pflag.Value interface
@@ -28,7 +35,7 @@ var _ pflag.Value = (*LicenseProduct)(nil)
 // Implement pflag.Value interface for custom type in cobra MultiService parameter
 func (lp *LicenseProduct) Set(product string) error {
 	if lp == nil {
-		return fmt.Errorf("failed to set LicenseProduct value: %s. LicenseProduct is nil", product)
+		return &errs.PingCLIError{Prefix: licenseProductErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	switch {
@@ -49,18 +56,21 @@ func (lp *LicenseProduct) Set(product string) error {
 	case strings.EqualFold(product, ""): // Allow empty string to be set
 		*lp = LicenseProduct("")
 	default:
-		return fmt.Errorf("unrecognized License Product: '%s'. Must be one of: %s", product, strings.Join(LicenseProductValidValues(), ", "))
+		return &errs.PingCLIError{Prefix: licenseProductErrorPrefix, Err: fmt.Errorf("%w: '%s'. Must be one of: %s", ErrUnrecognizedProduct, product, strings.Join(LicenseProductValidValues(), ", "))}
 	}
 
 	return nil
 }
 
-func (lp LicenseProduct) Type() string {
+func (lp *LicenseProduct) Type() string {
 	return "string"
 }
 
-func (lp LicenseProduct) String() string {
-	return string(lp)
+func (lp *LicenseProduct) String() string {
+	if lp == nil {
+		return ""
+	}
+	return string(*lp)
 }
 
 func LicenseProductValidValues() []string {

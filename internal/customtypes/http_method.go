@@ -3,10 +3,12 @@
 package customtypes
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
 )
 
@@ -18,6 +20,11 @@ const (
 	ENUM_HTTP_METHOD_PATCH  string = "PATCH"
 )
 
+var (
+	httpMethodErrorPrefix = "custom type http method error"
+	ErrUnrecognizedMethod = errors.New("unrecognized http method")
+)
+
 type HTTPMethod string
 
 // Verify that the custom type satisfies the pflag.Value interface
@@ -27,7 +34,7 @@ var _ pflag.Value = (*HTTPMethod)(nil)
 
 func (hm *HTTPMethod) Set(httpMethod string) error {
 	if hm == nil {
-		return fmt.Errorf("failed to set HTTP Method value: %s. HTTPMethod is nil", httpMethod)
+		return &errs.PingCLIError{Prefix: httpMethodErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	switch {
@@ -44,18 +51,21 @@ func (hm *HTTPMethod) Set(httpMethod string) error {
 	case strings.EqualFold(httpMethod, ""):
 		*hm = HTTPMethod("")
 	default:
-		return fmt.Errorf("unrecognized HTTP Method: '%s'. Must be one of: %s", httpMethod, strings.Join(HTTPMethodValidValues(), ", "))
+		return &errs.PingCLIError{Prefix: httpMethodErrorPrefix, Err: fmt.Errorf("%w: '%s'. Must be one of: %s", ErrUnrecognizedMethod, httpMethod, strings.Join(HTTPMethodValidValues(), ", "))}
 	}
 
 	return nil
 }
 
-func (hm HTTPMethod) Type() string {
+func (hm *HTTPMethod) Type() string {
 	return "string"
 }
 
-func (hm HTTPMethod) String() string {
-	return string(hm)
+func (hm *HTTPMethod) String() string {
+	if hm == nil {
+		return ""
+	}
+	return string(*hm)
 }
 
 func HTTPMethodValidValues() []string {

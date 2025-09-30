@@ -3,114 +3,148 @@
 package configuration_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/require"
 )
 
-// Test ValidateKoanfKey function
 func Test_ValidateKoanfKey(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	err := configuration.ValidateKoanfKey("noColor")
-	if err != nil {
-		t.Errorf("ValidateKoanfKey returned error: %v", err)
+	testCases := []struct {
+		name          string
+		koanfKey      string
+		expectedError error
+	}{
+		{
+			name:     "Happy path - valid key",
+			koanfKey: options.RootColorOption.KoanfKey,
+		},
+		{
+			name:          "Invalid key",
+			koanfKey:      "invalid-key",
+			expectedError: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:          "Empty key",
+			koanfKey:      "",
+			expectedError: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:     "Happy Path - case insensitive key",
+			koanfKey: strings.ToUpper(options.RootColorOption.KoanfKey),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := configuration.ValidateKoanfKey(tc.koanfKey)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test ValidateKoanfKey function fails with invalid key
-func Test_ValidateKoanfKey_InvalidKey(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := configuration.ValidateKoanfKey("invalid-key")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test ValidateKoanfKey function fails with empty key
-func Test_ValidateKoanfKey_EmptyKey(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^key '' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := configuration.ValidateKoanfKey("")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test ValidateKoanfKey supports case-insensitive keys
-func Test_ValidateKoanfKey_CaseInsensitive(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := configuration.ValidateKoanfKey("NoCoLoR")
-	if err != nil {
-		t.Errorf("ValidateKoanfKey returned error: %v", err)
-	}
-}
-
-// Test ValidateParentKoanfKey function
 func Test_ValidateParentKoanfKey(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	err := configuration.ValidateParentKoanfKey("service")
-	if err != nil {
-		t.Errorf("ValidateParentKoanfKey returned error: %v", err)
+	testCases := []struct {
+		name          string
+		koanfKey      string
+		expectedError error
+	}{
+		{
+			name:     "Happy path - valid parent key",
+			koanfKey: strings.SplitN(options.PingOneAuthenticationTypeOption.KoanfKey, ".", 2)[0],
+		},
+		{
+			name:          "Invalid key",
+			koanfKey:      "invalid-parent-key",
+			expectedError: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:          "Empty key",
+			koanfKey:      "",
+			expectedError: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:     "Happy Path - case insensitive parent key",
+			koanfKey: strings.ToUpper(strings.SplitN(options.PingOneAuthenticationTypeOption.KoanfKey, ".", 2)[0]),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := configuration.ValidateParentKoanfKey(tc.koanfKey)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test ValidateParentKoanfKey function fails with invalid key
-func Test_ValidateParentKoanfKey_InvalidKey(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := configuration.ValidateParentKoanfKey("invalid-key")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test ValidateParentKoanfKey function fails with empty key
-func Test_ValidateParentKoanfKey_EmptyKey(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^key '' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := configuration.ValidateParentKoanfKey("")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test ValidateParentKoanfKey supports case-insensitive keys
-func Test_ValidateParentKoanfKey_CaseInsensitive(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := configuration.ValidateParentKoanfKey("SeRvIcE")
-	if err != nil {
-		t.Errorf("ValidateParentKoanfKey returned error: %v", err)
-	}
-}
-
-// Test OptionFromKoanfKey function
 func Test_OptionFromKoanfKey(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	opt, err := configuration.OptionFromKoanfKey("noColor")
-	if err != nil {
-		t.Errorf("OptionFromKoanfKey returned error: %v", err)
+	testCases := []struct {
+		name           string
+		koanfKey       string
+		expectedOption options.Option
+		expectedError  error
+	}{
+		{
+			name:           "Happy path - valid key",
+			koanfKey:       options.RootColorOption.KoanfKey,
+			expectedOption: options.RootColorOption,
+		},
+		{
+			name:           "Happy path - case insensitive key",
+			koanfKey:       strings.ToUpper(options.RootColorOption.KoanfKey),
+			expectedOption: options.RootColorOption,
+		},
+		{
+			name:          "Invalid key",
+			koanfKey:      "invalid-key",
+			expectedError: configuration.ErrNoOptionForKey,
+		},
+		{
+			name:          "Empty key",
+			koanfKey:      "",
+			expectedError: configuration.ErrEmptyKeyForOptionSearch,
+		},
 	}
 
-	if opt.KoanfKey != "noColor" {
-		t.Errorf("OptionFromKoanfKey returned invalid option: %v", opt)
-	}
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test OptionFromKoanfKey supports case-insensitive keys
-func Test_OptionFromKoanfKey_CaseInsensitive(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+			opt, err := configuration.OptionFromKoanfKey(tc.koanfKey)
 
-	opt, err := configuration.OptionFromKoanfKey("NoCoLoR")
-	if err != nil {
-		t.Errorf("OptionFromKoanfKey returned error: %v", err)
-	}
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
 
-	if opt.KoanfKey != options.RootColorOption.KoanfKey {
-		t.Errorf("OptionFromKoanfKey returned invalid option: %v", opt)
+			require.Equal(t, tc.expectedOption, opt)
+		})
 	}
 }
