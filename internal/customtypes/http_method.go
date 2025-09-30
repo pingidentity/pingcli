@@ -65,6 +65,7 @@ func (hm *HTTPMethod) String() string {
 	if hm == nil {
 		return ""
 	}
+
 	return string(*hm)
 }
 

@@ -70,6 +70,7 @@ func (lp *LicenseProduct) String() string {
 	if lp == nil {
 		return ""
 	}
+
 	return string(*lp)
 }
 

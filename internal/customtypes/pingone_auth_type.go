@@ -52,6 +52,7 @@ func (pat *PingOneAuthenticationType) String() string {
 	if pat == nil {
 		return ""
 	}
+
 	return string(*pat)
 }
 

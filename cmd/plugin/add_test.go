@@ -22,7 +22,10 @@ func Test_PluginAddCommand(t *testing.T) {
 	pluginFilename := filepath.Base(goldenPlugin)
 	require.FileExists(t, goldenPlugin, "Test plugin executable does not exist")
 
-	defer os.Remove(goldenPlugin)
+	t.Cleanup(func() {
+		err := os.Remove(goldenPlugin)
+		require.NoError(t, err, "Failed to remove test plugin executable")
+	})
 
 	testCases := []struct {
 		name                string
@@ -77,6 +80,7 @@ func Test_PluginAddCommand(t *testing.T) {
 
 			if !tc.expectErr {
 				require.NoError(t, err)
+
 				return
 			}
 

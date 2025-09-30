@@ -46,6 +46,7 @@ func Test_ConfigCommand(t *testing.T) {
 
 			if !tc.expectErr {
 				assert.NoError(t, err)
+
 				return
 			}
 

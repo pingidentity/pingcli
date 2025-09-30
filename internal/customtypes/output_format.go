@@ -56,6 +56,7 @@ func (o *OutputFormat) String() string {
 	if o == nil {
 		return ""
 	}
+
 	return string(*o)
 }
 

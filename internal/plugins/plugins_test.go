@@ -23,7 +23,6 @@ var (
 		Long:    "A longer description for a test plugin",
 		Example: "pingcli test-plugin --flag value",
 	}
-	testRunError = errors.New("plugin run error")
 )
 
 // mockPingCliCommand is a mock implementation of the grpc.PingCliCommand interface for testing.
@@ -35,6 +34,7 @@ func (m *mockPingCliCommand) Configuration() (*grpc.PingCliCommandConfiguration,
 	if configErr := os.Getenv("PINGCLI_TEST_PLUGIN_CONFIG_ERROR"); configErr != "" {
 		return nil, errors.New(configErr)
 	}
+
 	return testPluginConfig, nil
 }
 
@@ -42,6 +42,7 @@ func (m *mockPingCliCommand) Run(args []string, l grpc.Logger) error {
 	if runErr := os.Getenv("PINGCLI_TEST_PLUGIN_RUN_ERROR"); runErr != "" {
 		return errors.New(runErr)
 	}
+
 	return fmt.Errorf("args: %s", strings.Join(args, ","))
 }
 
@@ -54,13 +55,17 @@ func TestMain(m *testing.M) {
 			},
 			GRPCServer: hplugin.DefaultGRPCServer,
 		})
+
 		return
 	}
 	os.Exit(m.Run())
 }
 
 func setupPluginTest(t *testing.T) string {
+	t.Helper()
+
 	t.Setenv("PINGCLI_TEST_PLUGIN", "1")
+
 	return os.Args[0]
 }
 

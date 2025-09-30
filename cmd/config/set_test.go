@@ -84,6 +84,7 @@ func Test_ConfigSetCommand(t *testing.T) {
 
 			if !tc.expectErr {
 				require.NoError(t, err)
+
 				return
 			}
 

@@ -52,6 +52,7 @@ func (rs *RequestService) String() string {
 	if rs == nil {
 		return ""
 	}
+
 	return string(*rs)
 }
 

@@ -215,6 +215,7 @@ func filterRootFlags(cmd *cobra.Command, args []string) []string {
 		if flag == nil {
 			// If it's not a recognized root flag, it must be for the plugin.
 			pluginArgs = append(pluginArgs, arg)
+
 			continue
 		}
 
@@ -228,5 +229,6 @@ func filterRootFlags(cmd *cobra.Command, args []string) []string {
 		// It's a non-boolean flag in the form "--flag value". We need to skip both.
 		i++
 	}
+
 	return pluginArgs
 }

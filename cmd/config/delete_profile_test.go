@@ -67,6 +67,7 @@ func Test_ConfigDeleteProfileCommand(t *testing.T) {
 
 			if !tc.expectErr {
 				assert.NoError(t, err)
+
 				return
 			}
 

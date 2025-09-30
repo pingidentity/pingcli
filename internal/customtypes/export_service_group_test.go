@@ -161,8 +161,8 @@ func Test_ExportServiceGroup_GetServicesInGroup(t *testing.T) {
 			},
 		},
 		{
-			name:         "non existant group",
-			cType:        utils.Pointer(customtypes.ExportServiceGroup("non-existant")),
+			name:         "non existent group",
+			cType:        utils.Pointer(customtypes.ExportServiceGroup("non-existent")),
 			expectedStrs: []string{},
 		},
 		{

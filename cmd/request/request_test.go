@@ -112,6 +112,7 @@ func Test_RequestCommand_Validation(t *testing.T) {
 
 			if !tc.expectErr {
 				require.NoError(t, err)
+
 				return
 			}
 

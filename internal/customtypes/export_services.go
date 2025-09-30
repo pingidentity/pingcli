@@ -94,9 +94,7 @@ func (es *ExportServices) SetServicesByServiceGroup(serviceGroup *ExportServiceG
 		return nil
 	}
 
-	es.Set(strings.Join(serviceGroup.GetServicesInGroup(), ","))
-
-	return nil
+	return es.Set(strings.Join(serviceGroup.GetServicesInGroup(), ","))
 }
 
 func (es *ExportServices) ContainsPingOneService() bool {

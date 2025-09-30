@@ -59,6 +59,7 @@ func (esg *ExportServiceGroup) String() string {
 	if esg == nil {
 		return ""
 	}
+
 	return string(*esg)
 }
 

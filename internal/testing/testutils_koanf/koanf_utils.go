@@ -5,6 +5,7 @@ package testutils_koanf
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -106,7 +107,7 @@ func CreateConfigFile(t *testing.T) string {
 		configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
 	}
 
-	configFilePath := t.TempDir() + "/config.yaml"
+	configFilePath := filepath.Join(t.TempDir(), "config.yaml")
 	if err := os.WriteFile(configFilePath, []byte(configFileContents), 0600); err != nil {
 		t.Fatalf("Failed to create config file: %s", err)
 	}
@@ -132,7 +133,7 @@ func InitKoanfs(t *testing.T) *profiles.KoanfConfig {
 
 	configuration.InitAllOptions()
 
-	configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
+	configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, filepath.Join(t.TempDir(), "config.yaml"), 1)
 
 	return configureMainKoanf(t)
 }
@@ -142,7 +143,7 @@ func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 
 	configuration.InitAllOptions()
 
-	configFileContents = strings.Replace(fileContents, outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
+	configFileContents = strings.Replace(fileContents, outputDirectoryReplacement, filepath.Join(t.TempDir(), "config.yaml"), 1)
 	configureMainKoanf(t)
 }
 

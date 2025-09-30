@@ -24,7 +24,10 @@ func CaptureStdout(f func()) string {
 
 	f()
 
-	w.Close()
+	err := w.Close()
+	if err != nil {
+		return ""
+	}
 
 	return <-outC
 }

@@ -342,7 +342,7 @@ func createNonEmptyDir(t *testing.T) string {
 	t.Helper()
 
 	dir := t.TempDir()
-	file, err := os.CreateTemp(dir, "file-*.tf")
+	file, err := os.CreateTemp(dir, "file-*.tf") // #nosec G304
 	require.NoError(t, err)
 
 	err = file.Close()

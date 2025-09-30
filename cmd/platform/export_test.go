@@ -4,6 +4,7 @@ package platform_test
 
 import (
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -120,7 +121,9 @@ func Test_PlatformExportCommand(t *testing.T) {
 				"--" + options.PlatformExportOverwriteOption.CobraParamName + "=false",
 			},
 			setup: func(t *testing.T, tempDir string) {
-				_, err := os.Create(tempDir + "/file")
+				t.Helper()
+
+				_, err := os.Create(filepath.Join(tempDir, "file")) // #nosec G304
 				require.NoError(t, err)
 			},
 			expectErr:     true,
@@ -133,7 +136,9 @@ func Test_PlatformExportCommand(t *testing.T) {
 				"--" + options.PlatformExportOverwriteOption.CobraParamName,
 			},
 			setup: func(t *testing.T, tempDir string) {
-				_, err := os.Create(tempDir + "/file")
+				t.Helper()
+
+				_, err := os.Create(filepath.Join(tempDir, "file")) // #nosec G304
 				require.NoError(t, err)
 			},
 			expectErr: false,
@@ -331,6 +336,7 @@ func Test_PlatformExportCommand(t *testing.T) {
 
 			if !tc.expectErr {
 				require.NoError(t, err)
+
 				return
 			}
 

@@ -43,6 +43,7 @@ func (i *Int) String() string {
 	if i == nil {
 		return "0"
 	}
+
 	return strconv.FormatInt(int64(*i), 10)
 }
 
@@ -50,5 +51,6 @@ func (i *Int) Int64() int64 {
 	if i == nil {
 		return 0
 	}
+
 	return int64(*i)
 }

@@ -224,7 +224,7 @@ func Test_HeaderSlice_SetHttpRequestHeaders(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			testutils_koanf.InitKoanfs(t)
 
-			req, err := http.NewRequest(http.MethodGet, "http://localhost", nil)
+			req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://localhost", nil)
 			require.NoError(t, err)
 
 			tc.cType.SetHttpRequestHeaders(req)

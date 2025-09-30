@@ -93,6 +93,7 @@ func Test_LicenseCommand(t *testing.T) {
 
 			if !tc.expectErr {
 				require.NoError(t, err)
+
 				return
 			}
 

@@ -47,6 +47,7 @@ func Test_PlatformCommand(t *testing.T) {
 
 			if !tc.expectErr {
 				require.NoError(t, err)
+
 				return
 			}
 

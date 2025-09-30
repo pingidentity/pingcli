@@ -86,6 +86,7 @@ func (h *HeaderSlice) String() string {
 	if h == nil {
 		return ""
 	}
+
 	return strings.Join(h.StringSlice(), ",")
 }
 

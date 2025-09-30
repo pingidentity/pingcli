@@ -69,6 +69,7 @@ func Test_ConfigUnsetCommand(t *testing.T) {
 
 			if !tc.expectErr {
 				require.NoError(t, err)
+
 				return
 			}
 

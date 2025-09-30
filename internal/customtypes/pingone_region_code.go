@@ -70,6 +70,7 @@ func (prc *PingOneRegionCode) String() string {
 	if prc == nil {
 		return ""
 	}
+
 	return string(*prc)
 }
 
