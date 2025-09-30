@@ -17,11 +17,11 @@ require (
 	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.3.0
 	github.com/manifoldco/promptui v0.9.0
-	github.com/patrickcping/pingone-go-sdk-v2 v0.14.0
-	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.1
-	github.com/patrickcping/pingone-go-sdk-v2/management v0.60.0
-	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.1
-	github.com/patrickcping/pingone-go-sdk-v2/risk v0.19.1
+	github.com/patrickcping/pingone-go-sdk-v2 v0.14.1
+	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.2
+	github.com/patrickcping/pingone-go-sdk-v2/management v0.61.0
+	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.2
+	github.com/patrickcping/pingone-go-sdk-v2/risk v0.20.0
 	github.com/pingidentity/pingfederate-go-client/v1220 v1220.0.0
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.1
@@ -164,8 +164,8 @@ require (
 	github.com/nishanths/predeclared v0.2.2 // indirect
 	github.com/nunnatsa/ginkgolinter v0.20.0 // indirect
 	github.com/oklog/run v1.2.0 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.11.1 // indirect
-	github.com/patrickcping/pingone-go-sdk-v2/verify v0.9.1 // indirect
+	github.com/patrickcping/pingone-go-sdk-v2/credentials v0.11.2 // indirect
+	github.com/patrickcping/pingone-go-sdk-v2/verify v0.9.2 // indirect
 	github.com/pavius/impi v0.0.3 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -189,7 +189,7 @@ require (
 	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
 	github.com/sashamelentyev/interfacebloat v1.1.0 // indirect
 	github.com/sashamelentyev/usestdlibvars v1.29.0 // indirect
-	github.com/securego/gosec/v2 v2.22.6 // indirect
+	github.com/securego/gosec/v2 v2.22.8 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/sivchari/containedctx v1.0.3 // indirect
 	github.com/sonatard/noctx v0.3.5 // indirect
@@ -234,7 +234,7 @@ require (
 	golang.org/x/sys v0.35.0 // indirect
 	golang.org/x/text v0.28.0 // indirect
 	golang.org/x/tools v0.36.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250721164621-a45f3dfb1074 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250728155136-f173205681a0 // indirect
 	honnef.co/go/tools v0.6.1 // indirect
 	mvdan.cc/gofumpt v0.8.0 // indirect
 	mvdan.cc/unparam v0.0.0-20250301125049-0df0534333a4 // indirect
