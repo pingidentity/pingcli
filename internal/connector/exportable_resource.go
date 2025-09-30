@@ -8,7 +8,7 @@ import (
 	"regexp"
 
 	pingoneGoClient "github.com/patrickcping/pingone-go-sdk-v2/pingone"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
+	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1230/configurationapi"
 )
 
 type ImportBlock struct {

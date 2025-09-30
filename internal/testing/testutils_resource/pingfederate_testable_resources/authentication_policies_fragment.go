@@ -11,7 +11,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
-	client "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
+	client "github.com/pingidentity/pingfederate-go-client/v1230/configurationapi"
 )
 
 func AuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
@@ -42,7 +42,7 @@ func createAuthenticationPoliciesFragment(t *testing.T, clientInfo *connector.Cl
 	clientStruct := client.AuthenticationPolicyFragment{
 		Id:   utils.Pointer("TestFragmentId"),
 		Name: utils.Pointer("TestFragmentName"),
-		RootNode: &client.AuthenticationPolicyTreeNode{
+		RootNode: client.AuthenticationPolicyTreeNode{
 			Action: client.PolicyActionAggregation{
 				AuthnSourcePolicyAction: &client.AuthnSourcePolicyAction{
 					PolicyAction: client.PolicyAction{

@@ -22,7 +22,7 @@ require (
 	github.com/patrickcping/pingone-go-sdk-v2/management v0.61.0
 	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.2
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.20.0
-	github.com/pingidentity/pingfederate-go-client/v1220 v1220.0.0
+	github.com/pingidentity/pingfederate-go-client/v1230 v1230.0.3
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10
