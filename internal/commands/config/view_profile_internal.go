@@ -7,8 +7,13 @@ import (
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
+)
+
+var (
+	viewProfileErrorPrefix = "failed to view profile"
 )
 
 func RunInternalConfigViewProfile(args []string) (err error) {
@@ -18,20 +23,25 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 	} else {
 		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
 		if err != nil {
-			return fmt.Errorf("failed to view profile: %w", err)
+			return &errs.PingCLIError{Prefix: viewProfileErrorPrefix, Err: err}
 		}
 	}
 
-	// Validate the profile name
-	err = profiles.GetKoanfConfig().ValidateExistingProfileName(pName)
+	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return fmt.Errorf("failed to view profile: %w", err)
+		return &errs.PingCLIError{Prefix: viewProfileErrorPrefix, Err: err}
+	}
+
+	// Validate the profile name
+	err = koanfConfig.ValidateExistingProfileName(pName)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: viewProfileErrorPrefix, Err: err}
 	}
 
 	// Get the Koanf configuration for the specified profile
-	koanfProfile, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
+	koanfProfile, err := koanfConfig.GetProfileKoanf(pName)
 	if err != nil {
-		return fmt.Errorf("failed to get config from profile: %w", err)
+		return &errs.PingCLIError{Prefix: viewProfileErrorPrefix, Err: err}
 	}
 
 	// Iterate over the options in profile and print them
@@ -46,7 +56,7 @@ func RunInternalConfigViewProfile(args []string) (err error) {
 		}
 
 		if err != nil {
-			return fmt.Errorf("failed to get koanf value from option: %w", err)
+			return &errs.PingCLIError{Prefix: viewProfileErrorPrefix, Err: err}
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)

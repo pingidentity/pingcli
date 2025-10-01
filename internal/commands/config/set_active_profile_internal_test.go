@@ -6,32 +6,55 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test RunInternalConfigSetActiveProfile function
 func Test_RunInternalConfigSetActiveProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	testCases := []struct {
+		name          string
+		profileName   string
+		expectedError error
+	}{
+		{
+			name:        "Set different profile as active",
+			profileName: "production",
+		},
+		{
+			name:          "Set invalid profile name as active",
+			profileName:   "(*#&)",
+			expectedError: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:          "Set non-existent profile as active",
+			profileName:   "non-existent",
+			expectedError: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:          "Set empty profile name as active",
+			profileName:   "",
+			expectedError: profiles.ErrProfileNameEmpty,
+		},
+		{
+			name:        "Set current active profile as active",
+			profileName: "default",
+		},
+	}
 
-	err := RunInternalConfigSetActiveProfile([]string{"production"}, os.Stdin)
-	testutils.CheckExpectedError(t, err, nil)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test RunInternalConfigSetActiveProfile function fails with invalid profile name
-func Test_RunInternalConfigSetActiveProfile_InvalidProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+			err := RunInternalConfigSetActiveProfile([]string{tc.profileName}, os.Stdin)
 
-	expectedErrorPattern := `^failed to set active profile: invalid profile name: '.*' profile does not exist$`
-	err := RunInternalConfigSetActiveProfile([]string{"(*#&)"}, os.Stdin)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSetActiveProfile function fails with non-existent profile
-func Test_RunInternalConfigSetActiveProfile_NonExistentProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set active profile: invalid profile name: '.*' profile does not exist$`
-	err := RunInternalConfigSetActiveProfile([]string{"non-existent"}, os.Stdin)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }

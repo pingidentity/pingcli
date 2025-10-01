@@ -3,141 +3,119 @@
 package config_internal
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/require"
 )
 
-// Test RunInternalConfigSet function
 func Test_RunInternalConfigSet(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	err := RunInternalConfigSet("noColor=true")
-	if err != nil {
-		t.Errorf("RunInternalConfigSet returned error: %v", err)
-	}
-}
-
-// Test RunInternalConfigSet function fails when active profile is set
-func Test_RunInternalConfigSet_InvalidActiveProfileUse(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	var (
-		profileName = customtypes.String("default")
-	)
-
-	options.RootProfileOption.Flag.Changed = true
-	options.RootProfileOption.CobraParamValue = &profileName
-	expectedErrorPattern := `^failed to set configuration: invalid assignment. Please use the 'pingcli config set active-profile <profile-name>' command to set the active profile`
-	err := RunInternalConfigSet("activeProfile=myNewProfile")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with invalid key
-func Test_RunInternalConfigSet_InvalidKey(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set configuration: key '.*' is not recognized as a valid configuration key.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := RunInternalConfigSet("invalid-key=false")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with invalid value
-func Test_RunInternalConfigSet_InvalidValue(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set configuration: value for key '.*' must be a boolean. Allowed .*: strconv.ParseBool: parsing ".*": invalid syntax$`
-	err := RunInternalConfigSet("noColor=invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with non-existent profile name
-func Test_RunInternalConfigSet_NonExistentProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	var (
-		profileName = customtypes.String("non-existent")
-	)
-
-	options.RootProfileOption.Flag.Changed = true
-	options.RootProfileOption.CobraParamValue = &profileName
-
-	expectedErrorPattern := `^failed to set configuration: invalid profile name: '.*' profile does not exist$`
-	err := RunInternalConfigSet("noColor=true")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function with different profile
-func Test_RunInternalConfigSet_DifferentProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	var (
-		profileName = customtypes.String("production")
-	)
-
-	options.RootProfileOption.Flag.Changed = true
-	options.RootProfileOption.CobraParamValue = &profileName
-
-	err := RunInternalConfigSet("noColor=true")
-	if err != nil {
-		t.Errorf("RunInternalConfigSet returned error: %v", err)
-	}
-}
-
-// Test RunInternalConfigSet function fails with invalid profile name
-func Test_RunInternalConfigSet_InvalidProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	var (
-		profileName = customtypes.String("*&%*&")
-	)
-
-	options.RootProfileOption.Flag.Changed = true
-	options.RootProfileOption.CobraParamValue = &profileName
-
-	expectedErrorPattern := `^failed to set configuration: invalid profile name: '.*' profile does not exist$`
-	err := RunInternalConfigSet("noColor=true")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with no value provided
-func Test_RunInternalConfigSet_NoValue(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set configuration: value for key '.*' is empty. Use 'pingcli config unset .*' to unset the key$`
-	err := RunInternalConfigSet("noColor=")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigSet function fails with no keyValue provided
-func Test_RunInternalConfigSet_NoKeyValue(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^failed to set configuration: invalid assignment format ''\. Expect 'key=value' format$`
-	err := RunInternalConfigSet("")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Test_RunInternalConfigSet function succeeds with case-insensitive keys
-func Test_RunInternalConfigSet_CaseInsensitiveKeys(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := RunInternalConfigSet("NoCoLoR=true")
-	if err != nil {
-		t.Errorf("RunInternalConfigSet returned error: %v", err)
+	testCases := []struct {
+		name          string
+		profileName   customtypes.String
+		checkOption   *options.Option
+		checkValue    string
+		kvPair        string
+		expectedError error
+	}{
+		{
+			name:        "Set noColor to True",
+			checkOption: &options.RootColorOption,
+			checkValue:  "true",
+			kvPair:      fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+		},
+		{
+			name:          "Set active profile",
+			kvPair:        fmt.Sprintf("%s=production", options.RootActiveProfileOption.KoanfKey),
+			expectedError: ErrActiveProfileAssignment,
+		},
+		{
+			name:          "Set non-existent key",
+			kvPair:        "nonExistantKey=true",
+			expectedError: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:          "Set boolean key with invalid variable type",
+			kvPair:        fmt.Sprintf("%s=invalid", options.RootColorOption.KoanfKey),
+			expectedError: ErrMustBeBoolean,
+		},
+		{
+			name:          "Set key on non-existent profile",
+			profileName:   "non-existent",
+			kvPair:        fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+			expectedError: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:        "Set noColor to True on different profile",
+			profileName: "production",
+			checkOption: &options.RootColorOption,
+			checkValue:  "true",
+			kvPair:      fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+		},
+		{
+			name:          "Set key on invalid profile name format",
+			profileName:   "(*#&)",
+			kvPair:        fmt.Sprintf("%s=true", options.RootColorOption.KoanfKey),
+			expectedError: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:          "Set key with empty value",
+			kvPair:        fmt.Sprintf("%s=", options.RootColorOption.KoanfKey),
+			expectedError: ErrEmptyValue,
+		},
+		{
+			name:          "Run set command with no key-value pair provided",
+			kvPair:        "",
+			expectedError: ErrKeyAssignmentFormat,
+		},
+		{
+			name:          "Run set with invalid key-value assignment format",
+			kvPair:        "key::value",
+			expectedError: ErrKeyAssignmentFormat,
+		},
+		{
+			name:        "Set value with case-insensitive key",
+			kvPair:      "nOcOlOr=true",
+			checkOption: &options.RootColorOption,
+			checkValue:  "true",
+		},
 	}
 
-	// Make sure the actual correct key was set, not the case-insensitive one
-	vVal, err := profiles.GetOptionValue(options.RootColorOption)
-	if err != nil {
-		t.Errorf("GetOptionValue returned error: %v", err)
-	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-	if vVal != "true" {
-		t.Errorf("Expected %s to be true, got %v", options.RootColorOption.KoanfKey, vVal)
+			if tc.profileName != "" {
+				options.RootProfileOption.Flag.Changed = true
+				options.RootProfileOption.CobraParamValue = &tc.profileName
+			}
+
+			err := RunInternalConfigSet(tc.kvPair)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+
+			if tc.checkOption != nil {
+				vVal, err := profiles.GetOptionValue(*tc.checkOption)
+				if err != nil {
+					require.Fail(t, "GetOptionValue returned error: %v", err)
+				}
+
+				if vVal != tc.checkValue {
+					require.Fail(t, "Expected %s to be %s, got %v", tc.checkOption.KoanfKey, tc.checkValue, vVal)
+				}
+			}
+		})
 	}
 }

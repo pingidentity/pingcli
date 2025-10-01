@@ -3,11 +3,15 @@
 package customtypes
 
 import (
-	"fmt"
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
+)
+
+var (
+	stringSliceErrorPrefix = "custom type string slice error"
 )
 
 type StringSlice []string
@@ -17,7 +21,7 @@ var _ pflag.Value = (*StringSlice)(nil)
 
 func (ss *StringSlice) Set(val string) error {
 	if ss == nil {
-		return fmt.Errorf("failed to set StringSlice value: %s. StringSlice is nil", val)
+		return &errs.PingCLIError{Prefix: stringSliceErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	if val == "" || val == "[]" {
@@ -32,7 +36,7 @@ func (ss *StringSlice) Set(val string) error {
 
 func (ss *StringSlice) Remove(val string) (bool, error) {
 	if ss == nil {
-		return false, fmt.Errorf("failed to remove StringSlice value: %s. StringSlice is nil", val)
+		return false, &errs.PingCLIError{Prefix: stringSliceErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	if val == "" || val == "[]" {
@@ -50,18 +54,22 @@ func (ss *StringSlice) Remove(val string) (bool, error) {
 	return false, nil
 }
 
-func (ss StringSlice) Type() string {
+func (ss *StringSlice) Type() string {
 	return "[]string"
 }
 
-func (ss StringSlice) String() string {
+func (ss *StringSlice) String() string {
+	if ss == nil {
+		return ""
+	}
+
 	return strings.Join(ss.StringSlice(), ",")
 }
 
-func (ss StringSlice) StringSlice() []string {
+func (ss *StringSlice) StringSlice() []string {
 	if ss == nil {
 		return []string{}
 	}
 
-	return []string(ss)
+	return []string(*ss)
 }

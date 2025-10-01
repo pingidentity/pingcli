@@ -6,54 +6,76 @@ import (
 	"os"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test RunInternalPluginAdd function
 func Test_RunInternalPluginAdd(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	// Create a temporary $PATH for a test plugin
+	goldenPluginFileName := createGoldenPlugin(t)
+
+	testCases := []struct {
+		name          string
+		pluginName    string
+		expectedError error
+	}{
+		{
+			name:       "Happy path - Add plugin",
+			pluginName: goldenPluginFileName,
+		},
+		{
+			name:          "Test non-existent plugin",
+			pluginName:    "non-existent-plugin",
+			expectedError: ErrPluginNotFound,
+		},
+		{
+			name:          "Test empty plugin name",
+			pluginName:    "",
+			expectedError: ErrPluginNameEmpty,
+		},
+		// TODO - In testutils_koanf.InitKoanfs(t), create a valid plugin executable and add it to the config and path similar to below
+		// {
+		// 	name:          "Test adding a plugin that already exists",
+		// 	pluginName:    "existing-plugin",
+		// 	expectedError: ErrPluginAlreadyExists,
+		// },
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := RunInternalPluginAdd(tc.pluginName)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}
+
+func createGoldenPlugin(t *testing.T) string {
+	t.Helper()
+
 	pathDir := t.TempDir()
 	t.Setenv("PATH", pathDir)
 
 	testPlugin, err := os.CreateTemp(pathDir, "test-plugin-*.sh")
-	if err != nil {
-		t.Fatalf("Failed to create temporary plugin file: %v", err)
-	}
-
-	defer func() {
-		err = os.Remove(testPlugin.Name())
-		if err != nil {
-			t.Fatalf("Failed to remove temporary plugin file: %v", err)
-		}
-	}()
+	require.NoError(t, err)
 
 	_, err = testPlugin.WriteString("#!/usr/bin/env sh\necho \"Hello, world!\"\nexit 0\n")
-	if err != nil {
-		t.Fatalf("Failed to write to temporary plugin file: %v", err)
-	}
+	require.NoError(t, err)
 
 	err = testPlugin.Chmod(0755)
-	if err != nil {
-		t.Fatalf("Failed to set permissions on temporary plugin file: %v", err)
-	}
+	require.NoError(t, err)
 
 	err = testPlugin.Close()
-	if err != nil {
-		t.Fatalf("Failed to close temporary plugin file: %v", err)
-	}
+	require.NoError(t, err)
 
-	err = RunInternalPluginAdd(testPlugin.Name())
-	if err != nil {
-		t.Errorf("RunInternalPluginAdd returned error: %v", err)
-	}
-}
-
-// Test RunInternalPluginAdd function fails with non-existent plugin
-func Test_RunInternalPluginAdd_NonExistentPlugin(t *testing.T) {
-	expectedErrorPattern := `^failed to add plugin: exec: .*: executable file not found in \$PATH$`
-	err := RunInternalPluginAdd("non-existent-plugin")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	return testPlugin.Name()
 }

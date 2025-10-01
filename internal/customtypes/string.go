@@ -3,9 +3,12 @@
 package customtypes
 
 import (
-	"fmt"
-
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
+)
+
+var (
+	stringErrorPrefix = "custom type string error"
 )
 
 type String string
@@ -15,7 +18,7 @@ var _ pflag.Value = (*String)(nil)
 
 func (s *String) Set(val string) error {
 	if s == nil {
-		return fmt.Errorf("failed to set String value: %s. String is nil", val)
+		return &errs.PingCLIError{Prefix: stringErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	*s = String(val)
@@ -23,10 +26,14 @@ func (s *String) Set(val string) error {
 	return nil
 }
 
-func (s String) Type() string {
+func (s *String) Type() string {
 	return "string"
 }
 
-func (s String) String() string {
-	return string(s)
+func (s *String) String() string {
+	if s == nil {
+		return ""
+	}
+
+	return string(*s)
 }

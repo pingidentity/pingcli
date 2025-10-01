@@ -8,18 +8,23 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var (
+	getErrorPrefix = "failed to get configuration"
+)
+
 func RunInternalConfigGet(koanfKey string) (err error) {
 	if err = configuration.ValidateParentKoanfKey(koanfKey); err != nil {
-		return fmt.Errorf("failed to get configuration: %w", err)
+		return &errs.PingCLIError{Prefix: getErrorPrefix, Err: err}
 	}
 
 	pName, err := readConfigGetOptions()
 	if err != nil {
-		return fmt.Errorf("failed to get configuration: %w", err)
+		return &errs.PingCLIError{Prefix: getErrorPrefix, Err: err}
 	}
 
 	msgStr := fmt.Sprintf("Configuration values for profile '%s' and key '%s':\n", pName, koanfKey)
@@ -37,7 +42,7 @@ func RunInternalConfigGet(koanfKey string) (err error) {
 
 		vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 		if err != nil {
-			return fmt.Errorf("failed to get configuration: %w", err)
+			return &errs.PingCLIError{Prefix: getErrorPrefix, Err: err}
 		}
 
 		unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -65,11 +70,11 @@ func readConfigGetOptions() (pName string, err error) {
 	}
 
 	if err != nil {
-		return "", err
+		return pName, &errs.PingCLIError{Prefix: getErrorPrefix, Err: err}
 	}
 
 	if pName == "" {
-		return "", fmt.Errorf("unable to determine profile to get configuration from")
+		return pName, &errs.PingCLIError{Prefix: getErrorPrefix, Err: ErrUndeterminedProfile}
 	}
 
 	return pName, nil

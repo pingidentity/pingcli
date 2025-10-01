@@ -53,7 +53,6 @@ linters:
     - staticcheck
     - tagalign
     - testableexamples
-    - testpackage
     - thelper
     - tparallel
     - unconvert

@@ -6,81 +6,170 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/pingidentity/pingcli/internal/utils"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Bool Set function
 func Test_Bool_Set(t *testing.T) {
-	b := new(customtypes.Bool)
-	val := "true"
+	testutils_koanf.InitKoanfs(t)
 
-	err := b.Set(val)
-	if err != nil {
-		t.Errorf("Set returned error: %v", err)
+	testCases := []struct {
+		name          string
+		cType         *customtypes.Bool
+		boolStr       string
+		expectedError error
+	}{
+		{
+			name:    "Happy path - true",
+			cType:   new(customtypes.Bool),
+			boolStr: "true",
+		},
+		{
+			name:    "Happy path - false",
+			cType:   new(customtypes.Bool),
+			boolStr: "false",
+		},
+		{
+			name:          "Invalid value",
+			cType:         new(customtypes.Bool),
+			boolStr:       "invalid",
+			expectedError: customtypes.ErrParseBool,
+		},
+		{
+			name:          "Empty value",
+			cType:         new(customtypes.Bool),
+			boolStr:       "",
+			expectedError: customtypes.ErrParseBool,
+		},
+		{
+			name:          "Nil custom bool type",
+			cType:         nil,
+			boolStr:       "true",
+			expectedError: customtypes.ErrCustomTypeNil,
+		},
 	}
 
-	val = "false"
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-	err = b.Set(val)
-	if err != nil {
-		t.Errorf("Set returned error: %v", err)
+			err := tc.cType.Set(tc.boolStr)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test Set function fails with invalid value
-func Test_Bool_Set_InvalidValue(t *testing.T) {
-	b := new(customtypes.Bool)
-	val := "invalid"
+func Test_Bool_Type(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	expectedErrorPattern := `^strconv.ParseBool: parsing ".*": invalid syntax$`
-	err := b.Set(val)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	testCases := []struct {
+		name         string
+		cType        *customtypes.Bool
+		expectedType string
+	}{
+		{
+			name:         "Happy path - true",
+			cType:        utils.Pointer(customtypes.Bool(true)),
+			expectedType: "bool",
+		},
+		{
+			name:         "Happy path - false",
+			cType:        utils.Pointer(customtypes.Bool(false)),
+			expectedType: "bool",
+		},
+		{
+			name:         "Nil custom bool type",
+			cType:        nil,
+			expectedType: "bool",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualType := tc.cType.Type()
+
+			require.Equal(t, tc.expectedType, actualType)
+		})
+	}
 }
 
-// Test Set function fails with nil
-func Test_Bool_Set_Nil(t *testing.T) {
-	var b *customtypes.Bool
-	val := "true"
-
-	expectedErrorPattern := `^failed to set Bool value: .* Bool is nil$`
-	err := b.Set(val)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test String function
 func Test_Bool_String(t *testing.T) {
-	b := customtypes.Bool(true)
+	testutils_koanf.InitKoanfs(t)
 
-	expected := "true"
-	actual := b.String()
-	if actual != expected {
-		t.Errorf("String returned: %s, expected: %s", actual, expected)
+	testCases := []struct {
+		name        string
+		cType       *customtypes.Bool
+		expectedStr string
+	}{
+		{
+			name:        "Happy path - true",
+			cType:       utils.Pointer(customtypes.Bool(true)),
+			expectedStr: "true",
+		},
+		{
+			name:        "Happy path - false",
+			cType:       utils.Pointer(customtypes.Bool(false)),
+			expectedStr: "false",
+		},
+		{
+			name:        "Nil custom bool type",
+			cType:       nil,
+			expectedStr: "false",
+		},
 	}
 
-	b = customtypes.Bool(false)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-	expected = "false"
-	actual = b.String()
-	if actual != expected {
-		t.Errorf("String returned: %s, expected: %s", actual, expected)
+			actualStr := tc.cType.String()
+
+			require.Equal(t, tc.expectedStr, actualStr)
+		})
 	}
 }
 
-// Test Bool function
 func Test_Bool_Bool(t *testing.T) {
-	b := customtypes.Bool(true)
+	testutils_koanf.InitKoanfs(t)
 
-	expected := true
-	actual := b.Bool()
-	if actual != expected {
-		t.Errorf("Bool returned: %t, expected: %t", actual, expected)
+	testCases := []struct {
+		name         string
+		cType        *customtypes.Bool
+		expectedBool bool
+	}{
+		{
+			name:         "Happy path - true",
+			cType:        utils.Pointer(customtypes.Bool(true)),
+			expectedBool: true,
+		},
+		{
+			name:         "Happy path - false",
+			cType:        utils.Pointer(customtypes.Bool(false)),
+			expectedBool: false,
+		},
+		{
+			name:         "Nil custom bool type",
+			cType:        nil,
+			expectedBool: false,
+		},
 	}
 
-	b = customtypes.Bool(false)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-	expected = false
-	actual = b.Bool()
-	if actual != expected {
-		t.Errorf("Bool returned: %t, expected: %t", actual, expected)
+			actualBool := tc.cType.Bool()
+
+			require.Equal(t, tc.expectedBool, actualBool)
+		})
 	}
 }

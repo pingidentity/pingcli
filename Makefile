@@ -2,6 +2,7 @@
 # This simplifies complex commands and makes the file more readable.
 .ONESHELL:
 SHELL := $(shell which bash || which sh)
+.SHELLFLAGS := -ec
 
 # ====================================================================================
 # VARIABLES
@@ -119,7 +120,6 @@ protogen: ## Generate Go code from .proto files
 
 test: _check_ping_env ## Run all tests
 	@echo "  > Test: Running all Go tests..."
-	set -e
 	for dir in $(TEST_DIRS); do
 		echo "    -> $$dir"
 		$(GOTEST) $$dir
@@ -171,7 +171,7 @@ _check_ping_env:
 
 _check_docker:
 	@echo "  > Docker: Checking if the Docker daemon is running..."
-	$(DOCKER) info > /dev/null 2>&1
+	$(DOCKER) info > /dev/null
 	echo "✅ Docker daemon is running."
 
 _run_pf_container:
@@ -188,7 +188,6 @@ _run_pf_container:
 
 _wait_for_pf:
 	@echo "  > Docker: Waiting for container to become healthy (up to 4 minutes)..."
-	set -e
 	timeout=240
 	while test $$timeout -gt 0; do
 		status=$$(docker inspect --format='{{json .State.Health.Status}}' $(CONTAINER_NAME) 2>/dev/null || echo "")

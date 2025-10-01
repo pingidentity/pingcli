@@ -3,357 +3,350 @@
 package platform_internal
 
 import (
-	"crypto/tls"
-	"net/http"
+	"fmt"
 	"os"
 	"regexp"
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
-	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
+	"github.com/stretchr/testify/require"
 )
 
-// Test RunInternalExport function
-func TestRunInternalExport(t *testing.T) {
+type testCase struct {
+	name                       string
+	services                   customtypes.ExportServices
+	checkTfFiles               bool
+	nilContext                 bool
+	cACertPemFiles             customtypes.StringSlice
+	pfAuthType                 customtypes.PingFederateAuthenticationType
+	pfAccessToken              customtypes.String
+	pfClientId                 customtypes.String
+	pfClientSecret             customtypes.String
+	pfTokenURL                 customtypes.String
+	outputDir                  customtypes.String
+	overwriteOutputDirLocation bool
+	changeWorkingDir           bool
+	overwriteOnExport          customtypes.Bool
+	expectedError              error
+}
+
+func Test_RunInternalExport(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	err := RunInternalExport(t.Context(), "v1.2.3")
-	testutils.CheckExpectedError(t, err, nil)
+	goldenCACertPemFile := createGoldenCACertPemFile(t)
+	malformedCaCertPemFile := createMalformedCACertPemFile(t)
+	unwriteableDir := createUnwriteableDir(t)
+	unreadableDir := createUnreadableDir(t)
+	nonEmptyDir := createNonEmptyDir(t)
 
-	// Check if there are terraform files in the export directory
-	outputDir, err := profiles.GetOptionValue(options.PlatformExportOutputDirectoryOption)
-	if err != nil {
-		t.Fatalf("profiles.GetOptionValue() error = %v", err)
-	}
-
-	files, err := os.ReadDir(outputDir)
-	if err != nil {
-		t.Fatalf("os.ReadDir() error = %v", err)
-	}
-
-	// Check the number of files in the directory
-	if len(files) == 0 {
-		t.Errorf("RunInternalExport() num files = %v, want non-zero", len(files))
-	}
-
-	// Check the file type is .tf
-	re := regexp.MustCompile(`^.*\.tf$`)
-	for _, file := range files {
-		if file.IsDir() {
-			t.Errorf("RunInternalExport() file = %v, want file", file)
-		}
-
-		if !re.MatchString(file.Name()) {
-			t.Errorf("RunInternalExport() file = %v, want .tf file", file.Name())
-		}
-	}
-}
-
-// Test RunInternalExport function fails with nil context
-func TestRunInternalExportNilContext(t *testing.T) {
-	expectedErrorPattern := `^failed to run 'platform export' command\. context is nil$`
-	err := RunInternalExport(nil, "v1.2.3") //nolint:staticcheck // SA1012 this is a test
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test initPingFederateServices function
-func TestInitPingFederateServices(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := initPingFederateServices(t.Context(), "v1.2.3")
-	testutils.CheckExpectedError(t, err, nil)
-
-	// make sure pf context is not nil
-	if pingfederateContext == nil {
-		t.Errorf("initPingFederateServices() pingfederateContext = %v, want non-nil", pingfederateContext)
-	}
-
-	// check pf context has auth values included
-	if pingfederateContext.Value(pingfederateGoClient.ContextBasicAuth) == nil {
-		t.Errorf("initPingFederateServices() pingfederateContext.Value = %v, want non-nil", pingfederateContext.Value(pingfederateGoClient.ContextBasicAuth))
-	}
-}
-
-// Test initPingFederateServices function fails with nil context
-func TestInitPingFederateServicesNilContext(t *testing.T) {
-	expectedErrorPattern := `^failed to initialize PingFederate services\. context is nil$`
-	err := initPingFederateServices(nil, "v1.2.3") //nolint:staticcheck // SA1012 this is a test
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test initPingOneServices function
-func TestInitPingOneServices(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := initPingOneServices(t.Context(), "v1.2.3")
-	testutils.CheckExpectedError(t, err, nil)
-
-	// make sure po context is not nil
-	if pingoneContext == nil {
-		t.Errorf("initPingOneServices() pingoneContext = %v, want non-nil", pingoneContext)
-	}
-}
-
-// Test initPingFederateApiClient function
-func TestInitPingFederateApiClient(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{
-			InsecureSkipVerify: true, //#nosec G402 -- This is a test
+	testCases := []testCase{
+		{
+			name: "Test Happy Path - All Services",
+			services: []string{
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
+				customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE,
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_MFA,
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+				customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO,
+			},
+			checkTfFiles: true,
+		},
+		{
+			name:     "Test export with no services selected",
+			services: []string{},
+		},
+		// TODO - The PF Container used for testing needs to support Access Token Auth
+		// {
+		// 	name:         "Test Happy Path - Access Token",
+		// 	services:     []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+		// 	checkTfFiles: true,
+		// 	pfAuthType:   customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_ACCESS_TOKEN),
+		// },
+		// TODO - The PF Container used for testing needs to support Client Credentials Auth
+		// {
+		// 	name:         "Test Happy Path - PingFederate Client Credentials",
+		// 	services:     []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+		// 	checkTfFiles: true,
+		// 	pfAuthType:   customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS),
+		// },
+		{
+			name:          "Test with empty access token - PingFederate Access Token Auth",
+			services:      []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+			pfAuthType:    customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_ACCESS_TOKEN),
+			pfAccessToken: "",
+			expectedError: ErrAccessTokenEmpty,
+		},
+		{
+			name:          "Test with invalid access token - PingFederate Access Token Auth",
+			services:      []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+			pfAuthType:    customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_ACCESS_TOKEN),
+			pfAccessToken: "invalid-token",
+			expectedError: ErrPingFederateInit,
+		},
+		{
+			name:          "Test empty client credentials - PingFederate Client Credentials Auth",
+			services:      []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+			pfAuthType:    customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS),
+			pfClientId:    "",
+			expectedError: ErrClientCredentialsEmpty,
+		},
+		{
+			name:           "Test invalid client credentials - PingFederate Client Credentials Auth",
+			services:       []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+			pfAuthType:     customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS),
+			pfClientId:     "invalid-client-id",
+			pfClientSecret: "invalid-client-secret",
+			pfTokenURL:     "http://localhost:9031/pf-admin-api/v1/oauth/token",
+			expectedError:  ErrPingFederateInit,
+		},
+		{
+			name:           "Test Happy Path With PEM file - PingFederate",
+			services:       []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+			checkTfFiles:   true,
+			cACertPemFiles: *goldenCACertPemFile,
+		},
+		{
+			name:          "Test with nil context",
+			nilContext:    true,
+			expectedError: ErrNilContext,
+		},
+		{
+			name:           "Test with invalid PEM filepath - PingFederate",
+			services:       []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+			cACertPemFiles: []string{"/invalid/file/path.pem"},
+			expectedError:  ErrReadCaCertPemFile,
+		},
+		{
+			name:           "Test with malformed PEM file - PingFederate",
+			services:       []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+			cACertPemFiles: *malformedCaCertPemFile,
+			expectedError:  ErrAppendToCertPool,
+		},
+		{
+			name:          "Test invalid PingFederate Auth Type",
+			services:      []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
+			pfAuthType:    "invalid-auth-type",
+			expectedError: ErrPingFederateAuthType,
+		},
+		{
+			name:                       "Test empty output directory",
+			services:                   []string{customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT},
+			outputDir:                  "",
+			overwriteOutputDirLocation: true,
+			expectedError:              ErrOutputDirectoryEmpty,
+		},
+		{
+			name:                       "Test non-writable output directory",
+			services:                   []string{customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT},
+			outputDir:                  customtypes.String(unwriteableDir),
+			overwriteOutputDirLocation: true,
+			expectedError:              ErrCreateOutputDirectory,
+		},
+		{
+			name:                       "Test Happy Path with relative output directory",
+			services:                   []string{customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT},
+			outputDir:                  "relative-dir",
+			overwriteOutputDirLocation: true,
+			changeWorkingDir:           true,
+			checkTfFiles:               true,
+		},
+		{
+			name:                       "Test unreable output directory",
+			services:                   []string{customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT},
+			outputDir:                  customtypes.String(unreadableDir),
+			overwriteOutputDirLocation: true,
+			expectedError:              ErrReadOutputDirectory,
+		},
+		{
+			name:                       "Test non-empty output directory without overwrite",
+			services:                   []string{customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT},
+			outputDir:                  customtypes.String(nonEmptyDir),
+			overwriteOutputDirLocation: true,
+			expectedError:              ErrOutputDirectoryNotEmpty,
+		},
+		{
+			name:                       "Test non-empty output directory with overwrite",
+			services:                   []string{customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT},
+			outputDir:                  customtypes.String(nonEmptyDir),
+			overwriteOutputDirLocation: true,
+			overwriteOnExport:          true,
+			checkTfFiles:               true,
 		},
 	}
 
-	err := initPingFederateApiClient(tr, "v1.2.3")
-	testutils.CheckExpectedError(t, err, nil)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-	// make sure pf client is not nil
-	if pingfederateApiClient == nil {
-		t.Errorf("initPingFederateApiClient() pingfederateApiClient = %v, want non-nil", pingfederateApiClient)
+			setupTestCase(t, tc)
+
+			ctx := t.Context()
+			if tc.nilContext {
+				ctx = nil
+			}
+
+			err := RunInternalExport(ctx, "v1.2.3")
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+
+			if tc.checkTfFiles {
+				outputDir, err := profiles.GetOptionValue(options.PlatformExportOutputDirectoryOption)
+				require.NoError(t, err)
+
+				files, err := os.ReadDir(outputDir)
+				require.NoError(t, err)
+				require.NotZero(t, len(files), "Expected non-zero number of files in output directory")
+
+				re := regexp.MustCompile(`^.*\.tf$`)
+				for _, file := range files {
+					require.False(t, file.IsDir(), "Expected file, got directory: %v", file.Name())
+					require.True(t, re.MatchString(file.Name()), "Expected .tf file, got: %v", file.Name())
+				}
+			}
+		})
 	}
 }
 
-// Test initPingFederateApiClient function fails with nil transport
-func TestInitPingFederateApiClientNilTransport(t *testing.T) {
-	expectedErrorPattern := `^failed to initialize pingfederate API client\. http transport is nil$`
-	err := initPingFederateApiClient(nil, "v1.2.3")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+func setupTestCase(t *testing.T, tc testCase) {
+	t.Helper()
 
-// Test initPingOneApiClient function
-func TestInitPingOneApiClient(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	if tc.services != nil {
+		options.PlatformExportServiceOption.Flag.Changed = true
+		options.PlatformExportServiceOption.CobraParamValue = &tc.services
+	}
 
-	err := initPingOneApiClient(t.Context(), "v1.2.3")
-	testutils.CheckExpectedError(t, err, nil)
+	if tc.cACertPemFiles != nil {
+		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "cACertPemFiles is only applicable to PingFederate service export")
+		options.PingFederateCACertificatePemFilesOption.Flag.Changed = true
+		options.PingFederateCACertificatePemFilesOption.CobraParamValue = &tc.cACertPemFiles
+	}
 
-	// make sure po client is not nil
-	if pingoneApiClient == nil {
-		t.Errorf("initPingOneApiClient() pingoneApiClient = %v, want non-nil", pingoneApiClient)
+	if tc.pfAuthType != "" {
+		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfAuthType is only applicable to PingFederate service export")
+		options.PingFederateAuthenticationTypeOption.Flag.Changed = true
+		options.PingFederateAuthenticationTypeOption.CobraParamValue = &tc.pfAuthType
+	}
+
+	if tc.pfAccessToken != "" {
+		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfAccessToken is only applicable to PingFederate service export")
+		options.PingFederateAccessTokenAuthAccessTokenOption.Flag.Changed = true
+		options.PingFederateAccessTokenAuthAccessTokenOption.CobraParamValue = &tc.pfAccessToken
+	}
+
+	if tc.pfClientId != "" {
+		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfClientId is only applicable to PingFederate service export")
+		options.PingFederateClientCredentialsAuthClientIDOption.Flag.Changed = true
+		options.PingFederateClientCredentialsAuthClientIDOption.CobraParamValue = &tc.pfClientId
+	}
+
+	if tc.pfClientSecret != "" {
+		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfClientSecret is only applicable to PingFederate service export")
+		options.PingFederateClientCredentialsAuthClientSecretOption.Flag.Changed = true
+		options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamValue = &tc.pfClientSecret
+	}
+
+	if tc.pfTokenURL != "" {
+		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfTokenURL is only applicable to PingFederate service export")
+		options.PingFederateClientCredentialsAuthTokenURLOption.Flag.Changed = true
+		options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamValue = &tc.pfTokenURL
+	}
+
+	if tc.overwriteOutputDirLocation {
+		options.PlatformExportOutputDirectoryOption.Flag.Changed = true
+		options.PlatformExportOutputDirectoryOption.CobraParamValue = &tc.outputDir
+	}
+
+	if tc.changeWorkingDir {
+		originalWd, err := os.Getwd()
+		require.NoError(t, err)
+
+		t.Chdir(t.TempDir())
+
+		t.Cleanup(func() {
+			t.Chdir(originalWd)
+		})
+	}
+
+	if tc.overwriteOnExport {
+		options.PlatformExportOverwriteOption.Flag.Changed = true
+		options.PlatformExportOverwriteOption.CobraParamValue = &tc.overwriteOnExport
 	}
 }
 
-// Test initPingOneApiClient function fails with nil context
-func TestInitPingOneApiClientNilContext(t *testing.T) {
-	expectedErrorPattern := `^failed to initialize pingone API client\. context is nil$`
-	err := initPingOneApiClient(nil, "v1.2.3") //nolint:staticcheck // SA1012 this is a test
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+func createCaCertPemFile(t *testing.T, certStr string) *customtypes.StringSlice {
+	t.Helper()
+
+	testCACertPemFiles := new(customtypes.StringSlice)
+
+	caCertFile, err := os.CreateTemp(t.TempDir(), "caCert-*.pem")
+	require.NoError(t, err)
+
+	_, err = caCertFile.WriteString(certStr)
+	require.NoError(t, err)
+
+	err = caCertFile.Close()
+	require.NoError(t, err)
+
+	err = testCACertPemFiles.Set(caCertFile.Name())
+	require.NoError(t, err)
+
+	return testCACertPemFiles
 }
 
-// Test createOrValidateOutputDir function with non-existent directory
-func TestCreateOrValidateOutputDir(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+func createGoldenCACertPemFile(t *testing.T) *customtypes.StringSlice {
+	t.Helper()
 
-	outputDir := os.TempDir() + "/nonexistantdir"
+	certStr, err := testutils.CreateX509Certificate()
+	require.NoError(t, err)
 
-	_, err := createOrValidateOutputDir(outputDir, false)
-	testutils.CheckExpectedError(t, err, nil)
+	return createCaCertPemFile(t, certStr)
 }
 
-// Test createOrValidateOutputDir function with existent directory
-func TestCreateOrValidateOutputDirExistentDir(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+func createMalformedCACertPemFile(t *testing.T) *customtypes.StringSlice {
+	t.Helper()
 
-	outputDir := t.TempDir()
-
-	_, err := createOrValidateOutputDir(outputDir, false)
-	testutils.CheckExpectedError(t, err, nil)
+	return createCaCertPemFile(t, "malformed-cert")
 }
 
-// Test createOrValidateOutputDir function with existent directory and overwrite flag
-// when there is a file in the directory
-func TestCreateOrValidateOutputDirExistentDirWithFile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+func createUnwriteableDir(t *testing.T) string {
+	t.Helper()
 
-	outputDir := t.TempDir()
+	dir := t.TempDir()
+	err := os.Chmod(dir, 0400) // read-only
+	require.NoError(t, err)
 
-	file, err := os.Create(outputDir + "/file") //#nosec G304 -- This is a test
-	if err != nil {
-		t.Fatalf("os.Create() error = %v", err)
-	}
+	return fmt.Sprintf("%s/subdir", dir)
+}
+
+func createUnreadableDir(t *testing.T) string {
+	t.Helper()
+
+	dir := t.TempDir()
+	err := os.Chmod(dir, 0000) // no permissions
+	require.NoError(t, err)
+
+	return dir
+}
+
+func createNonEmptyDir(t *testing.T) string {
+	t.Helper()
+
+	dir := t.TempDir()
+	file, err := os.CreateTemp(dir, "file-*.tf") // #nosec G304
+	require.NoError(t, err)
+
 	err = file.Close()
-	if err != nil {
-		t.Fatalf("file.Close() error = %v", err)
-	}
+	require.NoError(t, err)
 
-	_, err = createOrValidateOutputDir(outputDir, true)
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test createOrValidateOutputDir function fails with existent directory and no overwrite flag
-// when there is a file in the directory
-func TestCreateOrValidateOutputDirExistentDirWithFileNoOverwrite(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	outputDir := t.TempDir()
-
-	file, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
-	if err != nil {
-		t.Fatalf("os.Create() error = %v", err)
-	}
-	err = file.Close()
-	if err != nil {
-		t.Fatalf("file.Close() error = %v", err)
-	}
-
-	expectedErrorPattern := `^output directory '.*' is not empty\. Use --overwrite to overwrite existing export data$`
-	_, err = createOrValidateOutputDir(outputDir, false)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test getPingOneExportEnvID function
-func TestGetPingOneExportEnvID(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	if err := getPingOneExportEnvID(); err != nil {
-		t.Errorf("getPingOneExportEnvID() error = %v, want nil", err)
-	}
-
-	// Check pingoneExportEnvID is not empty
-	if pingoneExportEnvID == "" {
-		t.Errorf("getPingOneExportEnvID() pingoneExportEnvID = %v, want non-empty", pingoneExportEnvID)
-	}
-}
-
-// Test validatePingOneExportEnvID function
-func TestValidatePingOneExportEnvID(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	if err := initPingOneApiClient(t.Context(), "v1.2.3"); err != nil {
-		t.Errorf("initPingOneApiClient() error = %v, want nil", err)
-	}
-
-	if err := getPingOneExportEnvID(); err != nil {
-		t.Errorf("getPingOneExportEnvID() error = %v, want nil", err)
-	}
-
-	err := validatePingOneExportEnvID(t.Context())
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test validatePingOneExportEnvID function fails with nil context
-func TestValidatePingOneExportEnvIDNilContext(t *testing.T) {
-	expectedErrorPattern := `^failed to validate pingone environment ID '.*'\. context is nil$`
-	err := validatePingOneExportEnvID(nil) //nolint:staticcheck // SA1012 this is a test
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test getExportableConnectors function
-func TestGetExportableConnectors(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	es := new(customtypes.ExportServices)
-	err := es.Set(customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
-	if err != nil {
-		t.Fatalf("ms.Set() error = %v", err)
-	}
-
-	expectedConnectors := len(es.GetServices())
-
-	exportableConnectors := getExportableConnectors(es)
-	if len(*exportableConnectors) == 0 {
-		t.Errorf("getExportableConnectors() exportableConnectors = %v, want non-empty", exportableConnectors)
-	}
-
-	if len(*exportableConnectors) != expectedConnectors {
-		t.Errorf("getExportableConnectors() exportableConnectors = %v, want %v", len(*exportableConnectors), expectedConnectors)
-	}
-}
-
-// Test getExportableConnectors function with nil MultiService
-func TestGetExportableConnectorsNilMultiService(t *testing.T) {
-	exportableConnectors := getExportableConnectors(nil)
-
-	expectedConnectors := 0
-	if len(*exportableConnectors) != expectedConnectors {
-		t.Errorf("getExportableConnectors() exportableConnectors = %v, want %v", len(*exportableConnectors), expectedConnectors)
-	}
-}
-
-// Test exportConnectors function
-func TestExportConnectors(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := initPingOneServices(t.Context(), "v1.2.3")
-	if err != nil {
-		t.Fatalf("initPingOneServices() error = %v", err)
-	}
-
-	es := new(customtypes.ExportServices)
-	err = es.Set(customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
-	if err != nil {
-		t.Fatalf("ms.Set() error = %v", err)
-	}
-
-	exportableConnectors := getExportableConnectors(es)
-
-	err = exportConnectors(exportableConnectors, customtypes.ENUM_EXPORT_FORMAT_HCL, t.TempDir(), true)
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test exportConnectors function with nil exportable connectors
-func TestExportConnectorsNilExportableConnectors(t *testing.T) {
-	err := exportConnectors(nil, customtypes.ENUM_EXPORT_FORMAT_HCL, t.TempDir(), true)
-
-	expectedErrorPattern := `^failed to export services\. exportable connectors list is nil$`
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test exportConnectors function with empty exportable connectors
-func TestExportConnectorsEmptyExportableConnectors(t *testing.T) {
-	exportableConnectors := &[]connector.Exportable{}
-
-	err := exportConnectors(exportableConnectors, customtypes.ENUM_EXPORT_FORMAT_HCL, t.TempDir(), true)
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test exportConnectors function with invalid export format
-func TestExportConnectorsInvalidExportFormat(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := initPingOneServices(t.Context(), "v1.2.3")
-	if err != nil {
-		t.Fatalf("initPingOneServices() error = %v", err)
-	}
-
-	es := new(customtypes.ExportServices)
-	err = es.Set(customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
-	if err != nil {
-		t.Fatalf("ms.Set() error = %v", err)
-	}
-
-	exportableConnectors := getExportableConnectors(es)
-
-	err = exportConnectors(exportableConnectors, "invalid", t.TempDir(), true)
-
-	expectedErrorPattern := `^failed to export '.*' service: unrecognized export format ".*"\. Must be one of: .*$`
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test exportConnectors function with invalid output directory
-func TestExportConnectorsInvalidOutputDir(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := initPingOneServices(t.Context(), "v1.2.3")
-	if err != nil {
-		t.Fatalf("initPingOneServices() error = %v", err)
-	}
-
-	es := new(customtypes.ExportServices)
-	err = es.Set(customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT)
-	if err != nil {
-		t.Fatalf("ms.Set() error = %v", err)
-	}
-
-	exportableConnectors := getExportableConnectors(es)
-
-	err = exportConnectors(exportableConnectors, customtypes.ENUM_EXPORT_FORMAT_HCL, "/invalid", true)
-
-	expectedErrorPattern := `^failed to export '.*' service: failed to create export file ".*". err: open .*: no such file or directory$`
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	return dir
 }

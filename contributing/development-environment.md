@@ -143,12 +143,12 @@ go 1.25.1
 
 replace github.com/patrickcping/pingone-go-sdk-v2/management => ../pingone-go-sdk-v2/management
 replace github.com/patrickcping/pingone-go-sdk-v2/mfa => ../pingone-go-sdk-v2/mfa
-replace github.com/pingidentity/pingfederate-go-client/v1220 => ../pingfederate-go-client/v1220
+replace github.com/pingidentity/pingfederate-go-client/v1230 => ../pingfederate-go-client/v1230
 
 require (
 	github.com/patrickcping/pingone-go-sdk-v2/management v0.60.0
 	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.1
-	github.com/pingidentity/pingfederate-go-client/v1220 v1220.0.0
+	github.com/pingidentity/pingfederate-go-client/v1230 v1230.0.3
   
   ...
 )

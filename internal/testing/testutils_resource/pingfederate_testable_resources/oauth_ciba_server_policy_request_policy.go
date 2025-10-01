@@ -11,7 +11,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
 	"github.com/pingidentity/pingcli/internal/utils"
-	client "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
+	client "github.com/pingidentity/pingfederate-go-client/v1230/configurationapi"
 )
 
 func OauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
@@ -62,7 +62,7 @@ func createOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 				},
 			},
 		},
-		IdentityHintMapping: &client.AttributeMapping{
+		IdentityHintMapping: client.AttributeMapping{
 			AttributeContractFulfillment: map[string]client.AttributeFulfillmentValue{
 				"subject": {
 					Source: client.SourceTypeIdKey{
@@ -78,7 +78,7 @@ func createOauthCibaServerPolicyRequestPolicy(t *testing.T, clientInfo *connecto
 		},
 		Name:                        "TestRequestPolicyName",
 		RequireTokenForIdentityHint: utils.Pointer(false),
-		TransactionLifetime:         utils.Pointer(int64(120)),
+		TransactionLifetime:         int64(120),
 	}
 
 	request = request.Body(clientStruct)

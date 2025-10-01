@@ -5,84 +5,115 @@ package config_test
 import (
 	"testing"
 
+	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/profiles"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Config Unset Command Executes without issue
-func TestConfigUnsetCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", options.RootColorOption.KoanfKey)
-	testutils.CheckExpectedError(t, err, nil)
+func Test_ConfigUnsetCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name:      "Happy Path",
+			args:      []string{options.RootColorOption.KoanfKey},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - help",
+			args:      []string{"--help"},
+			expectErr: false,
+		},
+		{
+			name:          "Too few arguments",
+			args:          []string{},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{options.RootColorOption.KoanfKey, options.RootOutputFormatOption.KoanfKey},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:          "Invalid key",
+			args:          []string{"pingcli.invalid"},
+			expectErr:     true,
+			expectedErrIs: configuration.ErrInvalidConfigurationKey,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"config", "unset"}, tc.args...)...)
+
+			if !tc.expectErr {
+				require.NoError(t, err)
+
+				return
+			}
+
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }
 
-// Test Config Set Command Fails when provided too few arguments
-func TestConfigUnsetCmd_TooFewArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli config unset': command accepts 1 arg\(s\), received 0$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Set Command Fails when provided too many arguments
-func TestConfigUnsetCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli config unset': command accepts 1 arg\(s\), received 2$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", options.RootColorOption.KoanfKey, options.RootOutputFormatOption.KoanfKey)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Unset Command Fails when an invalid key is provided
-func TestConfigUnsetCmd_InvalidKey(t *testing.T) {
-	expectedErrorPattern := `^failed to unset configuration: key '.*' is not recognized as a valid configuration key\.\s*Use 'pingcli config list-keys' to view all available keys`
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", "pingcli.invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Unset Command for key 'pingone.worker.clientId' updates koanf configuration
+// TestConfigUnsetCmd_CheckKoanfConfig verifies that the 'config unset' command correctly updates the underlying koanf configuration.
 func TestConfigUnsetCmd_CheckKoanfConfig(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	koanfConfig := profiles.GetKoanfConfig().KoanfInstance()
+	koanfConfig, err := profiles.GetKoanfConfig()
+	require.NoError(t, err, "Error getting koanf configuration")
+
+	koanfInstance := koanfConfig.KoanfInstance()
 	koanfKey := options.PingOneAuthenticationWorkerClientIDOption.KoanfKey
 	profileKoanfKey := "default." + koanfKey
 
-	koanfOldValue := koanfConfig.String(profileKoanfKey)
+	// Ensure there is a value to unset
+	require.NotEmpty(t, koanfInstance.String(profileKoanfKey), "Precondition failed: koanf value is already empty")
 
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", koanfKey)
-	testutils.CheckExpectedError(t, err, nil)
+	// Execute the unset command
+	err = testutils_cobra.ExecutePingcli(t, "config", "unset", koanfKey)
+	require.NoError(t, err)
 
-	koanfConfig = profiles.GetKoanfConfig().KoanfInstance()
-
-	koanfNewValue := koanfConfig.String(profileKoanfKey)
-	if koanfOldValue == koanfNewValue {
-		t.Errorf("Expected koanf configuration value to be updated. Old: %s, New: %s", koanfOldValue, koanfNewValue)
-	}
-
-	if koanfNewValue != "" {
-		t.Errorf("Expected koanf configuration value to be empty. Got: %s", koanfNewValue)
-	}
-}
-
-// Test Config Unset Command Fails when provided an invalid flag
-func TestConfigUnsetCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test Config Unset Command --help, -h flag
-func TestConfigUnsetCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "unset", "--help")
-	testutils.CheckExpectedError(t, err, nil)
-
-	err = testutils_cobra.ExecutePingcli(t, "config", "unset", "-h")
-	testutils.CheckExpectedError(t, err, nil)
+	// Re-fetch the koanf instance to see the change
+	koanfConfig, err = profiles.GetKoanfConfig()
+	require.NoError(t, err, "Error getting koanf configuration")
+	koanfInstance = koanfConfig.KoanfInstance()
+	koanfNewValue := koanfInstance.String(profileKoanfKey)
+	assert.Empty(t, koanfNewValue, "Expected koanf configuration value to be empty after unset")
 }
 
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_unsetMaskedValue() {
 	t := testing.T{}
+	testutils_koanf.InitKoanfs(&t)
 	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.PingFederateBasicAuthUsernameOption.KoanfKey)
 
 	// Output:
@@ -93,6 +124,7 @@ func Example_unsetMaskedValue() {
 // https://pkg.go.dev/testing#hdr-Examples
 func Example_unsetUnmaskedValue() {
 	t := testing.T{}
+	testutils_koanf.InitKoanfs(&t)
 	_ = testutils_cobra.ExecutePingcli(&t, "config", "unset", options.RootOutputFormatOption.KoanfKey)
 
 	// Output:

@@ -3,52 +3,70 @@
 package config_internal
 
 import (
+	"os"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test deleteProfile function
-func Test_deleteProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+func Test_RunInternalConfigDeleteProfile(t *testing.T) {
+	testCases := []struct {
+		name              string
+		profileName       string
+		autoConfirmDelete customtypes.Bool
+		expectedError     error
+	}{
+		{
+			name:              "Delete Existing Profile",
+			profileName:       "production",
+			autoConfirmDelete: true,
+		},
+		{
+			name:              "Invalid Profile Name: Active Profile",
+			profileName:       "default",
+			autoConfirmDelete: true,
+			expectedError:     profiles.ErrDeleteActiveProfile,
+		},
+		{
+			name:              "Invalid Profile Name: Non-Existent Profile",
+			profileName:       "non-existent",
+			autoConfirmDelete: false,
+			expectedError:     profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:              "Invalid Profile Name: Empty Profile Name",
+			profileName:       "",
+			autoConfirmDelete: false,
+			expectedError:     profiles.ErrProfileNameEmpty,
+		},
+		{
+			name:              "Invalid Profile Name: Special Characters",
+			profileName:       "(*#&)",
+			autoConfirmDelete: false,
+			expectedError:     profiles.ErrProfileNameNotExist,
+		},
+	}
 
-	err := deleteProfile("production")
-	testutils.CheckExpectedError(t, err, nil)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test deleteProfile function fails with active profile
-func Test_deleteProfile_ActiveProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+			options.ConfigDeleteAutoAcceptOption.Flag.Changed = true
+			options.ConfigDeleteAutoAcceptOption.CobraParamValue = &tc.autoConfirmDelete
 
-	expectedErrorPattern := `^'.*' is the active profile and cannot be deleted$`
-	err := deleteProfile("default")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			err := RunInternalConfigDeleteProfile([]string{tc.profileName}, os.Stdin)
 
-// Test deleteProfile function fails with invalid profile name
-func Test_deleteProfile_InvalidProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^invalid profile name: '.*' profile does not exist$`
-	err := deleteProfile("(*#&)")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test deleteProfile function fails with empty profile name
-func Test_deleteProfile_EmptyProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^invalid profile name: profile name cannot be empty$`
-	err := deleteProfile("")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test deleteProfile function fails with non-existent profile name
-func Test_deleteProfile_NonExistentProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^invalid profile name: '.*' profile does not exist$`
-	err := deleteProfile("non-existent")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }

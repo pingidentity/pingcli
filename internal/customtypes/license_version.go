@@ -3,10 +3,17 @@
 package customtypes
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
+)
+
+var (
+	licenseVersionErrorPrefix = "custom type license version error"
+	ErrInvalidVersionFormat   = errors.New("invalid version format, must be 'major.minor'")
 )
 
 type LicenseVersion string
@@ -15,32 +22,36 @@ type LicenseVersion string
 var _ pflag.Value = (*LicenseVersion)(nil)
 
 // Implement pflag.Value interface for custom type in cobra MultiService parameter
-func (lp *LicenseVersion) Set(version string) error {
-	if lp == nil {
-		return fmt.Errorf("failed to set LicenseVersion value: %s. LicenseVersion is nil", version)
+func (lv *LicenseVersion) Set(version string) error {
+	if lv == nil {
+		return &errs.PingCLIError{Prefix: licenseVersionErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	// The license version must be of the form "major.minor" or empty
 	if version == "" {
-		*lp = LicenseVersion("")
+		*lv = LicenseVersion("")
 
 		return nil
 	}
 
 	// Validate the format of the version string via regex
 	if !regexp.MustCompile(`^\d+\.\d+$`).MatchString(version) {
-		return fmt.Errorf("failed to set LicenseVersion value: %s. Invalid version format, must be 'major.minor'. Example: '12.3'", version)
+		return &errs.PingCLIError{Prefix: licenseVersionErrorPrefix, Err: fmt.Errorf("%w: %s. Example: '12.3'", ErrInvalidVersionFormat, version)}
 	}
 
-	*lp = LicenseVersion(version)
+	*lv = LicenseVersion(version)
 
 	return nil
 }
 
-func (lp LicenseVersion) Type() string {
+func (lv *LicenseVersion) Type() string {
 	return "string"
 }
 
-func (lp LicenseVersion) String() string {
-	return string(lp)
+func (lv *LicenseVersion) String() string {
+	if lv == nil {
+		return ""
+	}
+
+	return string(*lv)
 }

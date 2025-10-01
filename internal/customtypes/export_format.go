@@ -3,15 +3,22 @@
 package customtypes
 
 import (
+	"errors"
 	"fmt"
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
 )
 
 const (
 	ENUM_EXPORT_FORMAT_HCL string = "HCL"
+)
+
+var (
+	exportFormatErrorPrefix = "custom type export format error"
+	ErrUnrecognisedFormat   = errors.New("unrecognized export format")
 )
 
 type ExportFormat string
@@ -23,7 +30,7 @@ var _ pflag.Value = (*ExportFormat)(nil)
 
 func (ef *ExportFormat) Set(format string) error {
 	if ef == nil {
-		return fmt.Errorf("failed to set Export Format value: %s. Export Format is nil", format)
+		return &errs.PingCLIError{Prefix: exportFormatErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	switch {
@@ -32,18 +39,22 @@ func (ef *ExportFormat) Set(format string) error {
 	case strings.EqualFold(format, ""):
 		*ef = ExportFormat("")
 	default:
-		return fmt.Errorf("unrecognized export format '%s'. Must be one of: %s", format, strings.Join(ExportFormatValidValues(), ", "))
+		return &errs.PingCLIError{Prefix: exportFormatErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognisedFormat, format, strings.Join(ExportFormatValidValues(), ", "))}
 	}
 
 	return nil
 }
 
-func (ef ExportFormat) Type() string {
+func (ef *ExportFormat) Type() string {
 	return "string"
 }
 
-func (ef ExportFormat) String() string {
-	return string(ef)
+func (ef *ExportFormat) String() string {
+	if ef == nil {
+		return ""
+	}
+
+	return string(*ef)
 }
 
 func ExportFormatValidValues() []string {

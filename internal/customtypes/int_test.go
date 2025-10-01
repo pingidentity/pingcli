@@ -6,46 +6,150 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/pingidentity/pingcli/internal/utils"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Int Set function
 func Test_Int_Set(t *testing.T) {
-	i := new(customtypes.Int)
+	testutils_koanf.InitKoanfs(t)
 
-	err := i.Set("42")
-	if err != nil {
-		t.Errorf("Set returned error: %v", err)
+	testCases := []struct {
+		name          string
+		cType         *customtypes.Int
+		value         string
+		expectedError error
+	}{
+		{
+			name:  "Happy path",
+			cType: new(customtypes.Int),
+			value: "42",
+		},
+		{
+			name:          "Invalid value",
+			cType:         new(customtypes.Int),
+			value:         "invalid",
+			expectedError: customtypes.ErrParseInt,
+		},
+		{
+			name:          "Empty value",
+			cType:         new(customtypes.Int),
+			value:         "",
+			expectedError: customtypes.ErrParseInt,
+		},
+		{
+			name:          "Nil custom type",
+			cType:         nil,
+			value:         "42",
+			expectedError: customtypes.ErrCustomTypeNil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := tc.cType.Set(tc.value)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test Set function fails with invalid value
-func Test_Int_Set_InvalidValue(t *testing.T) {
-	i := new(customtypes.Int)
+func Test_Int_Type(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	invalidValue := "invalid"
-	expectedErrorPattern := `^strconv.ParseInt: parsing ".*": invalid syntax$`
-	err := i.Set(invalidValue)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	testCases := []struct {
+		name         string
+		cType        *customtypes.Int
+		expectedType string
+	}{
+		{
+			name:         "Happy path",
+			cType:        utils.Pointer(customtypes.Int(42)),
+			expectedType: "int64",
+		},
+		{
+			name:         "Nil custom type",
+			cType:        nil,
+			expectedType: "int64",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualType := tc.cType.Type()
+
+			require.Equal(t, tc.expectedType, actualType)
+		})
+	}
 }
 
-// Test Set function fails with nil
-func Test_Int_Set_Nil(t *testing.T) {
-	var i *customtypes.Int
-	val := "42"
-
-	expectedErrorPattern := `^failed to set Int value: .* Int is nil$`
-	err := i.Set(val)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test String function
 func Test_Int_String(t *testing.T) {
-	i := customtypes.Int(42)
+	testutils_koanf.InitKoanfs(t)
 
-	expected := "42"
-	actual := i.String()
-	if actual != expected {
-		t.Errorf("String returned: %s, expected: %s", actual, expected)
+	testCases := []struct {
+		name        string
+		cType       *customtypes.Int
+		expectedStr string
+	}{
+		{
+			name:        "Happy path",
+			cType:       utils.Pointer(customtypes.Int(42)),
+			expectedStr: "42",
+		},
+		{
+			name:        "Nil custom type",
+			cType:       nil,
+			expectedStr: "0",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualStr := tc.cType.String()
+
+			require.Equal(t, tc.expectedStr, actualStr)
+		})
+	}
+}
+
+func Test_Int_Int64(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	testCases := []struct {
+		name        string
+		cType       *customtypes.Int
+		expectedInt int64
+	}{
+		{
+			name:        "Happy path",
+			cType:       utils.Pointer(customtypes.Int(42)),
+			expectedInt: 42,
+		},
+		{
+			name:        "Nil custom type",
+			cType:       nil,
+			expectedInt: 0,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualInt := tc.cType.Int64()
+
+			require.Equal(t, tc.expectedInt, actualInt)
+		})
 	}
 }

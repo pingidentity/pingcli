@@ -3,44 +3,78 @@
 package feedback_test
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/pingidentity/pingcli/cmd/common"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Feedback Command Executes without issue
-func TestFeedbackCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "feedback")
-	testutils.CheckExpectedError(t, err, nil)
-}
+func Test_FeedbackCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-// Test Feedback Command fails when provided too many arguments
-func TestFeedbackCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli feedback': command accepts 0 arg\(s\), received 1$`
-	err := testutils_cobra.ExecutePingcli(t, "feedback", "extra-arg")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name:      "Happy Path",
+			args:      []string{},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - help",
+			args:      []string{"--help"},
+			expectErr: false,
+		},
+		{
+			name: "Happy Path - with profile flag",
+			args: []string{
+				fmt.Sprintf("--%s", options.RootProfileOption.CobraParamName),
+				"default",
+			},
+			expectErr: false,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{"extra-arg"},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+	}
 
-// Test Feedback Command help flag
-func TestFeedbackCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "feedback", "--help")
-	testutils.CheckExpectedError(t, err, nil)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-	err = testutils_cobra.ExecutePingcli(t, "feedback", "-h")
-	testutils.CheckExpectedError(t, err, nil)
-}
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"feedback"}, tc.args...)...)
 
-// Test Feedback Command fails with invalid flag
-func TestFeedbackCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "feedback", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			if !tc.expectErr {
+				require.NoError(t, err)
 
-// Test Feedback Command with valid profile
-func TestFeedbackCmd_Profile(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "feedback", "--"+options.RootProfileOption.CobraParamName, "default")
-	testutils.CheckExpectedError(t, err, nil)
+				return
+			}
+
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }

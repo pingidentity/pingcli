@@ -9,6 +9,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/autocompletion"
 	request_internal "github.com/pingidentity/pingcli/internal/commands/request"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/spf13/cobra"
@@ -84,7 +85,7 @@ func requestRunE(cmd *cobra.Command, args []string) error {
 	l.Debug().Msgf("Request Subcommand Called.")
 
 	if err := request_internal.RunInternalRequest(args[0]); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: "", Err: err}
 	}
 
 	return nil
