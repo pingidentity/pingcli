@@ -10,17 +10,17 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 ## Table of Contents
 
 - [Install](#install)
-	- [Docker](#docker)
-	- [macOS](#macos)
-	- [Linux](#linux)
-	- [Windows](#windows)
+  - [Docker](#docker)
+  - [macOS](#macos)
+  - [Linux](#linux)
+  - [Windows](#windows)
 - [Verify](#verify)
-	- [Checksums](#checksums)
-	- [GPG Signatures](#gpg-signatures)
+  - [Checksums](#checksums)
+  - [GPG Signatures](#gpg-signatures)
 - [Configure Ping CLI](#configure-ping-cli)
 - [Commands](#commands)
-	- [Platform Export](#platform-export)
-	- [Custom Request](#custom-request)
+  - [Platform Export](#platform-export)
+  - [Custom Request](#custom-request)
 - [Getting Help](#getting-help)
 
 ## Install
@@ -30,11 +30,13 @@ The Ping CLI is a unified command line interface for configuring and managing Pi
 Use the [Ping CLI Docker image](https://hub.docker.com/r/pingidentity/pingcli)
 
 Pull Image:
+
 ```shell
 docker pull pingidentity/pingcli:latest
 ```
 
 Example Commands:
+
 ```shell
 docker run --rm pingidentity/pingcli:latest <sub commands>
 
@@ -43,7 +45,7 @@ docker run --rm pingidentity/pingcli:latest --version
 
 ### macOS
 
-##### Homebrew
+#### Homebrew
 
 Use PingIdentity's Homebrew tap to install Ping CLI
 
@@ -52,7 +54,7 @@ brew tap pingidentity/tap
 brew install pingcli
 ```
 
-##### Manual Installation
+#### Manual Installation
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
 
@@ -86,6 +88,7 @@ brew install pingcli
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for Alpine (.apk) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
 > **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+
 ```shell
 apk add --allow-untrusted ./pingcli_<version>_linux_amd64.apk
 apk add --allow-untrusted ./pingcli_<version>_linux_arm64.apk
@@ -96,6 +99,7 @@ apk add --allow-untrusted ./pingcli_<version>_linux_arm64.apk
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for Debian (.deb) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
 > **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+
 ```shell
 apt install ./pingcli_<version>_linux_amd64.deb
 apt install ./pingcli_<version>_linux_arm64.deb
@@ -106,6 +110,7 @@ apt install ./pingcli_<version>_linux_arm64.deb
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for RPM (.rpm) package downloads. To verify package downloads, see the [Verify Section](#verify).
 
 > **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+
 ```shell
 yum install ./pingcli_<version>_linux_amd64.rpm
 yum install ./pingcli_<version>_linux_arm64.rpm
@@ -114,17 +119,19 @@ yum install ./pingcli_<version>_linux_arm64.rpm
 OR
 
 > **_NOTE:_** The following commands may require `sudo` if not run as the root user.
+
 ```shell
 dnf install ./pingcli_<version>_linux_amd64.rpm
 dnf install ./pingcli_<version>_linux_arm64.rpm
 ```
 
 > **_NOTE:_**
+
 > - Use `yum` for CentOS/RHEL 7 and earlier, and for older Fedora systems.
 > - Use `dnf` for Fedora 22+ and CentOS/RHEL 8+.
 > Both commands achieve the same result; use the one appropriate for your distribution.
 
-##### Manual Installation
+#### Manual Installation
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
 
@@ -144,7 +151,7 @@ sudo mv pingcli /usr/local/bin/pingcli;
 
 ### Windows
 
-##### Manual Installation
+#### Manual Installation
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for artifact downloads, artifact signatures, and the checksum file. To verify package downloads, see the [Verify Section](#verify).
 
@@ -152,6 +159,7 @@ OR
 
 Use the following single-line PowerShell 7.4 command to install Ping CLI into '%LOCALAPPDATA%\Programs' directly.
 >**_NOTE:_** After installation, ensure that `%LOCALAPPDATA%\Programs` is included in your PATH environment variable. If it is not already present, add it so you can call `pingcli` directly in your terminal.
+
 ```powershell
 $latestReleaseUrl = Invoke-WebRequest -Uri "https://github.com/pingidentity/pingcli/releases/latest" -MaximumRedirection 0 -ErrorAction Ignore -UseBasicParsing -SkipHttpErrorCheck; `
 $RELEASE_VERSION = [System.IO.Path]::GetFileName($latestReleaseUrl.Headers.Location); `
@@ -172,7 +180,7 @@ See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases
 
 See [the latest GitHub release](https://github.com/pingidentity/pingcli/releases/latest) for the artifact downloads and signature files.
 
-##### Add our public GPG Key via OpenPGP Public Key Server
+#### Add our public GPG Key via OpenPGP Public Key Server
 
 ```shell
 gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
@@ -181,6 +189,7 @@ gpg --keyserver keys.openpgp.org --recv-key 0x6703FFB15B36A7AC
 OR
 
 ##### Add our public GPG Key via MIT PGP Public Key Server
+
 ```shell
 gpg --keyserver pgp.mit.edu --recv-key 0x6703FFB15B36A7AC
 ```
@@ -215,6 +224,12 @@ See [Configuration Key Documentation](./docs/tool-configuration/configuration-ke
 and their purposes.
 
 See [Autocompletion Documentation](./docs/autocompletion/autocompletion.md) for information on loading autocompletion for select command flags.
+
+### Documentation Generation
+
+Documentation generation instructions (configuration options reference, per-command pages, navigation, rebuild workflow, and golden test usage) have moved to a dedicated guide:
+
+See: `tools/README_DocumentGeneration.md`
 
 ## Commands
 
