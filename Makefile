@@ -44,6 +44,7 @@ endef
 .PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest
 .PHONY: starttestcontainer removetestcontainer spincontainer openlocalwebapi openapp protogen
 .PHONY: _check_env _check_ping_env _check_docker _run_pf_container _wait_for_pf _stop_pf_container
+.PHONY: generate-options-docs generate-command-docs generate-all-docs
 
 # ====================================================================================
 # USER-FACING COMMANDS
@@ -83,6 +84,34 @@ golangcilint: ## Run golangci-lint for comprehensive code analysis
 	$(GOLANGCI_LINT) cache clean
 	$(GOLANGCI_LINT) run --timeout 5m ./...
 	echo "✅ No linting issues found."
+
+generate-options-docs: ## Generate configuration options documentation then validate via golden tests
+	@echo "  > Docs: Generating options documentation..."
+	@if [ -z "$(OUTPUT)" ]; then \
+		mkdir -p ./docs/dev-ux-portal-docs/general; \
+		$(GOCMD) run ./tools/generate-options-docs -asciidoc -o ./docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc; \
+		echo "✅ Documentation generated at docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc"; \
+	else \
+		$(GOCMD) run ./tools/generate-options-docs $(OUTPUT); \
+		echo "✅ Documentation generated with custom OUTPUT $(OUTPUT)"; \
+	fi
+	@echo "  > Docs: Running golden tests for options docs..."
+	@$(GOCMD) test ./tools/generate-options-docs/docgen -run TestOptionsDocGeneration >/dev/null && echo "✅ Options documentation golden test passed."
+
+generate-command-docs: ## Generate per-command AsciiDoc pages then validate via golden tests
+	@echo "  > Docs: Generating command documentation..."
+	mkdir -p ./docs/dev-ux-portal-docs
+	$(GOCMD) run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs $(COMMAND_DOCS_ARGS)
+	echo "✅ Command docs generated in docs/dev-ux-portal-docs"
+	@echo "  > Docs: Running golden tests for command docs..."
+	@$(GOCMD) test ./tools/generate-command-docs -run TestCommandDocGeneration >/dev/null && echo "✅ Command documentation golden test passed."
+
+generate-all-docs: ## Rebuild ALL docs then run golden tests for both sets
+	@echo "  > Docs: Rebuilding all documentation (clean + regenerate)..."
+	mkdir -p ./docs/dev-ux-portal-docs/general
+	$(MAKE) generate-options-docs OUTPUT='-o docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc'
+	$(MAKE) generate-command-docs
+	@echo "✅ All documentation rebuilt and validated via golden tests."
 
 protogen: ## Generate Go code from .proto files
 	@echo "  > Protogen: Generating gRPC code from proto files..."
