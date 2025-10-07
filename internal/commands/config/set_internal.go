@@ -161,7 +161,7 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 			return fmt.Errorf("unable to set key '%w' in koanf profile: ", err)
 		}
 	case options.PINGONE_REGION_CODE:
-		region := new(customtypes.PingOneRegionCode)
+		region := new(customtypes.String)
 		if err = region.Set(vValue); err != nil {
 			return fmt.Errorf("value for key '%s' must be a valid PingOne Region Code. Allowed [%s]: %w", vKey, strings.Join(customtypes.PingOneRegionCodeValidValues(), ", "), err)
 		}

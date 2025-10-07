@@ -150,10 +150,10 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			}
 		case options.PINGONE_REGION_CODE:
 			switch typedValue := vValue.(type) {
-			case *customtypes.PingOneRegionCode:
+			case *customtypes.String:
 				continue
 			case string:
-				prc := new(customtypes.PingOneRegionCode)
+				prc := new(customtypes.String)
 				if err = prc.Set(typedValue); err != nil {
 					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingOne Region Code value: %w", pName, typedValue, key, err)
 				}

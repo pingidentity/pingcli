@@ -16,12 +16,14 @@ const (
 	ENUM_PINGONE_REGION_CODE_CA string = "CA"
 	ENUM_PINGONE_REGION_CODE_EU string = "EU"
 	ENUM_PINGONE_REGION_CODE_NA string = "NA"
+	ENUM_PINGONE_REGION_CODE_SG string = "SG"
 
 	ENUM_PINGONE_TLD_AP string = "asia"
 	ENUM_PINGONE_TLD_AU string = "com.au"
 	ENUM_PINGONE_TLD_CA string = "ca"
 	ENUM_PINGONE_TLD_EU string = "eu"
 	ENUM_PINGONE_TLD_NA string = "com"
+	ENUM_PINGONE_TLD_SG string = "sg"
 )
 
 type PingOneRegionCode string
@@ -70,6 +72,7 @@ func PingOneRegionCodeValidValues() []string {
 		ENUM_PINGONE_REGION_CODE_CA,
 		ENUM_PINGONE_REGION_CODE_EU,
 		ENUM_PINGONE_REGION_CODE_NA,
+		ENUM_PINGONE_REGION_CODE_SG,
 	}
 
 	slices.Sort(pingoneRegionCodes)

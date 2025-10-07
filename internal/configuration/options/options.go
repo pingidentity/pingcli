@@ -80,6 +80,7 @@ func Options() []Option {
 		PingOneAuthenticationClientCredentialsClientIDOption,
 		PingOneAuthenticationClientCredentialsClientSecretOption,
 		PingOneAuthenticationClientCredentialsEnvironmentIDOption,
+		PingOneAuthenticationClientCredentialsScopesOption,
 		PingOneAuthenticationDeviceCodeClientIDOption,
 		PingOneAuthenticationDeviceCodeEnvironmentIDOption,
 		PingOneAuthenticationDeviceCodeScopesOption,
@@ -171,6 +172,7 @@ var (
 	PingOneAuthenticationClientCredentialsClientIDOption      Option
 	PingOneAuthenticationClientCredentialsClientSecretOption  Option
 	PingOneAuthenticationClientCredentialsEnvironmentIDOption Option
+	PingOneAuthenticationClientCredentialsScopesOption        Option
 	PingOneAuthenticationDeviceCodeClientIDOption             Option
 	PingOneAuthenticationDeviceCodeEnvironmentIDOption        Option
 	PingOneAuthenticationDeviceCodeScopesOption               Option

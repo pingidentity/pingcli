@@ -1,12 +1,14 @@
 package auth_internal
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingone-go-client/config"
@@ -18,80 +20,31 @@ var (
 	pingoneAPIClient *pingone.APIClient
 )
 
-func savePingOneKoanfValues(accessToken, accessTokenExpiry string) error {
-	pName, err := profiles.GetOptionValue(options.RootProfileOption)
-	if err != nil {
-		return err
-	}
-	if pName == "" {
-		pName, err = profiles.GetOptionValue(options.RootActiveProfileOption)
-		if err != nil {
-			return err
-		}
-	}
-	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
-	if err != nil {
-		return err
-	}
-	if err = subKoanf.Set(options.RequestAccessTokenOption.KoanfKey, accessToken); err != nil {
-		return err
-	}
-
-	tokenExpiryInt, err := strconv.ParseInt(accessTokenExpiry, 10, 64)
-	if err != nil {
-		return err
-	}
-
-	if err = subKoanf.Set(options.RequestAccessTokenExpiryOption.KoanfKey, tokenExpiryInt); err != nil {
-		return err
-	}
-	if err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf); err != nil {
-		return err
-	}
-	return nil
-}
-
 func GetPingOneClient() (*pingone.APIClient, error) {
-	pingoneAPIClientConfig, err := getPingOneConfiguration()
+	if pingoneAPIClient != nil {
+		return pingoneAPIClient, nil
+	}
+
+	configConfiguration, err := getConfigConfiguration()
+	if err != nil {
+		return nil, err
+	}
+	pingoneConfiguration := pingone.NewConfiguration(configConfiguration)
+
+	pingoneAPIClient, err = pingone.NewAPIClient(pingoneConfiguration)
 	if err != nil {
 		return nil, err
 	}
 
-	if pingoneAPIClient == nil {
-		pingOneNewConfig := pingone.NewConfiguration(pingoneAPIClientConfig)
-
-		pingOneRegionCode, err := profiles.GetOptionValue(options.PingOneRegionCodeOption)
-		if err != nil {
-			return nil, err
-		}
-
-		isValidRegion := pingone.EnvironmentRegionCode(pingOneRegionCode).IsValid()
-
-		if pingOneRegionCode == "" || !isValidRegion {
-			return nil, fmt.Errorf("PingOne region code is required and must be valid.")
-		}
-
-		pingOneNewConfig.Service.WithRootDomain(pingOneRegionCode)
-
-		pingoneAPIClient, err = pingone.NewAPIClient(pingOneNewConfig)
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	pingOneAPIClientConfig := pingoneAPIClient.GetConfig()
-
-	accessToken := pingOneAPIClientConfig.Service.GetAccessToken()
-	if accessToken == "" {
-		return nil, fmt.Errorf("failed to create PingOne client: access token is empty")
-	}
-
-	accessTokenExpiry := pingOneAPIClientConfig.Service.GetAccessTokenExpiry()
-	accessTokenExpiryStr := strconv.Itoa(accessTokenExpiry)
-
-	if err := savePingOneKoanfValues(accessToken, accessTokenExpiryStr); err != nil {
-		return nil, fmt.Errorf("failed to save PingOne access token: %w", err)
-	}
+	//accessToken := pingoneAPIClientConfig.GetAccessToken()
+	//if accessToken == "" {
+	//	return nil, fmt.Errorf("failed to create PingOne client: access token is empty")
+	//
+	//accessTokenExpiry := pingoneAPIClientConfig.GetAccessTokenExpiry()
+	//accessTokenExpiryStr := strconv.Itoa(accessTokenExpir//
+	//if err := savePingOneKoanfValues(accessToken, accessTokenExpiryStr); err != nil {
+	//	return nil, fmt.Errorf("failed to save PingOne access token: %w", err)
+	//}
 
 	return pingoneAPIClient, nil
 }
@@ -134,20 +87,16 @@ func GetPingOneAccessToken() (accessToken string, err error) {
 	return pingOneAuth()
 }
 
-func getPingOneConfiguration() (*config.Configuration, error) {
-	pingOneConfig := config.NewConfiguration()
+func getConfigConfiguration() (*config.Configuration, error) {
+	configConfiguration := config.NewConfiguration()
 
 	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 	if err != nil {
 		return nil, err
 	}
 
-	if !pingoneoauth2.IsValidGrantType(authType) && authType != "worker" {
-		return nil, fmt.Errorf("unrecognized or unsupported PingOne authentication type: '%s'", authType)
-	}
-
-	switch pingoneoauth2.GrantType(authType) {
-	case pingoneoauth2.GrantTypeAuthCode:
+	switch authType {
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
 		authCodeClientID, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeClientIDOption)
 		if err != nil {
 			return nil, err
@@ -158,27 +107,24 @@ func getPingOneConfiguration() (*config.Configuration, error) {
 			return nil, err
 		}
 
-		authCodePortStr, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodePortOption)
-		if err != nil {
-			return nil, err
-		}
-
 		authCodeScopes, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeScopesOption)
 		if err != nil {
 			return nil, err
 		}
 
-		// Set the PingOne Configuration values
-		authCodeScopesList := strings.Split(authCodeScopes, ",")
-
-		pingOneConfig.Auth.AuthCode = &config.AuthCode{
-			AuthCodeClientID:      &authCodeClientID,
-			AuthCodeEnvironmentID: &authCodeEnvId,
-			AuthCodePort:          &authCodePortStr,
-			AuthCodeScopes:        &authCodeScopesList,
+		redirectURI, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIOption)
+		if err != nil {
+			return nil, err
 		}
 
-	case pingoneoauth2.GrantTypeDeviceCode:
+		authCodeScopesList := strings.Split(authCodeScopes, ",")
+
+		configConfiguration.WithAuthCodeClientID(authCodeClientID)
+		configConfiguration.WithAuthCodeEnvironmentID(authCodeEnvId)
+		configConfiguration.WithAuthCodeScopes(authCodeScopesList)
+		configConfiguration.WithAuthCodeRedirectURI(redirectURI)
+
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		deviceCodeClientID, err := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)
 		if err != nil {
 			return nil, err
@@ -196,15 +142,12 @@ func getPingOneConfiguration() (*config.Configuration, error) {
 
 		deviceCodeScopesList := strings.Split(deviceCodeScopes, ",")
 
-		*pingOneConfig.Auth.GrantType = pingoneoauth2.GrantType(authType)
+		configConfiguration.WithDeviceCodeClientID(deviceCodeClientID)
+		configConfiguration.WithDeviceCodeEnvironmentID(deviceCodeEnvId)
+		configConfiguration.WithDeviceCodeScopes(deviceCodeScopesList)
 
-		pingOneConfig.Auth.DeviceCode = &config.DeviceCode{
-			DeviceCodeClientID:      &deviceCodeClientID,
-			DeviceCodeEnvironmentID: &deviceCodeEnvId,
-			DeviceCodeScopes:        &deviceCodeScopesList,
-		}
 	// Support original "worker" type as alias for "client_credentials"
-	case pingoneoauth2.GrantTypeClientCredentials, "worker":
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER:
 		if authType == "worker" {
 			authType = "client_credentials"
 		}
@@ -219,23 +162,69 @@ func getPingOneConfiguration() (*config.Configuration, error) {
 			return nil, err
 		}
 
-		environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
+		clientCredentialsEnvironmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
 		if err != nil {
 			return nil, err
 		}
 
-		*pingOneConfig.Auth.GrantType = pingoneoauth2.GrantType(authType)
-
-		pingOneConfig.Auth.ClientCredentials = &config.ClientCredentials{
-			ClientCredentialsClientID:      &clientID,
-			ClientCredentialsClientSecret:  &clientSecret,
-			ClientCredentialsEnvironmentID: &environmentID,
+		clientCredentialsScopes, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsScopesOption)
+		if err != nil {
+			return nil, err
 		}
+
+		// Scopes are mandatory - no defaults allowed
+		// if len(clientCredentialsScopes) == 0 {
+		// 	return nil, fmt.Errorf("client credentials scopes are required but not provided - user must supply scopes")
+		// }
+
+		clientCredentialsScopesList := strings.Split(clientCredentialsScopes, ",")
+		// Trim whitespace from each scope
+		for i, scope := range clientCredentialsScopesList {
+			clientCredentialsScopesList[i] = strings.TrimSpace(scope)
+		}
+		// Filter out empty scopes
+		filteredScopes := make([]string, 0)
+		for _, scope := range clientCredentialsScopesList {
+			if scope != "" {
+				filteredScopes = append(filteredScopes, scope)
+			}
+		}
+
+		configConfiguration.WithClientCredentialsScopes(filteredScopes)
+
+		configConfiguration.WithClientCredentialsClientID(clientID)
+		configConfiguration.WithClientCredentialsClientSecret(clientSecret)
+		configConfiguration.WithClientCredentialsEnvironmentID(clientCredentialsEnvironmentID)
+
 	default:
 		return nil, fmt.Errorf("unrecognized or unsupported PingOne authentication type: '%s'", authType)
 	}
 
-	return pingOneConfig, nil
+	configConfiguration.WithGrantType(pingoneoauth2.GrantType(authType))
+
+	pingOneRegionCode, err := profiles.GetOptionValue(options.PingOneRegionCodeOption)
+	if err != nil {
+		return nil, err
+	}
+
+	switch pingOneRegionCode {
+	case customtypes.ENUM_PINGONE_REGION_CODE_AP:
+		configConfiguration.WithTopLevelDomain(pingoneoauth2.TopLevelDomainAPAC)
+	case customtypes.ENUM_PINGONE_REGION_CODE_AU:
+		configConfiguration.WithTopLevelDomain(pingoneoauth2.TopLevelDomainAU)
+	case customtypes.ENUM_PINGONE_REGION_CODE_CA:
+		configConfiguration.WithTopLevelDomain(pingoneoauth2.TopLevelDomainCA)
+	case customtypes.ENUM_PINGONE_REGION_CODE_EU:
+		configConfiguration.WithTopLevelDomain(pingoneoauth2.TopLevelDomainEU)
+	case customtypes.ENUM_PINGONE_REGION_CODE_NA:
+		configConfiguration.WithTopLevelDomain(pingoneoauth2.TopLevelDomainNA)
+	case customtypes.ENUM_PINGONE_REGION_CODE_SG:
+		configConfiguration.WithTopLevelDomain(pingoneoauth2.TopLevelDomainSG)
+	default:
+		return nil, fmt.Errorf("PingOne region code is required and must be valid.")
+	}
+
+	return configConfiguration, nil
 }
 
 func pingOneAuth() (accessToken string, err error) {
@@ -249,5 +238,10 @@ func pingOneAuth() (accessToken string, err error) {
 		return "", fmt.Errorf("PingOne client configuration is nil")
 	}
 
-	return *pingOneClientConfig.Service.Auth.AccessToken, nil
+	accessToken, err = pingOneClientConfig.Service.GetAccessToken(context.Background())
+	if err != nil {
+		return "", err
+	}
+
+	return accessToken, nil
 }

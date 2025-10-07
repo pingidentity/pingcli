@@ -12,15 +12,14 @@ import (
 )
 
 func InitPingOneServiceOptions() {
-	initPingOneAuthenticationAPIEnvironmentIDOption()
 	initPingOneAuthenticationAuthCodeClientIDOption()
 	initPingOneAuthenticationAuthCodeEnvironmentIDOption()
-	initPingOneAuthenticationAuthCodePortOption()
 	initPingOneAuthenticationAuthCodeRedirectURIOption()
 	initPingOneAuthenticationAuthCodeScopesOption()
 	initPingOneAuthenticationClientCredentialsClientIDOption()
 	initPingOneAuthenticationClientCredentialsClientSecretOption()
 	initPingOneAuthenticationClientCredentialsEnvironmentIDOption()
+	initPingOneAuthenticationClientCredentialsScopesOption()
 	initPingOneAuthenticationDeviceCodeClientIDOption()
 	initPingOneAuthenticationDeviceCodeEnvironmentIDOption()
 	initPingOneAuthenticationDeviceCodeScopesOption()
@@ -29,28 +28,6 @@ func InitPingOneServiceOptions() {
 	initPingOneAuthenticationWorkerClientSecretOption()
 	initPingOneAuthenticationWorkerEnvironmentIDOption()
 	initPingOneRegionCodeOption()
-}
-
-func initPingOneAuthenticationAPIEnvironmentIDOption() {
-	cobraParamName := "pingone-api-environment-id"
-	cobraValue := new(customtypes.UUID)
-	defaultValue := customtypes.UUID("")
-	envVar := "PINGCLI_PINGONE_API_ENVIRONMENT_ID"
-
-	options.PingOneAuthenticationAPIEnvironmentIDOption = options.Option{
-		CobraParamName:  cobraParamName,
-		CobraParamValue: cobraValue,
-		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
-		Flag: &pflag.Flag{
-			Name:  cobraParamName,
-			Usage: "The ID of the PingOne environment that contains the API client used to authenticate to the PingOne management API.",
-			Value: cobraValue,
-		},
-		Sensitive: false,
-		Type:      options.UUID,
-		KoanfKey:  "service.pingOne.authentication.environmentID",
-	}
 }
 
 func initPingOneAuthenticationAuthCodeClientIDOption() {
@@ -94,26 +71,6 @@ func initPingOneAuthenticationAuthCodeEnvironmentIDOption() {
 		Sensitive: false,
 		Type:      options.UUID,
 		KoanfKey:  "service.pingOne.authentication.authCode.environmentID",
-	}
-}
-
-func initPingOneAuthenticationAuthCodePortOption() {
-	cobraParamName := "pingone-oidc-auth-code-port"
-	cobraValue := new(customtypes.String)
-	envVar := "PINGCLI_PINGONE_OIDC_AUTH_CODE_PORT"
-
-	options.PingOneAuthenticationAuthCodePortOption = options.Option{
-		CobraParamName:  cobraParamName,
-		CobraParamValue: cobraValue,
-		EnvVar:          envVar,
-		Flag: &pflag.Flag{
-			Name:  cobraParamName,
-			Usage: "The port to use for the local redirect URI when using the auth code authentication type to authenticate to the PingOne management API.",
-			Value: cobraValue,
-		},
-		Sensitive: false,
-		Type:      options.STRING,
-		KoanfKey:  "service.pingOne.authentication.authCode.port",
 	}
 }
 
@@ -224,6 +181,28 @@ func initPingOneAuthenticationClientCredentialsEnvironmentIDOption() {
 		Sensitive: false,
 		Type:      options.UUID,
 		KoanfKey:  "service.pingOne.authentication.clientCredentials.environmentID",
+	}
+}
+
+func initPingOneAuthenticationClientCredentialsScopesOption() {
+	cobraParamName := "pingone-client-credentials-scopes"
+	cobraValue := new(customtypes.StringSlice)
+	defaultValue := customtypes.StringSlice{}
+	envVar := "PINGCLI_PINGONE_CLIENT_CREDENTIALS_SCOPES"
+
+	options.PingOneAuthenticationClientCredentialsScopesOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The scopes to request for the client credentials used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.STRING_SLICE,
+		KoanfKey:  "service.pingOne.authentication.clientCredentials.scopes",
 	}
 }
 
@@ -389,14 +368,12 @@ func initPingOneAuthenticationWorkerEnvironmentIDOption() {
 
 func initPingOneRegionCodeOption() {
 	cobraParamName := "pingone-region-code"
-	cobraValue := new(customtypes.PingOneRegionCode)
-	defaultValue := customtypes.PingOneRegionCode("")
+	cobraValue := new(customtypes.String)
 	envVar := "PINGCLI_PINGONE_REGION_CODE"
 
 	options.PingOneRegionCodeOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
-		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name: cobraParamName,
