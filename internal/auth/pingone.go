@@ -172,21 +172,12 @@ func getConfigConfiguration() (*config.Configuration, error) {
 			return nil, err
 		}
 
-		// Scopes are mandatory - no defaults allowed
-		// if len(clientCredentialsScopes) == 0 {
-		// 	return nil, fmt.Errorf("client credentials scopes are required but not provided - user must supply scopes")
-		// }
-
 		clientCredentialsScopesList := strings.Split(clientCredentialsScopes, ",")
-		// Trim whitespace from each scope
-		for i, scope := range clientCredentialsScopesList {
-			clientCredentialsScopesList[i] = strings.TrimSpace(scope)
-		}
-		// Filter out empty scopes
-		filteredScopes := make([]string, 0)
+		var filteredScopes []string
 		for _, scope := range clientCredentialsScopesList {
-			if scope != "" {
-				filteredScopes = append(filteredScopes, scope)
+			trimmedScope := strings.TrimSpace(scope)
+			if trimmedScope != "" {
+				filteredScopes = append(filteredScopes, trimmedScope)
 			}
 		}
 
