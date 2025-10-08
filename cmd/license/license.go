@@ -15,10 +15,10 @@ import (
 
 const (
 	licenseCommandExamples = `  Request a new evaluation license for PingFederate 12.0.
-    pingcli license request --product pingfederate --version 12.0
-	
-	  Request a new evaluation license for PingAccess 6.3.
-	pingcli license request --product pingaccess --version 6.3`
+    pingcli license --product pingfederate --version 12.0
+
+  Request a new evaluation license for PingAccess 6.3.
+    pingcli license --product pingaccess --version 6.3`
 )
 
 func NewLicenseCommand() *cobra.Command {
