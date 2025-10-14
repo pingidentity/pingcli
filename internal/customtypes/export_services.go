@@ -64,7 +64,7 @@ func (es *ExportServices) Set(servicesStr string) error {
 
 		enumService, ok := validServiceMap[service]
 		if !ok {
-			return &errs.PingCLIError{Prefix: exportServicesErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognisedExportService, service, strings.Join(ExportServicesValidValues(), ", "))}
+			return &errs.PingCLIError{Prefix: exportServicesErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognizedExportService, service, strings.Join(ExportServicesValidValues(), ", "))}
 		}
 
 		if _, ok := existingServices[enumService]; ok {

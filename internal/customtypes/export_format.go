@@ -37,7 +37,7 @@ func (ef *ExportFormat) Set(format string) error {
 	case strings.EqualFold(format, ""):
 		*ef = ExportFormat("")
 	default:
-		return &errs.PingCLIError{Prefix: exportFormatErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognisedFormat, format, strings.Join(ExportFormatValidValues(), ", "))}
+		return &errs.PingCLIError{Prefix: exportFormatErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognizedFormat, format, strings.Join(ExportFormatValidValues(), ", "))}
 	}
 
 	return nil

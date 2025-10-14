@@ -36,7 +36,7 @@ func (esg *ExportServiceGroup) Set(serviceGroup string) error {
 	// Check if the user provided group is valid
 	validServiceGroups := ExportServiceGroupValidValues()
 	if !slices.Contains(validServiceGroups, serviceGroup) {
-		return &errs.PingCLIError{Prefix: exportServiceGroupErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognisedServiceGroup, serviceGroup, strings.Join(validServiceGroups, ", "))}
+		return &errs.PingCLIError{Prefix: exportServiceGroupErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognizedServiceGroup, serviceGroup, strings.Join(validServiceGroups, ", "))}
 	}
 
 	*esg = ExportServiceGroup(serviceGroup)

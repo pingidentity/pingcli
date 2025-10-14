@@ -34,7 +34,7 @@ func Test_ExportFormat_Set(t *testing.T) {
 			name:          "Invalid value",
 			cType:         new(customtypes.ExportFormat),
 			formatStr:     "invalid",
-			expectedError: customtypes.ErrUnrecognisedFormat,
+			expectedError: customtypes.ErrUnrecognizedFormat,
 		},
 		{
 			name:          "Nil custom type",

@@ -69,7 +69,7 @@ func Test_PlatformExportCommand(t *testing.T) {
 				"--" + options.PlatformExportServiceGroupOption.CobraParamName, "invalid",
 			},
 			expectErr:     true,
-			expectedErrIs: customtypes.ErrUnrecognisedServiceGroup,
+			expectedErrIs: customtypes.ErrUnrecognizedServiceGroup,
 		},
 		{
 			name: "Happy Path - with specific service",
@@ -96,7 +96,7 @@ func Test_PlatformExportCommand(t *testing.T) {
 				"--" + options.PlatformExportServiceOption.CobraParamName, "invalid",
 			},
 			expectErr:     true,
-			expectedErrIs: customtypes.ErrUnrecognisedExportService,
+			expectedErrIs: customtypes.ErrUnrecognizedExportService,
 		},
 		{
 			name: "Invalid format",
@@ -104,7 +104,7 @@ func Test_PlatformExportCommand(t *testing.T) {
 				"--" + options.PlatformExportExportFormatOption.CobraParamName, "invalid",
 			},
 			expectErr:     true,
-			expectedErrIs: customtypes.ErrUnrecognisedFormat,
+			expectedErrIs: customtypes.ErrUnrecognizedFormat,
 		},
 		{
 			name: "Invalid output directory",

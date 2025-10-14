@@ -90,7 +90,7 @@ func Test_ExportServices_Set(t *testing.T) {
 			cType:               new(customtypes.ExportServices),
 			servicesStrs:        []string{"invalid"},
 			expectedNumServices: 0,
-			expectedError:       customtypes.ErrUnrecognisedExportService,
+			expectedError:       customtypes.ErrUnrecognizedExportService,
 		},
 		{
 			name:                "Nil custom type",

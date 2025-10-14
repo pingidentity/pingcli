@@ -13,10 +13,13 @@ import (
 // If the function takes longer than 30 seconds to complete, it returns an empty string.
 func CaptureStdout(f func()) string {
 	originalStdout := os.Stdout
-	r, w, _ := os.Pipe()
+	r, w, err := os.Pipe()
+	if err != nil {
+		return ""
+	}
+	defer r.Close()
 
 	defer func() { os.Stdout = originalStdout }()
-
 	os.Stdout = w
 
 	outC := make(chan string, 1)

@@ -5,6 +5,6 @@ package common
 import "errors"
 
 var (
-	ErrExactArgs = errors.New("incorrect number of arguments")
-	ErrRangeArgs = errors.New("incorrect number of arguments")
+	ErrExactArgs = errors.New("exact number of arguments not provided")
+	ErrRangeArgs = errors.New("argument count not in valid range")
 )

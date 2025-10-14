@@ -29,7 +29,7 @@ func Test_ExportServiceGroup_Set(t *testing.T) {
 			name:          "Invalid value",
 			cType:         new(customtypes.ExportServiceGroup),
 			value:         "invalid",
-			expectedError: customtypes.ErrUnrecognisedServiceGroup,
+			expectedError: customtypes.ErrUnrecognizedServiceGroup,
 		},
 		{
 			name:  "Happy path - empty",
