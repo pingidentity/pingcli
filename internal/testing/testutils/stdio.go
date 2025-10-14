@@ -17,7 +17,7 @@ func CaptureStdout(f func()) string {
 	if err != nil {
 		return ""
 	}
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	defer func() { os.Stdout = originalStdout }()
 	os.Stdout = w
