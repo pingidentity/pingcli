@@ -3,7 +3,6 @@
 package plugin_internal
 
 import (
-	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
@@ -16,9 +15,7 @@ import (
 )
 
 var (
-	addErrorPrefix         = "failed to add plugin"
-	ErrPluginAlreadyExists = errors.New("plugin executable already exists in configuration")
-	ErrPluginNotFound      = errors.New("plugin executable not found in system PATH")
+	addErrorPrefix = "failed to add plugin"
 )
 
 func RunInternalPluginAdd(pluginExecutable string) error {

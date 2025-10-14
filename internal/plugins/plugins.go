@@ -4,7 +4,6 @@ package plugins
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os/exec"
@@ -23,13 +22,7 @@ import (
 )
 
 var (
-	pluginsErrorPrefix      = "plugins error"
-	ErrGetPluginExecutables = errors.New("failed to get configured plugin executables")
-	ErrCreateRPCClient      = errors.New("failed to create plugin rpc client")
-	ErrDispensePlugin       = errors.New("the rpc client failed to dispense plugin executable")
-	ErrCastPluginInterface  = errors.New("failed to cast plugin executable to grpc.PingCliCommand interface")
-	ErrPluginConfiguration  = errors.New("failed to get plugin configuration")
-	ErrExecutePlugin        = errors.New("failed to execute plugin command")
+	pluginsErrorPrefix = "plugins error"
 )
 
 func AddAllPluginToCmd(cmd *cobra.Command) error {
@@ -185,7 +178,7 @@ func filterRootFlags(cmd *cobra.Command, args []string) []string {
 	rootFlags := cmd.Root().PersistentFlags()
 
 	// isRootFlag checks if a given argument (like "--profile") is a known persistent flag on the root command.
-	isRootFlag := func(arg string) *pflag.Flag {
+	lookupRootFlag := func(arg string) *pflag.Flag {
 		// Positional arguments don't start with a hyphen, so they can't be flags.
 		if !strings.HasPrefix(arg, "-") {
 			return nil
@@ -210,7 +203,7 @@ func filterRootFlags(cmd *cobra.Command, args []string) []string {
 
 	for i := 0; i < len(args); i++ {
 		arg := args[i]
-		flag := isRootFlag(arg)
+		flag := lookupRootFlag(arg)
 
 		if flag == nil {
 			// If it's not a recognized root flag, it must be for the plugin.

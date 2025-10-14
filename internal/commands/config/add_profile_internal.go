@@ -3,7 +3,6 @@
 package config_internal
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"strconv"
@@ -17,10 +16,7 @@ import (
 )
 
 var (
-	addProfileErrorPrefix   = "failed to add profile"
-	ErrNoProfileProvided    = errors.New("unable to determine profile name")
-	ErrSetActiveFlagInvalid = errors.New("invalid value for set-active flag. must be 'true' or 'false'")
-	ErrKoanfNotInitialized  = errors.New("koanf configuration not initialized")
+	addProfileErrorPrefix = "failed to add profile"
 )
 
 func RunInternalConfigAddProfile(rc io.ReadCloser, koanfConfig *profiles.KoanfConfig) (err error) {

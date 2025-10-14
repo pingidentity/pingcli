@@ -14,9 +14,13 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var (
+	errInvalidInput = errors.New("invalid input")
+)
+
 func mockValidateFunc(input string) error {
 	if input == "invalid" {
-		return errors.New("invalid input")
+		return errInvalidInput
 	}
 
 	return nil

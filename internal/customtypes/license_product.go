@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -24,7 +23,6 @@ const (
 
 var (
 	licenseProductErrorPrefix = "custom type license product error"
-	ErrUnrecognizedProduct    = errors.New("unrecognized license product")
 )
 
 type LicenseProduct string

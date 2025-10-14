@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -22,8 +21,7 @@ const (
 )
 
 var (
-	exportServicesErrorPrefix    = "custom type export services error"
-	ErrUnrecognisedExportService = errors.New("unrecognized service")
+	exportServicesErrorPrefix = "custom type export services error"
 )
 
 type ExportServices []string
@@ -50,11 +48,7 @@ func (es *ExportServices) Set(servicesStr string) error {
 	}
 
 	// Create a map of valid service values to check against user-provided services
-	validServices := ExportServicesValidValues()
-	validServiceMap := make(map[string]string, len(validServices))
-	for _, s := range validServices {
-		validServiceMap[strings.ToLower(s)] = s
-	}
+	validServiceMap := ExportServicesValidValuesMap()
 
 	// Create a map of existing services set in the ExportServices object
 	existingServices := make(map[string]struct{}, len(*es))
@@ -70,7 +64,7 @@ func (es *ExportServices) Set(servicesStr string) error {
 
 		enumService, ok := validServiceMap[service]
 		if !ok {
-			return &errs.PingCLIError{Prefix: exportServicesErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognisedExportService, service, strings.Join(validServices, ", "))}
+			return &errs.PingCLIError{Prefix: exportServicesErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognisedExportService, service, strings.Join(ExportServicesValidValues(), ", "))}
 		}
 
 		if _, ok := existingServices[enumService]; ok {
@@ -175,4 +169,15 @@ func ExportServicesValidValues() []string {
 	slices.Sort(allServices)
 
 	return allServices
+}
+
+// ExportServicesValidValuesMap returns a map of valid export service values with lowercase keys
+func ExportServicesValidValuesMap() map[string]string {
+	validServices := ExportServicesValidValues()
+	validServiceMap := make(map[string]string, len(validServices))
+	for _, s := range validServices {
+		validServiceMap[strings.ToLower(s)] = s
+	}
+
+	return validServiceMap
 }

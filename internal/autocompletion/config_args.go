@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
@@ -14,7 +15,8 @@ import (
 func ConfigViewProfileFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Unable to get configuration: %v", err), nil)
+		wrappedErr := fmt.Errorf("%w: %w", ErrGetConfiguration, err)
+		output.SystemError((&errs.PingCLIError{Prefix: autocompletionErrorPrefix, Err: wrappedErr}).Error(), nil)
 	}
 
 	return koanfConfig.ProfileNames(), cobra.ShellCompDirectiveNoFileComp
@@ -23,7 +25,8 @@ func ConfigViewProfileFunc(cmd *cobra.Command, args []string, toComplete string)
 func ConfigReturnNonActiveProfilesFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Unable to get configuration: %v", err), nil)
+		wrappedErr := fmt.Errorf("%w: %w", ErrGetConfiguration, err)
+		output.SystemError((&errs.PingCLIError{Prefix: autocompletionErrorPrefix, Err: wrappedErr}).Error(), nil)
 	}
 
 	profileNames := koanfConfig.ProfileNames()
@@ -33,7 +36,8 @@ func ConfigReturnNonActiveProfilesFunc(cmd *cobra.Command, args []string, toComp
 
 	activeProfileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
-		output.SystemError(fmt.Sprintf("Unable to get active profile: %v", err), nil)
+		wrappedErr := fmt.Errorf("%w: %w", ErrGetActiveProfile, err)
+		output.SystemError((&errs.PingCLIError{Prefix: autocompletionErrorPrefix, Err: wrappedErr}).Error(), nil)
 	}
 
 	nonActiveProfiles := []string{}

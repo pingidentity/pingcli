@@ -3,7 +3,7 @@
 package config_internal
 
 import (
-	"errors"
+	"fmt"
 	"slices"
 	"strings"
 
@@ -16,9 +16,6 @@ import (
 )
 
 var (
-	ErrRetrieveKeys     = errors.New("failed to retrieve configuration keys")
-	ErrNestedMap        = errors.New("failed to create nested map for key")
-	ErrMarshalKeys      = errors.New("failed to marshal keys to YAML format")
 	listKeysErrorPrefix = "failed to get configuration keys list"
 )
 
@@ -56,7 +53,9 @@ func returnKeysYamlString() (keysYamlStr string, err error) {
 				}
 				currentMap, currentMapOk = currentMap[k].(map[string]interface{})
 				if !currentMapOk {
-					return keysYamlStr, &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: ErrNestedMap}
+					wrappedErr := fmt.Errorf("key '%s': %w", koanfKey, ErrNestedMap)
+
+					return keysYamlStr, &errs.PingCLIError{Prefix: listKeysErrorPrefix, Err: wrappedErr}
 				}
 			}
 		}

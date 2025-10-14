@@ -9,6 +9,7 @@ linters:
     - decorder
     - dupword
     - durationcheck
+    - err113
     - errcheck
     - errchkjson
     - errname

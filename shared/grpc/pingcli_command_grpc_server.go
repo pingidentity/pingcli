@@ -25,7 +25,7 @@ func (s *PingCliCommandGRPCServer) Configuration(ctx context.Context, req *proto
 	}
 
 	if cmd == nil {
-		return nil, errors.New("plugin returned a nil configuration")
+		return nil, ErrNilConfiguration
 	}
 
 	return &proto.PingCliCommandConfigurationResponse{

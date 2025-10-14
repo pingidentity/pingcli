@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"regexp"
 
@@ -13,7 +12,6 @@ import (
 
 var (
 	licenseVersionErrorPrefix = "custom type license version error"
-	ErrInvalidVersionFormat   = errors.New("invalid version format, must be 'major.minor'")
 )
 
 type LicenseVersion string

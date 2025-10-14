@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -18,7 +17,6 @@ const (
 
 var (
 	exportFormatErrorPrefix = "custom type export format error"
-	ErrUnrecognisedFormat   = errors.New("unrecognized export format")
 )
 
 type ExportFormat string

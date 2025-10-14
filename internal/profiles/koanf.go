@@ -3,7 +3,6 @@
 package profiles
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"regexp"
@@ -20,22 +19,7 @@ import (
 var (
 	k *KoanfConfig
 
-	koanfErrorPrefix                     = "profile configuration error"
-	ErrNoOptionValue                     = errors.New("no option value found")
-	ErrKoanfNotInitialized               = errors.New("koanf instance is not initialized")
-	ErrProfileNameEmpty                  = errors.New("invalid profile name: profile name cannot be empty")
-	ErrProfileNameFormat                 = errors.New("invalid profile name: profile name must contain only alphanumeric characters, underscores, and dashes")
-	ErrProfileNameSameAsActiveProfileKey = errors.New("invalid profile name: profile name cannot be the same as the active profile key")
-	ErrSetActiveProfile                  = errors.New("error setting active profile")
-	ErrWriteKoanfFile                    = errors.New("failed to write configuration file to disk")
-	ErrProfileNameNotExist               = errors.New("invalid profile name: profile name does not exist")
-	ErrProfileNameAlreadyExists          = errors.New("invalid profile name: profile name already exists")
-	ErrKoanfProfileExtractAndLoad        = errors.New("failed to extract and load profile configuration")
-	ErrSetKoanfKeyValue                  = errors.New("failed to set koanf key value")
-	ErrMarshalKoanf                      = errors.New("failed to marshal koanf configuration")
-	ErrKoanfMerge                        = errors.New("failed to merge koanf configuration")
-	ErrDeleteActiveProfile               = errors.New("the active profile cannot be deleted")
-	ErrSetKoanfKeyDefaultValue           = errors.New("failed to set koanf key default value")
+	koanfErrorPrefix = "profile configuration error"
 )
 
 type KoanfConfig struct {

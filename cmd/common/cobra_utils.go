@@ -3,7 +3,6 @@
 package common
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pingidentity/pingcli/internal/errs"
@@ -12,8 +11,6 @@ import (
 
 var (
 	argsErrorPrefix = "failed to execute command"
-	ErrExactArgs    = errors.New("incorrect number of arguments")
-	ErrRangeArgs    = errors.New("incorrect number of arguments")
 )
 
 func ExactArgs(numArgs int) cobra.PositionalArgs {

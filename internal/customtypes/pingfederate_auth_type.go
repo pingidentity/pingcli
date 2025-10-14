@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -20,7 +19,6 @@ const (
 
 var (
 	pingFederateAuthTypeErrorPrefix = "custom type pingfederate authentication type error"
-	ErrUnrecognizedPingFederateAuth = errors.New("unrecognized pingfederate authentication type")
 )
 
 type PingFederateAuthenticationType string

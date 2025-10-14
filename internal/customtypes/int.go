@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -13,7 +12,6 @@ import (
 
 var (
 	intErrorPrefix = "custom type int error"
-	ErrParseInt    = errors.New("failed to parse value as int")
 )
 
 type Int int64

@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -18,7 +17,6 @@ const (
 
 var (
 	exportServiceGroupErrorPrefix = "custom type export service group error"
-	ErrUnrecognisedServiceGroup   = errors.New("unrecognized service group")
 )
 
 type ExportServiceGroup string
@@ -35,14 +33,9 @@ func (esg *ExportServiceGroup) Set(serviceGroup string) error {
 		return nil
 	}
 
-	// Create a map of valid service groups to check the user provided group against
+	// Check if the user provided group is valid
 	validServiceGroups := ExportServiceGroupValidValues()
-	validServiceGroupMap := make(map[string]struct{}, len(validServiceGroups))
-	for _, s := range validServiceGroups {
-		validServiceGroupMap[s] = struct{}{}
-	}
-
-	if _, ok := validServiceGroupMap[serviceGroup]; !ok {
+	if !slices.Contains(validServiceGroups, serviceGroup) {
 		return &errs.PingCLIError{Prefix: exportServiceGroupErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognisedServiceGroup, serviceGroup, strings.Join(validServiceGroups, ", "))}
 	}
 

@@ -11,8 +11,11 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+var (
+	errTest = errors.New("test error")
+)
+
 func Test_PingCLIError_Error(t *testing.T) {
-	testErr := errors.New("test error")
 	prefix1 := "prefix 1"
 	prefix2 := "prefix 2"
 
@@ -28,11 +31,11 @@ func Test_PingCLIError_Error(t *testing.T) {
 			name: "Happy path",
 			err: &errs.PingCLIError{
 				Prefix: prefix1,
-				Err:    testErr,
+				Err:    errTest,
 			},
-			expectedStr:  fmt.Sprintf("%s: %s", prefix1, testErr.Error()),
+			expectedStr:  fmt.Sprintf("%s: %s", prefix1, errTest.Error()),
 			expectedAs:   &errs.PingCLIError{},
-			expectedIs:   testErr,
+			expectedIs:   errTest,
 			assertUnwrap: require.Error,
 		},
 		{
@@ -41,12 +44,12 @@ func Test_PingCLIError_Error(t *testing.T) {
 				Prefix: prefix1,
 				Err: &errs.PingCLIError{
 					Prefix: prefix1,
-					Err:    testErr,
+					Err:    errTest,
 				},
 			},
-			expectedStr:  fmt.Sprintf("%s: %s", prefix1, testErr.Error()),
+			expectedStr:  fmt.Sprintf("%s: %s", prefix1, errTest.Error()),
 			expectedAs:   &errs.PingCLIError{},
-			expectedIs:   testErr,
+			expectedIs:   errTest,
 			assertUnwrap: require.Error,
 		},
 		{
@@ -55,12 +58,12 @@ func Test_PingCLIError_Error(t *testing.T) {
 				Prefix: prefix2,
 				Err: &errs.PingCLIError{
 					Prefix: prefix1,
-					Err:    testErr,
+					Err:    errTest,
 				},
 			},
-			expectedStr:  fmt.Sprintf("%s: %s: %s", prefix2, prefix1, testErr.Error()),
+			expectedStr:  fmt.Sprintf("%s: %s: %s", prefix2, prefix1, errTest.Error()),
 			expectedAs:   &errs.PingCLIError{},
-			expectedIs:   testErr,
+			expectedIs:   errTest,
 			assertUnwrap: require.Error,
 		},
 		{

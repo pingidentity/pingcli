@@ -26,6 +26,10 @@ func (e *PingCLIError) Error() string {
 		}
 	}
 
+	if e.Prefix == "" {
+		return e.Err.Error()
+	}
+
 	return fmt.Sprintf("%s: %s", e.Prefix, e.Err.Error())
 }
 

@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -22,7 +21,6 @@ const (
 
 var (
 	httpMethodErrorPrefix = "custom type http method error"
-	ErrUnrecognizedMethod = errors.New("unrecognized http method")
 )
 
 type HTTPMethod string

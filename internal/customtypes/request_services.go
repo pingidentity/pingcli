@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -18,7 +17,6 @@ const (
 
 var (
 	requestServiceErrorPrefix = "custom type request service error"
-	ErrUnrecognizedService    = errors.New("unrecognized request service")
 )
 
 type RequestService string

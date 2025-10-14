@@ -16,24 +16,24 @@ import (
 )
 
 var (
-	ErrLicenseDataEmpty = errors.New("returned license data is empty. please check your request parameters")
-	ErrGetProduct       = errors.New("failed to get product option value")
-	ErrGetVersion       = errors.New("failed to get version option value")
-	ErrGetDevopsUser    = errors.New("failed to get devops user option value")
-	ErrGetDevopsKey     = errors.New("failed to get devops key option value")
-	ErrRequiredValues   = errors.New("product, version, devops user, and devops key must be specified for license request")
-	ErrLicenseRequest   = errors.New("license request failed")
-	licenseErrorPrefix  = "failed to run license request"
+	licenseErrorPrefix = "failed to run license request"
 )
 
+type licenseOptions struct {
+	product    string
+	version    string
+	devopsUser string
+	devopsKey  string
+}
+
 func RunInternalLicense() (err error) {
-	product, version, devopsUser, devopsKey, err := readLicenseOptionValues()
+	opts, err := readLicenseOptionValues()
 	if err != nil {
 		return &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: err}
 	}
 
 	ctx := context.Background()
-	licenseData, err := runLicenseRequest(ctx, product, version, devopsUser, devopsKey)
+	licenseData, err := runLicenseRequest(ctx, opts.product, opts.version, opts.devopsUser, opts.devopsKey)
 	if err != nil {
 		return &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: err}
 	}
@@ -47,32 +47,35 @@ func RunInternalLicense() (err error) {
 	return nil
 }
 
-func readLicenseOptionValues() (product, version, devopsUser, devopsKey string, err error) {
-	product, err = profiles.GetOptionValue(options.LicenseProductOption)
+func readLicenseOptionValues() (*licenseOptions, error) {
+	opts := &licenseOptions{}
+	var err error
+
+	opts.product, err = profiles.GetOptionValue(options.LicenseProductOption)
 	if err != nil {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetProduct, err)}
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetProduct, err)}
 	}
 
-	version, err = profiles.GetOptionValue(options.LicenseVersionOption)
+	opts.version, err = profiles.GetOptionValue(options.LicenseVersionOption)
 	if err != nil {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetVersion, err)}
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetVersion, err)}
 	}
 
-	devopsUser, err = profiles.GetOptionValue(options.LicenseDevopsUserOption)
+	opts.devopsUser, err = profiles.GetOptionValue(options.LicenseDevopsUserOption)
 	if err != nil {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetDevopsUser, err)}
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetDevopsUser, err)}
 	}
 
-	devopsKey, err = profiles.GetOptionValue(options.LicenseDevopsKeyOption)
+	opts.devopsKey, err = profiles.GetOptionValue(options.LicenseDevopsKeyOption)
 	if err != nil {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetDevopsKey, err)}
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetDevopsKey, err)}
 	}
 
-	if product == "" || version == "" || devopsUser == "" || devopsKey == "" {
-		return product, version, devopsUser, devopsKey, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: ErrRequiredValues}
+	if opts.product == "" || opts.version == "" || opts.devopsUser == "" || opts.devopsKey == "" {
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: ErrRequiredValues}
 	}
 
-	return product, version, devopsUser, devopsKey, nil
+	return opts, nil
 }
 
 func runLicenseRequest(ctx context.Context, product, version, devopsUser, devopsKey string) (licenseData string, err error) {

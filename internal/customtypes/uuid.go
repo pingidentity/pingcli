@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/hashicorp/go-uuid"
@@ -13,7 +12,6 @@ import (
 
 var (
 	uuidErrorPrefix = "custom type uuid error"
-	ErrInvalidUUID  = errors.New("invalid uuid")
 )
 
 type UUID string

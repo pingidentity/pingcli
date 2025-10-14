@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -13,7 +12,6 @@ import (
 
 var (
 	boolErrorPrefix = "custom type bool error"
-	ErrParseBool    = errors.New("failed to parse value as bool")
 )
 
 type Bool bool

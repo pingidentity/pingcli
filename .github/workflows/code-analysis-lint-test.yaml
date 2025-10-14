@@ -143,8 +143,6 @@ jobs:
           TEST_PINGONE_WORKER_CLIENT_ID: ${{ secrets.TEST_PINGONE_WORKER_CLIENT_ID }}
           TEST_PINGONE_WORKER_CLIENT_SECRET: ${{ secrets.TEST_PINGONE_WORKER_CLIENT_SECRET }}
           TEST_PINGONE_REGION_CODE: ${{ secrets.TEST_PINGONE_REGION_CODE }}
-          TEST_PINGCLI_DEVOPS_USER: ${{ secrets.TEST_PINGCLI_DEVOPS_USER }}
-          TEST_PINGCLI_DEVOPS_KEY: ${{ secrets.TEST_PINGCLI_DEVOPS_KEY }}
 
   onfailure:
     if: ${{ always() && github.event_name == 'schedule' && contains(needs.*.result, 'failure') }}

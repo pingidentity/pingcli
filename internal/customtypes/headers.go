@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"regexp"
@@ -15,10 +14,8 @@ import (
 )
 
 var (
-	headerErrorPrefix       = "custom type header error"
-	ErrInvalidHeaderFormat  = errors.New("invalid header format. must be in `key:value` format")
-	ErrDisallowedAuthHeader = errors.New("authorization header is not allowed")
-	headerRegex             = regexp.MustCompile(`(^[^\s:]+):(.*)`)
+	headerErrorPrefix = "custom type header error"
+	headerRegex       = regexp.MustCompile(`(^[^\s:]+):(.*)`)
 )
 
 type Header struct {

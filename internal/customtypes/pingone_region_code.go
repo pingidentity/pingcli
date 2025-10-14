@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -27,8 +26,7 @@ const (
 )
 
 var (
-	pingOneRegionCodeErrorPrefix     = "custom type pingone region code error"
-	ErrUnrecognizedPingOneRegionCode = errors.New("unrecognized pingone region code")
+	pingOneRegionCodeErrorPrefix = "custom type pingone region code error"
 )
 
 type PingOneRegionCode string

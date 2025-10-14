@@ -3,7 +3,6 @@
 package customtypes
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -18,7 +17,6 @@ const (
 
 var (
 	pingOneAuthTypeErrorPrefix = "custom type pingone auth type error"
-	ErrUnrecognizedPingOneAuth = errors.New("unrecognized pingone authentication type")
 )
 
 type PingOneAuthenticationType string

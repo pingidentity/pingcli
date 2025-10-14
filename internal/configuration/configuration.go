@@ -3,7 +3,6 @@
 package configuration
 
 import (
-	"errors"
 	"slices"
 	"strings"
 
@@ -20,10 +19,7 @@ import (
 )
 
 var (
-	configurationErrorPrefix   = "configuration options error"
-	ErrInvalidConfigurationKey = errors.New("provided key is not recognized as a valid configuration key.\nuse 'pingcli config list-keys' to view all available keys")
-	ErrNoOptionForKey          = errors.New("no option found for the provided configuration key")
-	ErrEmptyKeyForOptionSearch = errors.New("empty key provided for option search, too many matches with options not configured with a koanf key")
+	configurationErrorPrefix = "configuration options error"
 )
 
 func KoanfKeys() (keys []string) {

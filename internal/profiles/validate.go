@@ -3,7 +3,6 @@
 package profiles
 
 import (
-	"errors"
 	"fmt"
 	"slices"
 	"strings"
@@ -16,26 +15,7 @@ import (
 )
 
 var (
-	validateErrorPrefix             = "profile validation error"
-	ErrValidatePingCLIConfiguration = errors.New("failed to validate Ping CLI configuration")
-	ErrInvalidConfigurationKey      = errors.New("invalid configuration key(s) found in profile")
-	ErrUnrecognizedVariableType     = errors.New("unrecognized variable type for key")
-	ErrValidateBoolean              = errors.New("invalid boolean value")
-	ErrValidateUUID                 = errors.New("invalid uuid value")
-	ErrValidateOutputFormat         = errors.New("invalid output format value")
-	ErrValidatePingOneRegionCode    = errors.New("invalid pingone region code value")
-	ErrValidateString               = errors.New("invalid string value")
-	ErrValidateStringSlice          = errors.New("invalid string slice value")
-	ErrValidateExportServiceGroup   = errors.New("invalid export service group value")
-	ErrValidateExportServices       = errors.New("invalid export services value")
-	ErrValidateExportFormat         = errors.New("invalid export format value")
-	ErrValidateHTTPMethod           = errors.New("invalid http method value")
-	ErrValidateRequestService       = errors.New("invalid request service value")
-	ErrValidateInt                  = errors.New("invalid int value")
-	ErrValidatePingFederateAuthType = errors.New("invalid pingfederate auth type value")
-	ErrValidatePingOneAuthType      = errors.New("invalid pingone auth type value")
-	ErrValidateLicenseProduct       = errors.New("invalid license product value")
-	ErrValidateLicenseVersion       = errors.New("invalid license version value")
+	validateErrorPrefix = "profile validation error"
 )
 
 func Validate() (err error) {

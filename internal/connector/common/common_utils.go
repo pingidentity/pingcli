@@ -13,7 +13,12 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
+)
+
+var (
+	utilsErrorPrefix = "connector common utils error"
 )
 
 func WriteFiles(exportableResources []connector.ExportableResource, format, outputDir string, overwriteExport bool) (err error) {
@@ -22,13 +27,13 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 	// Parse the HCL import block template
 	hclImportBlockTemplate, err := template.New("HCLImportBlock").Parse(connector.HCLImportBlockTemplate)
 	if err != nil {
-		return fmt.Errorf("failed to parse HCL import block template. err: %s", err.Error())
+		return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w: %w", ErrParseHCLTemplate, err)}
 	}
 
 	for _, exportableResource := range exportableResources {
 		importBlocks, err := exportableResource.ExportAll()
 		if err != nil {
-			return fmt.Errorf("failed to export resource %s. err: %s", exportableResource.ResourceType(), err.Error())
+			return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrExportResource, exportableResource.ResourceType(), err)}
 		}
 
 		if len(*importBlocks) == 0 {
@@ -54,12 +59,12 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 		// This can be changed with the --overwrite export parameter
 		_, err = os.Stat(outputFilePath)
 		if err == nil && !overwriteExport {
-			return fmt.Errorf("generated import file for %q already exists. Use --overwrite to overwrite existing export data", outputFileName)
+			return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w for %q", ErrFileAlreadyExists, outputFileName)}
 		}
 
 		outputFile, err := os.Create(outputFilePath)
 		if err != nil {
-			return fmt.Errorf("failed to create export file %q. err: %s", outputFilePath, err.Error())
+			return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w for %q: %w", ErrCreateExportFile, outputFileName, err)}
 		}
 		defer func() {
 			cErr := outputFile.Close()
@@ -81,10 +86,10 @@ func WriteFiles(exportableResources []connector.ExportableResource, format, outp
 			case customtypes.ENUM_EXPORT_FORMAT_HCL:
 				err := hclImportBlockTemplate.Execute(outputFile, importBlock)
 				if err != nil {
-					return fmt.Errorf("failed to write import template to file %q. err: %s", outputFilePath, err.Error())
+					return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w for %q: %w", ErrWriteTemplateToFile, outputFileName, err)}
 				}
 			default:
-				return fmt.Errorf("unrecognized export format %q. Must be one of: %s", format, customtypes.ExportFormatValidValues())
+				return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of '%s'", ErrUnrecognizedExportFormat, format, customtypes.ExportFormatValidValues())}
 			}
 		}
 	}
@@ -96,17 +101,17 @@ func writeHeader(format, outputFilePath string, outputFile *os.File) error {
 	// Parse the HCL header
 	hclImportHeaderTemplate, err := template.New("HCLImportHeader").Parse(connector.HCLImportHeaderTemplate)
 	if err != nil {
-		return fmt.Errorf("failed to parse HCL import header template. err: %s", err.Error())
+		return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w: %w", ErrParseHCLTemplate, err)}
 	}
 
 	switch format {
 	case customtypes.ENUM_EXPORT_FORMAT_HCL:
 		err := hclImportHeaderTemplate.Execute(outputFile, nil)
 		if err != nil {
-			return fmt.Errorf("failed to write import template to file %q. err: %s", outputFilePath, err.Error())
+			return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w for %q: %w", ErrWriteTemplateToFile, outputFilePath, err)}
 		}
 	default:
-		return fmt.Errorf("unrecognized export format %q. Must be one of: %s", format, customtypes.ExportFormatValidValues())
+		return &errs.PingCLIError{Prefix: utilsErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of '%s'", ErrUnrecognizedExportFormat, format, customtypes.ExportFormatValidValues())}
 	}
 
 	return nil
