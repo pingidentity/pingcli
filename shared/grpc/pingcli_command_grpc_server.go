@@ -24,6 +24,10 @@ func (s *PingCliCommandGRPCServer) Configuration(ctx context.Context, req *proto
 		return nil, err
 	}
 
+	if cmd == nil {
+		return nil, ErrNilConfiguration
+	}
+
 	return &proto.PingCliCommandConfigurationResponse{
 		Example: &cmd.Example,
 		Long:    &cmd.Long,

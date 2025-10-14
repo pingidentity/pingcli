@@ -5,44 +5,84 @@ package config_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/cmd/common"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test Config Set Command Executes without issue
-func TestConfigViewProfileCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile")
-	testutils.CheckExpectedError(t, err, nil)
-}
+func Test_ConfigViewProfileCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-// Test Config Set Command Executes with a defined profile
-func TestConfigViewProfileCmd_Execute_WithProfileFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "production")
-	testutils.CheckExpectedError(t, err, nil)
-}
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name:      "Happy Path - view active profile",
+			args:      []string{},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - view specified profile",
+			args:      []string{"production"},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - with unmask-values flag",
+			args:      []string{"--unmask-values"},
+			expectErr: false,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{"profile1", "profile2"},
+			expectErr:     true,
+			expectedErrIs: common.ErrRangeArgs,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+		{
+			name:          "Non-existent profile",
+			args:          []string{"non-existent"},
+			expectErr:     true,
+			expectedErrIs: profiles.ErrProfileNameNotExist,
+		},
+		{
+			name:          "Invalid profile name format",
+			args:          []string{"(*&*(#))"},
+			expectErr:     true,
+			expectedErrIs: profiles.ErrProfileNameNotExist,
+		},
+	}
 
-func TestConfigViewProfileCmd_Execute_UnmaskValuesFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "--unmask-values")
-	testutils.CheckExpectedError(t, err, nil)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test Config Set Command fails with invalid flag
-func TestConfigViewProfileCmd_Execute_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"config", "view-profile"}, tc.args...)...)
 
-// Test Config Set Command fails with non-existent profile
-func TestConfigViewProfileCmd_Execute_NonExistentProfile(t *testing.T) {
-	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*' profile does not exist$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "non-existent")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			if !tc.expectErr {
+				require.NoError(t, err)
 
-// Test Config Set Command fails with invalid profile
-func TestConfigViewProfileCmd_Execute_InvalidProfile(t *testing.T) {
-	expectedErrorPattern := `^failed to view profile: invalid profile name: '.*' profile does not exist$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "view-profile", "(*&*(#))")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+				return
+			}
+
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }

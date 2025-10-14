@@ -10,12 +10,14 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingone"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingOneGatewayRoleAssignmentResource{}
+	_                                      connector.ExportableResource = &PingOneGatewayRoleAssignmentResource{}
+	gatewayRoleAssignmentExportErrorPrefix                              = "pingone_gateway_role_assignment resource export error"
 )
 
 type PingOneGatewayRoleAssignmentResource struct {
@@ -155,5 +157,5 @@ func (r *PingOneGatewayRoleAssignmentResource) getRoleAssignmentRoleName(roleId 
 		}
 	}
 
-	return nil, false, fmt.Errorf("failed to export resource '%s'. No role name found for Role ID '%s'", r.ResourceType(), roleId)
+	return nil, false, &errs.PingCLIError{Prefix: gatewayRoleAssignmentExportErrorPrefix, Err: fmt.Errorf("%w: %q", ErrRoleNameNotFound, roleId)}
 }

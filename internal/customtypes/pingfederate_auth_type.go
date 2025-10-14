@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
 )
 
@@ -14,6 +15,10 @@ const (
 	ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_BASIC              string = "basicAuth"
 	ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_ACCESS_TOKEN       string = "accessTokenAuth"
 	ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS string = "clientCredentialsAuth"
+)
+
+var (
+	pingFederateAuthTypeErrorPrefix = "custom type pingfederate authentication type error"
 )
 
 type PingFederateAuthenticationType string
@@ -24,7 +29,7 @@ var _ pflag.Value = (*PingFederateAuthenticationType)(nil)
 // Implement pflag.Value interface for custom type in cobra MultiService parameter
 func (pat *PingFederateAuthenticationType) Set(authType string) error {
 	if pat == nil {
-		return fmt.Errorf("failed to set PingFederate Authentication Type value: %s. PingFederate Authentication Type is nil", authType)
+		return &errs.PingCLIError{Prefix: pingFederateAuthTypeErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	switch {
@@ -37,18 +42,22 @@ func (pat *PingFederateAuthenticationType) Set(authType string) error {
 	case strings.EqualFold(authType, ""):
 		*pat = PingFederateAuthenticationType("")
 	default:
-		return fmt.Errorf("unrecognized PingFederate Authentication Type: '%s'. Must be one of: %s", authType, strings.Join(PingFederateAuthenticationTypeValidValues(), ", "))
+		return &errs.PingCLIError{Prefix: pingFederateAuthTypeErrorPrefix, Err: fmt.Errorf("%w: '%s'. Must be one of: %s", ErrUnrecognizedPingFederateAuth, authType, strings.Join(PingFederateAuthenticationTypeValidValues(), ", "))}
 	}
 
 	return nil
 }
 
-func (pat PingFederateAuthenticationType) Type() string {
+func (pat *PingFederateAuthenticationType) Type() string {
 	return "string"
 }
 
-func (pat PingFederateAuthenticationType) String() string {
-	return string(pat)
+func (pat *PingFederateAuthenticationType) String() string {
+	if pat == nil {
+		return ""
+	}
+
+	return string(*pat)
 }
 
 func PingFederateAuthenticationTypeValidValues() []string {

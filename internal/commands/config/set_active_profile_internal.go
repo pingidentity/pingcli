@@ -6,9 +6,14 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/input"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
+)
+
+var (
+	setActiveProfileErrorPrefix = "failed to set active profile"
 )
 
 func RunInternalConfigSetActiveProfile(args []string, rc io.ReadCloser) (err error) {
@@ -18,14 +23,19 @@ func RunInternalConfigSetActiveProfile(args []string, rc io.ReadCloser) (err err
 	} else {
 		pName, err = promptUserToSelectActiveProfile(rc)
 		if err != nil {
-			return fmt.Errorf("failed to set active profile: %w", err)
+			return &errs.PingCLIError{Prefix: setActiveProfileErrorPrefix, Err: err}
 		}
 	}
 
 	output.Message(fmt.Sprintf("Setting active profile to '%s'...", pName), nil)
 
-	if err = profiles.GetKoanfConfig().ChangeActiveProfile(pName); err != nil {
-		return fmt.Errorf("failed to set active profile: %w", err)
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return &errs.PingCLIError{Prefix: setActiveProfileErrorPrefix, Err: err}
+	}
+
+	if err = koanfConfig.ChangeActiveProfile(pName); err != nil {
+		return &errs.PingCLIError{Prefix: setActiveProfileErrorPrefix, Err: err}
 	}
 
 	output.Success(fmt.Sprintf("Active profile set to '%s'", pName), nil)
@@ -34,10 +44,14 @@ func RunInternalConfigSetActiveProfile(args []string, rc io.ReadCloser) (err err
 }
 
 func promptUserToSelectActiveProfile(rc io.ReadCloser) (pName string, err error) {
-	pName, err = input.RunPromptSelect("Select profile to set as active: ", profiles.GetKoanfConfig().ProfileNames(), rc)
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return "", &errs.PingCLIError{Prefix: setActiveProfileErrorPrefix, Err: err}
+	}
+	pName, err = input.RunPromptSelect("Select profile to set as active: ", koanfConfig.ProfileNames(), rc)
 
 	if err != nil {
-		return pName, err
+		return pName, &errs.PingCLIError{Prefix: setActiveProfileErrorPrefix, Err: err}
 	}
 
 	return pName, nil

@@ -10,7 +10,8 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingfederate/resources"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_resource"
-	client "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
+	"github.com/pingidentity/pingcli/internal/utils"
+	client "github.com/pingidentity/pingfederate-go-client/v1230/configurationapi"
 )
 
 func OauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *connector.ClientInfo) *testutils_resource.TestableResource {
@@ -54,7 +55,7 @@ func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 		AuthenticationPolicyContractRef: client.ResourceLink{
 			Id: testApcId,
 		},
-		Id: "testApcToPersistentGrantMappingId",
+		Id: utils.Pointer("testApcToPersistentGrantMappingId"),
 	}
 
 	request = request.Body(clientStruct)
@@ -74,10 +75,10 @@ func createOauthAuthenticationPolicyContractMapping(t *testing.T, clientInfo *co
 
 	return testutils_resource.ResourceInfo{
 		DeletionIds: []string{
-			resource.Id,
+			*resource.Id,
 		},
 		CreationInfo: map[testutils_resource.ResourceCreationInfoType]string{
-			testutils_resource.ENUM_ID: resource.Id,
+			testutils_resource.ENUM_ID: *resource.Id,
 		},
 	}
 }

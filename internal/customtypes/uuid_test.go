@@ -6,49 +6,123 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/pingidentity/pingcli/internal/utils"
+	"github.com/stretchr/testify/require"
 )
 
-// Test UUID Set function
 func Test_UUID_Set(t *testing.T) {
-	uuid := new(customtypes.UUID)
+	testutils_koanf.InitKoanfs(t)
 
-	val := "123e4567-e89b-12d3-a456-426614174000"
-	err := uuid.Set(val)
-	if err != nil {
-		t.Errorf("Set returned error: %v", err)
+	testCases := []struct {
+		name          string
+		cType         *customtypes.UUID
+		value         string
+		expectedError error
+	}{
+		{
+			name:  "Happy path",
+			cType: new(customtypes.UUID),
+			value: "123e4567-e89b-12d3-a456-426614174000",
+		},
+		{
+			name:  "Happy path - empty",
+			cType: new(customtypes.UUID),
+			value: "",
+		},
+		{
+			name:          "Invalid value",
+			cType:         new(customtypes.UUID),
+			value:         "invalid",
+			expectedError: customtypes.ErrInvalidUUID,
+		},
+		{
+			name:          "Nil custom type",
+			cType:         nil,
+			value:         "123e4567-e89b-12d3-a456-426614174000",
+			expectedError: customtypes.ErrCustomTypeNil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := tc.cType.Set(tc.value)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test Set function fails with invalid value
-func Test_UUID_Set_InvalidValue(t *testing.T) {
-	uuid := new(customtypes.UUID)
+func Test_UUID_Type(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	invalidValue := "invalid"
+	testCases := []struct {
+		name         string
+		cType        *customtypes.UUID
+		expectedType string
+	}{
+		{
+			name:         "Happy path",
+			cType:        utils.Pointer(customtypes.UUID("123e4567-e89b-12d3-a456-426614174000")),
+			expectedType: "string",
+		},
+		{
+			name:         "Nil custom type",
+			cType:        nil,
+			expectedType: "string",
+		},
+	}
 
-	expectedErrorPattern := `^uuid string is wrong length$`
-	err := uuid.Set(invalidValue)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualType := tc.cType.Type()
+
+			require.Equal(t, tc.expectedType, actualType)
+		})
+	}
 }
 
-// Test Set function fails with nil
-func Test_UUID_Set_Nil(t *testing.T) {
-	var uuid *customtypes.UUID
-
-	val := "123e4567-e89b-12d3-a456-426614174000"
-
-	expectedErrorPattern := `^failed to set UUID value: .* UUID is nil$`
-	err := uuid.Set(val)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test String function
 func Test_UUID_String(t *testing.T) {
-	uuid := customtypes.UUID("123e4567-e89b-12d3-a456-426614174000")
+	testutils_koanf.InitKoanfs(t)
 
-	expected := "123e4567-e89b-12d3-a456-426614174000"
-	actual := uuid.String()
-	if actual != expected {
-		t.Errorf("String returned: %s, expected: %s", actual, expected)
+	testCases := []struct {
+		name        string
+		cType       *customtypes.UUID
+		expectedStr string
+	}{
+		{
+			name:        "Happy path",
+			cType:       utils.Pointer(customtypes.UUID("123e4567-e89b-12d3-a456-426614174000")),
+			expectedStr: "123e4567-e89b-12d3-a456-426614174000",
+		},
+		{
+			name:        "Happy path - empty",
+			cType:       utils.Pointer(customtypes.UUID("")),
+			expectedStr: "",
+		},
+		{
+			name:        "Nil custom type",
+			cType:       nil,
+			expectedStr: "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualStr := tc.cType.String()
+
+			require.Equal(t, tc.expectedStr, actualStr)
+		})
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
 )
 
@@ -24,6 +25,10 @@ const (
 	ENUM_PINGONE_TLD_NA string = "com"
 )
 
+var (
+	pingOneRegionCodeErrorPrefix = "custom type pingone region code error"
+)
+
 type PingOneRegionCode string
 
 // Verify that the custom type satisfies the pflag.Value interface
@@ -33,7 +38,7 @@ var _ pflag.Value = (*PingOneRegionCode)(nil)
 
 func (prc *PingOneRegionCode) Set(regionCode string) error {
 	if prc == nil {
-		return fmt.Errorf("failed to set PingOne Region Code value: %s. PingOne Region Code is nil", regionCode)
+		return &errs.PingCLIError{Prefix: pingOneRegionCodeErrorPrefix, Err: ErrCustomTypeNil}
 	}
 	switch {
 	case strings.EqualFold(regionCode, ENUM_PINGONE_REGION_CODE_AP):
@@ -49,18 +54,22 @@ func (prc *PingOneRegionCode) Set(regionCode string) error {
 	case strings.EqualFold(regionCode, ""):
 		*prc = PingOneRegionCode("")
 	default:
-		return fmt.Errorf("unrecognized PingOne Region Code: '%s'. Must be one of: %s", regionCode, strings.Join(PingOneRegionCodeValidValues(), ", "))
+		return &errs.PingCLIError{Prefix: pingOneRegionCodeErrorPrefix, Err: fmt.Errorf("%w: '%s'. Must be one of: %s", ErrUnrecognizedPingOneRegionCode, regionCode, strings.Join(PingOneRegionCodeValidValues(), ", "))}
 	}
 
 	return nil
 }
 
-func (prc PingOneRegionCode) Type() string {
+func (prc *PingOneRegionCode) Type() string {
 	return "string"
 }
 
-func (prc PingOneRegionCode) String() string {
-	return string(prc)
+func (prc *PingOneRegionCode) String() string {
+	if prc == nil {
+		return ""
+	}
+
+	return string(*prc)
 }
 
 func PingOneRegionCodeValidValues() []string {

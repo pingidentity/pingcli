@@ -11,7 +11,12 @@ import (
 	"github.com/patrickcping/pingone-go-sdk-v2/mfa"
 	"github.com/patrickcping/pingone-go-sdk-v2/risk"
 	"github.com/pingidentity/pingcli/internal/connector/common"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
+)
+
+var (
+	pingoneConnectorCommonErrorPrefix = "pingone connector common utils error"
 )
 
 func GetAuthorizeAPIObjectsFromIterator[T any](iter authorize.EntityArrayPagedIterator, clientFuncName, extractionFuncName, resourceType string) ([]T, error) {
@@ -20,14 +25,14 @@ func GetAuthorizeAPIObjectsFromIterator[T any](iter authorize.EntityArrayPagedIt
 	for cursor, err := range iter {
 		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, clientFuncName, resourceType)
 		if err != nil {
-			return nil, err
+			return nil, &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: err}
 		}
 		// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
 		if !ok {
 			return nil, nil
 		}
 
-		nilErr := common.DataNilError(resourceType, cursor.HTTPResponse)
+		nilErr := &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: common.DataNilError(resourceType, cursor.HTTPResponse)}
 
 		if cursor.EntityArray == nil {
 			return nil, nilErr
@@ -55,14 +60,14 @@ func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPaged
 	for cursor, err := range iter {
 		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, clientFuncName, resourceType)
 		if err != nil {
-			return nil, err
+			return nil, &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: err}
 		}
 		// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
 		if !ok {
 			return nil, nil
 		}
 
-		nilErr := common.DataNilError(resourceType, cursor.HTTPResponse)
+		nilErr := &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: common.DataNilError(resourceType, cursor.HTTPResponse)}
 
 		if cursor.EntityArray == nil {
 			return nil, nilErr
@@ -90,14 +95,14 @@ func GetMfaAPIObjectsFromIterator[T any](iter mfa.EntityArrayPagedIterator, clie
 	for cursor, err := range iter {
 		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, clientFuncName, resourceType)
 		if err != nil {
-			return nil, err
+			return nil, &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: err}
 		}
 		// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
 		if !ok {
 			return nil, nil
 		}
 
-		nilErr := common.DataNilError(resourceType, cursor.HTTPResponse)
+		nilErr := &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: common.DataNilError(resourceType, cursor.HTTPResponse)}
 
 		if cursor.EntityArray == nil {
 			return nil, nilErr
@@ -125,14 +130,14 @@ func GetRiskAPIObjectsFromIterator[T any](iter risk.EntityArrayPagedIterator, cl
 	for cursor, err := range iter {
 		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, clientFuncName, resourceType)
 		if err != nil {
-			return nil, err
+			return nil, &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: err}
 		}
 		// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
 		if !ok {
 			return nil, nil
 		}
 
-		nilErr := common.DataNilError(resourceType, cursor.HTTPResponse)
+		nilErr := &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: common.DataNilError(resourceType, cursor.HTTPResponse)}
 
 		if cursor.EntityArray == nil {
 			return nil, nilErr
@@ -157,12 +162,15 @@ func GetRiskAPIObjectsFromIterator[T any](iter risk.EntityArrayPagedIterator, cl
 func getAPIObjectFromEmbedded[T any](embedded reflect.Value, extractionFuncName, resourceType string) ([]T, error) {
 	embeddedExtractionFunc := embedded.MethodByName(extractionFuncName)
 	if !embeddedExtractionFunc.IsValid() {
-		return nil, fmt.Errorf("failed to find extraction function '%s' for resource '%s'", extractionFuncName, resourceType)
+		return nil, &errs.PingCLIError{
+			Prefix: pingoneConnectorCommonErrorPrefix,
+			Err:    fmt.Errorf("%w. Function %q. Resource %q", ErrUnknownExtractionFunction, extractionFuncName, resourceType),
+		}
 	}
 
 	reflectValues := embeddedExtractionFunc.Call(nil)
 	if len(reflectValues) == 0 {
-		return nil, fmt.Errorf("failed to get reflect value from embedded. embedded is empty")
+		return nil, &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: ErrEmbeddedEmpty}
 	}
 
 	rInterface := reflectValues[0].Interface()
@@ -172,7 +180,7 @@ func getAPIObjectFromEmbedded[T any](embedded reflect.Value, extractionFuncName,
 
 	apiObject, apiObjectOk := rInterface.([]T)
 	if !apiObjectOk {
-		return nil, fmt.Errorf("failed to cast reflect value to %s", resourceType)
+		return nil, &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: fmt.Errorf("%w. Resource Type %q", ErrCastReflectValue, resourceType)}
 	}
 
 	return apiObject, nil

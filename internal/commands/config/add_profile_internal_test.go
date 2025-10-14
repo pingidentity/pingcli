@@ -8,125 +8,82 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test RunInternalConfigAddProfile function
 func Test_RunInternalConfigAddProfile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	var (
-		profileName = customtypes.String("test-profile")
-		description = customtypes.String("test-description")
-		setActive   = customtypes.Bool(false)
-	)
-
-	options.ConfigAddProfileNameOption.Flag.Changed = true
-	options.ConfigAddProfileNameOption.CobraParamValue = &profileName
-
-	options.ConfigAddProfileDescriptionOption.Flag.Changed = true
-	options.ConfigAddProfileDescriptionOption.CobraParamValue = &description
-
-	options.ConfigAddProfileSetActiveOption.Flag.Changed = true
-	options.ConfigAddProfileSetActiveOption.CobraParamValue = &setActive
-
-	err := RunInternalConfigAddProfile(os.Stdin)
-	if err != nil {
-		t.Errorf("RunInternalConfigAddProfile returned error: %v", err)
+	testCases := []struct {
+		name          string
+		profileName   customtypes.String
+		description   customtypes.String
+		setActive     customtypes.Bool
+		setKoanfNil   bool
+		expectedError error
+	}{
+		{
+			name:        "Create New Profile and Not Set it as the Active Profile",
+			profileName: "test-profile",
+			description: "test-description",
+			setActive:   customtypes.Bool(false),
+		},
+		{
+			name:        "Create New Profile and Set it as the Active Profile",
+			profileName: "test-profile-active",
+			description: "test-description-active",
+			setActive:   customtypes.Bool(true),
+		},
+		{
+			name:          "Invalid Profile Name: Already Exists",
+			profileName:   "default",
+			description:   "test-description",
+			setActive:     customtypes.Bool(false),
+			expectedError: profiles.ErrProfileNameAlreadyExists,
+		},
+		{
+			name:          "Invalid Profile Name: None Provided",
+			profileName:   "",
+			description:   "test-description",
+			setActive:     customtypes.Bool(false),
+			expectedError: ErrNoProfileProvided,
+		},
+		{
+			name:          "Koanf Not Initialized",
+			profileName:   "new-profile",
+			description:   "test-description",
+			setActive:     customtypes.Bool(false),
+			setKoanfNil:   true,
+			expectedError: ErrKoanfNotInitialized,
+		},
 	}
-}
 
-// Test RunInternalConfigAddProfile function fails when existing profile name is provided
-func Test_RunInternalConfigAddProfile_ExistingProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			koanfConfig := testutils_koanf.InitKoanfs(t)
 
-	var (
-		profileName = customtypes.String("default")
-		description = customtypes.String("test-description")
-		setActive   = customtypes.Bool(false)
-	)
+			if tc.setKoanfNil {
+				koanfConfig = nil
+			}
 
-	options.ConfigAddProfileNameOption.Flag.Changed = true
-	options.ConfigAddProfileNameOption.CobraParamValue = &profileName
+			options.ConfigAddProfileNameOption.Flag.Changed = true
+			options.ConfigAddProfileNameOption.CobraParamValue = &tc.profileName
 
-	options.ConfigAddProfileDescriptionOption.Flag.Changed = true
-	options.ConfigAddProfileDescriptionOption.CobraParamValue = &description
+			options.ConfigAddProfileDescriptionOption.Flag.Changed = true
+			options.ConfigAddProfileDescriptionOption.CobraParamValue = &tc.description
 
-	options.ConfigAddProfileSetActiveOption.Flag.Changed = true
-	options.ConfigAddProfileSetActiveOption.CobraParamValue = &setActive
+			options.ConfigAddProfileSetActiveOption.Flag.Changed = true
+			options.ConfigAddProfileSetActiveOption.CobraParamValue = &tc.setActive
 
-	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'. profile already exists$`
-	err := RunInternalConfigAddProfile(os.Stdin)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			err := RunInternalConfigAddProfile(os.Stdin, koanfConfig)
 
-// Test RunInternalConfigAddProfile function fails when profile name is not provided
-func Test_RunInternalConfigAddProfile_NoProfileName(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-	var (
-		profileName = customtypes.String("")
-		description = customtypes.String("test-description")
-		setActive   = customtypes.Bool(false)
-	)
-
-	options.ConfigAddProfileNameOption.Flag.Changed = true
-	options.ConfigAddProfileNameOption.CobraParamValue = &profileName
-
-	options.ConfigAddProfileDescriptionOption.Flag.Changed = true
-	options.ConfigAddProfileDescriptionOption.CobraParamValue = &description
-
-	options.ConfigAddProfileSetActiveOption.Flag.Changed = true
-	options.ConfigAddProfileSetActiveOption.CobraParamValue = &setActive
-
-	expectedErrorPattern := `^failed to add profile: unable to determine profile name$`
-	err := RunInternalConfigAddProfile(os.Stdin)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalConfigAddProfile function succeeds with set active flag set to true
-func Test_RunInternalConfigAddProfile_SetActive(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-	var (
-		profileName = customtypes.String("test-profile-active")
-		description = customtypes.String("test-description")
-		setActive   = customtypes.Bool(true)
-	)
-
-	options.ConfigAddProfileNameOption.Flag.Changed = true
-	options.ConfigAddProfileNameOption.CobraParamValue = &profileName
-
-	options.ConfigAddProfileDescriptionOption.Flag.Changed = true
-	options.ConfigAddProfileDescriptionOption.CobraParamValue = &description
-
-	options.ConfigAddProfileSetActiveOption.Flag.Changed = true
-	options.ConfigAddProfileSetActiveOption.CobraParamValue = &setActive
-
-	err := RunInternalConfigAddProfile(os.Stdin)
-	if err != nil {
-		t.Errorf("RunInternalConfigAddProfile returned error: %v", err)
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
 	}
-}
-
-// Test RunInternalConfigAddProfile function fails with invalid set active flag
-func Test_RunInternalConfigAddProfile_InvalidSetActive(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-	var (
-		profileName = customtypes.String("test-profile")
-		description = customtypes.String("test-description")
-		setActive   = customtypes.String("invalid")
-	)
-
-	options.ConfigAddProfileNameOption.Flag.Changed = true
-	options.ConfigAddProfileNameOption.CobraParamValue = &profileName
-
-	options.ConfigAddProfileDescriptionOption.Flag.Changed = true
-	options.ConfigAddProfileDescriptionOption.CobraParamValue = &description
-
-	options.ConfigAddProfileSetActiveOption.Flag.Changed = true
-	options.ConfigAddProfileSetActiveOption.CobraParamValue = &setActive
-
-	expectedErrorPattern := `^failed to add profile: strconv.ParseBool: parsing ".*": invalid syntax$`
-	err := RunInternalConfigAddProfile(os.Stdin)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

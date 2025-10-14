@@ -3,7 +3,6 @@
 package request_internal
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -11,229 +10,266 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/pingidentity/pingcli/internal/utils"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test RunInternalRequest function
 func Test_RunInternalRequest(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
+	workerEnvId, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+	require.NoError(t, err)
 
-	err := RunInternalRequest(fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)))
-	testutils.CheckExpectedError(t, err, nil)
+	defaultService := customtypes.RequestService(customtypes.ENUM_REQUEST_SERVICE_PINGONE)
+	defaultHttpMethod := customtypes.HTTPMethod(customtypes.ENUM_HTTP_METHOD_GET)
+	defaultRegionCode := customtypes.PingOneRegionCode(customtypes.ENUM_PINGONE_REGION_CODE_NA)
+
+	testCases := []struct {
+		name                     string
+		uri                      string
+		service                  *customtypes.RequestService
+		httpMethod               *customtypes.HTTPMethod
+		regionCode               *customtypes.PingOneRegionCode
+		workerEnvId              *customtypes.String
+		workerClientId           *customtypes.String
+		runTwiceToSetAccessToken bool
+		expectedError            error
+	}{
+		{
+			name: "Happy path - Run internal request",
+			uri:  fmt.Sprintf("environments/%s/populations", workerEnvId),
+		},
+		{
+			name:          "Test request with empty service",
+			uri:           fmt.Sprintf("environments/%s/populations", workerEnvId),
+			service:       utils.Pointer(customtypes.RequestService("")),
+			expectedError: ErrServiceEmpty,
+		},
+		{
+			name:          "Test with invalid service",
+			uri:           fmt.Sprintf("environments/%s/populations", workerEnvId),
+			service:       utils.Pointer(customtypes.RequestService("invalid-service")),
+			expectedError: ErrUnrecognizedService,
+		},
+		{
+			name: "Happy Path - Test with invalid URI",
+			uri:  "invalid-uri",
+		},
+		{
+			name:          "Test with empty HTTP method",
+			uri:           fmt.Sprintf("environments/%s/populations", workerEnvId),
+			httpMethod:    utils.Pointer(customtypes.HTTPMethod("")),
+			expectedError: ErrHttpMethodEmpty,
+		},
+		{
+			name:          "Test with invalid HTTP method",
+			uri:           fmt.Sprintf("environments/%s/populations", workerEnvId),
+			httpMethod:    utils.Pointer(customtypes.HTTPMethod("invalid-http-method")),
+			expectedError: ErrUnrecognizedHttpMethod,
+		},
+		{
+			name:          "Test with empty pingone region code",
+			uri:           fmt.Sprintf("environments/%s/populations", workerEnvId),
+			regionCode:    utils.Pointer(customtypes.PingOneRegionCode("")),
+			expectedError: ErrPingOneRegionCodeEmpty,
+		},
+		{
+			name:          "Test with invalid pingone region code",
+			uri:           fmt.Sprintf("environments/%s/populations", workerEnvId),
+			regionCode:    utils.Pointer(customtypes.PingOneRegionCode("invalid-region-code")),
+			expectedError: ErrUnrecognizedPingOneRegionCode,
+		},
+		{
+			name:          "Test with empty worker environment ID",
+			uri:           fmt.Sprintf("environments/%s/populations", workerEnvId),
+			workerEnvId:   utils.Pointer(customtypes.String("")),
+			expectedError: ErrPingOneWorkerEnvIDEmpty,
+		},
+		{
+			name:           "Test with empty worker client ID",
+			uri:            fmt.Sprintf("environments/%s/populations", workerEnvId),
+			workerClientId: utils.Pointer(customtypes.String("")),
+			expectedError:  ErrPingOneClientIDAndSecretEmpty,
+		},
+		{
+			name:           "Test with invalid worker client ID",
+			uri:            fmt.Sprintf("environments/%s/populations", workerEnvId),
+			workerClientId: utils.Pointer(customtypes.String("invalid-client-id")),
+			expectedError:  ErrPingOneAuthenticate,
+		},
+		{
+			name:                     "Happy path - Run internal request twice to set access token",
+			uri:                      fmt.Sprintf("environments/%s/populations", workerEnvId),
+			runTwiceToSetAccessToken: true,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			options.RequestServiceOption.Flag.Changed = true
+			if tc.service != nil {
+				options.RequestServiceOption.CobraParamValue = tc.service
+			} else {
+				options.RequestServiceOption.CobraParamValue = &defaultService
+			}
+
+			options.RequestHTTPMethodOption.Flag.Changed = true
+			if tc.httpMethod != nil {
+				options.RequestHTTPMethodOption.CobraParamValue = tc.httpMethod
+			} else {
+				options.RequestHTTPMethodOption.CobraParamValue = &defaultHttpMethod
+			}
+
+			options.PingOneRegionCodeOption.Flag.Changed = true
+			if tc.regionCode != nil {
+				options.PingOneRegionCodeOption.CobraParamValue = tc.regionCode
+			} else {
+				options.PingOneRegionCodeOption.CobraParamValue = &defaultRegionCode
+			}
+
+			if tc.workerEnvId != nil {
+				options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag.Changed = true
+				options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamValue = tc.workerEnvId
+			}
+
+			if tc.workerClientId != nil {
+				options.PingOneAuthenticationWorkerClientIDOption.Flag.Changed = true
+				options.PingOneAuthenticationWorkerClientIDOption.CobraParamValue = tc.workerClientId
+			}
+
+			err := RunInternalRequest(tc.uri)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			if tc.runTwiceToSetAccessToken {
+				err = RunInternalRequest(tc.uri)
+
+				if tc.expectedError != nil {
+					require.Error(t, err)
+					assert.ErrorIs(t, err, tc.expectedError)
+				} else {
+					assert.NoError(t, err)
+				}
+			}
+		})
+	}
 }
 
 // Test RunInternalRequest function with fail
 func Test_RunInternalRequestWithFail(t *testing.T) {
 	if os.Getenv("RUN_INTERNAL_FAIL_TEST") == "true" {
 		testutils_koanf.InitKoanfs(t)
-		t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
+
+		service := customtypes.RequestService(customtypes.ENUM_REQUEST_SERVICE_PINGONE)
+		fail := customtypes.String("true")
+
+		options.RequestServiceOption.Flag.Changed = true
+		options.RequestServiceOption.CobraParamValue = &service
+
 		options.RequestFailOption.Flag.Changed = true
-		err := options.RequestFailOption.Flag.Value.Set("true")
-		if err != nil {
-			t.Fatal(err)
-		}
+		options.RequestFailOption.CobraParamValue = &fail
+
 		_ = RunInternalRequest("environments/failTest")
 		t.Fatal("This should never run due to internal request resulting in os.Exit(1)")
 	} else {
 		cmdName := os.Args[0]
 		cmd := exec.CommandContext(t.Context(), cmdName, "-test.run=Test_RunInternalRequestWithFail") //#nosec G204 -- This is a test
 		cmd.Env = append(os.Environ(), "RUN_INTERNAL_FAIL_TEST=true")
-		err := cmd.Run()
+		output, err := cmd.CombinedOutput()
+
+		require.Contains(t, string(output), "ERROR: Failed Custom Request")
+		require.NotContains(t, string(output), "This should never run due to internal request resulting in os.Exit(1)")
 
 		var exitErr *exec.ExitError
-		if errors.As(err, &exitErr) {
-			if !exitErr.Success() {
-				return
+		require.ErrorAs(t, err, &exitErr)
+		require.False(t, exitErr.Success(), "Process should exit with a non-zero")
+	}
+}
+
+func Test_getData(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	dataFileContents := `{data: 'json from file'}`
+	dataRawContents := `{data: 'json from raw'}`
+
+	dataFile := createDataJSONFile(t, dataFileContents)
+
+	testCases := []struct {
+		name          string
+		rawData       *customtypes.String
+		dataFile      *customtypes.String
+		expectedError error
+	}{
+		{
+			name:    "Happy path - get data from rawData",
+			rawData: utils.Pointer(customtypes.String(dataRawContents)),
+		},
+		{
+			name:     "Happy path - get data from dataFile",
+			dataFile: utils.Pointer(customtypes.String(dataFile)),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			require.True(t, (tc.rawData != nil) != (tc.dataFile != nil), "Either rawData or dataFile must be set, but not both")
+
+			var (
+				dataStr string
+				err     error
+			)
+
+			if tc.rawData != nil {
+				options.RequestDataRawOption.Flag.Changed = true
+				options.RequestDataRawOption.CobraParamValue = tc.rawData
+
+				dataStr, err = getDataRaw()
+
+				require.Equal(t, dataStr, dataRawContents)
 			}
-		}
 
-		t.Fatalf("The process did not exit with a non-zero: %s", err)
+			if tc.dataFile != nil {
+				options.RequestDataOption.Flag.Changed = true
+				options.RequestDataOption.CobraParamValue = tc.dataFile
+
+				dataStr, err = getDataFile()
+
+				require.Equal(t, dataStr, dataFileContents)
+			}
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test RunInternalRequest function with empty service
-func Test_RunInternalRequest_EmptyService(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+func createDataJSONFile(t *testing.T, data string) string {
+	t.Helper()
 
-	err := os.Unsetenv(options.RequestServiceOption.EnvVar)
-	if err != nil {
-		t.Fatalf("failed to unset environment variable: %v", err)
-	}
+	file, err := os.CreateTemp(t.TempDir(), "data-*.json")
+	require.NoError(t, err)
 
-	err = RunInternalRequest("environments")
-	expectedErrorPattern := "failed to send custom request: service is required"
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+	_, err = file.WriteString(data)
+	require.NoError(t, err)
 
-// Test RunInternalRequest function with unrecognized service
-func Test_RunInternalRequest_UnrecognizedService(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	err = file.Close()
+	require.NoError(t, err)
 
-	t.Setenv(options.RequestServiceOption.EnvVar, "invalid-service")
-
-	err := RunInternalRequest("environments")
-	expectedErrorPattern := "failed to send custom request: unrecognized service 'invalid-service'"
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test RunInternalRequest function with valid service but invalid URI
-// This should not error, but rather print a failure message with Body and status of response
-func Test_RunInternalRequest_ValidService_InvalidURI(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
-
-	err := RunInternalRequest("invalid-uri")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test runInternalPingOneRequest function
-func Test_runInternalPingOneRequest(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := runInternalPingOneRequest("environments")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test runInternalPingOneRequest function with invalid URI
-// This should not error, but rather print a failure message with Body and status of response
-func Test_runInternalPingOneRequest_InvalidURI(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := runInternalPingOneRequest("invalid-uri")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test getTopLevelDomain function
-func Test_getTopLevelDomain(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.PingOneRegionCodeOption.EnvVar, customtypes.ENUM_PINGONE_REGION_CODE_CA)
-
-	domain, err := getTopLevelDomain()
-	testutils.CheckExpectedError(t, err, nil)
-
-	expectedDomain := customtypes.ENUM_PINGONE_TLD_CA
-	if domain != expectedDomain {
-		t.Errorf("expected %s, got %s", expectedDomain, domain)
-	}
-}
-
-// Test getTopLevelDomain function with invalid region code
-func Test_getTopLevelDomain_InvalidRegionCode(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.PingOneRegionCodeOption.EnvVar, "invalid-region")
-
-	_, err := getTopLevelDomain()
-	expectedErrorPattern := "unrecognized PingOne region code: 'invalid-region'"
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test pingoneAccessToken function
-func Test_pingoneAccessToken(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	firstToken, err := pingoneAccessToken()
-	testutils.CheckExpectedError(t, err, nil)
-
-	// Run the function again to test caching
-	secondToken, err := pingoneAccessToken()
-	testutils.CheckExpectedError(t, err, nil)
-
-	if firstToken != secondToken {
-		t.Errorf("expected access token to be cached, got different tokens: %s and %s", firstToken, secondToken)
-	}
-}
-
-// Test pingoneAuth function
-func Test_pingoneAuth(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	firstToken, err := pingoneAuth()
-	testutils.CheckExpectedError(t, err, nil)
-
-	// Check token was cached
-	secondToken, err := pingoneAccessToken()
-	testutils.CheckExpectedError(t, err, nil)
-
-	if firstToken != secondToken {
-		t.Errorf("expected access token to be cached, got different tokens: %s and %s", firstToken, secondToken)
-	}
-}
-
-// Test pingoneAuth function with invalid credentials
-func Test_pingoneAuth_InvalidCredentials(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.PingOneAuthenticationWorkerClientIDOption.EnvVar, "invalid")
-
-	_, err := pingoneAuth()
-	expectedErrorPattern := `(?s)^failed to authenticate with PingOne: Response Status 401 Unauthorized: Response Body .*$`
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test getData function
-func Test_getDataRaw(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedData := "{data: 'json'}"
-	t.Setenv(options.RequestDataRawOption.EnvVar, expectedData)
-
-	data, err := getDataRaw()
-	testutils.CheckExpectedError(t, err, nil)
-
-	if data != expectedData {
-		t.Errorf("expected %s, got %s", expectedData, data)
-	}
-}
-
-// Test getData function with empty data
-func Test_getDataRaw_EmptyData(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.RequestDataRawOption.EnvVar, "")
-
-	data, err := getDataRaw()
-	testutils.CheckExpectedError(t, err, nil)
-
-	if data != "" {
-		t.Errorf("expected empty data, got %s", data)
-	}
-}
-
-// Test getData function with file input
-func Test_getDataFile_FileInput(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedData := "{data: 'json from file'}"
-	testDir := t.TempDir()
-	testFile := testDir + "/test.json"
-	err := os.WriteFile(testFile, []byte(expectedData), 0600)
-	if err != nil {
-		t.Fatalf("failed to write test file: %v", err)
-	}
-
-	t.Setenv(options.RequestDataOption.EnvVar, testFile)
-
-	data, err := getDataFile()
-	testutils.CheckExpectedError(t, err, nil)
-
-	if data != expectedData {
-		t.Errorf("expected %s, got %s", expectedData, data)
-	}
-}
-
-// Test getData function with non-existent file input
-func Test_getDataFile_NonExistentFileInput(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.RequestDataOption.EnvVar, "non_existent_file.json")
-
-	_, err := getDataFile()
-	expectedErrorPattern := `^open .*: no such file or directory$`
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	return file.Name()
 }

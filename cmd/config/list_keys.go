@@ -6,6 +6,7 @@ import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -39,7 +40,7 @@ func configListKeysRunE(cmd *cobra.Command, args []string) error {
 
 	err := config_internal.RunInternalConfigListKeys()
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: "", Err: err}
 	}
 
 	return nil

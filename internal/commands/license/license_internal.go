@@ -10,24 +10,36 @@ import (
 	"net/http"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var (
+	licenseErrorPrefix = "failed to run license request"
+)
+
+type licenseOptions struct {
+	product    string
+	version    string
+	devopsUser string
+	devopsKey  string
+}
+
 func RunInternalLicense() (err error) {
-	product, version, devopsUser, devopsKey, err := readLicenseOptionValues()
+	opts, err := readLicenseOptionValues()
 	if err != nil {
-		return fmt.Errorf("failed to run license request: %w", err)
+		return &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: err}
 	}
 
 	ctx := context.Background()
-	licenseData, err := runLicenseRequest(ctx, product, version, devopsUser, devopsKey)
+	licenseData, err := runLicenseRequest(ctx, opts.product, opts.version, opts.devopsUser, opts.devopsKey)
 	if err != nil {
-		return fmt.Errorf("failed to run license request: %w", err)
+		return &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: err}
 	}
 
 	if licenseData == "" {
-		return fmt.Errorf("failed to run license request: returned license data is empty, please check your request parameters")
+		return &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: ErrLicenseDataEmpty}
 	}
 
 	output.Message(licenseData, nil)
@@ -35,38 +47,41 @@ func RunInternalLicense() (err error) {
 	return nil
 }
 
-func readLicenseOptionValues() (product, version, devopsUser, devopsKey string, err error) {
-	product, err = profiles.GetOptionValue(options.LicenseProductOption)
+func readLicenseOptionValues() (*licenseOptions, error) {
+	opts := &licenseOptions{}
+	var err error
+
+	opts.product, err = profiles.GetOptionValue(options.LicenseProductOption)
 	if err != nil {
-		return "", "", "", "", fmt.Errorf("failed to get product option: %w", err)
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetProduct, err)}
 	}
 
-	version, err = profiles.GetOptionValue(options.LicenseVersionOption)
+	opts.version, err = profiles.GetOptionValue(options.LicenseVersionOption)
 	if err != nil {
-		return "", "", "", "", fmt.Errorf("failed to get version option: %w", err)
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetVersion, err)}
 	}
 
-	devopsUser, err = profiles.GetOptionValue(options.LicenseDevopsUserOption)
+	opts.devopsUser, err = profiles.GetOptionValue(options.LicenseDevopsUserOption)
 	if err != nil {
-		return "", "", "", "", fmt.Errorf("failed to get devops user option: %w", err)
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetDevopsUser, err)}
 	}
 
-	devopsKey, err = profiles.GetOptionValue(options.LicenseDevopsKeyOption)
+	opts.devopsKey, err = profiles.GetOptionValue(options.LicenseDevopsKeyOption)
 	if err != nil {
-		return "", "", "", "", fmt.Errorf("failed to get devops key option: %w", err)
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetDevopsKey, err)}
 	}
 
-	if product == "" || version == "" || devopsUser == "" || devopsKey == "" {
-		return "", "", "", "", fmt.Errorf("product, version, devops user, and devops key must be specified for license request")
+	if opts.product == "" || opts.version == "" || opts.devopsUser == "" || opts.devopsKey == "" {
+		return nil, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: ErrRequiredValues}
 	}
 
-	return product, version, devopsUser, devopsKey, nil
+	return opts, nil
 }
 
 func runLicenseRequest(ctx context.Context, product, version, devopsUser, devopsKey string) (licenseData string, err error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, "https://license.pingidentity.com/devops/license", nil)
 	if err != nil {
-		return "", fmt.Errorf("failed to create license request: %w", err)
+		return licenseData, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: err}
 	}
 
 	req.Header.Set("Devops-User", devopsUser)
@@ -79,20 +94,23 @@ func runLicenseRequest(ctx context.Context, product, version, devopsUser, devops
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("failed to execute license request: %w", err)
+		return licenseData, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: err}
 	}
 	defer func() {
 		cErr := res.Body.Close()
 		err = errors.Join(err, cErr)
+		if err != nil {
+			err = &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: err}
+		}
 	}()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", fmt.Errorf("failed to read response body: %w", err)
+		return licenseData, &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: err}
 	}
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
-		return "", fmt.Errorf("license request failed with status %d: %s", res.StatusCode, string(body))
+		return "", &errs.PingCLIError{Prefix: licenseErrorPrefix, Err: fmt.Errorf("%w with status %d: %s", ErrLicenseRequest, res.StatusCode, string(body))}
 	}
 
 	return string(body), nil

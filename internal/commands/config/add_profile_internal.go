@@ -9,20 +9,29 @@ import (
 
 	"github.com/knadh/koanf/v2"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/input"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
-	newProfileName, newDescription, setActive, err := readConfigAddProfileOptions(rc)
-	if err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+var (
+	addProfileErrorPrefix = "failed to add profile"
+)
+
+func RunInternalConfigAddProfile(rc io.ReadCloser, koanfConfig *profiles.KoanfConfig) (err error) {
+	if koanfConfig == nil {
+		return &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: ErrKoanfNotInitialized}
 	}
 
-	err = profiles.GetKoanfConfig().ValidateNewProfileName(newProfileName)
+	newProfileName, newDescription, setActive, err := readConfigAddProfileOptions(rc)
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+		return &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
+	}
+
+	err = koanfConfig.ValidateNewProfileName(newProfileName)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 	}
 
 	output.Message(fmt.Sprintf("Adding new profile '%s'...", newProfileName), nil)
@@ -30,26 +39,26 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 	subKoanf := koanf.New(".")
 	err = subKoanf.Set(options.ProfileDescriptionOption.KoanfKey, newDescription)
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+		return &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 	}
 
-	if err = profiles.GetKoanfConfig().SaveProfile(newProfileName, subKoanf); err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+	if err = koanfConfig.SaveProfile(newProfileName, subKoanf); err != nil {
+		return &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 	}
 
-	output.Success(fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", profiles.GetKoanfConfig().GetKoanfConfigFile()), nil)
+	output.Success(fmt.Sprintf("Profile created. Update additional profile attributes via 'pingcli config set' or directly within the config file at '%s'", koanfConfig.GetKoanfConfigFile()), nil)
 
 	if setActive {
-		if err = profiles.GetKoanfConfig().ChangeActiveProfile(newProfileName); err != nil {
-			return fmt.Errorf("failed to set active profile: %w", err)
+		if err = koanfConfig.ChangeActiveProfile(newProfileName); err != nil {
+			return &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 		}
 
 		output.Success(fmt.Sprintf("Profile '%s' set as active.", newProfileName), nil)
 	}
 
-	err = profiles.GetKoanfConfig().DefaultMissingKoanfKeys()
+	err = koanfConfig.DefaultMissingKoanfKeys()
 	if err != nil {
-		return fmt.Errorf("failed to add profile: %w", err)
+		return &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 	}
 
 	return nil
@@ -57,15 +66,15 @@ func RunInternalConfigAddProfile(rc io.ReadCloser) (err error) {
 
 func readConfigAddProfileOptions(rc io.ReadCloser) (newProfileName, newDescription string, setActive bool, err error) {
 	if newProfileName, err = readConfigAddProfileNameOption(rc); err != nil {
-		return newProfileName, newDescription, setActive, err
+		return newProfileName, newDescription, setActive, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 	}
 
 	if newDescription, err = readConfigAddProfileDescriptionOption(rc); err != nil {
-		return newProfileName, newDescription, setActive, err
+		return newProfileName, newDescription, setActive, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 	}
 
 	if setActive, err = readConfigAddProfileSetActiveOption(rc); err != nil {
-		return newProfileName, newDescription, setActive, err
+		return newProfileName, newDescription, setActive, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 	}
 
 	return newProfileName, newDescription, setActive, nil
@@ -73,22 +82,27 @@ func readConfigAddProfileOptions(rc io.ReadCloser) (newProfileName, newDescripti
 
 func readConfigAddProfileNameOption(rc io.ReadCloser) (newProfileName string, err error) {
 	if !options.ConfigAddProfileNameOption.Flag.Changed {
-		newProfileName, err = input.RunPrompt("New profile name", profiles.GetKoanfConfig().ValidateNewProfileName, rc)
+		koanfConfig, err := profiles.GetKoanfConfig()
 		if err != nil {
-			return newProfileName, err
+			return newProfileName, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
+		}
+
+		newProfileName, err = input.RunPrompt("New profile name", koanfConfig.ValidateNewProfileName, rc)
+		if err != nil {
+			return newProfileName, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 		}
 
 		if newProfileName == "" {
-			return newProfileName, fmt.Errorf("unable to determine profile name")
+			return newProfileName, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: ErrNoProfileProvided}
 		}
 	} else {
 		newProfileName, err = profiles.GetOptionValue(options.ConfigAddProfileNameOption)
 		if err != nil {
-			return newProfileName, err
+			return newProfileName, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 		}
 
 		if newProfileName == "" {
-			return newProfileName, fmt.Errorf("unable to determine profile name")
+			return newProfileName, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: ErrNoProfileProvided}
 		}
 	}
 
@@ -97,21 +111,37 @@ func readConfigAddProfileNameOption(rc io.ReadCloser) (newProfileName string, er
 
 func readConfigAddProfileDescriptionOption(rc io.ReadCloser) (newDescription string, err error) {
 	if !options.ConfigAddProfileDescriptionOption.Flag.Changed {
-		return input.RunPrompt("New profile description: ", nil, rc)
+		newDescription, err = input.RunPrompt("New profile description: ", nil, rc)
+		if err != nil {
+			return newDescription, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
+		}
 	} else {
-		return profiles.GetOptionValue(options.ConfigAddProfileDescriptionOption)
+		newDescription, err = profiles.GetOptionValue(options.ConfigAddProfileDescriptionOption)
+		if err != nil {
+			return newDescription, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
+		}
 	}
+
+	return newDescription, nil
 }
 
 func readConfigAddProfileSetActiveOption(rc io.ReadCloser) (setActive bool, err error) {
 	if !options.ConfigAddProfileSetActiveOption.Flag.Changed {
-		return input.RunPromptConfirm("Set new profile as active: ", rc)
+		setActive, err = input.RunPromptConfirm("Set new profile as active: ", rc)
+		if err != nil {
+			return setActive, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
+		}
 	} else {
 		boolStr, err := profiles.GetOptionValue(options.ConfigAddProfileSetActiveOption)
 		if err != nil {
-			return setActive, err
+			return setActive, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: err}
 		}
 
-		return strconv.ParseBool(boolStr)
+		setActive, err = strconv.ParseBool(boolStr)
+		if err != nil {
+			return setActive, &errs.PingCLIError{Prefix: addProfileErrorPrefix, Err: ErrSetActiveFlagInvalid}
+		}
 	}
+
+	return setActive, nil
 }

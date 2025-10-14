@@ -13,10 +13,13 @@ import (
 	"github.com/knadh/koanf/providers/confmap"
 	"github.com/knadh/koanf/v2"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 )
 
 var (
 	k *KoanfConfig
+
+	koanfErrorPrefix = "profile configuration error"
 )
 
 type KoanfConfig struct {
@@ -33,8 +36,12 @@ func NewKoanfConfig(cnfFilePath string) *KoanfConfig {
 	return k
 }
 
-func GetKoanfConfig() *KoanfConfig {
-	return k
+func GetKoanfConfig() (*KoanfConfig, error) {
+	if k == nil || k.koanfInstance == nil {
+		return nil, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrKoanfNotInitialized}
+	}
+
+	return k, nil
 }
 
 func (k KoanfConfig) GetKoanfConfigFile() string {
@@ -67,13 +74,11 @@ func GetActiveProfileName(k *koanf.Koanf) string {
 
 func KoanfValueFromOption(opt options.Option, pName string) (value string, ok bool, err error) {
 	if opt.KoanfKey != "" {
-		var (
-			kValue            any
-			mainKoanfInstance = GetKoanfConfig()
-		)
+		var kValue any
 
-		if mainKoanfInstance == nil || mainKoanfInstance.KoanfInstance() == nil {
-			return "", false, fmt.Errorf("failed to get option value: koanf instance is not initialized")
+		mainKoanfInstance, err := GetKoanfConfig()
+		if err != nil {
+			return "", false, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 		}
 
 		// Case 1: Koanf Key is the ActiveProfile Key, get value from main koanf instance
@@ -89,12 +94,12 @@ func KoanfValueFromOption(opt options.Option, pName string) (value string, ok bo
 			if pName == "" {
 				pName, err = GetOptionValue(options.RootProfileOption)
 				if err != nil {
-					return "", false, err
+					return "", false, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 				}
 				if pName == "" {
 					pName, err = GetOptionValue(options.RootActiveProfileOption)
 					if err != nil {
-						return "", false, err
+						return "", false, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 					}
 				}
 			}
@@ -102,7 +107,7 @@ func KoanfValueFromOption(opt options.Option, pName string) (value string, ok bo
 			// Get the sub koanf instance for the profile
 			subKoanf, err := mainKoanfInstance.GetProfileKoanf(pName)
 			if err != nil {
-				return "", false, err
+				return "", false, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 			}
 
 			kValue = subKoanf.Get(opt.KoanfKey)
@@ -158,16 +163,16 @@ func (k KoanfConfig) ProfileNames() (profileNames []string) {
 // The profile name cannot be empty
 func (k KoanfConfig) ValidateProfileNameFormat(pName string) (err error) {
 	if pName == "" {
-		return fmt.Errorf("invalid profile name: profile name cannot be empty")
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrProfileNameEmpty}
 	}
 
 	re := regexp.MustCompile(`^[a-zA-Z0-9\_\-]+$`)
 	if !re.MatchString(pName) {
-		return fmt.Errorf("invalid profile name: '%s'. name must contain only alphanumeric characters, underscores, and dashes", pName)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrProfileNameFormat}
 	}
 
 	if strings.EqualFold(pName, options.RootActiveProfileOption.KoanfKey) {
-		return fmt.Errorf("invalid profile name: '%s'. name cannot be the same as the active profile key", pName)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrProfileNameSameAsActiveProfileKey}
 	}
 
 	return nil
@@ -175,16 +180,16 @@ func (k KoanfConfig) ValidateProfileNameFormat(pName string) (err error) {
 
 func (k KoanfConfig) ChangeActiveProfile(pName string) (err error) {
 	if err = k.ValidateExistingProfileName(pName); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 	}
 
 	err = k.KoanfInstance().Set(options.RootActiveProfileOption.KoanfKey, pName)
 	if err != nil {
-		return fmt.Errorf("error setting active profile: %w", err)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrSetActiveProfile, err)}
 	}
 
 	if err = k.WriteFile(); err != nil {
-		return fmt.Errorf("failed to write config file for set active profile: %w", err)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 	}
 
 	return nil
@@ -193,7 +198,7 @@ func (k KoanfConfig) ChangeActiveProfile(pName string) (err error) {
 // The profile name must exist
 func (k KoanfConfig) ValidateExistingProfileName(pName string) (err error) {
 	if pName == "" {
-		return fmt.Errorf("invalid profile name: profile name cannot be empty")
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrProfileNameEmpty}
 	}
 
 	pNames := k.ProfileNames()
@@ -201,7 +206,7 @@ func (k KoanfConfig) ValidateExistingProfileName(pName string) (err error) {
 	if !slices.ContainsFunc(pNames, func(n string) bool {
 		return n == pName
 	}) {
-		return fmt.Errorf("invalid profile name: '%s' profile does not exist", pName)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrProfileNameNotExist}
 	}
 
 	return nil
@@ -211,7 +216,7 @@ func (k KoanfConfig) ValidateExistingProfileName(pName string) (err error) {
 // The new profile name must be unique
 func (k KoanfConfig) ValidateNewProfileName(pName string) (err error) {
 	if err = k.ValidateProfileNameFormat(pName); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 	}
 
 	pNames := k.ProfileNames()
@@ -219,7 +224,7 @@ func (k KoanfConfig) ValidateNewProfileName(pName string) (err error) {
 	if slices.ContainsFunc(pNames, func(n string) bool {
 		return n == pName
 	}) {
-		return fmt.Errorf("invalid profile name: '%s'. profile already exists", pName)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrProfileNameAlreadyExists}
 	}
 
 	return nil
@@ -227,14 +232,14 @@ func (k KoanfConfig) ValidateNewProfileName(pName string) (err error) {
 
 func (k KoanfConfig) GetProfileKoanf(pName string) (subKoanf *koanf.Koanf, err error) {
 	if err = k.ValidateExistingProfileName(pName); err != nil {
-		return nil, err
+		return nil, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 	}
 
 	// Create a new koanf instance for the profile
 	subKoanf = koanf.New(".")
 	err = subKoanf.Load(confmap.Provider(k.KoanfInstance().Cut(pName).All(), "."), nil)
 	if err != nil {
-		return nil, fmt.Errorf("error marshalling koanf: %w", err)
+		return nil, &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrKoanfProfileExtractAndLoad, err)}
 	}
 
 	return subKoanf, nil
@@ -255,7 +260,7 @@ func (k KoanfConfig) WriteFile() (err error) {
 				if strings.ToLower(fullKoanfKeyValue) == key {
 					err = k.KoanfInstance().Set(fullKoanfKeyValue, val)
 					if err != nil {
-						return fmt.Errorf("error setting koanf key %s: %w", fullKoanfKeyValue, err)
+						return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrSetKoanfKeyValue, err)}
 					}
 					k.KoanfInstance().Delete(key)
 				}
@@ -271,12 +276,12 @@ func (k KoanfConfig) WriteFile() (err error) {
 
 	encodedConfig, err := k.KoanfInstance().Marshal(yaml.Parser())
 	if err != nil {
-		return fmt.Errorf("error marshalling koanf: %w", err)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrMarshalKoanf, err)}
 	}
 
 	err = os.WriteFile(k.GetKoanfConfigFile(), encodedConfig, 0600)
 	if err != nil {
-		return fmt.Errorf("error opening file (%s): %w", k.GetKoanfConfigFile(), err)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrWriteKoanfFile, err)}
 	}
 
 	return nil
@@ -285,12 +290,12 @@ func (k KoanfConfig) WriteFile() (err error) {
 func (k KoanfConfig) SaveProfile(pName string, subKoanf *koanf.Koanf) (err error) {
 	err = k.KoanfInstance().MergeAt(subKoanf, pName)
 	if err != nil {
-		return fmt.Errorf("error merging koanf: %w", err)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrKoanfMerge, err)}
 	}
 
 	err = k.WriteFile()
 	if err != nil {
-		return fmt.Errorf("failed to save profile '%s': %w", pName, err)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 	}
 
 	return nil
@@ -298,16 +303,16 @@ func (k KoanfConfig) SaveProfile(pName string, subKoanf *koanf.Koanf) (err error
 
 func (k KoanfConfig) DeleteProfile(pName string) (err error) {
 	if err = k.ValidateExistingProfileName(pName); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 	}
 
 	activeProfileName, err := GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 	}
 
 	if activeProfileName == pName {
-		return fmt.Errorf("'%s' is the active profile and cannot be deleted", pName)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: ErrDeleteActiveProfile}
 	}
 
 	// Delete the profile from the main koanf
@@ -315,7 +320,7 @@ func (k KoanfConfig) DeleteProfile(pName string) (err error) {
 
 	err = k.WriteFile()
 	if err != nil {
-		return fmt.Errorf("failed to delete profile '%s': %w", pName, err)
+		return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 	}
 
 	return nil
@@ -326,7 +331,7 @@ func (k KoanfConfig) DefaultMissingKoanfKeys() (err error) {
 	for _, pName := range k.ProfileNames() {
 		subKoanf, err := k.GetProfileKoanf(pName)
 		if err != nil {
-			return err
+			return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 		}
 
 		for _, opt := range options.Options() {
@@ -337,13 +342,13 @@ func (k KoanfConfig) DefaultMissingKoanfKeys() (err error) {
 			if !subKoanf.Exists(opt.KoanfKey) {
 				err = subKoanf.Set(opt.KoanfKey, opt.DefaultValue)
 				if err != nil {
-					return fmt.Errorf("error setting default value for koanf key %s: %w", opt.KoanfKey, err)
+					return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: fmt.Errorf("%w: %w", ErrSetKoanfKeyDefaultValue, err)}
 				}
 			}
 		}
 		err = k.SaveProfile(pName, subKoanf)
 		if err != nil {
-			return fmt.Errorf("failed to save profile '%s': %w", pName, err)
+			return &errs.PingCLIError{Prefix: koanfErrorPrefix, Err: err}
 		}
 	}
 
@@ -372,9 +377,9 @@ func GetOptionValue(opt options.Option) (string, error) {
 		return opt.DefaultValue.String(), nil
 	}
 
-	// This is a error, as it means the option is not configured internally to contain one of the 4 values above.
+	// This is an error, as it means the option is not configured internally to contain one of the 4 values above.
 	// This should never happen, as all options should at least have a default value.
-	return "", fmt.Errorf("failed to get option value: no value found: %v", opt)
+	return "", &errs.PingCLIError{Err: ErrNoOptionValue}
 }
 
 func MaskValue(value any) string {

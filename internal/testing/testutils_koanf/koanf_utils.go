@@ -5,6 +5,7 @@ package testutils_koanf
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -103,10 +104,10 @@ func CreateConfigFile(t *testing.T) string {
 	t.Helper()
 
 	if configFileContents == "" {
-		configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
+		configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
 	}
 
-	configFilePath := t.TempDir() + "/config.yaml"
+	configFilePath := filepath.Join(t.TempDir(), "config.yaml")
 	if err := os.WriteFile(configFilePath, []byte(configFileContents), 0600); err != nil {
 		t.Fatalf("Failed to create config file: %s", err)
 	}
@@ -114,35 +115,39 @@ func CreateConfigFile(t *testing.T) string {
 	return configFilePath
 }
 
-func configureMainKoanf(t *testing.T) {
+func configureMainKoanf(t *testing.T) *profiles.KoanfConfig {
 	t.Helper()
 
 	configFilePath = CreateConfigFile(t)
-	mainKoanf := profiles.NewKoanfConfig(configFilePath)
+	koanfConfig := profiles.NewKoanfConfig(configFilePath)
 
-	if err := mainKoanf.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
+	if err := koanfConfig.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
 		t.Fatalf("Failed to load configuration from file '%s': %v", configFilePath, err)
 	}
+
+	return koanfConfig
 }
 
-func InitKoanfs(t *testing.T) {
+func InitKoanfs(t *testing.T) *profiles.KoanfConfig {
 	t.Helper()
 
 	configuration.InitAllOptions()
 
-	configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
+	configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, filepath.Join(t.TempDir(), "config.yaml"), 1)
 
-	configureMainKoanf(t)
+	return configureMainKoanf(t)
 }
 
 func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 	t.Helper()
 
-	configFileContents = fileContents
+	configuration.InitAllOptions()
+
+	configFileContents = strings.Replace(fileContents, outputDirectoryReplacement, filepath.Join(t.TempDir(), "config.yaml"), 1)
 	configureMainKoanf(t)
 }
 
-func getDefaultConfigFileContents() string {
+func GetDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
@@ -155,7 +160,7 @@ func getDefaultConfigFileContents() string {
 	)
 }
 
-func ReturnDefaultLegacyConfigFileContents() string {
+func GetDefaultLegacyConfigFileContents() string {
 	return fmt.Sprintf(defaultLegacyConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,

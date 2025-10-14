@@ -9,6 +9,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/autocompletion"
 	platform_internal "github.com/pingidentity/pingcli/internal/commands/platform"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/spf13/cobra"
@@ -89,7 +90,12 @@ func exportRunE(cmd *cobra.Command, args []string) error {
 
 	l.Debug().Msgf("Platform Export Subcommand Called.")
 
-	return platform_internal.RunInternalExport(cmd.Context(), cmd.Root().Version)
+	err := platform_internal.RunInternalExport(cmd.Context(), cmd.Root().Version)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: "", Err: err}
+	}
+
+	return nil
 }
 
 func initGeneralExportFlags(cmd *cobra.Command) {

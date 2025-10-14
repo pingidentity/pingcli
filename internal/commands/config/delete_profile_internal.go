@@ -7,9 +7,14 @@ import (
 	"io"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/input"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
+)
+
+var (
+	deleteProfileErrorPrefix = "failed to delete profile"
 )
 
 func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error) {
@@ -19,17 +24,22 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 	} else {
 		pName, err = promptUserToDeleteProfile(rc)
 		if err != nil {
-			return fmt.Errorf("failed to delete profile: %w", err)
+			return &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
 		}
 	}
 
-	if err = profiles.GetKoanfConfig().ValidateExistingProfileName(pName); err != nil {
-		return fmt.Errorf("failed to delete profile: %w", err)
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
+	}
+
+	if err = koanfConfig.ValidateExistingProfileName(pName); err != nil {
+		return &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
 	}
 
 	confirmed, err := promptUserToConfirmDelete(pName, rc)
 	if err != nil {
-		return fmt.Errorf("failed to delete profile: %w", err)
+		return &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
 	}
 
 	if !confirmed {
@@ -40,17 +50,21 @@ func RunInternalConfigDeleteProfile(args []string, rc io.ReadCloser) (err error)
 
 	err = deleteProfile(pName)
 	if err != nil {
-		return fmt.Errorf("failed to delete profile: %w", err)
+		return &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
 	}
 
 	return nil
 }
 
 func promptUserToDeleteProfile(rc io.ReadCloser) (pName string, err error) {
-	pName, err = input.RunPromptSelect("Select profile to delete", profiles.GetKoanfConfig().ProfileNames(), rc)
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return pName, &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
+	}
+	pName, err = input.RunPromptSelect("Select profile to delete", koanfConfig.ProfileNames(), rc)
 
 	if err != nil {
-		return pName, err
+		return pName, &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
 	}
 
 	return pName, nil
@@ -61,7 +75,7 @@ func promptUserToConfirmDelete(pName string, rc io.ReadCloser) (confirmed bool, 
 	if options.ConfigDeleteAutoAcceptOption.Flag.Changed {
 		autoAccept, err = profiles.GetOptionValue(options.ConfigDeleteAutoAcceptOption)
 		if err != nil {
-			return false, err
+			return false, &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
 		}
 	}
 
@@ -69,14 +83,24 @@ func promptUserToConfirmDelete(pName string, rc io.ReadCloser) (confirmed bool, 
 		return true, nil
 	}
 
-	return input.RunPromptConfirm(fmt.Sprintf("Are you sure you want to delete profile '%s'", pName), rc)
+	confirmed, err = input.RunPromptConfirm(fmt.Sprintf("Are you sure you want to delete profile '%s'", pName), rc)
+	if err != nil {
+		return false, &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
+	}
+
+	return confirmed, nil
 }
 
 func deleteProfile(pName string) (err error) {
 	output.Message(fmt.Sprintf("Deleting profile '%s'...", pName), nil)
 
-	if err = profiles.GetKoanfConfig().DeleteProfile(pName); err != nil {
-		return err
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		return &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
+	}
+
+	if err = koanfConfig.DeleteProfile(pName); err != nil {
+		return &errs.PingCLIError{Prefix: deleteProfileErrorPrefix, Err: err}
 	}
 
 	output.Success(fmt.Sprintf("Profile '%s' deleted.", pName), nil)

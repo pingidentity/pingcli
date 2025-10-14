@@ -126,9 +126,7 @@ func TestSSOTerraformPlan(t *testing.T) {
 		{
 			name:             "ResourceScopePingOneApi",
 			testableResource: pingone_sso_testable_resources.ResourceScopePingOneApi(t, clientInfo),
-			ignoredErrors: []string{
-				"Error: Invalid Attribute Value Match",
-			},
+			ignoredErrors:    nil,
 		},
 		{
 			name:             "ResourceSecret",

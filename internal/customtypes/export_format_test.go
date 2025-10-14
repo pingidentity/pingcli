@@ -6,50 +6,140 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/pingidentity/pingcli/internal/utils"
+	"github.com/stretchr/testify/require"
 )
 
-// Test ExportFormat Set function
 func Test_ExportFormat_Set(t *testing.T) {
-	// Create a new ExportFormat
-	exportFormat := new(customtypes.ExportFormat)
+	testutils_koanf.InitKoanfs(t)
 
-	err := exportFormat.Set(customtypes.ENUM_EXPORT_FORMAT_HCL)
-	if err != nil {
-		t.Errorf("Set returned error: %v", err)
+	testCases := []struct {
+		name          string
+		cType         *customtypes.ExportFormat
+		formatStr     string
+		expectedError error
+	}{
+		{
+			name:      "Happy path - HCL",
+			cType:     new(customtypes.ExportFormat),
+			formatStr: customtypes.ENUM_EXPORT_FORMAT_HCL,
+		},
+		{
+			name:      "Happy path - empty",
+			cType:     new(customtypes.ExportFormat),
+			formatStr: "",
+		},
+		{
+			name:          "Invalid value",
+			cType:         new(customtypes.ExportFormat),
+			formatStr:     "invalid",
+			expectedError: customtypes.ErrUnrecognizedFormat,
+		},
+		{
+			name:          "Nil custom type",
+			cType:         nil,
+			formatStr:     customtypes.ENUM_EXPORT_FORMAT_HCL,
+			expectedError: customtypes.ErrCustomTypeNil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := tc.cType.Set(tc.formatStr)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test Set function fails with invalid value
-func Test_ExportFormat_Set_InvalidValue(t *testing.T) {
-	// Create a new ExportFormat
-	exportFormat := new(customtypes.ExportFormat)
+func Test_ExportFormat_Type(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	invalidValue := "invalid"
+	testCases := []struct {
+		name         string
+		cType        *customtypes.ExportFormat
+		expectedType string
+	}{
+		{
+			name:         "Happy path - HCL",
+			cType:        utils.Pointer(customtypes.ExportFormat(customtypes.ENUM_EXPORT_FORMAT_HCL)),
+			expectedType: "string",
+		},
+		{
+			name:         "Happy path - empty",
+			cType:        utils.Pointer(customtypes.ExportFormat("")),
+			expectedType: "string",
+		},
+		{
+			name:         "Nil custom type",
+			cType:        nil,
+			expectedType: "string",
+		},
+	}
 
-	expectedErrorPattern := `^unrecognized export format '.*'. Must be one of: .*$`
-	err := exportFormat.Set(invalidValue)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualType := tc.cType.Type()
+
+			require.Equal(t, tc.expectedType, actualType)
+		})
+	}
 }
 
-// Test Set function fails with nil
-func Test_ExportFormat_Set_Nil(t *testing.T) {
-	var exportFormat *customtypes.ExportFormat
-
-	val := customtypes.ENUM_EXPORT_FORMAT_HCL
-
-	expectedErrorPattern := `^failed to set Export Format value: .* Export Format is nil$`
-	err := exportFormat.Set(val)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test String function
 func Test_ExportFormat_String(t *testing.T) {
-	exportFormat := customtypes.ExportFormat(customtypes.ENUM_EXPORT_FORMAT_HCL)
+	testutils_koanf.InitKoanfs(t)
 
-	expected := customtypes.ENUM_EXPORT_FORMAT_HCL
-	actual := exportFormat.String()
-	if actual != expected {
-		t.Errorf("String returned: %s, expected: %s", actual, expected)
+	testCases := []struct {
+		name        string
+		cType       *customtypes.ExportFormat
+		expectedStr string
+	}{
+		{
+			name:        "Happy path - HCL",
+			cType:       utils.Pointer(customtypes.ExportFormat(customtypes.ENUM_EXPORT_FORMAT_HCL)),
+			expectedStr: customtypes.ENUM_EXPORT_FORMAT_HCL,
+		},
+		{
+			name:        "Happy path - Empty",
+			cType:       utils.Pointer(customtypes.ExportFormat("")),
+			expectedStr: "",
+		},
+		{
+			name:        "Nil custom type",
+			cType:       nil,
+			expectedStr: "",
+		},
 	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualStr := tc.cType.String()
+
+			require.Equal(t, tc.expectedStr, actualStr)
+		})
+	}
+}
+
+func Test_ExportFormatValidValues(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	expectedValues := []string{
+		customtypes.ENUM_EXPORT_FORMAT_HCL,
+	}
+
+	actualValues := customtypes.ExportFormatValidValues()
+
+	require.Equal(t, expectedValues, actualValues)
 }

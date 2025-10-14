@@ -5,91 +5,129 @@ package config_test
 import (
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/cmd/common"
+	config_internal "github.com/pingidentity/pingcli/internal/commands/config"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
 )
 
-// Test config add profile command executes without issue
-func TestConfigAddProfileCmd_Execute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "test-profile",
-		"--description", "test description",
-		"--set-active=false")
-	testutils.CheckExpectedError(t, err, nil)
-}
+func Test_ConfigAddProfileCommand(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-// Test config add profile with multiple case-insensitive profile names
-func TestConfigAddProfileCmd_CaseInsensitiveProfileNamesExecute(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "same-profile",
-		"--description", "test description",
-		"--set-active=false")
-	testutils.CheckExpectedError(t, err, nil)
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name: "Happy Path",
+			args: []string{
+				"--" + options.ConfigAddProfileNameOption.CobraParamName, "test-profile",
+				"--" + options.ConfigAddProfileDescriptionOption.CobraParamName, "test description",
+				"--" + options.ConfigAddProfileSetActiveOption.CobraParamName + "=false",
+			},
+			expectErr: false,
+		},
+		{
+			name: "Happy Path - Profile names are case insensitive",
+			args: []string{
+				"--" + options.ConfigAddProfileNameOption.CobraParamName, "DEfAuLt",
+				"--" + options.ConfigAddProfileDescriptionOption.CobraParamName, "test description",
+				"--" + options.ConfigAddProfileSetActiveOption.CobraParamName + "=false",
+			},
+			expectErr: false,
+		},
+		{
+			name: "Too many arguments",
+			args: []string{
+				"extra-arg",
+			},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name: "Invalid flag",
+			args: []string{
+				"--invalid-flag",
+			},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+		{
+			name: "Invalid value for valid flag",
+			args: []string{
+				"--" + options.ConfigAddProfileSetActiveOption.CobraParamName + "=invalid-value",
+			},
+			expectErr:     true,
+			expectedErrIs: customtypes.ErrParseBool,
+		},
+		{
+			name: "Duplicate profile name",
+			args: []string{
+				"--" + options.ConfigAddProfileNameOption.CobraParamName, "default",
+				"--" + options.ConfigAddProfileDescriptionOption.CobraParamName, "test description",
+				"--" + options.ConfigAddProfileSetActiveOption.CobraParamName + "=false",
+			},
+			expectErr:     true,
+			expectedErrIs: profiles.ErrProfileNameAlreadyExists,
+		},
+		{
+			name: "Invalid profile name",
+			args: []string{
+				"--" + options.ConfigAddProfileNameOption.CobraParamName, "pname&*^*&^$&@!",
+				"--" + options.ConfigAddProfileDescriptionOption.CobraParamName, "test description",
+				"--" + options.ConfigAddProfileSetActiveOption.CobraParamName + "=false",
+			},
+			expectErr:     true,
+			expectedErrIs: profiles.ErrProfileNameFormat,
+		},
+		{
+			name: "Profile name is activeProfile",
+			args: []string{
+				"--" + options.ConfigAddProfileNameOption.CobraParamName, options.RootActiveProfileOption.KoanfKey,
+				"--" + options.ConfigAddProfileDescriptionOption.CobraParamName, "test description",
+				"--" + options.ConfigAddProfileSetActiveOption.CobraParamName + "=false",
+			},
+			expectErr:     true,
+			expectedErrIs: profiles.ErrProfileNameSameAsActiveProfileKey,
+		},
+		{
+			name: "Profile name is empty",
+			args: []string{
+				"--" + options.ConfigAddProfileNameOption.CobraParamName, "",
+				"--" + options.ConfigAddProfileDescriptionOption.CobraParamName, "test description",
+				"--" + options.ConfigAddProfileSetActiveOption.CobraParamName + "=false",
+			},
+			expectErr:     true,
+			expectedErrIs: config_internal.ErrNoProfileProvided,
+		},
+	}
 
-	err = testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "SAME-PROFILE",
-		"--description", "test description",
-		"--set-active=false")
-	testutils.CheckExpectedError(t, err, nil)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test config add profile command fails when provided too many arguments
-func TestConfigAddProfileCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli config add-profile': command accepts 0 arg\(s\), received 1$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile", "extra-arg")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"config", "add-profile"}, tc.args...)...)
 
-// Test config add profile command fails when provided an invalid flag
-func TestConfigAddProfileCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid-flag$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile", "--invalid-flag")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+			if !tc.expectErr {
+				assert.NoError(t, err)
 
-// Test config add profile command fails when provided an invalid value for a flag
-func TestConfigAddProfileCmd_InvalidFlagValue(t *testing.T) {
-	expectedErrorPattern := `^invalid argument ".*" for ".*" flag: strconv\.ParseBool: parsing ".*": invalid syntax$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile", "--set-active=invalid-value")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+				return
+			}
 
-// Test config add profile command fails when provided a duplicate profile name
-func TestConfigAddProfileCmd_DuplicateProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'\. profile already exists$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "default",
-		"--description", "test description",
-		"--set-active=false")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test config add profile command fails when provided an invalid profile name
-func TestConfigAddProfileCmd_InvalidProfileName(t *testing.T) {
-	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'\. name must contain only alphanumeric characters, underscores, and dashes$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "pname&*^*&^$&@!",
-		"--description", "test description",
-		"--set-active=false")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test config add profile command fails when provided an invalid set-active value
-func TestConfigAddProfileCmd_InvalidSetActiveValue(t *testing.T) {
-	expectedErrorPattern := `^invalid argument ".*" for "-s, --set-active" flag: strconv\.ParseBool: parsing ".*": invalid syntax$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "test-profile",
-		"--description", "test description",
-		"--set-active=invalid-value")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test config add profile command fails when using activeprofile as the profile name
-func TestConfigSetCmd_InvalidAddActiveProfile(t *testing.T) {
-	expectedErrorPattern := `^failed to add profile: invalid profile name: '.*'. name cannot be the same as the active profile key$`
-	err := testutils_cobra.ExecutePingcli(t, "config", "add-profile",
-		"--name", "activeprofile",
-		"--description", "test description",
-		"--set-active=true")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }

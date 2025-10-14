@@ -124,8 +124,13 @@ func initKoanfProfile() {
 		l.Debug().Msgf("Using configuration profile: %s", configFileActiveProfile)
 	}
 
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Failed to get koanf config: %v", err), nil)
+	}
+
 	// Configure the profile koanf instance
-	if err := profiles.GetKoanfConfig().ChangeActiveProfile(configFileActiveProfile); err != nil {
+	if err := koanfConfig.ChangeActiveProfile(configFileActiveProfile); err != nil {
 		output.UserFatal(fmt.Sprintf("Failed to set active profile: %v", err), nil)
 	}
 
@@ -213,14 +218,19 @@ func initKoanf(cfgFile string) {
 
 	loadKoanfConfig(cfgFile)
 
+	koanfConfig, err := profiles.GetKoanfConfig()
+	if err != nil {
+		output.SystemError(fmt.Sprintf("Failed to get koanf config: %v", err), nil)
+	}
+
 	// If there are no profiles in the configuration file, seed the default profile
-	if len(profiles.GetKoanfConfig().ProfileNames()) == 0 {
+	if len(koanfConfig.ProfileNames()) == 0 {
 		l.Debug().Msgf("No profiles found in configuration file. Creating default profile in configuration file '%s'", cfgFile)
 		createConfigFile(cfgFile)
 		loadKoanfConfig(cfgFile)
 	}
 
-	err := profiles.GetKoanfConfig().DefaultMissingKoanfKeys()
+	err = koanfConfig.DefaultMissingKoanfKeys()
 	if err != nil {
 		output.SystemError(err.Error(), nil)
 	}

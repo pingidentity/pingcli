@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -15,6 +16,10 @@ import (
 	"github.com/pingidentity/pingcli/tools/docutil"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+)
+
+var (
+	errPathOutsideBase = errors.New("refusing to read path outside base directory")
 )
 
 func main() {
@@ -343,7 +348,7 @@ func readFileIfWithin(path, base string) ([]byte, error) {
 	cleanBase := filepath.Clean(base)
 	cleanPath := filepath.Clean(path)
 	if !strings.HasPrefix(cleanPath+string(os.PathSeparator), cleanBase+string(os.PathSeparator)) {
-		return nil, fmt.Errorf("refusing to read path outside base directory: %s", path)
+		return nil, fmt.Errorf("%w: %s", errPathOutsideBase, path)
 	}
 	data, err := os.ReadFile(cleanPath) // #nosec G304 path validated above
 	if err != nil {

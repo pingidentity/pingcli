@@ -10,12 +10,14 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingone"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingOneApplicationResourceGrantResource{}
+	_                                         connector.ExportableResource = &PingOneApplicationResourceGrantResource{}
+	applicationResourceGrantExportErrorPrefix                              = "pingone_application_resource_grant resource export error"
 )
 
 type PingOneApplicationResourceGrantResource struct {
@@ -170,5 +172,5 @@ func (r *PingOneApplicationResourceGrantResource) getGrantResourceName(grantReso
 		}
 	}
 
-	return "", false, fmt.Errorf("unable to get resource name for grant resource ID: %s", grantResourceId)
+	return "", false, &errs.PingCLIError{Prefix: applicationResourceGrantExportErrorPrefix, Err: fmt.Errorf("%w: %q", ErrResourceNameNotFound, grantResourceId)}
 }

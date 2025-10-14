@@ -7,12 +7,17 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
 )
 
 const (
 	ENUM_OUTPUT_FORMAT_TEXT string = "text"
 	ENUM_OUTPUT_FORMAT_JSON string = "json"
+)
+
+var (
+	outputFormatErrorPrefix = "custom type output format error"
 )
 
 type OutputFormat string
@@ -24,7 +29,7 @@ var _ pflag.Value = (*OutputFormat)(nil)
 
 func (o *OutputFormat) Set(outputFormat string) error {
 	if o == nil {
-		return fmt.Errorf("failed to set Output Format value: %s. Output Format is nil", outputFormat)
+		return &errs.PingCLIError{Prefix: outputFormatErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	switch {
@@ -35,18 +40,22 @@ func (o *OutputFormat) Set(outputFormat string) error {
 	case strings.EqualFold(outputFormat, ""):
 		*o = OutputFormat("")
 	default:
-		return fmt.Errorf("unrecognized Output Format: '%s'. Must be one of: %s", outputFormat, strings.Join(OutputFormatValidValues(), ", "))
+		return &errs.PingCLIError{Prefix: outputFormatErrorPrefix, Err: fmt.Errorf("%w: '%s'. Must be one of: %s", ErrUnrecognizedOutputFormat, outputFormat, strings.Join(OutputFormatValidValues(), ", "))}
 	}
 
 	return nil
 }
 
-func (o OutputFormat) Type() string {
+func (o *OutputFormat) Type() string {
 	return "string"
 }
 
-func (o OutputFormat) String() string {
-	return string(o)
+func (o *OutputFormat) String() string {
+	if o == nil {
+		return ""
+	}
+
+	return string(*o)
 }
 
 func OutputFormatValidValues() []string {
