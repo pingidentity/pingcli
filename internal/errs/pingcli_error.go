@@ -26,11 +26,16 @@ func (e *PingCLIError) Error() string {
 		}
 	}
 
+	// if both are empty this just returns an empty string anyways
+	errMsg := e.Err.Error()
 	if e.Prefix == "" {
-		return e.Err.Error()
+		return errMsg
+	}
+	if errMsg == "" {
+		return e.Prefix
 	}
 
-	return fmt.Sprintf("%s: %s", e.Prefix, e.Err.Error())
+	return fmt.Sprintf("%s: %s", e.Prefix, errMsg)
 }
 
 func (e *PingCLIError) Unwrap() error {

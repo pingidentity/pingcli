@@ -61,8 +61,8 @@ func HandleClientResponse(response *http.Response, err error, apiFunctionName st
 		cErr := response.Body.Close()
 		if cErr != nil {
 			rErr = errors.Join(rErr, cErr)
+			rErr = &errs.PingCLIError{Prefix: resourceUtilsErrorPrefix, Err: rErr}
 		}
-		rErr = &errs.PingCLIError{Prefix: resourceUtilsErrorPrefix, Err: rErr}
 	}()
 
 	// When the client returns forbidden, warn user and skip export of resource
