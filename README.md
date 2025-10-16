@@ -185,6 +185,28 @@ and their purposes.
 
 See [Autocompletion Documentation](./docs/autocompletion/autocompletion.md) for information on loading autocompletion for select command flags.
 
+## Authentication
+
+After configuring your profile, authenticate with PingOne using OAuth2:
+
+```shell
+# Configure authentication (example for device code flow)
+pingcli config set service.pingone.regionCode=NA
+pingcli config set service.pingone.authentication.deviceCode.clientID=<your-client-id>
+pingcli config set service.pingone.authentication.deviceCode.environmentID=<your-env-id>
+
+# Authenticate
+pingcli auth login --device-code
+
+# Use authenticated commands
+pingcli request --service pingone --http-method GET environments
+
+# Logout when finished
+pingcli auth logout
+```
+
+See [Authentication Documentation](./docs/authentication/) for detailed information on all authentication flows and configuration options.
+
 ## Commands
 
 Ping CLI commands have the following structure:

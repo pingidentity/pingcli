@@ -35,7 +35,7 @@ func RunInternalRequest(uri string) (err error) {
 	return nil
 }
 
-func getDataFile() (data string, err error) {
+func GetDataFile() (data string, err error) {
 	dataFilepath, err := profiles.GetOptionValue(options.RequestDataOption)
 	if err != nil {
 		return "", err
@@ -54,7 +54,7 @@ func getDataFile() (data string, err error) {
 	return "", nil
 }
 
-func getDataRaw() (data string, err error) {
+func GetDataRaw() (data string, err error) {
 	data, err = profiles.GetOptionValue(options.RequestDataRawOption)
 	if err != nil {
 		return "", err

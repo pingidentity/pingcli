@@ -4,6 +4,7 @@ package platform_internal
 
 import (
 	"context"
+	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -15,6 +16,7 @@ import (
 
 	"github.com/patrickcping/pingone-go-sdk-v2/management"
 	pingoneGoClient "github.com/patrickcping/pingone-go-sdk-v2/pingone"
+	auth_internal "github.com/pingidentity/pingcli/internal/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
@@ -29,6 +31,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
+	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
 )
 
 var (
@@ -323,49 +326,155 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 		return fmt.Errorf("failed to initialize pingone API client. context is nil")
 	}
 
-	pingoneApiClientId, err = profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
-	if err != nil {
-		return err
-	}
-	clientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
-	if err != nil {
-		return err
-	}
-	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
-	if err != nil {
-		return err
-	}
+	// Try to get legacy worker credentials first
+	workerClientID, _ := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
+	workerClientSecret, _ := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
+	workerEnvironmentID, _ := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
 	regionCode, err := profiles.GetOptionValue(options.PingOneRegionCodeOption)
 	if err != nil {
 		return err
 	}
 
-	if pingoneApiClientId == "" || clientSecret == "" || environmentID == "" || regionCode == "" {
-		return fmt.Errorf("failed to initialize pingone API client. one of worker client ID, worker client secret, " +
-			"pingone region code, and/or worker environment ID is empty. configure these properties via parameter flags, " +
-			"environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)")
+	if regionCode == "" {
+		return fmt.Errorf("failed to initialize pingone API client. pingone region code is empty. " +
+			"configure this property via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)")
 	}
 
 	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
-
 	if v := strings.TrimSpace(os.Getenv("PINGCLI_PINGONE_APPEND_USER_AGENT")); v != "" {
 		userAgent = fmt.Sprintf("%s %s", userAgent, v)
 	}
 
 	enumRegionCode := management.EnumRegionCode(regionCode)
 
+	if workerClientID != "" && workerClientSecret != "" && workerEnvironmentID != "" {
+		l.Debug().Msgf("Using legacy worker authentication with client credentials")
+
+		pingoneApiClientId = workerClientID
+
+		accessToken, tokenValid := loadLegacyWorkerToken(ctx, workerClientID, workerEnvironmentID)
+
+		if tokenValid && accessToken != "" {
+			l.Debug().Msgf("Using cached access token for legacy worker authentication")
+
+			emptyString := ""
+			apiConfig := &pingoneGoClient.Config{
+				AccessToken:     &accessToken,
+				ClientID:        &emptyString,
+				ClientSecret:    &emptyString,
+				EnvironmentID:   &emptyString,
+				RegionCode:      &enumRegionCode,
+				UserAgentSuffix: &userAgent,
+			}
+
+			pingoneApiClient, err = apiConfig.APIClient(ctx)
+			if err != nil {
+				l.Debug().Msgf("Failed to use cached token, will authenticate with credentials: %v", err)
+			} else {
+				return nil
+			}
+		}
+
+		l.Debug().Msgf("Authenticating with worker credentials")
+		apiConfig := &pingoneGoClient.Config{
+			ClientID:        &workerClientID,
+			ClientSecret:    &workerClientSecret,
+			EnvironmentID:   &workerEnvironmentID,
+			RegionCode:      &enumRegionCode,
+			UserAgentSuffix: &userAgent,
+		}
+
+		pingoneApiClient, err = apiConfig.APIClient(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to initialize pingone API client. Check worker client ID, worker client secret,"+
+				" worker environment ID, and pingone region code configuration values. %v", err)
+		}
+
+		if err := cacheLegacyWorkerToken(pingoneApiClient, workerClientID, workerEnvironmentID); err != nil {
+			l.Debug().Msgf("Failed to cache legacy worker token: %v", err)
+		}
+
+		return nil
+	}
+
+	l.Debug().Msgf("Using unified authentication system with token source")
+
+	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+	if err != nil {
+		return err
+	}
+
+	if authType == "worker" {
+		authType = "client_credentials"
+	}
+
+	var environmentID string
+	var clientID string
+
+	switch authType {
+	case "device_code":
+		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption)
+		if err != nil {
+			return err
+		}
+		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)
+		if err != nil {
+			return err
+		}
+	case "auth_code":
+		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeEnvironmentIDOption)
+		if err != nil {
+			return err
+		}
+		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeClientIDOption)
+		if err != nil {
+			return err
+		}
+	case "client_credentials":
+		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
+		if err != nil {
+			return err
+		}
+		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption)
+		if err != nil {
+			return err
+		}
+	default:
+		return fmt.Errorf("unsupported authentication type '%s'. Please configure worker credentials or a supported authentication type (auth_code, device_code, client_credentials)", authType)
+	}
+
+	pingoneApiClientId = clientID
+
+	if environmentID == "" {
+		return fmt.Errorf("failed to initialize pingone API client. environment ID is empty. " +
+			"configure this property via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)")
+	}
+
+	tokenSource, err := auth_internal.GetValidTokenSource(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get valid token source for pingone API client: %w", err)
+	}
+
+	token, err := tokenSource.Token()
+	if err != nil {
+		return fmt.Errorf("failed to get access token for pingone API client: %w", err)
+	}
+
+	accessToken := token.AccessToken
+
+	emptyString := ""
 	apiConfig := &pingoneGoClient.Config{
-		ClientID:        &pingoneApiClientId,
-		ClientSecret:    &clientSecret,
-		EnvironmentID:   &environmentID,
+		AccessToken:     &accessToken,
+		ClientID:        &emptyString,
+		ClientSecret:    &emptyString,
+		EnvironmentID:   &emptyString,
 		RegionCode:      &enumRegionCode,
 		UserAgentSuffix: &userAgent,
 	}
 
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to initialize pingone API client. Check worker client ID, worker client secret,"+
-			" worker environment ID, and pingone region code configuration values. %v", err)
+		return fmt.Errorf("failed to initialize pingone API client: %v", err)
 	}
 
 	return nil
@@ -500,6 +609,42 @@ func getExportableConnectors(exportServices *customtypes.ExportServices) (export
 	}
 
 	return &connectors
+}
+
+func loadLegacyWorkerToken(ctx context.Context, clientID, environmentID string) (accessToken string, valid bool) {
+	l := logger.Get()
+
+	tokenKey := generateLegacyWorkerTokenKey(clientID, environmentID)
+	storage := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+	token, err := storage.LoadToken()
+	if err != nil {
+		l.Debug().Msgf("No cached token found for legacy worker auth: %v", err)
+		return "", false
+	}
+
+	if !token.Valid() {
+		l.Debug().Msg("Cached token for legacy worker auth is expired")
+		return "", false
+	}
+
+	return token.AccessToken, true
+}
+
+func cacheLegacyWorkerToken(client *pingoneGoClient.Client, clientID, environmentID string) error {
+	l := logger.Get()
+
+	if client == nil {
+		return fmt.Errorf("pingone client is nil")
+	}
+
+	l.Debug().Msg("Legacy worker token caching skipped - old SDK handles its own caching")
+
+	return nil
+}
+
+func generateLegacyWorkerTokenKey(clientID, environmentID string) string {
+	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%s:%s:worker", environmentID, clientID))))
+	return fmt.Sprintf("token-%s", hash[:16])
 }
 
 func exportConnectors(exportableConnectors *[]connector.Exportable, exportFormat, outputDir string, overwriteExport bool) (err error) {

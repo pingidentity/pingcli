@@ -52,6 +52,10 @@ func Options() []Option {
 		ConfigListKeysYamlOption,
 		ConfigUnmaskSecretValueOption,
 
+		AuthMethodAuthCodeOption,
+		AuthMethodClientCredentialsOption,
+		AuthMethodDeviceCodeOption,
+
 		LicenseProductOption,
 		LicenseVersionOption,
 		LicenseDevopsUserOption,
@@ -134,6 +138,13 @@ var (
 	ConfigDeleteAutoAcceptOption      Option
 	ConfigListKeysYamlOption          Option
 	ConfigUnmaskSecretValueOption     Option
+)
+
+// 'pingcli login' command options
+var (
+	AuthMethodAuthCodeOption          Option
+	AuthMethodClientCredentialsOption Option
+	AuthMethodDeviceCodeOption        Option
 )
 
 // License options

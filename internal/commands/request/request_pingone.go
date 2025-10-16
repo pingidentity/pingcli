@@ -19,28 +19,62 @@ import (
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
-func runInternalPingOneRequest(uri string) (err error) {
-	pingOneAPIClient, err := auth_internal.GetPingOneClient()
+// GetAPIURLForRegion builds the correct API URL based on region configuration
+func GetAPIURLForRegion(uri string) (string, error) {
+	regionCode, err := profiles.GetOptionValue(options.PingOneRegionCodeOption)
 	if err != nil {
-		return err
+		return "", fmt.Errorf("failed to get region code: %w", err)
 	}
 
-	pingOneAPIClientConfig := pingOneAPIClient.GetConfig()
-	if pingOneAPIClientConfig == nil {
-		return fmt.Errorf("PingOne client configuration is nil")
+	var tld string
+	switch regionCode {
+	case customtypes.ENUM_PINGONE_REGION_CODE_AP:
+		tld = "asia"
+	case customtypes.ENUM_PINGONE_REGION_CODE_AU:
+		tld = "com.au"
+	case customtypes.ENUM_PINGONE_REGION_CODE_CA:
+		tld = "ca"
+	case customtypes.ENUM_PINGONE_REGION_CODE_EU:
+		tld = "eu"
+	case customtypes.ENUM_PINGONE_REGION_CODE_NA:
+		tld = "com"
+	case customtypes.ENUM_PINGONE_REGION_CODE_SG:
+		tld = "asia"
+	default:
+		tld = "com" // default to NA
 	}
 
-	tld := pingOneAPIClientConfig.Service.GetTopLevelDomain()
-	if tld == "" {
-		return fmt.Errorf("failed to determine PingOne environment top level domain")
+	return fmt.Sprintf("https://api.pingone.%s/v1/%s", tld, uri), nil
+}
+
+func runInternalPingOneRequest(uri string) (err error) {
+	var accessToken string
+	var ctx = context.Background()
+
+	// Use the unified authentication system with OAuth2 token source
+	tokenSource, err := auth_internal.GetValidTokenSource(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get valid token source: %w", err)
+	}
+
+	// Get access token from the token source (handles caching and refresh)
+	token, err := tokenSource.Token()
+	if err != nil {
+		return fmt.Errorf("failed to get access token: %w", err)
+	}
+
+	accessToken = token.AccessToken
+
+	// Build API URL using proper region configuration
+	apiURL, err := GetAPIURLForRegion(uri)
+	if err != nil {
+		return fmt.Errorf("failed to build API URL: %w", err)
 	}
 
 	failOption, err := profiles.GetOptionValue(options.RequestFailOption)
 	if err != nil {
 		return err
 	}
-
-	apiURL := fmt.Sprintf("https://api.pingone.%s/v1/%s", tld, uri)
 
 	httpMethod, err := profiles.GetOptionValue(options.RequestHTTPMethodOption)
 	if err != nil {
@@ -51,26 +85,19 @@ func runInternalPingOneRequest(uri string) (err error) {
 		return fmt.Errorf("http method is required")
 	}
 
-	data, err := getDataRaw()
+	data, err := GetDataRaw()
 	if err != nil {
 		return err
 	}
 
 	if data == "" {
-		data, err = getDataFile()
+		data, err = GetDataFile()
 		if err != nil {
 			return err
 		}
 	}
 
 	payload := strings.NewReader(data)
-
-	// Get access token once
-	ctx := context.Background()
-	accessToken, err := pingOneAPIClientConfig.Service.GetAccessToken(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get access token: %w", err)
-	}
 
 	// Create a simple HTTP client (not OAuth2-managed)
 	client := &http.Client{}

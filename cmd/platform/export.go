@@ -103,14 +103,18 @@ func initPingOneExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthCodeClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthCodeEnvironmentIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthCodeRedirectURIOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthCodeScopesOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeScopesOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientSecretOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsScopesOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
-
-	cmd.MarkFlagsRequiredTogether(
-		options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName,
-		options.PingOneAuthenticationWorkerClientIDOption.CobraParamName,
-		options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName,
-		options.PingOneRegionCodeOption.CobraParamName,
-	)
 }
 
 func initPingFederateGeneralFlags(cmd *cobra.Command) {

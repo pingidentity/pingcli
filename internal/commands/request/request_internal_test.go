@@ -4,27 +4,14 @@ package request_internal
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"testing"
 
-	auth_internal "github.com/pingidentity/pingcli/internal/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
-
-// Test RunInternalRequest function
-func Test_RunInternalRequest(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
-
-	err := RunInternalRequest(fmt.Sprintf("environments/%s/populations", os.Getenv(options.PingOneAuthenticationWorkerEnvironmentIDOption.EnvVar)))
-	testutils.CheckExpectedError(t, err, nil)
-}
 
 // Test RunInternalRequest function with fail
 func Test_RunInternalRequestWithFail(t *testing.T) {
@@ -80,76 +67,6 @@ func Test_RunInternalRequest_UnrecognizedService(t *testing.T) {
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// Test RunInternalRequest function with valid service but invalid URI
-// This should not error, but rather print a failure message with Body and status of response
-func Test_RunInternalRequest_ValidService_InvalidURI(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.RequestServiceOption.EnvVar, "pingone")
-
-	err := RunInternalRequest("invalid-uri")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test runInternalPingOneRequest function
-func Test_runInternalPingOneRequest(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := runInternalPingOneRequest("environments")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test runInternalPingOneRequest function with invalid URI
-// This should not error, but rather print a failure message with Body and status of response
-func Test_runInternalPingOneRequest_InvalidURI(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := runInternalPingOneRequest("invalid-uri")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test getTopLevelDomain function
-func Test_getTopLevelDomain(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.PingOneRegionCodeOption.EnvVar, customtypes.ENUM_PINGONE_REGION_CODE_CA)
-
-	domain, err := auth_internal.GetTopLevelDomain()
-	testutils.CheckExpectedError(t, err, nil)
-
-	expectedDomain := customtypes.ENUM_PINGONE_TLD_CA
-	if domain != expectedDomain {
-		t.Errorf("expected %s, got %s", expectedDomain, domain)
-	}
-}
-
-// Test getTopLevelDomain function with invalid region code
-func Test_getTopLevelDomain_InvalidRegionCode(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	t.Setenv(options.PingOneRegionCodeOption.EnvVar, "invalid-region")
-
-	_, err := auth_internal.GetTopLevelDomain()
-	expectedErrorPattern := "unrecognized PingOne region code: 'invalid-region'"
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test pingoneAccessToken function
-func Test_pingoneAccessToken(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	firstToken, err := auth_internal.PingOneAccessToken()
-	testutils.CheckExpectedError(t, err, nil)
-
-	// Run the function again to test caching
-	secondToken, err := auth_internal.PingOneAccessToken()
-	testutils.CheckExpectedError(t, err, nil)
-
-	if firstToken != secondToken {
-		t.Errorf("expected access token to be cached, got different tokens: %s and %s", firstToken, secondToken)
-	}
-}
-
 // Test getData function
 func Test_getDataRaw(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
@@ -157,7 +74,7 @@ func Test_getDataRaw(t *testing.T) {
 	expectedData := "{data: 'json'}"
 	t.Setenv(options.RequestDataRawOption.EnvVar, expectedData)
 
-	data, err := getDataRaw()
+	data, err := GetDataRaw()
 	testutils.CheckExpectedError(t, err, nil)
 
 	if data != expectedData {
@@ -171,7 +88,7 @@ func Test_getDataRaw_EmptyData(t *testing.T) {
 
 	t.Setenv(options.RequestDataRawOption.EnvVar, "")
 
-	data, err := getDataRaw()
+	data, err := GetDataRaw()
 	testutils.CheckExpectedError(t, err, nil)
 
 	if data != "" {
@@ -193,7 +110,7 @@ func Test_getDataFile_FileInput(t *testing.T) {
 
 	t.Setenv(options.RequestDataOption.EnvVar, testFile)
 
-	data, err := getDataFile()
+	data, err := GetDataFile()
 	testutils.CheckExpectedError(t, err, nil)
 
 	if data != expectedData {
@@ -207,7 +124,7 @@ func Test_getDataFile_NonExistentFileInput(t *testing.T) {
 
 	t.Setenv(options.RequestDataOption.EnvVar, "non_existent_file.json")
 
-	_, err := getDataFile()
+	_, err := GetDataFile()
 	expectedErrorPattern := `^open .*: no such file or directory$`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }

@@ -153,10 +153,18 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			case *customtypes.String:
 				continue
 			case string:
-				prc := new(customtypes.String)
+				// Allow empty string as a default value
+				if typedValue == "" {
+					continue
+				}
+				// Validate non-empty strings against valid region codes
+				prc := new(customtypes.PingOneRegionCode)
 				if err = prc.Set(typedValue); err != nil {
 					return fmt.Errorf("profile '%s': variable type '%T' for key '%s' is not a PingOne Region Code value: %w", pName, typedValue, key, err)
 				}
+			case nil:
+				// Allow nil/null values as default state - they will be treated as empty strings
+				continue
 			default:
 				return fmt.Errorf("profile '%s': variable type %T for key '%s' is not a PingOne Region Code value", pName, typedValue, key)
 			}

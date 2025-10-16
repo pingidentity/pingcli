@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	configuration_auth "github.com/pingidentity/pingcli/internal/configuration/auth"
 	configuration_config "github.com/pingidentity/pingcli/internal/configuration/config"
 	configuration_license "github.com/pingidentity/pingcli/internal/configuration/license"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -86,6 +87,8 @@ func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
 }
 
 func InitAllOptions() {
+	configuration_auth.InitAuthOptions()
+
 	configuration_config.InitConfigAddProfileOptions()
 	configuration_config.InitConfigDeleteProfileOptions()
 	configuration_config.InitConfigListKeyOptions()

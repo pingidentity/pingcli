@@ -409,3 +409,117 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
+
+// Test Platform Export Command with PingOne client_credentials authentication
+func TestPlatformExportCmd_PingOneClientCredentialsAuth(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	outputDir := t.TempDir()
+
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
+		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
+		"--"+options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	testutils.CheckExpectedError(t, err, nil)
+}
+
+// Test Platform Export Command with PingOne device_code authentication
+func TestPlatformExportCmd_PingOneDeviceCodeAuth(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	outputDir := t.TempDir()
+
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
+		"--"+options.PingOneAuthenticationDeviceCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationDeviceCodeEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	testutils.CheckExpectedError(t, err, nil)
+}
+
+// Test Platform Export Command with PingOne auth_code authentication
+func TestPlatformExportCmd_PingOneAuthCodeAuth(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	outputDir := t.TempDir()
+
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE,
+		"--"+options.PingOneAuthenticationAuthCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationAuthCodeEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		"--"+options.PingOneAuthenticationAuthCodeRedirectURIOption.CobraParamName, "http://localhost:8080/callback",
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	testutils.CheckExpectedError(t, err, nil)
+}
+
+// Test Platform Export Command fails when client_credentials authentication is missing client ID
+func TestPlatformExportCmd_PingOneClientCredentialsAuthMissingClientID(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	outputDir := t.TempDir()
+
+	expectedErrorPattern := `^failed to initialize pingone API client\. environment ID is empty\..*$`
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
+		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Platform Export Command fails when device_code authentication is missing environment ID
+func TestPlatformExportCmd_PingOneDeviceCodeAuthMissingEnvironmentID(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	outputDir := t.TempDir()
+
+	expectedErrorPattern := `^failed to initialize pingone API client\. environment ID is empty\..*$`
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
+		"--"+options.PingOneAuthenticationDeviceCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Platform Export Command fails when region code is missing with new auth methods
+func TestPlatformExportCmd_PingOneNewAuthMissingRegionCode(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	outputDir := t.TempDir()
+
+	expectedErrorPattern := `^failed to initialize pingone API client\. pingone region code is empty\..*$`
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
+		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
+		"--"+options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"))
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+// Test Platform Export Command with invalid authentication type
+func TestPlatformExportCmd_PingOneInvalidAuthType(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	outputDir := t.TempDir()
+
+	expectedErrorPattern := `^invalid argument "invalid_auth" for "--pingone-authentication-type" flag: unrecognized PingOne authentication type.*$`
+	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
+		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--"+options.PlatformExportOverwriteOption.CobraParamName,
+		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, "invalid_auth",
+		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}

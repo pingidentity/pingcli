@@ -56,8 +56,29 @@ production:
     description: "test profile description"
     noColor: true
     outputFormat: text
+    export:
+        outputDirectory: %s
+        services: ["%s"]
+    license:
+        devopsUser: %s
+        devopsKey: %s
     service:
+        pingOne:
+            regionCode: %s
+            authentication:
+                type: worker
+                worker:
+                    clientID: %s
+                    clientSecret: %s
+                    environmentID: %s
         pingFederate:
+            adminAPIPath: /pf-admin-api/v1
+            authentication:
+                type: basicAuth
+                basicAuth:
+                    username: Administrator
+                    password: 2FederateM0re
+            httpsHost: https://localhost:9999
             insecureTrustAllTLS: false
             xBypassExternalValidationHeader: false`
 
@@ -103,7 +124,7 @@ func CreateConfigFile(t *testing.T) string {
 	t.Helper()
 
 	if configFileContents == "" {
-		configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
+		configFileContents = strings.ReplaceAll(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir())
 	}
 
 	configFilePath := t.TempDir() + "/config.yaml"
@@ -130,7 +151,7 @@ func InitKoanfs(t *testing.T) {
 
 	configuration.InitAllOptions()
 
-	configFileContents = strings.Replace(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml", 1)
+	configFileContents = strings.ReplaceAll(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml")
 
 	configureMainKoanf(t)
 }
@@ -144,14 +165,22 @@ func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 
 func getDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
-		outputDirectoryReplacement,
-		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
-		os.Getenv("TEST_PINGCLI_DEVOPS_USER"),
-		os.Getenv("TEST_PINGCLI_DEVOPS_KEY"),
-		os.Getenv("TEST_PINGONE_REGION_CODE"),
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
-		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		outputDirectoryReplacement,                      // default export outputDirectory
+		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT, // default export services
+		os.Getenv("TEST_PINGCLI_DEVOPS_USER"),           // default license devopsUser
+		os.Getenv("TEST_PINGCLI_DEVOPS_KEY"),            // default license devopsKey
+		os.Getenv("TEST_PINGONE_REGION_CODE"),           // default service pingOne regionCode
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // default service pingOne worker clientID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),  // default service pingOne worker clientSecret
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // default service pingOne worker environmentID
+		outputDirectoryReplacement,                      // production export outputDirectory
+		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT, // production export services
+		os.Getenv("TEST_PINGCLI_DEVOPS_USER"),           // production license devopsUser
+		os.Getenv("TEST_PINGCLI_DEVOPS_KEY"),            // production license devopsKey
+		os.Getenv("TEST_PINGONE_REGION_CODE"),           // production service pingOne regionCode
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // production service pingOne worker clientID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),  // production service pingOne worker clientSecret
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // production service pingOne worker environmentID
 	)
 }
 
