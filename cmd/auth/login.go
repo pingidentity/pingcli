@@ -10,7 +10,9 @@ import (
 	auth_internal "github.com/pingidentity/pingcli/internal/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/profiles"
+	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
 	"github.com/spf13/cobra"
+	"golang.org/x/oauth2"
 )
 
 func NewLoginCommand() *cobra.Command {
@@ -26,6 +28,18 @@ func NewLoginCommand() *cobra.Command {
 	cmd.Flags().AddFlag(options.AuthMethodAuthCodeOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodClientCredentialsOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodDeviceCodeOption.Flag)
+
+	// Enforce that exactly one authentication method must be specified
+	cmd.MarkFlagsMutuallyExclusive(
+		options.AuthMethodAuthCodeOption.Flag.Name,
+		options.AuthMethodClientCredentialsOption.Flag.Name,
+		options.AuthMethodDeviceCodeOption.Flag.Name,
+	)
+	cmd.MarkFlagsOneRequired(
+		options.AuthMethodAuthCodeOption.Flag.Name,
+		options.AuthMethodClientCredentialsOption.Flag.Name,
+		options.AuthMethodDeviceCodeOption.Flag.Name,
+	)
 
 	return cmd
 }
@@ -46,23 +60,6 @@ func authLoginRunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get auth-code flag: %w", err)
 	}
 
-	// Check that exactly one authentication method is specified
-	authMethods := []string{deviceCodeStr, clientCredentialsStr, authCodeStr}
-	selectedCount := 0
-	for _, method := range authMethods {
-		if method == "true" {
-			selectedCount++
-		}
-	}
-
-	if selectedCount == 0 {
-		return fmt.Errorf("please specify an authentication method: --auth-code, --client-credentials, or --device-code")
-	}
-
-	if selectedCount > 1 {
-		return fmt.Errorf("please specify only one authentication method")
-	}
-
 	ctx := context.Background()
 
 	// Get current profile name for messaging
@@ -71,65 +68,44 @@ func authLoginRunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get active profile: %w", err)
 	}
 
-	if deviceCodeStr == "true" {
-		// Perform device code authentication
-		token, newAuth, err := auth_internal.PerformDeviceCodeLogin(ctx)
+	// Perform authentication based on selected method (Cobra ensures exactly one is set)
+	var token *oauth2.Token
+	var newAuth bool
+	var selectedMethod string
+
+	switch {
+	case deviceCodeStr == "true":
+		selectedMethod = string(svcOAuth2.GrantTypeDeviceCode)
+		token, newAuth, err = auth_internal.PerformDeviceCodeLogin(ctx)
 		if err != nil {
 			return fmt.Errorf("device code login failed: %w", err)
 		}
-
-		if newAuth {
-			fmt.Printf("Successfully logged in using device_code authentication. Credentials saved to Keychain for profile '%s'.\n", profileName)
-		} else {
-			fmt.Printf("Already authenticated with valid device_code token for profile '%s'.\n", profileName)
-		}
-		fmt.Printf("Access token expires: %s\n", token.Expiry.Format("2006-01-02 15:04:05 MST"))
-		if token.RefreshToken != "" {
-			fmt.Printf("Refresh token available for automatic renewal.\n")
-		}
-
-		return nil
-	}
-
-	if clientCredentialsStr == "true" {
-		// Perform client credentials authentication
-		token, newAuth, err := auth_internal.PerformClientCredentialsLogin(ctx)
+	case clientCredentialsStr == "true":
+		selectedMethod = string(svcOAuth2.GrantTypeClientCredentials)
+		token, newAuth, err = auth_internal.PerformClientCredentialsLogin(ctx)
 		if err != nil {
 			return fmt.Errorf("client credentials login failed: %w", err)
 		}
-
-		if newAuth {
-			fmt.Printf("Successfully logged in using client_credentials authentication. Credentials saved to Keychain for profile '%s'.\n", profileName)
-		} else {
-			fmt.Printf("Already authenticated with valid client_credentials token for profile '%s'.\n", profileName)
-		}
-		fmt.Printf("Access token expires: %s\n", token.Expiry.Format("2006-01-02 15:04:05 MST"))
-		if token.RefreshToken != "" {
-			fmt.Printf("Refresh token available for automatic renewal.\n")
-		}
-
-		return nil
-	}
-
-	if authCodeStr == "true" {
-		// Perform authorization code authentication
-		token, newAuth, err := auth_internal.PerformAuthCodeLogin(ctx)
+	case authCodeStr == "true":
+		selectedMethod = string(svcOAuth2.GrantTypeAuthCode)
+		token, newAuth, err = auth_internal.PerformAuthCodeLogin(ctx)
 		if err != nil {
 			return fmt.Errorf("authorization code login failed: %w", err)
 		}
-
-		if newAuth {
-			fmt.Printf("Successfully logged in using auth_code authentication. Credentials saved to Keychain for profile '%s'.\n", profileName)
-		} else {
-			fmt.Printf("Already authenticated with valid auth_code token for profile '%s'.\n", profileName)
-		}
-		fmt.Printf("Access token expires: %s\n", token.Expiry.Format("2006-01-02 15:04:05 MST"))
-		if token.RefreshToken != "" {
-			fmt.Printf("Refresh token available for automatic renewal.\n")
-		}
-
-		return nil
+	default:
+		return fmt.Errorf("no valid authentication method selected")
 	}
 
-	return fmt.Errorf("no valid authentication method selected")
+	// Display authentication result
+	if newAuth {
+		fmt.Printf("Successfully logged in using %s authentication. Credentials saved to Keychain for profile '%s'.\n", selectedMethod, profileName)
+	} else {
+		fmt.Printf("Already authenticated with valid %s token for profile '%s'.\n", selectedMethod, profileName)
+	}
+	fmt.Printf("Access token expires: %s\n", token.Expiry.Format("2006-01-02 15:04:05 MST"))
+	if token.RefreshToken != "" {
+		fmt.Printf("Refresh token available for automatic renewal.\n")
+	}
+
+	return nil
 }

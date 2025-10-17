@@ -4,6 +4,7 @@ package auth_internal
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -82,18 +83,18 @@ func ClearToken() error {
 	// Clear tokens from all auth methods
 	methods := []string{deviceCodeTokenKey, authCodeTokenKey, clientCredentialsTokenKey}
 
-	var lastErr error
+	var errs []error
 	for _, method := range methods {
 		storage := getTokenStorage(method)
 		if err := storage.ClearToken(); err != nil {
-			lastErr = err // Keep track of last error, but continue clearing others
+			errs = append(errs, err)
 		}
 	}
 
 	// Also clear the cached PingOne API client to force re-initialization
 	ClearPingOneClientCache()
 
-	return lastErr
+	return errors.Join(errs...)
 }
 
 // ClearTokenForMethod removes the cached token for a specific authentication method
@@ -369,11 +370,6 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get authentication type: %w", err)
-	}
-
-	// Support original "worker" type as alias for "client_credentials"
-	if authType == "worker" {
-		authType = "client_credentials"
 	}
 
 	// Automatically authenticate based on configured method

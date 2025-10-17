@@ -474,7 +474,7 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to initialize pingone API client: %v", err)
+		return fmt.Errorf("failed to initialize pingone API client: %w", err)
 	}
 
 	return nil
@@ -611,7 +611,7 @@ func getExportableConnectors(exportServices *customtypes.ExportServices) (export
 	return &connectors
 }
 
-func loadLegacyWorkerToken(ctx context.Context, clientID, environmentID string) (accessToken string, valid bool) {
+func loadLegacyWorkerToken(_ context.Context, clientID, environmentID string) (accessToken string, valid bool) {
 	l := logger.Get()
 
 	tokenKey := generateLegacyWorkerTokenKey(clientID, environmentID)
@@ -619,18 +619,20 @@ func loadLegacyWorkerToken(ctx context.Context, clientID, environmentID string) 
 	token, err := storage.LoadToken()
 	if err != nil {
 		l.Debug().Msgf("No cached token found for legacy worker auth: %v", err)
+
 		return "", false
 	}
 
 	if !token.Valid() {
 		l.Debug().Msg("Cached token for legacy worker auth is expired")
+
 		return "", false
 	}
 
 	return token.AccessToken, true
 }
 
-func cacheLegacyWorkerToken(client *pingoneGoClient.Client, clientID, environmentID string) error {
+func cacheLegacyWorkerToken(client *pingoneGoClient.Client, _, _ string) error {
 	l := logger.Get()
 
 	if client == nil {
@@ -644,6 +646,7 @@ func cacheLegacyWorkerToken(client *pingoneGoClient.Client, clientID, environmen
 
 func generateLegacyWorkerTokenKey(clientID, environmentID string) string {
 	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%s:%s:worker", environmentID, clientID))))
+
 	return fmt.Sprintf("token-%s", hash[:16])
 }
 

@@ -44,24 +44,38 @@ func GetCurrentAuthMethod() (string, error) {
 }
 
 func GetAuthMethodKey(authMethod string) (string, error) {
-	// Map worker to client_credentials
-	if authMethod == "worker" {
-		authMethod = "client_credentials"
-	}
-
 	// Get environment ID and client ID based on auth method
 	var environmentID, clientID string
+	var err error
 
 	switch authMethod {
 	case "device_code":
-		environmentID, _ = profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption)
-		clientID, _ = profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)
+		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption)
+		if err != nil {
+			return "", fmt.Errorf("failed to get device code environment ID: %w", err)
+		}
+		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)
+		if err != nil {
+			return "", fmt.Errorf("failed to get device code client ID: %w", err)
+		}
 	case "auth_code", "authorization_code":
-		environmentID, _ = profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeEnvironmentIDOption)
-		clientID, _ = profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeClientIDOption)
+		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeEnvironmentIDOption)
+		if err != nil {
+			return "", fmt.Errorf("failed to get auth code environment ID: %w", err)
+		}
+		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeClientIDOption)
+		if err != nil {
+			return "", fmt.Errorf("failed to get auth code client ID: %w", err)
+		}
 	case "client_credentials":
-		environmentID, _ = profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
-		clientID, _ = profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption)
+		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
+		if err != nil {
+			return "", fmt.Errorf("failed to get client credentials environment ID: %w", err)
+		}
+		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption)
+		if err != nil {
+			return "", fmt.Errorf("failed to get client credentials client ID: %w", err)
+		}
 	default:
 		return "", fmt.Errorf("unsupported auth method: %s", authMethod)
 	}

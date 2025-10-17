@@ -70,16 +70,6 @@ func GetPingOneClient() (*pingone.APIClient, error) {
 		return nil, err
 	}
 
-	// accessToken := pingoneAPIClientConfig.GetAccessToken()
-	// if accessToken == "" {
-	//	return nil, fmt.Errorf("failed to create PingOne client: access token is empty")
-	//
-	// accessTokenExpiry := pingoneAPIClientConfig.GetAccessTokenExpiry()
-	// accessTokenExpiryStr := strconv.Itoa(accessTokenExpir//
-	// if err := savePingOneKoanfValues(accessToken, accessTokenExpiryStr); err != nil {
-	//	return nil, fmt.Errorf("failed to save PingOne access token: %w", err)
-	//}
-
 	return pingoneAPIClient, nil
 }
 
@@ -221,7 +211,7 @@ func getConfigConfiguration() (*config.Configuration, error) {
 	configConfiguration.WithGrantType(pingoneoauth2.GrantType(authType))
 
 	// Apply region configuration
-	configConfiguration, err = applyRegionConfigurationToConfigConfiguration(configConfiguration)
+	configConfiguration, err = applyRegionConfiguration(configConfiguration)
 	if err != nil {
 		return nil, err
 	}
@@ -237,7 +227,7 @@ func getConfigConfigurationWithToken(accessToken string) (*config.Configuration,
 	configConfiguration.WithAccessToken(accessToken)
 
 	// Apply region configuration
-	configConfiguration, err := applyRegionConfigurationToConfigConfiguration(configConfiguration)
+	configConfiguration, err := applyRegionConfiguration(configConfiguration)
 	if err != nil {
 		return nil, err
 	}

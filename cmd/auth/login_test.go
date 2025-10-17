@@ -7,12 +7,9 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/cmd/auth"
-	"github.com/pingidentity/pingcli/internal/configuration/options"
-	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
-	"github.com/spf13/cobra"
 )
 
 func TestLoginCommand_Creation(t *testing.T) {
@@ -110,43 +107,6 @@ func TestLoginCommand_FlagValidationExecution(t *testing.T) {
 	err = testutils_cobra.ExecutePingcli(t, "login", "-h")
 	if err != nil {
 		t.Errorf("Shorthand help flag should work without error, got: %v", err)
-	}
-}
-
-// testShorthandFlagOptionValue is a helper function to test shorthand flags using GetOptionValue
-//
-//nolint:unused // Helper function for potential future use
-func testShorthandFlagOptionValue(t *testing.T, cmd *cobra.Command, shorthand, fullName string, option options.Option) {
-	t.Helper()
-
-	// Test that shorthand flag can be set and retrieved via GetOptionValue
-	flag := cmd.Flags().ShorthandLookup(shorthand)
-	if flag == nil {
-		t.Fatalf("Shorthand flag %s should not be nil", shorthand)
-	}
-	if flag.Name != fullName {
-		t.Errorf("Expected shorthand %s to map to %s, got %s", shorthand, fullName, flag.Name)
-	}
-
-	// Set via shorthand flag and verify via GetOptionValue
-	err := cmd.Flags().Set(fullName, "true") // Set via full name since that's how Cobra handles it internally
-	if err != nil {
-		t.Fatalf("Should be able to set %s flag via shorthand: %v", fullName, err)
-	}
-
-	value, err := profiles.GetOptionValue(option)
-	if err != nil {
-		t.Fatalf("GetOptionValue should work for shorthand %s: %v", shorthand, err)
-	}
-
-	if value != "true" {
-		t.Errorf("Expected GetOptionValue to return 'true' for shorthand %s, got %q", shorthand, value)
-	}
-
-	// Reset
-	err = cmd.Flags().Set(fullName, "false")
-	if err != nil {
-		t.Fatalf("Should be able to reset %s flag: %v", fullName, err)
 	}
 }
 
