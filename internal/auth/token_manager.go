@@ -6,11 +6,11 @@ import (
 	"crypto/sha256"
 	"fmt"
 
-	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
-	"golang.org/x/oauth2"
-
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/profiles"
+	"github.com/pingidentity/pingone-go-client/config"
+	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
+	"golang.org/x/oauth2"
 )
 
 type TokenManager interface {
@@ -40,6 +40,10 @@ func GetCurrentAuthMethod() (string, error) {
 		return "", fmt.Errorf("auth method is not configured")
 	}
 
+	return GetAuthMethodKey(authMethod)
+}
+
+func GetAuthMethodKey(authMethod string) (string, error) {
 	// Map worker to client_credentials
 	if authMethod == "worker" {
 		authMethod = "client_credentials"
@@ -62,12 +66,6 @@ func GetCurrentAuthMethod() (string, error) {
 		return "", fmt.Errorf("unsupported auth method: %s", authMethod)
 	}
 
-	// Fallback to shared environment ID if method-specific one is not available
-	if environmentID == "" {
-		// Note: There might not be a shared environment ID option, let's check what's configured
-		// For now, require method-specific environment ID
-	}
-
 	if environmentID == "" || clientID == "" {
 		return "", fmt.Errorf("environment ID and client ID are required for token key generation (env: %s, client: %s)", environmentID, clientID)
 	}
@@ -77,6 +75,17 @@ func GetCurrentAuthMethod() (string, error) {
 	tokenKey := fmt.Sprintf("token-%x", hash[:8]) // Use first 8 bytes of hash for shorter key
 
 	return tokenKey, nil
+}
+
+func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
+	if cfg == nil || cfg.Auth.GrantType == nil {
+		return "", fmt.Errorf("configuration does not have grant type set")
+	}
+
+	// Convert GrantType to string
+	grantType := string(*cfg.Auth.GrantType)
+
+	return GetAuthMethodKey(grantType)
 }
 
 func (tm *DefaultTokenManager) SaveToken(token *oauth2.Token) error {
@@ -114,5 +123,6 @@ func (tm *DefaultTokenManager) HasToken() bool {
 
 	storage := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
 	hasToken, err := storage.HasToken()
+
 	return err == nil && hasToken
 }

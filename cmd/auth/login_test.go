@@ -113,7 +113,9 @@ func TestLoginCommand_FlagValidationExecution(t *testing.T) {
 	}
 }
 
-// Helper function to test shorthand flags using GetOptionValue
+// testShorthandFlagOptionValue is a helper function to test shorthand flags using GetOptionValue
+//
+//nolint:unused // Helper function for potential future use
 func testShorthandFlagOptionValue(t *testing.T, cmd *cobra.Command, shorthand, fullName string, option options.Option) {
 	t.Helper()
 

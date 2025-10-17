@@ -86,6 +86,7 @@ func NewExportCommand() *cobra.Command {
 func exportRunE(cmd *cobra.Command, args []string) error {
 	l := logger.Get()
 	l.Debug().Msgf("Platform Export Subcommand Called.")
+
 	return platform_internal.RunInternalExport(cmd.Context(), cmd.Root().Version)
 }
 
@@ -99,21 +100,21 @@ func initGeneralExportFlags(cmd *cobra.Command) {
 }
 
 func initPingOneExportFlags(cmd *cobra.Command) {
-	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthCodeClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthCodeEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthCodeRedirectURIOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthCodeScopesOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeClientIDOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeScopesOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientSecretOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsScopesOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeScopesOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
 }
 

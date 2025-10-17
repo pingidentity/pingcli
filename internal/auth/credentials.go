@@ -18,7 +18,7 @@ import (
 // Token storage keys for different authentication methods
 const (
 	deviceCodeTokenKey        = "device-code-token"
-	authCodeTokenKey          = "auth-code-token"
+	authCodeTokenKey          = "auth-code-token" // #nosec G101 -- This is a keychain identifier, not a credential
 	clientCredentialsTokenKey = "client-credentials-token"
 )
 
@@ -30,12 +30,14 @@ func getTokenStorage(authMethod string) *svcOAuth2.KeychainStorage {
 // SaveToken saves an OAuth2 token using the SDK keychain storage for the specific auth method
 func SaveTokenForMethod(token *oauth2.Token, authMethod string) error {
 	storage := getTokenStorage(authMethod)
+
 	return storage.SaveToken(token)
 }
 
 // LoadTokenForMethod loads an OAuth2 token using the SDK keychain storage for the specific auth method
 func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 	storage := getTokenStorage(authMethod)
+
 	return storage.LoadToken()
 }
 
@@ -116,31 +118,30 @@ func PerformDeviceCodeLogin(ctx context.Context) (*oauth2.Token, bool, error) {
 	// Set grant type to device code
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeDeviceCode)
 
-	// Check if we already have a valid cached token by generating the same key the SDK would use
-	tokenKey, err := GetCurrentAuthMethod()
+	// Load any existing cached token before calling SDK
+	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+	var existingToken *oauth2.Token
 	if err == nil {
-		// Try to load existing token using the hash-based key
 		keychainStorage := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-		if existingToken, loadErr := keychainStorage.LoadToken(); loadErr == nil && existingToken != nil && existingToken.Valid() {
-			// We have a valid cached token
-			return existingToken, false, nil
-		}
+		existingToken, _ = keychainStorage.LoadToken()
 	}
 
-	// No valid cached token found, get token source to perform authentication
+	// Get token source to perform authentication or use cached token
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get token source: %w", err)
 	}
 
-	// Get token (this will perform new authentication since we didn't find a cached token)
+	// Get token (SDK will return cached token if valid, or perform new authentication)
 	token, err := tokenSource.Token()
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get token: %w", err)
 	}
 
-	// This is new authentication
-	return token, true, nil
+	// Determine if this was new authentication by comparing with what we loaded
+	newAuth := existingToken == nil || existingToken.AccessToken != token.AccessToken
+
+	return token, newAuth, nil
 }
 
 // GetDeviceCodeConfiguration builds device code configuration from CLI options
@@ -176,9 +177,7 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 		WithDeviceCodeEnvironmentID(environmentID)
 
 	scopesList := parseScopesList(scopes)
-	if len(scopesList) > 0 {
-		cfg = cfg.WithDeviceCodeScopes(scopesList)
-	}
+	cfg = cfg.WithDeviceCodeScopes(scopesList)
 
 	// Apply region configuration
 	return applyRegionConfiguration(cfg)
@@ -194,30 +193,30 @@ func PerformAuthCodeLogin(ctx context.Context) (*oauth2.Token, bool, error) {
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeAuthCode)
 
 	// Check if we already have a valid cached token by generating the same key the SDK would use
-	tokenKey, err := GetCurrentAuthMethod()
+	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+	var existingToken *oauth2.Token
 	if err == nil {
 		// Try to load existing token using the hash-based key
 		keychainStorage := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-		if existingToken, loadErr := keychainStorage.LoadToken(); loadErr == nil && existingToken != nil && existingToken.Valid() {
-			// We have a valid cached token
-			return existingToken, false, nil
-		}
+		existingToken, _ = keychainStorage.LoadToken()
 	}
 
-	// No valid cached token found, get token source to perform authentication
+	// Get token source to perform authentication or use cached token
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get token source: %w", err)
 	}
 
-	// Get token (this will perform new authentication since we didn't find a cached token)
+	// Get token (SDK will return cached token if valid, or perform new authentication)
 	token, err := tokenSource.Token()
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get token: %w", err)
 	}
 
-	// This is new authentication
-	return token, true, nil
+	// Determine if this was new authentication by comparing with what we loaded
+	newAuth := existingToken == nil || existingToken.AccessToken != token.AccessToken
+
+	return token, newAuth, nil
 }
 
 // GetAuthCodeConfiguration builds auth code configuration from CLI options
@@ -280,31 +279,30 @@ func PerformClientCredentialsLogin(ctx context.Context) (*oauth2.Token, bool, er
 	// Set grant type to client credentials
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeClientCredentials)
 
-	// Check if we already have a valid cached token by generating the same key the SDK would use
-	tokenKey, err := GetCurrentAuthMethod()
+	// Load any existing cached token before calling SDK
+	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+	var existingToken *oauth2.Token
 	if err == nil {
-		// Try to load existing token using the hash-based key
 		keychainStorage := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-		if existingToken, loadErr := keychainStorage.LoadToken(); loadErr == nil && existingToken != nil && existingToken.Valid() {
-			// We have a valid cached token
-			return existingToken, false, nil
-		}
+		existingToken, _ = keychainStorage.LoadToken()
 	}
 
-	// No valid cached token found, get token source to perform authentication
+	// Get token source to perform authentication or use cached token
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get token source: %w", err)
 	}
 
-	// Get token (this will perform new authentication since we didn't find a cached token)
+	// Get token (SDK will return cached token if valid, or perform new authentication)
 	token, err := tokenSource.Token()
 	if err != nil {
 		return nil, false, fmt.Errorf("failed to get token: %w", err)
 	}
 
-	// This is new authentication
-	return token, true, nil
+	// Determine if this was new authentication by comparing with what we loaded
+	newAuth := existingToken == nil || existingToken.AccessToken != token.AccessToken
+
+	return token, newAuth, nil
 }
 
 // GetClientCredentialsConfiguration builds client credentials configuration from CLI options

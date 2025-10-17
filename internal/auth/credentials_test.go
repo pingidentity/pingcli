@@ -141,8 +141,10 @@ func TestGetAuthCodeConfiguration_MissingEnvironmentID(t *testing.T) {
 }
 
 func TestSaveAndLoadToken(t *testing.T) {
-	// Test that SaveToken returns an error with nil token
-	err := auth_internal.SaveToken(nil)
+	testKey := "test-token-key"
+
+	// Test that SaveTokenForMethod returns an error with nil token
+	err := auth_internal.SaveTokenForMethod(nil, testKey)
 	if err == nil {
 		t.Error("Expected error, but got nil")
 	}
@@ -152,9 +154,11 @@ func TestSaveAndLoadToken(t *testing.T) {
 }
 
 func TestClearToken(t *testing.T) {
-	// Test that ClearToken doesn't panic when no token exists
+	testKey := "test-token-key"
+
+	// Test that ClearTokenForMethod doesn't panic when no token exists
 	// This should handle the case where keychain entry doesn't exist
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearTokenForMethod(testKey)
 
 	// Should not error when no token exists (handles ErrNotFound)
 	if err != nil {
@@ -176,10 +180,12 @@ func TestGetValidTokenSource_NoCache(t *testing.T) {
 		t.Error("Expected error, but got nil")
 	}
 	// The error should be related to authentication configuration or automatic authentication failure
-	if err != nil && !(strings.Contains(err.Error(), "failed to get authentication type") ||
+	if err == nil || (strings.Contains(err.Error(), "failed to get authentication type") ||
 		strings.Contains(err.Error(), "automatic client credentials authentication failed") ||
 		strings.Contains(err.Error(), "automatic authorization code authentication failed") ||
 		strings.Contains(err.Error(), "automatic device code authentication failed")) {
+		// Expected authentication error
+	} else {
 		t.Errorf("Expected authentication-related error, got: %s", err.Error())
 	}
 }
@@ -272,7 +278,9 @@ func TestConfigurationValidation_AuthCode(t *testing.T) {
 }
 
 func TestSaveToken_NilToken(t *testing.T) {
-	err := auth_internal.SaveToken(nil)
+	testKey := "test-token-key"
+
+	err := auth_internal.SaveTokenForMethod(nil, testKey)
 
 	if err == nil {
 		t.Error("Expected error, but got nil")
@@ -313,9 +321,11 @@ func TestGetValidTokenSource_ErrorPaths(t *testing.T) {
 	}
 	// The error message can vary depending on the configured auth type and state
 	// Since "worker" type gets converted to "client_credentials", we expect client credentials auth failure
-	if err != nil && !(strings.Contains(err.Error(), "automatic client credentials authentication failed") ||
+	if err == nil || (strings.Contains(err.Error(), "automatic client credentials authentication failed") ||
 		strings.Contains(err.Error(), "failed to get authentication type") ||
 		strings.Contains(err.Error(), "client ID is not configured")) {
+		// Expected authentication error
+	} else {
 		t.Errorf("Expected client credentials authentication failure, got: %s", err.Error())
 	}
 }
@@ -351,6 +361,7 @@ func TestGetValidTokenSource_AutomaticDeviceCodeAuth(t *testing.T) {
 	for _, expectedError := range expectedErrors {
 		if strings.Contains(err.Error(), expectedError) {
 			errorMatched = true
+
 			break
 		}
 	}
@@ -389,6 +400,7 @@ func TestGetValidTokenSource_AutomaticAuthCodeAuth(t *testing.T) {
 	for _, expectedError := range expectedErrors {
 		if strings.Contains(err.Error(), expectedError) {
 			errorMatched = true
+
 			break
 		}
 	}
@@ -434,6 +446,7 @@ func TestGetValidTokenSource_AutomaticClientCredentialsAuth(t *testing.T) {
 	for _, expectedError := range expectedErrors {
 		if strings.Contains(err.Error(), expectedError) {
 			errorMatched = true
+
 			break
 		}
 	}
