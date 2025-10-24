@@ -35,11 +35,6 @@ func NewLoginCommand() *cobra.Command {
 		options.AuthMethodClientCredentialsOption.Flag.Name,
 		options.AuthMethodDeviceCodeOption.Flag.Name,
 	)
-	cmd.MarkFlagsOneRequired(
-		options.AuthMethodAuthCodeOption.Flag.Name,
-		options.AuthMethodClientCredentialsOption.Flag.Name,
-		options.AuthMethodDeviceCodeOption.Flag.Name,
-	)
 
 	return cmd
 }
@@ -55,11 +50,6 @@ func authLoginRunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get client-credentials flag: %w", err)
 	}
 
-	authCodeStr, err := profiles.GetOptionValue(options.AuthMethodAuthCodeOption)
-	if err != nil {
-		return fmt.Errorf("failed to get auth-code flag: %w", err)
-	}
-
 	ctx := context.Background()
 
 	// Get current profile name for messaging
@@ -68,7 +58,7 @@ func authLoginRunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to get active profile: %w", err)
 	}
 
-	// Perform authentication based on selected method (Cobra ensures exactly one is set)
+	// Perform authentication based on selected method (auth_code is default if none specified)
 	var token *oauth2.Token
 	var newAuth bool
 	var selectedMethod string
@@ -86,14 +76,13 @@ func authLoginRunE(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return fmt.Errorf("client credentials login failed: %w", err)
 		}
-	case authCodeStr == "true":
+	default:
+		// Default to auth_code if no method flag is specified
 		selectedMethod = string(svcOAuth2.GrantTypeAuthCode)
 		token, newAuth, err = auth_internal.PerformAuthCodeLogin(ctx)
 		if err != nil {
 			return fmt.Errorf("authorization code login failed: %w", err)
 		}
-	default:
-		return fmt.Errorf("no valid authentication method selected")
 	}
 
 	// Display authentication result

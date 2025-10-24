@@ -130,71 +130,104 @@ func TestLoginCommand_BooleanFlagBehavior(t *testing.T) {
 	}
 }
 
-func TestAuthLoginRunE_NoFlagsSet(t *testing.T) {
-	expectedErrorPattern := `^please specify an authentication method: --auth-code, --client-credentials, or --device-code$`
+func TestLoginCommand_DefaultAuthCode(t *testing.T) {
+	// Test that when no flags are provided, it defaults to auth_code
+	expectedErrorPattern := `^authorization code login failed`
 	err := testutils_cobra.ExecutePingcli(t, "login")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-func TestAuthLoginRunE_MultipleFlagsSet(t *testing.T) {
-	expectedErrorPattern := `^please specify only one authentication method$`
-	err := testutils_cobra.ExecutePingcli(t, "login", "--device-code", "--client-credentials")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+func TestLoginCommand_MutuallyExclusiveFlags(t *testing.T) {
+	testCases := []struct {
+		name string
+		args []string
+	}{
+		{
+			name: "device-code and client-credentials",
+			args: []string{"--device-code", "--client-credentials"},
+		},
+		{
+			name: "device-code and auth-code",
+			args: []string{"--device-code", "--auth-code"},
+		},
+		{
+			name: "client-credentials and auth-code",
+			args: []string{"--client-credentials", "--auth-code"},
+		},
+		{
+			name: "all three flags",
+			args: []string{"--device-code", "--client-credentials", "--auth-code"},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			args := append([]string{"login"}, tc.args...)
+			err := testutils_cobra.ExecutePingcli(t, args...)
+			if err == nil {
+				t.Fatal("Expected error for mutually exclusive flags, got nil")
+			}
+			// Check that error mentions mutual exclusivity
+			if !strings.Contains(err.Error(), "if any flags in the group") {
+				t.Errorf("Expected mutually exclusive flags error, got: %v", err)
+			}
+		})
+	}
 }
 
-func TestAuthLoginRunE_DeviceCodeFlag(t *testing.T) {
-	expectedErrorPattern := `^device code login failed`
-	err := testutils_cobra.ExecutePingcli(t, "login", "--device-code")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+func TestLoginCommand_SpecificAuthMethod(t *testing.T) {
+	testCases := []struct {
+		name                 string
+		flag                 string
+		expectedErrorPattern string
+	}{
+		{
+			name:                 "auth-code flag",
+			flag:                 "--auth-code",
+			expectedErrorPattern: `^authorization code login failed`,
+		},
+		{
+			name:                 "auth-code shorthand",
+			flag:                 "-a",
+			expectedErrorPattern: `^authorization code login failed`,
+		},
+		{
+			name:                 "device-code flag",
+			flag:                 "--device-code",
+			expectedErrorPattern: `^device code login failed`,
+		},
+		{
+			name:                 "device-code shorthand",
+			flag:                 "-d",
+			expectedErrorPattern: `^device code login failed`,
+		},
+		{
+			name:                 "client-credentials flag",
+			flag:                 "--client-credentials",
+			expectedErrorPattern: `^client credentials login failed`,
+		},
+		{
+			name:                 "client-credentials shorthand",
+			flag:                 "-c",
+			expectedErrorPattern: `^client credentials login failed`,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := testutils_cobra.ExecutePingcli(t, "login", tc.flag)
+			testutils.CheckExpectedError(t, err, &tc.expectedErrorPattern)
+		})
+	}
 }
 
-func TestAuthLoginRunE_DeviceCodeShorthandFlag(t *testing.T) {
-	// Test that shorthand flag -d maps correctly and produces expected error
-	expectedErrorPattern := `^device code login failed`
-	err := testutils_cobra.ExecutePingcli(t, "login", "-d")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-func TestAuthLoginRunE_ClientCredentialsFlag(t *testing.T) {
-	expectedErrorPattern := `^client credentials login failed`
-	err := testutils_cobra.ExecutePingcli(t, "login", "--client-credentials")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-func TestAuthLoginRunE_ClientCredentialsShorthandFlag(t *testing.T) {
-	// Test that shorthand flag -c maps correctly and produces expected error
-	expectedErrorPattern := `^client credentials login failed`
-	err := testutils_cobra.ExecutePingcli(t, "login", "-c")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-func TestAuthLoginRunE_AuthCodeFlag(t *testing.T) {
-	expectedErrorPattern := `^authorization code login failed`
-	err := testutils_cobra.ExecutePingcli(t, "login", "--auth-code")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-func TestAuthLoginRunE_AuthCodeShorthandFlag(t *testing.T) {
-	// Test that shorthand flag -a maps correctly and produces expected error
-	expectedErrorPattern := `^authorization code login failed`
-	err := testutils_cobra.ExecutePingcli(t, "login", "-a")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-func TestAuthLoginRunE_DeviceCodeAndClientCredentials(t *testing.T) {
-	expectedErrorPattern := `^please specify only one authentication method$`
-	err := testutils_cobra.ExecutePingcli(t, "login", "--device-code", "--client-credentials")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-func TestAuthLoginRunE_DeviceCodeAndAuthCode(t *testing.T) {
-	expectedErrorPattern := `^please specify only one authentication method$`
-	err := testutils_cobra.ExecutePingcli(t, "login", "--device-code", "--auth-code")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-func TestAuthLoginRunE_ClientCredentialsAndAuthCode(t *testing.T) {
-	expectedErrorPattern := `^please specify only one authentication method$`
-	err := testutils_cobra.ExecutePingcli(t, "login", "--client-credentials", "--auth-code")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+func TestLoginCommandValidation(t *testing.T) {
+	// Test invalid flag combination (too many arguments)
+	err := testutils_cobra.ExecutePingcli(t, "login", "extra", "arguments")
+	if err == nil {
+		t.Fatal("Expected error when too many arguments are provided")
+	}
+	if !strings.Contains(err.Error(), "command accepts 0 arg(s), received 2") {
+		t.Errorf("Expected argument validation error, got: %v", err)
+	}
 }

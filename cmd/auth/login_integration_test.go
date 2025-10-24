@@ -220,7 +220,7 @@ func TestLoginCommand_ClientCredentialsFullFlagParsing_Integration(t *testing.T)
 	}
 }
 
-// TestLoginCommand_NoFlagsExecution_Integration tests that command fails when no flags are provided
+// TestLoginCommand_NoFlagsExecution_Integration tests that command defaults to auth_code when no flags are provided
 func TestLoginCommand_NoFlagsExecution_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	cmd := auth.NewLoginCommand()
@@ -230,8 +230,8 @@ func TestLoginCommand_NoFlagsExecution_Integration(t *testing.T) {
 
 	if err == nil {
 		t.Error("Expected error but got none")
-	} else if !strings.Contains(err.Error(), "please specify an authentication method") {
-		t.Errorf("Error should contain %q, got: %v", "please specify an authentication method", err)
+	} else if !strings.Contains(err.Error(), "authorization code login failed") {
+		t.Errorf("Error should contain 'authorization code login failed' (default), got: %v", err)
 	}
 }
 
@@ -245,8 +245,8 @@ func TestLoginCommand_MultipleFlagsDeviceCodeAndAuthCode_Integration(t *testing.
 
 	if err == nil {
 		t.Error("Expected error but got none")
-	} else if !strings.Contains(err.Error(), "please specify only one authentication method") {
-		t.Errorf("Error should contain %q, got: %v", "please specify only one authentication method", err)
+	} else if !strings.Contains(err.Error(), "if any flags in the group") {
+		t.Errorf("Expected mutually exclusive flags error, got: %v", err)
 	}
 }
 
@@ -260,8 +260,8 @@ func TestLoginCommand_MultipleFlagsClientCredAndDeviceCode_Integration(t *testin
 
 	if err == nil {
 		t.Error("Expected error but got none")
-	} else if !strings.Contains(err.Error(), "please specify only one authentication method") {
-		t.Errorf("Error should contain %q, got: %v", "please specify only one authentication method", err)
+	} else if !strings.Contains(err.Error(), "if any flags in the group") {
+		t.Errorf("Expected mutually exclusive flags error, got: %v", err)
 	}
 }
 
@@ -275,8 +275,8 @@ func TestLoginCommand_MultipleFlagsAuthCodeAndClientCred_Integration(t *testing.
 
 	if err == nil {
 		t.Error("Expected error but got none")
-	} else if !strings.Contains(err.Error(), "please specify only one authentication method") {
-		t.Errorf("Error should contain %q, got: %v", "please specify only one authentication method", err)
+	} else if !strings.Contains(err.Error(), "if any flags in the group") {
+		t.Errorf("Expected mutually exclusive flags error, got: %v", err)
 	}
 }
 
@@ -290,8 +290,8 @@ func TestLoginCommand_AllThreeFlagsExecution_Integration(t *testing.T) {
 
 	if err == nil {
 		t.Error("Expected error but got none")
-	} else if !strings.Contains(err.Error(), "please specify only one authentication method") {
-		t.Errorf("Error should contain %q, got: %v", "please specify only one authentication method", err)
+	} else if !strings.Contains(err.Error(), "if any flags in the group") {
+		t.Errorf("Expected mutually exclusive flags error, got: %v", err)
 	}
 }
 

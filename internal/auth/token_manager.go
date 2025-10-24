@@ -3,7 +3,6 @@
 package auth_internal
 
 import (
-	"crypto/sha256"
 	"fmt"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -84,11 +83,8 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 		return "", fmt.Errorf("environment ID and client ID are required for token key generation (env: %s, client: %s)", environmentID, clientID)
 	}
 
-	// Create a hash of environment ID + client ID + auth method for uniqueness
-	hash := sha256.Sum256([]byte(fmt.Sprintf("%s:%s:%s", environmentID, clientID, authMethod)))
-	tokenKey := fmt.Sprintf("token-%x", hash[:8]) // Use first 8 bytes of hash for shorter key
-
-	return tokenKey, nil
+	// Use the SDK's GenerateKeychainAccountName for consistency
+	return svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, authMethod), nil
 }
 
 func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
