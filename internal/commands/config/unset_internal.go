@@ -8,44 +8,54 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var (
+	unsetErrorPrefix = "failed to unset configuration"
+)
+
 func RunInternalConfigUnset(koanfKey string) (err error) {
 	if err = configuration.ValidateKoanfKey(koanfKey); err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
 	}
 
 	pName, err := readConfigUnsetOptions()
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
 	}
 
-	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
+	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
+	}
+
+	subKoanf, err := koanfConfig.GetProfileKoanf(pName)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
 	}
 
 	opt, err := configuration.OptionFromKoanfKey(koanfKey)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
 	}
 
 	err = subKoanf.Set(opt.KoanfKey, opt.DefaultValue)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
 	}
 
-	if err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf); err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+	if err = koanfConfig.SaveProfile(pName, subKoanf); err != nil {
+		return &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
 	}
 
 	msgStr := "Configuration unset successfully:\n"
 
 	vVal, _, err := profiles.KoanfValueFromOption(opt, pName)
 	if err != nil {
-		return fmt.Errorf("failed to unset configuration: %w", err)
+		return &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
 	}
 
 	unmaskOptionVal, err := profiles.GetOptionValue(options.ConfigUnmaskSecretValueOption)
@@ -72,11 +82,11 @@ func readConfigUnsetOptions() (pName string, err error) {
 	}
 
 	if err != nil {
-		return pName, err
+		return pName, &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: err}
 	}
 
 	if pName == "" {
-		return pName, fmt.Errorf("unable to determine profile to unset configuration from")
+		return pName, &errs.PingCLIError{Prefix: unsetErrorPrefix, Err: ErrUndeterminedProfile}
 	}
 
 	return pName, nil

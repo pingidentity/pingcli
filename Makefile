@@ -1,202 +1,209 @@
-SHELL := /bin/bash
+# Use .ONESHELL to treat each recipe as a single shell script.
+# This simplifies complex commands and makes the file more readable.
+.ONESHELL:
+SHELL := $(shell which bash || which sh)
+.SHELLFLAGS := -ec
 
-.PHONY: install fmt vet test devchecknotest devcheck importfmtlint golangcilint starttestcontainer removetestcontainer spincontainer openlocalwebapi openapp
+# ====================================================================================
+# VARIABLES
+# ====================================================================================
 
-default: install
+# Go variables
+GOCMD := go
+GOTIDY := $(GOCMD) mod tidy
+GOINSTALL := $(GOCMD) install .
+GOFMT := $(GOCMD) fmt ./...
+GOVET := $(GOCMD) vet ./...
+GOTEST := $(GOCMD) test -count=1
+GOLANGCI_LINT := $(GOCMD) tool golangci-lint
+IMPI := $(GOCMD) tool impi
 
-install:
-	@echo -n "Running 'go mod tidy' to ensure all dependencies are up to date..."
-	@if go mod tidy; then \
-        echo " SUCCESS"; \
-    else \
-        echo " FAILED"; \
-        exit 1; \
-    fi
+# Find all directories containing Go test files.
+TEST_DIRS := $(shell find . -type f -name '*_test.go' -print0 | xargs -0 -n1 dirname | sort -u)
 
-	@echo -n "Running 'go install' to install pingcli..."
-	@if go install .; then \
-		echo " SUCCESS"; \
+# Docker variables
+DOCKER := docker
+CONTAINER_NAME := pingcli_test_pingfederate_container
+
+# Cross-platform 'open' command.
+OPEN_CMD := xdg-open
+ifeq ($(shell uname), Darwin)
+	OPEN_CMD := open
+endif
+
+# Helper to check for required environment variables.
+# If not set, it stops execution with an error.
+define check_env
+	$(if $(value $1),,$(error ERROR: Environment variable '$1' is not set. $(2)))
+endef
+
+# ====================================================================================
+# PHONY TARGETS
+# ====================================================================================
+
+.PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest
+.PHONY: starttestcontainer removetestcontainer spincontainer openlocalwebapi openapp protogen
+.PHONY: _check_env _check_ping_env _check_docker _run_pf_container _wait_for_pf _stop_pf_container
+.PHONY: generate-options-docs generate-command-docs generate-all-docs
+
+# ====================================================================================
+# USER-FACING COMMANDS
+# ====================================================================================
+
+# Set the default goal to 'help'.
+default: help
+
+help: ## Display this help message
+	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+install: ## Install the application binaries
+	@echo "  > Tidy: Ensuring dependencies are up to date..."
+	$(GOTIDY)
+	echo "✅ Dependencies are up to date."
+	echo "  > Install: Building and installing application..."
+	$(GOINSTALL)
+	echo "✅ Application installed."
+
+fmt: ## Format Go source code
+	@echo "  > Fmt: Formatting Go code..."
+	$(GOFMT)
+	echo "✅ Go code formatted."
+
+vet: ## Run go vet to catch suspicious constructs
+	@echo "  > Vet: Analyzing source code for potential issues..."
+	$(GOVET)
+	echo "✅ No issues found."
+
+importfmtlint: ## Format Go import ordering
+	@echo "  > ImportFmt: Formatting import statements..."
+	$(IMPI) --skip internal/proto/pingcli_command --local . --scheme stdThirdPartyLocal ./...
+	echo "✅ Import statements formatted."
+
+golangcilint: ## Run golangci-lint for comprehensive code analysis
+	@echo "  > Lint: Running golangci-lint..."
+	$(GOLANGCI_LINT) cache clean
+	$(GOLANGCI_LINT) run --timeout 5m ./...
+	echo "✅ No linting issues found."
+
+generate-options-docs: ## Generate configuration options documentation then validate via golden tests
+	@echo "  > Docs: Generating options documentation..."
+	@if [ -z "$(OUTPUT)" ]; then \
+		mkdir -p ./docs/dev-ux-portal-docs/general; \
+		$(GOCMD) run ./tools/generate-options-docs -asciidoc -o ./docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc; \
+		echo "✅ Documentation generated at docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc"; \
 	else \
-		echo " FAILED"; \
-		exit 1; \
+		$(GOCMD) run ./tools/generate-options-docs $(OUTPUT); \
+		echo "✅ Documentation generated with custom OUTPUT $(OUTPUT)"; \
 	fi
+	@echo "  > Docs: Running golden tests for options docs..."
+	@$(GOCMD) test ./tools/generate-options-docs/docgen -run TestOptionsDocGeneration >/dev/null && echo "✅ Options documentation golden test passed."
 
-fmt:
-	@echo -n "Running 'go fmt' to format the code..."
-	@if go fmt ./...; then \
-		echo " SUCCESS"; \
-	else \
-		echo " FAILED"; \
-		exit 1; \
-	fi
+generate-command-docs: ## Generate per-command AsciiDoc pages then validate via golden tests
+	@echo "  > Docs: Generating command documentation..."
+	mkdir -p ./docs/dev-ux-portal-docs
+	$(GOCMD) run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs $(COMMAND_DOCS_ARGS)
+	echo "✅ Command docs generated in docs/dev-ux-portal-docs"
+	@echo "  > Docs: Running golden tests for command docs..."
+	@$(GOCMD) test ./tools/generate-command-docs -run TestCommandDocGeneration >/dev/null && echo "✅ Command documentation golden test passed."
 
-vet:
-	@echo -n "Running 'go vet' to check for potential issues..."
-	@if go vet ./...; then \
-		echo " SUCCESS"; \
-	else \
-		echo " FAILED"; \
-		exit 1; \
-	fi
+generate-all-docs: ## Rebuild ALL docs then run golden tests for both sets
+	@echo "  > Docs: Rebuilding all documentation (clean + regenerate)..."
+	mkdir -p ./docs/dev-ux-portal-docs/general
+	$(MAKE) generate-options-docs OUTPUT='-o docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc'
+	$(MAKE) generate-command-docs
+	@echo "✅ All documentation rebuilt and validated via golden tests."
 
-test: --checktestenvvars --test-cmd --test-internal-commands --test-internal-configuration --test-internal-connector --test-internal-customtypes --test-internal-input --test-internal-profiles
+protogen: ## Generate Go code from .proto files
+	@echo "  > Protogen: Generating gRPC code from proto files..."
+	protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto
+	echo "✅ gRPC code generated."
 
---checktestenvvars:
-	@echo -n "Checking for required environment variables to run pingcli tests..."
-	@test -n "$$TEST_PINGONE_ENVIRONMENT_ID" || { echo " FAILED"; echo "TEST_PINGONE_ENVIRONMENT_ID environment variable is not set.\n\nCreate/Specify an unconfigured PingOne environment to test Ping CLI with. The following services are required: PingOne SSO, PingOne MFA, PingOne Protect, PingOne DaVinci, PingOne Authorize, and PingFederate"; exit 1; }
-	@test -n "$$TEST_PINGONE_REGION_CODE" || { echo " FAILED"; echo "TEST_PINGONE_REGION_CODE environment variable is not set.\n\nCreate/Specify an unconfigured PingOne environment to test Ping CLI with. The following services are required: PingOne SSO, PingOne MFA, PingOne Protect, PingOne DaVinci, PingOne Authorize, and PingFederate"; exit 1; }
-	@test -n "$$TEST_PINGONE_WORKER_CLIENT_ID" || { echo " FAILED"; echo "TEST_PINGONE_WORKER_CLIENT_ID environment variable is not set.\n\nCreate/Specify a worker applicaiton in the unconfigured PingOne environment with all admin roles to test Ping CLI with"; exit 1; }
-	@test -n "$$TEST_PINGONE_WORKER_CLIENT_SECRET" || { echo " FAILED"; echo "TEST_PINGONE_WORKER_CLIENT_SECRET environment variable is not set.\n\nCreate/Specify a worker applicaiton in an unconfigured PingOne environment with all admin roles to test Ping CLI with"; exit 1; }
-	@echo " SUCCESS"
+test: _check_ping_env ## Run all tests
+	@echo "  > Test: Running all Go tests..."
+	for dir in $(TEST_DIRS); do
+		echo "    -> $$dir"
+		$(GOTEST) $$dir
+	done
+	echo "✅ All tests passed."
 
---test-cmd:
-	@echo "Running tests for cmd..."
-	@go test -count=1 ./cmd/...
+devcheck: install importfmtlint fmt vet golangcilint spincontainer test removetestcontainer ## Run the full suite of development checks and tests
+	@echo "✅ All development checks passed successfully."
 
---test-internal-commands:
-	@echo "Running tests for internal/commands..."
-	@go test -count=1 ./internal/commands/...
+devchecknotest: install importfmtlint fmt vet golangcilint ## Run all development checks except tests
+	@echo "✅ All development checks (no tests) passed successfully."
 
---test-internal-configuration:
-	@echo "Running tests for internal/configuration..."
-	@go test -count=1 ./internal/configuration/...
+# ====================================================================================
+# DOCKER & CONTAINER COMMANDS
+# ====================================================================================
 
---test-internal-connector:
-	@echo "Running tests for internal/connector..."
+starttestcontainer: _check_docker _check_env _run_pf_container _wait_for_pf ## Start the PingFederate test container
+removetestcontainer: _check_docker _stop_pf_container ## Stop and remove the PingFederate test container
+spincontainer: removetestcontainer starttestcontainer ## Re-spin the test container (remove and start)
 
-	@# Test each connector package separately to avoid configuration collision
-	@go test -count=1 ./internal/connector
+openlocalwebapi: ## Open the PingFederate Admin API docs in a browser
+	@echo "  > Browser: Opening PingFederate Admin API docs..."
+	$(OPEN_CMD) "https://localhost:9999/pf-admin-api/api-docs/#/"
+	echo "✅ Opened PingFederate Admin API docs."
 
-	@# Test the resources within each connector first
-	@go test -count=1 ./internal/connector/pingfederate/resources
-	@go test -count=1 ./internal/connector/pingone/authorize/resources
-	@go test -count=1 ./internal/connector/pingone/mfa/resources
-	@go test -count=1 ./internal/connector/pingone/platform/resources
-	@go test -count=1 ./internal/connector/pingone/protect/resources
-	@go test -count=1 ./internal/connector/pingone/sso/resources
+openapp: ## Open the PingFederate Admin Console in a browser
+	@echo "  > Browser: Opening PingFederate Admin Console..."
+	$(OPEN_CMD) "https://localhost:9999/pingfederate/app"
+	echo "✅ Opened PingFederate Admin Console."
 
-	@# Test the connectors itegration terraform plan tests
-	@go test -count=1 ./internal/connector/pingfederate
-	@go test -count=1 ./internal/connector/pingone/authorize
-	@go test -count=1 ./internal/connector/pingone/mfa
-	@go test -count=1 ./internal/connector/pingone/platform
-	@go test -count=1 ./internal/connector/pingone/protect
-	@go test -count=1 ./internal/connector/pingone/sso
+# ====================================================================================
+# INTERNAL HELPER TARGETS (Not intended for direct use)
+# ====================================================================================
 
---test-internal-customtypes:
-	@echo "Running tests for internal/customtypes..."
-	@go test -count=1 ./internal/customtypes/...
+_check_env:
+	@echo "  > Env: Checking Docker container variables..."
+	$(call check_env,TEST_PING_IDENTITY_DEVOPS_USER,See https://devops.pingidentity.com/how-to/devopsRegistration/)
+	$(call check_env,TEST_PING_IDENTITY_DEVOPS_KEY,See https://devops.pingidentity.com/how-to/devopsRegistration/)
+	$(call check_env,TEST_PING_IDENTITY_ACCEPT_EULA,Set to 'YES' to accept the EULA.)
+	echo "✅ Required Docker variables are set."
 
---test-internal-input:
-	@echo "Running tests for internal/input..."
-	@go test -count=1 ./internal/input/...
+_check_ping_env:
+	@echo "  > Env: Checking PingOne test variables..."
+	$(call check_env,TEST_PINGONE_ENVIRONMENT_ID,Specify an unconfigured PingOne environment.)
+	$(call check_env,TEST_PINGONE_REGION_CODE,Specify the region for the PingOne environment.)
+	$(call check_env,TEST_PINGONE_WORKER_CLIENT_ID,Specify a worker app client ID with admin roles.)
+	$(call check_env,TEST_PINGONE_WORKER_CLIENT_SECRET,Specify the secret for the worker app.)
+	echo "✅ Required PingOne test variables are set."
 
---test-internal-profiles:
-	@echo "Running tests for internal/profiles..."
-	@go test -count=1 ./internal/profiles/...
+_check_docker:
+	@echo "  > Docker: Checking if the Docker daemon is running..."
+	$(DOCKER) info > /dev/null
+	echo "✅ Docker daemon is running."
 
-devchecknotest: install importfmtlint fmt vet golangcilint
-
-devcheck: devchecknotest spincontainer test removetestcontainer
-
-importfmtlint:
-	@echo -n "Running 'impi' to format import ordering..."
-	@if go tool impi --skip internal/proto/pingcli_command --local . --scheme stdThirdPartyLocal ./...; then \
-		echo " SUCCESS"; \
-	else \
-		echo " FAILED"; \
-		exit 1; \
-	fi
-
-golangcilint:
-	@echo -n "Running 'golangci-lint' to check for code quality issues... "
-	@# Clear the cache for every run, so that the linter outputs the same results as the GH Actions workflow
-	@if go tool golangci-lint cache clean && go tool golangci-lint run --timeout 5m ./...; then \
-		echo "SUCCESS"; \
-	else \
-		echo "FAILED"; \
-		exit 1; \
-	fi
-
-starttestcontainer: --checkpfcontainerenvvars --checkdocker --dockerrunpf --waitforpfhealthy
-
---checkpfcontainerenvvars:
-	@echo -n "Checking for required environment variables to run PingFederate container..."
-	@test -n "$$TEST_PING_IDENTITY_DEVOPS_USER" || { echo " FAILED"; echo "TEST_PING_IDENTITY_DEVOPS_USER environment variable is not set.\n\nNot Registered? Register for the DevOps Program at https://devops.pingidentity.com/how-to/devopsRegistration/."; exit 1; }
-	@test -n "$$TEST_PING_IDENTITY_DEVOPS_KEY" || { echo " FAILED"; echo "TEST_PING_IDENTITY_DEVOPS_KEY environment variable is not set.\n\nNot Registered? Register for the DevOps Program at https://devops.pingidentity.com/how-to/devopsRegistration/."; exit 1; }
-	@test "YES" = "$$TEST_PING_IDENTITY_ACCEPT_EULA" || { echo " FAILED"; echo "You must accept the EULA to use the PingFederate container. Set TEST_PING_IDENTITY_ACCEPT_EULA=YES to continue."; exit 1; }
-	@echo " SUCCESS"
-
---checkdocker:
-	@echo -n "Checking if Docker is running..."
-	@docker info > /dev/null 2>&1 || { echo " FAILED"; echo "Docker is not running. Please start Docker and try again."; exit 1; }
-	@echo " SUCCESS"
-
---dockerrunpf:
-	@echo -n "Starting the PingFederate container..."
-	@docker run --name pingcli_test_pingfederate_container \
-		-d -p 9031:9031 \
-		-p 9999:9999 \
-		--env PING_IDENTITY_DEVOPS_USER="$${TEST_PING_IDENTITY_DEVOPS_USER}" \
-		--env PING_IDENTITY_DEVOPS_KEY="$${TEST_PING_IDENTITY_DEVOPS_KEY}" \
-		--env PING_IDENTITY_ACCEPT_EULA="$${TEST_PING_IDENTITY_ACCEPT_EULA}" \
+_run_pf_container:
+	@echo "  > Docker: Starting the PingFederate container..."
+	$(DOCKER) run --name $(CONTAINER_NAME) \
+		-d -p 9031:9031 -p 9999:9999 \
+		--env PING_IDENTITY_DEVOPS_USER="$(TEST_PING_IDENTITY_DEVOPS_USER)" \
+		--env PING_IDENTITY_DEVOPS_KEY="$(TEST_PING_IDENTITY_DEVOPS_KEY)" \
+		--env PING_IDENTITY_ACCEPT_EULA="$(TEST_PING_IDENTITY_ACCEPT_EULA)" \
 		--env CREATE_INITIAL_ADMIN_USER="true" \
 		-v $$(pwd)/internal/testing/pingfederate_container_files/deploy:/opt/in/instance/server/default/deploy \
-		pingidentity/pingfederate:latest > /dev/null 2>&1 || { echo " FAILED"; echo "Failed to start the PingFederate container. Please check your Docker setup."; exit 1; }
-	@echo " SUCCESS"
+		pingidentity/pingfederate:latest
+	echo "✅ PingFederate container started."
 
---waitforpfhealthy:
-	@echo -n "Waiting for the PingFederate container to become healthy..."
-	@timeout=240; \
-	while test $$timeout -gt 0; do \
-		status=$$(docker inspect --format='{{json .State.Health.Status}}' pingcli_test_pingfederate_container 2>/dev/null || echo ""); \
-		if test "$$status" = '"healthy"'; then \
-			echo " SUCCESS"; \
-			exit 0; \
-		fi; \
-		sleep 1; \
-		timeout=$$((timeout - 1)); \
-	done; \
-	echo " FAILED"; \
-	echo "PingFederate container did not become healthy within the timeout period."; \
-	echo "Current status: $$status"; \
-	docker logs pingcli_test_pingfederate_container || echo "No logs available."; \
+_wait_for_pf:
+	@echo "  > Docker: Waiting for container to become healthy (up to 4 minutes)..."
+	timeout=240
+	while test $$timeout -gt 0; do
+		status=$$(docker inspect --format='{{json .State.Health.Status}}' $(CONTAINER_NAME) 2>/dev/null || echo "")
+		if test "$$status" = '"healthy"'; then
+			echo "✅ Docker: Container is healthy."
+			exit 0
+		fi
+		sleep 1
+		timeout=$$((timeout - 1))
+	done
+	echo "Error: Container did not become healthy within the timeout period."
+	$(DOCKER) logs $(CONTAINER_NAME) || echo "No logs available."
 	exit 1
 
-removetestcontainer: --checkdocker
-	@echo -n "Stopping and removing the PingFederate container..."
-	@if docker rm -f pingcli_test_pingfederate_container > /dev/null 2>&1; then \
-		echo " SUCCESS"; \
-	else \
-		echo " FAILED"; \
-		exit 1; \
-	fi
-
-spincontainer: removetestcontainer starttestcontainer
-
-openlocalwebapi:
-	@echo -n "Opening the PingFederate Admin API documentation in the default web browser..."
-	@if open "https://localhost:9999/pf-admin-api/api-docs/#/"; then \
-		echo " SUCCESS"; \
-	else \
-		echo " FAILED"; \
-		exit 1; \
-	fi
-
-openapp:
-	@echo -n "Opening the PingFederate Admin Console in the default web browser..."
-	@if open "https://localhost:9999/pingfederate/app"; then \
-		echo " SUCCESS"; \
-	else \
-		echo " FAILED"; \
-		exit 1; \
-	fi
-
-protogen:
-	@echo -n "Running 'protoc' to generate Go code from proto files..."
-	@if protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto; then \
-		echo " SUCCESS"; \
-	else \
-		echo " FAILED"; \
-		exit 1; \
-	fi
+_stop_pf_container:
+	@echo "  > Docker: Stopping and removing previous container..."
+	# Using '|| true' correctly prevents an error if the container doesn't exist.
+	$(DOCKER) rm -f $(CONTAINER_NAME) 2>/dev/null || true
+	echo "✅ Previous container removed."

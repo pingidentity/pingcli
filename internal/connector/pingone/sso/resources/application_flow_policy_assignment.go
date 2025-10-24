@@ -10,12 +10,14 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingone"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingOneApplicationFlowPolicyAssignmentResource{}
+	_                                                connector.ExportableResource = &PingOneApplicationFlowPolicyAssignmentResource{}
+	applicationFlowPolicyAssignmentExportErrorPrefix                              = "pingone_application_flow_policy_assignment resource export error"
 )
 
 type PingOneApplicationFlowPolicyAssignmentResource struct {
@@ -166,5 +168,5 @@ func (r *PingOneApplicationFlowPolicyAssignmentResource) getFlowPolicyName(flowP
 		}
 	}
 
-	return "", false, fmt.Errorf("unable to get Flow Policy Name for Flow Policy ID: %s", flowPolicyId)
+	return "", false, &errs.PingCLIError{Prefix: applicationFlowPolicyAssignmentExportErrorPrefix, Err: fmt.Errorf("%w: %q", ErrFlowPolicyNameNotFound, flowPolicyId)}
 }

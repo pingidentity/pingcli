@@ -3,63 +3,52 @@
 package plugin_internal
 
 import (
-	"os"
 	"testing"
 
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test RunInternalPluginRemove function
 func Test_RunInternalPluginRemove(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	// Create a temporary $PATH for a test plugin
-	pathDir := t.TempDir()
-	t.Setenv("PATH", pathDir)
+	goldenPluginFileName := createGoldenPlugin(t)
 
-	testPlugin, err := os.CreateTemp(pathDir, "test-plugin-*.sh")
-	if err != nil {
-		t.Fatalf("Failed to create temporary plugin file: %v", err)
+	testCases := []struct {
+		name              string
+		pluginName        string
+		createPluginFirst bool
+		expectedError     error
+	}{
+		{
+			name:              "Happy path - List plugins",
+			pluginName:        goldenPluginFileName,
+			createPluginFirst: true,
+		},
+		{
+			name:       "Test non-existent plugin",
+			pluginName: "non-existent-plugin",
+		},
 	}
 
-	defer func() {
-		err = os.Remove(testPlugin.Name())
-		if err != nil {
-			t.Fatalf("Failed to remove temporary plugin file: %v", err)
-		}
-	}()
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-	_, err = testPlugin.WriteString("#!/usr/bin/env sh\necho \"Hello, world!\"\nexit 0\n")
-	if err != nil {
-		t.Fatalf("Failed to write to temporary plugin file: %v", err)
+			if tc.createPluginFirst {
+				err := RunInternalPluginAdd(tc.pluginName)
+				require.NoError(t, err)
+			}
+
+			err := RunInternalPluginRemove(tc.pluginName)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				assert.ErrorIs(t, err, tc.expectedError)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
 	}
-
-	err = testPlugin.Chmod(0755)
-	if err != nil {
-		t.Fatalf("Failed to set permissions on temporary plugin file: %v", err)
-	}
-
-	err = testPlugin.Close()
-	if err != nil {
-		t.Fatalf("Failed to close temporary plugin file: %v", err)
-	}
-
-	err = RunInternalPluginAdd(testPlugin.Name())
-	if err != nil {
-		t.Errorf("RunInternalPluginAdd returned error: %v", err)
-	}
-
-	err = RunInternalPluginRemove(testPlugin.Name())
-	if err != nil {
-		t.Errorf("RunInternalPluginRemove returned error: %v", err)
-	}
-}
-
-// Test RunInternalPluginRemove function succeeds with non-existent plugin
-func Test_RunInternalPluginRemove_NonExistentPlugin(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := RunInternalPluginRemove("non-existent-plugin")
-	testutils.CheckExpectedError(t, err, nil)
 }

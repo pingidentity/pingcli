@@ -7,11 +7,16 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
 )
 
 const (
 	ENUM_REQUEST_SERVICE_PINGONE string = "pingone"
+)
+
+var (
+	requestServiceErrorPrefix = "custom type request service error"
 )
 
 type RequestService string
@@ -22,7 +27,7 @@ var _ pflag.Value = (*RequestService)(nil)
 // Implement pflag.Value interface for custom type in cobra MultiService parameter
 func (rs *RequestService) Set(service string) error {
 	if rs == nil {
-		return fmt.Errorf("failed to set RequestService value: %s. RequestService is nil", service)
+		return &errs.PingCLIError{Prefix: requestServiceErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	switch {
@@ -31,18 +36,22 @@ func (rs *RequestService) Set(service string) error {
 	case strings.EqualFold(service, ""):
 		*rs = RequestService("")
 	default:
-		return fmt.Errorf("unrecognized Request Service: '%s'. Must be one of: %s", service, strings.Join(RequestServiceValidValues(), ", "))
+		return &errs.PingCLIError{Prefix: requestServiceErrorPrefix, Err: fmt.Errorf("%w: '%s'. Must be one of: %s", ErrUnrecognizedService, service, strings.Join(RequestServiceValidValues(), ", "))}
 	}
 
 	return nil
 }
 
-func (rs RequestService) Type() string {
+func (rs *RequestService) Type() string {
 	return "string"
 }
 
-func (rs RequestService) String() string {
-	return string(rs)
+func (rs *RequestService) String() string {
+	if rs == nil {
+		return ""
+	}
+
+	return string(*rs)
 }
 
 func RequestServiceValidValues() []string {

@@ -6,48 +6,208 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
+	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/pingidentity/pingcli/internal/utils"
+	"github.com/stretchr/testify/require"
 )
 
-// Test StringSlice Set function
 func Test_StringSlice_Set(t *testing.T) {
-	ss := new(customtypes.StringSlice)
+	testutils_koanf.InitKoanfs(t)
 
-	val := "value1,value2"
-	err := ss.Set(val)
-	if err != nil {
-		t.Errorf("Set returned error: %v", err)
+	testCases := []struct {
+		name          string
+		cType         *customtypes.StringSlice
+		value         string
+		expectedError error
+	}{
+		{
+			name:  "Happy path",
+			cType: new(customtypes.StringSlice),
+			value: "value1,value2",
+		},
+		{
+			name:  "Happy path - empty",
+			cType: new(customtypes.StringSlice),
+			value: "",
+		},
+		{
+			name:          "Nil custom type",
+			cType:         nil,
+			value:         "value1,value2",
+			expectedError: customtypes.ErrCustomTypeNil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			err := tc.cType.Set(tc.value)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+		})
 	}
 }
 
-// Test Set function fails with nil
-func Test_StringSlice_Set_Nil(t *testing.T) {
-	var ss *customtypes.StringSlice
+func Test_StringSlice_Type(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	val := "value1,value2"
-	expectedErrorPattern := `^failed to set StringSlice value: .* StringSlice is nil$`
-	err := ss.Set(val)
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	testCases := []struct {
+		name         string
+		cType        *customtypes.StringSlice
+		expectedType string
+	}{
+		{
+			name:         "Happy path",
+			cType:        utils.Pointer(customtypes.StringSlice([]string{"value1", "value2"})),
+			expectedType: "[]string",
+		},
+		{
+			name:         "Nil custom type",
+			cType:        nil,
+			expectedType: "[]string",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualType := tc.cType.Type()
+
+			require.Equal(t, tc.expectedType, actualType)
+		})
+	}
 }
 
-// Test String function
 func Test_StringSlice_String(t *testing.T) {
-	ss := customtypes.StringSlice([]string{"value1", "value2"})
+	testutils_koanf.InitKoanfs(t)
 
-	expected := "value1,value2"
-	actual := ss.String()
-	if actual != expected {
-		t.Errorf("String returned: %s, expected: %s", actual, expected)
+	testCases := []struct {
+		name        string
+		cType       *customtypes.StringSlice
+		expectedStr string
+	}{
+		{
+			name:        "Happy path",
+			cType:       utils.Pointer(customtypes.StringSlice([]string{"value1", "value2"})),
+			expectedStr: "value1,value2",
+		},
+		{
+			name:        "Happy path - empty",
+			cType:       utils.Pointer(customtypes.StringSlice([]string{})),
+			expectedStr: "",
+		},
+		{
+			name:        "Nil custom type",
+			cType:       nil,
+			expectedStr: "",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualStr := tc.cType.String()
+
+			require.Equal(t, tc.expectedStr, actualStr)
+		})
 	}
 }
 
-// Test StringSlice String function with empty slice
-func Test_StringSlice_String_Empty(t *testing.T) {
-	ss := customtypes.StringSlice([]string{})
+func Test_StringSlice_StringSlice(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
 
-	expected := ""
-	actual := ss.String()
-	if actual != expected {
-		t.Errorf("String returned: %s, expected: %s", actual, expected)
+	testCases := []struct {
+		name             string
+		cType            *customtypes.StringSlice
+		expectedStrSlice []string
+	}{
+		{
+			name:             "Happy path",
+			cType:            utils.Pointer(customtypes.StringSlice([]string{"value1", "value2"})),
+			expectedStrSlice: []string{"value1", "value2"},
+		},
+		{
+			name:             "Happy path - empty",
+			cType:            utils.Pointer(customtypes.StringSlice([]string{})),
+			expectedStrSlice: []string{},
+		},
+		{
+			name:             "Nil custom type",
+			cType:            nil,
+			expectedStrSlice: []string{},
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualStrSlice := tc.cType.StringSlice()
+
+			require.Equal(t, tc.expectedStrSlice, actualStrSlice)
+		})
+	}
+}
+
+func Test_StringSlice_Remove(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	testCases := []struct {
+		name          string
+		cType         *customtypes.StringSlice
+		value         string
+		expectedBool  bool
+		expectedError error
+	}{
+		{
+			name:         "Happy path",
+			cType:        utils.Pointer(customtypes.StringSlice([]string{"value1", "value2"})),
+			value:        "value1",
+			expectedBool: true,
+		},
+		{
+			name:         "Happy path - not found",
+			cType:        utils.Pointer(customtypes.StringSlice([]string{"value1", "value2"})),
+			value:        "value3",
+			expectedBool: false,
+		},
+		{
+			name:         "Happy path - empty",
+			cType:        utils.Pointer(customtypes.StringSlice([]string{"value1", "value2"})),
+			value:        "",
+			expectedBool: false,
+		},
+		{
+			name:          "Nil custom type",
+			cType:         nil,
+			value:         "value1",
+			expectedBool:  false,
+			expectedError: customtypes.ErrCustomTypeNil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
+
+			actualBool, err := tc.cType.Remove(tc.value)
+
+			if tc.expectedError != nil {
+				require.Error(t, err)
+				require.ErrorIs(t, err, tc.expectedError)
+			} else {
+				require.NoError(t, err)
+			}
+
+			require.Equal(t, tc.expectedBool, actualBool)
+		})
 	}
 }

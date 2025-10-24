@@ -3,7 +3,6 @@
 package configuration
 
 import (
-	"fmt"
 	"slices"
 	"strings"
 
@@ -17,6 +16,11 @@ import (
 	configuration_request "github.com/pingidentity/pingcli/internal/configuration/request"
 	configuration_root "github.com/pingidentity/pingcli/internal/configuration/root"
 	configuration_services "github.com/pingidentity/pingcli/internal/configuration/services"
+	"github.com/pingidentity/pingcli/internal/errs"
+)
+
+var (
+	configurationErrorPrefix = "configuration options error"
 )
 
 func KoanfKeys() (keys []string) {
@@ -39,7 +43,7 @@ func ValidateKoanfKey(koanfKey string) error {
 		}
 	}
 
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", koanfKey)
+	return &errs.PingCLIError{Prefix: configurationErrorPrefix, Err: ErrInvalidConfigurationKey}
 }
 
 // Return a list of all koanf keys from Options
@@ -73,17 +77,21 @@ func ValidateParentKoanfKey(koanfKey string) error {
 		}
 	}
 
-	return fmt.Errorf("key '%s' is not recognized as a valid configuration key.\nUse 'pingcli config list-keys' to view all available keys", koanfKey)
+	return &errs.PingCLIError{Prefix: configurationErrorPrefix, Err: ErrInvalidConfigurationKey}
 }
 
 func OptionFromKoanfKey(koanfKey string) (opt options.Option, err error) {
+	if koanfKey == "" {
+		return opt, &errs.PingCLIError{Prefix: configurationErrorPrefix, Err: ErrEmptyKeyForOptionSearch}
+	}
+
 	for _, opt := range options.Options() {
 		if strings.EqualFold(opt.KoanfKey, koanfKey) {
 			return opt, nil
 		}
 	}
 
-	return opt, fmt.Errorf("failed to get option: no option found for koanf key: %s", koanfKey)
+	return opt, &errs.PingCLIError{Prefix: configurationErrorPrefix, Err: ErrNoOptionForKey}
 }
 
 func InitAllOptions() {

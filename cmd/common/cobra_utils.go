@@ -5,13 +5,18 @@ package common
 import (
 	"fmt"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/cobra"
+)
+
+var (
+	argsErrorPrefix = "failed to execute command"
 )
 
 func ExactArgs(numArgs int) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
 		if len(args) != numArgs {
-			return fmt.Errorf("failed to execute '%s': command accepts %d arg(s), received %d", cmd.CommandPath(), numArgs, len(args))
+			return &errs.PingCLIError{Prefix: argsErrorPrefix, Err: fmt.Errorf("%w: command accepts %d arg(s), received %d", ErrExactArgs, numArgs, len(args))}
 		}
 
 		return nil
@@ -21,7 +26,7 @@ func ExactArgs(numArgs int) cobra.PositionalArgs {
 func RangeArgs(minArgs, maxArgs int) cobra.PositionalArgs {
 	return func(cmd *cobra.Command, args []string) error {
 		if len(args) < minArgs || len(args) > maxArgs {
-			return fmt.Errorf("failed to execute '%s': command accepts %d to %d arg(s), received %d", cmd.CommandPath(), minArgs, maxArgs, len(args))
+			return &errs.PingCLIError{Prefix: argsErrorPrefix, Err: fmt.Errorf("%w: command accepts %d to %d arg(s), received %d", ErrRangeArgs, minArgs, maxArgs, len(args))}
 		}
 
 		return nil

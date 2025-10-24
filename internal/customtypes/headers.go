@@ -9,7 +9,13 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
+)
+
+var (
+	headerErrorPrefix = "custom type header error"
+	headerRegex       = regexp.MustCompile(`(^[^\s:]+):(.*)`)
 )
 
 type Header struct {
@@ -22,66 +28,72 @@ type HeaderSlice []Header
 // Verify that the custom type satisfies the pflag.Value interface
 var _ pflag.Value = (*HeaderSlice)(nil)
 
-func NewHeader(header string) (Header, error) {
-	regexPattern := `(^[^\s]+):[\t ]{0,1}(.*)$`
-	headerNameRegex := regexp.MustCompile(regexPattern)
-	matches := headerNameRegex.FindStringSubmatch(header)
+func newHeader(header string) (Header, error) {
+	matches := headerRegex.FindStringSubmatch(header)
 	if len(matches) != 3 {
-		return Header{}, fmt.Errorf("failed to set Headers: Invalid header: %s. Headers must be in the proper format. Expected regex pattern: %s", header, regexPattern)
+		return Header{}, fmt.Errorf("%w: %s", ErrInvalidHeaderFormat, header)
 	}
 
-	if matches[1] == "Authorization" {
-		return Header{}, fmt.Errorf("failed to set Headers: Invalid header: %s. Authorization header is not allowed", matches[1])
+	key := matches[1]
+	if strings.EqualFold(key, "Authorization") {
+		return Header{}, fmt.Errorf("%w: %s", ErrDisallowedAuthHeader, key)
 	}
 
 	return Header{
-		Key:   matches[1],
-		Value: matches[2],
+		Key:   key,
+		Value: strings.TrimSpace(matches[2]), // Trim space as tabs and spaces are allowed after the colon in Header format
 	}, nil
 }
 
 func (h *HeaderSlice) Set(val string) error {
 	if h == nil {
-		return fmt.Errorf("failed to set Headers value: %s. Headers is nil", val)
+		return &errs.PingCLIError{Prefix: headerErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
 	if val == "" || val == "[]" {
 		return nil
-	} else {
-		valH := strings.SplitSeq(val, ",")
-		for header := range valH {
-			headerVal, err := NewHeader(header)
-			if err != nil {
-				return err
-			}
-			*h = append(*h, headerVal)
+	}
+
+	for header := range strings.SplitSeq(val, ",") {
+		headerVal, err := newHeader(header)
+		if err != nil {
+			return &errs.PingCLIError{Prefix: headerErrorPrefix, Err: err}
 		}
+		*h = append(*h, headerVal)
 	}
 
 	return nil
 }
 
-func (h HeaderSlice) SetHttpRequestHeaders(request *http.Request) {
-	for _, header := range h {
+func (h *HeaderSlice) SetHttpRequestHeaders(request *http.Request) {
+	if h == nil {
+		return
+	}
+
+	for _, header := range *h {
 		request.Header.Add(header.Key, header.Value)
 	}
 }
 
-func (h HeaderSlice) Type() string {
+func (h *HeaderSlice) Type() string {
 	return "[]string"
 }
 
-func (h HeaderSlice) String() string {
+func (h *HeaderSlice) String() string {
+	if h == nil {
+		return ""
+	}
+
 	return strings.Join(h.StringSlice(), ",")
 }
 
-func (h HeaderSlice) StringSlice() []string {
+func (h *HeaderSlice) StringSlice() []string {
 	if h == nil {
 		return []string{}
 	}
 
 	headers := []string{}
-	for _, header := range h {
+	for _, header := range *h {
 		headers = append(headers, fmt.Sprintf("%s:%s", header.Key, header.Value))
 	}
 

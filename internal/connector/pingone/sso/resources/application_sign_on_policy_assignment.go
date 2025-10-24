@@ -10,12 +10,14 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingone"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingOneApplicationSignOnPolicyAssignmentResource{}
+	_                                                  connector.ExportableResource = &PingOneApplicationSignOnPolicyAssignmentResource{}
+	applicationSignOnPolicyAssignmentExportErrorPrefix                              = "pingone_application_sign_on_policy_assignment resource export error"
 )
 
 type PingOneApplicationSignOnPolicyAssignmentResource struct {
@@ -165,5 +167,5 @@ func (r *PingOneApplicationSignOnPolicyAssignmentResource) getSignOnPolicyName(s
 		}
 	}
 
-	return "", false, fmt.Errorf("unable to get sign-on policy name for sign-on policy ID: %s", signOnPolicyId)
+	return "", false, &errs.PingCLIError{Prefix: applicationSignOnPolicyAssignmentExportErrorPrefix, Err: fmt.Errorf("%w: %q", ErrSignOnPolicyNameNotFound, signOnPolicyId)}
 }

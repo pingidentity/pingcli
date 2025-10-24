@@ -5,6 +5,7 @@ package plugin
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	plugin_internal "github.com/pingidentity/pingcli/internal/commands/plugin"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/spf13/cobra"
 )
@@ -33,7 +34,7 @@ func pluginAddRunE(cmd *cobra.Command, args []string) error {
 	l.Debug().Msgf("Plugin Add Subcommand Called.")
 
 	if err := plugin_internal.RunInternalPluginAdd(args[0]); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: "", Err: err}
 	}
 
 	return nil

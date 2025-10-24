@@ -7,6 +7,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/spf13/pflag"
 )
 
@@ -19,78 +20,87 @@ const (
 	ENUM_EXPORT_SERVICE_PINGFEDERATE      string = "pingfederate"
 )
 
+var (
+	exportServicesErrorPrefix = "custom type export services error"
+)
+
 type ExportServices []string
 
 // Verify that the custom type satisfies the pflag.Value interface
 var _ pflag.Value = (*ExportServices)(nil)
 
 // Implement pflag.Value interface for custom type in cobra MultiService parameter
-func (es ExportServices) GetServices() []string {
-	return []string(es)
-}
-
-func (es *ExportServices) Set(services string) error {
+func (es *ExportServices) GetServices() []string {
 	if es == nil {
-		return fmt.Errorf("failed to set ExportServices value: %s. ExportServices is nil", services)
+		return []string{}
 	}
 
-	if services == "" || services == "[]" {
+	return []string(*es)
+}
+
+func (es *ExportServices) Set(servicesStr string) error {
+	if es == nil {
+		return &errs.PingCLIError{Prefix: exportServicesErrorPrefix, Err: ErrCustomTypeNil}
+	}
+
+	if servicesStr == "" || servicesStr == "[]" {
 		return nil
 	}
 
-	validServices := ExportServicesValidValues()
-	serviceList := strings.Split(services, ",")
-	returnServiceList := *es
+	// Create a map of valid service values to check against user-provided services
+	validServiceMap := ExportServicesValidValuesMap()
 
-	for _, service := range serviceList {
-		if !slices.ContainsFunc(validServices, func(validService string) bool {
-			if strings.EqualFold(validService, service) {
-				if !slices.Contains(returnServiceList, validService) {
-					returnServiceList = append(returnServiceList, validService)
-				}
-
-				return true
-			}
-
-			return false
-		}) {
-			return fmt.Errorf("failed to set ExportServices: Invalid service: %s. Allowed services: %s", service, strings.Join(validServices, ", "))
-		}
+	// Create a map of existing services set in the ExportServices object
+	existingServices := make(map[string]struct{}, len(*es))
+	for _, s := range *es {
+		existingServices[s] = struct{}{}
 	}
 
-	slices.Sort(returnServiceList)
+	// Loop through user-provided services
+	// check for valid value in map
+	// check the service does not already exist
+	for service := range strings.SplitSeq(servicesStr, ",") {
+		service = strings.ToLower(strings.TrimSpace(service))
 
-	*es = returnServiceList
+		enumService, ok := validServiceMap[service]
+		if !ok {
+			return &errs.PingCLIError{Prefix: exportServicesErrorPrefix, Err: fmt.Errorf("%w '%s': must be one of %s", ErrUnrecognizedExportService, service, strings.Join(ExportServicesValidValues(), ", "))}
+		}
+
+		if _, ok := existingServices[enumService]; ok {
+			continue
+		}
+
+		*es = append(*es, enumService)
+	}
+
+	slices.Sort(*es)
 
 	return nil
 }
 
 func (es *ExportServices) SetServicesByServiceGroup(serviceGroup *ExportServiceGroup) error {
 	if es == nil {
-		return fmt.Errorf("failed to set ExportServices value: %s. ExportServices is nil", serviceGroup)
+		return &errs.PingCLIError{Prefix: exportServicesErrorPrefix, Err: ErrCustomTypeNil}
 	}
 
-	if serviceGroup.String() == "" {
+	if serviceGroup == nil || serviceGroup.String() == "" {
 		return nil
 	}
 
-	switch {
-	case strings.EqualFold(ENUM_EXPORT_SERVICE_GROUP_PINGONE, serviceGroup.String()):
-		return es.Set(strings.Join(ExportServicesPingOneValidValues(), ","))
-	default:
-		return fmt.Errorf("failed to SetServicesByServiceGroup: Invalid service group: %s. Allowed services: %s", serviceGroup.String(), strings.Join(ExportServiceGroupValidValues(), ", "))
-	}
+	return es.Set(strings.Join(serviceGroup.GetServicesInGroup(), ","))
 }
 
-func (es ExportServices) ContainsPingOneService() bool {
-	if es == nil {
+func (es *ExportServices) ContainsPingOneService() bool {
+	if es == nil || len(*es) == 0 {
 		return false
 	}
 
-	pingoneServices := ExportServicesPingOneValidValues()
+	esg := ExportServiceGroup(ENUM_EXPORT_SERVICE_GROUP_PINGONE)
+	servicesInGroup := esg.GetServicesInGroup()
 
-	for _, service := range es {
-		if slices.ContainsFunc(pingoneServices, func(s string) bool {
+	for _, service := range *es {
+		if slices.ContainsFunc(servicesInGroup, func(s string) bool {
 			return strings.EqualFold(s, service)
 		}) {
 			return true
@@ -100,20 +110,50 @@ func (es ExportServices) ContainsPingOneService() bool {
 	return false
 }
 
-func (es ExportServices) ContainsPingFederateService() bool {
-	if es == nil {
+func (es *ExportServices) ContainsPingFederateService() bool {
+	if es == nil || len(*es) == 0 {
 		return false
 	}
 
-	return slices.Contains(es, ENUM_EXPORT_SERVICE_PINGFEDERATE)
+	return slices.ContainsFunc(*es, func(s string) bool {
+		return strings.EqualFold(s, ENUM_EXPORT_SERVICE_PINGFEDERATE)
+	})
 }
 
-func (es ExportServices) Type() string {
+func (es *ExportServices) Type() string {
 	return "[]string"
 }
 
-func (es ExportServices) String() string {
-	return strings.Join(es, ",")
+func (es *ExportServices) String() string {
+	if es == nil {
+		return ""
+	}
+
+	slices.Sort(*es)
+
+	return strings.Join(*es, ",")
+}
+
+func (es *ExportServices) Merge(es2 *ExportServices) error {
+	if es == nil {
+		return &errs.PingCLIError{Prefix: exportServicesErrorPrefix, Err: ErrCustomTypeNil}
+	}
+
+	if es2 == nil {
+		return nil
+	}
+
+	mergedServices := []string{}
+
+	for _, service := range append(es.GetServices(), es2.GetServices()...) {
+		if !slices.Contains(mergedServices, service) {
+			mergedServices = append(mergedServices, service)
+		}
+	}
+
+	slices.Sort(mergedServices)
+
+	return es.Set(strings.Join(mergedServices, ","))
 }
 
 func ExportServicesValidValues() []string {
@@ -131,30 +171,13 @@ func ExportServicesValidValues() []string {
 	return allServices
 }
 
-func ExportServicesPingOneValidValues() []string {
-	pingOneServices := []string{
-		ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
-		ENUM_EXPORT_SERVICE_PINGONE_AUTHORIZE,
-		ENUM_EXPORT_SERVICE_PINGONE_SSO,
-		ENUM_EXPORT_SERVICE_PINGONE_MFA,
-		ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
+// ExportServicesValidValuesMap returns a map of valid export service values with lowercase keys
+func ExportServicesValidValuesMap() map[string]string {
+	validServices := ExportServicesValidValues()
+	validServiceMap := make(map[string]string, len(validServices))
+	for _, s := range validServices {
+		validServiceMap[strings.ToLower(s)] = s
 	}
 
-	slices.Sort(pingOneServices)
-
-	return pingOneServices
-}
-
-func (es *ExportServices) Merge(es2 ExportServices) error {
-	mergedServices := []string{}
-
-	for _, service := range append(es.GetServices(), es2.GetServices()...) {
-		if !slices.Contains(mergedServices, service) {
-			mergedServices = append(mergedServices, service)
-		}
-	}
-
-	slices.Sort(mergedServices)
-
-	return es.Set(strings.Join(mergedServices, ","))
+	return validServiceMap
 }

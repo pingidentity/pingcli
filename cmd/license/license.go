@@ -8,6 +8,7 @@ import (
 	"github.com/pingidentity/pingcli/cmd/common"
 	license_internal "github.com/pingidentity/pingcli/internal/commands/license"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/spf13/cobra"
@@ -15,10 +16,10 @@ import (
 
 const (
 	licenseCommandExamples = `  Request a new evaluation license for PingFederate 12.0.
-    pingcli license request --product pingfederate --version 12.0
-	
-	  Request a new evaluation license for PingAccess 6.3.
-	pingcli license request --product pingaccess --version 6.3`
+    pingcli license --product pingfederate --version 12.0
+
+  Request a new evaluation license for PingAccess 6.3.
+    pingcli license --product pingaccess --version 6.3`
 )
 
 func NewLicenseCommand() *cobra.Command {
@@ -56,7 +57,7 @@ func licenseRunE(cmd *cobra.Command, args []string) error {
 	l.Debug().Msgf("License Subcommand Called.")
 
 	if err := license_internal.RunInternalLicense(); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: "", Err: err}
 	}
 
 	return nil

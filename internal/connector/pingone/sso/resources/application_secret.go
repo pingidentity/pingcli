@@ -12,13 +12,15 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/connector/pingone"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 )
 
 // Verify that the resource satisfies the exportable resource interface
 var (
-	_ connector.ExportableResource = &PingOneApplicationSecretResource{}
+	_                                  connector.ExportableResource = &PingOneApplicationSecretResource{}
+	applicationSecretExportErrorPrefix                              = "pingone_application_secret resource export error" // #nosec G101 -- This is not a credential
 )
 
 type PingOneApplicationSecretResource struct {
@@ -132,7 +134,7 @@ func (r *PingOneApplicationSecretResource) checkApplicationSecretData(applicatio
 		if response.StatusCode == http.StatusForbidden {
 			return false, nil
 		} else {
-			return false, fmt.Errorf("error: Expected 403 Forbidden response - worker apps cannot read their own secret\n%s Response Code: %s\nResponse Body: %s", "ReadApplicationSecret", response.Status, response.Body)
+			return false, &errs.PingCLIError{Prefix: applicationSecretExportErrorPrefix, Err: fmt.Errorf("%w: ReadApplicationSecret Response Code: %s Response Body: %v", ErrUnexpectedResponse, response.Status, response.Body)}
 		}
 	}
 

@@ -3,85 +3,107 @@
 package license_test
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/pingidentity/pingcli/cmd/common"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
-	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// Test License Command Executes without issue (with all required flags)
-func TestLicenseCmd_Execute(t *testing.T) {
+func Test_LicenseCommand(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	err := testutils_cobra.ExecutePingcli(t, "license",
-		"--"+options.LicenseProductOption.CobraParamName, customtypes.ENUM_LICENSE_PRODUCT_PING_FEDERATE,
-		"--"+options.LicenseVersionOption.CobraParamName, "12.0")
-	testutils.CheckExpectedError(t, err, nil)
-}
+	testCases := []struct {
+		name                string
+		args                []string
+		expectErr           bool
+		expectedErrIs       error
+		expectedErrContains string
+	}{
+		{
+			name: "Happy Path",
+			args: []string{
+				"--" + options.LicenseProductOption.CobraParamName, customtypes.ENUM_LICENSE_PRODUCT_PING_FEDERATE,
+				"--" + options.LicenseVersionOption.CobraParamName, "12.0",
+			},
+			expectErr: false,
+		},
+		{
+			name: "Happy Path - shorthand flags",
+			args: []string{
+				"-" + options.LicenseProductOption.Flag.Shorthand, customtypes.ENUM_LICENSE_PRODUCT_PING_FEDERATE,
+				"-" + options.LicenseVersionOption.Flag.Shorthand, "12.0",
+			},
+			expectErr: false,
+		},
+		{
+			name: "Happy Path - with profile flag",
+			args: []string{
+				"--" + options.LicenseProductOption.CobraParamName, customtypes.ENUM_LICENSE_PRODUCT_PING_FEDERATE,
+				"--" + options.LicenseVersionOption.CobraParamName, "12.0",
+				"--" + options.RootProfileOption.CobraParamName, "default",
+			},
+			expectErr: false,
+		},
+		{
+			name:      "Happy Path - help",
+			args:      []string{"--help"},
+			expectErr: false,
+		},
+		{
+			name:          "Too many arguments",
+			args:          []string{"extra-arg"},
+			expectErr:     true,
+			expectedErrIs: common.ErrExactArgs,
+		},
+		{
+			name:                "Invalid flag",
+			args:                []string{"--invalid-flag"},
+			expectErr:           true,
+			expectedErrContains: "unknown flag",
+		},
+		{
+			name: "Missing required product flag",
+			args: []string{
+				"--" + options.LicenseVersionOption.CobraParamName, "12.0",
+			},
+			expectErr:           true,
+			expectedErrContains: fmt.Sprintf(`required flag(s) "%s" not set`, options.LicenseProductOption.CobraParamName),
+		},
+		{
+			name: "Missing required version flag",
+			args: []string{
+				"--" + options.LicenseProductOption.CobraParamName, customtypes.ENUM_LICENSE_PRODUCT_PING_FEDERATE,
+			},
+			expectErr:           true,
+			expectedErrContains: fmt.Sprintf(`required flag(s) "%s" not set`, options.LicenseVersionOption.CobraParamName),
+		},
+	}
 
-// Test License Command fails when provided too many arguments
-func TestLicenseCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli license': command accepts 0 arg\(s\), received 1$`
-	err := testutils_cobra.ExecutePingcli(t, "license", "extra-arg")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			testutils_koanf.InitKoanfs(t)
 
-// Test License Command help flag
-func TestLicenseCmd_HelpFlag(t *testing.T) {
-	err := testutils_cobra.ExecutePingcli(t, "license", "--help")
-	testutils.CheckExpectedError(t, err, nil)
+			err := testutils_cobra.ExecutePingcli(t, append([]string{"license"}, tc.args...)...)
 
-	err = testutils_cobra.ExecutePingcli(t, "license", "-h")
-	testutils.CheckExpectedError(t, err, nil)
-}
+			if !tc.expectErr {
+				require.NoError(t, err)
 
-// Test License Command fails with invalid flag
-func TestLicenseCmd_InvalidFlag(t *testing.T) {
-	expectedErrorPattern := `^unknown flag: --invalid$`
-	err := testutils_cobra.ExecutePingcli(t, "license", "--invalid")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
+				return
+			}
 
-// Test License Command fails when required product flag is missing
-func TestLicenseCmd_MissingProductFlag(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^required flag\(s\) "product" not set$`
-	err := testutils_cobra.ExecutePingcli(t, "license",
-		"--"+options.LicenseVersionOption.CobraParamName, "12.0")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test License Command fails when required version flag is missing
-func TestLicenseCmd_MissingVersionFlag(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	expectedErrorPattern := `^required flag\(s\) "version" not set$`
-	err := testutils_cobra.ExecutePingcli(t, "license",
-		"--"+options.LicenseProductOption.CobraParamName, "pingfederate")
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
-// Test License Command with shorthand flags
-func TestLicenseCmd_ShorthandFlags(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := testutils_cobra.ExecutePingcli(t, "license",
-		"-"+options.LicenseProductOption.Flag.Shorthand, "pingfederate",
-		"-"+options.LicenseVersionOption.Flag.Shorthand, "12.0")
-	testutils.CheckExpectedError(t, err, nil)
-}
-
-// Test License Command with a profile
-func TestLicenseCmd_Profile(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	err := testutils_cobra.ExecutePingcli(t, "license",
-		"--"+options.LicenseProductOption.CobraParamName, "pingfederate",
-		"--"+options.LicenseVersionOption.CobraParamName, "12.0",
-		"--"+options.RootProfileOption.CobraParamName, "default")
-	testutils.CheckExpectedError(t, err, nil)
+			assert.Error(t, err)
+			if tc.expectedErrIs != nil {
+				assert.ErrorIs(t, err, tc.expectedErrIs)
+			}
+			if tc.expectedErrContains != "" {
+				assert.ErrorContains(t, err, tc.expectedErrContains)
+			}
+		})
+	}
 }

@@ -9,25 +9,28 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 )
 
+var (
+	addErrorPrefix = "failed to add plugin"
+)
+
 func RunInternalPluginAdd(pluginExecutable string) error {
 	if pluginExecutable == "" {
-		return fmt.Errorf("plugin executable is required")
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: ErrPluginNameEmpty}
 	}
 
-	// Check if plugin executable is in PATH
 	_, err := exec.LookPath(pluginExecutable)
 	if err != nil {
-		// exec error contains executable name and $PATH error message
-		return fmt.Errorf("failed to add plugin: %w", err)
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: fmt.Errorf("%w: %w", ErrPluginNotFound, err)}
 	}
 
 	err = addPluginExecutable(pluginExecutable)
 	if err != nil {
-		return fmt.Errorf("failed to add plugin: %w", err)
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
 	}
 
 	output.Success(fmt.Sprintf("Plugin '%s' added.", pluginExecutable), nil)
@@ -38,42 +41,50 @@ func RunInternalPluginAdd(pluginExecutable string) error {
 func addPluginExecutable(pluginExecutable string) error {
 	pName, err := readPluginAddProfileName()
 	if err != nil {
-		return fmt.Errorf("failed to read profile name: %w", err)
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
 	}
 
-	subKoanf, err := profiles.GetKoanfConfig().GetProfileKoanf(pName)
+	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
-		return fmt.Errorf("failed to get profile: %w", err)
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
 	}
 
-	existingPluginExectuables, _, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, pName)
+	subKoanf, err := koanfConfig.GetProfileKoanf(pName)
 	if err != nil {
-		return fmt.Errorf("failed to get existing plugin configuration from profile '%s': %w", pName, err)
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
+	}
+
+	existingPluginExectuables, ok, err := profiles.KoanfValueFromOption(options.PluginExecutablesOption, pName)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: fmt.Errorf("%w: %w", ErrReadPluginNamesConfig, err)}
+	}
+	if !ok {
+		existingPluginExectuables = ""
 	}
 
 	strSlice := new(customtypes.StringSlice)
 	if err = strSlice.Set(existingPluginExectuables); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
 	}
 
 	// Check if the plugin is already added
 	for _, existingPlugin := range strSlice.StringSlice() {
 		if strings.EqualFold(existingPlugin, pluginExecutable) {
-			return fmt.Errorf("plugin '%s' is already added to profile '%s'", pluginExecutable, pName)
+			return &errs.PingCLIError{Prefix: addErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrPluginAlreadyExists, pluginExecutable)}
 		}
 	}
 
 	if err = strSlice.Set(pluginExecutable); err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
 	}
 
 	err = subKoanf.Set(options.PluginExecutablesOption.KoanfKey, strSlice)
 	if err != nil {
-		return err
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
 	}
 
-	if err = profiles.GetKoanfConfig().SaveProfile(pName, subKoanf); err != nil {
-		return err
+	if err = koanfConfig.SaveProfile(pName, subKoanf); err != nil {
+		return &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
 	}
 
 	return nil
@@ -87,11 +98,11 @@ func readPluginAddProfileName() (pName string, err error) {
 	}
 
 	if err != nil {
-		return pName, err
+		return pName, &errs.PingCLIError{Prefix: addErrorPrefix, Err: err}
 	}
 
 	if pName == "" {
-		return pName, fmt.Errorf("unable to determine active profile")
+		return pName, &errs.PingCLIError{Prefix: addErrorPrefix, Err: ErrUndeterminedProfile}
 	}
 
 	return pName, nil

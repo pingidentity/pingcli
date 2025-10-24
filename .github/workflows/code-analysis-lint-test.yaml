@@ -25,8 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
           cache: true
@@ -43,8 +43,8 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
           cache: true
@@ -58,8 +58,8 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
           cache: true
@@ -70,13 +70,13 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
           cache: true
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v8
         with:
           # Require: The version of golangci-lint to use.
           # When `install-mode` is `binary` (default) the value can be v1.2 or v1.2.3 or `latest` to use the latest version.
@@ -112,8 +112,8 @@ jobs:
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
           cache: true
@@ -122,33 +122,31 @@ jobs:
     name: go test
     needs: [build]
     runs-on: ubuntu-latest
-    env:
-      PINGCLI_LOG_LEVEL: ${{ vars.PINGCLI_LOG_LEVEL }}
-      PINGCLI_LOG_PATH: ${{ vars.PINGCLI_LOG_PATH }}
-      TEST_PING_IDENTITY_ACCEPT_EULA: ${{ vars.TEST_PING_IDENTITY_ACCEPT_EULA }}
-      TEST_PING_IDENTITY_DEVOPS_USER: ${{ secrets.TEST_PING_IDENTITY_DEVOPS_USER }}
-      TEST_PING_IDENTITY_DEVOPS_KEY: ${{ secrets.TEST_PING_IDENTITY_DEVOPS_KEY }}
-      TEST_PINGONE_ENVIRONMENT_ID: ${{ secrets.TEST_PINGONE_ENVIRONMENT_ID }}
-      TEST_PINGONE_WORKER_CLIENT_ID: ${{ secrets.TEST_PINGONE_WORKER_CLIENT_ID }}
-      TEST_PINGONE_WORKER_CLIENT_SECRET: ${{ secrets.TEST_PINGONE_WORKER_CLIENT_SECRET }}
-      TEST_PINGONE_REGION_CODE: ${{ secrets.TEST_PINGONE_REGION_CODE }}
-      TEST_PINGCLI_DEVOPS_USER: ${{ secrets.TEST_PINGCLI_DEVOPS_USER }}
-      TEST_PINGCLI_DEVOPS_KEY: ${{ secrets.TEST_PINGCLI_DEVOPS_KEY }}
-      
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
         with:
           go-version-file: "go.mod"
           cache: true
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_wrapper: false
-      - run: make starttestcontainer && make test && make removetestcontainer
+      - name: Run make commands
+        run: make starttestcontainer && make test && make removetestcontainer
+        env:
+          PINGCLI_LOG_LEVEL: ${{ vars.PINGCLI_LOG_LEVEL }}
+          PINGCLI_LOG_PATH: ${{ vars.PINGCLI_LOG_PATH }}
+          TEST_PING_IDENTITY_ACCEPT_EULA: ${{ vars.TEST_PING_IDENTITY_ACCEPT_EULA }}
+          TEST_PING_IDENTITY_DEVOPS_USER: ${{ secrets.TEST_PING_IDENTITY_DEVOPS_USER }}
+          TEST_PING_IDENTITY_DEVOPS_KEY: ${{ secrets.TEST_PING_IDENTITY_DEVOPS_KEY }}
+          TEST_PINGONE_ENVIRONMENT_ID: ${{ secrets.TEST_PINGONE_ENVIRONMENT_ID }}
+          TEST_PINGONE_WORKER_CLIENT_ID: ${{ secrets.TEST_PINGONE_WORKER_CLIENT_ID }}
+          TEST_PINGONE_WORKER_CLIENT_SECRET: ${{ secrets.TEST_PINGONE_WORKER_CLIENT_SECRET }}
+          TEST_PINGONE_REGION_CODE: ${{ secrets.TEST_PINGONE_REGION_CODE }}
 
   onfailure:
     if: ${{ always() && github.event_name == 'schedule' && contains(needs.*.result, 'failure') }}
-    needs: [test]
+    needs: [fmt, vet, golangci, importfmt, test]
     name: Send failure webhook
     runs-on: ubuntu-latest
     steps:

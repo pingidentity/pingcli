@@ -9,6 +9,7 @@ linters:
     - decorder
     - dupword
     - durationcheck
+    - err113
     - errcheck
     - errchkjson
     - errname
@@ -53,7 +54,6 @@ linters:
     - staticcheck
     - tagalign
     - testableexamples
-    - testpackage
     - thelper
     - tparallel
     - unconvert
