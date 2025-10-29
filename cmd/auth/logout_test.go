@@ -23,7 +23,7 @@ func TestLogoutCommand_Creation(t *testing.T) {
 	if cmd.Short != "Logout user from the CLI" {
 		t.Errorf("Expected command short to be 'Logout user from the CLI', got %q", cmd.Short)
 	}
-	expectedLong := "Logout user from the CLI by clearing stored credentials from Keychain. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the auth method flags."
+	expectedLong := "Logout user from the CLI by clearing stored credentials. Credentials are cleared from both keychain and file storage. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the auth method flags."
 	if cmd.Long != expectedLong {
 		t.Errorf("Expected command long to be %q, got %q", expectedLong, cmd.Long)
 	}

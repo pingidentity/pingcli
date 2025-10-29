@@ -8,6 +8,7 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingone-go-client/config"
 	pingoneoauth2 "github.com/pingidentity/pingone-go-client/oauth2"
@@ -34,7 +35,10 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 	case customtypes.ENUM_PINGONE_REGION_CODE_SG:
 		cfg = cfg.WithTopLevelDomain(pingoneoauth2.TopLevelDomainSG)
 	default:
-		return nil, fmt.Errorf("region code is required and must be valid. Please run 'pingcli config set service.pingone.regionCode=<region>'")
+		return nil, &errs.PingCLIError{
+			Prefix: fmt.Sprintf("invalid region code '%s'", regionCode),
+			Err:    ErrRegionCodeRequired,
+		}
 	}
 
 	return cfg, nil

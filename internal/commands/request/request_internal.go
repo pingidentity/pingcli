@@ -19,7 +19,7 @@ func RunInternalRequest(uri string) (err error) {
 	}
 
 	if service == "" {
-		return fmt.Errorf("failed to send custom request: service is required")
+		return ErrServiceEmpty
 	}
 
 	switch service {
@@ -29,7 +29,7 @@ func RunInternalRequest(uri string) (err error) {
 			return fmt.Errorf("failed to send custom request: %w", err)
 		}
 	default:
-		return fmt.Errorf("failed to send custom request: unrecognized service '%s'", service)
+		return fmt.Errorf("%w: '%s'", ErrUnrecognizedService, service)
 	}
 
 	return nil

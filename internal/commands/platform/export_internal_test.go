@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"testing"
 
+	auth_internal "github.com/pingidentity/pingcli/internal/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
@@ -93,7 +94,7 @@ func Test_RunInternalExport(t *testing.T) {
 			services:      []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
 			pfAuthType:    customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS),
 			pfClientId:    "",
-			expectedError: ErrClientCredentialsEmpty,
+			expectedError: ErrPingFederateInit,
 		},
 		{
 			name:           "Test invalid client credentials - PingFederate Client Credentials Auth",
@@ -125,7 +126,7 @@ func Test_RunInternalExport(t *testing.T) {
 			name:           "Test with malformed PEM file - PingFederate",
 			services:       []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
 			cACertPemFiles: *malformedCaCertPemFile,
-			expectedError:  ErrAppendToCertPool,
+			expectedError:  auth_internal.ErrPingFederateCACertParse,
 		},
 		{
 			name:          "Test invalid PingFederate Auth Type",

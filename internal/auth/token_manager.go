@@ -6,12 +6,14 @@ import (
 	"fmt"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingone-go-client/config"
 	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
 	"golang.org/x/oauth2"
 )
 
+// TokenManager defines the interface for managing OAuth2 tokens in the keychain
 type TokenManager interface {
 	SaveToken(token *oauth2.Token) error
 	LoadToken() (*oauth2.Token, error)
@@ -19,16 +21,19 @@ type TokenManager interface {
 	HasToken() bool
 }
 
+// DefaultTokenManager implements the TokenManager interface using the default pingcli keychain service
 type DefaultTokenManager struct {
 	serviceName string
 }
 
+// NewDefaultTokenManager creates a new DefaultTokenManager instance
 func NewDefaultTokenManager() TokenManager {
 	return &DefaultTokenManager{
 		serviceName: "pingcli",
 	}
 }
 
+// GetCurrentAuthMethod returns the configured authentication method key for the active profile
 func GetCurrentAuthMethod() (string, error) {
 	authMethod, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 	if err != nil {
@@ -36,12 +41,14 @@ func GetCurrentAuthMethod() (string, error) {
 	}
 
 	if authMethod == "" {
-		return "", fmt.Errorf("auth method is not configured")
+		return "", ErrAuthMethodNotConfigured
 	}
 
 	return GetAuthMethodKey(authMethod)
 }
 
+// GetAuthMethodKey generates a unique keychain account name for the given authentication method
+// using the environment ID and client ID from the profile configuration
 func GetAuthMethodKey(authMethod string) (string, error) {
 	// Get environment ID and client ID based on auth method
 	var environmentID, clientID string
@@ -76,20 +83,27 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 			return "", fmt.Errorf("failed to get client credentials client ID: %w", err)
 		}
 	default:
-		return "", fmt.Errorf("unsupported auth method: %s", authMethod)
+		return "", &errs.PingCLIError{
+			Prefix: fmt.Sprintf("failed to generate token key for auth method '%s'", authMethod),
+			Err:    ErrUnsupportedAuthMethod,
+		}
 	}
 
 	if environmentID == "" || clientID == "" {
-		return "", fmt.Errorf("environment ID and client ID are required for token key generation (env: %s, client: %s)", environmentID, clientID)
+		return "", &errs.PingCLIError{
+			Prefix: "failed to generate token key",
+			Err:    ErrTokenKeyGenerationRequirements,
+		}
 	}
 
 	// Use the SDK's GenerateKeychainAccountName for consistency
 	return svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, authMethod), nil
 }
 
+// GetAuthMethodKeyFromConfig generates a unique keychain account name from a configuration object
 func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 	if cfg == nil || cfg.Auth.GrantType == nil {
-		return "", fmt.Errorf("configuration does not have grant type set")
+		return "", ErrGrantTypeNotSet
 	}
 
 	// Convert GrantType to string
@@ -98,6 +112,7 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 	return GetAuthMethodKey(grantType)
 }
 
+// SaveToken saves a token to the keychain for the currently configured authentication method
 func (tm *DefaultTokenManager) SaveToken(token *oauth2.Token) error {
 	authMethod, err := GetCurrentAuthMethod()
 	if err != nil {
@@ -107,6 +122,7 @@ func (tm *DefaultTokenManager) SaveToken(token *oauth2.Token) error {
 	return SaveTokenForMethod(token, authMethod)
 }
 
+// LoadToken loads a token from the keychain for the currently configured authentication method
 func (tm *DefaultTokenManager) LoadToken() (*oauth2.Token, error) {
 	authMethod, err := GetCurrentAuthMethod()
 	if err != nil {
@@ -116,6 +132,7 @@ func (tm *DefaultTokenManager) LoadToken() (*oauth2.Token, error) {
 	return LoadTokenForMethod(authMethod)
 }
 
+// ClearToken clears the token from the keychain for the currently configured authentication method
 func (tm *DefaultTokenManager) ClearToken() error {
 	authMethod, err := GetCurrentAuthMethod()
 	if err != nil {
@@ -125,6 +142,7 @@ func (tm *DefaultTokenManager) ClearToken() error {
 	return ClearTokenForMethod(authMethod)
 }
 
+// HasToken checks if a token exists in the keychain for the currently configured authentication method
 func (tm *DefaultTokenManager) HasToken() bool {
 	tokenKey, err := GetCurrentAuthMethod()
 	if err != nil {

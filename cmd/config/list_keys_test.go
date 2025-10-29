@@ -36,7 +36,7 @@ func TestConfigListKeysCmd_HelpFlag(t *testing.T) {
 
 // Test Config List Keys Command fails when provided too many arguments
 func TestConfigListKeysCmd_TooManyArgs(t *testing.T) {
-	expectedErrorPattern := `^failed to execute 'pingcli config list-keys': command accepts 0 arg\(s\), received 1$`
+	expectedErrorPattern := `command accepts 0 arg\(s\), received 1`
 	err := testutils_cobra.ExecutePingcli(t, "config", "list-keys", options.RootColorOption.KoanfKey)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -48,7 +48,8 @@ func Example_listKeysValue() {
 
 	// Output:
 	// Valid Keys:
-	// - activeProfile
+	// - auth.services
+	// - auth.useKeychain
 	// - description
 	// - detailedExitCode
 	// - export.format
@@ -79,7 +80,17 @@ func Example_listKeysValue() {
 	// - service.pingFederate.httpsHost
 	// - service.pingFederate.insecureTrustAllTLS
 	// - service.pingFederate.xBypassExternalValidationHeader
-	// - service.pingOne.authentication.environmentID
+	// - service.pingOne.authentication.authCode.clientID
+	// - service.pingOne.authentication.authCode.environmentID
+	// - service.pingOne.authentication.authCode.redirectURI
+	// - service.pingOne.authentication.authCode.scopes
+	// - service.pingOne.authentication.clientCredentials.clientID
+	// - service.pingOne.authentication.clientCredentials.clientSecret
+	// - service.pingOne.authentication.clientCredentials.environmentID
+	// - service.pingOne.authentication.clientCredentials.scopes
+	// - service.pingOne.authentication.deviceCode.clientID
+	// - service.pingOne.authentication.deviceCode.environmentID
+	// - service.pingOne.authentication.deviceCode.scopes
 	// - service.pingOne.authentication.type
 	// - service.pingOne.authentication.worker.clientID
 	// - service.pingOne.authentication.worker.clientSecret

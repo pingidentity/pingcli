@@ -7,17 +7,19 @@ import (
 
 	"github.com/pingidentity/pingcli/cmd/common"
 	auth_internal "github.com/pingidentity/pingcli/internal/auth"
+	"github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
 )
 
+// NewLogoutCommand creates a new logout command that clears stored credentials
 func NewLogoutCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
-		Long:                  "Logout user from the CLI by clearing stored credentials from Keychain. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the auth method flags.",
+		Long:                  "Logout user from the CLI by clearing stored credentials. Credentials are cleared from both keychain and file storage. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the auth method flags.",
 		RunE:                  authLogoutRunE,
 		Short:                 "Logout user from the CLI",
 		Use:                   "logout [flags]",
@@ -38,42 +40,80 @@ func NewLogoutCommand() *cobra.Command {
 	return cmd
 }
 
+// authLogoutRunE implements the logout command logic, clearing credentials from both
+// keychain and file storage for the specified or configured authentication method
 func authLogoutRunE(cmd *cobra.Command, args []string) error {
 	// Check if any auth method flags were provided
-	deviceCodeStr, err := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
-	if err != nil {
-		return fmt.Errorf("failed to get device-code flag: %w", err)
-	}
+	deviceCodeFlag := cmd.Flag(options.AuthMethodDeviceCodeOption.Flag.Name)
+	clientCredentialsFlag := cmd.Flag(options.AuthMethodClientCredentialsOption.Flag.Name)
+	authCodeFlag := cmd.Flag(options.AuthMethodAuthCodeOption.Flag.Name)
 
-	clientCredentialsStr, err := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
-	if err != nil {
-		return fmt.Errorf("failed to get client-credentials flag: %w", err)
-	}
+	flagProvided := (deviceCodeFlag != nil && deviceCodeFlag.Changed) ||
+		(clientCredentialsFlag != nil && clientCredentialsFlag.Changed) ||
+		(authCodeFlag != nil && authCodeFlag.Changed)
 
 	var authType string
-	var tokenKey string
+	var err error
 
-	// Determine which auth method to use
-	switch {
-	case deviceCodeStr == "true":
-		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
-		tokenKey, err = auth_internal.GetAuthMethodKey(authType)
-		if err != nil {
-			return fmt.Errorf("failed to generate token key for %s: %w", authType, err)
+	if !flagProvided {
+		// No flag provided - use the configured authentication type
+		authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+		if err != nil || authType == "" {
+			return auth.ErrNoAuthTypeSpecified
 		}
-	case clientCredentialsStr == "true":
-		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
-		tokenKey, err = auth_internal.GetAuthMethodKey(authType)
+	} else {
+		// Flag was provided - determine which one
+		deviceCodeStr, err := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
 		if err != nil {
-			return fmt.Errorf("failed to generate token key for %s: %w", authType, err)
+			return fmt.Errorf("failed to get device-code flag: %w", err)
 		}
-	default:
-		// No flags provided or --auth-code flag - default to auth_code
-		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE
-		tokenKey, err = auth_internal.GetAuthMethodKey(authType)
+
+		clientCredentialsStr, err := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
 		if err != nil {
-			return fmt.Errorf("failed to generate token key for %s: %w", authType, err)
+			return fmt.Errorf("failed to get client-credentials flag: %w", err)
 		}
+
+		switch {
+		case deviceCodeStr == "true":
+			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
+		case clientCredentialsStr == "true":
+			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
+		default:
+			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE
+		}
+	}
+
+	// Check if configuration exists for this auth method before trying to generate token key
+	var hasConfig bool
+	switch authType {
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
+		clientID, _ := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeClientIDOption)
+		envID, _ := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeEnvironmentIDOption)
+		hasConfig = clientID != "" && envID != ""
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
+		clientID, _ := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)
+		envID, _ := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption)
+		hasConfig = clientID != "" && envID != ""
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
+		clientID, _ := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption)
+		envID, _ := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
+		hasConfig = clientID != "" && envID != ""
+	}
+
+	if !hasConfig {
+		// Get current profile name for the message
+		profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+		if err != nil {
+			profileName = "current profile"
+		}
+
+		return fmt.Errorf("logout failed for %s in %s: %w", authType, profileName, auth.ErrNoAuthConfiguration)
+	}
+
+	// Generate token key for the selected auth method
+	tokenKey, err := auth_internal.GetAuthMethodKey(authType)
+	if err != nil {
+		return fmt.Errorf("failed to generate token key for %s: %w", authType, err)
 	}
 
 	// Clear only the token for the specified or configured authentication method
@@ -87,7 +127,7 @@ func authLogoutRunE(cmd *cobra.Command, args []string) error {
 		profileName = "unknown" // fallback if we can't get the profile name
 	}
 
-	fmt.Printf("Successfully logged out from %s authentication. Credentials cleared from Keychain for profile '%s'.\n", authType, profileName)
+	fmt.Printf("Successfully logged out from %s authentication. Credentials cleared from storage for profile '%s'.\n", authType, profileName)
 
 	return nil
 }

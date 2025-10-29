@@ -14,6 +14,7 @@ type OptionType int
 // OptionType enums
 const (
 	BOOL OptionType = iota
+	AUTH_SERVICES
 	EXPORT_FORMAT
 	EXPORT_SERVICE_GROUP
 	EXPORT_SERVICES
@@ -55,6 +56,8 @@ func Options() []Option {
 		AuthMethodAuthCodeOption,
 		AuthMethodClientCredentialsOption,
 		AuthMethodDeviceCodeOption,
+		AuthServiceOption,
+		AuthUseKeychainOption,
 
 		LicenseProductOption,
 		LicenseVersionOption,
@@ -145,6 +148,8 @@ var (
 	AuthMethodAuthCodeOption          Option
 	AuthMethodClientCredentialsOption Option
 	AuthMethodDeviceCodeOption        Option
+	AuthServiceOption                 Option
+	AuthUseKeychainOption             Option
 )
 
 // License options

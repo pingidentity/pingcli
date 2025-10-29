@@ -40,11 +40,22 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 | `service.pingfederate.httpsHost` | `--pingfederate-https-host` | PINGCLI_PINGFEDERATE_HTTPS_HOST | String | The PingFederate HTTPS host used to communicate with PingFederate's admin API. Example: 'https://pingfederate-admin.bxretail.org'
 | `service.pingfederate.insecureTrustAllTLS` | `--pingfederate-insecure-trust-all-tls` | PINGCLI_PINGFEDERATE_INSECURE_TRUST_ALL_TLS | Boolean | Trust any certificate when connecting to the PingFederate server admin API. (default false) This is insecure and shouldn't be enabled outside of testing.
 | `service.pingfederate.xBypassExternalValidationHeader` | `--pingfederate-x-bypass-external-validation-header` | PINGCLI_PINGFEDERATE_X_BYPASS_EXTERNAL_VALIDATION_HEADER | Boolean | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false)
-| `service.pingone.authentication.type` | `--pingone-authentication-type` | PINGCLI_PINGONE_AUTHENTICATION_TYPE | String (Enum) | The authentication type to use to authenticate to the PingOne management API. (default worker) Options are: worker.
+| `service.pingone.authentication.authCode.clientID` | `--pingone-oidc-auth-code-client-id` | PINGCLI_PINGONE_OIDC_AUTH_CODE_CLIENT_ID | String (UUID Format) | The auth code client ID used to authenticate to the PingOne management API.
+| `service.pingone.authentication.authCode.environmentID` | `--pingone-oidc-auth-code-environment-id` | PINGCLI_PINGONE_OIDC_AUTH_CODE_ENVIRONMENT_ID | String (UUID Format) | The ID of the PingOne environment that contains the auth code client used to authenticate to the PingOne management API.
+| `service.pingone.authentication.authCode.redirectURI` | `--pingone-oidc-auth-code-redirect-uri` | PINGCLI_PINGONE_OIDC_AUTH_CODE_REDIRECT_URI | String | The redirect URI to use when using the auth code authentication type to authenticate to the PingOne management API.
+| `service.pingone.authentication.authCode.scopes` | `--pingone-oidc-auth-code-scopes` | PINGCLI_PINGONE_OIDC_AUTH_CODE_SCOPES | String Array | The auth code scope(s) used to authenticate to the PingOne management API.
+| `service.pingone.authentication.clientCredentials.clientID` | `--pingone-client-credentials-client-id` | PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID | String (UUID Format) | The client credentials client ID used to authenticate to the PingOne management API.
+| `service.pingone.authentication.clientCredentials.clientSecret` | `--pingone-client-credentials-client-secret` | PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET | String | The client credentials client secret used to authenticate to the PingOne management API.
+| `service.pingone.authentication.clientCredentials.environmentID` | `--pingone-client-credentials-environment-id` | PINGCLI_PINGONE_CLIENT_CREDENTIALS_ENVIRONMENT_ID | String (UUID Format) | The ID of the PingOne environment that contains the client credentials client used to authenticate to the PingOne management API.
+| `service.pingone.authentication.clientCredentials.scopes` | `--pingone-client-credentials-scopes` | PINGCLI_PINGONE_CLIENT_CREDENTIALS_SCOPES | String Array | The scopes to request for the client credentials used to authenticate to the PingOne management API.
+| `service.pingone.authentication.deviceCode.clientID` | `--pingone-device-code-client-id` | PINGCLI_PINGONE_DEVICE_CODE_CLIENT_ID | String (UUID Format) | The device code client ID used to authenticate to the PingOne management API.
+| `service.pingone.authentication.deviceCode.environmentID` | `--pingone-device-code-environment-id` | PINGCLI_PINGONE_DEVICE_CODE_ENVIRONMENT_ID | String (UUID Format) | The ID of the PingOne environment that contains the device code client used to authenticate to the PingOne management API.
+| `service.pingone.authentication.deviceCode.scopes` | `--pingone-device-code-scopes` | PINGCLI_PINGONE_DEVICE_CODE_SCOPES | String Array | The device code scope(s) used to authenticate to the PingOne management API.
+| `service.pingone.authentication.type` | `--pingone-authentication-type` | PINGCLI_PINGONE_AUTHENTICATION_TYPE | String (Enum) | The authentication type to use to authenticate to the PingOne management API. (default worker) Options are: auth_code, client_credentials, device_code, worker.
 | `service.pingone.authentication.worker.clientID` | `--pingone-worker-client-id` | PINGCLI_PINGONE_WORKER_CLIENT_ID | String (UUID Format) | The worker client ID used to authenticate to the PingOne management API.
 | `service.pingone.authentication.worker.clientSecret` | `--pingone-worker-client-secret` | PINGCLI_PINGONE_WORKER_CLIENT_SECRET | String | The worker client secret used to authenticate to the PingOne management API.
 | `service.pingone.authentication.worker.environmentID` | `--pingone-worker-environment-id` | PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID | String (UUID Format) | The ID of the PingOne environment that contains the worker client used to authenticate to the PingOne management API.
-| `service.pingone.regionCode` | `--pingone-region-code` | PINGCLI_PINGONE_REGION_CODE | String (Enum) | The region code of the PingOne tenant. Options are: AP, AU, CA, EU, NA. Example: 'NA'
+| `service.pingone.regionCode` | `--pingone-region-code` | PINGCLI_PINGONE_REGION_CODE | String (Enum) | The region code of the PingOne tenant. Options are: AP, AU, CA, EU, NA, SG. Example: 'NA'
 |===
 
 == Platform Export Properties
@@ -81,4 +92,14 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 | `request.accessTokenExpiry` |  |  | Integer | 
 | `request.fail` | `--fail` / `-f` |  | Boolean | Return non-zero exit code when HTTP custom request returns a failure status code.
 | `request.service` | `--service` / `-s` | PINGCLI_REQUEST_SERVICE | String (Enum) | The Ping service (configured in the active profile) to send the custom request to. Options are: pingone. Example: 'pingone'
+|===
+
+== Auth properties
+
+[cols="2,2,2,1,3"]
+|===
+|Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose
+
+| `auth.services` | `--service` / `-s` | PINGCLI_AUTH_SERVICE | N/A | Specifies the service(s) to authenticate. Accepts a comma-separated string to delimit multiple services.  Options are: pingfederate, pingone. Example: 'pingone,pingfederate'
+| `auth.useKeychain` | `--use-keychain` | PINGCLI_AUTH_USE_KEYCHAIN | Boolean | Use system keychain for storing authentication tokens. If false or keychain is unavailable, tokens will be stored in ~/.pingcli/credentials/. (default true)
 |===

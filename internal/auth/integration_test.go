@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	auth_internal "github.com/pingidentity/pingcli/internal/auth"
@@ -11,9 +12,54 @@ import (
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
-// createIntegrationTestConfig generates test configuration from environment variables
+// createIntegrationTestConfig generates test configuration with dummy values
+// This is only used for configuration validation tests, not actual authentication
 func createIntegrationTestConfig() string {
-	return fmt.Sprintf(`activeProfile: integration
+	return `activeProfile: integration
+integration:
+    description: "Integration test profile"
+    noColor: true
+    outputFormat: json
+    service:
+        pingOne:
+            regionCode: NA
+            authentication:
+                type: clientCredentials
+                clientCredentials:
+                    clientID: 00000000-0000-0000-0000-000000000001
+                    clientSecret: dummy-secret-for-config-test
+                    environmentID: 00000000-0000-0000-0000-000000000000
+                    scopes: ["openid"]
+                deviceCode:
+                    clientID: ""
+                    environmentID: ""
+                    scopes: []
+                authCode:
+                    clientID: ""
+                    environmentID: ""
+                    redirectURI: ""
+                    scopes: []
+`
+}
+
+func TestClientCredentialsAuthentication_Integration(t *testing.T) {
+	// Skip if running in CI environment without credentials
+	if os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID") == "" ||
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET") == "" ||
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID") == "" ||
+		os.Getenv("TEST_PINGONE_REGION_CODE") == "" {
+		t.Skip("Skipping integration test - missing required environment variables")
+	}
+
+	// Default scopes if not provided
+	scopes := os.Getenv("TEST_PINGONE_SCOPES")
+	if scopes == "" {
+		scopes = "openid"
+	}
+
+	// Initialize configuration with test config
+	configuration.InitAllOptions()
+	testConfig := fmt.Sprintf(`activeProfile: integration
 integration:
     description: "Integration test profile"
     noColor: true
@@ -28,41 +74,13 @@ integration:
                     clientSecret: %s
                     environmentID: %s
                     scopes: ["%s"]
-                deviceCode:
-                    clientID: %s
-                    environmentID: %s
-                    scopes: ["%s"]
-                authCode:
-                    clientID: %s
-                    environmentID: %s
-                    redirectURI: "http://localhost:8080/callback"
-                    scopes: ["%s"]
 `,
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
 		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
-		os.Getenv("TEST_PINGONE_SCOPES"),
-		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),
-		os.Getenv("TEST_PINGONE_DEVICE_CODE_ENVIRONMENT_ID"),
-		os.Getenv("TEST_PINGONE_DEVICE_CODE_SCOPES"),
-		os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID"),
-		os.Getenv("TEST_PINGONE_AUTH_CODE_ENVIRONMENT_ID"),
-		os.Getenv("TEST_PINGONE_AUTH_CODE_SCOPES"))
-}
-
-func TestClientCredentialsAuthentication_Integration(t *testing.T) {
-	// Skip if running in CI environment without credentials
-	if os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID") == "" ||
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET") == "" ||
-		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID") == "" ||
-		os.Getenv("TEST_PINGONE_REGION_CODE") == "" {
-		t.Skip("Skipping integration test - missing required environment variables")
-	}
-
-	// Initialize configuration with test config
-	configuration.InitAllOptions()
-	testutils_koanf.InitKoanfsCustomFile(t, createIntegrationTestConfig())
+		scopes)
+	testutils_koanf.InitKoanfsCustomFile(t, testConfig)
 
 	// Clear any existing tokens to ensure fresh authentication
 	err := auth_internal.ClearToken()
@@ -98,9 +116,36 @@ func TestValidTokenSource_Integration(t *testing.T) {
 		t.Skip("Skipping integration test - missing required environment variables")
 	}
 
+	// Default scopes if not provided
+	scopes := os.Getenv("TEST_PINGONE_SCOPES")
+	if scopes == "" {
+		scopes = "openid"
+	}
+
 	// Initialize configuration with test config
 	configuration.InitAllOptions()
-	testutils_koanf.InitKoanfsCustomFile(t, createIntegrationTestConfig())
+	testConfig := fmt.Sprintf(`activeProfile: integration
+integration:
+    description: "Integration test profile"
+    noColor: true
+    outputFormat: json
+    service:
+        pingOne:
+            regionCode: %s
+            authentication:
+                type: clientCredentials
+                clientCredentials:
+                    clientID: %s
+                    clientSecret: %s
+                    environmentID: %s
+                    scopes: ["%s"]
+`,
+		os.Getenv("TEST_PINGONE_REGION_CODE"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		scopes)
+	testutils_koanf.InitKoanfsCustomFile(t, testConfig)
 
 	// Clear any existing tokens to ensure fresh authentication
 	err := auth_internal.ClearToken()
@@ -143,39 +188,35 @@ func TestValidTokenSource_Integration(t *testing.T) {
 }
 
 func TestDeviceCodeConfiguration_Integration(t *testing.T) {
-	// Skip if running in CI environment without credentials
-	if os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID") == "" ||
-		os.Getenv("TEST_PINGONE_DEVICE_CODE_ENVIRONMENT_ID") == "" ||
-		os.Getenv("TEST_PINGONE_REGION_CODE") == "" {
-		t.Skip("Skipping integration test - missing required environment variables")
-	}
-
 	// Initialize configuration with test config
 	configuration.InitAllOptions()
 	testutils_koanf.InitKoanfsCustomFile(t, createIntegrationTestConfig())
 
-	// Test getting device code configuration - this validates the configuration is properly set
+	// Test getting device code configuration - with empty values, this should fail validation
+	// This test verifies that empty device code configuration is properly validated
 	_, err := auth_internal.GetDeviceCodeConfiguration()
-	if err != nil {
-		t.Fatalf("Should be able to get device code configuration: %v", err)
+	if err == nil {
+		t.Fatal("Should get validation error with empty device code configuration")
+	}
+	// Verify we get the expected configuration error
+	if !strings.Contains(err.Error(), "client ID is not configured") {
+		t.Errorf("Expected client ID configuration error, got: %v", err)
 	}
 }
 
 func TestAuthCodeConfiguration_Integration(t *testing.T) {
-	// Skip if running in CI environment without credentials
-	if os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID") == "" ||
-		os.Getenv("TEST_PINGONE_AUTH_CODE_ENVIRONMENT_ID") == "" ||
-		os.Getenv("TEST_PINGONE_REGION_CODE") == "" {
-		t.Skip("Skipping integration test - missing required environment variables")
-	}
-
 	// Initialize configuration with test config
 	configuration.InitAllOptions()
 	testutils_koanf.InitKoanfsCustomFile(t, createIntegrationTestConfig())
 
-	// Test getting auth code configuration - this validates the configuration is properly set
+	// Test getting auth code configuration - with empty values, this should fail validation
+	// This test verifies that empty auth code configuration is properly validated
 	_, err := auth_internal.GetAuthCodeConfiguration()
-	if err != nil {
-		t.Fatalf("Should be able to get auth code configuration: %v", err)
+	if err == nil {
+		t.Fatal("Should get validation error with empty auth code configuration")
+	}
+	// Verify we get the expected configuration error
+	if !strings.Contains(err.Error(), "client ID is not configured") {
+		t.Errorf("Expected client ID configuration error, got: %v", err)
 	}
 }

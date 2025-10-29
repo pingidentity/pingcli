@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1220/configurationapi"
 )
@@ -22,6 +23,7 @@ var (
 	pingfederateApiClient *pingfederateGoClient.APIClient
 )
 
+// GetPingFederateClient returns the cached PingFederate API client instance or creates a new one
 func GetPingFederateClient() *pingfederateGoClient.APIClient {
 	if pingfederateApiClient == nil {
 		pingfederateApiClient = pingfederateGoClient.NewAPIClient(pingfederateGoClient.NewConfiguration())
@@ -30,6 +32,7 @@ func GetPingFederateClient() *pingfederateGoClient.APIClient {
 	return pingfederateApiClient
 }
 
+// SetPingFederateClient initializes and configures a PingFederate API client with TLS settings and authentication
 func SetPingFederateClient(ctx context.Context, client *pingfederateGoClient.APIClient, pingcliVersion string) (*pingfederateGoClient.APIClient, error) {
 	httpsHost, err := profiles.GetOptionValue(options.PingFederateHTTPSHostOption)
 	if err != nil {
@@ -41,7 +44,7 @@ func SetPingFederateClient(ctx context.Context, client *pingfederateGoClient.API
 	}
 
 	if ctx == nil {
-		return nil, fmt.Errorf("failed to initialize PingFederate services. context is nil")
+		return nil, ErrPingFederateContextNil
 	}
 
 	pfInsecureTrustAllTLS, err := profiles.GetOptionValue(options.PingFederateInsecureTrustAllTLSOption)
@@ -66,7 +69,10 @@ func SetPingFederateClient(ctx context.Context, client *pingfederateGoClient.API
 
 		ok := caCertPool.AppendCertsFromPEM(caCert)
 		if !ok {
-			return nil, fmt.Errorf("failed to parse CA certificate PEM file '%s' to certificate pool", caCertPemFile)
+			return nil, &errs.PingCLIError{
+				Prefix: fmt.Sprintf("failed to parse CA certificate PEM file '%s'", caCertPemFile),
+				Err:    ErrPingFederateCACertParse,
+			}
 		}
 	}
 

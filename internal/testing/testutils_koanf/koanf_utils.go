@@ -28,7 +28,7 @@ default:
     noColor: true
     outputFormat: text
     export:
-        outputDirectory: %s
+        outputDirectory: "%s"
         services: ["%s"]
     license:
         devopsUser: %s
@@ -37,10 +37,21 @@ default:
         pingOne:
             regionCode: %s
             authentication:
-                type: worker
+                type: client_credentials
                 worker:
                     clientID: %s
                     clientSecret: %s
+                    environmentID: %s
+                clientCredentials:
+                    clientID: %s
+                    clientSecret: %s
+                    environmentID: %s
+                    scopes: %s
+                authCode:
+                    clientID: %s
+                    environmentID: %s
+                deviceCode:
+                    clientID: %s
                     environmentID: %s
         pingFederate:
             adminAPIPath: /pf-admin-api/v1
@@ -57,7 +68,7 @@ production:
     noColor: true
     outputFormat: text
     export:
-        outputDirectory: %s
+        outputDirectory: "%s"
         services: ["%s"]
     license:
         devopsUser: %s
@@ -66,10 +77,21 @@ production:
         pingOne:
             regionCode: %s
             authentication:
-                type: worker
+                type: client_credentials
                 worker:
                     clientID: %s
                     clientSecret: %s
+                    environmentID: %s
+                clientCredentials:
+                    clientID: %s
+                    clientSecret: %s
+                    environmentID: %s
+                    scopes: %s
+                authCode:
+                    clientID: %s
+                    environmentID: %s
+                deviceCode:
+                    clientID: %s
                     environmentID: %s
         pingFederate:
             adminAPIPath: /pf-admin-api/v1
@@ -88,7 +110,7 @@ default:
     nocolor: true
     outputformat: text
     export:
-        outputdirectory: %s
+        outputdirectory: "%s"
         servicegroup: %s
         services: ["%s"]
     service:
@@ -124,7 +146,7 @@ func CreateConfigFile(t *testing.T) string {
 	t.Helper()
 
 	if configFileContents == "" {
-		configFileContents = strings.ReplaceAll(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir())
+		configFileContents = strings.ReplaceAll(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir())
 	}
 
 	configFilePath := t.TempDir() + "/config.yaml"
@@ -151,7 +173,7 @@ func InitKoanfs(t *testing.T) {
 
 	configuration.InitAllOptions()
 
-	configFileContents = strings.ReplaceAll(getDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml")
+	configFileContents = strings.ReplaceAll(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml")
 
 	configureMainKoanf(t)
 }
@@ -163,7 +185,7 @@ func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 	configureMainKoanf(t)
 }
 
-func getDefaultConfigFileContents() string {
+func GetDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
 		outputDirectoryReplacement,                      // default export outputDirectory
 		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT, // default export services
@@ -173,6 +195,14 @@ func getDefaultConfigFileContents() string {
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // default service pingOne worker clientID
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),  // default service pingOne worker clientSecret
 		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // default service pingOne worker environmentID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // default service pingOne clientCredentials clientID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),  // default service pingOne clientCredentials clientSecret
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // default service pingOne clientCredentials environmentID
+		"p1:read:env p1:read:user",                      // default service pingOne clientCredentials scopes
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // default service pingOne authCode clientID
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // default service pingOne authCode environmentID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // default service pingOne deviceCode clientID
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // default service pingOne deviceCode environmentID
 		outputDirectoryReplacement,                      // production export outputDirectory
 		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT, // production export services
 		os.Getenv("TEST_PINGCLI_DEVOPS_USER"),           // production license devopsUser
@@ -181,6 +211,14 @@ func getDefaultConfigFileContents() string {
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // production service pingOne worker clientID
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),  // production service pingOne worker clientSecret
 		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // production service pingOne worker environmentID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // production service pingOne clientCredentials clientID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),  // production service pingOne clientCredentials clientSecret
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // production service pingOne clientCredentials environmentID
+		"p1:read:env p1:read:user",                      // production service pingOne clientCredentials scopes
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // production service pingOne authCode clientID
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // production service pingOne authCode environmentID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),      // production service pingOne deviceCode clientID
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),        // production service pingOne deviceCode environmentID
 	)
 }
 

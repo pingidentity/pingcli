@@ -8,6 +8,7 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingone-go-client/config"
@@ -19,12 +20,12 @@ var (
 	pingoneAPIClient *pingone.APIClient
 )
 
-// ClearPingOneClientCache clears the cached PingOne API client
+// ClearPingOneClientCache clears the cached PingOne API client instance, forcing re-initialization on next use
 func ClearPingOneClientCache() {
 	pingoneAPIClient = nil
 }
 
-// GetAuthenticatedPingOneClient returns a PingOne client with valid authentication
+// GetAuthenticatedPingOneClient returns a PingOne API client instance with valid authentication credentials
 func GetAuthenticatedPingOneClient(ctx context.Context) (*pingone.APIClient, error) {
 	// Get a valid token source (will handle caching and refresh)
 	tokenSource, err := GetValidTokenSource(ctx)
@@ -54,6 +55,7 @@ func GetAuthenticatedPingOneClient(ctx context.Context) (*pingone.APIClient, err
 	return apiClient, nil
 }
 
+// GetPingOneClient returns the cached PingOne API client instance or creates a new one if not already initialized
 func GetPingOneClient() (*pingone.APIClient, error) {
 	if pingoneAPIClient != nil {
 		return pingoneAPIClient, nil
@@ -73,6 +75,7 @@ func GetPingOneClient() (*pingone.APIClient, error) {
 	return pingoneAPIClient, nil
 }
 
+// GetPingOneAccessToken retrieves a valid access token, either from cache or by performing new authentication
 func GetPingOneAccessToken() (accessToken string, err error) {
 	// Check if existing access token is available
 	accessToken, err = profiles.GetOptionValue(options.RequestAccessTokenOption)
@@ -111,6 +114,7 @@ func GetPingOneAccessToken() (accessToken string, err error) {
 	return pingOneAuth()
 }
 
+// getConfigConfiguration builds a PingOne SDK configuration from the active profile settings
 func getConfigConfiguration() (*config.Configuration, error) {
 	configConfiguration := config.NewConfiguration()
 
@@ -205,7 +209,10 @@ func getConfigConfiguration() (*config.Configuration, error) {
 		configConfiguration.WithClientCredentialsEnvironmentID(clientCredentialsEnvironmentID)
 
 	default:
-		return nil, fmt.Errorf("unrecognized or unsupported PingOne authentication type: '%s'", authType)
+		return nil, &errs.PingCLIError{
+			Prefix: fmt.Sprintf("failed to get configuration for authentication type '%s'", authType),
+			Err:    ErrPingOneUnrecognizedAuthType,
+		}
 	}
 
 	configConfiguration.WithGrantType(pingoneoauth2.GrantType(authType))
@@ -219,7 +226,7 @@ func getConfigConfiguration() (*config.Configuration, error) {
 	return configConfiguration, nil
 }
 
-// getConfigConfigurationWithToken creates a configuration with a specific access token
+// getConfigConfigurationWithToken creates a PingOne SDK configuration with a specific access token
 func getConfigConfigurationWithToken(accessToken string) (*config.Configuration, error) {
 	configConfiguration := config.NewConfiguration()
 
@@ -235,6 +242,7 @@ func getConfigConfigurationWithToken(accessToken string) (*config.Configuration,
 	return configConfiguration, nil
 }
 
+// pingOneAuth performs PingOne authentication and returns the access token
 func pingOneAuth() (accessToken string, err error) {
 	pingOneClient, err := GetPingOneClient()
 	if err != nil {
@@ -243,7 +251,7 @@ func pingOneAuth() (accessToken string, err error) {
 
 	pingOneClientConfig := pingOneClient.GetConfig()
 	if pingOneClientConfig == nil {
-		return "", fmt.Errorf("PingOne client configuration is nil")
+		return "", ErrPingOneClientConfigNil
 	}
 
 	accessToken, err = pingOneClientConfig.Service.GetAccessToken(context.Background())

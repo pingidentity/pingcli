@@ -52,7 +52,7 @@ func Test_RunInternalRequest_EmptyService(t *testing.T) {
 	}
 
 	err = RunInternalRequest("environments")
-	expectedErrorPattern := "failed to send custom request: service is required"
+	expectedErrorPattern := "service is not set"
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -63,7 +63,7 @@ func Test_RunInternalRequest_UnrecognizedService(t *testing.T) {
 	t.Setenv(options.RequestServiceOption.EnvVar, "invalid-service")
 
 	err := RunInternalRequest("environments")
-	expectedErrorPattern := "failed to send custom request: unrecognized service 'invalid-service'"
+	expectedErrorPattern := "unrecognized service.*invalid-service"
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 

@@ -20,6 +20,8 @@ var (
 		"environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)")
 	ErrPingOneInit = errors.New("failed to initialize pingone API client. Check worker client ID, worker client secret," +
 		" worker environment ID, and pingone region code configuration values")
+	ErrPingOneEnvironmentIDEmpty = errors.New("failed to initialize pingone API client. environment ID is empty. " +
+		"configure this property via parameter flags, environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)")
 	ErrOutputDirectoryEmpty       = errors.New("output directory is not set")
 	ErrGetPresentWorkingDirectory = errors.New("failed to get present working directory")
 	ErrCreateOutputDirectory      = errors.New("failed to create output directory")

@@ -82,7 +82,7 @@ func runInternalPingOneRequest(uri string) (err error) {
 	}
 
 	if httpMethod == "" {
-		return fmt.Errorf("http method is required")
+		return ErrHttpMethodEmpty
 	}
 
 	data, err := GetDataRaw()
