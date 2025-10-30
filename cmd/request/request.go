@@ -98,6 +98,7 @@ func initPingOneRequestFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsScopesOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
+	cmd.Flags().AddFlag(options.AuthUseKeychainOption.Flag)
 }
 
 func requestRunE(cmd *cobra.Command, args []string) error {

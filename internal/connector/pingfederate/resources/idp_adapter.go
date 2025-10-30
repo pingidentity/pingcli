@@ -4,7 +4,6 @@
 package resources
 
 import (
-	auth_internal "github.com/pingidentity/pingcli/internal/auth"
 	"github.com/pingidentity/pingcli/internal/connector"
 	"github.com/pingidentity/pingcli/internal/connector/common"
 	"github.com/pingidentity/pingcli/internal/logger"
@@ -64,9 +63,7 @@ func (r *PingFederateIdpAdapterResource) ExportAll() (*[]connector.ImportBlock, 
 func (r *PingFederateIdpAdapterResource) getIdpAdapterData() (map[string]string, error) {
 	idpAdapterData := make(map[string]string)
 
-	pfClient := auth_internal.GetPingFederateClient()
-
-	apiObj, response, err := pfClient.IdpAdaptersAPI.GetIdpAdapters(r.clientInfo.PingFederateContext).Execute()
+	apiObj, response, err := r.clientInfo.PingFederateApiClient.IdpAdaptersAPI.GetIdpAdapters(r.clientInfo.PingFederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetIdpAdapters", r.ResourceType())
 	if err != nil {
 		return nil, err

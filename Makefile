@@ -41,7 +41,7 @@ endef
 # PHONY TARGETS
 # ====================================================================================
 
-.PHONY: help default install fmt vet test importfmtlint golangcilint devcheck devchecknotest
+.PHONY: help default install fmt vet test test-auth importfmtlint golangcilint devcheck devchecknotest
 .PHONY: starttestcontainer removetestcontainer spincontainer openlocalwebapi openapp protogen
 .PHONY: _check_env _check_ping_env _check_docker _run_pf_container _wait_for_pf _stop_pf_container
 .PHONY: generate-options-docs generate-command-docs generate-all-docs
@@ -118,13 +118,23 @@ protogen: ## Generate Go code from .proto files
 	protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto
 	echo "✅ gRPC code generated."
 
-test: _check_ping_env ## Run all tests
-	@echo "  > Test: Running all Go tests..."
-	for dir in $(TEST_DIRS); do
-		echo "    -> $$dir"
-		$(GOTEST) $$dir
+test: test-auth _check_ping_env ## Run all tests (auth tests run first sequentially, then all others)
+	@echo "  > Test: Running all other Go tests..."
+	@for dir in $(TEST_DIRS); do \
+		if [[ "$$dir" != *"/auth" ]]; then \
+			echo "    -> $$dir"; \
+			$(GOTEST) $$dir; \
+		fi; \
 	done
-	echo "✅ All tests passed."
+	@echo "✅ All tests passed."
+
+test-auth: _check_ping_env ## Run auth tests sequentially (internal/auth then cmd/auth)
+	@echo "  > Test: Running auth tests sequentially to avoid shared resource conflicts..."
+	@echo "    -> ./internal/auth/..."
+	@$(GOTEST) ./internal/auth/...
+	@echo "    -> ./cmd/auth/..."
+	@$(GOTEST) ./cmd/auth/...
+	@echo "✅ All auth tests passed."
 
 devcheck: install importfmtlint fmt vet golangcilint spincontainer test removetestcontainer ## Run the full suite of development checks and tests
 	@echo "✅ All development checks passed successfully."

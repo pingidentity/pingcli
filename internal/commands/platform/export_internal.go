@@ -4,7 +4,6 @@ package platform_internal
 
 import (
 	"context"
-	"crypto/sha256"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
@@ -27,11 +26,11 @@ import (
 	"github.com/pingidentity/pingcli/internal/connector/pingone/protect"
 	"github.com/pingidentity/pingcli/internal/connector/pingone/sso"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1230/configurationapi"
-	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
 )
 
 var (
@@ -46,7 +45,7 @@ var (
 
 func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 	if ctx == nil {
-		return ErrNilContext
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrNilContext}
 	}
 
 	exportFormat, err := profiles.GetOptionValue(options.PlatformExportExportFormatOption)
@@ -123,7 +122,7 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 
 func initPingFederateServices(ctx context.Context, pingcliVersion string) (err error) {
 	if ctx == nil {
-		return auth_internal.ErrPingFederateContextNil
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: auth_internal.ErrPingFederateContextNil}
 	}
 
 	pfInsecureTrustAllTLS, err := profiles.GetOptionValue(options.PingFederateInsecureTrustAllTLSOption)
@@ -143,12 +142,12 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		caCertPemFile := filepath.Clean(caCertPemFile)
 		caCert, err := os.ReadFile(caCertPemFile)
 		if err != nil {
-			return fmt.Errorf("%w '%s': %w", ErrReadCaCertPemFile, caCertPemFile, err)
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrReadCaCertPemFile, caCertPemFile, err)}
 		}
 
 		ok := caCertPool.AppendCertsFromPEM(caCert)
 		if !ok {
-			return fmt.Errorf("%w: '%s'", auth_internal.ErrPingFederateCACertParse, caCertPemFile)
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'", auth_internal.ErrPingFederateCACertParse, caCertPemFile)}
 		}
 	}
 
@@ -186,7 +185,7 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		}
 
 		if pfUsername == "" || pfPassword == "" {
-			return ErrBasicAuthEmpty
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrBasicAuthEmpty}
 		}
 
 		pingfederateContext = context.WithValue(ctx, pingfederateGoClient.ContextBasicAuth, pingfederateGoClient.BasicAuth{
@@ -200,7 +199,7 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		}
 
 		if pfAccessToken == "" {
-			return ErrAccessTokenEmpty
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrAccessTokenEmpty}
 		}
 
 		pingfederateContext = context.WithValue(ctx, pingfederateGoClient.ContextAccessToken, pfAccessToken)
@@ -223,7 +222,7 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 		}
 
 		if pfClientID == "" || pfClientSecret == "" || pfTokenUrl == "" {
-			return ErrClientCredentialsEmpty
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrClientCredentialsEmpty}
 		}
 
 		pingfederateContext = context.WithValue(ctx, pingfederateGoClient.ContextOAuth2, pingfederateGoClient.OAuthValues{
@@ -234,14 +233,14 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 			Scopes:       strings.Split(pfScopes, ","),
 		})
 	default:
-		return fmt.Errorf("%w: '%s'", ErrPingFederateAuthType, authType)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrPingFederateAuthType, authType)}
 	}
 
 	// Test PF API client with create Context Auth
 	_, response, err := pingfederateApiClient.VersionAPI.GetVersion(pingfederateContext).Execute()
 	ok, err := common.HandleClientResponse(response, err, "GetVersion", "pingfederate_client_init")
 	if err != nil || !ok {
-		return ErrPingFederateInit
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrPingFederateInit}
 	}
 
 	return nil
@@ -270,7 +269,7 @@ func initPingFederateApiClient(tr *http.Transport, pingcliVersion string) (err e
 	l.Debug().Msgf("Initializing PingFederate API client.")
 
 	if tr == nil {
-		return ErrHttpTransportNil
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrHttpTransportNil}
 	}
 
 	httpsHost, err := profiles.GetOptionValue(options.PingFederateHTTPSHostOption)
@@ -292,7 +291,7 @@ func initPingFederateApiClient(tr *http.Transport, pingcliVersion string) (err e
 	}
 
 	if httpsHost == "" {
-		return ErrHttpsHostEmpty
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrHttpsHostEmpty}
 	}
 
 	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
@@ -323,7 +322,7 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 	l.Debug().Msgf("Initializing PingOne API client.")
 
 	if ctx == nil {
-		return ErrNilContext
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrNilContext}
 	}
 
 	// Try to get legacy worker credentials first
@@ -336,7 +335,7 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 	}
 
 	if regionCode == "" {
-		return auth_internal.ErrRegionCodeRequired
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: auth_internal.ErrRegionCodeRequired}
 	}
 
 	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
@@ -385,7 +384,7 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 		pingoneApiClient, err = apiConfig.APIClient(ctx)
 		if err != nil {
-			return fmt.Errorf("%w: %w", ErrPingOneInit, err)
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: %w", ErrPingOneInit, err)}
 		}
 
 		if err := cacheLegacyWorkerToken(pingoneApiClient, workerClientID, workerEnvironmentID); err != nil {
@@ -438,23 +437,23 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 			return err
 		}
 	default:
-		return fmt.Errorf("%w: '%s'. Please configure worker credentials or a supported authentication type (auth_code, device_code, client_credentials)", auth_internal.ErrPingOneUnrecognizedAuthType, authType)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'. Please configure worker credentials or a supported authentication type (auth_code, device_code, client_credentials)", auth_internal.ErrPingOneUnrecognizedAuthType, authType)}
 	}
 
 	pingoneApiClientId = clientID
 
 	if environmentID == "" {
-		return ErrPingOneEnvironmentIDEmpty
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrPingOneEnvironmentIDEmpty}
 	}
 
 	tokenSource, err := auth_internal.GetValidTokenSource(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to get valid token source for pingone API client: %w", err)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to get valid token source for pingone API client: %w", err)}
 	}
 
 	token, err := tokenSource.Token()
 	if err != nil {
-		return fmt.Errorf("failed to get access token for pingone API client: %w", err)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to get access token for pingone API client: %w", err)}
 	}
 
 	accessToken := token.AccessToken
@@ -471,7 +470,7 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	pingoneApiClient, err = apiConfig.APIClient(ctx)
 	if err != nil {
-		return fmt.Errorf("failed to initialize pingone API client: %w", err)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to initialize pingone API client: %w", err)}
 	}
 
 	return nil
@@ -482,19 +481,19 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 
 	// Check if outputDir is empty
 	if outputDir == "" {
-		return "", fmt.Errorf("%w. Specify the output directory "+
+		return "", &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w. Specify the output directory "+
 			"via the '--%s' flag, '%s' environment variable, or key '%s' in the configuration file",
 			ErrOutputDirectoryEmpty,
 			options.PlatformExportOutputDirectoryOption.CobraParamName,
 			options.PlatformExportOutputDirectoryOption.EnvVar,
-			options.PlatformExportOutputDirectoryOption.KoanfKey)
+			options.PlatformExportOutputDirectoryOption.KoanfKey)}
 	}
 
 	// Check if path is absolute. If not, make it absolute using the present working directory
 	if !filepath.IsAbs(outputDir) {
 		pwd, err := os.Getwd()
 		if err != nil {
-			return "", fmt.Errorf("%w: %w", ErrGetPresentWorkingDirectory, err)
+			return "", &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: %w", ErrGetPresentWorkingDirectory, err)}
 		}
 
 		outputDir = filepath.Join(pwd, outputDir)
@@ -509,7 +508,7 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 
 		err = os.MkdirAll(outputDir, os.FileMode(0700))
 		if err != nil {
-			return "", fmt.Errorf("%w '%s': %w", ErrCreateOutputDirectory, outputDir, err)
+			return "", &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrCreateOutputDirectory, outputDir, err)}
 		}
 
 		output.Success(fmt.Sprintf("Output directory '%s' created", outputDir), nil)
@@ -519,11 +518,11 @@ func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolved
 		// This can be changed with the --overwrite export parameter
 		dirEntries, err := os.ReadDir(outputDir)
 		if err != nil {
-			return "", fmt.Errorf("%w '%s': %w", ErrReadOutputDirectory, outputDir, err)
+			return "", &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrReadOutputDirectory, outputDir, err)}
 		}
 
 		if len(dirEntries) > 0 {
-			return "", fmt.Errorf("%w: '%s'", ErrOutputDirectoryNotEmpty, outputDir)
+			return "", &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrOutputDirectoryNotEmpty, outputDir)}
 		}
 	}
 
@@ -542,7 +541,7 @@ func getPingOneExportEnvID() (err error) {
 			return err
 		}
 		if pingoneExportEnvID == "" {
-			return ErrDeterminePingOneExportEnv
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrDeterminePingOneExportEnv}
 		}
 
 		output.Message("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
@@ -556,11 +555,11 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 	l.Debug().Msgf("Validating export environment ID...")
 
 	if ctx == nil {
-		return fmt.Errorf("%w '%s': context is nil", ErrValidatePingOneEnvId, pingoneExportEnvID)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': context is nil", ErrValidatePingOneEnvId, pingoneExportEnvID)}
 	}
 
 	if pingoneApiClient == nil {
-		return fmt.Errorf("%w '%s': apiClient is nil", ErrValidatePingOneEnvId, pingoneExportEnvID)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': apiClient is nil", ErrValidatePingOneEnvId, pingoneExportEnvID)}
 	}
 
 	environment, response, err := pingoneApiClient.ManagementAPIClient.EnvironmentsApi.ReadOneEnvironment(ctx, pingoneExportEnvID).Execute()
@@ -569,11 +568,11 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 		return err
 	}
 	if !ok {
-		return fmt.Errorf("%w: '%s'", ErrValidatePingOneEnvId, pingoneExportEnvID)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrValidatePingOneEnvId, pingoneExportEnvID)}
 	}
 
 	if environment == nil {
-		return fmt.Errorf("%w: '%s'", ErrPingOneEnvNotExist, pingoneExportEnvID)
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrPingOneEnvNotExist, pingoneExportEnvID)}
 	}
 
 	return nil
@@ -609,32 +608,20 @@ func getExportableConnectors(exportServices *customtypes.ExportServices) (export
 	return &connectors
 }
 
-func loadLegacyWorkerToken(_ context.Context, clientID, environmentID string) (accessToken string, valid bool) {
+func loadLegacyWorkerToken(_ context.Context, _, _ string) (accessToken string, valid bool) {
 	l := logger.Get()
 
-	tokenKey := generateLegacyWorkerTokenKey(clientID, environmentID)
-	storage := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-	token, err := storage.LoadToken()
-	if err != nil {
-		l.Debug().Msgf("No cached token found for legacy worker auth: %v", err)
+	// Legacy worker token loading is deprecated - always return invalid to force re-auth
+	l.Debug().Msg("Legacy worker token caching is deprecated - using direct authentication")
 
-		return "", false
-	}
-
-	if !token.Valid() {
-		l.Debug().Msg("Cached token for legacy worker auth is expired")
-
-		return "", false
-	}
-
-	return token.AccessToken, true
+	return "", false
 }
 
 func cacheLegacyWorkerToken(client *pingoneGoClient.Client, _, _ string) error {
 	l := logger.Get()
 
 	if client == nil {
-		return ErrPingOneClientNil
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrPingOneClientNil}
 	}
 
 	l.Debug().Msg("Legacy worker token caching skipped - old SDK handles its own caching")
@@ -642,15 +629,9 @@ func cacheLegacyWorkerToken(client *pingoneGoClient.Client, _, _ string) error {
 	return nil
 }
 
-func generateLegacyWorkerTokenKey(clientID, environmentID string) string {
-	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(fmt.Sprintf("%s:%s:worker", environmentID, clientID))))
-
-	return fmt.Sprintf("token-%s", hash[:16])
-}
-
 func exportConnectors(exportableConnectors *[]connector.Exportable, exportFormat, outputDir string, overwriteExport bool) (err error) {
 	if exportableConnectors == nil {
-		return ErrConnectorListNil
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrConnectorListNil}
 	}
 
 	// Loop through user defined exportable connectors and export them
@@ -659,7 +640,7 @@ func exportConnectors(exportableConnectors *[]connector.Exportable, exportFormat
 
 		err := connector.Export(exportFormat, outputDir, overwriteExport)
 		if err != nil {
-			return fmt.Errorf("%w '%s': %w", ErrExportService, connector.ConnectorServiceName(), err)
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w '%s': %w", ErrExportService, connector.ConnectorServiceName(), err)}
 		}
 	}
 

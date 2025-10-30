@@ -19,9 +19,9 @@ func PlatformExportPingOneAuthenticationTypeFunc(cmd *cobra.Command, args []stri
 	return customtypes.PingOneAuthenticationTypeValidValues(), cobra.ShellCompDirectiveNoFileComp
 }
 
-// func PlatformExportPingOneRegionCodeFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
-// 	return customtypes.PingOneRegionCodeValidValues(), cobra.ShellCompDirectiveNoFileComp
-// }
+func PlatformExportPingOneRegionCodeFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	return customtypes.PingOneRegionCodeValidValues(), cobra.ShellCompDirectiveNoFileComp
+}
 
 func PlatformExportServicesFunc(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 	return customtypes.ExportServicesValidValues(), cobra.ShellCompDirectiveNoFileComp

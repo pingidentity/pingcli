@@ -21,14 +21,18 @@ pingcli auth logout
 - Refresh tokens
 - Token metadata (expiry, creation time)
 
+### Storage Locations (Both Cleared)
+1. **OS Credential Stores:**
+   - **macOS**: Keychain Services
+   - **Windows**: Windows Credential Manager  
+   - **Linux**: Secret Service API (GNOME Keyring/KDE KWallet)
+
+2. **File Storage:**
+   - `~/.pingcli/credentials/*.json` - Encrypted token files (one per auth method)
+
 ### Cache
 - PingOne API client cache
 - Cached authentication state
-
-### Storage Locations
-- **macOS**: Keychain Services
-- **Windows**: Windows Credential Manager  
-- **Linux**: Secret Service API (GNOME Keyring/KDE KWallet)
 
 ## Examples
 
@@ -38,7 +42,7 @@ pingcli auth logout
 ```
 **Output:**
 ```
-Successfully logged out. Credentials cleared from Keychain.
+Successfully logged out. Credentials cleared from Keychain and file storage.
 ```
 
 ### Logout in Automation
@@ -77,14 +81,16 @@ pingcli request get /environments
 
 Expected response:
 ```
-Error: no authentication found in Keychain. Please run 'pingcli login --device-code' to authenticate
+Error: no valid authentication token found. Please run 'pingcli auth login --device-code' to authenticate
 ```
 
 ## Manual Token Removal
 
-If logout fails, manually remove tokens:
+If logout fails, manually remove tokens from both storage locations:
 
-### macOS
+### Keychain/Credential Store
+
+**macOS:**
 ```bash
 # Command line
 security delete-generic-password -s "pingcli" -a "device-code-token"
@@ -92,7 +98,7 @@ security delete-generic-password -s "pingcli" -a "device-code-token"
 # GUI: Keychain Access → search "pingcli" → delete entry
 ```
 
-### Windows
+**Windows:**
 ```cmd
 # Command line
 cmdkey /delete:LegacyGeneric:target=pingcli
@@ -100,12 +106,23 @@ cmdkey /delete:LegacyGeneric:target=pingcli
 # GUI: Control Panel → Credential Manager → remove pingcli entry
 ```
 
-### Linux
+**Linux:**
 ```bash
 # GNOME
 secret-tool clear service pingcli
 
 # GUI: seahorse → search "pingcli" → delete
+```
+
+### File Storage
+
+**All Platforms:**
+```bash
+# Remove all token files
+rm -rf ~/.pingcli/credentials
+
+# Or remove specific auth method
+rm ~/.pingcli/credentials/device-code-token.json
 ```
 
 ## Troubleshooting

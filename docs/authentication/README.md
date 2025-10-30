@@ -56,32 +56,62 @@ pingcli auth logout
 
 ### Token Storage
 
-pingcli uses the [`pingone-go-client`](https://github.com/pingidentity/pingone-go-client) SDK for secure token storage across platforms:
+pingcli uses a **dual storage system** to ensure tokens are accessible across different environments:
 
-- **macOS**: Keychain Services
-- **Windows**: Windows Credential Manager  
-- **Linux**: Secret Service API
+1. **Primary Storage**: Secure platform credential stores (via [`pingone-go-client`](https://github.com/pingidentity/pingone-go-client) SDK)
+   - **macOS**: Keychain Services
+   - **Windows**: Windows Credential Manager  
+   - **Linux**: Secret Service API
 
-The SDK provides a consistent `TokenStorage` interface that handles:
-- Token serialization and encryption
-- Cross-platform credential store access
-- Automatic token cleanup on logout
+2. **Secondary Storage**: Encrypted file-based storage at `~/.pingcli/credentials/`
+   - Used when keychain storage fails or is unavailable
+   - Automatically created and maintained
+   - One file per authentication method (e.g., `device-code-token.json`, `auth-code-token.json`)
+   - Provides compatibility with SSH sessions, containers, and CI/CD environments
+
+### Storage Behavior
+
+By default, tokens are stored in **both** locations:
+- Keychain storage (if available) - for system-wide secure access
+- File storage (always) - for reliability and portability
+
+#### Using the `--use-keychain` Flag
+
+The `--use-keychain` flag controls token retrieval preference:
+
+```bash
+# Use keychain-stored token exclusively (fails if unavailable)
+pingcli request --use-keychain get /environments
+
+# Default: Try keychain first, fallback to file
+pingcli request get /environments
+```
+
+**Behavior**:
+- `--use-keychain=true`: Only attempts keychain retrieval. Fails if keychain token is missing or inaccessible.
+- `--use-keychain=false` (default): Tries keychain first, automatically falls back to file storage if keychain fails.
+
+**Use Cases**:
+- `--use-keychain=true`: Enforce keychain security in trusted environments
+- Default behavior: Maximum compatibility across environments (SSH, containers, CI/CD)
 
 ### SDK Integration
 
-Authentication tokens are managed through the SDK's `oauth2.KeychainStorage` implementation:
+Token storage leverages the SDK's `oauth2.KeychainStorage` implementation alongside local file storage:
 
 ```go
-// Global token storage instance
-var tokenStorage = oauth2.NewKeychainStorage("pingcli", "device-code-token")
+// Dual storage approach
+var keychainStorage = oauth2.NewKeychainStorage("pingcli", "device-code-token")
+var fileStorage = auth.NewFileStorage("~/.pingcli/credentials/device-code-token.json")
 
-// Token operations delegate to SDK
+// Tokens are stored in both locations
 func SaveToken(token *oauth2.Token) error {
-    return tokenStorage.SaveToken(token)
+    keychainStorage.SaveToken(token)  // Best effort
+    return fileStorage.SaveToken(token)  // Always succeeds
 }
 ```
 
-This ensures consistent token management across all applications using the `pingone-go-client` SDK.
+This ensures consistent token management while providing maximum reliability across all environments.
 
 ## See Also
 - [Authentication Overview](overview.md)

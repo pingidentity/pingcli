@@ -5,6 +5,8 @@ package platform_internal
 import "errors"
 
 var (
+	exportErrorPrefix = "platform export error"
+
 	ErrNilContext               = errors.New("context is nil")
 	ErrReadCaCertPemFile        = errors.New("failed to read CA certificate PEM file")
 	ErrAppendToCertPool         = errors.New("failed to append to certificate pool from PEM file")

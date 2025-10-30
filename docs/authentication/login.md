@@ -148,12 +148,44 @@ Error: failed to get valid token (may need to re-authenticate)
 ```
 **Solution:** Check configuration and try again. Use `pingcli auth logout` to clear any corrupted tokens.
 
+## Token Storage
+
+pingcli uses a **dual storage system** for maximum reliability:
+
+1. **Primary**: OS credential stores (Keychain/Credential Manager/Secret Service)
+2. **Secondary**: Encrypted file storage at `~/.pingcli/tokens`
+
+### Storage Behavior
+- Tokens are automatically stored in **both** locations
+- Keychain provides system-wide secure access
+- File storage ensures compatibility with SSH, containers, and CI/CD
+
+### Using `--use-keychain` Flag
+
+Control token retrieval preference in commands that use stored tokens:
+
+```bash
+# Use keychain token exclusively (fails if unavailable)
+pingcli request --use-keychain get /environments
+
+# Default: Try keychain first, fallback to file
+pingcli request get /environments
+```
+
+**When to use `--use-keychain=true`:**
+- Enforce keychain security in trusted environments
+- Ensure tokens come from OS credential store only
+
+**Default behavior (recommended):**
+- Maximum compatibility across environments
+- Automatic fallback ensures reliability
+
 ## Security Notes
 
-- Tokens are stored securely in OS credential store
+- Tokens are stored in both OS credential store and encrypted file
 - Device code and auth code flows provide refresh tokens for automatic renewal
 - Client credentials flow requires secure secret management
-- Use `pingcli auth logout` to clear tokens when switching environments
+- Use `pingcli auth logout` to clear tokens from both locations when switching environments
 
 ## See Also
 - [Authentication Overview](overview.md)
