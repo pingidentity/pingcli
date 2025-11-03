@@ -90,7 +90,7 @@ integration:
 	}
 
 	// Test performing fresh client credentials authentication
-	token, newAuth, err := auth_internal.PerformClientCredentialsLogin(context.Background())
+	token, newAuth, _, err := auth_internal.PerformClientCredentialsLogin(context.Background())
 	if err != nil {
 		t.Fatalf("Client credentials authentication should succeed: %v", err)
 	}
@@ -155,7 +155,7 @@ integration:
 	}
 
 	// First authenticate to have a token
-	token, _, err := auth_internal.PerformClientCredentialsLogin(context.Background())
+	token, _, _, err := auth_internal.PerformClientCredentialsLogin(context.Background())
 	if err != nil {
 		t.Fatalf("Client credentials authentication should succeed: %v", err)
 	}
@@ -164,7 +164,7 @@ integration:
 	}
 
 	// Save the token to keychain for the next test
-	err = auth_internal.SaveToken(token)
+	_, err = auth_internal.SaveToken(token)
 	if err != nil {
 		t.Fatalf("Should be able to save token to keychain: %v", err)
 	}

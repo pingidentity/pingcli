@@ -27,30 +27,52 @@ func getTokenStorage(authMethod string) *svcOAuth2.KeychainStorage {
 	return svcOAuth2.NewKeychainStorage("pingcli", authMethod)
 }
 
-// shouldUseKeychain checks if keychain storage should be used based on the --files-option flag
+// shouldUseKeychain checks if keychain storage should be used based on the --file-storage flag
+// Returns true if keychain should be used (default), false if file storage should be used
 func shouldUseKeychain() bool {
-	useKeychain, err := profiles.GetOptionValue(options.AuthFileStorageOption)
+	useFileStorage, err := profiles.GetOptionValue(options.AuthFileStorageOption)
 	if err != nil {
 		// If we can't get the value, default to true (use keychain)
 		return true
 	}
 
-	if useKeychain == "" {
-		// If not set, default to true
-		return false
+	if useFileStorage == "" {
+		// If not set, default to true (use keychain)
+		return true
 	}
 
-	// Parse the string value to bool
-	return useKeychain == "true"
+	// If --file-storage is true, we should NOT use keychain
+	return useFileStorage != "true"
+}
+
+// getStorageType returns the appropriate storage type based on the --file-storage flag
+func getStorageType() config.StorageType {
+	if shouldUseKeychain() {
+		return config.StorageTypeKeychain
+	}
+	return config.StorageTypeFile
+}
+
+// StorageLocation indicates where credentials were saved
+type StorageLocation struct {
+	Keychain bool
+	File     bool
 }
 
 // SaveTokenForMethod saves an OAuth2 token to the keychain using the specified authentication method key
 // Falls back to file storage if keychain operations fail or if --use-keychain=false
-func SaveTokenForMethod(token *oauth2.Token, authMethod string) error {
+// Returns StorageLocation indicating where the token was saved
+func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation, error) {
+	location := StorageLocation{}
+
 	// Check if user disabled keychain
 	if !shouldUseKeychain() {
 		// Directly save to file storage
-		return saveTokenToFile(token, authMethod)
+		if err := saveTokenToFile(token, authMethod); err != nil {
+			return location, err
+		}
+		location.File = true
+		return location, nil
 	}
 
 	storage := getTokenStorage(authMethod)
@@ -60,13 +82,15 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) error {
 	if err != nil {
 		// Fallback to file storage if keychain fails
 		if fileErr := saveTokenToFile(token, authMethod); fileErr != nil {
-			return fmt.Errorf("failed to save token to keychain (%w) and file storage (%w)", err, fileErr)
+			return location, fmt.Errorf("failed to save token to keychain (%w) and file storage (%w)", err, fileErr)
 		}
 		// Token saved to file successfully
-		return nil
+		location.File = true
+		return location, nil
 	}
 
-	return nil
+	location.Keychain = true
+	return location, nil
 }
 
 // LoadTokenForMethod loads an OAuth2 token from the keychain using the specified authentication method key
@@ -96,7 +120,7 @@ func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 }
 
 // SaveToken saves an OAuth2 token using device code storage for backward compatibility with older versions
-func SaveToken(token *oauth2.Token) error {
+func SaveToken(token *oauth2.Token) (StorageLocation, error) {
 	return SaveTokenForMethod(token, deviceCodeTokenKey)
 }
 
@@ -269,10 +293,10 @@ func ClearTokenForMethod(authMethod string) error {
 
 // PerformDeviceCodeLogin performs device code authentication, returning the token, whether it's new authentication,
 // and any error encountered during the process
-func PerformDeviceCodeLogin(ctx context.Context) (*oauth2.Token, bool, error) {
+func PerformDeviceCodeLogin(ctx context.Context) (*oauth2.Token, bool, StorageLocation, error) {
 	cfg, err := GetDeviceCodeConfiguration()
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get device code configuration: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get device code configuration: %w", err)
 	}
 
 	// Set grant type to device code
@@ -287,31 +311,32 @@ func PerformDeviceCodeLogin(ctx context.Context) (*oauth2.Token, bool, error) {
 
 		// If we have a valid token, return it without performing new authentication
 		if existingToken != nil && existingToken.Valid() {
-			return existingToken, false, nil
+			return existingToken, false, StorageLocation{}, nil
 		}
 	}
 
 	// Get token source to perform authentication or use cached token
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get token source: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get token source: %w", err)
 	}
 
 	// Get token (SDK will return cached token if valid, or perform new authentication)
 	token, err := tokenSource.Token()
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get token: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get token: %w", err)
 	}
 
 	// Save token using our storage method (respects --use-keychain flag)
+	var location StorageLocation
 	if tokenKey != "" {
-		_ = SaveTokenForMethod(token, tokenKey)
+		location, _ = SaveTokenForMethod(token, tokenKey)
 	}
 
 	// Determine if this was new authentication by comparing with what we loaded
 	newAuth := existingToken == nil || existingToken.AccessToken != token.AccessToken
 
-	return token, newAuth, nil
+	return token, newAuth, location, nil
 }
 
 // GetDeviceCodeConfiguration builds a device code authentication configuration from the CLI profile options
@@ -355,14 +380,17 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	scopesList := parseScopesList(scopes)
 	cfg = cfg.WithDeviceCodeScopes(scopesList)
 
+	// Configure storage options based on --file-storage flag
+	cfg = cfg.WithStorageType(getStorageType())
+
 	// Apply region configuration
 	return applyRegionConfiguration(cfg)
 }
 
-func PerformAuthCodeLogin(ctx context.Context) (*oauth2.Token, bool, error) {
+func PerformAuthCodeLogin(ctx context.Context) (*oauth2.Token, bool, StorageLocation, error) {
 	cfg, err := GetAuthCodeConfiguration()
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get auth code configuration: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get auth code configuration: %w", err)
 	}
 
 	// Set grant type to auth code
@@ -377,31 +405,32 @@ func PerformAuthCodeLogin(ctx context.Context) (*oauth2.Token, bool, error) {
 
 		// If we have a valid token, return it without performing new authentication
 		if existingToken != nil && existingToken.Valid() {
-			return existingToken, false, nil
+			return existingToken, false, StorageLocation{}, nil
 		}
 	}
 
 	// Get token source to perform authentication or use cached token
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get token source: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get token source: %w", err)
 	}
 
 	// Get token (SDK will return cached token if valid, or perform new authentication)
 	token, err := tokenSource.Token()
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get token: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get token: %w", err)
 	}
 
 	// Save token using our storage method (respects --use-keychain flag)
+	var location StorageLocation
 	if tokenKey != "" {
-		_ = SaveTokenForMethod(token, tokenKey)
+		location, _ = SaveTokenForMethod(token, tokenKey)
 	}
 
 	// Determine if this was new authentication by comparing with what we loaded
 	newAuth := existingToken == nil || existingToken.AccessToken != token.AccessToken
 
-	return token, newAuth, nil
+	return token, newAuth, location, nil
 }
 
 // GetAuthCodeConfiguration builds an authorization code authentication configuration from the CLI profile options
@@ -470,14 +499,17 @@ func GetAuthCodeConfiguration() (*config.Configuration, error) {
 		cfg = cfg.WithAuthCodeScopes(scopesList)
 	}
 
+	// Configure storage options based on --file-storage flag
+	cfg = cfg.WithStorageType(getStorageType())
+
 	// Apply region configuration
 	return applyRegionConfiguration(cfg)
 }
 
-func PerformClientCredentialsLogin(ctx context.Context) (*oauth2.Token, bool, error) {
+func PerformClientCredentialsLogin(ctx context.Context) (*oauth2.Token, bool, StorageLocation, error) {
 	cfg, err := GetClientCredentialsConfiguration()
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get client credentials configuration: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get client credentials configuration: %w", err)
 	}
 
 	// Set grant type to client credentials
@@ -492,31 +524,32 @@ func PerformClientCredentialsLogin(ctx context.Context) (*oauth2.Token, bool, er
 
 		// If we have a valid token, return it without performing new authentication
 		if existingToken != nil && existingToken.Valid() {
-			return existingToken, false, nil
+			return existingToken, false, StorageLocation{}, nil
 		}
 	}
 
 	// Get token source to perform authentication or use cached token
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get token source: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get token source: %w", err)
 	}
 
 	// Get token (SDK will return cached token if valid, or perform new authentication)
 	token, err := tokenSource.Token()
 	if err != nil {
-		return nil, false, fmt.Errorf("failed to get token: %w", err)
+		return nil, false, StorageLocation{}, fmt.Errorf("failed to get token: %w", err)
 	}
 
 	// Save token using our storage method (respects --use-keychain flag)
+	var location StorageLocation
 	if tokenKey != "" {
-		_ = SaveTokenForMethod(token, tokenKey)
+		location, _ = SaveTokenForMethod(token, tokenKey)
 	}
 
 	// Determine if this was new authentication by comparing with what we loaded
 	newAuth := existingToken == nil || existingToken.AccessToken != token.AccessToken
 
-	return token, newAuth, nil
+	return token, newAuth, location, nil
 }
 
 // GetClientCredentialsConfiguration builds a client credentials authentication configuration from the CLI profile options
@@ -575,6 +608,9 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		cfg = cfg.WithClientCredentialsScopes(scopesList)
 	}
 
+	// Configure storage options based on --file-storage flag
+	cfg = cfg.WithStorageType(getStorageType())
+
 	// Apply region configuration
 	return applyRegionConfiguration(cfg)
 }
@@ -598,20 +634,21 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	// Automatically authenticate based on configured method
 	var token *oauth2.Token
 	var newAuth bool
+	var location StorageLocation
 
 	switch authType {
 	case "device_code":
-		token, newAuth, err = PerformDeviceCodeLogin(ctx)
+		token, newAuth, location, err = PerformDeviceCodeLogin(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("automatic device code authentication failed: %w", err)
 		}
 	case "auth_code":
-		token, newAuth, err = PerformAuthCodeLogin(ctx)
+		token, newAuth, location, err = PerformAuthCodeLogin(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("automatic authorization code authentication failed: %w", err)
 		}
 	case "client_credentials":
-		token, newAuth, err = PerformClientCredentialsLogin(ctx)
+		token, newAuth, location, err = PerformClientCredentialsLogin(ctx)
 		if err != nil {
 			return nil, fmt.Errorf("automatic client credentials authentication failed: %w", err)
 		}
@@ -623,7 +660,15 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	}
 
 	if newAuth {
-		fmt.Printf("Successfully authenticated using %s authentication\n", authType)
+		locationMsg := "storage"
+		if location.Keychain && location.File {
+			locationMsg = "keychain and file storage"
+		} else if location.Keychain {
+			locationMsg = "keychain"
+		} else if location.File {
+			locationMsg = "file storage"
+		}
+		fmt.Printf("Successfully authenticated using %s authentication (credentials saved to %s)\n", authType, locationMsg)
 	}
 
 	// Return a static token source with the obtained token

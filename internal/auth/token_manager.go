@@ -119,7 +119,8 @@ func (tm *DefaultTokenManager) SaveToken(token *oauth2.Token) error {
 		return fmt.Errorf("failed to get current auth method: %w", err)
 	}
 
-	return SaveTokenForMethod(token, authMethod)
+	_, err = SaveTokenForMethod(token, authMethod)
+	return err
 }
 
 // LoadToken loads a token from the keychain for the currently configured authentication method

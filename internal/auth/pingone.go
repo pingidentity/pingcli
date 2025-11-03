@@ -220,6 +220,9 @@ func getConfigConfiguration() (*config.Configuration, error) {
 
 	configConfiguration.WithGrantType(pingoneoauth2.GrantType(authType))
 
+	// Configure storage options based on --file-storage flag
+	configConfiguration.WithStorageType(getStorageType())
+
 	// Apply region configuration
 	configConfiguration, err = applyRegionConfiguration(configConfiguration)
 	if err != nil {

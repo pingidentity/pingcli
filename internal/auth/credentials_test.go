@@ -16,7 +16,7 @@ func TestPerformDeviceCodeLogin_MissingConfiguration(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, _, err := auth_internal.PerformDeviceCodeLogin(ctx)
+	_, _, _, err := auth_internal.PerformDeviceCodeLogin(ctx)
 
 	if err == nil {
 		t.Error("Expected error, but got nil")
@@ -34,7 +34,7 @@ func TestPerformClientCredentialsLogin_MissingConfiguration(t *testing.T) {
 
 	ctx := context.Background()
 
-	token, newAuth, err := auth_internal.PerformClientCredentialsLogin(ctx)
+	token, newAuth, _, err := auth_internal.PerformClientCredentialsLogin(ctx)
 
 	// In test environment, valid credentials may be configured, resulting in successful auth
 	// If credentials are missing, we'll get an error
@@ -59,7 +59,7 @@ func TestPerformAuthCodeLogin_MissingConfiguration(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, _, err := auth_internal.PerformAuthCodeLogin(ctx)
+	_, _, _, err := auth_internal.PerformAuthCodeLogin(ctx)
 
 	if err == nil {
 		t.Error("Expected error, but got nil")
@@ -192,7 +192,7 @@ func TestSaveAndLoadToken(t *testing.T) {
 	testKey := "test-token-key"
 
 	// Test that SaveTokenForMethod returns an error with nil token
-	err := auth_internal.SaveTokenForMethod(nil, testKey)
+	_, err := auth_internal.SaveTokenForMethod(nil, testKey)
 	if err == nil {
 		t.Error("Expected error, but got nil")
 	}
@@ -248,7 +248,7 @@ func TestAuthenticationErrorMessages_ClientCredentials(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	ctx := context.Background()
-	_, _, err := auth_internal.PerformClientCredentialsLogin(ctx)
+	_, _, _, err := auth_internal.PerformClientCredentialsLogin(ctx)
 
 	// In test environment, worker credentials are typically configured
 	if err == nil {
@@ -266,7 +266,7 @@ func TestAuthenticationErrorMessages_AuthCode(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	ctx := context.Background()
-	_, _, err := auth_internal.PerformAuthCodeLogin(ctx)
+	_, _, _, err := auth_internal.PerformAuthCodeLogin(ctx)
 
 	if err == nil {
 		t.Skip("Auth code authentication succeeded (full configuration present)")
@@ -343,7 +343,7 @@ func TestConfigurationValidation_AuthCode(t *testing.T) {
 func TestSaveToken_NilToken(t *testing.T) {
 	testKey := "test-token-key"
 
-	err := auth_internal.SaveTokenForMethod(nil, testKey)
+	_, err := auth_internal.SaveTokenForMethod(nil, testKey)
 
 	if err == nil {
 		t.Error("Expected error, but got nil")

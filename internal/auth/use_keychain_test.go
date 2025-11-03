@@ -15,8 +15,8 @@ import (
 func TestSaveTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	// Set use-keychain to false via environment variable
-	t.Setenv("PINGCLI_AUTH_USE_KEYCHAIN", "false")
+	// Set file-storage to true to disable keychain
+	t.Setenv("PINGCLI_AUTH_FILE_STORAGE", "true")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-access-token",
@@ -32,9 +32,14 @@ func TestSaveTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	})
 
 	// Save token - should go to file storage since keychain is disabled
-	err := SaveTokenForMethod(testToken, authMethod)
+	location, err := SaveTokenForMethod(testToken, authMethod)
 	if err != nil {
 		t.Fatalf("Failed to save token with keychain disabled: %v", err)
+	}
+
+	// Verify location indicates file storage only
+	if !location.File || location.Keychain {
+		t.Errorf("Expected file storage only, got Keychain=%v, File=%v", location.Keychain, location.File)
 	}
 
 	// Verify token was saved to file
@@ -52,8 +57,8 @@ func TestSaveTokenForMethod_WithKeychainDisabled(t *testing.T) {
 func TestSaveTokenForMethod_WithKeychainEnabled(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	// Keychain is enabled by default, but let's be explicit
-	t.Setenv("PINGCLI_AUTH_USE_KEYCHAIN", "true")
+	// Keychain is enabled by default (file-storage=false)
+	t.Setenv("PINGCLI_AUTH_FILE_STORAGE", "false")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-access-token-keychain",
@@ -69,11 +74,13 @@ func TestSaveTokenForMethod_WithKeychainEnabled(t *testing.T) {
 	})
 
 	// Save token - should try keychain first
-	err := SaveTokenForMethod(testToken, authMethod)
+	location, err := SaveTokenForMethod(testToken, authMethod)
 	if err != nil {
 		// Keychain might not be available in CI/test environment, which is fine
 		// It should fall back to file storage
 		t.Logf("SaveTokenForMethod returned error (expected in environments without keychain): %v", err)
+	} else {
+		t.Logf("Token saved to: Keychain=%v, File=%v", location.Keychain, location.File)
 	}
 
 	// Token should be loadable from either keychain or file storage
@@ -91,8 +98,8 @@ func TestSaveTokenForMethod_WithKeychainEnabled(t *testing.T) {
 func TestLoadTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	// Set use-keychain to false via environment variable
-	t.Setenv("PINGCLI_AUTH_USE_KEYCHAIN", "false")
+	// Set file-storage to true to disable keychain
+	t.Setenv("PINGCLI_AUTH_FILE_STORAGE", "true")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-load-access-token",
@@ -129,8 +136,8 @@ func TestLoadTokenForMethod_FallbackToFileStorage(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// This test verifies the fallback mechanism by using a fresh token key that keychain won't have
-	// We explicitly use keychain disabled mode to ensure file storage is used
-	t.Setenv("PINGCLI_AUTH_USE_KEYCHAIN", "false")
+	// We explicitly use file storage mode to ensure file storage is used
+	t.Setenv("PINGCLI_AUTH_FILE_STORAGE", "true")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-fallback-token",
@@ -187,9 +194,11 @@ func TestShouldUseKeychain_Default(t *testing.T) {
 	})
 
 	// Save token - should try keychain by default
-	err := SaveTokenForMethod(testToken, authMethod)
+	location, err := SaveTokenForMethod(testToken, authMethod)
 	if err != nil {
 		t.Logf("SaveTokenForMethod with default settings returned error: %v", err)
+	} else {
+		t.Logf("Token saved with default settings to: Keychain=%v, File=%v", location.Keychain, location.File)
 	}
 
 	// Should be able to load the token
@@ -267,8 +276,8 @@ func TestPerformLogin_UsesValidCachedToken(t *testing.T) {
 func TestSaveTokenForMethod_FileStorageFallback(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	// Keychain enabled by default
-	t.Setenv("PINGCLI_AUTH_USE_KEYCHAIN", "true")
+	// Keychain enabled by default (file-storage=false)
+	t.Setenv("PINGCLI_AUTH_FILE_STORAGE", "false")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-fallback-save",
@@ -284,9 +293,11 @@ func TestSaveTokenForMethod_FileStorageFallback(t *testing.T) {
 	})
 
 	// Save token - will try keychain first (may succeed or fail depending on environment)
-	err := SaveTokenForMethod(testToken, authMethod)
+	location, err := SaveTokenForMethod(testToken, authMethod)
 	if err != nil {
 		t.Logf("SaveTokenForMethod returned error: %v", err)
+	} else {
+		t.Logf("Token saved - fallback test to: Keychain=%v, File=%v", location.Keychain, location.File)
 	}
 
 	// Give a moment for file system operations to complete
@@ -308,12 +319,12 @@ func TestSaveTokenForMethod_FileStorageFallback(t *testing.T) {
 	}
 }
 
-// TestEnvironmentVariable_UseKeychain tests that PINGCLI_AUTH_USE_KEYCHAIN environment variable is respected
-func TestEnvironmentVariable_UseKeychain(t *testing.T) {
+// TestEnvironmentVariable_FileStorage tests that PINGCLI_AUTH_FILE_STORAGE environment variable is respected
+func TestEnvironmentVariable_FileStorage(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	// Set environment variable
-	t.Setenv("PINGCLI_AUTH_USE_KEYCHAIN", "false")
+	// Set environment variable to use file storage (disables keychain)
+	t.Setenv("PINGCLI_AUTH_FILE_STORAGE", "true")
 
 	// Reinitialize koanf to pick up environment variable
 	testutils_koanf.InitKoanfs(t)
@@ -331,15 +342,20 @@ func TestEnvironmentVariable_UseKeychain(t *testing.T) {
 	})
 
 	// Save token - should respect environment variable
-	err := SaveTokenForMethod(testToken, authMethod)
+	location, err := SaveTokenForMethod(testToken, authMethod)
 	if err != nil {
 		t.Fatalf("Failed to save token with env var: %v", err)
 	}
 
-	// Verify token was saved to file (since env var set to false)
+	// Verify location indicates file storage
+	if !location.File {
+		t.Errorf("Expected file storage with env var, got Keychain=%v, File=%v", location.Keychain, location.File)
+	}
+
+	// Verify token was saved to file (since file-storage is true)
 	loadedToken, err := loadTokenFromFile(authMethod)
 	if err != nil {
-		t.Fatalf("Token should be in file storage when env var is false: %v", err)
+		t.Fatalf("Token should be in file storage when env var is true: %v", err)
 	}
 
 	if loadedToken.AccessToken != testToken.AccessToken {

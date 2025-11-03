@@ -129,27 +129,28 @@ func authLoginRunE(cmd *cobra.Command, args []string) error {
 	// Perform authentication based on selected method flag
 	var token *oauth2.Token
 	var newAuth bool
+	var location auth_internal.StorageLocation
 
 	switch selectedMethod {
 	case string(svcOAuth2.GrantTypeDeviceCode):
-		token, newAuth, err = auth_internal.PerformDeviceCodeLogin(ctx)
+		token, newAuth, location, err = auth_internal.PerformDeviceCodeLogin(ctx)
 		if err != nil {
 			return handleLoginError(err, ctx, profileName)
 		}
 	case string(svcOAuth2.GrantTypeClientCredentials):
-		token, newAuth, err = auth_internal.PerformClientCredentialsLogin(ctx)
+		token, newAuth, location, err = auth_internal.PerformClientCredentialsLogin(ctx)
 		if err != nil {
 			return handleLoginError(err, ctx, profileName)
 		}
 	default:
-		token, newAuth, err = auth_internal.PerformAuthCodeLogin(ctx)
+		token, newAuth, location, err = auth_internal.PerformAuthCodeLogin(ctx)
 		if err != nil {
 			return handleLoginError(err, ctx, profileName)
 		}
 	}
 
 	// Display authentication result
-	displayLoginSuccess(token, newAuth, selectedMethod, profileName)
+	displayLoginSuccess(token, newAuth, location, selectedMethod, profileName)
 
 	return nil
 }
@@ -179,19 +180,20 @@ func ensureAuthConfigurationExists(authMethod string) error {
 func performLoginByConfiguredType(ctx context.Context, authType, profileName string) error {
 	var token *oauth2.Token
 	var newAuth bool
+	var location auth_internal.StorageLocation
 	var err error
 	var selectedMethod string
 
 	switch authType {
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		selectedMethod = string(svcOAuth2.GrantTypeDeviceCode)
-		token, newAuth, err = auth_internal.PerformDeviceCodeLogin(ctx)
+		token, newAuth, location, err = auth_internal.PerformDeviceCodeLogin(ctx)
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
 		selectedMethod = string(svcOAuth2.GrantTypeClientCredentials)
-		token, newAuth, err = auth_internal.PerformClientCredentialsLogin(ctx)
+		token, newAuth, location, err = auth_internal.PerformClientCredentialsLogin(ctx)
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
 		selectedMethod = string(svcOAuth2.GrantTypeAuthCode)
-		token, newAuth, err = auth_internal.PerformAuthCodeLogin(ctx)
+		token, newAuth, location, err = auth_internal.PerformAuthCodeLogin(ctx)
 	default:
 		return &errs.PingCLIError{
 			Prefix: fmt.Sprintf("invalid authentication type: %s", authType),
@@ -203,7 +205,7 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 		return handleLoginError(err, ctx, profileName)
 	}
 
-	displayLoginSuccess(token, newAuth, selectedMethod, profileName)
+	displayLoginSuccess(token, newAuth, location, selectedMethod, profileName)
 
 	return nil
 }
@@ -268,9 +270,21 @@ func isMissingConfigError(err error) bool {
 }
 
 // displayLoginSuccess displays the successful login message
-func displayLoginSuccess(token *oauth2.Token, newAuth bool, selectedMethod, profileName string) {
+func displayLoginSuccess(token *oauth2.Token, newAuth bool, location auth_internal.StorageLocation, selectedMethod, profileName string) {
 	if newAuth {
-		output.Success(fmt.Sprintf("Successfully logged in using %s authentication. Credentials saved to storage for profile '%s'.", selectedMethod, profileName), nil)
+		// Build storage location message
+		var storageMsg string
+		if location.Keychain && location.File {
+			storageMsg = "keychain and file storage"
+		} else if location.Keychain {
+			storageMsg = "keychain"
+		} else if location.File {
+			storageMsg = "file storage"
+		} else {
+			storageMsg = "storage"
+		}
+
+		output.Success(fmt.Sprintf("Successfully logged in using %s authentication. Credentials saved to %s for profile '%s'.", selectedMethod, storageMsg, profileName), nil)
 	} else {
 		output.Message(fmt.Sprintf("Already authenticated with valid %s token for profile '%s'.", selectedMethod, profileName), nil)
 	}

@@ -137,9 +137,10 @@ func initAuthFileStorageOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:  cobraParamName,
-			Usage: "Use file storage for storing authentication tokens. If false, tokens will be stored in memory. (default false)",
-			Value: cobraValue,
+			Name:        cobraParamName,
+			Usage:       "Store authentication tokens in file storage only, bypassing keychain. By default, keychain is attempted first with automatic fallback to file storage.",
+			Value:       cobraValue,
+			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
 		Sensitive: false,
 		Type:      options.BOOL,
