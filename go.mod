@@ -17,9 +17,9 @@ require (
 	github.com/knadh/koanf/providers/file v1.2.0
 	github.com/knadh/koanf/v2 v2.3.0
 	github.com/manifoldco/promptui v0.9.0
-	github.com/patrickcping/pingone-go-sdk-v2 v0.14.2
+	github.com/patrickcping/pingone-go-sdk-v2 v0.14.3
 	github.com/patrickcping/pingone-go-sdk-v2/authorize v0.8.2
-	github.com/patrickcping/pingone-go-sdk-v2/management v0.61.0
+	github.com/patrickcping/pingone-go-sdk-v2/management v0.62.0
 	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.2
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.21.0
 	github.com/pingidentity/pingfederate-go-client/v1230 v1230.0.3
@@ -229,7 +229,7 @@ require (
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/exp/typeparams v0.0.0-20250620022241-b7579e27df2b // indirect
 	golang.org/x/net v0.44.0 // indirect
-	golang.org/x/oauth2 v0.31.0 // indirect
+	golang.org/x/oauth2 v0.32.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
