@@ -37,7 +37,8 @@ integration:
                 authCode:
                     clientID: ""
                     environmentID: ""
-                    redirectURI: ""
+                    redirectURIPath: ""
+                    redirectURIPort: ""
                     scopes: []
 `
 }

@@ -20,11 +20,6 @@ var (
 	pingoneAPIClient *pingone.APIClient
 )
 
-// ClearPingOneClientCache clears the cached PingOne API client instance, forcing re-initialization on next use
-func ClearPingOneClientCache() {
-	pingoneAPIClient = nil
-}
-
 // GetAuthenticatedPingOneClient returns a PingOne API client instance with valid authentication credentials
 func GetAuthenticatedPingOneClient(ctx context.Context) (*pingone.APIClient, error) {
 	// Get a valid token source (will handle caching and refresh)
@@ -140,7 +135,12 @@ func getConfigConfiguration() (*config.Configuration, error) {
 			return nil, err
 		}
 
-		redirectURI, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIOption)
+		redirectURIPath, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIPathOption)
+		if err != nil {
+			return nil, err
+		}
+
+		redirectURIPort, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIPortOption)
 		if err != nil {
 			return nil, err
 		}
@@ -150,7 +150,10 @@ func getConfigConfiguration() (*config.Configuration, error) {
 		configConfiguration.WithAuthCodeClientID(authCodeClientID)
 		configConfiguration.WithAuthCodeEnvironmentID(authCodeEnvId)
 		configConfiguration.WithAuthCodeScopes(authCodeScopesList)
-		configConfiguration.WithAuthCodeRedirectURI(redirectURI)
+		configConfiguration.WithAuthCodeRedirectURI(config.AuthCodeRedirectURI{
+			Port: redirectURIPort,
+			Path: redirectURIPath,
+		})
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		deviceCodeClientID, err := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)

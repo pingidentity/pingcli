@@ -15,8 +15,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// No init() function needed - direct integration is cleaner
-
 // Token storage keys for different authentication methods
 const (
 	deviceCodeTokenKey        = "device-code-token"
@@ -29,9 +27,9 @@ func getTokenStorage(authMethod string) *svcOAuth2.KeychainStorage {
 	return svcOAuth2.NewKeychainStorage("pingcli", authMethod)
 }
 
-// shouldUseKeychain checks if keychain storage should be used based on the --use-keychain flag
+// shouldUseKeychain checks if keychain storage should be used based on the --files-option flag
 func shouldUseKeychain() bool {
-	useKeychain, err := profiles.GetOptionValue(options.AuthUseKeychainOption)
+	useKeychain, err := profiles.GetOptionValue(options.AuthFileStorageOption)
 	if err != nil {
 		// If we can't get the value, default to true (use keychain)
 		return true
@@ -39,7 +37,7 @@ func shouldUseKeychain() bool {
 
 	if useKeychain == "" {
 		// If not set, default to true
-		return true
+		return false
 	}
 
 	// Parse the string value to bool
@@ -247,9 +245,6 @@ func ClearToken() error {
 		}
 	}
 
-	// Also clear the cached PingOne API client to force re-initialization
-	ClearPingOneClientCache()
-
 	return errors.Join(errs...)
 }
 
@@ -268,9 +263,6 @@ func ClearTokenForMethod(authMethod string) error {
 	if err := clearTokenFromFile(authMethod); err != nil {
 		errs = append(errs, fmt.Errorf("file clear failed: %w", err))
 	}
-
-	// Also clear the cached PingOne API client to force re-initialization
-	ClearPingOneClientCache()
 
 	return errors.Join(errs...)
 }
@@ -441,15 +433,25 @@ func GetAuthCodeConfiguration() (*config.Configuration, error) {
 	}
 
 	// Get auth code redirect URI
-	redirectURI, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIOption)
+	redirectURIPath, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIPathOption)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get auth code redirect URI: %w", err)
 	}
-	if redirectURI == "" {
+	if redirectURIPath == "" {
 		return nil, &errs.PingCLIError{
 			Prefix: "failed to get auth code configuration",
 			Err:    ErrAuthCodeRedirectURINotConfigured,
 		}
+	}
+
+	redirectURIPort, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIPortOption)
+	if err != nil && redirectURIPort != "" {
+		return nil, fmt.Errorf("failed to get auth code redirect URI port: %w", err)
+	}
+
+	redirectURI := config.AuthCodeRedirectURI{
+		Port: redirectURIPort,
+		Path: redirectURIPath,
 	}
 
 	// Get auth code scopes (optional)

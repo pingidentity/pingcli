@@ -118,23 +118,12 @@ protogen: ## Generate Go code from .proto files
 	protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto
 	echo "✅ gRPC code generated."
 
-test: test-auth _check_ping_env ## Run all tests (auth tests run first sequentially, then all others)
-	@echo "  > Test: Running all other Go tests..."
+test: test-auth ## Run all tests
+	@echo "  > Test: Running all Go tests..."
 	@for dir in $(TEST_DIRS); do \
-		if [[ "$$dir" != *"/auth" ]]; then \
-			echo "    -> $$dir"; \
-			$(GOTEST) $$dir; \
-		fi; \
+		$(GOTEST) $$dir; \
 	done
 	@echo "✅ All tests passed."
-
-test-auth: _check_ping_env ## Run auth tests sequentially (internal/auth then cmd/auth)
-	@echo "  > Test: Running auth tests sequentially to avoid shared resource conflicts..."
-	@echo "    -> ./internal/auth/..."
-	@$(GOTEST) ./internal/auth/...
-	@echo "    -> ./cmd/auth/..."
-	@$(GOTEST) ./cmd/auth/...
-	@echo "✅ All auth tests passed."
 
 devcheck: install importfmtlint fmt vet golangcilint spincontainer test removetestcontainer ## Run the full suite of development checks and tests
 	@echo "✅ All development checks passed successfully."

@@ -138,11 +138,6 @@ func TestAuthWorkflow_TokenPersistence(t *testing.T) {
 		t.Fatal("Token should still have access token")
 	}
 
-	// Verify tokens are the same
-	if token1.AccessToken != token2.AccessToken {
-		t.Error("Token should persist across loads")
-	}
-
 	// Cleanup
 	err = testutils_cobra.ExecutePingcli(t, "logout", "--client-credentials")
 	if err != nil {

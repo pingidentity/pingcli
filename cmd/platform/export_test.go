@@ -475,7 +475,7 @@ func TestPlatformExportCmd_PingOneAuthCodeAuth(t *testing.T) {
 		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE,
 		"--"+options.PingOneAuthenticationAuthCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID"),
 		"--"+options.PingOneAuthenticationAuthCodeEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
-		"--"+options.PingOneAuthenticationAuthCodeRedirectURIOption.CobraParamName, "http://localhost:8080/callback",
+		"--"+options.PingOneAuthenticationAuthCodeRedirectURIPathOption.CobraParamName, "http://localhost:8080/callback",
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 	testutils.CheckExpectedError(t, err, nil)
 }

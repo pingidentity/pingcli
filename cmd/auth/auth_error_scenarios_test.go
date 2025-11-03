@@ -289,7 +289,8 @@ test:
                 type: auth_code
                 authCode:
                     clientID: 00000000-0000-0000-0000-000000000001
-                    redirectURI: http://localhost:3000/callback
+                    redirectURIPath: /callback
+                    redirectURIPort: "3000"
 `,
 			expectedErrorPattern: `environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},

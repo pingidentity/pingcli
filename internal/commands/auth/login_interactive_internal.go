@@ -78,7 +78,7 @@ func PromptForAuthType(rc io.ReadCloser, showStatus bool) (string, error) {
 }
 
 // PromptForAuthCodeConfig prompts for auth code configuration
-func PromptForAuthCodeConfig(rc io.ReadCloser) (clientID, environmentID, redirectURI, scopes string, err error) {
+func PromptForAuthCodeConfig(rc io.ReadCloser) (clientID, environmentID, redirectURIPath, redirectURIPort, scopes string, err error) {
 	// Client ID (required)
 	clientID, err = input.RunPrompt(
 		"Authorization Code Client ID",
@@ -92,7 +92,7 @@ func PromptForAuthCodeConfig(rc io.ReadCloser) (clientID, environmentID, redirec
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return "", "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
 	// Environment ID (required)
@@ -108,21 +108,22 @@ func PromptForAuthCodeConfig(rc io.ReadCloser) (clientID, environmentID, redirec
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return "", "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
 	// Redirect URI (optional, has default)
 	output.Message(fmt.Sprintf("Redirect URI (press Enter for default: %s)", defaultRedirectURI), nil)
-	redirectURI, err = input.RunPrompt(
-		"Redirect URI",
+	redirectURIPath, err = input.RunPrompt(
+		"Redirect URI path",
 		nil, // No validation - optional
 		rc,
 	)
+
 	if err != nil {
-		return "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return "", "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
-	if strings.TrimSpace(redirectURI) == "" {
-		redirectURI = defaultRedirectURI
+	if strings.TrimSpace(redirectURIPath) == "" {
+		redirectURIPath = defaultRedirectURI
 	}
 
 	// Scopes (optional)
@@ -133,10 +134,10 @@ func PromptForAuthCodeConfig(rc io.ReadCloser) (clientID, environmentID, redirec
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return "", "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
-	return clientID, environmentID, redirectURI, scopes, nil
+	return clientID, environmentID, redirectURIPath, redirectURIPort, scopes, nil
 }
 
 // PromptForDeviceCodeConfig prompts for device code configuration
@@ -252,7 +253,7 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (clientID, clientSecret,
 }
 
 // SaveAuthConfigToProfile saves the authentication configuration to the active profile
-func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, redirectURI, scopes string) error {
+func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, redirectURIPath, redirectURIport, scopes string) error {
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
@@ -282,8 +283,13 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 		if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeEnvironmentIDOption.KoanfKey, environmentID); err != nil {
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
-		if redirectURI != "" {
-			if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeRedirectURIOption.KoanfKey, redirectURI); err != nil {
+		if redirectURIPath != "" {
+			if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeRedirectURIPathOption.KoanfKey, redirectURIPath); err != nil {
+				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+			}
+		}
+		if redirectURIport != "" {
+			if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeRedirectURIPortOption.KoanfKey, redirectURIport); err != nil {
 				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 			}
 		}
@@ -401,12 +407,12 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		}
 	}
 
-	var clientID, clientSecret, environmentID, redirectURI, scopes string
+	var clientID, clientSecret, environmentID, redirectURIPath, redirectURIPort, scopes string
 
 	// Step 3: Collect configuration based on selected type
 	switch authType {
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-		clientID, environmentID, redirectURI, scopes, err = PromptForAuthCodeConfig(rc)
+		clientID, environmentID, redirectURIPath, redirectURIPort, scopes, err = PromptForAuthCodeConfig(rc)
 		if err != nil {
 			return err
 		}
@@ -425,7 +431,7 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 	}
 
 	// Step 4: Save configuration to profile
-	return SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, redirectURI, scopes)
+	return SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, redirectURIPath, redirectURIPort, scopes)
 }
 
 // PromptForReconfiguration asks the user if they want to reconfigure authentication

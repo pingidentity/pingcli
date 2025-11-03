@@ -17,7 +17,7 @@ func InitAuthOptions() {
 	initAuthMethodClientCredentialsOption()
 	initAuthMethodAuthCodeOption()
 	initAuthServiceOption()
-	initAuthUseKeychainOption()
+	initAuthFileStorageOption()
 }
 
 // initAuthMethodDeviceCodeOption initializes the --device-code authentication method flag
@@ -124,25 +124,25 @@ func initAuthServiceOption() {
 	}
 }
 
-// initAuthUseKeychainOption initializes the --use-keychain flag for controlling keychain storage
-func initAuthUseKeychainOption() {
-	cobraParamName := "use-keychain"
+// initAuthFileStorageOption initializes the --file-storage flag for controlling file storage of auth tokens
+func initAuthFileStorageOption() {
+	cobraParamName := "file-storage"
 	cobraValue := new(customtypes.Bool)
-	defaultValue := customtypes.Bool(true)
-	envVar := "PINGCLI_AUTH_USE_KEYCHAIN"
+	defaultValue := customtypes.Bool(false)
+	envVar := "PINGCLI_AUTH_FILE_STORAGE"
 
-	options.AuthUseKeychainOption = options.Option{
+	options.AuthFileStorageOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:  cobraParamName,
-			Usage: "Use system keychain for storing authentication tokens. If false or keychain is unavailable, tokens will be stored in ~/.pingcli/credentials/. (default true)",
+			Usage: "Use file storage for storing authentication tokens. If false, tokens will be stored in memory. (default false)",
 			Value: cobraValue,
 		},
 		Sensitive: false,
 		Type:      options.BOOL,
-		KoanfKey:  "auth.useKeychain",
+		KoanfKey:  "auth.fileStorage",
 	}
 }

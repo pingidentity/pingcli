@@ -29,13 +29,3 @@ func TestGetPingOneAccessToken_MissingConfiguration(t *testing.T) {
 		t.Errorf("Expected configuration error, got: %v", err)
 	}
 }
-
-// Test ClearPingOneClientCache function
-func TestClearPingOneClientCache(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
-	// This should not panic or error
-	auth_internal.ClearPingOneClientCache()
-
-	// Function should complete without issue - if we get here, test passes
-}

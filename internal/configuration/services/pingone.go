@@ -14,7 +14,8 @@ import (
 func InitPingOneServiceOptions() {
 	initPingOneAuthenticationAuthCodeClientIDOption()
 	initPingOneAuthenticationAuthCodeEnvironmentIDOption()
-	initPingOneAuthenticationAuthCodeRedirectURIOption()
+	initPingOneAuthenticationAuthCodeRedirectURIPathOption()
+	initPingOneAuthenticationAuthCodeRedirectURIPortOption()
 	initPingOneAuthenticationAuthCodeScopesOption()
 	initPingOneAuthenticationClientCredentialsClientIDOption()
 	initPingOneAuthenticationClientCredentialsClientSecretOption()
@@ -74,25 +75,47 @@ func initPingOneAuthenticationAuthCodeEnvironmentIDOption() {
 	}
 }
 
-func initPingOneAuthenticationAuthCodeRedirectURIOption() {
-	cobraParamName := "pingone-oidc-auth-code-redirect-uri"
+func initPingOneAuthenticationAuthCodeRedirectURIPathOption() {
+	cobraParamName := "pingone-oidc-auth-code-redirect-uri-path"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCLI_PINGONE_OIDC_AUTH_CODE_REDIRECT_URI"
+	envVar := "PINGCLI_PINGONE_OIDC_AUTH_CODE_REDIRECT_URI_PATH"
 
-	options.PingOneAuthenticationAuthCodeRedirectURIOption = options.Option{
+	options.PingOneAuthenticationAuthCodeRedirectURIPathOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:  cobraParamName,
-			Usage: "The redirect URI to use when using the auth code authentication type to authenticate to the PingOne management API.",
+			Usage: "The redirect URI path to use when using the auth code authentication type to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
 		Sensitive: false,
 		Type:      options.STRING,
-		KoanfKey:  "service.pingOne.authentication.authCode.redirectURI",
+		KoanfKey:  "service.pingOne.authentication.authCode.redirectURIPath",
+	}
+}
+
+func initPingOneAuthenticationAuthCodeRedirectURIPortOption() {
+	cobraParamName := "pingone-oidc-auth-code-redirect-uri-port"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_PINGONE_OIDC_AUTH_CODE_REDIRECT_URI_PORT"
+
+	options.PingOneAuthenticationAuthCodeRedirectURIPortOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The redirect URI port to use when using the auth code authentication type to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.STRING,
+		KoanfKey:  "service.pingOne.authentication.authCode.redirectURIPort",
 	}
 }
 

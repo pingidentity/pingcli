@@ -57,7 +57,7 @@ func Options() []Option {
 		AuthMethodClientCredentialsOption,
 		AuthMethodDeviceCodeOption,
 		AuthServiceOption,
-		AuthUseKeychainOption,
+		AuthFileStorageOption,
 
 		LicenseProductOption,
 		LicenseVersionOption,
@@ -81,7 +81,8 @@ func Options() []Option {
 		PingOneAuthenticationAuthCodeClientIDOption,
 		PingOneAuthenticationAuthCodeEnvironmentIDOption,
 		PingOneAuthenticationAuthCodePortOption,
-		PingOneAuthenticationAuthCodeRedirectURIOption,
+		PingOneAuthenticationAuthCodeRedirectURIPathOption,
+		PingOneAuthenticationAuthCodeRedirectURIPortOption,
 		PingOneAuthenticationAuthCodeScopesOption,
 		PingOneAuthenticationAPIEnvironmentIDOption,
 		PingOneAuthenticationClientCredentialsClientIDOption,
@@ -149,7 +150,7 @@ var (
 	AuthMethodClientCredentialsOption Option
 	AuthMethodDeviceCodeOption        Option
 	AuthServiceOption                 Option
-	AuthUseKeychainOption             Option
+	AuthFileStorageOption             Option
 )
 
 // License options
@@ -183,7 +184,8 @@ var (
 	PingOneAuthenticationAuthCodeClientIDOption               Option
 	PingOneAuthenticationAuthCodeEnvironmentIDOption          Option
 	PingOneAuthenticationAuthCodePortOption                   Option
-	PingOneAuthenticationAuthCodeRedirectURIOption            Option
+	PingOneAuthenticationAuthCodeRedirectURIPathOption        Option
+	PingOneAuthenticationAuthCodeRedirectURIPortOption        Option
 	PingOneAuthenticationAuthCodeScopesOption                 Option
 	PingOneAuthenticationClientCredentialsClientIDOption      Option
 	PingOneAuthenticationClientCredentialsClientSecretOption  Option
