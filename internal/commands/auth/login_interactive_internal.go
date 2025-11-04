@@ -1,13 +1,12 @@
 // Copyright © 2025 Ping Identity Corporation
 
-package auth
+package auth_internal
 
 import (
 	"fmt"
 	"io"
 	"strings"
 
-	auth_internal "github.com/pingidentity/pingcli/internal/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/errs"
@@ -386,11 +385,11 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 			var validationErr error
 			switch authType {
 			case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-				_, validationErr = auth_internal.GetAuthCodeConfiguration()
+				_, validationErr = GetAuthCodeConfiguration()
 			case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
-				_, validationErr = auth_internal.GetDeviceCodeConfiguration()
+				_, validationErr = GetDeviceCodeConfiguration()
 			case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
-				_, validationErr = auth_internal.GetClientCredentialsConfiguration()
+				_, validationErr = GetClientCredentialsConfiguration()
 			}
 
 			if validationErr == nil {

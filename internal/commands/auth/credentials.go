@@ -9,6 +9,7 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/errs"
+	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingone-go-client/config"
 	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
@@ -60,14 +61,15 @@ type StorageLocation struct {
 }
 
 // SaveTokenForMethod saves an OAuth2 token to the keychain using the specified authentication method key
-// Falls back to file storage if keychain operations fail or if --use-keychain=false
+// Always saves to both keychain and file storage unless --file-storage flag is set
 // Returns StorageLocation indicating where the token was saved
 func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation, error) {
+	l := logger.Get()
 	location := StorageLocation{}
 
 	// Check if user disabled keychain
 	if !shouldUseKeychain() {
-		// Directly save to file storage
+		// Directly save to file storage only
 		if err := saveTokenToFile(token, authMethod); err != nil {
 			return location, err
 		}
@@ -78,18 +80,27 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 	storage := getTokenStorage(authMethod)
 
 	// Try keychain storage first
-	err := storage.SaveToken(token)
-	if err != nil {
+	keychainErr := storage.SaveToken(token)
+	if keychainErr != nil {
 		// Fallback to file storage if keychain fails
+		l.Debug().Msgf("keychain storage unavailable (%v), falling back to file storage", keychainErr)
 		if fileErr := saveTokenToFile(token, authMethod); fileErr != nil {
-			return location, fmt.Errorf("failed to save token to keychain (%w) and file storage (%w)", err, fileErr)
+			return location, fmt.Errorf("failed to save token to keychain (%w) and file storage (%w)", keychainErr, fileErr)
 		}
 		// Token saved to file successfully
 		location.File = true
 		return location, nil
 	}
 
+	// Keychain succeeded - also save to file storage as backup
 	location.Keychain = true
+	if fileErr := saveTokenToFile(token, authMethod); fileErr != nil {
+		// Log warning but don't fail since keychain succeeded
+		l.Debug().Msgf("saved to keychain but failed to save backup to file storage: %v", fileErr)
+	} else {
+		location.File = true
+	}
+
 	return location, nil
 }
 
@@ -164,34 +175,6 @@ func LoadToken() (*oauth2.Token, error) {
 		}
 	}
 
-	// Also try all configured auth methods in case the type doesn't match
-	authMethods := []struct {
-		name      string
-		getConfig func() (*config.Configuration, error)
-		grantType svcOAuth2.GrantType
-	}{
-		{"client_credentials", GetClientCredentialsConfiguration, svcOAuth2.GrantTypeClientCredentials},
-		{"device_code", GetDeviceCodeConfiguration, svcOAuth2.GrantTypeDeviceCode},
-		{"auth_code", GetAuthCodeConfiguration, svcOAuth2.GrantTypeAuthCode},
-	}
-
-	for _, method := range authMethods {
-		cfg, err := method.getConfig()
-		if err == nil && cfg != nil {
-			// Set the grant type before generating the token key
-			cfg = cfg.WithGrantType(method.grantType)
-			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
-			if err == nil {
-				keychainStorage := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-				token, err := keychainStorage.LoadToken()
-				if err == nil && token != nil {
-					return token, nil
-				}
-			}
-		}
-	}
-
-	// Fall back to legacy token loading for backward compatibility
 	methods := []string{deviceCodeTokenKey, authCodeTokenKey, clientCredentialsTokenKey}
 
 	for _, method := range methods {
@@ -202,22 +185,6 @@ func LoadToken() (*oauth2.Token, error) {
 	}
 
 	return nil, ErrNoTokenFound
-}
-
-// GetTokenSource returns an OAuth2 token source from the cached token in the keychain
-func GetTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
-	// Try to load cached token
-	cachedToken, err := LoadToken()
-	if err != nil {
-		return nil, fmt.Errorf("failed to load cached token: %w", err)
-	}
-
-	if cachedToken == nil {
-		return nil, ErrNoCachedToken
-	}
-
-	// Return a simple static token source - SDK handles complex refresh during login
-	return oauth2.StaticTokenSource(cachedToken), nil
 }
 
 // ClearToken removes all cached tokens from the keychain for all authentication methods,

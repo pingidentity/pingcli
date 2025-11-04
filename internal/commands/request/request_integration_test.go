@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	auth_internal "github.com/pingidentity/pingcli/internal/auth"
+	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	request_internal "github.com/pingidentity/pingcli/internal/commands/request"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
@@ -38,7 +38,7 @@ func TestRequestPingOne_RealAuth(t *testing.T) {
 	}
 
 	// First authenticate
-	_, _, err = auth_internal.PerformClientCredentialsLogin(context.TODO())
+	_, _, _, err = auth_internal.PerformClientCredentialsLogin(context.Background())
 	if err != nil {
 		t.Fatalf("Authentication should succeed: %v", err)
 	}

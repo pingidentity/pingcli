@@ -8,7 +8,7 @@ import (
 	"regexp"
 	"testing"
 
-	auth_internal "github.com/pingidentity/pingcli/internal/auth"
+	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"

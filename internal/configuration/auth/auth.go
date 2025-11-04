@@ -3,9 +3,6 @@
 package configuration_auth
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/spf13/pflag"
@@ -16,7 +13,6 @@ func InitAuthOptions() {
 	initAuthMethodDeviceCodeOption()
 	initAuthMethodClientCredentialsOption()
 	initAuthMethodAuthCodeOption()
-	initAuthServiceOption()
 	initAuthFileStorageOption()
 }
 
@@ -89,38 +85,6 @@ func initAuthMethodAuthCodeOption() {
 		Sensitive: false,
 		Type:      options.BOOL,
 		KoanfKey:  "", // No koanf key
-	}
-}
-
-// initAuthServiceOption initializes the --service flag for specifying which services to authenticate
-func initAuthServiceOption() {
-	cobraParamName := "service"
-	cobraValue := new(customtypes.AuthServices)
-	defaultValue := customtypes.AuthServices([]string{})
-	envVar := "PINGCLI_AUTH_SERVICE"
-
-	options.AuthServiceOption = options.Option{
-		CobraParamName:  cobraParamName,
-		CobraParamValue: cobraValue,
-		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
-		Flag: &pflag.Flag{
-			Name:      cobraParamName,
-			Shorthand: "s",
-			Usage: fmt.Sprintf(
-				"Specifies the service(s) to authenticate. Accepts a comma-separated string to delimit multiple services. "+
-					"\nOptions are: %s."+
-					"\nExample: '%s,%s'",
-				strings.Join(customtypes.AuthServicesValidValues(), ", "),
-				customtypes.ENUM_AUTH_SERVICE_PINGONE,
-				customtypes.ENUM_AUTH_SERVICE_PINGFEDERATE,
-			),
-			Value:    cobraValue,
-			DefValue: "",
-		},
-		Sensitive: false,
-		Type:      options.AUTH_SERVICES,
-		KoanfKey:  "auth.services",
 	}
 }
 

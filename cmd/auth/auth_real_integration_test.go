@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	auth_internal "github.com/pingidentity/pingcli/internal/auth"
+	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"

@@ -144,30 +144,6 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidateBoolean, typedValue, typedValue)}
 			}
-		case options.AUTH_SERVICES:
-			switch typedValue := vValue.(type) {
-			case *customtypes.AuthServices:
-				continue
-			case string:
-				as := new(customtypes.AuthServices)
-				if err = as.Set(typedValue); err != nil {
-					return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s': %w", pName, ErrValidateAuthServices, typedValue, err)}
-				}
-			case []any:
-				as := new(customtypes.AuthServices)
-				for _, v := range typedValue {
-					switch innerTypedValue := v.(type) {
-					case string:
-						if err = as.Set(innerTypedValue); err != nil {
-							return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s': %w", pName, ErrValidateAuthServices, typedValue, err)}
-						}
-					default:
-						return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidateAuthServices, typedValue, typedValue)}
-					}
-				}
-			default:
-				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidateAuthServices, typedValue, typedValue)}
-			}
 		case options.UUID:
 			switch typedValue := vValue.(type) {
 			case *customtypes.UUID:
