@@ -140,7 +140,8 @@ func (tm *DefaultTokenManager) ClearToken() error {
 		return fmt.Errorf("failed to get current auth method: %w", err)
 	}
 
-	return ClearTokenForMethod(authMethod)
+	_, err = ClearTokenForMethod(authMethod)
+	return err
 }
 
 // HasToken checks if a token exists in the keychain for the currently configured authentication method
@@ -150,7 +151,10 @@ func (tm *DefaultTokenManager) HasToken() bool {
 		return false
 	}
 
-	storage := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+	storage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+	if err != nil {
+		return false
+	}
 	hasToken, err := storage.HasToken()
 
 	return err == nil && hasToken

@@ -11,7 +11,6 @@ import (
 	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingone-go-client/config"
-	pingoneoauth2 "github.com/pingidentity/pingone-go-client/oauth2"
 )
 
 // applyRegionConfiguration applies the PingOne region configuration to a config.Configuration
@@ -23,17 +22,17 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 
 	switch regionCode {
 	case customtypes.ENUM_PINGONE_REGION_CODE_AP:
-		cfg = cfg.WithTopLevelDomain(pingoneoauth2.TopLevelDomainAPAC)
+		cfg = cfg.WithTopLevelDomain(config.TopLevelDomainAPAC)
 	case customtypes.ENUM_PINGONE_REGION_CODE_AU:
-		cfg = cfg.WithTopLevelDomain(pingoneoauth2.TopLevelDomainAU)
+		cfg = cfg.WithTopLevelDomain(config.TopLevelDomainAU)
 	case customtypes.ENUM_PINGONE_REGION_CODE_CA:
-		cfg = cfg.WithTopLevelDomain(pingoneoauth2.TopLevelDomainCA)
+		cfg = cfg.WithTopLevelDomain(config.TopLevelDomainCA)
 	case customtypes.ENUM_PINGONE_REGION_CODE_EU:
-		cfg = cfg.WithTopLevelDomain(pingoneoauth2.TopLevelDomainEU)
+		cfg = cfg.WithTopLevelDomain(config.TopLevelDomainEU)
 	case customtypes.ENUM_PINGONE_REGION_CODE_NA:
-		cfg = cfg.WithTopLevelDomain(pingoneoauth2.TopLevelDomainNA)
+		cfg = cfg.WithTopLevelDomain(config.TopLevelDomainNA)
 	case customtypes.ENUM_PINGONE_REGION_CODE_SG:
-		cfg = cfg.WithTopLevelDomain(pingoneoauth2.TopLevelDomainSG)
+		cfg = cfg.WithTopLevelDomain(config.TopLevelDomainSG)
 	default:
 		return nil, &errs.PingCLIError{
 			Prefix: fmt.Sprintf("invalid region code '%s'", regionCode),

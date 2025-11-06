@@ -16,7 +16,7 @@ func TestPerformDeviceCodeLogin_MissingConfiguration(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, _, _, err := auth_internal.PerformDeviceCodeLogin(ctx)
+	_, err := auth_internal.PerformDeviceCodeLogin(ctx)
 
 	if err == nil {
 		t.Error("Expected error, but got nil")
@@ -34,17 +34,17 @@ func TestPerformClientCredentialsLogin_MissingConfiguration(t *testing.T) {
 
 	ctx := context.Background()
 
-	token, newAuth, _, err := auth_internal.PerformClientCredentialsLogin(ctx)
+	result, err := auth_internal.PerformClientCredentialsLogin(ctx)
 
 	// In test environment, valid credentials may be configured, resulting in successful auth
 	// If credentials are missing, we'll get an error
 	// Both outcomes are valid depending on test environment setup
 	if err == nil {
 		// Success - valid credentials were configured
-		if token == nil {
+		if result.Token == nil {
 			t.Error("Expected token when no error, but got nil")
 		}
-		if !newAuth {
+		if !result.NewAuth {
 			t.Log("Note: Authentication succeeded using cached token")
 		}
 	} else if !strings.Contains(err.Error(), "failed to get client credentials configuration") &&
@@ -59,7 +59,7 @@ func TestPerformAuthCodeLogin_MissingConfiguration(t *testing.T) {
 
 	ctx := context.Background()
 
-	_, _, _, err := auth_internal.PerformAuthCodeLogin(ctx)
+	_, err := auth_internal.PerformAuthCodeLogin(ctx)
 
 	if err == nil {
 		t.Error("Expected error, but got nil")
@@ -206,7 +206,7 @@ func TestClearToken(t *testing.T) {
 
 	// Test that ClearTokenForMethod doesn't panic when no token exists
 	// This should handle the case where keychain entry doesn't exist
-	err := auth_internal.ClearTokenForMethod(testKey)
+	_, err := auth_internal.ClearTokenForMethod(testKey)
 
 	// Should not error when no token exists (handles ErrNotFound)
 	if err != nil {
@@ -248,7 +248,7 @@ func TestAuthenticationErrorMessages_ClientCredentials(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	ctx := context.Background()
-	_, _, _, err := auth_internal.PerformClientCredentialsLogin(ctx)
+	_, err := auth_internal.PerformClientCredentialsLogin(ctx)
 
 	// In test environment, worker credentials are typically configured
 	if err == nil {
@@ -266,7 +266,7 @@ func TestAuthenticationErrorMessages_AuthCode(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	ctx := context.Background()
-	_, _, _, err := auth_internal.PerformAuthCodeLogin(ctx)
+	_, err := auth_internal.PerformAuthCodeLogin(ctx)
 
 	if err == nil {
 		t.Skip("Auth code authentication succeeded (full configuration present)")
@@ -274,6 +274,8 @@ func TestAuthenticationErrorMessages_AuthCode(t *testing.T) {
 	// Configuration validation checks multiple fields
 	if !strings.Contains(err.Error(), "auth code client ID is not configured") &&
 		!strings.Contains(err.Error(), "auth code redirect URI is not configured") &&
+		!strings.Contains(err.Error(), "auth code redirect URI path is not configured") &&
+		!strings.Contains(err.Error(), "auth code redirect URI port is not configured") &&
 		!strings.Contains(err.Error(), "failed to get auth code configuration") {
 		t.Errorf("Expected auth code configuration error, got: %v", err)
 	}
@@ -335,6 +337,8 @@ func TestConfigurationValidation_AuthCode(t *testing.T) {
 	// Configuration validation checks multiple fields
 	if !strings.Contains(err.Error(), "client ID is not configured") &&
 		!strings.Contains(err.Error(), "redirect URI is not configured") &&
+		!strings.Contains(err.Error(), "redirect URI path is not configured") &&
+		!strings.Contains(err.Error(), "redirect URI port is not configured") &&
 		!strings.Contains(err.Error(), "environment ID is not configured") {
 		t.Errorf("Expected configuration validation error, got: %v", err)
 	}

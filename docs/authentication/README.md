@@ -22,10 +22,10 @@ pingcli auth [command]
 pingcli auth --help
 
 # Login with device code flow
-pingcli auth login --device-code
+pingcli login --device-code
 
 # Logout and clear tokens
-pingcli auth logout
+pingcli logout
 ```
 
 ## Quick Start
@@ -39,7 +39,7 @@ pingcli auth logout
 
 2. **Authenticate**:
    ```bash
-   pingcli auth login --device-code
+   pingcli login --device-code
    ```
 
 3. **Use authenticated commands**:
@@ -49,7 +49,7 @@ pingcli auth logout
 
 4. **Logout when done**:
    ```bash
-   pingcli auth logout
+   pingcli logout
    ```
 
 ## Technical Architecture
@@ -63,51 +63,80 @@ pingcli uses a **dual storage system** to ensure tokens are accessible across di
    - **Windows**: Windows Credential Manager  
    - **Linux**: Secret Service API
 
-2. **Secondary Storage**: Encrypted file-based storage at `~/.pingcli/credentials/`
-   - Used when keychain storage fails or is unavailable
+2. **Secondary Storage**: File-based storage at `~/.pingcli/credentials/`
    - Automatically created and maintained
-   - One file per authentication method (e.g., `device-code-token.json`, `auth-code-token.json`)
+   - One file per authentication method (e.g., `<env-id>_<client-id>_device_code.json`)
    - Provides compatibility with SSH sessions, containers, and CI/CD environments
 
 ### Storage Behavior
 
-By default, tokens are stored in **both** locations:
-- Keychain storage (if available) - for system-wide secure access
-- File storage (always) - for reliability and portability
+**Default: Dual Storage with Automatic Fallback**
 
-#### Using the `--use-keychain` Flag
-
-The `--use-keychain` flag controls token retrieval preference:
+By default (`--file-storage=false`), tokens are stored in **both** locations simultaneously:
+- Keychain storage (primary) - for system-wide secure access
+- File storage (backup) - for reliability and portability
 
 ```bash
-# Use keychain-stored token exclusively (fails if unavailable)
-pingcli request --use-keychain get /environments
-
-# Default: Try keychain first, fallback to file
-pingcli request get /environments
+# Default: Saves to both keychain and file
+pingcli login --device-code
+# Output: Successfully logged in using device_code authentication. 
+#         Credentials saved to keychain and file storage for profile 'default'.
 ```
 
-**Behavior**:
-- `--use-keychain=true`: Only attempts keychain retrieval. Fails if keychain token is missing or inaccessible.
-- `--use-keychain=false` (default): Tries keychain first, automatically falls back to file storage if keychain fails.
+**Fallback Protection:**
+If keychain storage fails (unavailable, permission issues, etc.), the system automatically falls back to file storage only:
+```bash
+# Keychain unavailable - automatically uses file storage
+pingcli login --device-code
+# Output: Successfully logged in using device_code authentication. 
+#         Credentials saved to file storage for profile 'default'.
+```
 
-**Use Cases**:
-- `--use-keychain=true`: Enforce keychain security in trusted environments
-- Default behavior: Maximum compatibility across environments (SSH, containers, CI/CD)
+**File-Only Mode**
+
+Use the `--file-storage` flag to explicitly skip keychain and use only file storage:
+
+```bash
+# Explicitly use file storage only (skip keychain entirely)
+pingcli login --device-code --file-storage
+# Output: Successfully logged in using device_code authentication. 
+#         Credentials saved to file storage for profile 'default'.
+```
+
+**When to use `--file-storage`:**
+- SSH sessions where keychain access is unavailable
+- Containers and Docker environments
+- CI/CD pipelines
+- Debugging keychain issues
+- When you want to ensure file-only storage (no keychain attempts)
+
+**Token Retrieval:**
+- Default: Attempts keychain first, automatically falls back to file storage if keychain fails
+- File-only mode (`--file-storage=true`): Uses file storage exclusively
 
 ### SDK Integration
 
 Token storage leverages the SDK's `oauth2.KeychainStorage` implementation alongside local file storage:
 
 ```go
-// Dual storage approach
-var keychainStorage = oauth2.NewKeychainStorage("pingcli", "device-code-token")
-var fileStorage = auth.NewFileStorage("~/.pingcli/credentials/device-code-token.json")
-
-// Tokens are stored in both locations
-func SaveToken(token *oauth2.Token) error {
-    keychainStorage.SaveToken(token)  // Best effort
-    return fileStorage.SaveToken(token)  // Always succeeds
+// Dual storage approach - saves to both locations
+func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation, error) {
+    location := StorageLocation{}
+    
+    // Try keychain storage
+    if !fileStorageOnly() {
+        keychainStorage := oauth2.NewKeychainStorage("pingcli", authMethod)
+        if err := keychainStorage.SaveToken(token); err == nil {
+            location.Keychain = true
+        }
+    }
+    
+    // Always save to file storage as backup
+    if err := saveTokenToFile(token, authMethod); err == nil {
+        location.File = true
+    }
+    
+    return location, nil
 }
 ```
 

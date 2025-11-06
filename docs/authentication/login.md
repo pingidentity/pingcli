@@ -1,4 +1,4 @@
-# `pingcli auth login`
+# `pingcli login`
 
 Authenticate the CLI with PingOne using OAuth2 flows.
 
@@ -8,7 +8,7 @@ Login using one of three supported OAuth2 authentication flows. The CLI will sec
 
 ## Usage
 ```bash
-pingcli auth login [flags]
+pingcli login [flags]
 ```
 
 ## Flags
@@ -17,6 +17,9 @@ pingcli auth login [flags]
 - `-d, --device-code` - Use device code flow (recommended for interactive use)
 - `-a, --auth-code` - Use authorization code flow (requires browser)
 - `-c, --client-credentials` - Use client credentials flow (for automation)
+
+### Storage Options
+- `--file-storage` - Use only file storage (skip keychain).
 
 ### Global Flags
 - `-h, --help` - Help for login command
@@ -27,7 +30,7 @@ pingcli auth login [flags]
 **Recommended for interactive development**
 
 ```bash
-pingcli auth login --device-code
+pingcli login --device-code
 ```
 
 **Requirements:**
@@ -51,7 +54,7 @@ pingcli config set service.pingone.authentication.deviceCode.scopes="openid,prof
 **Requires browser on same machine**
 
 ```bash
-pingcli auth login --auth-code
+pingcli login --auth-code
 ```
 
 **Requirements:**
@@ -76,7 +79,7 @@ pingcli config set service.pingone.authentication.authCode.scopes="openid,profil
 **For automation and CI/CD**
 
 ```bash
-pingcli auth login --client-credentials
+pingcli login --client-credentials
 ```
 
 **Requirements:**
@@ -106,18 +109,18 @@ pingcli config set service.pingone.authentication.deviceCode.clientID=abc123
 pingcli config set service.pingone.authentication.deviceCode.environmentID=env456
 
 # Login
-pingcli auth login --device-code
+pingcli login --device-code
 ```
 
 ### CI/CD Pipeline
 ```bash
-# Set via environment variables (recommended)
+# Set via environment variables
 export PINGCLI_SERVICE_PINGONE_AUTHENTICATION_CLIENTCREDENTIALS_CLIENTID="$CI_CLIENT_ID"
 export PINGCLI_SERVICE_PINGONE_AUTHENTICATION_CLIENTCREDENTIALS_CLIENTSECRET="$CI_CLIENT_SECRET"
 export PINGCLI_SERVICE_PINGONE_AUTHENTICATION_CLIENTCREDENTIALS_ENVIRONMENTID="$CI_ENV_ID"
 
-# Login
-pingcli auth login --client-credentials
+# Login with file-only storage (skip keychain)
+pingcli login --client-credentials --file-storage
 ```
 
 ## Error Handling
@@ -153,36 +156,61 @@ Error: failed to get valid token (may need to re-authenticate)
 pingcli uses a **dual storage system** for maximum reliability:
 
 1. **Primary**: OS credential stores (Keychain/Credential Manager/Secret Service)
-2. **Secondary**: Encrypted file storage at `~/.pingcli/tokens`
+2. **Secondary**: Encrypted file storage at `~/.pingcli/credentials`
 
 ### Storage Behavior
-- Tokens are automatically stored in **both** locations
-- Keychain provides system-wide secure access
-- File storage ensures compatibility with SSH, containers, and CI/CD
 
-### Using `--use-keychain` Flag
-
-Control token retrieval preference in commands that use stored tokens:
-
+**Default:**
+Tokens are automatically stored in **both** locations:
 ```bash
-# Use keychain token exclusively (fails if unavailable)
-pingcli request --use-keychain get /environments
-
-# Default: Try keychain first, fallback to file
-pingcli request get /environments
+pingcli login --device-code
+# Output: Successfully logged in using device_code authentication. 
+#         Credentials saved to keychain and file storage for profile 'default'.
 ```
 
-**When to use `--use-keychain=true`:**
-- Enforce keychain security in trusted environments
-- Ensure tokens come from OS credential store only
+**Automatic Fallback:**
+If keychain fails (unavailable, permission denied, etc.), automatically falls back to file storage:
+```bash
+# Keychain unavailable - uses file storage instead
+pingcli login --device-code
+# Output: Successfully logged in using device_code authentication. 
+#         Credentials saved to file storage for profile 'default'.
+```
 
-**Default behavior (recommended):**
-- Maximum compatibility across environments
-- Automatic fallback ensures reliability
+**Benefits:**
+- Keychain provides system-wide secure access when available
+- File storage ensures tokens are never lost
+- Automatic fallback handles all edge cases
+- Zero user intervention required
+
+**File-Only Mode:**
+Use `--file-storage` flag to explicitly skip keychain:
+```bash
+pingcli login --device-code --file-storage
+# Output: Successfully logged in using device_code authentication. 
+#         Credentials saved to file storage for profile 'default'.
+```
+
+**When to use `--file-storage`:**
+- SSH sessions where keychain is unavailable
+- Docker containers
+- CI/CD pipelines
+- Systems without keychain support
+- When you want to guarantee file-only storage
+
+### Token Retrieval
+
+When loading tokens, pingcli automatically:
+1. Tries keychain first (unless `--file-storage` was used during login)
+2. Falls back to file storage if keychain fails
+3. Returns error only if both fail
+
+This ensures maximum reliability across all environments.
 
 ## Security Notes
 
-- Tokens are stored in both OS credential store and encrypted file
+- Tokens are stored in both OS credential store and encrypted file by default
+- Use `--file-storage` flag in environments without keychain access
 - Device code and auth code flows provide refresh tokens for automatic renewal
 - Client credentials flow requires secure secret management
 - Use `pingcli auth logout` to clear tokens from both locations when switching environments

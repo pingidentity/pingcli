@@ -20,9 +20,11 @@ var (
 	ErrDeviceCodeEnvironmentIDNotConfigured = errors.New("device code environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.deviceCode.environmentID=<your-env-id>'")
 
 	// Auth code errors
-	ErrAuthCodeClientIDNotConfigured      = errors.New("auth code client ID is not configured. Please run 'pingcli config set service.pingone.authentication.authCode.clientID=<your-client-id>'")
-	ErrAuthCodeEnvironmentIDNotConfigured = errors.New("auth code environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.authCode.environmentID=<your-env-id>'")
-	ErrAuthCodeRedirectURINotConfigured   = errors.New("auth code redirect URI is not configured. Please run 'pingcli config set service.pingone.authentication.authCode.redirectURI=<your-redirect-uri>'")
+	ErrAuthCodeClientIDNotConfigured        = errors.New("auth code client ID is not configured. Please run 'pingcli config set service.pingone.authentication.authCode.clientID=<your-client-id>'")
+	ErrAuthCodeEnvironmentIDNotConfigured   = errors.New("auth code environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.authCode.environmentID=<your-env-id>'")
+	ErrAuthCodeRedirectURINotConfigured     = errors.New("auth code redirect URI is not configured. Please run 'pingcli config set service.pingone.authentication.authCode.redirectURI=<your-redirect-uri>'")
+	ErrAuthCodeRedirectURIPathNotConfigured = errors.New("auth code redirect URI path is not configured. Please run 'pingcli config set service.pingone.authentication.authCode.redirectURIPath=<path>'")
+	ErrAuthCodeRedirectURIPortNotConfigured = errors.New("auth code redirect URI port is not configured. Please run 'pingcli config set service.pingone.authentication.authCode.redirectURIPort=<port>'")
 
 	// Client credentials errors
 	ErrClientCredentialsClientIDNotConfigured      = errors.New("client credentials client ID is not configured. Please run 'pingcli config set service.pingone.authentication.clientCredentials.clientID=<your-client-id>'")

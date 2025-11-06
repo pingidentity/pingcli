@@ -15,13 +15,11 @@ import (
 // If a specific auth method flag is provided, clears only that method's token.
 func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	// Check if any auth method flags were provided
-	deviceCodeFlag := cmd.Flag(options.AuthMethodDeviceCodeOption.Flag.Name)
-	clientCredentialsFlag := cmd.Flag(options.AuthMethodClientCredentialsOption.Flag.Name)
-	authCodeFlag := cmd.Flag(options.AuthMethodAuthCodeOption.Flag.Name)
+	deviceCodeStr, _ := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
+	clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
+	authCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthCodeOption)
 
-	flagProvided := (deviceCodeFlag != nil && deviceCodeFlag.Changed) ||
-		(clientCredentialsFlag != nil && clientCredentialsFlag.Changed) ||
-		(authCodeFlag != nil && authCodeFlag.Changed)
+	flagProvided := deviceCodeStr != "" || clientCredentialsStr != "" || authCodeStr != ""
 
 	// Get current profile name for messages
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
@@ -40,15 +38,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	// Flag was provided - determine which auth method to clear
-	deviceCodeStr, err := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
-	if err != nil {
-		return fmt.Errorf("failed to get device-code flag: %w", err)
-	}
-
-	clientCredentialsStr, err := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
-	if err != nil {
-		return fmt.Errorf("failed to get client-credentials flag: %w", err)
-	}
+	// (deviceCodeStr, clientCredentialsStr, authCodeStr already retrieved above)
 
 	var authType string
 	switch {
@@ -60,27 +50,6 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE
 	}
 
-	// Check if configuration exists for this auth method before trying to generate token key
-	var hasConfig bool
-	switch authType {
-	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-		clientID, _ := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeClientIDOption)
-		envID, _ := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeEnvironmentIDOption)
-		hasConfig = clientID != "" && envID != ""
-	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
-		clientID, _ := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)
-		envID, _ := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption)
-		hasConfig = clientID != "" && envID != ""
-	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
-		clientID, _ := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption)
-		envID, _ := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
-		hasConfig = clientID != "" && envID != ""
-	}
-
-	if !hasConfig {
-		return fmt.Errorf("logout failed for %s in %s: %w", authType, profileName, ErrNoAuthConfiguration)
-	}
-
 	// Generate token key for the selected auth method
 	tokenKey, err := GetAuthMethodKey(authType)
 	if err != nil {
@@ -88,11 +57,24 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	// Clear only the token for the specified authentication method
-	if err := ClearTokenForMethod(tokenKey); err != nil {
+	location, err := ClearTokenForMethod(tokenKey)
+	if err != nil {
 		return fmt.Errorf("failed to clear %s credentials: %w", authType, err)
 	}
 
-	fmt.Printf("Successfully logged out from %s authentication. Credentials cleared from storage for profile '%s'.\n", authType, profileName)
+	// Build storage location message
+	var storageMsg string
+	if location.Keychain && location.File {
+		storageMsg = "keychain and file storage"
+	} else if location.Keychain {
+		storageMsg = "keychain"
+	} else if location.File {
+		storageMsg = "file storage"
+	} else {
+		storageMsg = "storage"
+	}
+
+	fmt.Printf("Successfully logged out from %s authentication. Credentials cleared from %s for profile '%s'.\n", authType, storageMsg, profileName)
 
 	return nil
 }

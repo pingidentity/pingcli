@@ -90,20 +90,20 @@ integration:
 	}
 
 	// Test performing fresh client credentials authentication
-	token, newAuth, _, err := auth_internal.PerformClientCredentialsLogin(context.Background())
+	result, err := auth_internal.PerformClientCredentialsLogin(context.Background())
 	if err != nil {
 		t.Fatalf("Client credentials authentication should succeed: %v", err)
 	}
-	if token == nil {
+	if result.Token == nil {
 		t.Fatal("Token should not be nil")
 	}
-	if token.AccessToken == "" {
+	if result.Token.AccessToken == "" {
 		t.Error("Access token should not be empty")
 	}
-	if !token.Valid() {
+	if !result.Token.Valid() {
 		t.Error("Token should be valid")
 	}
-	if !newAuth {
+	if !result.NewAuth {
 		t.Error("Should be a new authentication since we cleared tokens")
 	}
 }
@@ -155,16 +155,16 @@ integration:
 	}
 
 	// First authenticate to have a token
-	token, _, _, err := auth_internal.PerformClientCredentialsLogin(context.Background())
+	result, err := auth_internal.PerformClientCredentialsLogin(context.Background())
 	if err != nil {
 		t.Fatalf("Client credentials authentication should succeed: %v", err)
 	}
-	if token == nil {
+	if result.Token == nil {
 		t.Fatal("Token should not be nil")
 	}
 
 	// Save the token to keychain for the next test
-	_, err = auth_internal.SaveToken(token)
+	_, err = auth_internal.SaveToken(result.Token)
 	if err != nil {
 		t.Fatalf("Should be able to save token to keychain: %v", err)
 	}

@@ -1,17 +1,26 @@
-# `pingcli auth logout`
+# `pingcli logout`
 
-Clear stored authentication tokens from the system credential store.
+Clear stored authentication tokens from both keychain and file storage.
 
 ## Synopsis
 
-Logout removes all stored authentication tokens and clears cached API client connections. Use this command when switching between environments, ending sessions, or troubleshooting authentication issues.
+Logout removes all stored authentication tokens from both the OS credential store and file storage. Use this command when switching between environments, ending sessions, or troubleshooting authentication issues.
 
 ## Usage
 ```bash
-pingcli auth logout
+pingcli logout [flags]
 ```
 
 ## Flags
+
+### Authentication Method (optional)
+- `-d, --device-code` - Clear only device code tokens
+- `-a, --auth-code` - Clear only authorization code tokens  
+- `-c, --client-credentials` - Clear only client credentials tokens
+
+If no flag is provided, clears tokens for **all** authentication methods.
+
+### Global Flags
 - `-h, --help` - Help for logout command
 
 ## What Gets Cleared
@@ -28,7 +37,7 @@ pingcli auth logout
    - **Linux**: Secret Service API (GNOME Keyring/KDE KWallet)
 
 2. **File Storage:**
-   - `~/.pingcli/credentials/*.json` - Encrypted token files (one per auth method)
+   - `~/.pingcli/credentials/<env-id>_<client-id>_<method>.json` - Encrypted token files
 
 ### Cache
 - PingOne API client cache
@@ -36,20 +45,39 @@ pingcli auth logout
 
 ## Examples
 
-### Basic Logout
+### Clear All Tokens (Default)
 ```bash
-pingcli auth logout
+pingcli logout
 ```
 **Output:**
 ```
-Successfully logged out. Credentials cleared from Keychain and file storage.
+Successfully logged out from all authentication methods. All credentials cleared from storage for profile 'default'.
+```
+
+### Clear Specific Authentication Method
+```bash
+# Clear only device code tokens
+pingcli logout --device-code
+```
+**Output:**
+```
+Successfully logged out from device_code authentication. Credentials cleared from keychain and file storage for profile 'default'.
+```
+
+```bash
+# Clear only client credentials tokens
+pingcli logout --client-credentials
+```
+**Output:**
+```
+Successfully logged out from client_credentials authentication. Credentials cleared from keychain and file storage for profile 'default'.
 ```
 
 ### Logout in Automation
 ```bash
 #!/bin/bash
 # CI/CD cleanup script
-pingcli auth logout
+pingcli logout --client-credentials
 echo "Authentication cleanup complete"
 ```
 
@@ -92,8 +120,8 @@ If logout fails, manually remove tokens from both storage locations:
 
 **macOS:**
 ```bash
-# Command line
-security delete-generic-password -s "pingcli" -a "device-code-token"
+# Command line (replace with your specific key)
+security delete-generic-password -s "pingcli" -a "<env-id>_<client-id>_device_code"
 
 # GUI: Keychain Access → search "pingcli" → delete entry
 ```
@@ -122,7 +150,7 @@ secret-tool clear service pingcli
 rm -rf ~/.pingcli/credentials
 
 # Or remove specific auth method
-rm ~/.pingcli/credentials/device-code-token.json
+rm ~/.pingcli/credentials/<env-id>_<client-id>_device_code.json
 ```
 
 ## Troubleshooting
@@ -150,7 +178,7 @@ pingcli auth login --device-code
 pingcli request get /environments
 
 # End session (good practice)
-pingcli auth logout
+pingcli logout
 ```
 
 ### CI/CD Integration
@@ -165,7 +193,7 @@ pingcli auth logout
     
 - name: Cleanup
   if: always()
-  run: pingcli auth logout
+  run: pingcli logout
 ```
 
 ### Security Checklist

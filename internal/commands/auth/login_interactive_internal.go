@@ -5,6 +5,7 @@ package auth_internal
 import (
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -17,12 +18,38 @@ import (
 )
 
 const (
-	defaultRedirectURI = config.DefaultAuthCodeRedirectURI
+	defaultRedirectURI     = config.DefaultAuthCodeRedirectURI
+	defaultRedirectURIPath = config.DefaultAuthCodeRedirectURIPath
+	defaultRedirectURIPort = config.DefaultAuthCodeRedirectURIPort
 )
 
 var (
 	loginInteractiveErrorPrefix = "failed to configure authentication"
 )
+
+// AuthCodeConfig holds the configuration for authorization code authentication
+type AuthCodeConfig struct {
+	ClientID        string
+	EnvironmentID   string
+	RedirectURIPath string
+	RedirectURIPort string
+	Scopes          string
+}
+
+// DeviceCodeConfig holds the configuration for device code authentication
+type DeviceCodeConfig struct {
+	ClientID      string
+	EnvironmentID string
+	Scopes        string
+}
+
+// ClientCredentialsConfig holds the configuration for client credentials authentication
+type ClientCredentialsConfig struct {
+	ClientID      string
+	ClientSecret  string
+	EnvironmentID string
+	Scopes        string
+}
 
 // PromptForAuthType prompts the user to select an authentication type
 // If showStatus is true, it will show (configured) or (not configured) status next to each option
@@ -77,9 +104,11 @@ func PromptForAuthType(rc io.ReadCloser, showStatus bool) (string, error) {
 }
 
 // PromptForAuthCodeConfig prompts for auth code configuration
-func PromptForAuthCodeConfig(rc io.ReadCloser) (clientID, environmentID, redirectURIPath, redirectURIPort, scopes string, err error) {
+func PromptForAuthCodeConfig(rc io.ReadCloser) (*AuthCodeConfig, error) {
+	config := &AuthCodeConfig{}
+
 	// Client ID (required)
-	clientID, err = input.RunPrompt(
+	clientID, err := input.RunPrompt(
 		"Authorization Code Client ID",
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
@@ -91,11 +120,12 @@ func PromptForAuthCodeConfig(rc io.ReadCloser) (clientID, environmentID, redirec
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.ClientID = clientID
 
 	// Environment ID (required)
-	environmentID, err = input.RunPrompt(
+	environmentID, err := input.RunPrompt(
 		"PingOne Environment ID",
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
@@ -107,42 +137,84 @@ func PromptForAuthCodeConfig(rc io.ReadCloser) (clientID, environmentID, redirec
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.EnvironmentID = environmentID
 
-	// Redirect URI (optional, has default)
-	output.Message(fmt.Sprintf("Redirect URI (press Enter for default: %s)", defaultRedirectURI), nil)
-	redirectURIPath, err = input.RunPrompt(
+	// Redirect URI Path (required)
+	output.Message(fmt.Sprintf("Redirect URI path (press Enter for default: %s)", defaultRedirectURIPath), nil)
+	redirectURIPath, err := input.RunPrompt(
 		"Redirect URI path",
-		nil, // No validation - optional
+		func(s string) error {
+			trimmed := strings.TrimSpace(s)
+			if trimmed == "" {
+				return nil // Allow empty for default
+			}
+			if !strings.HasPrefix(trimmed, "/") {
+				return fmt.Errorf("redirect URI path must start with '/'")
+			}
+			return nil
+		},
 		rc,
 	)
-
 	if err != nil {
-		return "", "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 	if strings.TrimSpace(redirectURIPath) == "" {
-		redirectURIPath = defaultRedirectURI
+		redirectURIPath = defaultRedirectURIPath
 	}
+	config.RedirectURIPath = redirectURIPath
+
+	// Redirect URI Port (required)
+	output.Message(fmt.Sprintf("Redirect URI port (press Enter for default: %s)", defaultRedirectURIPort), nil)
+	redirectURIPort, err := input.RunPrompt(
+		"Redirect URI port",
+		func(s string) error {
+			trimmed := strings.TrimSpace(s)
+			if trimmed == "" {
+				return nil // Allow empty for default
+			}
+			// Validate port is numeric and in valid range
+			port, err := strconv.Atoi(trimmed)
+			if err != nil {
+				return fmt.Errorf("port must be a number")
+			}
+			if port < 1 || port > 65535 {
+				return fmt.Errorf("port must be between 1 and 65535")
+			}
+			return nil
+		},
+		rc,
+	)
+	if err != nil {
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	if strings.TrimSpace(redirectURIPort) == "" {
+		redirectURIPort = defaultRedirectURIPort
+	}
+	config.RedirectURIPort = redirectURIPort
 
 	// Scopes (optional)
 	output.Message("Scopes (optional, comma-separated)", nil)
-	scopes, err = input.RunPrompt(
+	scopes, err := input.RunPrompt(
 		"Scopes",
 		nil, // No validation - optional
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.Scopes = scopes
 
-	return clientID, environmentID, redirectURIPath, redirectURIPort, scopes, nil
+	return config, nil
 }
 
 // PromptForDeviceCodeConfig prompts for device code configuration
-func PromptForDeviceCodeConfig(rc io.ReadCloser) (clientID, environmentID, scopes string, err error) {
+func PromptForDeviceCodeConfig(rc io.ReadCloser) (*DeviceCodeConfig, error) {
+	config := &DeviceCodeConfig{}
+
 	// Client ID (required)
-	clientID, err = input.RunPrompt(
+	clientID, err := input.RunPrompt(
 		"Device Code Client ID",
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
@@ -154,11 +226,12 @@ func PromptForDeviceCodeConfig(rc io.ReadCloser) (clientID, environmentID, scope
 		rc,
 	)
 	if err != nil {
-		return "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.ClientID = clientID
 
 	// Environment ID (required)
-	environmentID, err = input.RunPrompt(
+	environmentID, err := input.RunPrompt(
 		"PingOne Environment ID",
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
@@ -170,27 +243,31 @@ func PromptForDeviceCodeConfig(rc io.ReadCloser) (clientID, environmentID, scope
 		rc,
 	)
 	if err != nil {
-		return "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.EnvironmentID = environmentID
 
 	// Scopes (optional)
 	output.Message("Scopes (optional, comma-separated)", nil)
-	scopes, err = input.RunPrompt(
+	scopes, err := input.RunPrompt(
 		"Scopes",
 		nil, // No validation - optional
 		rc,
 	)
 	if err != nil {
-		return "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.Scopes = scopes
 
-	return clientID, environmentID, scopes, nil
+	return config, nil
 }
 
 // PromptForClientCredentialsConfig prompts for client credentials configuration
-func PromptForClientCredentialsConfig(rc io.ReadCloser) (clientID, clientSecret, environmentID, scopes string, err error) {
+func PromptForClientCredentialsConfig(rc io.ReadCloser) (*ClientCredentialsConfig, error) {
+	config := &ClientCredentialsConfig{}
+
 	// Client ID (required)
-	clientID, err = input.RunPrompt(
+	clientID, err := input.RunPrompt(
 		"Client Credentials Client ID",
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
@@ -202,11 +279,12 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (clientID, clientSecret,
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.ClientID = clientID
 
 	// Client Secret (required)
-	clientSecret, err = input.RunPrompt(
+	clientSecret, err := input.RunPrompt(
 		"Client Credentials Client Secret",
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
@@ -218,11 +296,12 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (clientID, clientSecret,
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.ClientSecret = clientSecret
 
 	// Environment ID (required)
-	environmentID, err = input.RunPrompt(
+	environmentID, err := input.RunPrompt(
 		"PingOne Environment ID",
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
@@ -234,21 +313,23 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (clientID, clientSecret,
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.EnvironmentID = environmentID
 
 	// Scopes (optional)
 	output.Message("Scopes (optional, comma-separated)", nil)
-	scopes, err = input.RunPrompt(
+	scopes, err := input.RunPrompt(
 		"Scopes",
 		nil, // No validation - optional
 		rc,
 	)
 	if err != nil {
-		return "", "", "", "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
+	config.Scopes = scopes
 
-	return clientID, clientSecret, environmentID, scopes, nil
+	return config, nil
 }
 
 // SaveAuthConfigToProfile saves the authentication configuration to the active profile
@@ -411,22 +492,34 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 	// Step 3: Collect configuration based on selected type
 	switch authType {
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-		clientID, environmentID, redirectURIPath, redirectURIPort, scopes, err = PromptForAuthCodeConfig(rc)
+		authCodeConfig, err := PromptForAuthCodeConfig(rc)
 		if err != nil {
 			return err
 		}
+		clientID = authCodeConfig.ClientID
+		environmentID = authCodeConfig.EnvironmentID
+		redirectURIPath = authCodeConfig.RedirectURIPath
+		redirectURIPort = authCodeConfig.RedirectURIPort
+		scopes = authCodeConfig.Scopes
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
-		clientID, environmentID, scopes, err = PromptForDeviceCodeConfig(rc)
+		deviceCodeConfig, err := PromptForDeviceCodeConfig(rc)
 		if err != nil {
 			return err
 		}
+		clientID = deviceCodeConfig.ClientID
+		environmentID = deviceCodeConfig.EnvironmentID
+		scopes = deviceCodeConfig.Scopes
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
-		clientID, clientSecret, environmentID, scopes, err = PromptForClientCredentialsConfig(rc)
+		clientCredentialsConfig, err := PromptForClientCredentialsConfig(rc)
 		if err != nil {
 			return err
 		}
+		clientID = clientCredentialsConfig.ClientID
+		clientSecret = clientCredentialsConfig.ClientSecret
+		environmentID = clientCredentialsConfig.EnvironmentID
+		scopes = clientCredentialsConfig.Scopes
 	}
 
 	// Step 4: Save configuration to profile
