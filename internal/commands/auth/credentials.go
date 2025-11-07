@@ -11,7 +11,6 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/errs"
-	"github.com/pingidentity/pingcli/internal/logger"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingone-go-client/config"
 	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
@@ -97,50 +96,23 @@ type LoginResult struct {
 	Location StorageLocation
 }
 
-// SaveTokenForMethod saves an OAuth2 token to the keychain using the specified authentication method key
-// Always saves to both keychain and file storage unless --file-storage flag is set
+// SaveTokenForMethod saves an OAuth2 token to file storage using the specified authentication method key
+// Note: SDK handles keychain storage separately with its own token key format
 // Returns StorageLocation indicating where the token was saved
 func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation, error) {
-	l := logger.Get()
 	location := StorageLocation{}
 
-	// Always save to file storage as backup
+	// Save to file storage
+	// Note: SDK handles keychain storage separately with its own token key format
 	if err := saveTokenToFile(token, authMethod); err != nil {
 		// If it's a critical error (like nil token), fail immediately
 		if errors.Is(err, ErrNilToken) {
 			return location, err
 		}
-		// If file storage is the only option (keychain disabled), fail here
-		if !shouldUseKeychain() {
-			return location, err
-		}
-		// Otherwise, just log a warning and continue with keychain
-		l.Debug().Msgf("failed to save token to file storage: %v", err)
-	} else {
-		location.File = true
+		return location, err
 	}
 
-	// If keychain is disabled, we're done (file storage already saved above)
-	if !shouldUseKeychain() {
-		return location, nil
-	}
-
-	// Try to save to keychain
-	storage, err := getTokenStorage(authMethod)
-	if err != nil {
-		return location, &errs.PingCLIError{
-			Prefix: "failed to create keychain storage",
-			Err:    err,
-		}
-	}
-
-	if err := storage.SaveToken(token); err != nil {
-		// Keychain failed, but file storage succeeded, so return success with warning
-		l.Debug().Msgf("keychain storage unavailable (%v), using file storage only", err)
-		return location, nil
-	}
-
-	location.Keychain = true
+	location.File = true
 	return location, nil
 }
 

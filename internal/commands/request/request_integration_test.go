@@ -38,7 +38,7 @@ func TestRequestPingOne_RealAuth(t *testing.T) {
 	}
 
 	// First authenticate
-	_, _, _, err = auth_internal.PerformClientCredentialsLogin(context.Background())
+	_, err = auth_internal.PerformClientCredentialsLogin(context.Background())
 	if err != nil {
 		t.Fatalf("Authentication should succeed: %v", err)
 	}

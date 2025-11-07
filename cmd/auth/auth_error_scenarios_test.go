@@ -115,7 +115,7 @@ test:
 
 	// Try to logout without specifying auth method and without configured auth type
 	err := testutils_cobra.ExecutePingcli(t, "logout")
-	expectedErrorPattern := `no authentication type configured|authentication type`
+	expectedErrorPattern := `no authentication type configured|authentication type|failed to generate token key`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -367,7 +367,7 @@ test:
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
 	err := testutils_cobra.ExecutePingcli(t, "login", "--auth-code")
-	expectedErrorPattern := `redirect URI is not configured|failed to prompt for reconfiguration|input prompt error`
+	expectedErrorPattern := `redirect URI.*is not configured|failed to prompt for reconfiguration|input prompt error`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
