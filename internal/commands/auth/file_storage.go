@@ -4,11 +4,13 @@ package auth_internal
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
+	"github.com/pingidentity/pingcli/internal/errs"
 	"golang.org/x/oauth2"
 )
 
@@ -24,14 +26,20 @@ type tokenFileData struct {
 func getCredentialsFilePath(authMethod string) (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return "", fmt.Errorf("failed to get home directory: %w", err)
+		return "", &errs.PingCLIError{
+			Prefix: "failed to get home directory",
+			Err:    err,
+		}
 	}
 
 	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
 
 	// Create directory if it doesn't exist
 	if err := os.MkdirAll(credentialsDir, 0700); err != nil {
-		return "", fmt.Errorf("failed to create credentials directory: %w", err)
+		return "", &errs.PingCLIError{
+			Prefix: "failed to create credentials directory",
+			Err:    err,
+		}
 	}
 
 	// Use auth method as filename
@@ -69,12 +77,18 @@ func saveTokenToFile(token *oauth2.Token, authMethod string) error {
 	// Marshal to JSON
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal token data: %w", err)
+		return &errs.PingCLIError{
+			Prefix: "failed to marshal token data",
+			Err:    err,
+		}
 	}
 
 	// Write to file with restrictive permissions (only owner can read/write)
 	if err := os.WriteFile(filePath, jsonData, 0600); err != nil {
-		return fmt.Errorf("failed to write token to file: %w", err)
+		return &errs.PingCLIError{
+			Prefix: "failed to write token to file",
+			Err:    err,
+		}
 	}
 
 	return nil
@@ -96,13 +110,19 @@ func loadTokenFromFile(authMethod string) (*oauth2.Token, error) {
 	// #nosec G304 -- filePath is constructed from user home dir and auth method
 	jsonData, err := os.ReadFile(filePath)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read credentials file: %w", err)
+		return nil, &errs.PingCLIError{
+			Prefix: "failed to read credentials file",
+			Err:    err,
+		}
 	}
 
 	// Unmarshal JSON
 	var data tokenFileData
 	if err := json.Unmarshal(jsonData, &data); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal token data: %w", err)
+		return nil, &errs.PingCLIError{
+			Prefix: "failed to unmarshal token data",
+			Err:    err,
+		}
 	}
 
 	// Convert to oauth2.Token
@@ -131,7 +151,10 @@ func clearTokenFromFile(authMethod string) error {
 
 	// Remove file
 	if err := os.Remove(filePath); err != nil {
-		return fmt.Errorf("failed to remove credentials file: %w", err)
+		return &errs.PingCLIError{
+			Prefix: "failed to remove credentials file",
+			Err:    err,
+		}
 	}
 
 	return nil
@@ -143,7 +166,10 @@ func clearTokenFromFile(authMethod string) error {
 func clearAllTokenFilesForGrantType(grantType, profileName string) error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return fmt.Errorf("failed to get home directory: %w", err)
+		return &errs.PingCLIError{
+			Prefix: "failed to get home directory",
+			Err:    err,
+		}
 	}
 
 	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
@@ -157,7 +183,10 @@ func clearAllTokenFilesForGrantType(grantType, profileName string) error {
 	// Read all files in credentials directory
 	files, err := os.ReadDir(credentialsDir)
 	if err != nil {
-		return fmt.Errorf("failed to read credentials directory: %w", err)
+		return &errs.PingCLIError{
+			Prefix: "failed to read credentials directory",
+			Err:    err,
+		}
 	}
 
 	// Default profile name if empty
@@ -165,7 +194,7 @@ func clearAllTokenFilesForGrantType(grantType, profileName string) error {
 		profileName = "default"
 	}
 
-	var errs []error
+	var errList []error
 	// Look for files matching pattern: token-*_{grantType}_{profile}.json
 	// Example: token-a1b2c3d4e5f6g7h8_device_code_production.json
 	suffix := fmt.Sprintf("_%s_%s.json", grantType, profileName)
@@ -180,59 +209,20 @@ func clearAllTokenFilesForGrantType(grantType, profileName string) error {
 			if file.Name()[len(file.Name())-len(suffix):] == suffix {
 				filePath := filepath.Join(credentialsDir, file.Name())
 				if err := os.Remove(filePath); err != nil {
-					errs = append(errs, fmt.Errorf("failed to remove %s: %w", file.Name(), err))
+					errList = append(errList, &errs.PingCLIError{
+						Prefix: fmt.Sprintf("failed to remove %s", file.Name()),
+						Err:    err,
+					})
 				}
 			}
 		}
 	}
 
-	if len(errs) > 0 {
-		return fmt.Errorf("failed to clear some token files: %v", errs)
-	}
-
-	return nil
-}
-
-// clearAllTokenFiles removes all token files from the credentials directory
-// This is useful for cleaning up old tokens when configuration changes
-func clearAllTokenFiles() error {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		return fmt.Errorf("failed to get home directory: %w", err)
-	}
-
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
-
-	// Check if directory exists
-	if _, err := os.Stat(credentialsDir); os.IsNotExist(err) {
-		// Directory doesn't exist, nothing to clear
-		return nil
-	}
-
-	// Read all files in the credentials directory
-	entries, err := os.ReadDir(credentialsDir)
-	if err != nil {
-		return fmt.Errorf("failed to read credentials directory: %w", err)
-	}
-
-	var errs []error
-	for _, entry := range entries {
-		if entry.IsDir() {
-			continue
+	if len(errList) > 0 {
+		return &errs.PingCLIError{
+			Prefix: "failed to clear some token files",
+			Err:    errors.Join(errList...),
 		}
-
-		// Only remove .json files that look like token files
-		filename := entry.Name()
-		if filepath.Ext(filename) == ".json" {
-			filePath := filepath.Join(credentialsDir, filename)
-			if err := os.Remove(filePath); err != nil {
-				errs = append(errs, fmt.Errorf("failed to remove %s: %w", filename, err))
-			}
-		}
-	}
-
-	if len(errs) > 0 {
-		return fmt.Errorf("failed to remove some token files: %v", errs)
 	}
 
 	return nil

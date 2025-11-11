@@ -4,7 +4,6 @@ package auth
 
 import (
 	"github.com/pingidentity/pingcli/cmd/common"
-
 	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/errs"
@@ -47,5 +46,4 @@ func authLogoutRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	return nil
-
 }

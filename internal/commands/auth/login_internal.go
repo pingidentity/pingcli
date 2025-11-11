@@ -110,30 +110,6 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// ensureAuthConfigurationExists checks if the required configuration exists for the given auth method
-// Returns an error if configuration is missing or invalid
-func ensureAuthConfigurationExists(authMethod string) error {
-	switch authMethod {
-	case string(svcOAuth2.GrantTypeDeviceCode):
-		_, err := GetDeviceCodeConfiguration()
-
-		return err
-	case string(svcOAuth2.GrantTypeClientCredentials):
-		_, err := GetClientCredentialsConfiguration()
-
-		return err
-	case string(svcOAuth2.GrantTypeAuthorizationCode):
-		_, err := GetAuthorizationCodeConfiguration()
-
-		return err
-	default:
-		return &errs.PingCLIError{
-			Prefix: fmt.Sprintf("unsupported authentication method: %s", authMethod),
-			Err:    ErrUnsupportedAuthMethod,
-		}
-	}
-}
-
 // performLoginByConfiguredType performs login using the configured authentication type
 func performLoginByConfiguredType(ctx context.Context, authType, profileName string) error {
 	var result *LoginResult
@@ -174,13 +150,14 @@ func displayLoginSuccess(token *oauth2.Token, newAuth bool, location StorageLoca
 	if newAuth {
 		// Build storage location message
 		var storageMsg string
-		if location.Keychain && location.File {
+		switch {
+		case location.Keychain && location.File:
 			storageMsg = "keychain and file storage"
-		} else if location.Keychain {
+		case location.Keychain:
 			storageMsg = "keychain"
-		} else if location.File {
+		case location.File:
 			storageMsg = "file storage"
-		} else {
+		default:
 			storageMsg = "storage"
 		}
 

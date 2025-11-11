@@ -452,7 +452,7 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 		return nil
 	}
 
-	return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("unsupported auth type: %s", authType)}
+	return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: %s", ErrPingOneUnrecognizedAuthType, authType)}
 }
 
 func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolvedOutputDir string, err error) {

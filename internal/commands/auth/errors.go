@@ -48,4 +48,9 @@ var (
 	ErrAuthConfigRequired    = errors.New("authentication configuration required. Please configure authentication using 'pingcli auth login' or 'pingcli config set'")
 	ErrNoAuthTypeSpecified   = errors.New("no authentication type configured and no flag specified. Use --auth-code, --device-code, or --client-credentials to specify which credentials to clear")
 	ErrNoAuthConfiguration   = errors.New("no configuration found. Nothing to logout from. Run 'pingcli login' to configure authentication")
+
+	// Redirect URI validation errors
+	ErrRedirectURIPathInvalid = errors.New("redirect URI path must start with '/'")
+	ErrPortInvalid            = errors.New("port must be a number")
+	ErrPortOutOfRange         = errors.New("port must be between 1 and 65535")
 )

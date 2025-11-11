@@ -171,6 +171,7 @@ func (tm *DefaultTokenManager) SaveToken(token *oauth2.Token) error {
 	}
 
 	_, err = SaveTokenForMethod(token, authMethod)
+
 	return err
 }
 
@@ -192,6 +193,7 @@ func (tm *DefaultTokenManager) ClearToken() error {
 	}
 
 	_, err = ClearTokenForMethod(authMethod)
+
 	return err
 }
 

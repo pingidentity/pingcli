@@ -34,6 +34,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		}
 
 		fmt.Printf("Successfully logged out from all authentication methods. All credentials cleared from storage for profile '%s'.\n", profileName)
+
 		return nil
 	}
 
@@ -64,13 +65,14 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 
 	// Build storage location message
 	var storageMsg string
-	if location.Keychain && location.File {
+	switch {
+	case location.Keychain && location.File:
 		storageMsg = "keychain and file storage"
-	} else if location.Keychain {
+	case location.Keychain:
 		storageMsg = "keychain"
-	} else if location.File {
+	case location.File:
 		storageMsg = "file storage"
-	} else {
+	default:
 		storageMsg = "storage"
 	}
 

@@ -290,11 +290,13 @@ func TestGenerateTokenKey(t *testing.T) {
 				if result != "" {
 					t.Errorf("Expected empty string, got %s", result)
 				}
+
 				return
 			}
 
 			if result == "" {
 				t.Error("Expected non-empty result")
+
 				return
 			}
 

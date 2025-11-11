@@ -150,8 +150,9 @@ func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfi
 				return nil // Allow empty for default
 			}
 			if !strings.HasPrefix(trimmed, "/") {
-				return fmt.Errorf("redirect URI path must start with '/'")
+				return ErrRedirectURIPathInvalid
 			}
+
 			return nil
 		},
 		rc,
@@ -176,11 +177,12 @@ func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfi
 			// Validate port is numeric and in valid range
 			port, err := strconv.Atoi(trimmed)
 			if err != nil {
-				return fmt.Errorf("port must be a number")
+				return ErrPortInvalid
 			}
 			if port < 1 || port > 65535 {
-				return fmt.Errorf("port must be between 1 and 65535")
+				return ErrPortOutOfRange
 			}
+
 			return nil
 		},
 		rc,
@@ -542,6 +544,7 @@ func checkExistingCredentials(authType string) (bool, error) {
 	switch authType {
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
 		clientID := subKoanf.String(options.PingOneAuthenticationAuthorizationCodeClientIDOption.KoanfKey)
+
 		return clientID != "", nil
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:

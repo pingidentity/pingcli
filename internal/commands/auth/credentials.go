@@ -109,10 +109,12 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		if errors.Is(err, ErrNilToken) {
 			return location, err
 		}
+
 		return location, err
 	}
 
 	location.File = true
+
 	return location, nil
 }
 
@@ -307,6 +309,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 				Err:    err,
 			}
 		}
+
 		return tokenSource, nil
 	}
 
