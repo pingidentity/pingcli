@@ -17,9 +17,9 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	// Check if any auth method flags were provided
 	deviceCodeStr, _ := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
 	clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
-	authCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthCodeOption)
+	authorizationCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
 
-	flagProvided := deviceCodeStr != "" || clientCredentialsStr != "" || authCodeStr != ""
+	flagProvided := deviceCodeStr != "" || clientCredentialsStr != "" || authorizationCodeStr != ""
 
 	// Get current profile name for messages
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
@@ -47,7 +47,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	case clientCredentialsStr == "true":
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
 	default:
-		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE
+		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
 	}
 
 	// Generate token key for the selected auth method

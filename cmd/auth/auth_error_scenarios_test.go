@@ -40,9 +40,9 @@ test:
 			expectedErrorPattern: `client credentials client ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
 		{
-			name:                 "auth code missing client ID",
-			authMethod:           "--auth-code",
-			expectedErrorPattern: `auth code client ID is not configured|failed to prompt for reconfiguration|input prompt error`,
+			name:                 "authorization code missing client ID",
+			authMethod:           "--authorization-code",
+			expectedErrorPattern: `authorization code client ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
 		{
 			name:                 "device code missing client ID",
@@ -85,10 +85,10 @@ test:
             regionCode: NA
             authentication:
                 type: client_credentials
+                environmentID: 00000000-0000-0000-0000-000000000000
                 clientCredentials:
                     clientID: 00000000-0000-0000-0000-000000000001
                     clientSecret: invalid-client-secret
-                    environmentID: 00000000-0000-0000-0000-000000000000
 `
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
@@ -152,13 +152,13 @@ func TestLoginCmd_MutuallyExclusiveFlags(t *testing.T) {
 		expectedError string
 	}{
 		{
-			name:          "auth-code and device-code together",
-			flags:         []string{"--auth-code", "--device-code"},
+			name:          "authorization-code and device-code together",
+			flags:         []string{"--authorization-code", "--device-code"},
 			expectedError: "if any flags in the group.*are set none of the others can be",
 		},
 		{
-			name:          "auth-code and client-credentials together",
-			flags:         []string{"--auth-code", "--client-credentials"},
+			name:          "authorization-code and client-credentials together",
+			flags:         []string{"--authorization-code", "--client-credentials"},
 			expectedError: "if any flags in the group.*are set none of the others can be",
 		},
 		{
@@ -168,7 +168,7 @@ func TestLoginCmd_MutuallyExclusiveFlags(t *testing.T) {
 		},
 		{
 			name:          "all three flags together",
-			flags:         []string{"--auth-code", "--device-code", "--client-credentials"},
+			flags:         []string{"--authorization-code", "--device-code", "--client-credentials"},
 			expectedError: "if any flags in the group.*are set none of the others can be",
 		},
 	}
@@ -185,8 +185,8 @@ func TestLoginCmd_MutuallyExclusiveFlags(t *testing.T) {
 // TestLogoutCmd_SpecificAuthMethod tests logout with specific auth method when multiple are configured
 func TestLogoutCmd_SpecificAuthMethod(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
-	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET")
 	environmentID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
 
 	if clientID == "" || clientSecret == "" || environmentID == "" {
@@ -233,10 +233,10 @@ test:
             regionCode: NA
             authentication:
                 type: client_credentials
+                environmentID: 00000000-0000-0000-0000-000000000000
                 clientCredentials:
                     clientID: 00000000-0000-0000-0000-000000000001
                     clientSecret: test-secret
-                    environmentID: 00000000-0000-0000-0000-000000000000
 `
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
@@ -275,8 +275,8 @@ test:
 			expectedErrorPattern: `environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
 		{
-			name:       "auth_code_missing_environment_id",
-			authMethod: "--auth-code",
+			name:       "authorization_code_missing_environment_id",
+			authMethod: "--authorization-code",
 			configContents: `
 activeProfile: test
 test:
@@ -286,8 +286,8 @@ test:
         pingOne:
             regionCode: NA
             authentication:
-                type: auth_code
-                authCode:
+                type: authorization_code
+                authorizationCode:
                     clientID: 00000000-0000-0000-0000-000000000001
                     redirectURIPath: /callback
                     redirectURIPort: "3000"
@@ -335,9 +335,9 @@ test:
             regionCode: NA
             authentication:
                 type: client_credentials
+                environmentID: 00000000-0000-0000-0000-000000000000
                 clientCredentials:
                     clientID: 00000000-0000-0000-0000-000000000001
-                    environmentID: 00000000-0000-0000-0000-000000000000
                     scopes:
                       - test:scope
 `
@@ -348,8 +348,8 @@ test:
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// TestLoginCmd_AuthCodeMissingRedirectURI tests auth code without redirect URI
-func TestLoginCmd_AuthCodeMissingRedirectURI(t *testing.T) {
+// TestLoginCmd_AuthorizationCodeMissingRedirectURI tests authorization code without redirect URI
+func TestLoginCmd_AuthorizationCodeMissingRedirectURI(t *testing.T) {
 	configContents := `
 activeProfile: test
 test:
@@ -359,14 +359,14 @@ test:
         pingOne:
             regionCode: NA
             authentication:
-                type: auth_code
-                authCode:
+                type: authorization_code
+                environmentID: 00000000-0000-0000-0000-000000000000
+                authorizationCode:
                     clientID: 00000000-0000-0000-0000-000000000001
-                    environmentID: 00000000-0000-0000-0000-000000000000
 `
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
-	err := testutils_cobra.ExecutePingcli(t, "login", "--auth-code")
+	err := testutils_cobra.ExecutePingcli(t, "login", "--authorization-code")
 	expectedErrorPattern := `redirect URI.*is not configured|failed to prompt for reconfiguration|input prompt error`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
@@ -426,7 +426,7 @@ func TestLogoutCmd_InvalidFlags(t *testing.T) {
 		},
 		{
 			name:                 "mutually_exclusive_flags",
-			args:                 []string{"logout", "--auth-code", "--client-credentials"},
+			args:                 []string{"logout", "--authorization-code", "--client-credentials"},
 			expectedErrorPattern: `if any flags in the group.*are set none of the others can be`,
 		},
 	}

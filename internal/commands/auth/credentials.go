@@ -20,7 +20,7 @@ import (
 // Token storage keys for different authentication methods
 const (
 	deviceCodeTokenKey        = "device-code-token"
-	authCodeTokenKey          = "auth-code-token" // #nosec G101 -- This is a keychain identifier, not a credential
+	authorizationCodeTokenKey = "authorization-code-token" // #nosec G101 -- This is a keychain identifier, not a credential
 	clientCredentialsTokenKey = "client-credentials-token"
 )
 
@@ -169,8 +169,8 @@ func LoadToken() (*oauth2.Token, error) {
 			authType = "client_credentials"
 		case "deviceCode":
 			authType = "device_code"
-		case "authCode":
-			authType = "auth_code"
+		case "authorization_code":
+			authType = "authorization_code"
 		}
 
 		// Try to get configuration for the configured auth method
@@ -186,15 +186,15 @@ func LoadToken() (*oauth2.Token, error) {
 				}
 			}
 			grantType = svcOAuth2.GrantTypeDeviceCode
-		case "auth_code":
-			cfg, err = GetAuthCodeConfiguration()
+		case "authorization_code":
+			cfg, err = GetAuthorizationCodeConfiguration()
 			if err != nil {
 				return nil, &errs.PingCLIError{
-					Prefix: "failed to get auth code configuration",
+					Prefix: "failed to get authorization code configuration",
 					Err:    err,
 				}
 			}
-			grantType = svcOAuth2.GrantTypeAuthCode
+			grantType = svcOAuth2.GrantTypeAuthorizationCode
 		case "client_credentials":
 			cfg, err = GetClientCredentialsConfiguration()
 			if err != nil {
@@ -236,6 +236,86 @@ func LoadToken() (*oauth2.Token, error) {
 	}
 }
 
+// GetValidTokenSource returns a valid OAuth2 token source for the configured authentication method
+func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
+	// First, try to load using configuration-based keys from the active profile
+	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+	if err != nil || authType == "" {
+		return nil, &errs.PingCLIError{
+			Prefix: "no authentication type configured",
+			Err:    ErrUnsupportedAuthType,
+		}
+	}
+
+	// Normalize auth type to snake_case format
+	switch authType {
+	case "worker":
+		authType = "client_credentials"
+	case "clientCredentials":
+		authType = "client_credentials"
+	case "deviceCode":
+		authType = "device_code"
+	case "authorization_code":
+		authType = "authorization_code"
+	}
+
+	// Try to get configuration for the configured auth method
+	var cfg *config.Configuration
+	var grantType svcOAuth2.GrantType
+	switch authType {
+	case "device_code":
+		cfg, err = GetDeviceCodeConfiguration()
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: "failed to get device code configuration",
+				Err:    err,
+			}
+		}
+		grantType = svcOAuth2.GrantTypeDeviceCode
+	case "authorization_code":
+		cfg, err = GetAuthorizationCodeConfiguration()
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: "failed to get authorization code configuration",
+				Err:    err,
+			}
+		}
+		grantType = svcOAuth2.GrantTypeAuthorizationCode
+	case "client_credentials":
+		cfg, err = GetClientCredentialsConfiguration()
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: "failed to get client credentials configuration",
+				Err:    err,
+			}
+		}
+		grantType = svcOAuth2.GrantTypeClientCredentials
+	default:
+		return nil, &errs.PingCLIError{
+			Prefix: fmt.Sprintf("unsupported authentication type: %s", authType),
+			Err:    ErrUnsupportedAuthType,
+		}
+	}
+
+	if cfg != nil {
+		// Set the grant type before getting the token source
+		cfg = cfg.WithGrantType(grantType)
+		tokenSource, err := cfg.TokenSource(ctx)
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: "failed to get token source",
+				Err:    err,
+			}
+		}
+		return tokenSource, nil
+	}
+
+	return nil, &errs.PingCLIError{
+		Prefix: "failed to get a valid token source",
+		Err:    ErrUnsupportedAuthType,
+	}
+}
+
 // ClearToken removes all cached tokens from the keychain for all authentication methods.
 // This clears tokens from ALL grant types, not just the currently configured one,
 // to handle cases where users switch between authentication methods
@@ -251,7 +331,7 @@ func ClearToken() error {
 	}{
 		{"client_credentials", GetClientCredentialsConfiguration, svcOAuth2.GrantTypeClientCredentials},
 		{"device_code", GetDeviceCodeConfiguration, svcOAuth2.GrantTypeDeviceCode},
-		{"auth_code", GetAuthCodeConfiguration, svcOAuth2.GrantTypeAuthCode},
+		{"authorization_code", GetAuthorizationCodeConfiguration, svcOAuth2.GrantTypeAuthorizationCode},
 	}
 
 	for _, method := range authMethods {
@@ -289,7 +369,7 @@ func ClearToken() error {
 	}
 
 	// Also clear tokens using simple string keys for backward compatibility
-	methods := []string{deviceCodeTokenKey, authCodeTokenKey, clientCredentialsTokenKey}
+	methods := []string{deviceCodeTokenKey, authorizationCodeTokenKey, clientCredentialsTokenKey}
 
 	for _, method := range methods {
 		storage, err := getTokenStorage(method)
@@ -337,6 +417,30 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 		location.File = true
 	}
 
+	// Also clear all token files for this grant type and current profile
+	// This handles cases where the user changed their configuration
+	// Determine grant type from auth method (authMethod is the token key)
+	// We need to parse it to get the grant type
+	// For now, just try all grant types - inefficient but safe
+	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil {
+		profileName = "default"
+	}
+
+	// Try all grant types to make sure we clean up
+	grantTypes := []string{
+		string(svcOAuth2.GrantTypeDeviceCode),
+		string(svcOAuth2.GrantTypeClientCredentials),
+		string(svcOAuth2.GrantTypeAuthorizationCode),
+	}
+
+	for _, grantType := range grantTypes {
+		if err := clearAllTokenFilesForGrantType(grantType, profileName); err != nil {
+			// Don't fail the whole operation if cleanup fails
+			errList = append(errList, fmt.Errorf("failed to clear all %s tokens: %w", grantType, err))
+		}
+	}
+
 	return location, errors.Join(errList...)
 }
 
@@ -356,16 +460,16 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		profileName = "default" // Fallback to default if we can't get profile name
 	}
 
-	// Get configuration values for token key generation
+	// Get client ID for token key generation
 	clientID := ""
+	if cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
+		clientID = *cfg.Auth.DeviceCode.DeviceCodeClientID
+	}
+
+	// Get environment ID for token key generation
 	environmentID := ""
-	if cfg.Auth.DeviceCode != nil {
-		if cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
-			clientID = *cfg.Auth.DeviceCode.DeviceCodeClientID
-		}
-		if cfg.Auth.DeviceCode.DeviceCodeEnvironmentID != nil {
-			environmentID = *cfg.Auth.DeviceCode.DeviceCodeEnvironmentID
-		}
+	if cfg.Endpoint.EnvironmentID != nil {
+		environmentID = *cfg.Endpoint.EnvironmentID
 	}
 
 	// Set grant type to device code
@@ -437,21 +541,6 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 		}
 	}
 
-	// Get device code environment ID
-	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: "failed to get device code environment ID",
-			Err:    err,
-		}
-	}
-	if environmentID == "" {
-		return nil, &errs.PingCLIError{
-			Prefix: "failed to get device code configuration",
-			Err:    ErrDeviceCodeEnvironmentIDNotConfigured,
-		}
-	}
-
 	// Get device code scopes (optional)
 	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeScopesOption)
 	if err != nil {
@@ -462,8 +551,7 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	}
 
 	// Configure device code settings
-	cfg = cfg.WithDeviceCodeClientID(clientID).
-		WithDeviceCodeEnvironmentID(environmentID)
+	cfg = cfg.WithDeviceCodeClientID(clientID)
 
 	scopesList := parseScopesList(scopes)
 	cfg = cfg.WithDeviceCodeScopes(scopesList)
@@ -472,14 +560,19 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithStorageType(getStorageType()).WithStorageName("pingcli")
 
 	// Apply region configuration
-	return applyRegionConfiguration(cfg)
+	cfg, err = applyRegionConfiguration(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
 }
 
-func PerformAuthCodeLogin(ctx context.Context) (*LoginResult, error) {
-	cfg, err := GetAuthCodeConfiguration()
+func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
+	cfg, err := GetAuthorizationCodeConfiguration()
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code configuration",
+			Prefix: "failed to get authorization code configuration",
 			Err:    err,
 		}
 	}
@@ -490,20 +583,20 @@ func PerformAuthCodeLogin(ctx context.Context) (*LoginResult, error) {
 		profileName = "default" // Fallback to default if we can't get profile name
 	}
 
-	// Get configuration values for token key generation
+	// Get client ID for token key generation
 	clientID := ""
-	environmentID := ""
-	if cfg.Auth.AuthCode != nil {
-		if cfg.Auth.AuthCode.AuthCodeClientID != nil {
-			clientID = *cfg.Auth.AuthCode.AuthCodeClientID
-		}
-		if cfg.Auth.AuthCode.AuthCodeEnvironmentID != nil {
-			environmentID = *cfg.Auth.AuthCode.AuthCodeEnvironmentID
-		}
+	if cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
+		clientID = *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID
 	}
 
-	// Set grant type to auth code
-	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeAuthCode)
+	// Get environment ID for token key generation
+	environmentID := ""
+	if cfg.Endpoint.EnvironmentID != nil {
+		environmentID = *cfg.Endpoint.EnvironmentID
+	}
+
+	// Set grant type to authorization code
+	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeAuthorizationCode)
 
 	// Get token source - SDK handles keychain storage based on configuration
 	tokenSource, err := cfg.TokenSource(ctx)
@@ -524,15 +617,15 @@ func PerformAuthCodeLogin(ctx context.Context) (*LoginResult, error) {
 	}
 
 	// Generate unique token key based on profile and configuration
-	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeAuthCode))
+	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeAuthorizationCode))
 	if tokenKey == "" {
 		// Fallback to simple key if generation fails
-		tokenKey = authCodeTokenKey
+		tokenKey = authorizationCodeTokenKey
 	}
 
 	// Clean up old token files for this grant type and profile (in case configuration changed)
 	// Ignore errors from cleanup - we still want to save the new token
-	_ = clearAllTokenFilesForGrantType(string(svcOAuth2.GrantTypeAuthCode), profileName)
+	_ = clearAllTokenFilesForGrantType(string(svcOAuth2.GrantTypeAuthorizationCode), profileName)
 
 	// Save token using our own storage logic (handles both file and keychain based on flags)
 	location, err := SaveTokenForMethod(token, tokenKey)
@@ -551,77 +644,62 @@ func PerformAuthCodeLogin(ctx context.Context) (*LoginResult, error) {
 	}, nil
 }
 
-// GetAuthCodeConfiguration builds an authorization code authentication configuration from the CLI profile options
-func GetAuthCodeConfiguration() (*config.Configuration, error) {
+// GetAuthorizationCodeConfiguration builds an authorization code authentication configuration from the CLI profile options
+func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 	cfg := config.NewConfiguration()
 
-	// Get auth code client ID
-	clientID, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeClientIDOption)
+	// Get authorization code client ID
+	clientID, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeClientIDOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code client ID",
+			Prefix: "failed to get authorization code client ID",
 			Err:    err,
 		}
 	}
 	if clientID == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code configuration",
-			Err:    ErrAuthCodeClientIDNotConfigured,
+			Prefix: "failed to get authorization code configuration",
+			Err:    ErrAuthorizationCodeClientIDNotConfigured,
 		}
 	}
 
-	// Get auth code environment ID
-	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeEnvironmentIDOption)
+	// Get authorization code redirect URI path
+	redirectURIPath, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code environment ID",
-			Err:    err,
-		}
-	}
-	if environmentID == "" {
-		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code configuration",
-			Err:    ErrAuthCodeEnvironmentIDNotConfigured,
-		}
-	}
-
-	// Get auth code redirect URI path
-	redirectURIPath, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIPathOption)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code redirect URI path",
+			Prefix: "failed to get authorization code redirect URI path",
 			Err:    err,
 		}
 	}
 	if redirectURIPath == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code configuration",
-			Err:    ErrAuthCodeRedirectURIPathNotConfigured,
+			Prefix: "failed to get authorization code configuration",
+			Err:    ErrAuthorizationCodeRedirectURIPathNotConfigured,
 		}
 	}
 
-	// Get auth code redirect URI port
-	redirectURIPort, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeRedirectURIPortOption)
+	// Get authorization code redirect URI port
+	redirectURIPort, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code redirect URI port",
+			Prefix: "failed to get authorization code redirect URI port",
 			Err:    err,
 		}
 	}
 	if redirectURIPort == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code configuration",
-			Err:    ErrAuthCodeRedirectURIPortNotConfigured,
+			Prefix: "failed to get authorization code configuration",
+			Err:    ErrAuthorizationCodeRedirectURIPortNotConfigured,
 		}
 	}
 
-	redirectURI := config.AuthCodeRedirectURI{
+	redirectURI := config.AuthorizationCodeRedirectURI{
 		Port: redirectURIPort,
 		Path: redirectURIPath,
 	}
 
 	// Get auth code scopes (optional)
-	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeScopesOption)
+	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeScopesOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
 			Prefix: "failed to get auth code scopes",
@@ -630,13 +708,12 @@ func GetAuthCodeConfiguration() (*config.Configuration, error) {
 	}
 
 	// Configure auth code settings
-	cfg = cfg.WithAuthCodeClientID(clientID).
-		WithAuthCodeEnvironmentID(environmentID).
-		WithAuthCodeRedirectURI(redirectURI)
+	cfg = cfg.WithAuthorizationCodeClientID(clientID).
+		WithAuthorizationCodeRedirectURI(redirectURI)
 
 	scopesList := parseScopesList(scopes)
 	if len(scopesList) > 0 {
-		cfg = cfg.WithAuthCodeScopes(scopesList)
+		cfg = cfg.WithAuthorizationCodeScopes(scopesList)
 	}
 
 	// Configure storage options based on --file-storage flag
@@ -644,7 +721,12 @@ func GetAuthCodeConfiguration() (*config.Configuration, error) {
 		WithStorageName("pingcli")
 
 	// Apply region configuration
-	return applyRegionConfiguration(cfg)
+	cfg, err = applyRegionConfiguration(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
 }
 
 func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
@@ -664,14 +746,14 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 
 	// Get configuration values for token key generation
 	clientID := ""
-	environmentID := ""
 	if cfg.Auth.ClientCredentials != nil {
 		if cfg.Auth.ClientCredentials.ClientCredentialsClientID != nil {
 			clientID = *cfg.Auth.ClientCredentials.ClientCredentialsClientID
 		}
-		if cfg.Auth.ClientCredentials.ClientCredentialsEnvironmentID != nil {
-			environmentID = *cfg.Auth.ClientCredentials.ClientCredentialsEnvironmentID
-		}
+	}
+	environmentID := ""
+	if cfg.Endpoint.EnvironmentID != nil {
+		environmentID = *cfg.Endpoint.EnvironmentID
 	}
 
 	// Set grant type to client credentials
@@ -757,21 +839,6 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		}
 	}
 
-	// Get client credentials environment ID
-	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: "failed to get client credentials environment ID",
-			Err:    err,
-		}
-	}
-	if environmentID == "" {
-		return nil, &errs.PingCLIError{
-			Prefix: "failed to get client credentials configuration",
-			Err:    ErrClientCredentialsEnvironmentIDNotConfigured,
-		}
-	}
-
 	// Get client credentials scopes (optional)
 	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsScopesOption)
 	if err != nil {
@@ -783,8 +850,7 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 
 	// Configure client credentials settings
 	cfg = cfg.WithClientCredentialsClientID(clientID).
-		WithClientCredentialsClientSecret(clientSecret).
-		WithClientCredentialsEnvironmentID(environmentID)
+		WithClientCredentialsClientSecret(clientSecret)
 
 	scopesList := parseScopesList(scopes)
 	if len(scopesList) > 0 {
@@ -796,75 +862,10 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		WithStorageName("pingcli")
 
 	// Apply region configuration
-	return applyRegionConfiguration(cfg)
-}
-
-// GetValidTokenSource returns a token source with a valid token, attempting to use cached tokens first
-// and performing automatic authentication for client_credentials if needed
-func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
-	// Try to load cached token first
-	cachedToken, err := LoadToken()
-	if err == nil && cachedToken != nil && cachedToken.Valid() {
-		// Return cached token if it's still valid
-		return oauth2.StaticTokenSource(cachedToken), nil
-	}
-
-	// No valid cached token found - attempt automatic authentication based on configured method
-	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+	cfg, err = applyRegionConfiguration(cfg)
 	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: "failed to get authentication type",
-			Err:    err,
-		}
+		return nil, err
 	}
 
-	// Automatically authenticate based on configured method
-	var result *LoginResult
-
-	switch authType {
-	case "device_code":
-		result, err = PerformDeviceCodeLogin(ctx)
-		if err != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: "automatic device code authentication failed",
-				Err:    err,
-			}
-		}
-	case "auth_code":
-		result, err = PerformAuthCodeLogin(ctx)
-		if err != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: "automatic authorization code authentication failed",
-				Err:    err,
-			}
-		}
-	case "client_credentials":
-		result, err = PerformClientCredentialsLogin(ctx)
-		if err != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: "automatic client credentials authentication failed",
-				Err:    err,
-			}
-		}
-	default:
-		return nil, &errs.PingCLIError{
-			Prefix: fmt.Sprintf("automatic authentication failed for type '%s'", authType),
-			Err:    ErrUnsupportedAuthType,
-		}
-	}
-
-	if result.NewAuth {
-		locationMsg := "storage"
-		if result.Location.Keychain && result.Location.File {
-			locationMsg = "keychain and file storage"
-		} else if result.Location.Keychain {
-			locationMsg = "keychain"
-		} else if result.Location.File {
-			locationMsg = "file storage"
-		}
-		fmt.Printf("Successfully authenticated using %s authentication (credentials saved to %s)\n", authType, locationMsg)
-	}
-
-	// Return a static token source with the obtained token
-	return oauth2.StaticTokenSource(result.Token), nil
+	return cfg, nil
 }

@@ -48,21 +48,21 @@ func TestInitAuthOptions(t *testing.T) {
 		t.Fatal("Flag should not be nil")
 	}
 
-	// Test auth-code option
-	authCodeOption := options.AuthMethodAuthCodeOption
-	if authCodeOption.CobraParamName != "auth-code" {
-		t.Errorf("Expected CobraParamName to be 'auth-code', got %q", authCodeOption.CobraParamName)
+	// Test authorization-code option
+	authorizationCodeOption := options.AuthMethodAuthorizationCodeOption
+	if authorizationCodeOption.CobraParamName != "authorization-code" {
+		t.Errorf("Expected CobraParamName to be 'authorization-code', got %q", authorizationCodeOption.CobraParamName)
 	}
-	if authCodeOption.Type != options.BOOL {
-		t.Errorf("Expected Type to be BOOL, got %v", authCodeOption.Type)
+	if authorizationCodeOption.Type != options.BOOL {
+		t.Errorf("Expected Type to be BOOL, got %v", authorizationCodeOption.Type)
 	}
-	if authCodeOption.Sensitive {
+	if authorizationCodeOption.Sensitive {
 		t.Error("Expected Sensitive to be false")
 	}
-	if authCodeOption.Flag.Usage != "Use authorization code authentication flow" {
-		t.Errorf("Expected Usage to be 'Use authorization code authentication flow', got %q", authCodeOption.Flag.Usage)
+	if authorizationCodeOption.Flag.Usage != "Use authorization code authentication flow" {
+		t.Errorf("Expected Usage to be 'Use authorization code authentication flow', got %q", authorizationCodeOption.Flag.Usage)
 	}
-	if authCodeOption.Flag == nil {
+	if authorizationCodeOption.Flag == nil {
 		t.Fatal("Flag should not be nil")
 	}
 }
@@ -83,8 +83,8 @@ func TestAuthOptionDefaults(t *testing.T) {
 		t.Errorf("Expected default value to be 'false', got %q", defaultValue)
 	}
 
-	authCodeOption := options.AuthMethodAuthCodeOption
-	defaultValue = authCodeOption.DefaultValue.String()
+	authorizationCodeOption := options.AuthMethodAuthorizationCodeOption
+	defaultValue = authorizationCodeOption.DefaultValue.String()
 	if defaultValue != "false" {
 		t.Errorf("Expected default value to be 'false', got %q", defaultValue)
 	}
@@ -104,9 +104,9 @@ func TestAuthOptionShorthandFlags(t *testing.T) {
 		t.Errorf("Expected shorthand to be 'c', got %q", clientCredentialsOption.Flag.Shorthand)
 	}
 
-	authCodeOption := options.AuthMethodAuthCodeOption
-	if authCodeOption.Flag.Shorthand != "a" {
-		t.Errorf("Expected shorthand to be 'a', got %q", authCodeOption.Flag.Shorthand)
+	authorizationCodeOption := options.AuthMethodAuthorizationCodeOption
+	if authorizationCodeOption.Flag.Shorthand != "z" {
+		t.Errorf("Expected shorthand to be 'z', got %q", authorizationCodeOption.Flag.Shorthand)
 	}
 }
 
@@ -124,9 +124,9 @@ func TestAuthOptionBooleanBehavior(t *testing.T) {
 		t.Errorf("Expected NoOptDefVal to be 'true', got %q", clientCredentialsOption.Flag.NoOptDefVal)
 	}
 
-	authCodeOption := options.AuthMethodAuthCodeOption
-	if authCodeOption.Flag.NoOptDefVal != "true" {
-		t.Errorf("Expected NoOptDefVal to be 'true', got %q", authCodeOption.Flag.NoOptDefVal)
+	authorizationCodeOption := options.AuthMethodAuthorizationCodeOption
+	if authorizationCodeOption.Flag.NoOptDefVal != "true" {
+		t.Errorf("Expected NoOptDefVal to be 'true', got %q", authorizationCodeOption.Flag.NoOptDefVal)
 	}
 }
 
@@ -137,7 +137,7 @@ func TestAllAuthOptionsInitialized(t *testing.T) {
 	authOptions := []options.Option{
 		options.AuthMethodDeviceCodeOption,
 		options.AuthMethodClientCredentialsOption,
-		options.AuthMethodAuthCodeOption,
+		options.AuthMethodAuthorizationCodeOption,
 	}
 
 	for _, option := range authOptions {

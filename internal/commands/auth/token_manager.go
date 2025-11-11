@@ -50,38 +50,30 @@ func GetCurrentAuthMethod() (string, error) {
 // GetAuthMethodKey generates a unique keychain account name for the given authentication method
 // using the environment ID and client ID from the profile configuration
 func GetAuthMethodKey(authMethod string) (string, error) {
-	// Get environment ID and client ID based on auth method
-	var environmentID, clientID string
+	// Get configuration for the auth method to extract environment ID and client ID
+	var cfg *config.Configuration
 	var err error
+	var grantType svcOAuth2.GrantType
 
 	switch authMethod {
 	case "device_code":
-		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption)
+		cfg, err = GetDeviceCodeConfiguration()
 		if err != nil {
-			return "", fmt.Errorf("failed to get device code environment ID: %w", err)
+			return "", fmt.Errorf("failed to get device code configuration: %w", err)
 		}
-		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)
+		grantType = svcOAuth2.GrantTypeDeviceCode
+	case "authorization_code":
+		cfg, err = GetAuthorizationCodeConfiguration()
 		if err != nil {
-			return "", fmt.Errorf("failed to get device code client ID: %w", err)
+			return "", fmt.Errorf("failed to get auth code configuration: %w", err)
 		}
-	case "auth_code", "authorization_code":
-		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeEnvironmentIDOption)
-		if err != nil {
-			return "", fmt.Errorf("failed to get auth code environment ID: %w", err)
-		}
-		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationAuthCodeClientIDOption)
-		if err != nil {
-			return "", fmt.Errorf("failed to get auth code client ID: %w", err)
-		}
+		grantType = svcOAuth2.GrantTypeAuthorizationCode
 	case "client_credentials":
-		environmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption)
+		cfg, err = GetClientCredentialsConfiguration()
 		if err != nil {
-			return "", fmt.Errorf("failed to get client credentials environment ID: %w", err)
+			return "", fmt.Errorf("failed to get client credentials configuration: %w", err)
 		}
-		clientID, err = profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption)
-		if err != nil {
-			return "", fmt.Errorf("failed to get client credentials client ID: %w", err)
-		}
+		grantType = svcOAuth2.GrantTypeClientCredentials
 	default:
 		return "", &errs.PingCLIError{
 			Prefix: fmt.Sprintf("failed to generate token key for auth method '%s'", authMethod),
@@ -89,27 +81,86 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 		}
 	}
 
-	if environmentID == "" || clientID == "" {
+	// Set the grant type before generating the token key
+	cfg = cfg.WithGrantType(grantType)
+
+	// Extract environment ID and client ID from configuration
+	environmentID := ""
+	if cfg.Endpoint.EnvironmentID != nil {
+		environmentID = *cfg.Endpoint.EnvironmentID
+	}
+
+	clientID := ""
+	switch grantType {
+	case svcOAuth2.GrantTypeDeviceCode:
+		if cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
+			clientID = *cfg.Auth.DeviceCode.DeviceCodeClientID
+		}
+	case svcOAuth2.GrantTypeAuthorizationCode:
+		if cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
+			clientID = *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID
+		}
+	case svcOAuth2.GrantTypeClientCredentials:
+		if cfg.Auth.ClientCredentials != nil && cfg.Auth.ClientCredentials.ClientCredentialsClientID != nil {
+			clientID = *cfg.Auth.ClientCredentials.ClientCredentialsClientID
+		}
+	}
+
+	// Use the SDK's GenerateKeychainAccountName to ensure consistency with SDK token storage
+	// This generates token-HASH without profile/grant type suffix for keychain compatibility
+	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType))
+	if tokenKey == "" || tokenKey == "default-token" {
 		return "", &errs.PingCLIError{
 			Prefix: "failed to generate token key",
 			Err:    ErrTokenKeyGenerationRequirements,
 		}
 	}
 
-	// Use the SDK's GenerateKeychainAccountName for consistency
-	return svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, authMethod), nil
+	return tokenKey, nil
 }
 
 // GetAuthMethodKeyFromConfig generates a unique keychain account name from a configuration object
+// This uses the SDK's GenerateKeychainAccountName to ensure consistency with SDK token storage
 func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 	if cfg == nil || cfg.Auth.GrantType == nil {
 		return "", ErrGrantTypeNotSet
 	}
 
-	// Convert GrantType to string
-	grantType := string(*cfg.Auth.GrantType)
+	// Extract environment ID from the config object
+	environmentID := ""
+	if cfg.Endpoint.EnvironmentID != nil {
+		environmentID = *cfg.Endpoint.EnvironmentID
+	}
 
-	return GetAuthMethodKey(grantType)
+	// Extract client ID based on grant type
+	grantType := *cfg.Auth.GrantType
+	clientID := ""
+	switch grantType {
+	case svcOAuth2.GrantTypeDeviceCode:
+		if cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
+			clientID = *cfg.Auth.DeviceCode.DeviceCodeClientID
+		}
+	case svcOAuth2.GrantTypeAuthorizationCode:
+		if cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
+			clientID = *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID
+		}
+	case svcOAuth2.GrantTypeClientCredentials:
+		if cfg.Auth.ClientCredentials != nil && cfg.Auth.ClientCredentials.ClientCredentialsClientID != nil {
+			clientID = *cfg.Auth.ClientCredentials.ClientCredentialsClientID
+		}
+	}
+
+	// Use the SDK's GenerateKeychainAccountName to ensure consistency with SDK token storage
+	// This generates token-HASH without profile/grant type suffix for keychain compatibility
+	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType))
+	if tokenKey == "" || tokenKey == "default-token" {
+		return "", &errs.PingCLIError{
+			Prefix: "failed to generate token key from config",
+			Err:    ErrTokenKeyGenerationRequirements,
+		}
+	}
+
+	return tokenKey, nil
 }
 
 // SaveToken saves a token to the keychain for the currently configured authentication method

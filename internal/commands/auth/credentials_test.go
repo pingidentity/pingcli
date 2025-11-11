@@ -54,18 +54,18 @@ func TestPerformClientCredentialsLogin_MissingConfiguration(t *testing.T) {
 	}
 }
 
-func TestPerformAuthCodeLogin_MissingConfiguration(t *testing.T) {
+func TestPerformAuthorizationCodeLogin_MissingConfiguration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	ctx := context.Background()
 
-	_, err := auth_internal.PerformAuthCodeLogin(ctx)
+	_, err := auth_internal.PerformAuthorizationCodeLogin(ctx)
 
 	if err == nil {
 		t.Error("Expected error, but got nil")
 	}
-	if err != nil && !strings.Contains(err.Error(), "failed to get auth code configuration") {
-		t.Errorf("Expected error to contain 'failed to get auth code configuration', got: %v", err)
+	if err != nil && !strings.Contains(err.Error(), "failed to get authorization code configuration") {
+		t.Errorf("Expected error to contain 'failed to get authorization code configuration', got: %v", err)
 	}
 }
 
@@ -111,10 +111,10 @@ func TestGetClientCredentialsConfiguration_MissingClientID(t *testing.T) {
 	}
 }
 
-func TestGetAuthCodeConfiguration_MissingClientID(t *testing.T) {
+func TestGetAuthorizationCodeConfiguration_MissingClientID(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	cfg, err := auth_internal.GetAuthCodeConfiguration()
+	cfg, err := auth_internal.GetAuthorizationCodeConfiguration()
 
 	// In test environment, some configuration may be present but incomplete
 	if err == nil {
@@ -124,10 +124,10 @@ func TestGetAuthCodeConfiguration_MissingClientID(t *testing.T) {
 		t.Skip("Auth code configuration is complete")
 	}
 	// Configuration validation checks multiple fields - can fail on any missing value
-	if !strings.Contains(err.Error(), "auth code client ID is not configured") &&
-		!strings.Contains(err.Error(), "auth code redirect URI is not configured") &&
-		!strings.Contains(err.Error(), "failed to get auth code configuration") {
-		t.Errorf("Expected auth code configuration error, got: %v", err)
+	if !strings.Contains(err.Error(), "authorization code client ID is not configured") &&
+		!strings.Contains(err.Error(), "authorization code redirect URI is not configured") &&
+		!strings.Contains(err.Error(), "failed to get authorization code configuration") {
+		t.Errorf("Expected authorization code configuration error, got: %v", err)
 	}
 }
 
@@ -174,10 +174,10 @@ func TestGetClientCredentialsConfiguration_MissingEnvironmentID(t *testing.T) {
 	}
 }
 
-func TestGetAuthCodeConfiguration_MissingEnvironmentID(t *testing.T) {
+func TestGetAuthorizationCodeConfiguration_MissingEnvironmentID(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	_, err := auth_internal.GetAuthCodeConfiguration()
+	_, err := auth_internal.GetAuthorizationCodeConfiguration()
 
 	if err == nil {
 		t.Error("Expected error, but got nil")
@@ -237,7 +237,10 @@ func TestGetValidTokenSource_NoCache(t *testing.T) {
 	} else if !strings.Contains(err.Error(), "failed to get authentication type") &&
 		!strings.Contains(err.Error(), "automatic client credentials authentication failed") &&
 		!strings.Contains(err.Error(), "automatic authorization code authentication failed") &&
-		!strings.Contains(err.Error(), "automatic device code authentication failed") {
+		!strings.Contains(err.Error(), "automatic device code authentication failed") &&
+		!strings.Contains(err.Error(), "failed to get client credentials configuration") &&
+		!strings.Contains(err.Error(), "failed to get device code configuration") &&
+		!strings.Contains(err.Error(), "failed to get authorization code configuration") {
 		// Error - authentication failed or configuration missing
 		t.Errorf("Expected authentication-related error, got: %s", err.Error())
 	}
@@ -261,23 +264,23 @@ func TestAuthenticationErrorMessages_ClientCredentials(t *testing.T) {
 	}
 }
 
-// TestAuthenticationErrorMessages_AuthCode tests auth code authentication error message
-func TestAuthenticationErrorMessages_AuthCode(t *testing.T) {
+// TestAuthenticationErrorMessages_AuthorizationCode tests authorization code authentication error message
+func TestAuthenticationErrorMessages_AuthorizationCode(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	ctx := context.Background()
-	_, err := auth_internal.PerformAuthCodeLogin(ctx)
+	_, err := auth_internal.PerformAuthorizationCodeLogin(ctx)
 
 	if err == nil {
-		t.Skip("Auth code authentication succeeded (full configuration present)")
+		t.Skip("Authorization code authentication succeeded (full configuration present)")
 	}
 	// Configuration validation checks multiple fields
-	if !strings.Contains(err.Error(), "auth code client ID is not configured") &&
-		!strings.Contains(err.Error(), "auth code redirect URI is not configured") &&
-		!strings.Contains(err.Error(), "auth code redirect URI path is not configured") &&
-		!strings.Contains(err.Error(), "auth code redirect URI port is not configured") &&
-		!strings.Contains(err.Error(), "failed to get auth code configuration") {
-		t.Errorf("Expected auth code configuration error, got: %v", err)
+	if !strings.Contains(err.Error(), "authorization code client ID is not configured") &&
+		!strings.Contains(err.Error(), "authorization code redirect URI is not configured") &&
+		!strings.Contains(err.Error(), "authorization code redirect URI path is not configured") &&
+		!strings.Contains(err.Error(), "authorization code redirect URI port is not configured") &&
+		!strings.Contains(err.Error(), "failed to get authorization code configuration") {
+		t.Errorf("Expected authorization code configuration error, got: %v", err)
 	}
 }
 
@@ -321,11 +324,11 @@ func TestConfigurationValidation_ClientCredentials(t *testing.T) {
 	}
 }
 
-// TestConfigurationValidation_AuthCode tests auth code configuration validation
-func TestConfigurationValidation_AuthCode(t *testing.T) {
+// TestConfigurationValidation_AuthorizationCode tests auth code configuration validation
+func TestConfigurationValidation_AuthorizationCode(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	cfg, err := auth_internal.GetAuthCodeConfiguration()
+	cfg, err := auth_internal.GetAuthorizationCodeConfiguration()
 
 	// In test environment, configuration may be complete or incomplete
 	if err == nil {
@@ -427,6 +430,9 @@ func TestGetValidTokenSource_AutomaticDeviceCodeAuth(t *testing.T) {
 		"automatic device code authentication failed",
 		"automatic client credentials authentication failed", // test env: worker -> client_credentials
 		"failed to get authentication type",
+		"failed to get client credentials configuration",
+		"failed to get device code configuration",
+		"failed to get authorization code configuration",
 	}
 
 	errorMatched := false
@@ -443,8 +449,8 @@ func TestGetValidTokenSource_AutomaticDeviceCodeAuth(t *testing.T) {
 	}
 }
 
-// TestGetValidTokenSource_AutomaticAuthCodeAuth tests automatic auth code authentication
-func TestGetValidTokenSource_AutomaticAuthCodeAuth(t *testing.T) {
+// TestGetValidTokenSource_AutomaticAuthorizationCodeAuth tests automatic auth code authentication
+func TestGetValidTokenSource_AutomaticAuthorizationCodeAuth(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	ctx := context.Background()
 
@@ -469,6 +475,8 @@ func TestGetValidTokenSource_AutomaticAuthCodeAuth(t *testing.T) {
 	expectedErrors := []string{
 		"automatic authorization code authentication failed",
 		"automatic client credentials authentication failed", // test env: worker -> client_credentials
+		"failed to get client credentials configuration",
+		"failed to get authorization code configuration",
 	}
 
 	errorMatched := false
@@ -518,6 +526,9 @@ func TestGetValidTokenSource_AutomaticClientCredentialsAuth(t *testing.T) {
 		"automatic authorization code authentication failed",
 		"automatic client credentials authentication failed",
 		"failed to get authentication type",
+		"failed to get client credentials configuration",
+		"failed to get device code configuration",
+		"failed to get authorization code configuration",
 	}
 
 	errorMatched := false

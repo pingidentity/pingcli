@@ -12,7 +12,7 @@ import (
 func InitAuthOptions() {
 	initAuthMethodDeviceCodeOption()
 	initAuthMethodClientCredentialsOption()
-	initAuthMethodAuthCodeOption()
+	initAuthMethodAuthorizationCodeOption()
 	initAuthFileStorageOption()
 }
 
@@ -64,13 +64,13 @@ func initAuthMethodClientCredentialsOption() {
 	}
 }
 
-// initAuthMethodAuthCodeOption initializes the --auth-code authentication method flag
-func initAuthMethodAuthCodeOption() {
-	cobraParamName := "auth-code"
+// initAuthMethodAuthorizationCodeOption initializes the --authorization-code authentication method flag
+func initAuthMethodAuthorizationCodeOption() {
+	cobraParamName := "authorization-code"
 	cobraValue := new(customtypes.Bool)
 	defaultValue := customtypes.Bool(false)
 
-	options.AuthMethodAuthCodeOption = options.Option{
+	options.AuthMethodAuthorizationCodeOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,

@@ -33,7 +33,7 @@ func TestLoginCommand_DeviceCodeShorthandParsing_Integration(t *testing.T) {
 	}
 
 	// Verify other flags are false
-	allFlags := []string{"auth-code", "client-credentials"}
+	allFlags := []string{"authorization-code", "client-credentials"}
 	for _, flagName := range allFlags {
 		otherFlagValue, err := cmd.Flags().GetBool(flagName)
 		if err != nil {
@@ -45,8 +45,8 @@ func TestLoginCommand_DeviceCodeShorthandParsing_Integration(t *testing.T) {
 	}
 }
 
-// TestLoginCommand_AuthCodeShorthandParsing_Integration tests that auth-code shorthand -a is properly parsed
-func TestLoginCommand_AuthCodeShorthandParsing_Integration(t *testing.T) {
+// TestLoginCommand_AuthorizationCodeShorthandParsing_Integration tests that authorization-code shorthand -a is properly parsed
+func TestLoginCommand_AuthorizationCodeShorthandParsing_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	cmd := auth.NewLoginCommand()
 
@@ -59,12 +59,12 @@ func TestLoginCommand_AuthCodeShorthandParsing_Integration(t *testing.T) {
 	}
 
 	// Check that the expected flag was set to true
-	flagValue, err := cmd.Flags().GetBool("auth-code")
+	flagValue, err := cmd.Flags().GetBool("authorization-code")
 	if err != nil {
 		t.Fatalf("GetBool should not error: %v", err)
 	}
 	if flagValue != true {
-		t.Errorf("Flag auth-code should be true, got %v", flagValue)
+		t.Errorf("Flag authorization-code should be true, got %v", flagValue)
 	}
 
 	// Verify other flags are false
@@ -75,7 +75,7 @@ func TestLoginCommand_AuthCodeShorthandParsing_Integration(t *testing.T) {
 			t.Fatalf("GetBool should not error: %v", err)
 		}
 		if otherFlagValue {
-			t.Errorf("Flag %s should be false when auth-code is set", flagName)
+			t.Errorf("Flag %s should be false when authorization-code is set", flagName)
 		}
 	}
 }
@@ -103,7 +103,7 @@ func TestLoginCommand_ClientCredentialsShorthandParsing_Integration(t *testing.T
 	}
 
 	// Verify other flags are false
-	allFlags := []string{"device-code", "auth-code"}
+	allFlags := []string{"device-code", "authorization-code"}
 	for _, flagName := range allFlags {
 		otherFlagValue, err := cmd.Flags().GetBool(flagName)
 		if err != nil {
@@ -138,7 +138,7 @@ func TestLoginCommand_DeviceCodeFullFlagParsing_Integration(t *testing.T) {
 	}
 
 	// Verify other flags are false
-	allFlags := []string{"auth-code", "client-credentials"}
+	allFlags := []string{"authorization-code", "client-credentials"}
 	for _, flagName := range allFlags {
 		otherFlagValue, err := cmd.Flags().GetBool(flagName)
 		if err != nil {
@@ -150,13 +150,13 @@ func TestLoginCommand_DeviceCodeFullFlagParsing_Integration(t *testing.T) {
 	}
 }
 
-// TestLoginCommand_AuthCodeFullFlagParsing_Integration tests that auth-code full flag is properly parsed
-func TestLoginCommand_AuthCodeFullFlagParsing_Integration(t *testing.T) {
+// TestLoginCommand_AuthorizationCodeFullFlagParsing_Integration tests that authorization-code full flag is properly parsed
+func TestLoginCommand_AuthorizationCodeFullFlagParsing_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	cmd := auth.NewLoginCommand()
 
 	// Set the args and parse flags
-	args := []string{"--auth-code"}
+	args := []string{"--authorization-code"}
 	cmd.SetArgs(args)
 	err := cmd.ParseFlags(args)
 	if err != nil {
@@ -164,12 +164,12 @@ func TestLoginCommand_AuthCodeFullFlagParsing_Integration(t *testing.T) {
 	}
 
 	// Check that the expected flag was set to true
-	flagValue, err := cmd.Flags().GetBool("auth-code")
+	flagValue, err := cmd.Flags().GetBool("authorization-code")
 	if err != nil {
 		t.Fatalf("GetBool should not error: %v", err)
 	}
 	if flagValue != true {
-		t.Errorf("Flag auth-code should be true, got %v", flagValue)
+		t.Errorf("Flag authorization-code should be true, got %v", flagValue)
 	}
 
 	// Verify other flags are false
@@ -180,7 +180,7 @@ func TestLoginCommand_AuthCodeFullFlagParsing_Integration(t *testing.T) {
 			t.Fatalf("GetBool should not error: %v", err)
 		}
 		if otherFlagValue {
-			t.Errorf("Flag %s should be false when auth-code is set", flagName)
+			t.Errorf("Flag %s should be false when authorization-code is set", flagName)
 		}
 	}
 }
@@ -208,7 +208,7 @@ func TestLoginCommand_ClientCredentialsFullFlagParsing_Integration(t *testing.T)
 	}
 
 	// Verify other flags are false
-	allFlags := []string{"device-code", "auth-code"}
+	allFlags := []string{"device-code", "authorization-code"}
 	for _, flagName := range allFlags {
 		otherFlagValue, err := cmd.Flags().GetBool(flagName)
 		if err != nil {
@@ -241,8 +241,8 @@ func TestLoginCommand_NoFlagsExecution_Integration(t *testing.T) {
 	}
 }
 
-// TestLoginCommand_MultipleFlagsDeviceCodeAndAuthCode_Integration tests that command fails with multiple flags -d -a
-func TestLoginCommand_MultipleFlagsDeviceCodeAndAuthCode_Integration(t *testing.T) {
+// TestLoginCommand_MultipleFlagsDeviceCodeAndAuthorizationCode_Integration tests that command fails with multiple flags -d -a
+func TestLoginCommand_MultipleFlagsDeviceCodeAndAuthorizationCode_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	cmd := auth.NewLoginCommand()
 
@@ -271,12 +271,12 @@ func TestLoginCommand_MultipleFlagsClientCredAndDeviceCode_Integration(t *testin
 	}
 }
 
-// TestLoginCommand_MultipleFlagsAuthCodeAndClientCred_Integration tests that command fails with multiple flags --auth-code --client-credentials
-func TestLoginCommand_MultipleFlagsAuthCodeAndClientCred_Integration(t *testing.T) {
+// TestLoginCommand_MultipleFlagsAuthorizationCodeAndClientCred_Integration tests that command fails with multiple flags --authorization-code --client-credentials
+func TestLoginCommand_MultipleFlagsAuthorizationCodeAndClientCred_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	cmd := auth.NewLoginCommand()
 
-	cmd.SetArgs([]string{"--auth-code", "--client-credentials"})
+	cmd.SetArgs([]string{"--authorization-code", "--client-credentials"})
 	err := cmd.Execute()
 
 	if err == nil {
@@ -321,8 +321,8 @@ func TestLoginCommand_DeviceCodeOnlyExecution_Integration(t *testing.T) {
 	}
 }
 
-// TestLoginCommand_AuthCodeOnlyExecution_Integration tests that auth-code flag only validates properly
-func TestLoginCommand_AuthCodeOnlyExecution_Integration(t *testing.T) {
+// TestLoginCommand_AuthorizationCodeOnlyExecution_Integration tests that authorization-code flag only validates properly
+func TestLoginCommand_AuthorizationCodeOnlyExecution_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	cmd := auth.NewLoginCommand()
 
@@ -378,24 +378,24 @@ func TestLoginCommand_DeviceCodeBooleanFlagBehavior_Integration(t *testing.T) {
 	}
 }
 
-// TestLoginCommand_AuthCodeBooleanFlagBehavior_Integration tests that auth-code flag can be set without values
-func TestLoginCommand_AuthCodeBooleanFlagBehavior_Integration(t *testing.T) {
+// TestLoginCommand_AuthorizationCodeBooleanFlagBehavior_Integration tests that authorization-code flag can be set without values
+func TestLoginCommand_AuthorizationCodeBooleanFlagBehavior_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	cmd := auth.NewLoginCommand()
 
-	args := []string{"--auth-code"}
+	args := []string{"--authorization-code"}
 	cmd.SetArgs(args)
 	err := cmd.ParseFlags(args)
 	if err != nil {
 		t.Fatalf("ParseFlags should not error: %v", err)
 	}
 
-	flagValue, err := cmd.Flags().GetBool("auth-code")
+	flagValue, err := cmd.Flags().GetBool("authorization-code")
 	if err != nil {
 		t.Fatalf("GetBool should not error: %v", err)
 	}
 	if !flagValue {
-		t.Errorf("Flag auth-code should be true when set without value")
+		t.Errorf("Flag authorization-code should be true when set without value")
 	}
 }
 
@@ -448,8 +448,8 @@ func TestLoginCommand_DeviceCodeShorthandExecution_Integration(t *testing.T) {
 	}
 }
 
-// TestLoginCommand_AuthCodeShorthandExecution_Integration tests end-to-end execution with auth-code shorthand flag
-func TestLoginCommand_AuthCodeShorthandExecution_Integration(t *testing.T) {
+// TestLoginCommand_AuthorizationCodeShorthandExecution_Integration tests end-to-end execution with authorization-code shorthand flag
+func TestLoginCommand_AuthorizationCodeShorthandExecution_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	cmd := auth.NewLoginCommand()
 

@@ -34,9 +34,9 @@ func TestLoginCommand_Creation(t *testing.T) {
 		t.Error("device-code flag should be present")
 	}
 
-	authCodeFlag := cmd.Flags().Lookup("auth-code")
-	if authCodeFlag == nil {
-		t.Error("auth-code flag should be present")
+	authorizationCodeFlag := cmd.Flags().Lookup("authorization-code")
+	if authorizationCodeFlag == nil {
+		t.Error("authorization-code flag should be present")
 	}
 
 	clientCredentialsFlag := cmd.Flags().Lookup("client-credentials")
@@ -131,7 +131,7 @@ func TestLoginCommand_BooleanFlagBehavior(t *testing.T) {
 	}
 }
 
-func TestLoginCommand_DefaultAuthCode(t *testing.T) {
+func TestLoginCommand_DefaultAuthorizationCode(t *testing.T) {
 	// Test that when no flags are provided, it defaults to auth_code
 	// With valid credentials configured, may succeed; otherwise should fail
 	err := testutils_cobra.ExecutePingcli(t, "login")
@@ -158,15 +158,15 @@ func TestLoginCommand_MutuallyExclusiveFlags(t *testing.T) {
 		},
 		{
 			name: "device-code and auth-code",
-			args: []string{"--device-code", "--auth-code"},
+			args: []string{"--device-code", "--authorization-code"},
 		},
 		{
 			name: "client-credentials and auth-code",
-			args: []string{"--client-credentials", "--auth-code"},
+			args: []string{"--client-credentials", "--authorization-code"},
 		},
 		{
 			name: "all three flags",
-			args: []string{"--device-code", "--client-credentials", "--auth-code"},
+			args: []string{"--device-code", "--client-credentials", "--authorization-code"},
 		},
 	}
 
@@ -195,7 +195,7 @@ func TestLoginCommand_SpecificAuthMethod(t *testing.T) {
 	}{
 		{
 			name:                 "auth-code flag",
-			flag:                 "--auth-code",
+			flag:                 "--authorization-code",
 			expectedErrorPattern: `authorization code`,
 			allowBoth:            true, // May succeed with valid config
 		},

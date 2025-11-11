@@ -129,9 +129,9 @@ func TestClearAllTokenFilesForGrantType(t *testing.T) {
 
 	testFiles := []string{
 		"token-abc12345_device_code_production.json",
-		"token-def67890_device_code_production.json", // Another device_code token for production
-		"token-abc12345_device_code_staging.json",    // Same hash, different profile
-		"token-ghi11111_auth_code_production.json",   // Different grant type, same profile
+		"token-def67890_device_code_production.json",        // Another device_code token for production
+		"token-abc12345_device_code_staging.json",           // Same hash, different profile
+		"token-ghi11111_authorization_code_production.json", // Different grant type, same profile
 		"token-jkl22222_client_credentials_production.json",
 	}
 
@@ -170,7 +170,7 @@ func TestClearAllTokenFilesForGrantType(t *testing.T) {
 	// Verify other files still exist
 	for _, filename := range []string{
 		"token-abc12345_device_code_staging.json",
-		"token-ghi11111_auth_code_production.json",
+		"token-ghi11111_authorization_code_production.json",
 		"token-jkl22222_client_credentials_production.json",
 	} {
 		filePath := filepath.Join(credentialsDir, filename)
@@ -241,10 +241,10 @@ func TestGenerateTokenKey(t *testing.T) {
 			profileName:   "",
 			environmentID: "env123",
 			clientID:      "client456",
-			grantType:     "auth_code",
+			grantType:     "authorization_code",
 			wantEmpty:     false,
 			wantPrefix:    "token-",
-			wantSuffix:    "_auth_code_default",
+			wantSuffix:    "_authorization_code_default",
 		},
 		{
 			name:          "Missing environment ID returns empty",
@@ -358,7 +358,7 @@ func TestGenerateTokenKey_Consistency(t *testing.T) {
 	}
 
 	// Different grant types should produce different keys
-	key6 := generateTokenKey("prod", "env1", "client1", "auth_code")
+	key6 := generateTokenKey("prod", "env1", "client1", "authorization_code")
 	if key1 == key6 {
 		t.Error("Different grant types should produce different keys")
 	}

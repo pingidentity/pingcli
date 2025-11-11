@@ -105,32 +105,32 @@ func TestLoginCommand_DeviceCodeShorthandFlag_Integration(t *testing.T) {
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// TestLoginCommand_AuthCodeValidation_Integration tests auth code configuration validation
+// TestLoginCommand_AuthorizationCodeValidation_Integration tests auth code configuration validation
 // Note: Full auth code flow testing is not currently implemented as it requires browser interaction automation
-func TestLoginCommand_AuthCodeValidation_Integration(t *testing.T) {
+func TestLoginCommand_AuthorizationCodeValidation_Integration(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	authCodeClientID := os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID")
+	authorizationCodeClientID := os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID")
 	environmentID := os.Getenv("TEST_PINGONE_AUTH_CODE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 
-	if authCodeClientID == "" || environmentID == "" || regionCode == "" {
+	if authorizationCodeClientID == "" || environmentID == "" || regionCode == "" {
 		t.Skip("Skipping auth code validation test: missing TEST_PINGONE_AUTH_CODE_* environment variables")
 	}
 
 	expectedErrorPattern := `^authorization code login failed: failed to get auth code configuration:`
-	err := testutils_cobra.ExecutePingcli(t, "login", "--auth-code")
+	err := testutils_cobra.ExecutePingcli(t, "login", "--authorization-code")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// TestLoginCommand_AuthCodeShorthandFlag_Integration tests auth code shorthand flag configuration validation
+// TestLoginCommand_AuthorizationCodeShorthandFlag_Integration tests auth code shorthand flag configuration validation
 // Note: Full auth code flow testing is not currently implemented as it requires browser interaction automation
-func TestLoginCommand_AuthCodeShorthandFlag_Integration(t *testing.T) {
+func TestLoginCommand_AuthorizationCodeShorthandFlag_Integration(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	authCodeClientID := os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID")
+	authorizationCodeClientID := os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID")
 	environmentID := os.Getenv("TEST_PINGONE_AUTH_CODE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 
-	if authCodeClientID == "" || environmentID == "" || regionCode == "" {
+	if authorizationCodeClientID == "" || environmentID == "" || regionCode == "" {
 		t.Skip("Skipping auth code validation test: missing TEST_PINGONE_AUTH_CODE_* environment variables")
 	}
 

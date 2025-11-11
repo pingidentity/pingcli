@@ -25,18 +25,16 @@ integration:
             regionCode: NA
             authentication:
                 type: clientCredentials
+                environmentID: 00000000-0000-0000-0000-000000000000
                 clientCredentials:
                     clientID: 00000000-0000-0000-0000-000000000001
                     clientSecret: dummy-secret-for-config-test
-                    environmentID: 00000000-0000-0000-0000-000000000000
                     scopes: ["openid"]
                 deviceCode:
                     clientID: ""
-                    environmentID: ""
                     scopes: []
-                authCode:
+                authorizationCode:
                     clientID: ""
-                    environmentID: ""
                     redirectURIPath: ""
                     redirectURIPort: ""
                     scopes: []
@@ -70,16 +68,16 @@ integration:
             regionCode: %s
             authentication:
                 type: clientCredentials
+                environmentID: %s
                 clientCredentials:
                     clientID: %s
                     clientSecret: %s
-                    environmentID: %s
                     scopes: ["%s"]
 `,
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
-		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		scopes)
 	testutils_koanf.InitKoanfsCustomFile(t, testConfig)
 
@@ -135,16 +133,16 @@ integration:
             regionCode: %s
             authentication:
                 type: clientCredentials
+                environmentID: %s
                 clientCredentials:
                     clientID: %s
                     clientSecret: %s
-                    environmentID: %s
                     scopes: ["%s"]
 `,
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
-		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		scopes)
 	testutils_koanf.InitKoanfsCustomFile(t, testConfig)
 
@@ -205,14 +203,14 @@ func TestDeviceCodeConfiguration_Integration(t *testing.T) {
 	}
 }
 
-func TestAuthCodeConfiguration_Integration(t *testing.T) {
+func TestAuthorizationCodeConfiguration_Integration(t *testing.T) {
 	// Initialize configuration with test config
 	configuration.InitAllOptions()
 	testutils_koanf.InitKoanfsCustomFile(t, createIntegrationTestConfig())
 
 	// Test getting auth code configuration - with empty values, this should fail validation
 	// This test verifies that empty auth code configuration is properly validated
-	_, err := auth_internal.GetAuthCodeConfiguration()
+	_, err := auth_internal.GetAuthorizationCodeConfiguration()
 	if err == nil {
 		t.Fatal("Should get validation error with empty auth code configuration")
 	}

@@ -442,7 +442,6 @@ func TestPlatformExportCmd_PingOneClientCredentialsAuth(t *testing.T) {
 		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_ID"),
 		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
-		"--"+options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -458,13 +457,12 @@ func TestPlatformExportCmd_PingOneDeviceCodeAuth(t *testing.T) {
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
 		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
 		"--"+options.PingOneAuthenticationDeviceCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),
-		"--"+options.PingOneAuthenticationDeviceCodeEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 	testutils.CheckExpectedError(t, err, nil)
 }
 
-// Test Platform Export Command with PingOne auth_code authentication
-func TestPlatformExportCmd_PingOneAuthCodeAuth(t *testing.T) {
+// Test Platform Export Command with PingOne authorization_code authentication
+func TestPlatformExportCmd_PingOneAuthorizationCodeAuth(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
@@ -472,10 +470,9 @@ func TestPlatformExportCmd_PingOneAuthCodeAuth(t *testing.T) {
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
-		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE,
-		"--"+options.PingOneAuthenticationAuthCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_AUTH_CODE_CLIENT_ID"),
-		"--"+options.PingOneAuthenticationAuthCodeEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
-		"--"+options.PingOneAuthenticationAuthCodeRedirectURIPathOption.CobraParamName, "http://localhost:8080/callback",
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE,
+		"--"+options.PingOneAuthenticationAuthorizationCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.CobraParamName, "http://localhost:8080/callback",
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 	testutils.CheckExpectedError(t, err, nil)
 }
@@ -537,8 +534,7 @@ func TestPlatformExportCmd_PingOneNewAuthMissingRegionCode(t *testing.T) {
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
 		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_ID"),
-		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
-		"--"+options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"))
+		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"))
 
 	// May succeed if worker credentials with region code are configured as fallback
 	if err == nil {

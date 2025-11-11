@@ -36,9 +36,9 @@ func TestLogoutCommand_Creation(t *testing.T) {
 	if deviceCodeFlag == nil {
 		t.Error("device-code flag should be present")
 	}
-	authCodeFlag := cmd.Flags().Lookup("auth-code")
-	if authCodeFlag == nil {
-		t.Error("auth-code flag should be present")
+	authorizationCodeFlag := cmd.Flags().Lookup("authorization-code")
+	if authorizationCodeFlag == nil {
+		t.Error("authorization-code flag should be present")
 	}
 	clientCredentialsFlag := cmd.Flags().Lookup("client-credentials")
 	if clientCredentialsFlag == nil {
@@ -49,8 +49,8 @@ func TestLogoutCommand_Creation(t *testing.T) {
 	if deviceCodeFlag != nil && deviceCodeFlag.Shorthand != "d" {
 		t.Error("device-code shorthand -d should be present")
 	}
-	if authCodeFlag != nil && authCodeFlag.Shorthand != "a" {
-		t.Error("auth-code shorthand -a should be present")
+	if authorizationCodeFlag != nil && authorizationCodeFlag.Shorthand != "a" {
+		t.Error("authorization-code shorthand -a should be present")
 	}
 	if clientCredentialsFlag != nil && clientCredentialsFlag.Shorthand != "c" {
 		t.Error("client-credentials shorthand -c should be present")
@@ -76,8 +76,8 @@ func TestLogoutCommandHelp(t *testing.T) {
 
 	// Verify auth method flags are in help
 	flagOutput := cmd.Flags().FlagUsages()
-	if !strings.Contains(flagOutput, "auth-code") {
-		t.Error("Help should contain auth-code flag")
+	if !strings.Contains(flagOutput, "authorization-code") {
+		t.Error("Help should contain authorization-code flag")
 	}
 	if !strings.Contains(flagOutput, "device-code") {
 		t.Error("Help should contain device-code flag")
@@ -115,16 +115,16 @@ func TestLogoutCommand_MutuallyExclusiveFlags(t *testing.T) {
 			flags: []string{"--device-code", "--client-credentials"},
 		},
 		{
-			name:  "device-code and auth-code",
-			flags: []string{"--device-code", "--auth-code"},
+			name:  "device-code and authorization-code",
+			flags: []string{"--device-code", "--authorization-code"},
 		},
 		{
-			name:  "client-credentials and auth-code",
-			flags: []string{"--client-credentials", "--auth-code"},
+			name:  "client-credentials and authorization-code",
+			flags: []string{"--client-credentials", "--authorization-code"},
 		},
 		{
 			name:  "all three flags",
-			flags: []string{"--device-code", "--client-credentials", "--auth-code"},
+			flags: []string{"--device-code", "--client-credentials", "--authorization-code"},
 		},
 	}
 
@@ -161,9 +161,9 @@ func TestLogoutCommand_SpecificAuthMethod(t *testing.T) {
 			flagName: "client-credentials",
 		},
 		{
-			name:     "auth-code flag",
-			flag:     "--auth-code",
-			flagName: "auth-code",
+			name:     "authorization-code flag",
+			flag:     "--authorization-code",
+			flagName: "authorization-code",
 		},
 		{
 			name:     "device-code shorthand",
@@ -176,9 +176,9 @@ func TestLogoutCommand_SpecificAuthMethod(t *testing.T) {
 			flagName: "client-credentials",
 		},
 		{
-			name:     "auth-code shorthand",
+			name:     "authorization-code shorthand",
 			flag:     "-a",
-			flagName: "auth-code",
+			flagName: "authorization-code",
 		},
 	}
 

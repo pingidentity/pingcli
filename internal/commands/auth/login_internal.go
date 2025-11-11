@@ -35,9 +35,9 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 	// Determine desired authentication method
 	deviceCodeStr, _ := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
 	clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
-	authCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthCodeOption)
+	authorizationCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
 
-	flagProvided := deviceCodeStr != "" || clientCredentialsStr != "" || authCodeStr != ""
+	flagProvided := deviceCodeStr != "" || clientCredentialsStr != "" || authorizationCodeStr != ""
 
 	// If no flag was provided, check if authentication type is configured
 	if !flagProvided {
@@ -62,7 +62,7 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	// Flag was provided - use the flag value to override any configuration
-	// (deviceCodeStr, clientCredentialsStr, authCodeStr already retrieved above)
+	// (deviceCodeStr, clientCredentialsStr, authorizationCodeStr already retrieved above)
 
 	// Determine which authentication method was requested and convert to auth type format
 	var authType string
@@ -72,11 +72,42 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 	case clientCredentialsStr == "true":
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
 	default:
-		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE
+		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
 	}
 
-	// Use the common login flow
-	return performLoginByConfiguredType(ctx, authType, profileName)
+	// Perform login based on auth type
+	var result *LoginResult
+	var selectedMethod string
+
+	switch authType {
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
+		selectedMethod = string(svcOAuth2.GrantTypeDeviceCode)
+		result, err = PerformDeviceCodeLogin(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to perform device code login: %w", err)
+		}
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+		selectedMethod = string(svcOAuth2.GrantTypeAuthorizationCode)
+		result, err = PerformAuthorizationCodeLogin(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to perform authorization code login: %w", err)
+		}
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
+		selectedMethod = string(svcOAuth2.GrantTypeClientCredentials)
+		result, err = PerformClientCredentialsLogin(ctx)
+		if err != nil {
+			return fmt.Errorf("failed to perform client credentials login: %w", err)
+		}
+	default:
+		return &errs.PingCLIError{
+			Prefix: fmt.Sprintf("invalid authentication type: %s", authType),
+			Err:    ErrInvalidAuthType,
+		}
+	}
+
+	displayLoginSuccess(result.Token, result.NewAuth, result.Location, selectedMethod, profileName)
+
+	return nil
 }
 
 // ensureAuthConfigurationExists checks if the required configuration exists for the given auth method
@@ -91,8 +122,8 @@ func ensureAuthConfigurationExists(authMethod string) error {
 		_, err := GetClientCredentialsConfiguration()
 
 		return err
-	case string(svcOAuth2.GrantTypeAuthCode):
-		_, err := GetAuthCodeConfiguration()
+	case string(svcOAuth2.GrantTypeAuthorizationCode):
+		_, err := GetAuthorizationCodeConfiguration()
 
 		return err
 	default:
@@ -113,12 +144,12 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		selectedMethod = string(svcOAuth2.GrantTypeDeviceCode)
 		result, err = PerformDeviceCodeLogin(ctx)
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+		selectedMethod = string(svcOAuth2.GrantTypeAuthorizationCode)
+		result, err = PerformAuthorizationCodeLogin(ctx)
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
 		selectedMethod = string(svcOAuth2.GrantTypeClientCredentials)
 		result, err = PerformClientCredentialsLogin(ctx)
-	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-		selectedMethod = string(svcOAuth2.GrantTypeAuthCode)
-		result, err = PerformAuthCodeLogin(ctx)
 	default:
 		return &errs.PingCLIError{
 			Prefix: fmt.Sprintf("invalid authentication type: %s", authType),

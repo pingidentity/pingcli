@@ -24,13 +24,13 @@ func NewLogoutCommand() *cobra.Command {
 	}
 
 	// Add the same auth method flags as login command
-	cmd.Flags().AddFlag(options.AuthMethodAuthCodeOption.Flag)
+	cmd.Flags().AddFlag(options.AuthMethodAuthorizationCodeOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodClientCredentialsOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodDeviceCodeOption.Flag)
 
 	// These flags are mutually exclusive - only one can be specified
 	cmd.MarkFlagsMutuallyExclusive(
-		options.AuthMethodAuthCodeOption.Flag.Name,
+		options.AuthMethodAuthorizationCodeOption.Flag.Name,
 		options.AuthMethodClientCredentialsOption.Flag.Name,
 		options.AuthMethodDeviceCodeOption.Flag.Name,
 	)

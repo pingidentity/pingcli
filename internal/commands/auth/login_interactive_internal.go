@@ -17,18 +17,17 @@ import (
 	"github.com/pingidentity/pingone-go-client/config"
 )
 
-const (
-	defaultRedirectURI     = config.DefaultAuthCodeRedirectURI
-	defaultRedirectURIPath = config.DefaultAuthCodeRedirectURIPath
-	defaultRedirectURIPort = config.DefaultAuthCodeRedirectURIPort
+var (
+	defaultRedirectURIPath = config.GetDefaultAuthorizationCodeRedirectURIPath()
+	defaultRedirectURIPort = config.GetDefaultAuthorizationCodeRedirectURIPort()
 )
 
 var (
 	loginInteractiveErrorPrefix = "failed to configure authentication"
 )
 
-// AuthCodeConfig holds the configuration for authorization code authentication
-type AuthCodeConfig struct {
+// AuthorizationCodeConfig holds the configuration for authorization code authentication
+type AuthorizationCodeConfig struct {
 	ClientID        string
 	EnvironmentID   string
 	RedirectURIPath string
@@ -55,8 +54,8 @@ type ClientCredentialsConfig struct {
 // If showStatus is true, it will show (configured) or (not configured) status next to each option
 func PromptForAuthType(rc io.ReadCloser, showStatus bool) (string, error) {
 	authTypes := []string{
-		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE,
 		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
+		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE,
 		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 	}
 
@@ -103,9 +102,9 @@ func PromptForAuthType(rc io.ReadCloser, showStatus bool) (string, error) {
 	return selectedType, nil
 }
 
-// PromptForAuthCodeConfig prompts for auth code configuration
-func PromptForAuthCodeConfig(rc io.ReadCloser) (*AuthCodeConfig, error) {
-	config := &AuthCodeConfig{}
+// PromptForAuthorizationCodeConfig prompts for auth code configuration
+func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfig, error) {
+	config := &AuthorizationCodeConfig{}
 
 	// Client ID (required)
 	clientID, err := input.RunPrompt(
@@ -356,34 +355,28 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 
 	// Save type-specific configuration
 	switch authType {
-	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-		if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeClientIDOption.KoanfKey, clientID); err != nil {
-			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-		}
-		if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeEnvironmentIDOption.KoanfKey, environmentID); err != nil {
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+		if err = subKoanf.Set(options.PingOneAuthenticationAuthorizationCodeClientIDOption.KoanfKey, clientID); err != nil {
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
 		if redirectURIPath != "" {
-			if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeRedirectURIPathOption.KoanfKey, redirectURIPath); err != nil {
+			if err = subKoanf.Set(options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.KoanfKey, redirectURIPath); err != nil {
 				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 			}
 		}
 		if redirectURIport != "" {
-			if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeRedirectURIPortOption.KoanfKey, redirectURIport); err != nil {
+			if err = subKoanf.Set(options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption.KoanfKey, redirectURIport); err != nil {
 				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 			}
 		}
 		if scopes != "" {
-			if err = subKoanf.Set(options.PingOneAuthenticationAuthCodeScopesOption.KoanfKey, scopes); err != nil {
+			if err = subKoanf.Set(options.PingOneAuthenticationAuthorizationCodeScopesOption.KoanfKey, scopes); err != nil {
 				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 			}
 		}
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		if err = subKoanf.Set(options.PingOneAuthenticationDeviceCodeClientIDOption.KoanfKey, clientID); err != nil {
-			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-		}
-		if err = subKoanf.Set(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption.KoanfKey, environmentID); err != nil {
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
 		if scopes != "" {
@@ -397,9 +390,6 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
 		if err = subKoanf.Set(options.PingOneAuthenticationClientCredentialsClientSecretOption.KoanfKey, clientSecret); err != nil {
-			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-		}
-		if err = subKoanf.Set(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.KoanfKey, environmentID); err != nil {
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
 		if scopes != "" {
@@ -465,8 +455,8 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 			// Validate that the existing configuration is complete
 			var validationErr error
 			switch authType {
-			case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-				_, validationErr = GetAuthCodeConfiguration()
+			case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+				_, validationErr = GetAuthorizationCodeConfiguration()
 			case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 				_, validationErr = GetDeviceCodeConfiguration()
 			case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
@@ -491,16 +481,16 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 
 	// Step 3: Collect configuration based on selected type
 	switch authType {
-	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-		authCodeConfig, err := PromptForAuthCodeConfig(rc)
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+		authorizationCodeConfig, err := PromptForAuthorizationCodeConfig(rc)
 		if err != nil {
 			return err
 		}
-		clientID = authCodeConfig.ClientID
-		environmentID = authCodeConfig.EnvironmentID
-		redirectURIPath = authCodeConfig.RedirectURIPath
-		redirectURIPort = authCodeConfig.RedirectURIPort
-		scopes = authCodeConfig.Scopes
+		clientID = authorizationCodeConfig.ClientID
+		environmentID = authorizationCodeConfig.EnvironmentID
+		redirectURIPath = authorizationCodeConfig.RedirectURIPath
+		redirectURIPort = authorizationCodeConfig.RedirectURIPort
+		scopes = authorizationCodeConfig.Scopes
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		deviceCodeConfig, err := PromptForDeviceCodeConfig(rc)
@@ -550,24 +540,20 @@ func checkExistingCredentials(authType string) (bool, error) {
 
 	// Check for type-specific required credentials
 	switch authType {
-	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE:
-		clientID := subKoanf.String(options.PingOneAuthenticationAuthCodeClientIDOption.KoanfKey)
-		environmentID := subKoanf.String(options.PingOneAuthenticationAuthCodeEnvironmentIDOption.KoanfKey)
-
-		return clientID != "" && environmentID != "", nil
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+		clientID := subKoanf.String(options.PingOneAuthenticationAuthorizationCodeClientIDOption.KoanfKey)
+		return clientID != "", nil
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		clientID := subKoanf.String(options.PingOneAuthenticationDeviceCodeClientIDOption.KoanfKey)
-		environmentID := subKoanf.String(options.PingOneAuthenticationDeviceCodeEnvironmentIDOption.KoanfKey)
 
-		return clientID != "" && environmentID != "", nil
+		return clientID != "", nil
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
 		clientID := subKoanf.String(options.PingOneAuthenticationClientCredentialsClientIDOption.KoanfKey)
 		clientSecret := subKoanf.String(options.PingOneAuthenticationClientCredentialsClientSecretOption.KoanfKey)
-		environmentID := subKoanf.String(options.PingOneAuthenticationClientCredentialsEnvironmentIDOption.KoanfKey)
 
-		return clientID != "" && clientSecret != "" && environmentID != "", nil
+		return clientID != "" && clientSecret != "", nil
 	}
 
 	return false, nil
@@ -576,7 +562,7 @@ func checkExistingCredentials(authType string) (bool, error) {
 // getAuthMethodsConfigurationStatus returns a map of auth types to their configuration status
 func getAuthMethodsConfigurationStatus() (map[string]bool, error) {
 	authTypes := []string{
-		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTH_CODE,
+		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE,
 		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
 		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 	}

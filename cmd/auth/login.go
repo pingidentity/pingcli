@@ -30,14 +30,14 @@ func NewLoginCommand() *cobra.Command {
 		Use:                   "login [flags]",
 	}
 
-	cmd.Flags().AddFlag(options.AuthMethodAuthCodeOption.Flag)
+	cmd.Flags().AddFlag(options.AuthMethodAuthorizationCodeOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodClientCredentialsOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodDeviceCodeOption.Flag)
 	cmd.Flags().AddFlag(options.AuthFileStorageOption.Flag)
 
 	// Enforce that exactly one authentication method must be specified
 	cmd.MarkFlagsMutuallyExclusive(
-		options.AuthMethodAuthCodeOption.Flag.Name,
+		options.AuthMethodAuthorizationCodeOption.Flag.Name,
 		options.AuthMethodClientCredentialsOption.Flag.Name,
 		options.AuthMethodDeviceCodeOption.Flag.Name,
 	)
