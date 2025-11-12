@@ -19,7 +19,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
 	authorizationCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
 
-	flagProvided := deviceCodeStr != "" || clientCredentialsStr != "" || authorizationCodeStr != ""
+	flagProvided := deviceCodeStr == "true" || clientCredentialsStr == "true" || authorizationCodeStr == "true"
 
 	// Get current profile name for messages
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
