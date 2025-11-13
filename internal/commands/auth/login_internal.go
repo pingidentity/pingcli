@@ -18,6 +18,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
+var (
+	loginErrorPrefix = "failed to login"
+)
+
 // AuthLoginRunE implements the login command logic, handling authentication based on the selected
 // method (auth code, device code, or client credentials) with support for interactive configuration
 func AuthLoginRunE(cmd *cobra.Command, args []string) error {
@@ -27,7 +31,7 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
 		return &errs.PingCLIError{
-			Prefix: "failed to get active profile",
+			Prefix: loginErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -46,7 +50,7 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 			// No authentication type configured - run interactive setup
 			if err := RunInteractiveAuthConfig(os.Stdin); err != nil {
 				return &errs.PingCLIError{
-					Prefix: "failed to complete interactive login",
+					Prefix: loginErrorPrefix,
 					Err:    err,
 				}
 			}
@@ -54,7 +58,7 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 			authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 			if err != nil {
 				return &errs.PingCLIError{
-					Prefix: "failed to read authentication type after configuration",
+					Prefix: loginErrorPrefix,
 					Err:    err,
 				}
 			}

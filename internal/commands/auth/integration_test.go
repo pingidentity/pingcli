@@ -161,12 +161,6 @@ integration:
 		t.Fatal("Token should not be nil")
 	}
 
-	// Save the token to keychain for the next test
-	_, err = auth_internal.SaveToken(result.Token)
-	if err != nil {
-		t.Fatalf("Should be able to save token to keychain: %v", err)
-	}
-
 	// Now test getting valid token source from cached token
 	tokenSource, err := auth_internal.GetValidTokenSource(context.Background())
 	if err != nil {

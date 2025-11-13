@@ -24,6 +24,10 @@ const (
 	clientCredentialsTokenKey = "client-credentials-token"
 )
 
+var (
+	credentialsErrorPrefix = "failed to manage credentials"
+)
+
 // getTokenStorage returns the appropriate keychain storage instance for the given authentication method
 func getTokenStorage(authMethod string) (*svcOAuth2.KeychainStorage, error) {
 	return svcOAuth2.NewKeychainStorage("pingcli", authMethod)
@@ -130,32 +134,28 @@ func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 	storage, err := getTokenStorage(authMethod)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to create keychain storage",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
 
 	// Try keychain storage first
 	token, err := storage.LoadToken()
-	if err != nil {
-		// Fallback to file storage if keychain fails
-		token, fileErr := loadTokenFromFile(authMethod)
-		if fileErr != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: "failed to load token from keychain and file storage",
-				Err:    errors.Join(err, fileErr),
-			}
-		}
-
-		return token, nil
+	if err == nil {
+		return token, nil // Success!
 	}
 
-	return token, nil
-}
+	// Keychain failed, try file fallback
+	token, fileErr := loadTokenFromFile(authMethod)
+	if fileErr == nil {
+		return token, nil // Success with fallback!
+	}
 
-// SaveToken saves an OAuth2 token using device code storage for backward compatibility with older versions
-func SaveToken(token *oauth2.Token) (StorageLocation, error) {
-	return SaveTokenForMethod(token, deviceCodeTokenKey)
+	//Both failed (err and fileErr are non-nil)
+	return nil, &errs.PingCLIError{
+		Prefix: credentialsErrorPrefix,
+		Err:    errors.Join(err, fileErr),
+	}
 }
 
 // LoadToken attempts to load an OAuth2 token from the keychain, trying configured auth methods first
@@ -183,7 +183,7 @@ func LoadToken() (*oauth2.Token, error) {
 			cfg, err = GetDeviceCodeConfiguration()
 			if err != nil {
 				return nil, &errs.PingCLIError{
-					Prefix: "failed to get device code configuration",
+					Prefix: credentialsErrorPrefix,
 					Err:    err,
 				}
 			}
@@ -192,7 +192,7 @@ func LoadToken() (*oauth2.Token, error) {
 			cfg, err = GetAuthorizationCodeConfiguration()
 			if err != nil {
 				return nil, &errs.PingCLIError{
-					Prefix: "failed to get authorization code configuration",
+					Prefix: credentialsErrorPrefix,
 					Err:    err,
 				}
 			}
@@ -201,7 +201,7 @@ func LoadToken() (*oauth2.Token, error) {
 			cfg, err = GetClientCredentialsConfiguration()
 			if err != nil {
 				return nil, &errs.PingCLIError{
-					Prefix: "failed to get client credentials configuration",
+					Prefix: credentialsErrorPrefix,
 					Err:    err,
 				}
 			}
@@ -214,7 +214,7 @@ func LoadToken() (*oauth2.Token, error) {
 			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
 			if err != nil {
 				return nil, &errs.PingCLIError{
-					Prefix: "failed to get auth method key from configuration",
+					Prefix: credentialsErrorPrefix,
 					Err:    err,
 				}
 			}
@@ -222,7 +222,7 @@ func LoadToken() (*oauth2.Token, error) {
 			token, err := LoadTokenForMethod(tokenKey)
 			if err != nil {
 				return nil, &errs.PingCLIError{
-					Prefix: fmt.Sprintf("failed to load token for %s", authType),
+					Prefix: credentialsErrorPrefix,
 					Err:    err,
 				}
 			}
@@ -233,7 +233,7 @@ func LoadToken() (*oauth2.Token, error) {
 
 	// No authentication type configured
 	return nil, &errs.PingCLIError{
-		Prefix: "no authentication type configured",
+		Prefix: credentialsErrorPrefix,
 		Err:    ErrUnsupportedAuthType,
 	}
 }
@@ -244,7 +244,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 	if err != nil || authType == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "no authentication type configured",
+			Prefix: credentialsErrorPrefix,
 			Err:    ErrUnsupportedAuthType,
 		}
 	}
@@ -269,7 +269,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		cfg, err = GetDeviceCodeConfiguration()
 		if err != nil {
 			return nil, &errs.PingCLIError{
-				Prefix: "failed to get device code configuration",
+				Prefix: credentialsErrorPrefix,
 				Err:    err,
 			}
 		}
@@ -278,7 +278,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		cfg, err = GetAuthorizationCodeConfiguration()
 		if err != nil {
 			return nil, &errs.PingCLIError{
-				Prefix: "failed to get authorization code configuration",
+				Prefix: credentialsErrorPrefix,
 				Err:    err,
 			}
 		}
@@ -287,15 +287,15 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		cfg, err = GetClientCredentialsConfiguration()
 		if err != nil {
 			return nil, &errs.PingCLIError{
-				Prefix: "failed to get client credentials configuration",
+				Prefix: credentialsErrorPrefix,
 				Err:    err,
 			}
 		}
 		grantType = svcOAuth2.GrantTypeClientCredentials
 	default:
 		return nil, &errs.PingCLIError{
-			Prefix: fmt.Sprintf("unsupported authentication type: %s", authType),
-			Err:    ErrUnsupportedAuthType,
+			Prefix: credentialsErrorPrefix,
+			Err:    fmt.Errorf("%w: %s", ErrUnsupportedAuthType, authType),
 		}
 	}
 
@@ -305,7 +305,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		tokenSource, err := cfg.TokenSource(ctx)
 		if err != nil {
 			return nil, &errs.PingCLIError{
-				Prefix: "failed to get token source",
+				Prefix: credentialsErrorPrefix,
 				Err:    err,
 			}
 		}
@@ -314,7 +314,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	}
 
 	return nil, &errs.PingCLIError{
-		Prefix: "failed to get a valid token source",
+		Prefix: credentialsErrorPrefix,
 		Err:    ErrUnsupportedAuthType,
 	}
 }
@@ -402,7 +402,7 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 	if err == nil {
 		if err := storage.ClearToken(); err != nil {
 			errList = append(errList, &errs.PingCLIError{
-				Prefix: "keychain clear failed",
+				Prefix: credentialsErrorPrefix,
 				Err:    err,
 			})
 		} else {
@@ -413,7 +413,7 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 	// Also clear from file storage
 	if err := clearTokenFromFile(authMethod); err != nil {
 		errList = append(errList, &errs.PingCLIError{
-			Prefix: "file clear failed",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		})
 	} else {
@@ -452,7 +452,7 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	cfg, err := GetDeviceCodeConfiguration()
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get device code configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -482,7 +482,7 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get token source",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -491,7 +491,7 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	token, err := tokenSource.Token()
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get token",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -511,7 +511,7 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	location, err := SaveTokenForMethod(token, tokenKey)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to save token",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -533,13 +533,13 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	clientID, err := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeClientIDOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get device code client ID",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
 	if clientID == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get device code configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    ErrDeviceCodeClientIDNotConfigured,
 		}
 	}
@@ -548,7 +548,7 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeScopesOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get device code scopes",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -575,7 +575,7 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 	cfg, err := GetAuthorizationCodeConfiguration()
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get authorization code configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -605,7 +605,7 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get token source",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -614,7 +614,7 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 	token, err := tokenSource.Token()
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get token",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -634,7 +634,7 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 	location, err := SaveTokenForMethod(token, tokenKey)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to save token",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -655,13 +655,13 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 	clientID, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeClientIDOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get authorization code client ID",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
 	if clientID == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get authorization code configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    ErrAuthorizationCodeClientIDNotConfigured,
 		}
 	}
@@ -670,13 +670,13 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 	redirectURIPath, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get authorization code redirect URI path",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
 	if redirectURIPath == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get authorization code configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    ErrAuthorizationCodeRedirectURIPathNotConfigured,
 		}
 	}
@@ -685,13 +685,13 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 	redirectURIPort, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get authorization code redirect URI port",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
 	if redirectURIPort == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get authorization code configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    ErrAuthorizationCodeRedirectURIPortNotConfigured,
 		}
 	}
@@ -705,7 +705,7 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeScopesOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get auth code scopes",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -736,7 +736,7 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 	cfg, err := GetClientCredentialsConfiguration()
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get client credentials configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -766,7 +766,7 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get token source",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -775,7 +775,7 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 	token, err := tokenSource.Token()
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get token",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -795,7 +795,7 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 	location, err := SaveTokenForMethod(token, tokenKey)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to save token",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
@@ -816,13 +816,13 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 	clientID, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get client credentials client ID",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
 	if clientID == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get client credentials configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    ErrClientCredentialsClientIDNotConfigured,
 		}
 	}
@@ -831,13 +831,13 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 	clientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientSecretOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get client credentials client secret",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
 	if clientSecret == "" {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get client credentials configuration",
+			Prefix: credentialsErrorPrefix,
 			Err:    ErrClientCredentialsClientSecretNotConfigured,
 		}
 	}
@@ -846,7 +846,7 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsScopesOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
-			Prefix: "failed to get client credentials scopes",
+			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
 	}
