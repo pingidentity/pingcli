@@ -196,7 +196,7 @@ func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfi
 	config.RedirectURIPort = redirectURIPort
 
 	// Scopes (optional)
-	output.Message("Scopes (optional, comma-separated)", nil)
+	output.Message("Scopes (optional, space-separated)", nil)
 	scopes, err := input.RunPrompt(
 		"Scopes",
 		nil, // No validation - optional

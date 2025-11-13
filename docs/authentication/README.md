@@ -1,32 +1,42 @@
 # Authentication Commands
 
-## `pingcli auth`
+## Authentication
 
-Main authentication command group for managing CLI authentication with PingOne services.
-
-### Usage
-```bash
-pingcli auth [command]
-```
+Main authentication commands for managing CLI authentication with PingOne services.
 
 ### Available Commands
-- [`login`](login.md) - Authenticate using OAuth2 flows
-- [`logout`](logout.md) - Clear stored authentication tokens
-
-### Flags
-- `-h, --help` - Help for auth command
+- [`pingcli login`](login.md) - Authenticate using OAuth2 flows
+- [`pingcli logout`](logout.md) - Clear stored authentication tokens
 
 ### Examples
 ```bash
-# View auth help
-pingcli auth --help
+# Interactive login - prompts for authentication method (if no type is configured)
+pingcli login
 
-# Login with device code flow
+# Login with specific authentication method
 pingcli login --device-code
+pingcli login --authorization-code
+pingcli login --client-credentials
 
 # Logout and clear tokens
 pingcli logout
 ```
+
+### Interactive Authentication
+
+When you run `pingcli login` without specifying an authentication method flag (or no type is set in the configuration), the CLI will prompt you to select from available methods:
+
+```bash
+$ pingcli login
+? Select authentication method:
+  ▸ device_code (configured)
+    authorization_code (configured)
+    client_credentials (not configured)
+```
+
+This interactive mode helps you choose the appropriate authentication flow for your use case without needing to remember the exact flag names. The status indicator shows whether each method has the required configuration settings:
+- **(configured)** - All required settings (client ID, environment ID, etc.) are present in your config
+- **(not configured)** - Missing one or more required configuration values
 
 ## Quick Start
 

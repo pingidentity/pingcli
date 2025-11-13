@@ -149,7 +149,7 @@ Error: device code client ID is not configured. Please run 'pingcli config set s
 ```
 Error: failed to get valid token (may need to re-authenticate)
 ```
-**Solution:** Check configuration and try again. Use `pingcli auth logout` to clear any corrupted tokens.
+**Solution:** Check configuration and try again. Use `pingcli logout` to clear any corrupted tokens.
 
 ## Token Storage
 
@@ -213,7 +213,7 @@ This ensures maximum reliability across all environments.
 - Use `--file-storage` flag in environments without keychain access
 - Device code and auth code flows provide refresh tokens for automatic renewal
 - Client credentials flow requires secure secret management
-- Use `pingcli auth logout` to clear tokens from both locations when switching environments
+- Use `pingcli logout` to clear tokens from both locations when switching environments
 
 ## See Also
 - [Authentication Overview](overview.md)
