@@ -45,7 +45,10 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 		if err != nil || strings.TrimSpace(authType) == "" {
 			// No authentication type configured - run interactive setup
 			if err := RunInteractiveAuthConfig(os.Stdin); err != nil {
-				return err
+				return &errs.PingCLIError{
+					Prefix: "failed to complete interactive login",
+					Err:    err,
+				}
 			}
 			// After interactive setup, re-read the auth type
 			authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
