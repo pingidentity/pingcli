@@ -12,77 +12,240 @@ import (
 )
 
 func InitPingOneServiceOptions() {
+	initPingOneAuthenticationAPIEnvironmentIDOption()
+	initPingOneAuthenticationAuthorizationCodeClientIDOption()
+	initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption()
+	initPingOneAuthenticationAuthorizationCodeRedirectURIPortOption()
+	initPingOneAuthenticationAuthorizationCodeScopesOption()
+	initPingOneAuthenticationClientCredentialsClientIDOption()
+	initPingOneAuthenticationClientCredentialsClientSecretOption()
+	initPingOneAuthenticationClientCredentialsScopesOption()
+	initPingOneAuthenticationDeviceCodeClientIDOption()
+	initPingOneAuthenticationDeviceCodeScopesOption()
 	initPingOneAuthenticationTypeOption()
-	initAuthenticationWorkerClientIDOption()
-	initAuthenticationWorkerClientSecretOption()
-	initAuthenticationWorkerEnvironmentIDOption()
-	initRegionCodeOption()
+	initPingOneAuthenticationWorkerClientIDOption()
+	initPingOneAuthenticationWorkerClientSecretOption()
+	initPingOneAuthenticationWorkerEnvironmentIDOption()
+	initPingOneRegionCodeOption()
 }
 
-func initAuthenticationWorkerClientIDOption() {
-	cobraParamName := "pingone-worker-client-id"
+func initPingOneAuthenticationAPIEnvironmentIDOption() {
+	cobraParamName := "pingone-environment-id"
 	cobraValue := new(customtypes.UUID)
 	defaultValue := customtypes.UUID("")
-	envVar := "PINGCLI_PINGONE_WORKER_CLIENT_ID"
+	envVar := "PINGCLI_PINGONE_ENVIRONMENT_ID"
 
-	options.PingOneAuthenticationWorkerClientIDOption = options.Option{
+	options.PingOneAuthenticationAPIEnvironmentIDOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:  cobraParamName,
-			Usage: "The worker client ID used to authenticate to the PingOne management API.",
+			Usage: "The ID of the PingOne environment to use for authentication (used by all auth types).",
 			Value: cobraValue,
 		},
 		Sensitive: false,
 		Type:      options.UUID,
-		KoanfKey:  "service.pingOne.authentication.worker.clientID",
+		KoanfKey:  "service.pingOne.authentication.environmentID",
 	}
 }
 
-func initAuthenticationWorkerClientSecretOption() {
-	cobraParamName := "pingone-worker-client-secret"
-	cobraValue := new(customtypes.String)
-	defaultValue := customtypes.String("")
-	envVar := "PINGCLI_PINGONE_WORKER_CLIENT_SECRET"
+func initPingOneAuthenticationAuthorizationCodeClientIDOption() {
+	cobraParamName := "pingone-oidc-authorization-code-client-id"
+	cobraValue := new(customtypes.UUID)
+	defaultValue := customtypes.UUID("")
+	envVar := "PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_CLIENT_ID"
 
-	options.PingOneAuthenticationWorkerClientSecretOption = options.Option{
+	options.PingOneAuthenticationAuthorizationCodeClientIDOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:  cobraParamName,
-			Usage: "The worker client secret used to authenticate to the PingOne management API.",
+			Usage: "The authorization code client ID used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.UUID,
+		KoanfKey:  "service.pingOne.authentication.authorizationCode.clientID",
+	}
+}
+
+func initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption() {
+	cobraParamName := "pingone-oidc-authorization-code-redirect-uri-path"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_REDIRECT_URI_PATH"
+
+	options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The redirect URI path to use when using the authorization code authentication type to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.STRING,
+		KoanfKey:  "service.pingOne.authentication.authorizationCode.redirectURIPath",
+	}
+}
+
+func initPingOneAuthenticationAuthorizationCodeRedirectURIPortOption() {
+	cobraParamName := "pingone-oidc-authorization-code-redirect-uri-port"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_REDIRECT_URI_PORT"
+
+	options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The redirect URI port to use when using the authorization code authentication type to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.STRING,
+		KoanfKey:  "service.pingOne.authentication.authorizationCode.redirectURIPort",
+	}
+}
+
+func initPingOneAuthenticationAuthorizationCodeScopesOption() {
+	cobraParamName := "pingone-oidc-authorization-code-scopes"
+	cobraValue := new(customtypes.StringSlice)
+	defaultValue := customtypes.StringSlice{}
+	envVar := "PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_SCOPES"
+
+	options.PingOneAuthenticationAuthorizationCodeScopesOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The authorization code scope(s) used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.STRING_SLICE,
+		KoanfKey:  "service.pingOne.authentication.authorizationCode.scopes",
+	}
+}
+
+func initPingOneAuthenticationClientCredentialsClientIDOption() {
+	cobraParamName := "pingone-client-credentials-client-id"
+	cobraValue := new(customtypes.UUID)
+	defaultValue := customtypes.UUID("")
+	envVar := "PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID"
+
+	options.PingOneAuthenticationClientCredentialsClientIDOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The client credentials client ID used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.UUID,
+		KoanfKey:  "service.pingOne.authentication.clientCredentials.clientID",
+	}
+}
+
+func initPingOneAuthenticationClientCredentialsClientSecretOption() {
+	cobraParamName := "pingone-client-credentials-client-secret"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET"
+
+	options.PingOneAuthenticationClientCredentialsClientSecretOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The client credentials client secret used to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
 		Sensitive: true,
 		Type:      options.STRING,
-		KoanfKey:  "service.pingOne.authentication.worker.clientSecret",
+		KoanfKey:  "service.pingOne.authentication.clientCredentials.clientSecret",
 	}
 }
 
-func initAuthenticationWorkerEnvironmentIDOption() {
-	cobraParamName := "pingone-worker-environment-id"
-	cobraValue := new(customtypes.UUID)
-	defaultValue := customtypes.UUID("")
-	envVar := "PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID"
+func initPingOneAuthenticationClientCredentialsScopesOption() {
+	cobraParamName := "pingone-client-credentials-scopes"
+	cobraValue := new(customtypes.StringSlice)
+	defaultValue := customtypes.StringSlice{}
+	envVar := "PINGCLI_PINGONE_CLIENT_CREDENTIALS_SCOPES"
 
-	options.PingOneAuthenticationWorkerEnvironmentIDOption = options.Option{
+	options.PingOneAuthenticationClientCredentialsScopesOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name: cobraParamName,
-			Usage: "The ID of the PingOne environment that contains the worker client used to authenticate to " +
-				"the PingOne management API.",
+			Name:  cobraParamName,
+			Usage: "The scopes to request for the client credentials used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.STRING_SLICE,
+		KoanfKey:  "service.pingOne.authentication.clientCredentials.scopes",
+	}
+}
+
+func initPingOneAuthenticationDeviceCodeClientIDOption() {
+	cobraParamName := "pingone-device-code-client-id"
+	cobraValue := new(customtypes.UUID)
+	defaultValue := customtypes.UUID("")
+	envVar := "PINGCLI_PINGONE_DEVICE_CODE_CLIENT_ID"
+
+	options.PingOneAuthenticationDeviceCodeClientIDOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The device code client ID used to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
 		Sensitive: false,
 		Type:      options.UUID,
-		KoanfKey:  "service.pingOne.authentication.worker.environmentID",
+		KoanfKey:  "service.pingOne.authentication.deviceCode.clientID",
+	}
+}
+
+func initPingOneAuthenticationDeviceCodeScopesOption() {
+	cobraParamName := "pingone-device-code-scopes"
+	cobraValue := new(customtypes.StringSlice)
+	defaultValue := customtypes.StringSlice{}
+	envVar := "PINGCLI_PINGONE_DEVICE_CODE_SCOPES"
+
+	options.PingOneAuthenticationDeviceCodeScopesOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "The device code scope(s) used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.STRING_SLICE,
+		KoanfKey:  "service.pingOne.authentication.deviceCode.scopes",
 	}
 }
 
@@ -113,16 +276,81 @@ func initPingOneAuthenticationTypeOption() {
 	}
 }
 
-func initRegionCodeOption() {
+func initPingOneAuthenticationWorkerClientIDOption() {
+	cobraParamName := "pingone-worker-client-id"
+	cobraValue := new(customtypes.UUID)
+	defaultValue := customtypes.UUID("")
+	envVar := "PINGCLI_PINGONE_WORKER_CLIENT_ID"
+
+	options.PingOneAuthenticationWorkerClientIDOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "DEPRECATED: Use --pingone-client-credentials-client-id instead. The worker client ID used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.UUID,
+		KoanfKey:  "service.pingOne.authentication.worker.clientID",
+	}
+}
+
+func initPingOneAuthenticationWorkerClientSecretOption() {
+	cobraParamName := "pingone-worker-client-secret"
+	cobraValue := new(customtypes.String)
+	defaultValue := customtypes.String("")
+	envVar := "PINGCLI_PINGONE_WORKER_CLIENT_SECRET"
+
+	options.PingOneAuthenticationWorkerClientSecretOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name:  cobraParamName,
+			Usage: "DEPRECATED: Use --pingone-client-credentials-client-secret instead. The worker client secret used to authenticate to the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: true,
+		Type:      options.STRING,
+		KoanfKey:  "service.pingOne.authentication.worker.clientSecret",
+	}
+}
+
+func initPingOneAuthenticationWorkerEnvironmentIDOption() {
+	cobraParamName := "pingone-worker-environment-id"
+	cobraValue := new(customtypes.UUID)
+	defaultValue := customtypes.UUID("")
+	envVar := "PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID"
+
+	options.PingOneAuthenticationWorkerEnvironmentIDOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          envVar,
+		Flag: &pflag.Flag{
+			Name: cobraParamName,
+			Usage: "DEPRECATED: Use --pingone-environment-id instead. The ID of the PingOne environment that contains the worker client used to authenticate to " +
+				"the PingOne management API.",
+			Value: cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.UUID,
+		KoanfKey:  "service.pingOne.authentication.worker.environmentID",
+	}
+}
+
+func initPingOneRegionCodeOption() {
 	cobraParamName := "pingone-region-code"
-	cobraValue := new(customtypes.PingOneRegionCode)
-	defaultValue := customtypes.PingOneRegionCode("")
+	cobraValue := new(customtypes.String)
 	envVar := "PINGCLI_PINGONE_REGION_CODE"
 
 	options.PingOneRegionCodeOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
-		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name: cobraParamName,

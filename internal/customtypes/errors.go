@@ -22,4 +22,5 @@ var (
 	ErrUnrecognizedFormat            = errors.New("unrecognized export format")
 	ErrUnrecognizedServiceGroup      = errors.New("unrecognized service group")
 	ErrUnrecognizedExportService     = errors.New("unrecognized service")
+	ErrUnrecognizedAuthService       = errors.New("unrecognized authentication service")
 )

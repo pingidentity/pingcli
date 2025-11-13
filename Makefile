@@ -118,13 +118,12 @@ protogen: ## Generate Go code from .proto files
 	protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto
 	echo "✅ gRPC code generated."
 
-test: _check_ping_env ## Run all tests
+test: ## Run all tests
 	@echo "  > Test: Running all Go tests..."
-	for dir in $(TEST_DIRS); do
-		echo "    -> $$dir"
-		$(GOTEST) $$dir
+	@for dir in $(TEST_DIRS); do \
+		$(GOTEST) $$dir; \
 	done
-	echo "✅ All tests passed."
+	@echo "✅ All tests passed."
 
 devcheck: install importfmtlint fmt vet golangcilint spincontainer test removetestcontainer ## Run the full suite of development checks and tests
 	@echo "✅ All development checks passed successfully."

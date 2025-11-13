@@ -149,10 +149,17 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			case *customtypes.UUID:
 				continue
 			case string:
+				// Allow empty string as default value
+				if typedValue == "" {
+					continue
+				}
 				u := new(customtypes.UUID)
 				if err = u.Set(typedValue); err != nil {
 					return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s': %w", pName, ErrValidateUUID, typedValue, err)}
 				}
+			case nil:
+				// Allow nil/null values as default state
+				continue
 			default:
 				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidateUUID, typedValue, typedValue)}
 			}
@@ -170,13 +177,21 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			}
 		case options.PINGONE_REGION_CODE:
 			switch typedValue := vValue.(type) {
-			case *customtypes.PingOneRegionCode:
+			case *customtypes.String:
 				continue
 			case string:
+				// Allow empty string as a default value
+				if typedValue == "" {
+					continue
+				}
+				// Validate non-empty strings against valid region codes
 				prc := new(customtypes.PingOneRegionCode)
 				if err = prc.Set(typedValue); err != nil {
 					return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s': %w", pName, ErrValidatePingOneRegionCode, typedValue, err)}
 				}
+			case nil:
+				// Allow nil/null values as default state - they will be treated as empty strings
+				continue
 			default:
 				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidatePingOneRegionCode, typedValue, typedValue)}
 			}
@@ -185,10 +200,17 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			case *customtypes.String:
 				continue
 			case string:
+				// Allow empty string as default value
+				if typedValue == "" {
+					continue
+				}
 				s := new(customtypes.String)
 				if err = s.Set(typedValue); err != nil {
 					return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s': %w", pName, ErrValidateString, typedValue, err)}
 				}
+			case nil:
+				// Allow nil/null values as default state
+				continue
 			default:
 				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidateString, typedValue, typedValue)}
 			}
@@ -197,6 +219,10 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			case *customtypes.StringSlice:
 				continue
 			case string:
+				// Allow empty string as default value
+				if typedValue == "" {
+					continue
+				}
 				ss := new(customtypes.StringSlice)
 				if err = ss.Set(typedValue); err != nil {
 					return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s': %w", pName, ErrValidateStringSlice, typedValue, err)}
@@ -213,6 +239,9 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 						return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidateStringSlice, typedValue, typedValue)}
 					}
 				}
+			case nil:
+				// Allow nil/null values as default state - they will be treated as empty slices
+				continue
 			default:
 				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidateStringSlice, typedValue, typedValue)}
 			}
@@ -321,10 +350,17 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			case *customtypes.PingOneAuthenticationType:
 				continue
 			case string:
+				// Allow empty string as a default value - will trigger interactive prompt
+				if typedValue == "" {
+					continue
+				}
 				pat := new(customtypes.PingOneAuthenticationType)
 				if err = pat.Set(typedValue); err != nil {
 					return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s': %w", pName, ErrValidatePingOneAuthType, typedValue, err)}
 				}
+			case nil:
+				// Allow nil/null values as default state - will trigger interactive prompt
+				continue
 			default:
 				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidatePingOneAuthType, typedValue, typedValue)}
 			}

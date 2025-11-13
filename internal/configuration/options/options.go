@@ -52,6 +52,11 @@ func Options() []Option {
 		ConfigListKeysYamlOption,
 		ConfigUnmaskSecretValueOption,
 
+		AuthMethodAuthorizationCodeOption,
+		AuthMethodClientCredentialsOption,
+		AuthMethodDeviceCodeOption,
+		AuthFileStorageOption,
+
 		LicenseProductOption,
 		LicenseVersionOption,
 		LicenseDevopsUserOption,
@@ -71,6 +76,16 @@ func Options() []Option {
 		PingFederateInsecureTrustAllTLSOption,
 		PingFederateXBypassExternalValidationHeaderOption,
 
+		PingOneAuthenticationAPIEnvironmentIDOption,
+		PingOneAuthenticationAuthorizationCodeClientIDOption,
+		PingOneAuthenticationAuthorizationCodeRedirectURIPathOption,
+		PingOneAuthenticationAuthorizationCodeRedirectURIPortOption,
+		PingOneAuthenticationAuthorizationCodeScopesOption,
+		PingOneAuthenticationClientCredentialsClientIDOption,
+		PingOneAuthenticationClientCredentialsClientSecretOption,
+		PingOneAuthenticationClientCredentialsScopesOption,
+		PingOneAuthenticationDeviceCodeClientIDOption,
+		PingOneAuthenticationDeviceCodeScopesOption,
 		PingOneAuthenticationTypeOption,
 		PingOneAuthenticationWorkerClientIDOption,
 		PingOneAuthenticationWorkerClientSecretOption,
@@ -123,6 +138,14 @@ var (
 	ConfigUnmaskSecretValueOption     Option
 )
 
+// 'pingcli login' command options
+var (
+	AuthMethodAuthorizationCodeOption Option
+	AuthMethodClientCredentialsOption Option
+	AuthMethodDeviceCodeOption        Option
+	AuthFileStorageOption             Option
+)
+
 // License options
 var (
 	LicenseProductOption    Option
@@ -150,11 +173,21 @@ var (
 
 // pingone service options
 var (
-	PingOneAuthenticationTypeOption                Option
-	PingOneAuthenticationWorkerClientIDOption      Option
-	PingOneAuthenticationWorkerClientSecretOption  Option
-	PingOneAuthenticationWorkerEnvironmentIDOption Option
-	PingOneRegionCodeOption                        Option
+	PingOneAuthenticationAPIEnvironmentIDOption                 Option
+	PingOneAuthenticationAuthorizationCodeClientIDOption        Option
+	PingOneAuthenticationAuthorizationCodeRedirectURIPathOption Option
+	PingOneAuthenticationAuthorizationCodeRedirectURIPortOption Option
+	PingOneAuthenticationAuthorizationCodeScopesOption          Option
+	PingOneAuthenticationClientCredentialsClientIDOption        Option
+	PingOneAuthenticationClientCredentialsClientSecretOption    Option
+	PingOneAuthenticationClientCredentialsScopesOption          Option
+	PingOneAuthenticationDeviceCodeClientIDOption               Option
+	PingOneAuthenticationDeviceCodeScopesOption                 Option
+	PingOneAuthenticationTypeOption                             Option
+	PingOneAuthenticationWorkerClientIDOption                   Option
+	PingOneAuthenticationWorkerClientSecretOption               Option
+	PingOneAuthenticationWorkerEnvironmentIDOption              Option
+	PingOneRegionCodeOption                                     Option
 )
 
 // 'pingcli platform export' command options

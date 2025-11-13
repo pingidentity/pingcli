@@ -1,3 +1,9 @@
+#### auth Properties
+
+| Config File Property | Equivalent Parameter | Environment Variable | Type | Purpose |
+|---|---|---|---|---|
+| auth.fileStorage | --file-storage | PINGCLI_AUTH_FILE_STORAGE | 0 | Store authentication tokens in file storage only, bypassing keychain. By default, keychain is attempted first with automatic fallback to file storage. |
+
 #### export Properties
 
 | Config File Property | Equivalent Parameter | Environment Variable | Type | Purpose |
@@ -48,9 +54,19 @@
 | service.pingFederate.httpsHost | --pingfederate-https-host | PINGCLI_PINGFEDERATE_HTTPS_HOST | 14 | The PingFederate HTTPS host used to communicate with PingFederate's admin API.<br><br>Example: 'https://pingfederate-admin.bxretail.org' |
 | service.pingFederate.insecureTrustAllTLS | --pingfederate-insecure-trust-all-tls | PINGCLI_PINGFEDERATE_INSECURE_TRUST_ALL_TLS | 0 | Trust any certificate when connecting to the PingFederate server admin API. (default false)<br><br>This is insecure and shouldn't be enabled outside of testing. |
 | service.pingFederate.xBypassExternalValidationHeader | --pingfederate-x-bypass-external-validation-header | PINGCLI_PINGFEDERATE_X_BYPASS_EXTERNAL_VALIDATION_HEADER | 0 | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false) |
-| service.pingOne.authentication.type | --pingone-authentication-type | PINGCLI_PINGONE_AUTHENTICATION_TYPE | 10 | The authentication type to use to authenticate to the PingOne management API. (default worker)<br><br>Options are: worker. |
+| service.pingOne.authentication.authorizationCode.clientID | --pingone-oidc-authorization-code-client-id | PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_CLIENT_ID | 16 | The authorization code client ID used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.authorizationCode.redirectURIPath | --pingone-oidc-authorization-code-redirect-uri-path | PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_REDIRECT_URI_PATH | 14 | The redirect URI path to use when using the authorization code authentication type to authenticate to the PingOne management API. |
+| service.pingOne.authentication.authorizationCode.redirectURIPort | --pingone-oidc-authorization-code-redirect-uri-port | PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_REDIRECT_URI_PORT | 14 | The redirect URI port to use when using the authorization code authentication type to authenticate to the PingOne management API. |
+| service.pingOne.authentication.authorizationCode.scopes | --pingone-oidc-authorization-code-scopes | PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_SCOPES | 15 | The authorization code scope(s) used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.clientCredentials.clientID | --pingone-client-credentials-client-id | PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID | 16 | The client credentials client ID used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.clientCredentials.clientSecret | --pingone-client-credentials-client-secret | PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET | 14 | The client credentials client secret used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.clientCredentials.scopes | --pingone-client-credentials-scopes | PINGCLI_PINGONE_CLIENT_CREDENTIALS_SCOPES | 15 | The scopes to request for the client credentials used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.deviceCode.clientID | --pingone-device-code-client-id | PINGCLI_PINGONE_DEVICE_CODE_CLIENT_ID | 16 | The device code client ID used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.deviceCode.scopes | --pingone-device-code-scopes | PINGCLI_PINGONE_DEVICE_CODE_SCOPES | 15 | The device code scope(s) used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.environmentID | --pingone-environment-id | PINGCLI_PINGONE_ENVIRONMENT_ID | 16 | The ID of the PingOne environment to use for authentication (used by all auth types). |
+| service.pingOne.authentication.type | --pingone-authentication-type | PINGCLI_PINGONE_AUTHENTICATION_TYPE | 10 | The authentication type to use to authenticate to the PingOne management API. (default worker)<br><br>Options are: authorization_code, client_credentials, device_code, worker. |
 | service.pingOne.authentication.worker.clientID | --pingone-worker-client-id | PINGCLI_PINGONE_WORKER_CLIENT_ID | 16 | The worker client ID used to authenticate to the PingOne management API. |
 | service.pingOne.authentication.worker.clientSecret | --pingone-worker-client-secret | PINGCLI_PINGONE_WORKER_CLIENT_SECRET | 14 | The worker client secret used to authenticate to the PingOne management API. |
 | service.pingOne.authentication.worker.environmentID | --pingone-worker-environment-id | PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID | 16 | The ID of the PingOne environment that contains the worker client used to authenticate to the PingOne management API. |
-| service.pingOne.regionCode | --pingone-region-code | PINGCLI_PINGONE_REGION_CODE | 11 | The region code of the PingOne tenant.<br><br>Options are: AP, AU, CA, EU, NA.<br><br>Example: 'NA' |
+| service.pingOne.regionCode | --pingone-region-code | PINGCLI_PINGONE_REGION_CODE | 11 | The region code of the PingOne tenant.<br><br>Options are: AP, AU, CA, EU, NA, SG.<br><br>Example: 'NA' |
 

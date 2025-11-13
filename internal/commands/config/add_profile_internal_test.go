@@ -61,10 +61,13 @@ func Test_RunInternalConfigAddProfile(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			koanfConfig := testutils_koanf.InitKoanfs(t)
+			testutils_koanf.InitKoanfs(t)
 
-			if tc.setKoanfNil {
-				koanfConfig = nil
+			var koanfConfig *profiles.KoanfConfig
+			if !tc.setKoanfNil {
+				var err error
+				koanfConfig, err = profiles.GetKoanfConfig()
+				require.NoError(t, err)
 			}
 
 			options.ConfigAddProfileNameOption.Flag.Changed = true

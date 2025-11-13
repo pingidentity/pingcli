@@ -10,6 +10,7 @@ import (
 
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
+	"github.com/pingidentity/pingcli/cmd/auth"
 	"github.com/pingidentity/pingcli/cmd/completion"
 	"github.com/pingidentity/pingcli/cmd/config"
 	"github.com/pingidentity/pingcli/cmd/feedback"
@@ -46,7 +47,8 @@ func NewRootCommand(version string, commit string) *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		// auth.NewAuthCommand(),
+		auth.NewLoginCommand(),
+		auth.NewLogoutCommand(),
 		completion.Command(),
 		config.NewConfigCommand(),
 		feedback.NewFeedbackCommand(),
