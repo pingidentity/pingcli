@@ -13,6 +13,10 @@ import (
 	"golang.org/x/oauth2"
 )
 
+var (
+	tokenManagerErrorPrefix = "failed to manage token"
+)
+
 // TokenManager defines the interface for managing OAuth2 tokens in the keychain
 type TokenManager interface {
 	SaveToken(token *oauth2.Token) error
@@ -76,8 +80,8 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 		grantType = svcOAuth2.GrantTypeClientCredentials
 	default:
 		return "", &errs.PingCLIError{
-			Prefix: fmt.Sprintf("failed to generate token key for auth method '%s'", authMethod),
-			Err:    ErrUnsupportedAuthMethod,
+			Prefix: tokenManagerErrorPrefix,
+			Err:    fmt.Errorf("%w: %s", ErrUnsupportedAuthMethod, authMethod),
 		}
 	}
 
@@ -111,7 +115,7 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType))
 	if tokenKey == "" || tokenKey == "default-token" {
 		return "", &errs.PingCLIError{
-			Prefix: "failed to generate token key",
+			Prefix: tokenManagerErrorPrefix,
 			Err:    ErrTokenKeyGenerationRequirements,
 		}
 	}
@@ -155,7 +159,7 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType))
 	if tokenKey == "" || tokenKey == "default-token" {
 		return "", &errs.PingCLIError{
-			Prefix: "failed to generate token key from config",
+			Prefix: tokenManagerErrorPrefix,
 			Err:    ErrTokenKeyGenerationRequirements,
 		}
 	}

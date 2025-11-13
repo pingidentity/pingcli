@@ -289,7 +289,7 @@ func initPingOneAuthenticationWorkerClientIDOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:  cobraParamName,
-			Usage: "The worker client ID used to authenticate to the PingOne management API.",
+			Usage: "DEPRECATED: Use --pingone-client-credentials-client-id instead. The worker client ID used to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
 		Sensitive: false,
@@ -311,7 +311,7 @@ func initPingOneAuthenticationWorkerClientSecretOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:  cobraParamName,
-			Usage: "The worker client secret used to authenticate to the PingOne management API.",
+			Usage: "DEPRECATED: Use --pingone-client-credentials-client-secret instead. The worker client secret used to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
 		Sensitive: true,
@@ -333,7 +333,7 @@ func initPingOneAuthenticationWorkerEnvironmentIDOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name: cobraParamName,
-			Usage: "The ID of the PingOne environment that contains the worker client used to authenticate to " +
+			Usage: "DEPRECATED: Use --pingone-environment-id instead. The ID of the PingOne environment that contains the worker client used to authenticate to " +
 				"the PingOne management API.",
 			Value: cobraValue,
 		},
