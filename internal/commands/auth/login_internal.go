@@ -137,11 +137,14 @@ func displayLoginSuccess(token *oauth2.Token, newAuth bool, location StorageLoca
 		}
 
 		output.Success(fmt.Sprintf("Successfully logged in using %s authentication. Credentials saved to %s for profile '%s'.", selectedMethod, storageMsg, profileName), nil)
+		if token.RefreshToken != "" {
+			output.Message("Refresh token available for automatic renewal.", nil)
+		}
 	} else {
-		output.Message(fmt.Sprintf("Already authenticated with valid %s token for profile '%s'.", selectedMethod, profileName), nil)
-	}
-	output.Message(fmt.Sprintf("Access token expires: %s", token.Expiry.Format("2006-01-02 15:04:05 MST")), nil)
-	if token.RefreshToken != "" {
-		output.Message("Refresh token available for automatic renewal.", nil)
+		// Using cached token - SDK already logged the expiry
+		output.Success(fmt.Sprintf("Using existing %s token for profile '%s'.", selectedMethod, profileName), nil)
+		if token.RefreshToken != "" {
+			output.Message("Token will be automatically refreshed when needed.", nil)
+		}
 	}
 }

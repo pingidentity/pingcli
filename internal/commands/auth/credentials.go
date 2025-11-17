@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/errs"
@@ -478,6 +479,34 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	// Set grant type to device code
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeDeviceCode)
 
+	// Generate unique token key based on profile and configuration
+	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeDeviceCode))
+	if tokenKey == "" {
+		// Fallback to simple key if generation fails
+		tokenKey = deviceCodeTokenKey
+	}
+
+	// Check if we have a valid cached token before calling TokenSource
+	// Store the existing token's expiry to compare later
+	var existingTokenExpiry *time.Time
+
+	// First try SDK keychain storage if enabled
+	if shouldUseKeychain() {
+		keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+		if err == nil {
+			if existingToken, err := keychainStorage.LoadToken(); err == nil && existingToken != nil && existingToken.Valid() {
+				existingTokenExpiry = &existingToken.Expiry
+			}
+		}
+	}
+
+	// If not found in keychain, check file storage
+	if existingTokenExpiry == nil {
+		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.Valid() {
+			existingTokenExpiry = &existingToken.Expiry
+		}
+	}
+
 	// Get token source - SDK handles keychain storage based on configuration
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
@@ -496,13 +525,6 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// Generate unique token key based on profile and configuration
-	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeDeviceCode))
-	if tokenKey == "" {
-		// Fallback to simple key if generation fails
-		tokenKey = deviceCodeTokenKey
-	}
-
 	// Clean up old token files for this grant type and profile (in case configuration changed)
 	// Ignore errors from cleanup - we still want to save the new token
 	_ = clearAllTokenFilesForGrantType(string(svcOAuth2.GrantTypeDeviceCode), profileName)
@@ -516,11 +538,23 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// SDK doesn't tell us if this was new auth vs cached, so we assume it's always potentially new
-	// This is acceptable since the SDK handles the optimization internally
+	// SDK handles keychain storage separately - mark if keychain is enabled
+	if shouldUseKeychain() {
+		location.Keychain = true
+	}
+
+	// Determine if this was new authentication
+	// If we had an existing token with the same expiry, it's cached
+	// If expiry is different, new auth was performed
+	isNewAuth := true
+	if existingTokenExpiry != nil && token.Expiry.Equal(*existingTokenExpiry) {
+		isNewAuth = false
+	}
+
+	// NewAuth indicates whether new authentication was performed
 	return &LoginResult{
 		Token:    token,
-		NewAuth:  true,
+		NewAuth:  isNewAuth,
 		Location: location,
 	}, nil
 }
@@ -601,6 +635,34 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 	// Set grant type to authorization code
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeAuthorizationCode)
 
+	// Generate unique token key based on profile and configuration
+	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeAuthorizationCode))
+	if tokenKey == "" {
+		// Fallback to simple key if generation fails
+		tokenKey = authorizationCodeTokenKey
+	}
+
+	// Check if we have a valid cached token before calling TokenSource
+	// Store the existing token's expiry to compare later
+	var existingTokenExpiry *time.Time
+
+	// First try SDK keychain storage if enabled
+	if shouldUseKeychain() {
+		keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+		if err == nil {
+			if existingToken, err := keychainStorage.LoadToken(); err == nil && existingToken != nil && existingToken.Valid() {
+				existingTokenExpiry = &existingToken.Expiry
+			}
+		}
+	}
+
+	// If not found in keychain, check file storage
+	if existingTokenExpiry == nil {
+		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.Valid() {
+			existingTokenExpiry = &existingToken.Expiry
+		}
+	}
+
 	// Get token source - SDK handles keychain storage based on configuration
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
@@ -619,13 +681,6 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// Generate unique token key based on profile and configuration
-	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeAuthorizationCode))
-	if tokenKey == "" {
-		// Fallback to simple key if generation fails
-		tokenKey = authorizationCodeTokenKey
-	}
-
 	// Clean up old token files for this grant type and profile (in case configuration changed)
 	// Ignore errors from cleanup - we still want to save the new token
 	_ = clearAllTokenFilesForGrantType(string(svcOAuth2.GrantTypeAuthorizationCode), profileName)
@@ -639,10 +694,21 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// SDK doesn't tell us if this was new auth vs cached, so we assume it's always potentially new
+	// SDK handles keychain storage separately - mark if keychain is enabled
+	if shouldUseKeychain() {
+		location.Keychain = true
+	}
+
+	// Determine if this was new authentication
+	isNewAuth := true
+	if existingTokenExpiry != nil && token.Expiry.Equal(*existingTokenExpiry) {
+		isNewAuth = false
+	}
+
+	// NewAuth indicates whether new authentication was performed
 	return &LoginResult{
 		Token:    token,
-		NewAuth:  true,
+		NewAuth:  isNewAuth,
 		Location: location,
 	}, nil
 }
@@ -762,6 +828,34 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 	// Set grant type to client credentials
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeClientCredentials)
 
+	// Generate unique token key based on profile and configuration
+	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeClientCredentials))
+	if tokenKey == "" {
+		// Fallback to simple key if generation fails
+		tokenKey = clientCredentialsTokenKey
+	}
+
+	// Check if we have a valid cached token before calling TokenSource
+	// Store the existing token's expiry to compare later
+	var existingTokenExpiry *time.Time
+
+	// First try SDK keychain storage if enabled
+	if shouldUseKeychain() {
+		keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+		if err == nil {
+			if existingToken, err := keychainStorage.LoadToken(); err == nil && existingToken != nil && existingToken.Valid() {
+				existingTokenExpiry = &existingToken.Expiry
+			}
+		}
+	}
+
+	// If not found in keychain, check file storage
+	if existingTokenExpiry == nil {
+		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.Valid() {
+			existingTokenExpiry = &existingToken.Expiry
+		}
+	}
+
 	// Get token source - SDK handles keychain storage based on configuration
 	tokenSource, err := cfg.TokenSource(ctx)
 	if err != nil {
@@ -780,13 +874,6 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// Generate unique token key based on profile and configuration
-	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeClientCredentials))
-	if tokenKey == "" {
-		// Fallback to simple key if generation fails
-		tokenKey = clientCredentialsTokenKey
-	}
-
 	// Clean up old token files for this grant type and profile (in case configuration changed)
 	// Ignore errors from cleanup - we still want to save the new token
 	_ = clearAllTokenFilesForGrantType(string(svcOAuth2.GrantTypeClientCredentials), profileName)
@@ -800,10 +887,21 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// SDK doesn't tell us if this was new auth vs cached, so we assume it's always potentially new
+	// SDK handles keychain storage separately - mark if keychain is enabled
+	if shouldUseKeychain() {
+		location.Keychain = true
+	}
+
+	// Determine if this was new authentication
+	isNewAuth := true
+	if existingTokenExpiry != nil && token.Expiry.Equal(*existingTokenExpiry) {
+		isNewAuth = false
+	}
+
+	// NewAuth indicates whether new authentication was performed
 	return &LoginResult{
 		Token:    token,
-		NewAuth:  true,
+		NewAuth:  isNewAuth,
 		Location: location,
 	}, nil
 }
