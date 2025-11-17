@@ -145,7 +145,7 @@ jobs:
           TEST_PINGONE_REGION_CODE: ${{ secrets.TEST_PINGONE_REGION_CODE }}
 
   onfailure:
-    if: ${{ always() && github.event_name == 'schedule' && contains(needs.*.result, 'failure') }}
+    if: ${{ failure() && github.event_name == 'schedule' }}
     needs: [fmt, vet, golangci, importfmt, test]
     name: Send failure webhook
     runs-on: ubuntu-latest
