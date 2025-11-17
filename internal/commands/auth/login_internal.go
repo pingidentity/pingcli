@@ -44,8 +44,9 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 	flagProvided := deviceCodeStr == "true" || clientCredentialsStr == "true" || authorizationCodeStr == "true"
 
 	// If no flag was provided, check if authentication type is configured
+	var authType string
 	if !flagProvided {
-		authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+		authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 		if err != nil || strings.TrimSpace(authType) == "" {
 			// No authentication type configured - run interactive setup
 			if err := RunInteractiveAuthConfig(os.Stdin); err != nil {
@@ -54,19 +55,11 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 					Err:    err,
 				}
 			}
-			// After interactive setup, re-read the auth type
-			authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
-			if err != nil {
-				return &errs.PingCLIError{
-					Prefix: loginErrorPrefix,
-					Err:    err,
-				}
-			}
+			// After interactive setup, authType will be determined from the switch statement below
 		}
 	}
 
 	// Determine which authentication method was requested and convert to auth type format
-	var authType string
 	switch {
 	case deviceCodeStr == "true":
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE

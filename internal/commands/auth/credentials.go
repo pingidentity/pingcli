@@ -152,7 +152,7 @@ func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 		return token, nil // Success with fallback!
 	}
 
-	//Both failed (err and fileErr are non-nil)
+	// Both failed (err and fileErr are non-nil)
 	return nil, &errs.PingCLIError{
 		Prefix: credentialsErrorPrefix,
 		Err:    errors.Join(err, fileErr),
@@ -546,10 +546,7 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	// Determine if this was new authentication
 	// If we had an existing token with the same expiry, it's cached
 	// If expiry is different, new auth was performed
-	isNewAuth := true
-	if existingTokenExpiry != nil && token.Expiry.Equal(*existingTokenExpiry) {
-		isNewAuth = false
-	}
+	isNewAuth := existingTokenExpiry == nil || !token.Expiry.Equal(*existingTokenExpiry)
 
 	// NewAuth indicates whether new authentication was performed
 	return &LoginResult{
@@ -700,10 +697,9 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 	}
 
 	// Determine if this was new authentication
-	isNewAuth := true
-	if existingTokenExpiry != nil && token.Expiry.Equal(*existingTokenExpiry) {
-		isNewAuth = false
-	}
+	// If we had an existing token with the same expiry, it's cached
+	// If expiry is different, new auth was performed
+	isNewAuth := existingTokenExpiry == nil || !token.Expiry.Equal(*existingTokenExpiry)
 
 	// NewAuth indicates whether new authentication was performed
 	return &LoginResult{
@@ -893,10 +889,9 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 	}
 
 	// Determine if this was new authentication
-	isNewAuth := true
-	if existingTokenExpiry != nil && token.Expiry.Equal(*existingTokenExpiry) {
-		isNewAuth = false
-	}
+	// If we had an existing token with the same expiry, it's cached
+	// If expiry is different, new auth was performed
+	isNewAuth := existingTokenExpiry == nil || !token.Expiry.Equal(*existingTokenExpiry)
 
 	// NewAuth indicates whether new authentication was performed
 	return &LoginResult{
