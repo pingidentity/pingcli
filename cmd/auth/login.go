@@ -24,7 +24,7 @@ func NewLoginCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
-		Long:                  "Login user to the CLI using one of the supported authentication flows: device code, authorization code, or client credentials",
+		Long:                  "Login user to the CLI using one of the supported authentication flows: device code, authorization code, or client credentials for a service",
 		RunE:                  authLoginRunE,
 		Short:                 "Login user to the CLI",
 		Use:                   "login [flags]",
@@ -34,6 +34,7 @@ func NewLoginCommand() *cobra.Command {
 	cmd.Flags().AddFlag(options.AuthMethodClientCredentialsOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodDeviceCodeOption.Flag)
 	cmd.Flags().AddFlag(options.AuthFileStorageOption.Flag)
+	cmd.Flags().AddFlag(options.AuthProviderOption.Flag)
 
 	// Enforce that exactly one authentication method must be specified
 	cmd.MarkFlagsMutuallyExclusive(

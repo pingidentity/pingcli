@@ -128,11 +128,11 @@ func TestClearAllTokenFilesForGrantType(t *testing.T) {
 	_ = os.MkdirAll(credentialsDir, 0700)
 
 	testFiles := []string{
-		"token-abc12345_device_code_production.json",
-		"token-def67890_device_code_production.json",        // Another device_code token for production
-		"token-abc12345_device_code_staging.json",           // Same hash, different profile
-		"token-ghi11111_authorization_code_production.json", // Different grant type, same profile
-		"token-jkl22222_client_credentials_production.json",
+		"token-abc12345_pingone_device_code_production.json",
+		"token-def67890_pingone_device_code_production.json",        // Another device_code token for production
+		"token-abc12345_pingone_device_code_staging.json",           // Same hash, different profile
+		"token-ghi11111_pingone_authorization_code_production.json", // Different grant type, same profile
+		"token-jkl22222_pingone_client_credentials_production.json",
 	}
 
 	// Create test files
@@ -151,15 +151,15 @@ func TestClearAllTokenFilesForGrantType(t *testing.T) {
 	})
 
 	// Clear device_code tokens for production profile only
-	err := clearAllTokenFilesForGrantType("device_code", "production")
+	err := clearAllTokenFilesForGrantType("pingone", "device_code", "production")
 	if err != nil {
 		t.Fatalf("Failed to clear token files: %v", err)
 	}
 
 	// Verify device_code production files are gone
 	for _, filename := range []string{
-		"token-abc12345_device_code_production.json",
-		"token-def67890_device_code_production.json",
+		"token-abc12345_pingone_device_code_production.json",
+		"token-def67890_pingone_device_code_production.json",
 	} {
 		filePath := filepath.Join(credentialsDir, filename)
 		if _, err := os.Stat(filePath); !os.IsNotExist(err) {
@@ -169,9 +169,9 @@ func TestClearAllTokenFilesForGrantType(t *testing.T) {
 
 	// Verify other files still exist
 	for _, filename := range []string{
-		"token-abc12345_device_code_staging.json",
-		"token-ghi11111_authorization_code_production.json",
-		"token-jkl22222_client_credentials_production.json",
+		"token-abc12345_pingone_device_code_staging.json",
+		"token-ghi11111_pingone_authorization_code_production.json",
+		"token-jkl22222_pingone_client_credentials_production.json",
 	} {
 		filePath := filepath.Join(credentialsDir, filename)
 		if _, err := os.Stat(filePath); os.IsNotExist(err) {
@@ -182,7 +182,7 @@ func TestClearAllTokenFilesForGrantType(t *testing.T) {
 
 func TestClearAllTokenFilesForGrantType_NoFiles(t *testing.T) {
 	// Should not error when no matching files exist
-	err := clearAllTokenFilesForGrantType("device_code", "nonexistent-profile")
+	err := clearAllTokenFilesForGrantType("pingone", "device_code", "nonexistent-profile")
 	if err != nil {
 		t.Errorf("Expected no error when no files match, got: %v", err)
 	}
@@ -193,7 +193,7 @@ func TestClearAllTokenFilesForGrantType_DefaultProfile(t *testing.T) {
 	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
 	_ = os.MkdirAll(credentialsDir, 0700)
 
-	testFile := "token-abc12345_device_code_default.json"
+	testFile := "token-abc12345_pingone_device_code_default.json"
 	filePath := filepath.Join(credentialsDir, testFile)
 	if err := os.WriteFile(filePath, []byte("test"), 0600); err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
@@ -204,7 +204,7 @@ func TestClearAllTokenFilesForGrantType_DefaultProfile(t *testing.T) {
 	})
 
 	// Clear with empty profile name (should default to "default")
-	err := clearAllTokenFilesForGrantType("device_code", "")
+	err := clearAllTokenFilesForGrantType("pingone", "device_code", "")
 	if err != nil {
 		t.Fatalf("Failed to clear token files: %v", err)
 	}
@@ -218,6 +218,7 @@ func TestClearAllTokenFilesForGrantType_DefaultProfile(t *testing.T) {
 func TestGenerateTokenKey(t *testing.T) {
 	tests := []struct {
 		name          string
+		providerName  string
 		profileName   string
 		environmentID string
 		clientID      string
@@ -228,26 +229,38 @@ func TestGenerateTokenKey(t *testing.T) {
 	}{
 		{
 			name:          "Valid inputs with profile",
+			providerName:  "pingone",
 			profileName:   "production",
 			environmentID: "env123",
 			clientID:      "client456",
 			grantType:     "device_code",
 			wantEmpty:     false,
 			wantPrefix:    "token-",
-			wantSuffix:    "_device_code_production",
+			wantSuffix:    "_pingone_device_code_production",
 		},
 		{
 			name:          "Empty profile defaults to default",
+			providerName:  "pingone",
 			profileName:   "",
 			environmentID: "env123",
 			clientID:      "client456",
 			grantType:     "authorization_code",
 			wantEmpty:     false,
 			wantPrefix:    "token-",
-			wantSuffix:    "_authorization_code_default",
+			wantSuffix:    "_pingone_authorization_code_default",
+		},
+		{
+			name:          "Missing service name returns empty",
+			providerName:  "",
+			profileName:   "production",
+			environmentID: "env123",
+			clientID:      "client456",
+			grantType:     "device_code",
+			wantEmpty:     true,
 		},
 		{
 			name:          "Missing environment ID returns empty",
+			providerName:  "pingone",
 			profileName:   "production",
 			environmentID: "",
 			clientID:      "client456",
@@ -256,6 +269,7 @@ func TestGenerateTokenKey(t *testing.T) {
 		},
 		{
 			name:          "Missing client ID returns empty",
+			providerName:  "pingone",
 			profileName:   "production",
 			environmentID: "env123",
 			clientID:      "",
@@ -264,6 +278,7 @@ func TestGenerateTokenKey(t *testing.T) {
 		},
 		{
 			name:          "Missing grant type returns empty",
+			providerName:  "pingone",
 			profileName:   "production",
 			environmentID: "env123",
 			clientID:      "client456",
@@ -272,19 +287,20 @@ func TestGenerateTokenKey(t *testing.T) {
 		},
 		{
 			name:          "Different configs produce different hashes",
+			providerName:  "pingone",
 			profileName:   "staging",
 			environmentID: "env999",
 			clientID:      "client789",
 			grantType:     "client_credentials",
 			wantEmpty:     false,
 			wantPrefix:    "token-",
-			wantSuffix:    "_client_credentials_staging",
+			wantSuffix:    "_pingone_client_credentials_staging",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := generateTokenKey(tt.profileName, tt.environmentID, tt.clientID, tt.grantType)
+			result := generateTokenKey(tt.providerName, tt.profileName, tt.environmentID, tt.clientID, tt.grantType)
 
 			if tt.wantEmpty {
 				if result != "" {
@@ -308,7 +324,7 @@ func TestGenerateTokenKey(t *testing.T) {
 				t.Errorf("Expected result to end with %s, got %s", tt.wantSuffix, result)
 			}
 
-			// Verify format: token-<16hexchars>_<grantType>_<profile>
+			// Verify format: token-<16hexchars>_<service>_<grantType>_<profile>
 			// Note: grant type may contain underscores (e.g., device_code, client_credentials)
 			// So we check the structure differently
 
@@ -334,34 +350,40 @@ func TestGenerateTokenKey(t *testing.T) {
 
 func TestGenerateTokenKey_Consistency(t *testing.T) {
 	// Same inputs should produce same hash
-	key1 := generateTokenKey("prod", "env1", "client1", "device_code")
-	key2 := generateTokenKey("prod", "env1", "client1", "device_code")
+	key1 := generateTokenKey("pingone", "prod", "env1", "client1", "device_code")
+	key2 := generateTokenKey("pingone", "prod", "env1", "client1", "device_code")
 
 	if key1 != key2 {
 		t.Errorf("Same inputs should produce same key, got %s and %s", key1, key2)
 	}
 
 	// Different profiles should produce different keys (different suffix)
-	key3 := generateTokenKey("staging", "env1", "client1", "device_code")
+	key3 := generateTokenKey("pingone", "staging", "env1", "client1", "device_code")
 	if key1 == key3 {
 		t.Error("Different profiles should produce different keys")
 	}
 
 	// Different environment IDs should produce different hashes
-	key4 := generateTokenKey("prod", "env2", "client1", "device_code")
+	key4 := generateTokenKey("pingone", "prod", "env2", "client1", "device_code")
 	if key1 == key4 {
 		t.Error("Different environment IDs should produce different keys")
 	}
 
 	// Different client IDs should produce different hashes
-	key5 := generateTokenKey("prod", "env1", "client2", "device_code")
+	key5 := generateTokenKey("pingone", "prod", "env1", "client2", "device_code")
 	if key1 == key5 {
 		t.Error("Different client IDs should produce different keys")
 	}
 
 	// Different grant types should produce different keys
-	key6 := generateTokenKey("prod", "env1", "client1", "authorization_code")
+	key6 := generateTokenKey("pingone", "prod", "env1", "client1", "authorization_code")
 	if key1 == key6 {
 		t.Error("Different grant types should produce different keys")
+	}
+
+	// Different services should produce different keys
+	key7 := generateTokenKey("pingfederate", "prod", "env1", "client1", "device_code")
+	if key1 == key7 {
+		t.Error("Different services should produce different keys")
 	}
 }

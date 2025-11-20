@@ -7,6 +7,8 @@ tool (
 	github.com/pavius/impi/cmd/impi
 )
 
+replace github.com/pingidentity/pingone-go-client => ../pingone-go-client
+
 require (
 	github.com/fatih/color v1.18.0
 	github.com/hashicorp/go-hclog v1.6.3
@@ -22,7 +24,6 @@ require (
 	github.com/patrickcping/pingone-go-sdk-v2/management v0.61.0
 	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.2
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.21.0
-	github.com/pingidentity/pingfederate-go-client/v1220 v1220.0.0
 	github.com/pingidentity/pingfederate-go-client/v1230 v1230.0.3
 	github.com/pingidentity/pingone-go-client v0.2.0
 	github.com/rs/zerolog v1.34.0
@@ -30,7 +31,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
 	golang.org/x/mod v0.29.0
-	golang.org/x/oauth2 v0.31.0
+	golang.org/x/oauth2 v0.32.0
 	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
 	gopkg.in/yaml.v3 v3.0.1
@@ -39,6 +40,7 @@ require (
 require (
 	4d63.com/gocheckcompilerdirectives v1.3.0 // indirect
 	4d63.com/gochecknoglobals v0.2.2 // indirect
+	al.essio.dev/pkg/shellescape v1.5.1 // indirect
 	codeberg.org/chavacava/garif v0.2.0 // indirect
 	github.com/4meepo/tagalign v1.4.2 // indirect
 	github.com/Abirdcfly/dupword v0.1.6 // indirect
@@ -82,6 +84,7 @@ require (
 	github.com/ckaznocha/intrange v0.3.1 // indirect
 	github.com/curioswitch/go-reassign v0.3.0 // indirect
 	github.com/daixiang0/gci v0.13.6 // indirect
+	github.com/danieljoos/wincred v1.2.2 // indirect
 	github.com/dave/dst v0.27.3 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/denis-tingaikin/go-header v0.5.0 // indirect
@@ -103,6 +106,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.4.0 // indirect
 	github.com/go-xmlfmt/xmlfmt v1.1.3 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
+	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gofrs/flock v0.12.1 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golangci/dupl v0.0.0-20250308024227-f665c8d69b32 // indirect
@@ -116,7 +120,6 @@ require (
 	github.com/golangci/swaggoswag v0.0.0-20250504205917-77f2aca3143e // indirect
 	github.com/golangci/unconvert v0.0.0-20250410112200-a129a6e6413e // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gordonklaus/ineffassign v0.1.0 // indirect
 	github.com/gostaticanalysis/analysisutil v0.7.1 // indirect
 	github.com/gostaticanalysis/comment v1.5.0 // indirect
@@ -133,7 +136,6 @@ require (
 	github.com/jjti/go-spancheck v0.6.5 // indirect
 	github.com/julz/importas v0.2.0 // indirect
 	github.com/karamaru-alpha/copyloopvar v1.2.1 // indirect
-	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/kisielk/errcheck v1.9.0 // indirect
 	github.com/kisielk/gotool v1.0.0 // indirect
 	github.com/kkHAIKE/contextcheck v1.1.6 // indirect
@@ -222,6 +224,7 @@ require (
 	github.com/yagipy/maintidx v1.0.0 // indirect
 	github.com/yeya24/promlinter v0.3.0 // indirect
 	github.com/ykadowak/zerologlint v0.1.5 // indirect
+	github.com/zalando/go-keyring v0.2.6 // indirect
 	gitlab.com/bosi/decorder v0.4.2 // indirect
 	go-simpler.org/musttag v0.13.1 // indirect
 	go-simpler.org/sloglint v0.11.1 // indirect

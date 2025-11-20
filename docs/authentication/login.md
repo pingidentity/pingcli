@@ -18,6 +18,11 @@ pingcli login [flags]
 - `-a, --auth-code` - Use authorization code flow (requires browser)
 - `-c, --client-credentials` - Use client credentials flow (for automation)
 
+### Provider Selection
+- `-p, --provider` - Target authentication provider (default: `pingone`)
+  - Currently only `pingone` is supported
+  - Future versions will support multiple providers
+
 ### Storage Options
 - `--file-storage` - Use only file storage (skip keychain).
 
@@ -108,8 +113,11 @@ pingcli config set service.pingone.regionCode=NA
 pingcli config set service.pingone.authentication.deviceCode.clientID=abc123
 pingcli config set service.pingone.authentication.deviceCode.environmentID=env456
 
-# Login
+# Login (--provider defaults to pingone)
 pingcli login --device-code
+
+# Explicitly specify provider
+pingcli login --device-code --provider pingone
 ```
 
 ### CI/CD Pipeline

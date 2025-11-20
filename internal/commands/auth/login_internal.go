@@ -36,43 +36,57 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	// Determine desired authentication method
-	deviceCodeStr, _ := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
-	clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
-	authorizationCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
+	provider, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(provider) == "" {
+		// Default to pingone if no provider is specified
+		provider = customtypes.ENUM_AUTH_PROVIDER_PINGONE
+	}
 
-	flagProvided := deviceCodeStr == "true" || clientCredentialsStr == "true" || authorizationCodeStr == "true"
+	switch provider {
+	case customtypes.ENUM_AUTH_PROVIDER_PINGONE:
+		// Determine desired authentication method
+		deviceCodeStr, _ := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
+		clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
+		authorizationCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
 
-	// If no flag was provided, check if authentication type is configured
-	var authType string
-	if !flagProvided {
-		authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
-		if err != nil || strings.TrimSpace(authType) == "" {
-			// No authentication type configured - run interactive setup
-			if err := RunInteractiveAuthConfig(os.Stdin); err != nil {
-				return &errs.PingCLIError{
-					Prefix: loginErrorPrefix,
-					Err:    err,
+		flagProvided := deviceCodeStr == "true" || clientCredentialsStr == "true" || authorizationCodeStr == "true"
+
+		// If no flag was provided, check if authentication type is configured
+		var authType string
+		if !flagProvided {
+			authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+			if err != nil || strings.TrimSpace(authType) == "" {
+				// No authentication type configured - run interactive setup
+				if err := RunInteractiveAuthConfig(os.Stdin); err != nil {
+					return &errs.PingCLIError{
+						Prefix: loginErrorPrefix,
+						Err:    err,
+					}
 				}
+				// After interactive setup, authType will be determined from the switch statement below
 			}
-			// After interactive setup, authType will be determined from the switch statement below
 		}
-	}
 
-	// Determine which authentication method was requested and convert to auth type format
-	switch {
-	case deviceCodeStr == "true":
-		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
-	case clientCredentialsStr == "true":
-		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
+		// Determine which authentication method was requested and convert to auth type format
+		switch {
+		case deviceCodeStr == "true":
+			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
+		case clientCredentialsStr == "true":
+			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
+		default:
+			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
+		}
+
+		// Perform login based on auth type
+		err = performLoginByConfiguredType(ctx, authType, profileName)
+		if err != nil {
+			return err
+		}
 	default:
-		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
-	}
-
-	// Perform login based on auth type
-	err = performLoginByConfiguredType(ctx, authType, profileName)
-	if err != nil {
-		return err
+		return &errs.PingCLIError{
+			Prefix: loginErrorPrefix,
+			Err:    ErrInvalidAuthProvider,
+		}
 	}
 
 	return nil

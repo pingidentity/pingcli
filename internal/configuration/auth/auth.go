@@ -14,6 +14,7 @@ func InitAuthOptions() {
 	initAuthMethodClientCredentialsOption()
 	initAuthMethodAuthorizationCodeOption()
 	initAuthFileStorageOption()
+	initAuthProviderOption()
 }
 
 // initAuthMethodDeviceCodeOption initializes the --device-code authentication method flag
@@ -109,5 +110,28 @@ func initAuthFileStorageOption() {
 		Sensitive: false,
 		Type:      options.BOOL,
 		KoanfKey:  "auth.fileStorage",
+	}
+}
+
+// initAuthProviderOption initializes the --provider flag for specifying which provider to authenticate with
+func initAuthProviderOption() {
+	cobraParamName := "provider"
+	cobraValue := new(customtypes.AuthProvider)
+	defaultValue := customtypes.AuthProvider(customtypes.ENUM_AUTH_PROVIDER_PINGONE)
+
+	options.AuthProviderOption = options.Option{
+		CobraParamName:  cobraParamName,
+		CobraParamValue: cobraValue,
+		DefaultValue:    &defaultValue,
+		EnvVar:          "", // No environment variable
+		Flag: &pflag.Flag{
+			Name:      cobraParamName,
+			Shorthand: "p",
+			Usage:     "Authentication provider to use. Defaults to 'pingone' if not specified.",
+			Value:     cobraValue,
+		},
+		Sensitive: false,
+		Type:      options.STRING,
+		KoanfKey:  "", // No koanf key
 	}
 }

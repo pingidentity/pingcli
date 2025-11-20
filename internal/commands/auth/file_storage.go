@@ -160,10 +160,10 @@ func clearTokenFromFile(authMethod string) error {
 	return nil
 }
 
-// clearAllTokenFilesForGrantType removes all token files for a specific grant type and profile
+// clearAllTokenFilesForGrantType removes all token files for a specific provider, grant type and profile
 // This handles cleanup of tokens from old configurations (e.g., when client ID or environment ID changes)
-// Pattern: token-*_{grantType}_{profile}.json
-func clearAllTokenFilesForGrantType(grantType, profileName string) error {
+// Pattern: token-*_{service}_{grantType}_{profile}.json
+func clearAllTokenFilesForGrantType(providerName, grantType, profileName string) error {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		return &errs.PingCLIError{
@@ -189,22 +189,25 @@ func clearAllTokenFilesForGrantType(grantType, profileName string) error {
 		}
 	}
 
-	// Default profile name if empty
+	// Default values if empty
+	if providerName == "" {
+		providerName = "pingone"
+	}
 	if profileName == "" {
 		profileName = "default"
 	}
 
 	var errList []error
-	// Look for files matching pattern: token-*_{grantType}_{profile}.json
-	// Example: token-a1b2c3d4e5f6g7h8_device_code_production.json
-	suffix := fmt.Sprintf("_%s_%s.json", grantType, profileName)
+	// Look for files matching pattern: token-*_{service}_{grantType}_{profile}.json
+	// Example: token-a1b2c3d4e5f6g7h8_pingone_device_code_production.json
+	suffix := fmt.Sprintf("_%s_%s_%s.json", providerName, grantType, profileName)
 
 	for _, file := range files {
 		if file.IsDir() {
 			continue
 		}
 
-		// Check if filename matches the pattern for this grant type and profile
+		// Check if filename matches the pattern for this provider, grant type and profile
 		if filepath.Ext(file.Name()) == ".json" && len(file.Name()) > len(suffix) {
 			if file.Name()[len(file.Name())-len(suffix):] == suffix {
 				filePath := filepath.Join(credentialsDir, file.Name())

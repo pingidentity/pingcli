@@ -8,9 +8,11 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingone-go-client/config"
@@ -68,24 +70,24 @@ func getStorageType() config.StorageType {
 	return config.StorageTypeNone
 }
 
-// generateTokenKey generates a unique token key based on environmentID, clientID, and grantType
-// Format: token-<hash>_<grantType>_<profile>.json
-// The hash is based on environmentID:clientID:grantType for uniqueness
-// Profile name is added as a suffix to enable cleanup of tokens for the current profile
-func generateTokenKey(profileName, environmentID, clientID, grantType string) string {
-	if environmentID == "" || clientID == "" || grantType == "" {
+// generateTokenKey generates a unique token key based on provider, environmentID, clientID, and grantType
+// Format: token-<hash>_<service>_<grantType>_<profile>.json
+// The hash is based on service:environmentID:clientID:grantType for uniqueness
+// Service and profile name are added as suffixes to enable service-specific token management and cleanup
+func generateTokenKey(providerName, profileName, environmentID, clientID, grantType string) string {
+	if providerName == "" || environmentID == "" || clientID == "" || grantType == "" {
 		return ""
 	}
 
-	// Hash environment + client + grant type for uniqueness
-	hash := sha256.Sum256([]byte(fmt.Sprintf("%s:%s:%s", environmentID, clientID, grantType)))
+	// Hash service + environment + client + grant type for uniqueness
+	hash := sha256.Sum256([]byte(fmt.Sprintf("%s:%s:%s:%s", providerName, environmentID, clientID, grantType)))
 
 	// Add profile name as suffix (default to "default" if empty)
 	if profileName == "" {
 		profileName = "default"
 	}
 
-	return fmt.Sprintf("token-%x_%s_%s", hash[:8], grantType, profileName)
+	return fmt.Sprintf("token-%x_%s_%s_%s", hash[:8], providerName, grantType, profileName)
 }
 
 // StorageLocation indicates where credentials were saved
@@ -367,7 +369,11 @@ func ClearToken() error {
 		if err != nil {
 			profileName = "default" // Fallback to default if we can't get profile name
 		}
-		if err := clearAllTokenFilesForGrantType(grantTypeStr, profileName); err != nil {
+		providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+		if err != nil || providerName == "" {
+			providerName = "pingone" // Default to pingone
+		}
+		if err := clearAllTokenFilesForGrantType(providerName, grantTypeStr, profileName); err != nil {
 			errs = append(errs, err)
 		}
 	}
@@ -431,6 +437,11 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 		profileName = "default"
 	}
 
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || providerName == "" {
+		providerName = "pingone" // Default to pingone
+	}
+
 	// Try all grant types to make sure we clean up
 	grantTypes := []string{
 		string(svcOAuth2.GrantTypeDeviceCode),
@@ -439,7 +450,7 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 	}
 
 	for _, grantType := range grantTypes {
-		if err := clearAllTokenFilesForGrantType(grantType, profileName); err != nil {
+		if err := clearAllTokenFilesForGrantType(providerName, grantType, profileName); err != nil {
 			// Don't fail the whole operation if cleanup fails
 			errList = append(errList, fmt.Errorf("failed to clear all %s tokens: %w", grantType, err))
 		}
@@ -464,6 +475,12 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		profileName = "default" // Fallback to default if we can't get profile name
 	}
 
+	// Get service name for token key generation
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
+	}
+
 	// Get client ID for token key generation
 	clientID := ""
 	if cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
@@ -479,8 +496,8 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	// Set grant type to device code
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeDeviceCode)
 
-	// Generate unique token key based on profile and configuration
-	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeDeviceCode))
+	// Generate unique token key based on provider, profile and configuration
+	tokenKey := generateTokenKey(providerName, profileName, environmentID, clientID, string(svcOAuth2.GrantTypeDeviceCode))
 	if tokenKey == "" {
 		// Fallback to simple key if generation fails
 		tokenKey = deviceCodeTokenKey
@@ -527,7 +544,7 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 
 	// Clean up old token files for this grant type and profile (in case configuration changed)
 	// Ignore errors from cleanup - we still want to save the new token
-	_ = clearAllTokenFilesForGrantType(string(svcOAuth2.GrantTypeDeviceCode), profileName)
+	_ = clearAllTokenFilesForGrantType(providerName, string(svcOAuth2.GrantTypeDeviceCode), profileName)
 
 	// Save token using our own storage logic (handles both file and keychain based on flags)
 	location, err := SaveTokenForMethod(token, tokenKey)
@@ -617,6 +634,12 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 		profileName = "default" // Fallback to default if we can't get profile name
 	}
 
+	// Get service name for token key generation
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
+	}
+
 	// Get client ID for token key generation
 	clientID := ""
 	if cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
@@ -632,8 +655,8 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 	// Set grant type to authorization code
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeAuthorizationCode)
 
-	// Generate unique token key based on profile and configuration
-	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeAuthorizationCode))
+	// Generate unique token key based on provider, profile and configuration
+	tokenKey := generateTokenKey(providerName, profileName, environmentID, clientID, string(svcOAuth2.GrantTypeAuthorizationCode))
 	if tokenKey == "" {
 		// Fallback to simple key if generation fails
 		tokenKey = authorizationCodeTokenKey
@@ -680,7 +703,7 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 
 	// Clean up old token files for this grant type and profile (in case configuration changed)
 	// Ignore errors from cleanup - we still want to save the new token
-	_ = clearAllTokenFilesForGrantType(string(svcOAuth2.GrantTypeAuthorizationCode), profileName)
+	_ = clearAllTokenFilesForGrantType(providerName, string(svcOAuth2.GrantTypeAuthorizationCode), profileName)
 
 	// Save token using our own storage logic (handles both file and keychain based on flags)
 	location, err := SaveTokenForMethod(token, tokenKey)
@@ -809,6 +832,12 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 		profileName = "default" // Fallback to default if we can't get profile name
 	}
 
+	// Get service name for token key generation
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
+	}
+
 	// Get configuration values for token key generation
 	clientID := ""
 	if cfg.Auth.ClientCredentials != nil {
@@ -824,8 +853,8 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 	// Set grant type to client credentials
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeClientCredentials)
 
-	// Generate unique token key based on profile and configuration
-	tokenKey := generateTokenKey(profileName, environmentID, clientID, string(svcOAuth2.GrantTypeClientCredentials))
+	// Generate unique token key based on provider, profile and configuration
+	tokenKey := generateTokenKey(providerName, profileName, environmentID, clientID, string(svcOAuth2.GrantTypeClientCredentials))
 	if tokenKey == "" {
 		// Fallback to simple key if generation fails
 		tokenKey = clientCredentialsTokenKey
@@ -872,7 +901,7 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 
 	// Clean up old token files for this grant type and profile (in case configuration changed)
 	// Ignore errors from cleanup - we still want to save the new token
-	_ = clearAllTokenFilesForGrantType(string(svcOAuth2.GrantTypeClientCredentials), profileName)
+	_ = clearAllTokenFilesForGrantType(providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName)
 
 	// Save token using our own storage logic (handles both file and keychain based on flags)
 	location, err := SaveTokenForMethod(token, tokenKey)

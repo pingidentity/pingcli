@@ -27,13 +27,19 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		profileName = "current profile"
 	}
 
+	// Get service name for token key generation
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || providerName == "" {
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
+	}
+
 	if !flagProvided {
 		// No flag provided - clear ALL tokens (keychain and file storage)
 		if err := ClearToken(); err != nil {
 			return fmt.Errorf("failed to clear credentials: %w", err)
 		}
 
-		fmt.Printf("Successfully logged out from all authentication methods. All credentials cleared from storage for profile '%s'.\n", profileName)
+		fmt.Printf("Successfully logged out from all authentication methods for service '%s'. All credentials cleared from storage for profile '%s'.\n", providerName, profileName)
 
 		return nil
 	}
@@ -76,7 +82,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		storageMsg = "storage"
 	}
 
-	fmt.Printf("Successfully logged out from %s authentication. Credentials cleared from %s for profile '%s'.\n", authType, storageMsg, profileName)
+	fmt.Printf("Successfully logged out from %s authentication for service '%s'. Credentials cleared from %s for profile '%s'.\n", authType, providerName, storageMsg, profileName)
 
 	return nil
 }

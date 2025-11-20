@@ -56,6 +56,7 @@ func Options() []Option {
 		AuthMethodClientCredentialsOption,
 		AuthMethodDeviceCodeOption,
 		AuthFileStorageOption,
+		AuthProviderOption,
 
 		LicenseProductOption,
 		LicenseVersionOption,
@@ -140,10 +141,11 @@ var (
 
 // 'pingcli login' command options
 var (
+	AuthFileStorageOption             Option
 	AuthMethodAuthorizationCodeOption Option
 	AuthMethodClientCredentialsOption Option
 	AuthMethodDeviceCodeOption        Option
-	AuthFileStorageOption             Option
+	AuthProviderOption                Option
 )
 
 // License options

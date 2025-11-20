@@ -15,7 +15,7 @@ var (
 	ErrValidatePingOneRegionCode    = errors.New("invalid pingone region code value")
 	ErrValidateString               = errors.New("invalid string value")
 	ErrValidateStringSlice          = errors.New("invalid string slice value")
-	ErrValidateAuthServices         = errors.New("invalid auth services value")
+	ErrValidateAuthProvider         = errors.New("invalid auth provider value")
 	ErrValidateExportServiceGroup   = errors.New("invalid export service group value")
 	ErrValidateExportServices       = errors.New("invalid export services value")
 	ErrValidateExportFormat         = errors.New("invalid export format value")
