@@ -68,13 +68,16 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 		}
 
 		// Determine which authentication method was requested and convert to auth type format
-		switch {
-		case deviceCodeStr == "true":
-			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
-		case clientCredentialsStr == "true":
-			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
-		default:
-			authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
+		// If flags were provided, they take precedence. Otherwise, preserve configured authType (including legacy 'worker').
+		if flagProvided {
+			switch {
+			case deviceCodeStr == "true":
+				authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
+			case clientCredentialsStr == "true":
+				authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
+			default:
+				authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
+			}
 		}
 
 		// Perform login based on auth type
@@ -106,6 +109,10 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 		selectedMethod = string(svcOAuth2.GrantTypeAuthorizationCode)
 		result, err = PerformAuthorizationCodeLogin(ctx)
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
+		selectedMethod = string(svcOAuth2.GrantTypeClientCredentials)
+		result, err = PerformClientCredentialsLogin(ctx)
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER:
+		// Legacy 'worker' type maps to client credentials flow
 		selectedMethod = string(svcOAuth2.GrantTypeClientCredentials)
 		result, err = PerformClientCredentialsLogin(ctx)
 	default:
