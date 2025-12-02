@@ -103,16 +103,39 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 
 	switch authType {
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
+		// Pre-validate configuration; if missing, run interactive setup for device_code
+		if _, cfgErr := GetDeviceCodeConfiguration(); cfgErr != nil {
+			if interr := RunInteractiveAuthConfigForType(os.Stdin, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE); interr != nil {
+				return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: cfgErr}
+			}
+		}
 		selectedMethod = string(svcOAuth2.GrantTypeDeviceCode)
 		result, err = PerformDeviceCodeLogin(ctx)
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+		// Pre-validate configuration; if missing, run interactive setup for authorization_code
+		if _, cfgErr := GetAuthorizationCodeConfiguration(); cfgErr != nil {
+			if interr := RunInteractiveAuthConfigForType(os.Stdin, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE); interr != nil {
+				return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: cfgErr}
+			}
+		}
 		selectedMethod = string(svcOAuth2.GrantTypeAuthorizationCode)
 		result, err = PerformAuthorizationCodeLogin(ctx)
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
+		// Pre-validate configuration; if missing, run interactive setup for client_credentials
+		if _, cfgErr := GetClientCredentialsConfiguration(); cfgErr != nil {
+			if interr := RunInteractiveAuthConfigForType(os.Stdin, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS); interr != nil {
+				return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: cfgErr}
+			}
+		}
 		selectedMethod = string(svcOAuth2.GrantTypeClientCredentials)
 		result, err = PerformClientCredentialsLogin(ctx)
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER:
 		// Legacy 'worker' type maps to client credentials flow
+		if _, cfgErr := GetClientCredentialsConfiguration(); cfgErr != nil {
+			if interr := RunInteractiveAuthConfigForType(os.Stdin, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS); interr != nil {
+				return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: cfgErr}
+			}
+		}
 		selectedMethod = string(svcOAuth2.GrantTypeClientCredentials)
 		result, err = PerformClientCredentialsLogin(ctx)
 	default:

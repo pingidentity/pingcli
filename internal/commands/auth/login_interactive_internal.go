@@ -609,6 +609,88 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 	return SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes)
 }
 
+// RunInteractiveAuthConfigForType runs interactive prompts for a specific auth type if it's not configured.
+// If it is configured and valid, it will simply set the auth type on the profile.
+func RunInteractiveAuthConfigForType(rc io.ReadCloser, desiredAuthType string) error {
+	// Normalize desired type to one of the known enums
+	validTypes := map[string]bool{
+		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE: true,
+		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:        true,
+		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS: true,
+	}
+	if !validTypes[desiredAuthType] {
+		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: fmt.Errorf("unsupported authentication type: %s", desiredAuthType)}
+	}
+
+	// Determine whether the requested type is configured
+	configStatus, err := getAuthMethodsConfigurationStatus()
+	if err != nil {
+		return err
+	}
+	isConfigured := configStatus[desiredAuthType]
+
+	if isConfigured {
+		// Validate that the existing configuration is complete
+		var validationErr error
+		switch desiredAuthType {
+		case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+			_, validationErr = GetAuthorizationCodeConfiguration()
+		case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
+			_, validationErr = GetDeviceCodeConfiguration()
+		case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
+			_, validationErr = GetClientCredentialsConfiguration()
+		}
+
+		if validationErr == nil {
+			return SaveAuthTypeOnly(desiredAuthType)
+		}
+		// Fall through to reconfigure if incomplete
+		output.Message(fmt.Sprintf("Existing %s configuration is incomplete: %v", desiredAuthType, validationErr), nil)
+		output.Message("Let's complete the configuration...", nil)
+	} else {
+		output.Message(fmt.Sprintf("%s is not configured. Let's set it up!", desiredAuthType), nil)
+	}
+
+	// Collect configuration for the desired type
+	var clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes string
+	switch desiredAuthType {
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
+		cfg, err := PromptForAuthorizationCodeConfig(rc)
+		if err != nil {
+			return err
+		}
+		clientID = cfg.ClientID
+		environmentID = cfg.EnvironmentID
+		regionCode = cfg.RegionCode
+		redirectURIPath = cfg.RedirectURIPath
+		redirectURIPort = cfg.RedirectURIPort
+		scopes = cfg.Scopes
+
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
+		cfg, err := PromptForDeviceCodeConfig(rc)
+		if err != nil {
+			return err
+		}
+		clientID = cfg.ClientID
+		environmentID = cfg.EnvironmentID
+		regionCode = cfg.RegionCode
+		scopes = cfg.Scopes
+
+	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
+		cfg, err := PromptForClientCredentialsConfig(rc)
+		if err != nil {
+			return err
+		}
+		clientID = cfg.ClientID
+		clientSecret = cfg.ClientSecret
+		environmentID = cfg.EnvironmentID
+		regionCode = cfg.RegionCode
+		scopes = cfg.Scopes
+	}
+
+	return SaveAuthConfigToProfile(desiredAuthType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes)
+}
+
 // PromptForReconfiguration asks the user if they want to reconfigure authentication
 func PromptForReconfiguration(rc io.ReadCloser) (bool, error) {
 	return input.RunPromptConfirm("Do you want to reconfigure authentication", rc)
