@@ -294,6 +294,8 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 				Err:    err,
 			}
 		}
+	case "worker":
+		cfg, err = GetWorkerConfiguration()
 		grantType = svcOAuth2.GrantTypeClientCredentials
 	default:
 		return nil, &errs.PingCLIError{
@@ -982,6 +984,56 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		cfg = cfg.WithClientCredentialsScopes(scopesList)
 	}
 
+	// Configure storage options based on --file-storage flag
+	cfg = cfg.WithStorageType(getStorageType()).
+		WithStorageName("pingcli")
+
+	// Apply region configuration
+	cfg, err = applyRegionConfiguration(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	return cfg, nil
+}
+
+// GetWorkerConfiguration builds a worker authentication configuration from the CLI profile options
+func GetWorkerConfiguration() (*config.Configuration, error) {
+	cfg := config.NewConfiguration()
+
+	// Get worker client ID
+	clientID, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if clientID == "" {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrWorkerClientIDNotConfigured,
+		}
+	}
+
+	// Get worker client secret
+	clientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if clientSecret == "" {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrWorkerClientSecretNotConfigured,
+		}
+	}
+
+	// Configure worker settings
+	cfg = cfg.WithClientCredentialsClientID(clientID).
+		WithClientCredentialsClientSecret(clientSecret)
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).
 		WithStorageName("pingcli")

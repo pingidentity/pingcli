@@ -32,6 +32,11 @@ var (
 	ErrClientCredentialsClientSecretNotConfigured  = errors.New("client credentials client secret is not configured. Please run 'pingcli config set service.pingone.authentication.clientCredentials.clientSecret=<your-client-secret>'")
 	ErrClientCredentialsEnvironmentIDNotConfigured = errors.New("client credentials environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.clientCredentials.environmentID=<your-env-id>'")
 
+	// Worker errors
+	ErrWorkerClientIDNotConfigured      = errors.New("worker client ID is not configured. Please run 'pingcli config set service.pingone.authentication.worker.clientID=<your-client-id>'")
+	ErrWorkerClientSecretNotConfigured  = errors.New("worker client secret is not configured. Please run 'pingcli config set service.pingone.authentication.worker.clientSecret=<your-client-secret>'")
+	ErrWorkerEnvironmentIDNotConfigured = errors.New("worker environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.worker.environmentID=<your-env-id>'")
+
 	// PingFederate errors
 	ErrPingFederateContextNil  = errors.New("failed to initialize PingFederate services. context is nil")
 	ErrPingFederateCACertParse = errors.New("failed to parse CA certificate PEM file to certificate pool")
