@@ -63,7 +63,14 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 						Err:    err,
 					}
 				}
-				// After interactive setup, authType will be determined from the switch statement below
+				// Reload auth type from profile after interactive setup
+				authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+				if err != nil || strings.TrimSpace(authType) == "" {
+					return &errs.PingCLIError{
+						Prefix: loginErrorPrefix,
+						Err:    ErrInvalidAuthType,
+					}
+				}
 			}
 		}
 
@@ -80,7 +87,10 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 			}
 		}
 
-		// Perform login based on auth type
+		// Perform login based on auth type (ensure not empty)
+		if strings.TrimSpace(authType) == "" {
+			return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: ErrInvalidAuthType}
+		}
 		err = performLoginByConfiguredType(ctx, authType, profileName)
 		if err != nil {
 			return err
