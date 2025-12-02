@@ -26,10 +26,64 @@ var (
 	loginInteractiveErrorPrefix = "failed to configure authentication"
 )
 
+// getRegionOptions returns display strings for region selection
+func getRegionOptions() []string {
+	return []string{
+		"AP - Asia-Pacific (.asia)",
+		"AU - Australia (.com.au)",
+		"CA - Canada (.ca)",
+		"EU - Europe (.eu)",
+		"NA - North America (.com)",
+		"SG - Singapore (.sg)",
+	}
+}
+
+// mapDisplayToRegionCode maps display string to region code
+func mapDisplayToRegionCode(display string) string {
+	if strings.HasPrefix(display, "AP ") {
+		return "AP"
+	}
+	if strings.HasPrefix(display, "AU ") {
+		return "AU"
+	}
+	if strings.HasPrefix(display, "CA ") {
+		return "CA"
+	}
+	if strings.HasPrefix(display, "EU ") {
+		return "EU"
+	}
+	if strings.HasPrefix(display, "NA ") {
+		return "NA"
+	}
+	if strings.HasPrefix(display, "SG ") {
+		return "SG"
+	}
+	return ""
+}
+
+// PromptForRegionCode prompts the user to select a PingOne region code
+func PromptForRegionCode(rc io.ReadCloser) (string, error) {
+	options := getRegionOptions()
+	selected, err := input.RunPromptSelect(
+		"Select PingOne region",
+		options,
+		rc,
+	)
+	if err != nil {
+		return "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	code := mapDisplayToRegionCode(selected)
+	if code == "" {
+		return "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: fmt.Errorf("invalid region selection")}
+	}
+	return code, nil
+}
+
 // AuthorizationCodeConfig holds the configuration for authorization code authentication
 type AuthorizationCodeConfig struct {
 	ClientID        string
 	EnvironmentID   string
+	RegionCode      string
 	RedirectURIPath string
 	RedirectURIPort string
 	Scopes          string
@@ -39,6 +93,7 @@ type AuthorizationCodeConfig struct {
 type DeviceCodeConfig struct {
 	ClientID      string
 	EnvironmentID string
+	RegionCode    string
 	Scopes        string
 }
 
@@ -47,6 +102,7 @@ type ClientCredentialsConfig struct {
 	ClientID      string
 	ClientSecret  string
 	EnvironmentID string
+	RegionCode    string
 	Scopes        string
 }
 
@@ -139,6 +195,13 @@ func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfi
 		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 	config.EnvironmentID = environmentID
+
+	// Region Code (required)
+	regionCode, err := PromptForRegionCode(rc)
+	if err != nil {
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	config.RegionCode = regionCode
 
 	// Redirect URI Path (required)
 	output.Message(fmt.Sprintf("Redirect URI path (press Enter for default: %s)", defaultRedirectURIPath), nil)
@@ -248,6 +311,13 @@ func PromptForDeviceCodeConfig(rc io.ReadCloser) (*DeviceCodeConfig, error) {
 	}
 	config.EnvironmentID = environmentID
 
+	// Region Code (required)
+	regionCode, err := PromptForRegionCode(rc)
+	if err != nil {
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	config.RegionCode = regionCode
+
 	// Scopes (optional)
 	output.Message("Scopes (optional, comma-separated)", nil)
 	scopes, err := input.RunPrompt(
@@ -318,6 +388,13 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (*ClientCredentialsConfi
 	}
 	config.EnvironmentID = environmentID
 
+	// Region Code (required)
+	regionCode, err := PromptForRegionCode(rc)
+	if err != nil {
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	config.RegionCode = regionCode
+
 	// Scopes (optional)
 	output.Message("Scopes (optional, comma-separated)", nil)
 	scopes, err := input.RunPrompt(
@@ -334,7 +411,7 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (*ClientCredentialsConfi
 }
 
 // SaveAuthConfigToProfile saves the authentication configuration to the active profile
-func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, redirectURIPath, redirectURIport, scopes string) error {
+func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIport, scopes string) error {
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
@@ -353,6 +430,13 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 	// Set the authentication type
 	if err = subKoanf.Set(options.PingOneAuthenticationTypeOption.KoanfKey, authType); err != nil {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+
+	// Save region code for the profile
+	if regionCode != "" {
+		if err = subKoanf.Set(options.PingOneRegionCodeOption.KoanfKey, regionCode); err != nil {
+			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		}
 	}
 
 	// Save type-specific configuration
@@ -483,7 +567,7 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		}
 	}
 
-	var clientID, clientSecret, environmentID, redirectURIPath, redirectURIPort, scopes string
+	var clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes string
 
 	// Step 3: Collect configuration based on selected type
 	switch authType {
@@ -494,6 +578,7 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		}
 		clientID = authorizationCodeConfig.ClientID
 		environmentID = authorizationCodeConfig.EnvironmentID
+		regionCode = authorizationCodeConfig.RegionCode
 		redirectURIPath = authorizationCodeConfig.RedirectURIPath
 		redirectURIPort = authorizationCodeConfig.RedirectURIPort
 		scopes = authorizationCodeConfig.Scopes
@@ -505,6 +590,7 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		}
 		clientID = deviceCodeConfig.ClientID
 		environmentID = deviceCodeConfig.EnvironmentID
+		regionCode = deviceCodeConfig.RegionCode
 		scopes = deviceCodeConfig.Scopes
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
@@ -515,11 +601,12 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		clientID = clientCredentialsConfig.ClientID
 		clientSecret = clientCredentialsConfig.ClientSecret
 		environmentID = clientCredentialsConfig.EnvironmentID
+		regionCode = clientCredentialsConfig.RegionCode
 		scopes = clientCredentialsConfig.Scopes
 	}
 
 	// Step 4: Save configuration to profile
-	return SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, redirectURIPath, redirectURIPort, scopes)
+	return SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes)
 }
 
 // PromptForReconfiguration asks the user if they want to reconfigure authentication
