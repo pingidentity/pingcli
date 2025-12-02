@@ -394,6 +394,10 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 		if err = subKoanf.Set(options.PingOneAuthenticationClientCredentialsClientSecretOption.KoanfKey, clientSecret); err != nil {
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
+		if err = subKoanf.Set(options.PingOneAuthenticationAPIEnvironmentIDOption.KoanfKey, environmentID); err != nil {
+			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		}
+
 		if scopes != "" {
 			if err = subKoanf.Set(options.PingOneAuthenticationClientCredentialsScopesOption.KoanfKey, scopes); err != nil {
 				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
