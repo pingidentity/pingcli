@@ -294,6 +294,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 				Err:    err,
 			}
 		}
+		grantType = svcOAuth2.GrantTypeClientCredentials
 	case "worker":
 		cfg, err = GetWorkerConfiguration()
 		grantType = svcOAuth2.GrantTypeClientCredentials
