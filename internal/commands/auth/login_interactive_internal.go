@@ -432,6 +432,11 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
+	// Set the environment ID
+	if err = subKoanf.Set(options.PingOneAuthenticationAPIEnvironmentIDOption.KoanfKey, environmentID); err != nil {
+		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+
 	// Save region code for the profile
 	if regionCode != "" {
 		if err = subKoanf.Set(options.PingOneRegionCodeOption.KoanfKey, regionCode); err != nil {
@@ -476,9 +481,6 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
 		if err = subKoanf.Set(options.PingOneAuthenticationClientCredentialsClientSecretOption.KoanfKey, clientSecret); err != nil {
-			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-		}
-		if err = subKoanf.Set(options.PingOneAuthenticationAPIEnvironmentIDOption.KoanfKey, environmentID); err != nil {
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
 
