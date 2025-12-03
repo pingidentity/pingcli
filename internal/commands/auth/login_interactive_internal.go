@@ -259,7 +259,6 @@ func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfi
 	config.RedirectURIPort = redirectURIPort
 
 	// Scopes (optional)
-	output.Message("Scopes (optional, space-separated)", nil)
 	scopes, err := input.RunPrompt(
 		"Scopes",
 		nil, // No validation - optional
@@ -319,7 +318,6 @@ func PromptForDeviceCodeConfig(rc io.ReadCloser) (*DeviceCodeConfig, error) {
 	config.RegionCode = regionCode
 
 	// Scopes (optional)
-	output.Message("Scopes (optional, comma-separated)", nil)
 	scopes, err := input.RunPrompt(
 		"Scopes",
 		nil, // No validation - optional
@@ -396,7 +394,6 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (*ClientCredentialsConfi
 	config.RegionCode = regionCode
 
 	// Scopes (optional)
-	output.Message("Scopes (optional, comma-separated)", nil)
 	scopes, err := input.RunPrompt(
 		"Scopes",
 		nil, // No validation - optional
@@ -496,7 +493,7 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
-	output.Success(fmt.Sprintf("Authentication configuration saved to profile '%s'", profileName), nil)
+	output.Message(fmt.Sprintf("Authentication configuration saved to profile '%s'", profileName), nil)
 
 	return nil
 }
@@ -784,7 +781,7 @@ func SaveAuthTypeOnly(authType string) error {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
-	output.Success(fmt.Sprintf("Authentication type set to '%s' for profile '%s'", authType, profileName), nil)
+	output.Message(fmt.Sprintf("Authentication type set to '%s' for profile '%s'", authType, profileName), nil)
 
 	return nil
 }
