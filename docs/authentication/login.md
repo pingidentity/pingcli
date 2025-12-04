@@ -2,6 +2,65 @@
 
 Authenticate the CLI with PingOne using OAuth2 flows.
 
+## Prerequisites: Configure a PingOne Application
+
+Before running `pingcli login`, configure a PingOne application for the grant type you intend to use. PingCLI supports:
+
+- client_credentials (recommended for service/automation; legacy `worker` maps to this)
+- authorization_code (interactive browser login)
+- device_code (interactive terminal login on headless environments)
+
+See the PingOne Platform API documentation to manage applications:
+- Application operations: https://apidocs.pingidentity.com/pingone/platform/v1/api/#application-operations
+
+### Client credentials (Worker)
+
+Configure your PingOne application to support `client_credentials`:
+- Enable grant type: `client_credentials`
+- Create Client ID and Client Secret
+- Assign roles/scopes for PingOne Management API access (e.g., `p1:read:*` or resource-specific scopes)
+
+Collect for PingCLI:
+- Environment ID (the environment containing the application)
+- Client ID
+- Client Secret
+- Optional scopes (space- or comma-separated)
+
+PingCLI notes:
+- Auth type `worker` is applied as `client_credentials` under the hood
+- No refresh token is issued for `client_credentials`
+
+### Authorization code
+
+Configure your PingOne application to support `authorization_code`:
+- Enable grant type: `authorization_code`
+- Set redirect URI(s). PingCLI defaults to `http://localhost:<port><path>` with path `/callback` and port `8085` (customizable in CLI)
+- Create Client ID
+- Optional scopes (e.g., `openid profile p1:read:*`)
+
+Collect for PingCLI:
+- Environment ID
+- Client ID
+- Redirect URI path (e.g., `/callback`)
+- Redirect URI port (e.g., `8085`)
+- Optional scopes
+
+### Device code
+
+Configure your PingOne application to support device code:
+- Enable grant type: `urn:ietf:params:oauth:grant-type:device_code`
+- Create Client ID
+- Optional scopes (e.g., `openid p1:read:*`)
+
+Collect for PingCLI:
+- Environment ID
+- Client ID
+- Optional scopes
+
+### Region selection
+
+PingCLI prompts for your PingOne region and uses it to route API requests. Supported codes: `AP`, `AU`, `CA`, `EU`, `NA`, `SG`.
+
 ## Synopsis
 
 Login using one of three supported OAuth2 authentication flows. The CLI will securely store tokens for subsequent API calls.

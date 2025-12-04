@@ -146,8 +146,15 @@ func runInternalPingOneRequest(uri string) (err error) {
 	}
 
 	fields := map[string]any{
-		"response": json.RawMessage(body),
-		"status":   res.StatusCode,
+		"status": res.StatusCode,
+	}
+
+	// Include response if present; for 204 No Content on DELETE, there is no body
+	if len(body) > 0 {
+		fields["response"] = json.RawMessage(body)
+	} else if httpMethod == customtypes.ENUM_HTTP_METHOD_DELETE && res.StatusCode == http.StatusNoContent {
+		// Provide a clear success message for DELETE 204 responses
+		fields["message"] = "Resource deleted successfully (no content returned)"
 	}
 
 	if res.StatusCode < 200 || res.StatusCode >= 300 {
@@ -159,7 +166,12 @@ func runInternalPingOneRequest(uri string) (err error) {
 			return nil
 		}
 	} else {
-		output.Success("Custom request successful", fields)
+		// Tailor success title for DELETE 204 cases
+		if httpMethod == customtypes.ENUM_HTTP_METHOD_DELETE && res.StatusCode == http.StatusNoContent {
+			output.Success("Delete request successful", fields)
+		} else {
+			output.Success("Custom request successful", fields)
+		}
 	}
 
 	return nil

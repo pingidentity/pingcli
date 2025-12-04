@@ -613,6 +613,18 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).WithStorageName("pingcli")
 
+	// Apply Environment ID for consistent token key generation and endpoints
+	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(environmentID) != "" {
+		cfg = cfg.WithEnvironmentID(environmentID)
+	}
+
 	// Apply region configuration
 	cfg, err = applyRegionConfiguration(cfg)
 	if err != nil {
@@ -811,6 +823,18 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithStorageType(getStorageType()).
 		WithStorageName("pingcli")
 
+	// Apply Environment ID for consistent token key generation and endpoints
+	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(environmentID) != "" {
+		cfg = cfg.WithEnvironmentID(environmentID)
+	}
+
 	// Apply region configuration
 	cfg, err = applyRegionConfiguration(cfg)
 	if err != nil {
@@ -988,6 +1012,18 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).
 		WithStorageName("pingcli")
+
+	// Apply Environment ID for consistent token key generation and endpoints
+	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(environmentID) != "" {
+		cfg = cfg.WithEnvironmentID(environmentID)
+	}
 
 	// Apply region configuration
 	cfg, err = applyRegionConfiguration(cfg)
