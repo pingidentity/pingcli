@@ -15,18 +15,28 @@ var (
 )
 
 func RunPrompt(message string, validateFunc func(string) error, rc io.ReadCloser) (string, error) {
-	p := promptui.Prompt{
-		Label:    message,
-		Validate: validateFunc,
-		Stdin:    rc,
-	}
+	// Submit-only validation: run prompt without live Validate, then validate after submit.
+	for {
+		p := promptui.Prompt{
+			Label: message,
+			Stdin: rc,
+		}
 
-	userInput, err := p.Run()
-	if err != nil {
-		return "", &errs.PingCLIError{Prefix: inputPromptErrorPrefix, Err: err}
-	}
+		userInput, err := p.Run()
+		if err != nil {
+			return "", &errs.PingCLIError{Prefix: inputPromptErrorPrefix, Err: err}
+		}
 
-	return userInput, nil
+		if validateFunc != nil {
+			if vErr := validateFunc(userInput); vErr != nil {
+				//nolint:all
+				_ = vErr
+				continue
+			}
+		}
+
+		return userInput, nil
+	}
 }
 
 func RunPromptConfirm(message string, rc io.ReadCloser) (bool, error) {
