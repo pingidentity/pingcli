@@ -31,14 +31,11 @@ The following parameters can be configured in Ping CLI's static configuration fi
 | service.pingOne.authentication.authCode.clientID | ENUM_STRING | | The authorization code client ID used to authenticate to the PingOne management API when using OAuth 2.0 authorization code flow. |
 | service.pingOne.authentication.authCode.environmentID | ENUM_UUID | | The ID of the PingOne environment that contains the authorization code client used to authenticate to the PingOne management API. |
 | service.pingOne.authentication.authCode.redirectURI | ENUM_STRING | | The redirect URI configured for the authorization code client application.<br><br>Example: `http://localhost:8080/callback` |
-| service.pingOne.authentication.authCode.scopes | ENUM_STRING_SLICE | | The OAuth scopes requested when using authorization code flow.<br><br>Accepts a comma-separated string to delimit multiple scopes.<br><br>Example: `openid,profile` |
 | service.pingOne.authentication.clientCredentials.clientID | ENUM_STRING | | The client credentials client ID used to authenticate to the PingOne management API when using OAuth 2.0 client credentials flow. |
 | service.pingOne.authentication.clientCredentials.clientSecret | ENUM_STRING | | The client credentials client secret used to authenticate to the PingOne management API when using OAuth 2.0 client credentials flow. |
 | service.pingOne.authentication.clientCredentials.environmentID | ENUM_UUID | | The ID of the PingOne environment that contains the client credentials application used to authenticate to the PingOne management API. |
-| service.pingOne.authentication.clientCredentials.scopes | ENUM_STRING_SLICE | | The OAuth scopes requested when using client credentials flow.<br><br>Accepts a comma-separated string to delimit multiple scopes.<br><br>Example: `p1:read:*,p1:update:*` |
 | service.pingOne.authentication.deviceCode.clientID | ENUM_STRING | | The device code client ID used to authenticate to the PingOne management API when using OAuth 2.0 device code flow. |
 | service.pingOne.authentication.deviceCode.environmentID | ENUM_UUID | | The ID of the PingOne environment that contains the device code client used to authenticate to the PingOne management API. |
-| service.pingOne.authentication.deviceCode.scopes | ENUM_STRING_SLICE | | The OAuth scopes requested when using device code flow.<br><br>Accepts a comma-separated string to delimit multiple scopes.<br><br>Example: `openid,profile` |
 | service.pingOne.regionCode | ENUM_PINGONE_REGION_CODE | --pingone-region-code | The region code of the PingOne tenant.<br><br>Options are: AP, AU, CA, EU, NA, SG.<br><br>Example: `NA` |
 
 #### Platform Export Properties

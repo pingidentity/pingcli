@@ -221,30 +221,6 @@ func TestLogoutCmd_SpecificAuthMethod(t *testing.T) {
 	}
 }
 
-// TestLoginCmd_MissingScopes tests client credentials without required scopes
-func TestLoginCmd_MissingScopes(t *testing.T) {
-	configContents := `
-activeProfile: test
-test:
-    description: Test profile without scopes
-    outputFormat: json
-    service:
-        pingOne:
-            regionCode: NA
-            authentication:
-                type: client_credentials
-                environmentID: 00000000-0000-0000-0000-000000000000
-                clientCredentials:
-                    clientID: 00000000-0000-0000-0000-000000000001
-                    clientSecret: test-secret
-`
-	testutils_koanf.InitKoanfsCustomFile(t, configContents)
-
-	err := testutils_cobra.ExecutePingcli(t, "login", "--client-credentials")
-	expectedErrorPattern := `scopes are required|scope|failed to prompt for reconfiguration`
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
 // TestLoginCmd_MissingEnvironmentID tests behavior when environment ID is missing
 func TestLoginCmd_MissingEnvironmentID(t *testing.T) {
 	testCases := []struct {
@@ -269,8 +245,6 @@ test:
                 clientCredentials:
                     clientID: 00000000-0000-0000-0000-000000000001
                     clientSecret: test-secret
-                    scopes:
-                      - test:scope
 `,
 			expectedErrorPattern: `environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
@@ -338,8 +312,6 @@ test:
                 environmentID: 00000000-0000-0000-0000-000000000000
                 clientCredentials:
                     clientID: 00000000-0000-0000-0000-000000000001
-                    scopes:
-                      - test:scope
 `
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 

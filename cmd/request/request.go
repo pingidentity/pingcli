@@ -89,12 +89,9 @@ func initPingOneRequestFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeScopesOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeClientIDOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeScopesOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientSecretOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsScopesOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
 	cmd.Flags().AddFlag(options.AuthFileStorageOption.Flag)
 }

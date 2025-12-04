@@ -18,13 +18,11 @@ See the PingOne Platform API documentation to manage applications:
 Configure your PingOne application to support `client_credentials`:
 - Enable grant type: `client_credentials`
 - Create Client ID and Client Secret
-- Assign roles/scopes for PingOne Management API access (e.g., `p1:read:*` or resource-specific scopes)
 
 Collect for PingCLI:
 - Environment ID (the environment containing the application)
 - Client ID
 - Client Secret
-- Optional scopes (space- or comma-separated)
 
 PingCLI notes:
 - Auth type `worker` is applied as `client_credentials` under the hood
@@ -36,26 +34,22 @@ Configure your PingOne application to support `authorization_code`:
 - Enable grant type: `authorization_code`
 - Set redirect URI(s). PingCLI defaults to `http://localhost:<port><path>` with path `/callback` and port `8085` (customizable in CLI)
 - Create Client ID
-- Optional scopes (e.g., `openid profile p1:read:*`)
 
 Collect for PingCLI:
 - Environment ID
 - Client ID
 - Redirect URI path (e.g., `/callback`)
 - Redirect URI port (e.g., `8085`)
-- Optional scopes
 
 ### Device code
 
 Configure your PingOne application to support device code:
 - Enable grant type: `urn:ietf:params:oauth:grant-type:device_code`
 - Create Client ID
-- Optional scopes (e.g., `openid p1:read:*`)
 
 Collect for PingCLI:
 - Environment ID
 - Client ID
-- Optional scopes
 
 ### Region selection
 
@@ -105,7 +99,6 @@ pingcli login --device-code
 ```bash
 pingcli config set service.pingone.authentication.deviceCode.clientID=<client-id>
 pingcli config set service.pingone.authentication.deviceCode.environmentID=<env-id>
-pingcli config set service.pingone.authentication.deviceCode.scopes="openid,profile"  # optional
 ```
 
 **Flow:**
@@ -130,7 +123,6 @@ pingcli login --auth-code
 pingcli config set service.pingone.authentication.authCode.clientID=<client-id>
 pingcli config set service.pingone.authentication.authCode.environmentID=<env-id>
 pingcli config set service.pingone.authentication.authCode.redirectURI=http://localhost:8080/callback
-pingcli config set service.pingone.authentication.authCode.scopes="openid,profile"  # optional
 ```
 
 **Flow:**
@@ -155,7 +147,6 @@ pingcli login --client-credentials
 pingcli config set service.pingone.authentication.clientCredentials.clientID=<client-id>
 pingcli config set service.pingone.authentication.clientCredentials.clientSecret=<client-secret>
 pingcli config set service.pingone.authentication.clientCredentials.environmentID=<env-id>
-pingcli config set service.pingone.authentication.clientCredentials.scopes="p1:read:*"  # optional
 ```
 
 **Flow:**

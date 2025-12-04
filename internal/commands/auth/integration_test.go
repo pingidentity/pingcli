@@ -29,15 +29,12 @@ integration:
                 clientCredentials:
                     clientID: 00000000-0000-0000-0000-000000000001
                     clientSecret: dummy-secret-for-config-test
-                    scopes: ["openid"]
                 deviceCode:
                     clientID: ""
-                    scopes: []
                 authorizationCode:
                     clientID: ""
                     redirectURIPath: ""
                     redirectURIPort: ""
-                    scopes: []
 `
 }
 
@@ -48,12 +45,6 @@ func TestClientCredentialsAuthentication_Integration(t *testing.T) {
 		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID") == "" ||
 		os.Getenv("TEST_PINGONE_REGION_CODE") == "" {
 		t.Skip("Skipping integration test - missing required environment variables")
-	}
-
-	// Default scopes if not provided
-	scopes := os.Getenv("TEST_PINGONE_SCOPES")
-	if scopes == "" {
-		scopes = "openid"
 	}
 
 	// Initialize configuration with test config
@@ -72,13 +63,11 @@ integration:
                 clientCredentials:
                     clientID: %s
                     clientSecret: %s
-                    scopes: ["%s"]
 `,
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
 		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
-		scopes)
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"))
 	testutils_koanf.InitKoanfsCustomFile(t, testConfig)
 
 	// Clear any existing tokens to ensure fresh authentication
@@ -115,12 +104,6 @@ func TestValidTokenSource_Integration(t *testing.T) {
 		t.Skip("Skipping integration test - missing required environment variables")
 	}
 
-	// Default scopes if not provided
-	scopes := os.Getenv("TEST_PINGONE_SCOPES")
-	if scopes == "" {
-		scopes = "openid"
-	}
-
 	// Initialize configuration with test config
 	configuration.InitAllOptions()
 	testConfig := fmt.Sprintf(`activeProfile: integration
@@ -137,13 +120,11 @@ integration:
                 clientCredentials:
                     clientID: %s
                     clientSecret: %s
-                    scopes: ["%s"]
 `,
 		os.Getenv("TEST_PINGONE_REGION_CODE"),
 		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
-		scopes)
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"))
 	testutils_koanf.InitKoanfsCustomFile(t, testConfig)
 
 	// Clear any existing tokens to ensure fresh authentication

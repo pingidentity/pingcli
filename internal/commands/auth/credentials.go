@@ -595,20 +595,12 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 		}
 	}
 
-	// Get device code scopes (optional)
-	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationDeviceCodeScopesOption)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
 	// Configure device code settings
 	cfg = cfg.WithDeviceCodeClientID(clientID)
 
-	scopesList := parseScopesList(scopes)
-	cfg = cfg.WithDeviceCodeScopes(scopesList)
+	// This is the default scope. Additional scopes can be appended by the user later if needed.
+	scopeDefaults := []string{config.OIDCScopeOpenID.String()}
+	cfg = cfg.WithDeviceCodeScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).WithStorageName("pingcli")
@@ -801,23 +793,13 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 		Path: redirectURIPath,
 	}
 
-	// Get auth code scopes (optional)
-	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationAuthorizationCodeScopesOption)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
 	// Configure auth code settings
 	cfg = cfg.WithAuthorizationCodeClientID(clientID).
 		WithAuthorizationCodeRedirectURI(redirectURI)
 
-	scopesList := parseScopesList(scopes)
-	if len(scopesList) > 0 {
-		cfg = cfg.WithAuthorizationCodeScopes(scopesList)
-	}
+	// This is the default scope. Additional scopes can be appended by the user later if needed.
+	scopeDefaults := []string{config.OIDCScopeOpenID.String()}
+	cfg = cfg.WithAuthorizationCodeScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).
@@ -991,23 +973,13 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		}
 	}
 
-	// Get client credentials scopes (optional)
-	scopes, err := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsScopesOption)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
 	// Configure client credentials settings
 	cfg = cfg.WithClientCredentialsClientID(clientID).
 		WithClientCredentialsClientSecret(clientSecret)
 
-	scopesList := parseScopesList(scopes)
-	if len(scopesList) > 0 {
-		cfg = cfg.WithClientCredentialsScopes(scopesList)
-	}
+	// This is the default scope. Additional scopes can be appended by the user later if needed.
+	scopeDefaults := []string{config.OIDCScopeOpenID.String()}
+	cfg = cfg.WithClientCredentialsScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).

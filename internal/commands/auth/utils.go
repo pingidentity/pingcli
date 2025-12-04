@@ -4,7 +4,6 @@ package auth_internal
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -54,20 +53,4 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 	cfg = cfg.WithEnvironmentID(endpointsEnvironmentID)
 
 	return cfg, nil
-}
-
-// parseScopesList takes a space-separated string of scopes and returns a cleaned slice
-func parseScopesList(scopesStr string) []string {
-	if scopesStr == "" {
-		return nil
-	}
-
-	var scopesList []string
-	for scope := range strings.SplitSeq(scopesStr, " ") {
-		if scope != "" {
-			scopesList = append(scopesList, scope)
-		}
-	}
-
-	return scopesList
 }

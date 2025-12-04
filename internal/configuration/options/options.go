@@ -81,12 +81,9 @@ func Options() []Option {
 		PingOneAuthenticationAuthorizationCodeClientIDOption,
 		PingOneAuthenticationAuthorizationCodeRedirectURIPathOption,
 		PingOneAuthenticationAuthorizationCodeRedirectURIPortOption,
-		PingOneAuthenticationAuthorizationCodeScopesOption,
 		PingOneAuthenticationClientCredentialsClientIDOption,
 		PingOneAuthenticationClientCredentialsClientSecretOption,
-		PingOneAuthenticationClientCredentialsScopesOption,
 		PingOneAuthenticationDeviceCodeClientIDOption,
-		PingOneAuthenticationDeviceCodeScopesOption,
 		PingOneAuthenticationTypeOption,
 		PingOneAuthenticationWorkerClientIDOption,
 		PingOneAuthenticationWorkerClientSecretOption,
@@ -179,12 +176,9 @@ var (
 	PingOneAuthenticationAuthorizationCodeClientIDOption        Option
 	PingOneAuthenticationAuthorizationCodeRedirectURIPathOption Option
 	PingOneAuthenticationAuthorizationCodeRedirectURIPortOption Option
-	PingOneAuthenticationAuthorizationCodeScopesOption          Option
 	PingOneAuthenticationClientCredentialsClientIDOption        Option
 	PingOneAuthenticationClientCredentialsClientSecretOption    Option
-	PingOneAuthenticationClientCredentialsScopesOption          Option
 	PingOneAuthenticationDeviceCodeClientIDOption               Option
-	PingOneAuthenticationDeviceCodeScopesOption                 Option
 	PingOneAuthenticationTypeOption                             Option
 	PingOneAuthenticationWorkerClientIDOption                   Option
 	PingOneAuthenticationWorkerClientSecretOption               Option

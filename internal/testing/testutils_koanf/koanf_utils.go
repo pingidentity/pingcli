@@ -45,7 +45,6 @@ default:
                 clientCredentials:
                     clientID: %s
                     clientSecret: %s
-                    scopes: %s
                 authorizationCode:
                     clientID: %s
                 deviceCode:
@@ -82,7 +81,6 @@ production:
                 clientCredentials:
                     clientID: %s
                     clientSecret: %s
-                    scopes: %s
                 authorizationCode:
                     clientID: %s
                 deviceCode:
@@ -191,7 +189,6 @@ func GetDefaultConfigFileContents() string {
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),             // default service pingOne worker clientSecret
 		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID"),     // default service pingOne clientCredentials clientID
 		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET"), // default service pingOne clientCredentials clientSecret
-		"p1:read:env p1:read:user",                                 // default service pingOne clientCredentials scopes
 		os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"),     // default service pingOne authorizationCode clientID
 		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),            // default service pingOne deviceCode clientID
 		outputDirectoryReplacement,                                 // production export outputDirectory
@@ -204,7 +201,6 @@ func GetDefaultConfigFileContents() string {
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),             // production service pingOne worker clientSecret
 		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID"),     // production service pingOne clientCredentials clientID
 		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET"), // production service pingOne clientCredentials clientSecret
-		"p1:read:env p1:read:user",                                 // production service pingOne clientCredentials scopes
 		os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"),     // production service pingOne authorizationCode clientID
 		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),            // production service pingOne deviceCode clientID
 	)

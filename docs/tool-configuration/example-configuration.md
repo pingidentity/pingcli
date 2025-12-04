@@ -32,9 +32,6 @@ default:
                 clientcredentialsauth:
                     clientid: clientID
                     clientsecret: secret
-                    scopes:
-                        - openid
-                        - profile
                     tokenurl: https://pingfederate-admin.bxretail.org/as/token.oauth2
                 type: clientcredentialsauth
             cacertificatepemfiles: []

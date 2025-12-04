@@ -86,7 +86,6 @@ type AuthorizationCodeConfig struct {
 	RegionCode      string
 	RedirectURIPath string
 	RedirectURIPort string
-	Scopes          string
 }
 
 // DeviceCodeConfig holds the configuration for device code authentication
@@ -94,7 +93,6 @@ type DeviceCodeConfig struct {
 	ClientID      string
 	EnvironmentID string
 	RegionCode    string
-	Scopes        string
 }
 
 // ClientCredentialsConfig holds the configuration for client credentials authentication
@@ -103,7 +101,6 @@ type ClientCredentialsConfig struct {
 	ClientSecret  string
 	EnvironmentID string
 	RegionCode    string
-	Scopes        string
 }
 
 // PromptForAuthType prompts the user to select an authentication type
@@ -258,17 +255,6 @@ func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfi
 	}
 	config.RedirectURIPort = redirectURIPort
 
-	// Scopes (optional)
-	scopes, err := input.RunPrompt(
-		"Scopes",
-		nil, // No validation - optional
-		rc,
-	)
-	if err != nil {
-		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-	}
-	config.Scopes = scopes
-
 	return config, nil
 }
 
@@ -316,17 +302,6 @@ func PromptForDeviceCodeConfig(rc io.ReadCloser) (*DeviceCodeConfig, error) {
 		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 	config.RegionCode = regionCode
-
-	// Scopes (optional)
-	scopes, err := input.RunPrompt(
-		"Scopes",
-		nil, // No validation - optional
-		rc,
-	)
-	if err != nil {
-		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-	}
-	config.Scopes = scopes
 
 	return config, nil
 }
@@ -393,22 +368,11 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (*ClientCredentialsConfi
 	}
 	config.RegionCode = regionCode
 
-	// Scopes (optional)
-	scopes, err := input.RunPrompt(
-		"Scopes",
-		nil, // No validation - optional
-		rc,
-	)
-	if err != nil {
-		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-	}
-	config.Scopes = scopes
-
 	return config, nil
 }
 
 // SaveAuthConfigToProfile saves the authentication configuration to the active profile
-func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIport, scopes string) error {
+func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIport string) error {
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
@@ -457,20 +421,10 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 			}
 		}
-		if scopes != "" {
-			if err = subKoanf.Set(options.PingOneAuthenticationAuthorizationCodeScopesOption.KoanfKey, scopes); err != nil {
-				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-			}
-		}
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		if err = subKoanf.Set(options.PingOneAuthenticationDeviceCodeClientIDOption.KoanfKey, clientID); err != nil {
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-		}
-		if scopes != "" {
-			if err = subKoanf.Set(options.PingOneAuthenticationDeviceCodeScopesOption.KoanfKey, scopes); err != nil {
-				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-			}
 		}
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
@@ -479,12 +433,6 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 		}
 		if err = subKoanf.Set(options.PingOneAuthenticationClientCredentialsClientSecretOption.KoanfKey, clientSecret); err != nil {
 			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-		}
-
-		if scopes != "" {
-			if err = subKoanf.Set(options.PingOneAuthenticationClientCredentialsScopesOption.KoanfKey, scopes); err != nil {
-				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-			}
 		}
 	}
 
@@ -566,7 +514,7 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		}
 	}
 
-	var clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes string
+	var clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort string
 
 	// Step 3: Collect configuration based on selected type
 	switch authType {
@@ -580,7 +528,6 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		regionCode = authorizationCodeConfig.RegionCode
 		redirectURIPath = authorizationCodeConfig.RedirectURIPath
 		redirectURIPort = authorizationCodeConfig.RedirectURIPort
-		scopes = authorizationCodeConfig.Scopes
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		deviceCodeConfig, err := PromptForDeviceCodeConfig(rc)
@@ -590,7 +537,6 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		clientID = deviceCodeConfig.ClientID
 		environmentID = deviceCodeConfig.EnvironmentID
 		regionCode = deviceCodeConfig.RegionCode
-		scopes = deviceCodeConfig.Scopes
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
 		clientCredentialsConfig, err := PromptForClientCredentialsConfig(rc)
@@ -601,11 +547,10 @@ func RunInteractiveAuthConfig(rc io.ReadCloser) error {
 		clientSecret = clientCredentialsConfig.ClientSecret
 		environmentID = clientCredentialsConfig.EnvironmentID
 		regionCode = clientCredentialsConfig.RegionCode
-		scopes = clientCredentialsConfig.Scopes
 	}
 
 	// Step 4: Save configuration to profile
-	return SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes)
+	return SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort)
 }
 
 // RunInteractiveAuthConfigForType runs interactive prompts for a specific auth type if it's not configured.
@@ -651,7 +596,7 @@ func RunInteractiveAuthConfigForType(rc io.ReadCloser, desiredAuthType string) e
 	}
 
 	// Collect configuration for the desired type
-	var clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes string
+	var clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort string
 	switch desiredAuthType {
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE:
 		cfg, err := PromptForAuthorizationCodeConfig(rc)
@@ -663,7 +608,6 @@ func RunInteractiveAuthConfigForType(rc io.ReadCloser, desiredAuthType string) e
 		regionCode = cfg.RegionCode
 		redirectURIPath = cfg.RedirectURIPath
 		redirectURIPort = cfg.RedirectURIPort
-		scopes = cfg.Scopes
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE:
 		cfg, err := PromptForDeviceCodeConfig(rc)
@@ -673,7 +617,6 @@ func RunInteractiveAuthConfigForType(rc io.ReadCloser, desiredAuthType string) e
 		clientID = cfg.ClientID
 		environmentID = cfg.EnvironmentID
 		regionCode = cfg.RegionCode
-		scopes = cfg.Scopes
 
 	case customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS:
 		cfg, err := PromptForClientCredentialsConfig(rc)
@@ -684,10 +627,9 @@ func RunInteractiveAuthConfigForType(rc io.ReadCloser, desiredAuthType string) e
 		clientSecret = cfg.ClientSecret
 		environmentID = cfg.EnvironmentID
 		regionCode = cfg.RegionCode
-		scopes = cfg.Scopes
 	}
 
-	return SaveAuthConfigToProfile(desiredAuthType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort, scopes)
+	return SaveAuthConfigToProfile(desiredAuthType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort)
 }
 
 // PromptForReconfiguration asks the user if they want to reconfigure authentication

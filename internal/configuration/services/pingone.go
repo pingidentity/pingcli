@@ -16,12 +16,9 @@ func InitPingOneServiceOptions() {
 	initPingOneAuthenticationAuthorizationCodeClientIDOption()
 	initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption()
 	initPingOneAuthenticationAuthorizationCodeRedirectURIPortOption()
-	initPingOneAuthenticationAuthorizationCodeScopesOption()
 	initPingOneAuthenticationClientCredentialsClientIDOption()
 	initPingOneAuthenticationClientCredentialsClientSecretOption()
-	initPingOneAuthenticationClientCredentialsScopesOption()
 	initPingOneAuthenticationDeviceCodeClientIDOption()
-	initPingOneAuthenticationDeviceCodeScopesOption()
 	initPingOneAuthenticationTypeOption()
 	initPingOneAuthenticationWorkerClientIDOption()
 	initPingOneAuthenticationWorkerClientSecretOption()
@@ -117,28 +114,6 @@ func initPingOneAuthenticationAuthorizationCodeRedirectURIPortOption() {
 	}
 }
 
-func initPingOneAuthenticationAuthorizationCodeScopesOption() {
-	cobraParamName := "pingone-oidc-authorization-code-scopes"
-	cobraValue := new(customtypes.StringSlice)
-	defaultValue := customtypes.StringSlice{}
-	envVar := "PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_SCOPES"
-
-	options.PingOneAuthenticationAuthorizationCodeScopesOption = options.Option{
-		CobraParamName:  cobraParamName,
-		CobraParamValue: cobraValue,
-		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
-		Flag: &pflag.Flag{
-			Name:  cobraParamName,
-			Usage: "The authorization code scope(s) used to authenticate to the PingOne management API.",
-			Value: cobraValue,
-		},
-		Sensitive: false,
-		Type:      options.STRING_SLICE,
-		KoanfKey:  "service.pingOne.authentication.authorizationCode.scopes",
-	}
-}
-
 func initPingOneAuthenticationClientCredentialsClientIDOption() {
 	cobraParamName := "pingone-client-credentials-client-id"
 	cobraValue := new(customtypes.UUID)
@@ -183,28 +158,6 @@ func initPingOneAuthenticationClientCredentialsClientSecretOption() {
 	}
 }
 
-func initPingOneAuthenticationClientCredentialsScopesOption() {
-	cobraParamName := "pingone-client-credentials-scopes"
-	cobraValue := new(customtypes.StringSlice)
-	defaultValue := customtypes.StringSlice{}
-	envVar := "PINGCLI_PINGONE_CLIENT_CREDENTIALS_SCOPES"
-
-	options.PingOneAuthenticationClientCredentialsScopesOption = options.Option{
-		CobraParamName:  cobraParamName,
-		CobraParamValue: cobraValue,
-		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
-		Flag: &pflag.Flag{
-			Name:  cobraParamName,
-			Usage: "The scopes to request for the client credentials used to authenticate to the PingOne management API.",
-			Value: cobraValue,
-		},
-		Sensitive: false,
-		Type:      options.STRING_SLICE,
-		KoanfKey:  "service.pingOne.authentication.clientCredentials.scopes",
-	}
-}
-
 func initPingOneAuthenticationDeviceCodeClientIDOption() {
 	cobraParamName := "pingone-device-code-client-id"
 	cobraValue := new(customtypes.UUID)
@@ -224,28 +177,6 @@ func initPingOneAuthenticationDeviceCodeClientIDOption() {
 		Sensitive: false,
 		Type:      options.UUID,
 		KoanfKey:  "service.pingOne.authentication.deviceCode.clientID",
-	}
-}
-
-func initPingOneAuthenticationDeviceCodeScopesOption() {
-	cobraParamName := "pingone-device-code-scopes"
-	cobraValue := new(customtypes.StringSlice)
-	defaultValue := customtypes.StringSlice{}
-	envVar := "PINGCLI_PINGONE_DEVICE_CODE_SCOPES"
-
-	options.PingOneAuthenticationDeviceCodeScopesOption = options.Option{
-		CobraParamName:  cobraParamName,
-		CobraParamValue: cobraValue,
-		DefaultValue:    &defaultValue,
-		EnvVar:          envVar,
-		Flag: &pflag.Flag{
-			Name:  cobraParamName,
-			Usage: "The device code scope(s) used to authenticate to the PingOne management API.",
-			Value: cobraValue,
-		},
-		Sensitive: false,
-		Type:      options.STRING_SLICE,
-		KoanfKey:  "service.pingOne.authentication.deviceCode.scopes",
 	}
 }
 
