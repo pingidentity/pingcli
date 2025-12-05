@@ -21,8 +21,8 @@ func TestLoginCommand_Creation(t *testing.T) {
 	if cmd.Use != "login [flags]" {
 		t.Errorf("Expected Use to be 'login [flags]', got %q", cmd.Use)
 	}
-	if cmd.Short != "Login user to the CLI" {
-		t.Errorf("Expected Short to be 'Login user to the CLI', got %q", cmd.Short)
+	if cmd.Short != "Authenticate a supported provider" {
+		t.Errorf("Expected Short to be 'Authenticate a supported provider', got %q", cmd.Short)
 	}
 	if !cmd.DisableFlagsInUseLine {
 		t.Error("Expected DisableFlagsInUseLine to be true")

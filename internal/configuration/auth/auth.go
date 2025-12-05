@@ -31,7 +31,7 @@ func initAuthMethodDeviceCodeOption() {
 		Flag: &pflag.Flag{
 			Name:        cobraParamName,
 			Shorthand:   "d",
-			Usage:       "Use device code authentication flow",
+			Usage:       "Use device authorization flow",
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
@@ -55,7 +55,7 @@ func initAuthMethodClientCredentialsOption() {
 		Flag: &pflag.Flag{
 			Name:        cobraParamName,
 			Shorthand:   "c",
-			Usage:       "Use client credentials authentication flow",
+			Usage:       "Use client credentials flow",
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},
@@ -79,7 +79,7 @@ func initAuthMethodAuthorizationCodeOption() {
 		Flag: &pflag.Flag{
 			Name:        cobraParamName,
 			Shorthand:   "a",
-			Usage:       "Use authorization code authentication flow",
+			Usage:       "Use authorization code flow",
 			Value:       cobraValue,
 			NoOptDefVal: "true", // Make this flag a boolean flag
 		},

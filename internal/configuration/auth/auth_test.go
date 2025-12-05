@@ -23,8 +23,8 @@ func TestInitAuthOptions(t *testing.T) {
 	if deviceCodeOption.Sensitive {
 		t.Error("Expected Sensitive to be false")
 	}
-	if deviceCodeOption.Flag.Usage != "Use device code authentication flow" {
-		t.Errorf("Expected Usage to be 'Use device code authentication flow', got %q", deviceCodeOption.Flag.Usage)
+	if deviceCodeOption.Flag.Usage != "Use device authorization flow" {
+		t.Errorf("Expected Usage to be 'Use device authorization flow', got %q", deviceCodeOption.Flag.Usage)
 	}
 	if deviceCodeOption.Flag == nil {
 		t.Fatal("Flag should not be nil")
@@ -41,8 +41,8 @@ func TestInitAuthOptions(t *testing.T) {
 	if clientCredentialsOption.Sensitive {
 		t.Error("Expected Sensitive to be false")
 	}
-	if clientCredentialsOption.Flag.Usage != "Use client credentials authentication flow" {
-		t.Errorf("Expected Usage to be 'Use client credentials authentication flow', got %q", clientCredentialsOption.Flag.Usage)
+	if clientCredentialsOption.Flag.Usage != "Use client credentials flow" {
+		t.Errorf("Expected Usage to be 'Use client credentials flow', got %q", clientCredentialsOption.Flag.Usage)
 	}
 	if clientCredentialsOption.Flag == nil {
 		t.Fatal("Flag should not be nil")
@@ -59,8 +59,8 @@ func TestInitAuthOptions(t *testing.T) {
 	if authorizationCodeOption.Sensitive {
 		t.Error("Expected Sensitive to be false")
 	}
-	if authorizationCodeOption.Flag.Usage != "Use authorization code authentication flow" {
-		t.Errorf("Expected Usage to be 'Use authorization code authentication flow', got %q", authorizationCodeOption.Flag.Usage)
+	if authorizationCodeOption.Flag.Usage != "Use authorization code flow" {
+		t.Errorf("Expected Usage to be 'Use authorization code flow', got %q", authorizationCodeOption.Flag.Usage)
 	}
 	if authorizationCodeOption.Flag == nil {
 		t.Fatal("Flag should not be nil")

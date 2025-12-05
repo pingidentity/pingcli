@@ -38,7 +38,6 @@ func RunPromptSecret(message string, validateFunc func(string) error, rc io.Read
 			return s, nil
 		}
 
-		// Non-terminal stdin: avoid promptui redraw; read a single line.
 		fmt.Printf("%s: ", message)
 		br := bufio.NewReader(rc)
 		line, err := br.ReadString('\n')

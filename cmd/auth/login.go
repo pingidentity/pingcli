@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	// ErrUnknownAuthMethod is returned when an unknown authentication method is specified
-	ErrUnknownAuthMethod = fmt.Errorf("unknown authentication method")
+	// ErrUnknownAuthMethod is returned when an unknown authorization grant type is specified
+	ErrUnknownAuthMethod = fmt.Errorf("unknown authorization grant type")
 )
 
 // NewLoginCommand creates a new login command that authenticates users using one of the supported
@@ -24,9 +24,9 @@ func NewLoginCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
-		Long:                  "Login user to the CLI using one of the supported authentication flows: device code, authorization code, or client credentials for a service",
+		Long:                  "Authenticate the CLI to a supported provider, using one of the supported authorization grant types.",
 		RunE:                  authLoginRunE,
-		Short:                 "Login user to the CLI",
+		Short:                 "Authenticate",
 		Use:                   "login [flags]",
 	}
 
@@ -36,7 +36,7 @@ func NewLoginCommand() *cobra.Command {
 	cmd.Flags().AddFlag(options.AuthFileStorageOption.Flag)
 	cmd.Flags().AddFlag(options.AuthProviderOption.Flag)
 
-	// Enforce that exactly one authentication method must be specified
+	// Enforce that exactly one authorization grant type must be specified
 	cmd.MarkFlagsMutuallyExclusive(
 		options.AuthMethodAuthorizationCodeOption.Flag.Name,
 		options.AuthMethodClientCredentialsOption.Flag.Name,
