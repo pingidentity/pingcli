@@ -70,7 +70,7 @@ func TestInitAuthOptions(t *testing.T) {
 func TestAuthOptionDefaults(t *testing.T) {
 	configuration_auth.InitAuthOptions()
 
-	// All auth method flags should default to false
+	// All grant type flags should default to false
 	deviceCodeOption := options.AuthMethodDeviceCodeOption
 	defaultValue := deviceCodeOption.DefaultValue.String()
 	if defaultValue != "false" {
@@ -133,7 +133,7 @@ func TestAuthOptionBooleanBehavior(t *testing.T) {
 func TestAllAuthOptionsInitialized(t *testing.T) {
 	configuration_auth.InitAuthOptions()
 
-	// Verify all auth method options are properly initialized
+	// Verify all grant type options are properly initialized
 	authOptions := []options.Option{
 		options.AuthMethodDeviceCodeOption,
 		options.AuthMethodClientCredentialsOption,

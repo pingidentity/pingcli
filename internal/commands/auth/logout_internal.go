@@ -11,10 +11,10 @@ import (
 )
 
 // AuthLogoutRunE implements the logout command logic, clearing credentials from both
-// keychain and file storage. If no auth method flag is provided, clears all tokens.
-// If a specific auth method flag is provided, clears only that method's token.
+// keychain and file storage. If no grant type flag is provided, clears all tokens.
+// If a specific grant type flag is provided, clears only that method's token.
 func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
-	// Check if any auth method flags were provided
+	// Check if any grant type flags were provided
 	deviceCodeStr, _ := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
 	clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
 	authorizationCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
@@ -39,12 +39,12 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to clear credentials: %w", err)
 		}
 
-		fmt.Printf("Successfully logged out from all authentication methods for service '%s'. All credentials cleared from storage for profile '%s'.\n", providerName, profileName)
+		fmt.Printf("Successfully logged out from all methods for service '%s'. All credentials cleared from storage for profile '%s'.\n", providerName, profileName)
 
 		return nil
 	}
 
-	// Flag was provided - determine which auth method to clear
+	// Flag was provided - determine which grant type to clear
 	// (deviceCodeStr, clientCredentialsStr, authCodeStr already retrieved above)
 
 	var authType string
@@ -57,13 +57,13 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
 	}
 
-	// Generate token key for the selected auth method
+	// Generate token key for the selected grant type
 	tokenKey, err := GetAuthMethodKey(authType)
 	if err != nil {
 		return fmt.Errorf("failed to generate token key for %s: %w", authType, err)
 	}
 
-	// Clear only the token for the specified authentication method
+	// Clear only the token for the specified grant type
 	location, err := ClearTokenForMethod(tokenKey)
 	if err != nil {
 		return fmt.Errorf("failed to clear %s credentials: %w", authType, err)
@@ -82,7 +82,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		storageMsg = "storage"
 	}
 
-	fmt.Printf("Successfully logged out from %s authentication for service '%s'. Credentials cleared from %s for profile '%s'.\n", authType, providerName, storageMsg, profileName)
+	fmt.Printf("Successfully logged out from %s for service '%s'. Credentials cleared from %s for profile '%s'.\n", authType, providerName, storageMsg, profileName)
 
 	return nil
 }

@@ -206,7 +206,7 @@ func TestLogoutCommand_Integration(t *testing.T) {
 
 	// Login succeeded - token is saved in keychain
 
-	// Test logout using ExecutePingcli with the same auth method
+	// Test logout using ExecutePingcli with the same grant type
 	err = testutils_cobra.ExecutePingcli(t, "logout", "--client-credentials")
 	if err != nil {
 		t.Fatalf("Logout should succeed: %v", err)

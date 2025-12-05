@@ -113,7 +113,7 @@ test:
 `
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
-	// Try to logout without specifying auth method and without configured auth type
+	// Try to logout without specifying grant type and without configured auth type
 	err := testutils_cobra.ExecutePingcli(t, "logout")
 	expectedErrorPattern := `no authentication type configured|authentication type|failed to generate token key`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -142,7 +142,7 @@ test:
 	}
 }
 
-// TestLoginCmd_MutuallyExclusiveFlags tests that multiple auth method flags cannot be used together
+// TestLoginCmd_MutuallyExclusiveFlags tests that multiple grant type flags cannot be used together
 func TestLoginCmd_MutuallyExclusiveFlags(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
@@ -182,7 +182,7 @@ func TestLoginCmd_MutuallyExclusiveFlags(t *testing.T) {
 	}
 }
 
-// TestLogoutCmd_SpecificAuthMethod tests logout with specific auth method when multiple are configured
+// TestLogoutCmd_SpecificAuthMethod tests logout with specific grant type when multiple are configured
 func TestLogoutCmd_SpecificAuthMethod(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
 	clientID := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID")
@@ -201,14 +201,14 @@ func TestLogoutCmd_SpecificAuthMethod(t *testing.T) {
 		t.Fatalf("Failed to login: %v", err)
 	}
 
-	// Verify we can get the auth method configured
+	// Verify we can get the grant type configured
 	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 	if err != nil {
 		t.Fatalf("Failed to get auth type: %v", err)
 	}
 	t.Logf("Current auth type: %s", authType)
 
-	// Logout from specific auth method
+	// Logout from specific grant type
 	err = testutils_cobra.ExecutePingcli(t, "logout", "--client-credentials")
 	if err != nil {
 		t.Fatalf("Failed to logout: %v", err)

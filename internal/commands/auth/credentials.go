@@ -178,7 +178,7 @@ func LoadToken() (*oauth2.Token, error) {
 			authType = "authorization_code"
 		}
 
-		// Try to get configuration for the configured auth method
+		// Try to get configuration for the configured grant type
 		var cfg *config.Configuration
 		var grantType svcOAuth2.GrantType
 		switch authType {
@@ -264,7 +264,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		authType = "authorization_code"
 	}
 
-	// Try to get configuration for the configured auth method
+	// Try to get configuration for the configured grant type
 	var cfg *config.Configuration
 	var grantType svcOAuth2.GrantType
 	switch authType {
@@ -432,7 +432,7 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 
 	// Also clear all token files for this grant type and current profile
 	// This handles cases where the user changed their configuration
-	// Determine grant type from auth method (authMethod is the token key)
+	// Determine grant type from grant type (authMethod is the token key)
 	// We need to parse it to get the grant type
 	// For now, just try all grant types - inefficient but safe
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
@@ -599,7 +599,7 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithDeviceCodeClientID(clientID)
 
 	// This is the default scope. Additional scopes can be appended by the user later if needed.
-	scopeDefaults := []string{config.OIDCScopeOpenID.String()}
+	scopeDefaults := []string{"openid"}
 	cfg = cfg.WithDeviceCodeScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag
@@ -798,7 +798,7 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 		WithAuthorizationCodeRedirectURI(redirectURI)
 
 	// This is the default scope. Additional scopes can be appended by the user later if needed.
-	scopeDefaults := []string{config.OIDCScopeOpenID.String()}
+	scopeDefaults := []string{"openid"}
 	cfg = cfg.WithAuthorizationCodeScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag
@@ -978,7 +978,7 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		WithClientCredentialsClientSecret(clientSecret)
 
 	// This is the default scope. Additional scopes can be appended by the user later if needed.
-	scopeDefaults := []string{config.OIDCScopeOpenID.String()}
+	scopeDefaults := []string{"openid"}
 	cfg = cfg.WithClientCredentialsScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag

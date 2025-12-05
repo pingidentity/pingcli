@@ -183,7 +183,7 @@ func displayLoginSuccess(token *oauth2.Token, newAuth bool, location StorageLoca
 			storageMsg = "storage"
 		}
 
-		output.Success(fmt.Sprintf("Successfully logged in using %s authentication. Credentials saved to %s for profile '%s'.", selectedMethod, storageMsg, profileName), nil)
+		output.Success(fmt.Sprintf("Successfully logged in using %s. Credentials saved to %s for profile '%s'.", selectedMethod, storageMsg, profileName), nil)
 		if token.RefreshToken != "" {
 			output.Message("Refresh token available for automatic renewal.", nil)
 		}

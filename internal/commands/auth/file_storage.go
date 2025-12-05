@@ -22,7 +22,7 @@ type tokenFileData struct {
 	Expiry       time.Time `json:"expiry,omitempty"`
 }
 
-// getCredentialsFilePath returns the path to the credentials file for a given auth method
+// getCredentialsFilePath returns the path to the credentials file for a given grant type
 func getCredentialsFilePath(authMethod string) (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
@@ -42,7 +42,7 @@ func getCredentialsFilePath(authMethod string) (string, error) {
 		}
 	}
 
-	// Use auth method as filename
+	// Use grant type as filename
 	filename := fmt.Sprintf("%s.json", authMethod)
 
 	return filepath.Join(credentialsDir, filename), nil
@@ -107,7 +107,7 @@ func loadTokenFromFile(authMethod string) (*oauth2.Token, error) {
 	}
 
 	// Read file
-	// #nosec G304 -- filePath is constructed from user home dir and auth method
+	// #nosec G304 -- filePath is constructed from user home dir and grant type
 	jsonData, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, &errs.PingCLIError{
@@ -136,7 +136,7 @@ func loadTokenFromFile(authMethod string) (*oauth2.Token, error) {
 	return token, nil
 }
 
-// clearTokenFromFile removes the credentials file for a given auth method
+// clearTokenFromFile removes the credentials file for a given grant type
 func clearTokenFromFile(authMethod string) error {
 	filePath, err := getCredentialsFilePath(authMethod)
 	if err != nil {

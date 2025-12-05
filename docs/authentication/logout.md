@@ -51,7 +51,7 @@ pingcli logout
 ```
 **Output:**
 ```
-Successfully logged out from all authentication methods. All credentials cleared from storage for profile 'default'.
+Successfully logged out from all methods. All credentials cleared from storage for profile 'default'.
 ```
 
 ### Clear Specific Authentication Method
@@ -61,7 +61,7 @@ pingcli logout --device-code
 ```
 **Output:**
 ```
-Successfully logged out from device_code authentication. Credentials cleared from keychain and file storage for profile 'default'.
+Successfully logged out from device_code. Credentials cleared from keychain and file storage for profile 'default'.
 ```
 
 ```bash
@@ -70,7 +70,7 @@ pingcli logout --client-credentials
 ```
 **Output:**
 ```
-Successfully logged out from client_credentials authentication. Credentials cleared from keychain and file storage for profile 'default'.
+Successfully logged out from client_credentials. Credentials cleared from keychain and file storage for profile 'default'.
 ```
 
 ### Logout in Automation
@@ -149,7 +149,7 @@ secret-tool clear service pingcli
 # Remove all token files
 rm -rf ~/.pingcli/credentials
 
-# Or remove specific auth method
+# Or remove specific grant type
 rm ~/.pingcli/credentials/<env-id>_<client-id>_device_code.json
 ```
 

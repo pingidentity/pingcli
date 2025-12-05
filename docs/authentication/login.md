@@ -222,7 +222,7 @@ pingcli uses a **dual storage system** for maximum reliability:
 Tokens are automatically stored in **both** locations:
 ```bash
 pingcli login --device-code
-# Output: Successfully logged in using device_code authentication. 
+# Output: Successfully logged in using device_code. 
 #         Credentials saved to keychain and file storage for profile 'default'.
 ```
 
@@ -231,7 +231,7 @@ If keychain fails (unavailable, permission denied, etc.), automatically falls ba
 ```bash
 # Keychain unavailable - uses file storage instead
 pingcli login --device-code
-# Output: Successfully logged in using device_code authentication. 
+# Output: Successfully logged in using device_code. 
 #         Credentials saved to file storage for profile 'default'.
 ```
 
@@ -245,7 +245,7 @@ pingcli login --device-code
 Use `--file-storage` flag to explicitly skip keychain:
 ```bash
 pingcli login --device-code --file-storage
-# Output: Successfully logged in using device_code authentication. 
+# Output: Successfully logged in using device_code. 
 #         Credentials saved to file storage for profile 'default'.
 ```
 

@@ -23,7 +23,7 @@ func TestLogoutCommand_Creation(t *testing.T) {
 	if cmd.Short != "Logout user from the CLI" {
 		t.Errorf("Expected command short to be 'Logout user from the CLI', got %q", cmd.Short)
 	}
-	expectedLong := "Logout user from the CLI by clearing stored credentials. Credentials are cleared from both keychain and file storage. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the auth method flags."
+	expectedLong := "Logout user from the CLI by clearing stored credentials. Credentials are cleared from both keychain and file storage. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the grant type flags."
 	if cmd.Long != expectedLong {
 		t.Errorf("Expected command long to be %q, got %q", expectedLong, cmd.Long)
 	}
@@ -31,7 +31,7 @@ func TestLogoutCommand_Creation(t *testing.T) {
 		t.Errorf("Expected command Use to contain 'logout', got %q", cmd.Use)
 	}
 
-	// Test that the command has auth method flags
+	// Test that the command has grant type flags
 	deviceCodeFlag := cmd.Flags().Lookup("device-code")
 	if deviceCodeFlag == nil {
 		t.Error("device-code flag should be present")
@@ -74,7 +74,7 @@ func TestLogoutCommandHelp(t *testing.T) {
 		t.Errorf("Expected usage to contain 'logout', got %q", usage)
 	}
 
-	// Verify auth method flags are in help
+	// Verify grant type flags are in help
 	flagOutput := cmd.Flags().FlagUsages()
 	if !strings.Contains(flagOutput, "authorization-code") {
 		t.Error("Help should contain authorization-code flag")
@@ -105,7 +105,7 @@ func TestLogoutCommandValidation(t *testing.T) {
 func TestLogoutCommand_MutuallyExclusiveFlags(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	// Test that specifying multiple auth method flags fails
+	// Test that specifying multiple grant type flags fails
 	tests := []struct {
 		name  string
 		flags []string
@@ -133,7 +133,7 @@ func TestLogoutCommand_MutuallyExclusiveFlags(t *testing.T) {
 			args := append([]string{"logout"}, tt.flags...)
 			err := testutils_cobra.ExecutePingcli(t, args...)
 			if err == nil {
-				t.Error("Expected error when specifying multiple auth method flags, got nil")
+				t.Error("Expected error when specifying multiple grant type flags, got nil")
 			}
 			if !strings.Contains(err.Error(), "if any flags in the group") {
 				t.Errorf("Expected mutually exclusive flags error, got: %v", err)

@@ -75,7 +75,7 @@ pingcli uses a **dual storage system** to ensure tokens are accessible across di
 
 2. **Secondary Storage**: File-based storage at `~/.pingcli/credentials/`
    - Automatically created and maintained
-   - One file per authentication method (e.g., `<env-id>_<client-id>_device_code.json`)
+   - One file per grant type (e.g., `<env-id>_<client-id>_device_code.json`)
    - Provides compatibility with SSH sessions, containers, and CI/CD environments
 
 ### Storage Behavior
@@ -89,7 +89,7 @@ By default (`--file-storage=false`), tokens are stored in **both** locations sim
 ```bash
 # Default: Saves to both keychain and file
 pingcli login --device-code
-# Output: Successfully logged in using device_code authentication. 
+# Output: Successfully logged in using device_code. 
 #         Credentials saved to keychain and file storage for profile 'default'.
 ```
 
@@ -98,7 +98,7 @@ If keychain storage fails (unavailable, permission issues, etc.), the system aut
 ```bash
 # Keychain unavailable - automatically uses file storage
 pingcli login --device-code
-# Output: Successfully logged in using device_code authentication. 
+# Output: Successfully logged in using device_code. 
 #         Credentials saved to file storage for profile 'default'.
 ```
 
@@ -109,7 +109,7 @@ Use the `--file-storage` flag to explicitly skip keychain and use only file stor
 ```bash
 # Explicitly use file storage only (skip keychain entirely)
 pingcli login --device-code --file-storage
-# Output: Successfully logged in using device_code authentication. 
+# Output: Successfully logged in using device_code. 
 #         Credentials saved to file storage for profile 'default'.
 ```
 

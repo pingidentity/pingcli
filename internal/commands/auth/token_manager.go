@@ -41,7 +41,7 @@ func NewDefaultTokenManager() TokenManager {
 func GetCurrentAuthMethod() (string, error) {
 	authMethod, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 	if err != nil {
-		return "", fmt.Errorf("failed to get current auth method: %w", err)
+		return "", fmt.Errorf("failed to get current grant type: %w", err)
 	}
 
 	if authMethod == "" {
@@ -54,7 +54,7 @@ func GetCurrentAuthMethod() (string, error) {
 // GetAuthMethodKey generates a unique keychain account name for the given authentication method
 // using the environment ID and client ID from the profile configuration
 func GetAuthMethodKey(authMethod string) (string, error) {
-	// Get configuration for the auth method to extract environment ID and client ID
+	// Get configuration for the grant type to extract environment ID and client ID
 	var cfg *config.Configuration
 	var err error
 	var grantType svcOAuth2.GrantType
@@ -171,7 +171,7 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 func (tm *DefaultTokenManager) SaveToken(token *oauth2.Token) error {
 	authMethod, err := GetCurrentAuthMethod()
 	if err != nil {
-		return fmt.Errorf("failed to get current auth method: %w", err)
+		return fmt.Errorf("failed to get current grant type: %w", err)
 	}
 
 	_, err = SaveTokenForMethod(token, authMethod)
@@ -183,7 +183,7 @@ func (tm *DefaultTokenManager) SaveToken(token *oauth2.Token) error {
 func (tm *DefaultTokenManager) LoadToken() (*oauth2.Token, error) {
 	authMethod, err := GetCurrentAuthMethod()
 	if err != nil {
-		return nil, fmt.Errorf("failed to get current auth method: %w", err)
+		return nil, fmt.Errorf("failed to get current grant type: %w", err)
 	}
 
 	return LoadTokenForMethod(authMethod)
@@ -193,7 +193,7 @@ func (tm *DefaultTokenManager) LoadToken() (*oauth2.Token, error) {
 func (tm *DefaultTokenManager) ClearToken() error {
 	authMethod, err := GetCurrentAuthMethod()
 	if err != nil {
-		return fmt.Errorf("failed to get current auth method: %w", err)
+		return fmt.Errorf("failed to get current grant type: %w", err)
 	}
 
 	_, err = ClearTokenForMethod(authMethod)

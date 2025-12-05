@@ -16,13 +16,13 @@ func NewLogoutCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
-		Long:                  "Logout user from the CLI by clearing stored credentials. Credentials are cleared from both keychain and file storage. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the auth method flags.",
+		Long:                  "Logout user from the CLI by clearing stored credentials. Credentials are cleared from both keychain and file storage. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the grant type flags.",
 		RunE:                  authLogoutRunE,
 		Short:                 "Logout user from the CLI",
 		Use:                   "logout [flags]",
 	}
 
-	// Add the same auth method flags as login command
+	// Add the same grant type flags as login command
 	cmd.Flags().AddFlag(options.AuthMethodAuthorizationCodeOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodClientCredentialsOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodDeviceCodeOption.Flag)

@@ -520,7 +520,7 @@ func TestGetValidTokenSource_AutomaticClientCredentialsAuth(t *testing.T) {
 		}
 		t.Skip("Automatic authentication succeeded (valid credentials configured)")
 	}
-	// The specific error depends on the configured auth method
+	// The specific error depends on the configured grant type
 	expectedErrors := []string{
 		"automatic device code authentication failed",
 		"automatic authorization code authentication failed",
