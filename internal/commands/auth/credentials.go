@@ -63,10 +63,6 @@ func shouldUseKeychain() bool {
 // getStorageType returns the appropriate storage type for SDK keychain operations
 // SDK handles keychain storage, pingcli handles file storage separately
 func getStorageType() config.StorageType {
-	if shouldUseKeychain() {
-		return config.StorageTypeKeychain
-	}
-	// When keychain is disabled, SDK won't persist tokens - we handle file storage ourselves
 	return config.StorageTypeNone
 }
 
