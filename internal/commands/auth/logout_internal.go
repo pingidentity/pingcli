@@ -39,7 +39,8 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to clear credentials: %w", err)
 		}
 
-		fmt.Printf("Successfully logged out from all methods for service '%s'. All credentials cleared from storage for profile '%s'.\n", providerName, profileName)
+		// Report the storage cleared using common formatter
+		fmt.Printf("Successfully logged out from all methods for service '%s'. Credentials cleared from %s for profile '%s'.\n", providerName, formatFullLogoutStorageMessage(), profileName)
 
 		return nil
 	}
@@ -69,18 +70,8 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("failed to clear %s credentials: %w", authType, err)
 	}
 
-	// Build storage location message
-	var storageMsg string
-	switch {
-	case location.Keychain && location.File:
-		storageMsg = "keychain and file storage"
-	case location.Keychain:
-		storageMsg = "keychain"
-	case location.File:
-		storageMsg = "file storage"
-	default:
-		storageMsg = "storage"
-	}
+	// Build storage location message via common formatter
+	storageMsg := formatStorageLocation(location)
 
 	fmt.Printf("Successfully logged out from %s for service '%s'. Credentials cleared from %s for profile '%s'.\n", authType, providerName, storageMsg, profileName)
 

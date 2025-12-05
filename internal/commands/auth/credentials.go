@@ -63,6 +63,9 @@ func shouldUseKeychain() bool {
 // getStorageType returns the appropriate storage type for SDK keychain operations
 // SDK handles keychain storage, pingcli handles file storage separately
 func getStorageType() config.StorageType {
+	if shouldUseKeychain() {
+		return config.StorageTypeKeychain
+	}
 	return config.StorageTypeNone
 }
 
@@ -316,6 +319,8 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	if cfg != nil {
 		// Set the grant type before getting the token source
 		cfg = cfg.WithGrantType(grantType)
+
+		// Defer all token management to the SDK's TokenSource.
 		tokenSource, err := cfg.TokenSource(ctx)
 		if err != nil {
 			return nil, &errs.PingCLIError{
@@ -323,7 +328,6 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 				Err:    err,
 			}
 		}
-
 		return tokenSource, nil
 	}
 
@@ -492,24 +496,14 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
 	}
 
-	// Get client ID for token key generation
-	clientID := ""
-	if cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
-		clientID = *cfg.Auth.DeviceCode.DeviceCodeClientID
-	}
-
-	// Get environment ID for token key generation
-	environmentID := ""
-	if cfg.Endpoint.EnvironmentID != nil {
-		environmentID = *cfg.Endpoint.EnvironmentID
-	}
+	// Client ID and environment ID no longer needed for manual key generation
 
 	// Set grant type to device code
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeDeviceCode)
 
-	// Generate unique token key based on provider, profile and configuration
-	tokenKey := generateTokenKey(providerName, profileName, environmentID, clientID, string(svcOAuth2.GrantTypeDeviceCode))
-	if tokenKey == "" {
+	// Use SDK-consistent token key generation to avoid mismatches
+	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+	if err != nil || tokenKey == "" {
 		// Fallback to simple key if generation fails
 		tokenKey = deviceCodeTokenKey
 	}
@@ -655,24 +649,14 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
 	}
 
-	// Get client ID for token key generation
-	clientID := ""
-	if cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
-		clientID = *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID
-	}
-
-	// Get environment ID for token key generation
-	environmentID := ""
-	if cfg.Endpoint.EnvironmentID != nil {
-		environmentID = *cfg.Endpoint.EnvironmentID
-	}
+	// Client ID and environment ID no longer needed for manual key generation
 
 	// Set grant type to authorization code
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeAuthorizationCode)
 
-	// Generate unique token key based on provider, profile and configuration
-	tokenKey := generateTokenKey(providerName, profileName, environmentID, clientID, string(svcOAuth2.GrantTypeAuthorizationCode))
-	if tokenKey == "" {
+	// Use SDK-consistent token key generation to avoid mismatches
+	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+	if err != nil || tokenKey == "" {
 		// Fallback to simple key if generation fails
 		tokenKey = authorizationCodeTokenKey
 	}
@@ -855,24 +839,14 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
 	}
 
-	// Get configuration values for token key generation
-	clientID := ""
-	if cfg.Auth.ClientCredentials != nil {
-		if cfg.Auth.ClientCredentials.ClientCredentialsClientID != nil {
-			clientID = *cfg.Auth.ClientCredentials.ClientCredentialsClientID
-		}
-	}
-	environmentID := ""
-	if cfg.Endpoint.EnvironmentID != nil {
-		environmentID = *cfg.Endpoint.EnvironmentID
-	}
+	// Client ID and environment ID no longer needed for manual key generation
 
 	// Set grant type to client credentials
 	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeClientCredentials)
 
-	// Generate unique token key based on provider, profile and configuration
-	tokenKey := generateTokenKey(providerName, profileName, environmentID, clientID, string(svcOAuth2.GrantTypeClientCredentials))
-	if tokenKey == "" {
+	// Use SDK-consistent token key generation to avoid mismatches
+	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+	if err != nil || tokenKey == "" {
 		// Fallback to simple key if generation fails
 		tokenKey = clientCredentialsTokenKey
 	}

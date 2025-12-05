@@ -54,3 +54,27 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 
 	return cfg, nil
 }
+
+// formatStorageLocation returns a human-friendly message for where credentials were cleared
+// based on StorageLocation flags.
+func formatStorageLocation(location StorageLocation) string {
+	switch {
+	case location.Keychain && location.File:
+		return "keychain and file storage"
+	case location.Keychain:
+		return "keychain"
+	case location.File:
+		return "file storage"
+	default:
+		return "storage"
+	}
+}
+
+// formatFullLogoutStorageMessage reports the storage cleared for full logout based on configuration.
+// If keychain is enabled, we report keychain; otherwise file storage.
+func formatFullLogoutStorageMessage() string {
+	if shouldUseKeychain() {
+		return "keychain"
+	}
+	return "file storage"
+}
