@@ -3,11 +3,16 @@
 package input
 
 import (
+	"bufio"
 	"errors"
+	"fmt"
 	"io"
+	"os"
+	"strings"
 
 	"github.com/manifoldco/promptui"
 	"github.com/pingidentity/pingcli/internal/errs"
+	"golang.org/x/term"
 )
 
 var (
@@ -17,26 +22,35 @@ var (
 // RunPromptSecret behaves like RunPrompt but uses a masked input and submit-only validation,
 // minimizing prompt label re-renders common with promptui during live validation.
 func RunPromptSecret(message string, validateFunc func(string) error, rc io.ReadCloser) (string, error) {
+	// Prefer terminal password read to avoid any UI redraws.
 	for {
-		p := promptui.Prompt{
-			Label: message,
-			Mask:  '*',
-			Stdin: rc,
+		if term.IsTerminal(int(os.Stdin.Fd())) {
+			fmt.Printf("%s: ", message)
+			bytes, err := term.ReadPassword(int(os.Stdin.Fd()))
+			fmt.Println()
+			if err != nil {
+				return "", &errs.PingCLIError{Prefix: inputPromptErrorPrefix, Err: err}
+			}
+			s := strings.TrimSpace(string(bytes))
+			if validateFunc != nil && validateFunc(s) != nil {
+				continue
+			}
+			return s, nil
 		}
 
-		userInput, err := p.Run()
+		// Non-terminal stdin: avoid promptui redraw; read a single line.
+		fmt.Printf("%s: ", message)
+		br := bufio.NewReader(rc)
+		line, err := br.ReadString('\n')
+		fmt.Println()
 		if err != nil {
 			return "", &errs.PingCLIError{Prefix: inputPromptErrorPrefix, Err: err}
 		}
-
-		if validateFunc != nil {
-			if vErr := validateFunc(userInput); vErr != nil {
-				// Re-prompt without emitting extra lines to avoid duplicate labels.
-				continue
-			}
+		s := strings.TrimSpace(line)
+		if validateFunc != nil && validateFunc(s) != nil {
+			continue
 		}
-
-		return userInput, nil
+		return s, nil
 	}
 }
 
