@@ -14,6 +14,32 @@ var (
 	inputPromptErrorPrefix = "input prompt error"
 )
 
+// RunPromptSecret behaves like RunPrompt but uses a masked input and submit-only validation,
+// minimizing prompt label re-renders common with promptui during live validation.
+func RunPromptSecret(message string, validateFunc func(string) error, rc io.ReadCloser) (string, error) {
+	for {
+		p := promptui.Prompt{
+			Label: message,
+			Mask:  '*',
+			Stdin: rc,
+		}
+
+		userInput, err := p.Run()
+		if err != nil {
+			return "", &errs.PingCLIError{Prefix: inputPromptErrorPrefix, Err: err}
+		}
+
+		if validateFunc != nil {
+			if vErr := validateFunc(userInput); vErr != nil {
+				// Re-prompt without emitting extra lines to avoid duplicate labels.
+				continue
+			}
+		}
+
+		return userInput, nil
+	}
+}
+
 func RunPrompt(message string, validateFunc func(string) error, rc io.ReadCloser) (string, error) {
 	// Submit-only validation: run prompt without live Validate, then validate after submit.
 	for {

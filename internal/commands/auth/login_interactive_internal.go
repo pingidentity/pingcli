@@ -328,7 +328,7 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (*ClientCredentialsConfi
 	config.ClientID = clientID
 
 	// Client Secret (required)
-	clientSecret, err := input.RunPrompt(
+	clientSecret, err := input.RunPromptSecret(
 		"Client Credentials Client Secret",
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
