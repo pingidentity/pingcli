@@ -51,12 +51,12 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 
 		flagProvided := deviceCodeStr == "true" || clientCredentialsStr == "true" || authorizationCodeStr == "true"
 
-		// If no flag was provided, check if authentication type is configured
+		// If no flag was provided, check if authorization grant type is configured
 		var authType string
 		if !flagProvided {
 			authType, err = profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 			if err != nil || strings.TrimSpace(authType) == "" {
-				// No authentication type configured - run interactive setup
+				// No authorization grant type configured - run interactive setup
 				if err := RunInteractiveAuthConfig(os.Stdin); err != nil {
 					return &errs.PingCLIError{
 						Prefix: loginErrorPrefix,
@@ -105,7 +105,7 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-// performLoginByConfiguredType performs login using the configured authentication type
+// performLoginByConfiguredType performs login using the configured authorization grant type
 func performLoginByConfiguredType(ctx context.Context, authType, profileName string) error {
 	var result *LoginResult
 	var err error
@@ -150,7 +150,7 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 		result, err = PerformClientCredentialsLogin(ctx)
 	default:
 		return &errs.PingCLIError{
-			Prefix: fmt.Sprintf("invalid authentication type: %s", authType),
+			Prefix: fmt.Sprintf("invalid authorization grant type: %s", authType),
 			Err:    ErrInvalidAuthType,
 		}
 	}

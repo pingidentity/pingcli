@@ -103,7 +103,7 @@ type ClientCredentialsConfig struct {
 	RegionCode    string
 }
 
-// PromptForAuthType prompts the user to select an authentication type
+// PromptForAuthType prompts the user to select an authorization grant type
 // If showStatus is true, it will show (configured) or (not configured) status next to each option
 func PromptForAuthType(rc io.ReadCloser, showStatus bool) (string, error) {
 	authTypes := []string{
@@ -131,7 +131,7 @@ func PromptForAuthType(rc io.ReadCloser, showStatus bool) (string, error) {
 	}
 
 	selectedOption, err := input.RunPromptSelect(
-		"Select authentication type for this profile",
+		"Select authorization grant type for this profile",
 		displayOptions,
 		rc,
 	)
@@ -388,7 +388,7 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
-	// Set the authentication type
+	// Set the authorization grant type
 	if err = subKoanf.Set(options.PingOneAuthenticationTypeOption.KoanfKey, authType); err != nil {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
@@ -563,7 +563,7 @@ func RunInteractiveAuthConfigForType(rc io.ReadCloser, desiredAuthType string) e
 		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS: true,
 	}
 	if !validTypes[desiredAuthType] {
-		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: fmt.Errorf("unsupported authentication type: %s", desiredAuthType)}
+		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: fmt.Errorf("unsupported authorization grant type: %s", desiredAuthType)}
 	}
 
 	// Determine whether the requested type is configured
@@ -696,7 +696,7 @@ func getAuthMethodsConfigurationStatus() (map[string]bool, error) {
 	return status, nil
 }
 
-// SaveAuthTypeOnly saves just the authentication type without modifying existing credentials
+// SaveAuthTypeOnly saves just the authorization grant type without modifying existing credentials
 func SaveAuthTypeOnly(authType string) error {
 	koanfConfig, err := profiles.GetKoanfConfig()
 	if err != nil {
@@ -713,7 +713,7 @@ func SaveAuthTypeOnly(authType string) error {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
-	// Set only the authentication type
+	// Set only the authorization grant type
 	if err = subKoanf.Set(options.PingOneAuthenticationTypeOption.KoanfKey, authType); err != nil {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}

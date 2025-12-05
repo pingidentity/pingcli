@@ -246,7 +246,7 @@ func LoadToken() (*oauth2.Token, error) {
 		}
 	}
 
-	// No authentication type configured
+	// No authorization grant type configured
 	return nil, &errs.PingCLIError{
 		Prefix: credentialsErrorPrefix,
 		Err:    ErrUnsupportedAuthType,

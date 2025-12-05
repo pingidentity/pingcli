@@ -8,7 +8,7 @@ var (
 	// Token errors
 	ErrNoTokenFound                   = errors.New("no token found for any authentication method")
 	ErrNoCachedToken                  = errors.New("no cached token available")
-	ErrUnsupportedAuthType            = errors.New("unsupported authentication type. Please run 'pingcli login' to authenticate")
+	ErrUnsupportedAuthType            = errors.New("unsupported authorization grant type. Please run 'pingcli login' to authenticate")
 	ErrAuthMethodNotConfigured        = errors.New("grant type is not configured")
 	ErrUnsupportedAuthMethod          = errors.New("unsupported grant type")
 	ErrTokenKeyGenerationRequirements = errors.New("environment ID and client ID are required for token key generation")
@@ -42,17 +42,17 @@ var (
 	ErrPingFederateCACertParse = errors.New("failed to parse CA certificate PEM file to certificate pool")
 
 	// PingOne errors
-	ErrPingOneUnrecognizedAuthType = errors.New("unrecognized or unsupported PingOne authentication type")
+	ErrPingOneUnrecognizedAuthType = errors.New("unrecognized or unsupported PingOne authorization grant type")
 	ErrPingOneClientConfigNil      = errors.New("PingOne client configuration is nil")
 
 	// Configuration and validation errors
 	ErrClientIDRequired      = errors.New("client ID is required")
 	ErrClientSecretRequired  = errors.New("client secret is required")
 	ErrEnvironmentIDRequired = errors.New("environment ID is required")
-	ErrInvalidAuthType       = errors.New("invalid authentication type")
+	ErrInvalidAuthType       = errors.New("invalid authorization grant type")
 	ErrInvalidAuthProvider   = errors.New("invalid authentication provider")
 	ErrAuthConfigRequired    = errors.New("authentication configuration required. Please configure authentication using 'pingcli auth login' or 'pingcli config set'")
-	ErrNoAuthTypeSpecified   = errors.New("no authentication type configured and no flag specified. Use --auth-code, --device-code, or --client-credentials to specify which credentials to clear")
+	ErrNoAuthTypeSpecified   = errors.New("no authorization grant type configured and no flag specified. Use --auth-code, --device-code, or --client-credentials to specify which credentials to clear")
 	ErrNoAuthConfiguration   = errors.New("no configuration found. Nothing to logout from. Run 'pingcli login' to configure authentication")
 
 	// Redirect URI validation errors

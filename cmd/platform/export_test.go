@@ -546,12 +546,12 @@ func TestPlatformExportCmd_PingOneNewAuthMissingRegionCode(t *testing.T) {
 	}
 }
 
-// Test Platform Export Command with invalid authentication type
+// Test Platform Export Command with invalid authorization grant type
 func TestPlatformExportCmd_PingOneInvalidAuthType(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
-	expectedErrorPattern := `unrecognized pingone authentication type`
+	expectedErrorPattern := `unrecognized pingone authorization grant type`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,

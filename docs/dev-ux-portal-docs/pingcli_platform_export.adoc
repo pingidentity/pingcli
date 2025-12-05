@@ -71,7 +71,7 @@ pingcli platform export [flags]
       --pingfederate-token-url string                      The PingFederate OAuth token URL used to authenticate to the PingFederate admin API when using the OAuth 2.0 client credentials grant type.
       --pingfederate-username string                       The PingFederate username used to authenticate to the PingFederate admin API when using basic authentication. Example: 'administrator'
       --pingfederate-x-bypass-external-validation-header   Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false)
-      --pingone-authentication-type string                 The authentication type to use to authenticate to the PingOne management API. (default worker) Options are: worker.
+      --pingone-authentication-type string                 The authorization grant type to use to authenticate to the PingOne management API. (default worker) Options are: worker.
       --pingone-export-environment-id string               The ID of the PingOne environment to export. Must be a valid PingOne UUID.
       --pingone-region-code string                         The region code of the PingOne tenant. Options are: AP, AU, CA, EU, NA. Example: 'NA'
       --pingone-worker-client-id string                    The worker client ID used to authenticate to the PingOne management API.

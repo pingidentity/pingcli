@@ -15,7 +15,7 @@ var (
 	ErrUnrecognizedService           = errors.New("unrecognized request service")
 	ErrUnrecognizedOutputFormat      = errors.New("unrecognized output format")
 	ErrUnrecognizedPingOneRegionCode = errors.New("unrecognized pingone region code")
-	ErrUnrecognizedPingOneAuth       = errors.New("unrecognized pingone authentication type")
+	ErrUnrecognizedPingOneAuth       = errors.New("unrecognized pingone authorization grant type")
 	ErrUnrecognizedPingFederateAuth  = errors.New("unrecognized pingfederate authentication type")
 	ErrUnrecognizedProduct           = errors.New("unrecognized license product")
 	ErrInvalidVersionFormat          = errors.New("invalid version format, must be 'major.minor'")

@@ -415,7 +415,7 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 		}
 		grantType = svcOAuth2.GrantTypeClientCredentials
 	default:
-		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'. Please configure worker credentials or a supported authentication type (authorization_code, device_code, client_credentials)", ErrPingOneUnrecognizedAuthType, authType)}
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'. Please configure worker credentials or a supported authorization grant type (authorization_code, device_code, client_credentials)", ErrPingOneUnrecognizedAuthType, authType)}
 	}
 
 	if cfg != nil {

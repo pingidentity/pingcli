@@ -83,7 +83,7 @@ func initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:  cobraParamName,
-			Usage: "The redirect URI path to use when using the authorization code authentication type to authenticate to the PingOne management API.",
+			Usage: "The redirect URI path to use when using the authorization code authorization grant type to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
 		Sensitive: false,
@@ -105,7 +105,7 @@ func initPingOneAuthenticationAuthorizationCodeRedirectURIPortOption() {
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
 			Name:  cobraParamName,
-			Usage: "The redirect URI port to use when using the authorization code authentication type to authenticate to the PingOne management API.",
+			Usage: "The redirect URI port to use when using the authorization code authorization grant type to authenticate to the PingOne management API.",
 			Value: cobraValue,
 		},
 		Sensitive: false,
@@ -194,7 +194,7 @@ func initPingOneAuthenticationTypeOption() {
 		Flag: &pflag.Flag{
 			Name: cobraParamName,
 			Usage: fmt.Sprintf(
-				"The authentication type to use to authenticate to the PingOne management API. (default %s)"+
+				"The authorization grant type to use to authenticate to the PingOne management API. (default %s)"+
 					"\nOptions are: %s.",
 				customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER,
 				strings.Join(customtypes.PingOneAuthenticationTypeValidValues(), ", "),

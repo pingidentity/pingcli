@@ -234,7 +234,7 @@ func TestGetValidTokenSource_NoCache(t *testing.T) {
 			t.Error("Expected token source when no error, but got nil")
 		}
 		t.Log("Automatic authentication succeeded (valid credentials configured)")
-	} else if !strings.Contains(err.Error(), "failed to get authentication type") &&
+	} else if !strings.Contains(err.Error(), "failed to get authorization grant type") &&
 		!strings.Contains(err.Error(), "automatic client credentials authentication failed") &&
 		!strings.Contains(err.Error(), "automatic authorization code authentication failed") &&
 		!strings.Contains(err.Error(), "automatic device code authentication failed") &&
@@ -396,7 +396,7 @@ func TestGetValidTokenSource_ErrorPaths(t *testing.T) {
 	// The error message can vary depending on the configured auth type and state
 	// Since "worker" type gets converted to "client_credentials", we expect client credentials auth failure
 	if !strings.Contains(err.Error(), "automatic client credentials authentication failed") &&
-		!strings.Contains(err.Error(), "failed to get authentication type") &&
+		!strings.Contains(err.Error(), "failed to get authorization grant type") &&
 		!strings.Contains(err.Error(), "client ID is not configured") {
 		t.Errorf("Expected authentication failure, got: %s", err.Error())
 	}
@@ -425,11 +425,11 @@ func TestGetValidTokenSource_AutomaticDeviceCodeAuth(t *testing.T) {
 	// The error will depend on the configured auth type:
 	// - In test env: "worker" -> "client_credentials" -> "automatic client credentials authentication failed"
 	// - If device_code was configured: "automatic device code authentication failed"
-	// - Other config errors: "failed to get authentication type"
+	// - Other config errors: "failed to get authorization grant type"
 	expectedErrors := []string{
 		"automatic device code authentication failed",
 		"automatic client credentials authentication failed", // test env: worker -> client_credentials
-		"failed to get authentication type",
+		"failed to get authorization grant type",
 		"failed to get client credentials configuration",
 		"failed to get device code configuration",
 		"failed to get authorization code configuration",
@@ -525,7 +525,7 @@ func TestGetValidTokenSource_AutomaticClientCredentialsAuth(t *testing.T) {
 		"automatic device code authentication failed",
 		"automatic authorization code authentication failed",
 		"automatic client credentials authentication failed",
-		"failed to get authentication type",
+		"failed to get authorization grant type",
 		"failed to get client credentials configuration",
 		"failed to get device code configuration",
 		"failed to get authorization code configuration",

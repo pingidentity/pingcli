@@ -115,7 +115,7 @@ test:
 
 	// Try to logout without specifying grant type and without configured auth type
 	err := testutils_cobra.ExecutePingcli(t, "logout")
-	expectedErrorPattern := `no authentication type configured|authentication type|failed to generate token key`
+	expectedErrorPattern := `no authorization grant type configured|authorization grant type|failed to generate token key`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 

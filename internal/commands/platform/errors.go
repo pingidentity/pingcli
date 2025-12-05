@@ -20,7 +20,7 @@ var (
 	ErrHttpTransportNil            = errors.New("failed to initialize PingFederate service. HTTP transport is nil")
 	ErrHttpsHostEmpty              = errors.New("failed to initialize PingFederate service. HTTPS host is not set")
 	ErrRegionCodeRequired          = errors.New("region code is required and must be valid. Please run 'pingcli config set service.pingone.regionCode=<region>'")
-	ErrPingOneUnrecognizedAuthType = errors.New("unrecognized or unsupported PingOne authentication type")
+	ErrPingOneUnrecognizedAuthType = errors.New("unrecognized or unsupported PingOne authorization grant type")
 	ErrPingOneConfigValuesEmpty    = errors.New("failed to initialize pingone API client. one of worker client ID, worker client secret, " +
 		"pingone region code, and/or worker environment ID is not set. configure these properties via parameter flags, " +
 		"environment variables, or the tool's configuration file (default: $HOME/.pingcli/config.yaml)")
