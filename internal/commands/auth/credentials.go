@@ -109,19 +109,31 @@ type LoginResult struct {
 func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation, error) {
 	location := StorageLocation{}
 
-	// Save to file storage
-	// Note: SDK handles keychain storage separately with its own token key format
-	if err := saveTokenToFile(token, authMethod); err != nil {
-		// If it's a critical error (like nil token), fail immediately
-		if errors.Is(err, ErrNilToken) {
-			return location, err
-		}
-
-		return location, err
+	if token == nil {
+		return location, ErrNilToken
 	}
 
-	location.File = true
+	// If keychain is enabled, attempt keychain first, then fall back to file storage.
+	if shouldUseKeychain() {
+		if storage, err := getTokenStorage(authMethod); err == nil {
+			if err := storage.SaveToken(token); err == nil {
+				location.Keychain = true
+				return location, nil
+			}
+		}
+		// Fallback to file storage if keychain save failed or storage unavailable.
+		if err := saveTokenToFile(token, authMethod); err != nil {
+			return location, err
+		}
+		location.File = true
+		return location, nil
+	}
 
+	// File-only mode: save only to file storage and error if unsuccessful.
+	if err := saveTokenToFile(token, authMethod); err != nil {
+		return location, err
+	}
+	location.File = true
 	return location, nil
 }
 
