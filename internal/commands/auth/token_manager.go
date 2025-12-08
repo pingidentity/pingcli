@@ -4,6 +4,7 @@ package auth_internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/errs"
@@ -110,9 +111,18 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 		}
 	}
 
-	// Use the SDK's GenerateKeychainAccountName to ensure consistency with SDK token storage
-	// This generates token-HASH without profile/grant type suffix for keychain compatibility
-	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType))
+	// Build suffix to disambiguate across provider/grant/profile for both keychain and files
+	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if profileName == "" {
+		profileName = "default"
+	}
+	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
+	if strings.TrimSpace(providerName) == "" {
+		providerName = "pingone"
+	}
+	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)
+	// Use the SDK's GenerateKeychainAccountName with optional suffix
+	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType), suffix)
 	if tokenKey == "" || tokenKey == "default-token" {
 		return "", &errs.PingCLIError{
 			Prefix: tokenManagerErrorPrefix,
@@ -154,9 +164,18 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 		}
 	}
 
-	// Use the SDK's GenerateKeychainAccountName to ensure consistency with SDK token storage
-	// This generates token-HASH without profile/grant type suffix for keychain compatibility
-	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType))
+	// Build suffix to disambiguate across provider/grant/profile for both keychain and files
+	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if profileName == "" {
+		profileName = "default"
+	}
+	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
+	if strings.TrimSpace(providerName) == "" {
+		providerName = "pingone"
+	}
+	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)
+	// Use the SDK's GenerateKeychainAccountName with optional suffix
+	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType), suffix)
 	if tokenKey == "" || tokenKey == "default-token" {
 		return "", &errs.PingCLIError{
 			Prefix: tokenManagerErrorPrefix,

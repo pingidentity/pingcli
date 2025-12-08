@@ -112,19 +112,14 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		return location, ErrNilToken
 	}
 
-	// If keychain is enabled, attempt keychain first, then fall back to file storage.
+	// Avoid saving to keychain here: SDK handles keychain persistence via TokenSource.
+	// We only persist to file storage, optionally alongside SDK-managed keychain.
 	if shouldUseKeychain() {
-		if storage, err := getTokenStorage(authMethod); err == nil {
-			if err := storage.SaveToken(token); err == nil {
-				location.Keychain = true
-				return location, nil
-			}
+		if err := saveTokenToFile(token, authMethod); err == nil {
+			location.File = true
 		}
-		// Fallback to file storage if keychain save failed or storage unavailable.
-		if err := saveTokenToFile(token, authMethod); err != nil {
-			return location, err
-		}
-		location.File = true
+		// Indicate keychain is in use, though we did not write it here.
+		location.Keychain = true
 		return location, nil
 	}
 
@@ -673,6 +668,17 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).WithStorageName("pingcli")
 
+	// Provide optional suffix so SDK keychain entries align with file names
+	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if strings.TrimSpace(profileName) == "" {
+		profileName = "default"
+	}
+	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
+	if strings.TrimSpace(providerName) == "" {
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
+	}
+	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeDeviceCode), profileName))
+
 	// Apply Environment ID for consistent token key generation and endpoints
 	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
 	if err != nil {
@@ -888,6 +894,17 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithStorageType(getStorageType()).
 		WithStorageName("pingcli")
 
+	// Provide optional suffix so SDK keychain entries align with file names
+	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if strings.TrimSpace(profileName) == "" {
+		profileName = "default"
+	}
+	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
+	if strings.TrimSpace(providerName) == "" {
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
+	}
+	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeAuthorizationCode), profileName))
+
 	// Apply Environment ID for consistent token key generation and endpoints
 	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
 	if err != nil {
@@ -1057,6 +1074,17 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).
 		WithStorageName("pingcli")
+
+	// Provide optional suffix so SDK keychain entries align with file names
+	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if strings.TrimSpace(profileName) == "" {
+		profileName = "default"
+	}
+	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
+	if strings.TrimSpace(providerName) == "" {
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
+	}
+	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName))
 
 	// Apply Environment ID for consistent token key generation and endpoints
 	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
