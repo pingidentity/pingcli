@@ -437,9 +437,17 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 	}
 
 	// Persist the current file storage preference if explicitly set via flag or env
-	if fileStorageVal, err := profiles.GetOptionValue(options.AuthFileStorageOption); err == nil && fileStorageVal != "" {
-		if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, fileStorageVal); err != nil {
-			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	if fileStorageVal, err := profiles.GetOptionValue(options.AuthFileStorageOption); err == nil && strings.TrimSpace(fileStorageVal) != "" {
+		// Save as boolean, not string
+		if b, perr := strconv.ParseBool(strings.TrimSpace(fileStorageVal)); perr == nil {
+			if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, b); err != nil {
+				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+			}
+		} else {
+			// Default to false if parse fails
+			if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, false); err != nil {
+				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+			}
 		}
 	}
 
@@ -726,9 +734,17 @@ func SaveAuthTypeOnly(authType string) error {
 	}
 
 	// Persist the current file storage preference if explicitly set via flag or env
-	if fileStorageVal, err := profiles.GetOptionValue(options.AuthFileStorageOption); err == nil && fileStorageVal != "" {
-		if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, fileStorageVal); err != nil {
-			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	if fileStorageVal, err := profiles.GetOptionValue(options.AuthFileStorageOption); err == nil && strings.TrimSpace(fileStorageVal) != "" {
+		// Save as boolean, not string
+		if b, perr := strconv.ParseBool(strings.TrimSpace(fileStorageVal)); perr == nil {
+			if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, b); err != nil {
+				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+			}
+		} else {
+			// Default to false if parse fails
+			if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, false); err != nil {
+				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+			}
 		}
 	}
 

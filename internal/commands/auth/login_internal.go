@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -167,8 +168,15 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 	if fileStorageVal, fsErr := profiles.GetOptionValue(options.AuthFileStorageOption); fsErr == nil && strings.TrimSpace(fileStorageVal) != "" {
 		if koanfCfg, kErr := profiles.GetKoanfConfig(); kErr == nil {
 			if sub, sErr := koanfCfg.GetProfileKoanf(profileName); sErr == nil {
-				if setErr := sub.Set(options.AuthFileStorageOption.KoanfKey, fileStorageVal); setErr == nil {
-					_ = koanfCfg.SaveProfile(profileName, sub)
+				// Persist as boolean, not string
+				if b, perr := strconv.ParseBool(strings.TrimSpace(fileStorageVal)); perr == nil {
+					if setErr := sub.Set(options.AuthFileStorageOption.KoanfKey, b); setErr == nil {
+						_ = koanfCfg.SaveProfile(profileName, sub)
+					}
+				} else {
+					if setErr := sub.Set(options.AuthFileStorageOption.KoanfKey, false); setErr == nil { // default to false
+						_ = koanfCfg.SaveProfile(profileName, sub)
+					}
 				}
 			}
 		}
