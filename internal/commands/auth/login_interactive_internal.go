@@ -436,6 +436,13 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 		}
 	}
 
+	// Persist the current file storage preference if explicitly set via flag or env
+	if fileStorageVal, err := profiles.GetOptionValue(options.AuthFileStorageOption); err == nil && fileStorageVal != "" {
+		if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, fileStorageVal); err != nil {
+			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		}
+	}
+
 	// Save the profile
 	if err = koanfConfig.SaveProfile(profileName, subKoanf); err != nil {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
@@ -716,6 +723,13 @@ func SaveAuthTypeOnly(authType string) error {
 	// Set only the authorization grant type
 	if err = subKoanf.Set(options.PingOneAuthenticationTypeOption.KoanfKey, authType); err != nil {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+
+	// Persist the current file storage preference if explicitly set via flag or env
+	if fileStorageVal, err := profiles.GetOptionValue(options.AuthFileStorageOption); err == nil && fileStorageVal != "" {
+		if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, fileStorageVal); err != nil {
+			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+		}
 	}
 
 	// Save the profile

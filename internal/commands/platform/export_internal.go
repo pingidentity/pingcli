@@ -515,7 +515,7 @@ func getPingOneExportEnvID() (err error) {
 	}
 
 	if pingoneExportEnvID == "" {
-		pingoneExportEnvID, err = profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+		pingoneExportEnvID, err = profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
 		if err != nil {
 			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
 		}
@@ -523,7 +523,7 @@ func getPingOneExportEnvID() (err error) {
 			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrDeterminePingOneExportEnv}
 		}
 
-		output.Message("No target PingOne export environment ID specified. Defaulting export environment ID to the Worker App environment ID.", nil)
+		output.Message("No target PingOne export environment ID specified. Defaulting export environment ID to the PingOne authentication environment ID.", nil)
 	}
 
 	return nil

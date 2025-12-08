@@ -162,6 +162,18 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 		}
 	}
 
+	// Persist the current file storage preference into the profile when a login succeeds
+	// so subsequent commands honor the chosen storage mode without re-specifying the flag.
+	if fileStorageVal, fsErr := profiles.GetOptionValue(options.AuthFileStorageOption); fsErr == nil && strings.TrimSpace(fileStorageVal) != "" {
+		if koanfCfg, kErr := profiles.GetKoanfConfig(); kErr == nil {
+			if sub, sErr := koanfCfg.GetProfileKoanf(profileName); sErr == nil {
+				if setErr := sub.Set(options.AuthFileStorageOption.KoanfKey, fileStorageVal); setErr == nil {
+					_ = koanfCfg.SaveProfile(profileName, sub)
+				}
+			}
+		}
+	}
+
 	displayLoginSuccess(result.Token, result.NewAuth, result.Location, selectedMethod, profileName)
 
 	return nil

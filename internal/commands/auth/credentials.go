@@ -320,7 +320,48 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		// Set the grant type before getting the token source
 		cfg = cfg.WithGrantType(grantType)
 
-		// Defer all token management to the SDK's TokenSource.
+		// If using file storage, try to seed refresh from existing file token before new login
+		if !shouldUseKeychain() {
+			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+			if err == nil && tokenKey != "" {
+				if existingToken, ferr := loadTokenFromFile(tokenKey); ferr == nil && existingToken != nil && existingToken.RefreshToken != "" {
+					// Build minimal oauth2.Config for refresh using SDK endpoints
+					endpoints, eerr := cfg.AuthEndpoints()
+					if eerr == nil {
+						var oauthCfg *oauth2.Config
+						switch grantType {
+						case svcOAuth2.GrantTypeDeviceCode:
+							// Device Code: use client ID and optional scopes
+							if cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
+								var scopes []string
+								if cfg.Auth.DeviceCode.DeviceCodeScopes != nil {
+									scopes = *cfg.Auth.DeviceCode.DeviceCodeScopes
+								}
+								oauthCfg = &oauth2.Config{ClientID: *cfg.Auth.DeviceCode.DeviceCodeClientID, Endpoint: endpoints.Endpoint, Scopes: scopes}
+							}
+						case svcOAuth2.GrantTypeAuthorizationCode:
+							// Auth Code: use client ID and optional scopes
+							if cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
+								var scopes []string
+								if cfg.Auth.AuthorizationCode.AuthorizationCodeScopes != nil {
+									scopes = *cfg.Auth.AuthorizationCode.AuthorizationCodeScopes
+								}
+								oauthCfg = &oauth2.Config{ClientID: *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID, Endpoint: endpoints.Endpoint, Scopes: scopes}
+							}
+						default:
+							// client_credentials typically lacks refresh; fall through
+						}
+
+						if oauthCfg != nil {
+							baseTS := oauthCfg.TokenSource(ctx, existingToken)
+							return oauth2.ReuseTokenSource(nil, baseTS), nil
+						}
+					}
+				}
+			}
+		}
+
+		// Fallback: use SDK TokenSource (may perform new auth)
 		tokenSource, err := cfg.TokenSource(ctx)
 		if err != nil {
 			return nil, &errs.PingCLIError{
@@ -529,8 +570,33 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// Get token source - SDK handles keychain storage based on configuration
-	tokenSource, err := cfg.TokenSource(ctx)
+	// If using file storage and we have a refresh token, seed refresh via oauth2.ReuseTokenSource
+	var tokenSource oauth2.TokenSource
+	if !shouldUseKeychain() {
+		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.RefreshToken != "" {
+			endpoints, eerr := cfg.AuthEndpoints()
+			if eerr == nil && cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
+				var scopes []string
+				if cfg.Auth.DeviceCode.DeviceCodeScopes != nil {
+					scopes = *cfg.Auth.DeviceCode.DeviceCodeScopes
+				}
+				oauthCfg := &oauth2.Config{ClientID: *cfg.Auth.DeviceCode.DeviceCodeClientID, Endpoint: endpoints.Endpoint, Scopes: scopes}
+				baseTS := oauthCfg.TokenSource(ctx, existingToken)
+				tokenSource = oauth2.ReuseTokenSource(nil, baseTS)
+			}
+		}
+	}
+	// Fallback to SDK token source if we didn't create a seeded one
+	if tokenSource == nil {
+		var tsErr error
+		tokenSource, tsErr = cfg.TokenSource(ctx)
+		if tsErr != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    tsErr,
+			}
+		}
+	}
 	if err != nil {
 		return nil, &errs.PingCLIError{
 			Prefix: credentialsErrorPrefix,
@@ -682,8 +748,33 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// Get token source - SDK handles keychain storage based on configuration
-	tokenSource, err := cfg.TokenSource(ctx)
+	// If using file storage and we have a refresh token, seed refresh via oauth2.ReuseTokenSource
+	var tokenSource oauth2.TokenSource
+	if !shouldUseKeychain() {
+		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.RefreshToken != "" {
+			endpoints, eerr := cfg.AuthEndpoints()
+			if eerr == nil && cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
+				var scopes []string
+				if cfg.Auth.AuthorizationCode.AuthorizationCodeScopes != nil {
+					scopes = *cfg.Auth.AuthorizationCode.AuthorizationCodeScopes
+				}
+				oauthCfg := &oauth2.Config{ClientID: *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID, Endpoint: endpoints.Endpoint, Scopes: scopes}
+				baseTS := oauthCfg.TokenSource(ctx, existingToken)
+				tokenSource = oauth2.ReuseTokenSource(nil, baseTS)
+			}
+		}
+	}
+	// Fallback to SDK token source if we didn't create a seeded one
+	if tokenSource == nil {
+		var tsErr error
+		tokenSource, tsErr = cfg.TokenSource(ctx)
+		if tsErr != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    tsErr,
+			}
+		}
+	}
 	if err != nil {
 		return nil, &errs.PingCLIError{
 			Prefix: credentialsErrorPrefix,
