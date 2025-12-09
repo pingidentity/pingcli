@@ -109,7 +109,7 @@ func initAuthFileStorageOption() {
 		},
 		Sensitive: false,
 		Type:      options.BOOL,
-		KoanfKey:  "auth.fileStorage",
+		KoanfKey:  "login.fileStorage",
 	}
 }
 

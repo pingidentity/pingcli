@@ -6,6 +6,8 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/errs"
+	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/spf13/cobra"
 )
@@ -36,12 +38,10 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	if !flagProvided {
 		// No flag provided - clear ALL tokens (keychain and file storage)
 		if err := ClearToken(); err != nil {
-			return fmt.Errorf("failed to clear credentials: %w", err)
+			return fmt.Errorf("%s: %w", credentialsErrorPrefix, err)
 		}
-
 		// Report the storage cleared using common formatter
-		fmt.Printf("Successfully logged out from all methods for service '%s'. Credentials cleared from %s for profile '%s'.\n", providerName, formatFullLogoutStorageMessage(), profileName)
-
+		output.Success(fmt.Sprintf("Successfully logged out and cleared credentials from all methods for service '%s' using profile '%s'.\n", providerName, profileName), nil)
 		return nil
 	}
 
@@ -61,19 +61,16 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	// Generate token key for the selected grant type
 	tokenKey, err := GetAuthMethodKey(authType)
 	if err != nil {
-		return fmt.Errorf("failed to generate token key for %s: %w", authType, err)
+		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: err}
 	}
 
 	// Clear only the token for the specified grant type
 	location, err := ClearTokenForMethod(tokenKey)
 	if err != nil {
-		return fmt.Errorf("failed to clear %s credentials: %w", authType, err)
+		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: fmt.Errorf("failed to clear %s credentials. in %s: %w", authType, formatStorageLocation(location), err)}
 	}
 
-	// Build storage location message via common formatter
-	storageMsg := formatStorageLocation(location)
-
-	fmt.Printf("Successfully logged out from %s for service '%s'. Credentials cleared from %s for profile '%s'.\n", authType, providerName, storageMsg, profileName)
+	output.Success(fmt.Sprintf("Successfully logged out and cleared credentials from %s for service '%s' using profile '%s'.\n", authType, providerName, profileName), nil)
 
 	return nil
 }
