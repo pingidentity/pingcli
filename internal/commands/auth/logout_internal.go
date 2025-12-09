@@ -41,7 +41,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("%s: %w", credentialsErrorPrefix, err)
 		}
 		// Report the storage cleared using common formatter
-		output.Success(fmt.Sprintf("Successfully logged out and cleared credentials from all methods for service '%s' using profile '%s'.\n", providerName, profileName), nil)
+		output.Success(fmt.Sprintf("Successfully logged out and cleared credentials from all methods for service '%s' using profile '%s'.", providerName, profileName), nil)
 		return nil
 	}
 
@@ -70,7 +70,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: fmt.Errorf("failed to clear %s credentials. in %s: %w", authType, formatStorageLocation(location), err)}
 	}
 
-	output.Success(fmt.Sprintf("Successfully logged out and cleared credentials from %s for service '%s' using profile '%s'.\n", authType, providerName, profileName), nil)
+	output.Success(fmt.Sprintf("Successfully logged out and cleared credentials from %s for service '%s' using profile '%s'.", authType, providerName, profileName), nil)
 
 	return nil
 }

@@ -113,12 +113,8 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 	}
 
 	// Avoid saving to keychain here: SDK handles keychain persistence via TokenSource.
-	// We only persist to file storage, optionally alongside SDK-managed keychain.
+	// When keychain is enabled, do NOT write a file. Only indicate keychain is in use.
 	if shouldUseKeychain() {
-		if err := saveTokenToFile(token, authMethod); err == nil {
-			location.File = true
-		}
-		// Indicate keychain is in use, though we did not write it here.
 		location.Keychain = true
 		return location, nil
 	}
