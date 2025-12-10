@@ -474,35 +474,6 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 		location.File = true
 	}
 
-	// Also clear all token files for this grant type and current profile
-	// This handles cases where the user changed their configuration
-	// Determine grant type from grant type (authMethod is the token key)
-	// We need to parse it to get the grant type
-	// For now, just try all grant types - inefficient but safe
-	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if err != nil {
-		profileName = "default"
-	}
-
-	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || providerName == "" {
-		providerName = "pingone" // Default to pingone
-	}
-
-	// Try all grant types to make sure we clean up
-	grantTypes := []string{
-		string(svcOAuth2.GrantTypeDeviceCode),
-		string(svcOAuth2.GrantTypeClientCredentials),
-		string(svcOAuth2.GrantTypeAuthorizationCode),
-	}
-
-	for _, grantType := range grantTypes {
-		if err := clearAllTokenFilesForGrantType(providerName, grantType, profileName); err != nil {
-			// Don't fail the whole operation if cleanup fails
-			errList = append(errList, fmt.Errorf("failed to clear all %s tokens: %w", grantType, err))
-		}
-	}
-
 	return location, errors.Join(errList...)
 }
 
