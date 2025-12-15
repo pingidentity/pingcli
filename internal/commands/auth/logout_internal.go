@@ -42,6 +42,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		}
 		// Report the storage cleared using common formatter
 		output.Success(fmt.Sprintf("Successfully logged out and cleared credentials from all methods for service '%s' using profile '%s'.", providerName, profileName), nil)
+
 		return nil
 	}
 

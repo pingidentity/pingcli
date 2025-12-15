@@ -35,6 +35,7 @@ func RunPromptSecret(message string, validateFunc func(string) error, rc io.Read
 			if validateFunc != nil && validateFunc(s) != nil {
 				continue
 			}
+
 			return s, nil
 		}
 
@@ -49,6 +50,7 @@ func RunPromptSecret(message string, validateFunc func(string) error, rc io.Read
 		if validateFunc != nil && validateFunc(s) != nil {
 			continue
 		}
+
 		return s, nil
 	}
 }
@@ -68,8 +70,8 @@ func RunPrompt(message string, validateFunc func(string) error, rc io.ReadCloser
 
 		if validateFunc != nil {
 			if vErr := validateFunc(userInput); vErr != nil {
-				//nolint:all
 				_ = vErr
+
 				continue
 			}
 		}

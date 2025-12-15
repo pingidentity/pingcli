@@ -33,7 +33,7 @@ func NewLoginCommand() *cobra.Command {
 	cmd.Flags().AddFlag(options.AuthMethodAuthorizationCodeOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodClientCredentialsOption.Flag)
 	cmd.Flags().AddFlag(options.AuthMethodDeviceCodeOption.Flag)
-	cmd.Flags().AddFlag(options.AuthFileStorageOption.Flag)
+	cmd.Flags().AddFlag(options.AuthStorageOption.Flag)
 	cmd.Flags().AddFlag(options.AuthProviderOption.Flag)
 
 	// Enforce that exactly one authorization grant type must be specified

@@ -27,6 +27,7 @@ const (
 	PINGONE_REGION_CODE
 	REQUEST_HTTP_METHOD
 	REQUEST_SERVICE
+	STORAGE_TYPE
 	STRING
 	STRING_SLICE
 	UUID
@@ -55,7 +56,7 @@ func Options() []Option {
 		AuthMethodAuthorizationCodeOption,
 		AuthMethodClientCredentialsOption,
 		AuthMethodDeviceCodeOption,
-		AuthFileStorageOption,
+		AuthStorageOption,
 		AuthProviderOption,
 
 		LicenseProductOption,
@@ -138,7 +139,7 @@ var (
 
 // 'pingcli login' command options
 var (
-	AuthFileStorageOption             Option
+	AuthStorageOption                 Option
 	AuthMethodAuthorizationCodeOption Option
 	AuthMethodClientCredentialsOption Option
 	AuthMethodDeviceCodeOption        Option

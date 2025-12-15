@@ -7,7 +7,6 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -36,36 +35,44 @@ func getTokenStorage(authMethod string) (*svcOAuth2.KeychainStorage, error) {
 	return svcOAuth2.NewKeychainStorage("pingcli", authMethod)
 }
 
-// shouldUseKeychain checks if keychain storage should be used based on the --file-storage flag
-// Returns true if keychain should be used (default), false if file storage should be used
+// shouldUseKeychain checks if keychain storage should be used based on the storage type
+// Returns true if storage type is secure_local (default), false for file_system/none
 func shouldUseKeychain() bool {
-	useFileStorage, err := profiles.GetOptionValue(options.AuthFileStorageOption)
+	v, err := profiles.GetOptionValue(options.AuthStorageOption)
 	if err != nil {
-		// If we can't get the value, default to true (use keychain)
+		return true // default to keychain
+	}
+	s := strings.TrimSpace(strings.ToLower(v))
+	if s == "" {
+		return true // default to keychain
+	}
+	// Back-compat: boolean handling (true => file_system, false => secure_local)
+	if s == "true" {
+		return false
+	}
+	if s == "false" {
 		return true
 	}
-
-	if useFileStorage == "" {
-		// If not set, default to true (use keychain)
+	switch s {
+	case string(config.StorageTypeSecureLocal):
+		return true
+	case string(config.StorageTypeFileSystem), string(config.StorageTypeNone), string(config.StorageTypeSecureRemote):
+		return false
+	default:
+		// Unrecognized: lean secure by not disabling keychain
 		return true
 	}
-
-	// If --file-storage is true, we should NOT use keychain
-	useFileStorageBool, err := strconv.ParseBool(useFileStorage)
-	if err != nil {
-		// If we can't parse the value, default to true (use keychain)
-		return true
-	}
-
-	return !useFileStorageBool
 }
 
 // getStorageType returns the appropriate storage type for SDK keychain operations
 // SDK handles keychain storage, pingcli handles file storage separately
 func getStorageType() config.StorageType {
-	if shouldUseKeychain() {
-		return config.StorageTypeKeychain
+	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+	s := strings.TrimSpace(strings.ToLower(v))
+	if s == "false" || s == string(config.StorageTypeSecureLocal) || s == "" {
+		return config.StorageTypeSecureLocal
 	}
+	// For file_system/none/secure_remote, avoid SDK persistence (pingcli manages file persistence)
 	return config.StorageTypeNone
 }
 
@@ -116,6 +123,7 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 	// When keychain is enabled, do NOT write a file. Only indicate keychain is in use.
 	if shouldUseKeychain() {
 		location.Keychain = true
+
 		return location, nil
 	}
 
@@ -124,6 +132,7 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		return location, err
 	}
 	location.File = true
+
 	return location, nil
 }
 
@@ -299,6 +308,12 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		grantType = svcOAuth2.GrantTypeClientCredentials
 	case "worker":
 		cfg, err = GetWorkerConfiguration()
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    err,
+			}
+		}
 		grantType = svcOAuth2.GrantTypeClientCredentials
 	default:
 		return nil, &errs.PingCLIError{
@@ -345,6 +360,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 
 						if oauthCfg != nil {
 							baseTS := oauthCfg.TokenSource(ctx, existingToken)
+
 							return oauth2.ReuseTokenSource(nil, baseTS), nil
 						}
 					}
@@ -360,6 +376,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 				Err:    err,
 			}
 		}
+
 		return tokenSource, nil
 	}
 

@@ -6,7 +6,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
@@ -14,6 +13,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
+	"github.com/pingidentity/pingone-go-client/config"
 	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
 	"github.com/spf13/cobra"
 	"golang.org/x/oauth2"
@@ -163,20 +163,21 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 		}
 	}
 
-	// Persist the current file storage preference into the profile when a login succeeds
+	// Persist the current storage preference into the profile when a login succeeds
 	// so subsequent commands honor the chosen storage mode without re-specifying the flag.
-	if fileStorageVal, fsErr := profiles.GetOptionValue(options.AuthFileStorageOption); fsErr == nil && strings.TrimSpace(fileStorageVal) != "" {
+	if storageVal, fsErr := profiles.GetOptionValue(options.AuthStorageOption); fsErr == nil && strings.TrimSpace(storageVal) != "" {
 		if koanfCfg, kErr := profiles.GetKoanfConfig(); kErr == nil {
 			if sub, sErr := koanfCfg.GetProfileKoanf(profileName); sErr == nil {
-				// Persist as boolean, not string
-				if b, perr := strconv.ParseBool(strings.TrimSpace(fileStorageVal)); perr == nil {
-					if setErr := sub.Set(options.AuthFileStorageOption.KoanfKey, b); setErr == nil {
-						_ = koanfCfg.SaveProfile(profileName, sub)
-					}
-				} else {
-					if setErr := sub.Set(options.AuthFileStorageOption.KoanfKey, false); setErr == nil { // default to false
-						_ = koanfCfg.SaveProfile(profileName, sub)
-					}
+				// Normalize booleans to storage type strings for backward compatibility
+				val := strings.TrimSpace(strings.ToLower(storageVal))
+				switch val {
+				case "true":
+					val = string(config.StorageTypeFileSystem)
+				case "false", "":
+					val = string(config.StorageTypeSecureLocal)
+				}
+				if setErr := sub.Set(options.AuthStorageOption.KoanfKey, val); setErr == nil {
+					_ = koanfCfg.SaveProfile(profileName, sub)
 				}
 			}
 		}

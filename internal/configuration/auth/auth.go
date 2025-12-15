@@ -5,6 +5,7 @@ package configuration_auth
 import (
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingone-go-client/config"
 	"github.com/spf13/pflag"
 )
 
@@ -13,7 +14,7 @@ func InitAuthOptions() {
 	initAuthMethodDeviceCodeOption()
 	initAuthMethodClientCredentialsOption()
 	initAuthMethodAuthorizationCodeOption()
-	initAuthFileStorageOption()
+	initAuthStorageOption()
 	initAuthProviderOption()
 }
 
@@ -89,27 +90,33 @@ func initAuthMethodAuthorizationCodeOption() {
 	}
 }
 
-// initAuthFileStorageOption initializes the --file-storage flag for controlling file storage of auth tokens
-func initAuthFileStorageOption() {
-	cobraParamName := "file-storage"
-	cobraValue := new(customtypes.Bool)
-	defaultValue := customtypes.Bool(false)
-	envVar := "PINGCLI_AUTH_FILE_STORAGE"
+// initAuthStorageOption initializes the --storage flag for controlling file storage of auth tokens
+func initAuthStorageOption() {
+	cobraParamName := "storage"
+	// Use custom type wrapper compatible with pflag.Value
+	cobraValue := new(customtypes.StorageType)
+	// Default to secure local (keychain) storage when not specified
+	defaultValue := customtypes.StorageType(config.StorageTypeSecureLocal)
+	envVar := "PINGCLI_AUTH_STORAGE"
 
-	options.AuthFileStorageOption = options.Option{
+	options.AuthStorageOption = options.Option{
 		CobraParamName:  cobraParamName,
 		CobraParamValue: cobraValue,
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:        cobraParamName,
-			Usage:       "Store authentication tokens in local file storage only. Without this flag, keychain storage is attempted first with fallback to local file storage.",
-			Value:       cobraValue,
-			NoOptDefVal: "true", // Make this flag a boolean flag
+			Name: cobraParamName,
+			Usage: "Auth token storage (default: secure_local)\n" +
+				"  secure_local  - Use OS keychain (default)\n" +
+				"  file_system   - Store tokens in ~/.pingcli/credentials\n" +
+				"  none          - Do not persist tokens",
+			Value: cobraValue,
+			// Require an explicit value to avoid noisy help like string[=...] output
+			NoOptDefVal: "",
 		},
 		Sensitive: false,
-		Type:      options.BOOL,
-		KoanfKey:  "login.fileStorage",
+		Type:      options.STRING,
+		KoanfKey:  "login.storage.type",
 	}
 }
 

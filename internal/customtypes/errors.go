@@ -23,4 +23,5 @@ var (
 	ErrUnrecognizedServiceGroup      = errors.New("unrecognized service group")
 	ErrUnrecognizedExportService     = errors.New("unrecognized service")
 	ErrUnrecognizedAuthProvider      = errors.New("unrecognized authentication provider")
+	ErrUnrecognizedStorageType       = errors.New("unrecognized storage type")
 )

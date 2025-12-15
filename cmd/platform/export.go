@@ -117,7 +117,7 @@ func initPingOneExportFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
-	cmd.Flags().AddFlag(options.AuthFileStorageOption.Flag)
+	cmd.Flags().AddFlag(options.AuthStorageOption.Flag)
 }
 
 func initPingFederateGeneralFlags(cmd *cobra.Command) {

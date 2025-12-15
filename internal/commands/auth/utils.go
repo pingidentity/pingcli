@@ -69,12 +69,3 @@ func formatStorageLocation(location StorageLocation) string {
 		return "storage"
 	}
 }
-
-// formatFullLogoutStorageMessage reports the storage cleared for full logout based on configuration.
-// If keychain is enabled, we report keychain; otherwise file storage.
-func formatFullLogoutStorageMessage() string {
-	if shouldUseKeychain() {
-		return "keychain"
-	}
-	return "file storage"
-}

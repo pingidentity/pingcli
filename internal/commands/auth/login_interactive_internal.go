@@ -58,6 +58,7 @@ func mapDisplayToRegionCode(display string) string {
 	if strings.HasPrefix(display, "SG ") {
 		return "SG"
 	}
+
 	return ""
 }
 
@@ -74,8 +75,9 @@ func PromptForRegionCode(rc io.ReadCloser) (string, error) {
 	}
 	code := mapDisplayToRegionCode(selected)
 	if code == "" {
-		return "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: fmt.Errorf("invalid region selection")}
+		return "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: errs.ErrInvalidInput}
 	}
+
 	return code, nil
 }
 
@@ -436,18 +438,17 @@ func SaveAuthConfigToProfile(authType, clientID, clientSecret, environmentID, re
 		}
 	}
 
-	// Persist the current file storage preference if explicitly set via flag or env
-	if fileStorageVal, err := profiles.GetOptionValue(options.AuthFileStorageOption); err == nil && strings.TrimSpace(fileStorageVal) != "" {
-		// Save as boolean, not string
-		if b, perr := strconv.ParseBool(strings.TrimSpace(fileStorageVal)); perr == nil {
-			if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, b); err != nil {
-				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-			}
-		} else {
-			// Default to false if parse fails
-			if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, false); err != nil {
-				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-			}
+	// Persist the current storage preference if explicitly set via flag or env
+	if storageVal, err := profiles.GetOptionValue(options.AuthStorageOption); err == nil && strings.TrimSpace(storageVal) != "" {
+		val := strings.TrimSpace(strings.ToLower(storageVal))
+		switch val {
+		case "true":
+			val = string(config.StorageTypeFileSystem)
+		case "false", "":
+			val = string(config.StorageTypeSecureLocal)
+		}
+		if err = subKoanf.Set(options.AuthStorageOption.KoanfKey, val); err != nil {
+			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
 	}
 
@@ -578,7 +579,7 @@ func RunInteractiveAuthConfigForType(rc io.ReadCloser, desiredAuthType string) e
 		customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS: true,
 	}
 	if !validTypes[desiredAuthType] {
-		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: fmt.Errorf("unsupported authorization grant type: %s", desiredAuthType)}
+		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: errs.ErrInvalidInput}
 	}
 
 	// Determine whether the requested type is configured
@@ -733,18 +734,17 @@ func SaveAuthTypeOnly(authType string) error {
 		return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
-	// Persist the current file storage preference if explicitly set via flag or env
-	if fileStorageVal, err := profiles.GetOptionValue(options.AuthFileStorageOption); err == nil && strings.TrimSpace(fileStorageVal) != "" {
-		// Save as boolean, not string
-		if b, perr := strconv.ParseBool(strings.TrimSpace(fileStorageVal)); perr == nil {
-			if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, b); err != nil {
-				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-			}
-		} else {
-			// Default to false if parse fails
-			if err = subKoanf.Set(options.AuthFileStorageOption.KoanfKey, false); err != nil {
-				return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
-			}
+	// Persist the current storage preference if explicitly set via flag or env
+	if storageVal, err := profiles.GetOptionValue(options.AuthStorageOption); err == nil && strings.TrimSpace(storageVal) != "" {
+		val := strings.TrimSpace(strings.ToLower(storageVal))
+		switch val {
+		case "true":
+			val = string(config.StorageTypeFileSystem)
+		case "false", "":
+			val = string(config.StorageTypeSecureLocal)
+		}
+		if err = subKoanf.Set(options.AuthStorageOption.KoanfKey, val); err != nil {
+			return &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 		}
 	}
 

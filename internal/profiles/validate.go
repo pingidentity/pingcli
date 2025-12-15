@@ -214,6 +214,22 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			default:
 				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s' of type '%T'", pName, ErrValidateString, typedValue, typedValue)}
 			}
+		case options.STORAGE_TYPE:
+			switch typedValue := vValue.(type) {
+			case *customtypes.StorageType:
+				continue
+			case string:
+				// Allow empty string as default (interpreted as secure_local later)
+				st := new(customtypes.StorageType)
+				if err = st.Set(typedValue); err != nil {
+					return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%s': %w", pName, ErrValidateStorageType, typedValue, err)}
+				}
+			case nil:
+				// Allow nil/null
+				continue
+			default:
+				return &errs.PingCLIError{Prefix: validateErrorPrefix, Err: fmt.Errorf("profile '%s': %w '%v' of type '%T'", pName, ErrValidateStorageType, typedValue, typedValue)}
+			}
 		case options.STRING_SLICE:
 			switch typedValue := vValue.(type) {
 			case *customtypes.StringSlice:
