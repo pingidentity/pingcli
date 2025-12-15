@@ -2,7 +2,7 @@
 
 | Config File Property | Equivalent Parameter | Environment Variable | Type | Purpose |
 |---|---|---|---|---|
-| login.fileStorage | --file-storage | PINGCLI_AUTH_STORAGE | 0 | Store authentication tokens in local file storage only. Without this flag, keychain storage is attempted first with fallback to local file storage. |
+| login.storage.type | --storage | PINGCLI_AUTH_STORAGE | 14 | Auth token storage (default: secure_local). Values: secure_local, file_system, none. |
 
 #### export Properties
 
