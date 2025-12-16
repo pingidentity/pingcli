@@ -177,14 +177,14 @@ func LoadToken() (*oauth2.Token, error) {
 	// First, try to load using configuration-based keys from the active profile
 	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
 	if err == nil && authType != "" {
-		// Normalize auth type to snake_case format
+		// Normalize auth type to snake_case format and handle camelCase aliases
 		switch authType {
-		case "worker":
-			authType = "client_credentials"
 		case "clientCredentials":
 			authType = "client_credentials"
 		case "deviceCode":
 			authType = "device_code"
+		case "authorizationCode":
+			authType = "authorization_code"
 		case "authorization_code":
 			authType = "authorization_code"
 		}
@@ -213,6 +213,15 @@ func LoadToken() (*oauth2.Token, error) {
 			grantType = svcOAuth2.GrantTypeAuthorizationCode
 		case "client_credentials":
 			cfg, err = GetClientCredentialsConfiguration()
+			if err != nil {
+				return nil, &errs.PingCLIError{
+					Prefix: credentialsErrorPrefix,
+					Err:    err,
+				}
+			}
+			grantType = svcOAuth2.GrantTypeClientCredentials
+		case "worker":
+			cfg, err = GetWorkerConfiguration()
 			if err != nil {
 				return nil, &errs.PingCLIError{
 					Prefix: credentialsErrorPrefix,
@@ -263,14 +272,14 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		}
 	}
 
-	// Normalize auth type to snake_case format
+	// Normalize auth type to snake_case format and handle camelCase aliases
 	switch authType {
-	case "worker":
-		authType = "client_credentials"
 	case "clientCredentials":
 		authType = "client_credentials"
 	case "deviceCode":
 		authType = "device_code"
+	case "authorizationCode":
+		authType = "authorization_code"
 	case "authorization_code":
 		authType = "authorization_code"
 	}
@@ -1125,12 +1134,38 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 		}
 	}
 
-	// Configure worker settings
+	// Configure worker settings (client_credentials under the hood)
 	cfg = cfg.WithClientCredentialsClientID(clientID).
 		WithClientCredentialsClientSecret(clientSecret)
+	// Align default scopes with client credentials flow
+	scopeDefaults := []string{"openid"}
+	cfg = cfg.WithClientCredentialsScopes(scopeDefaults)
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).
 		WithStorageName("pingcli")
+
+	// Provide optional suffix so SDK keychain entries align with file names
+	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if strings.TrimSpace(profileName) == "" {
+		profileName = "default"
+	}
+	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
+	if strings.TrimSpace(providerName) == "" {
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
+	}
+	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName))
+
+	// Apply Environment ID for consistent token key generation and endpoints
+	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(environmentID) != "" {
+		cfg = cfg.WithEnvironmentID(environmentID)
+	}
 
 	// Apply region configuration
 	cfg, err = applyRegionConfiguration(cfg)

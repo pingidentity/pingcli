@@ -79,6 +79,12 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 			return "", fmt.Errorf("failed to get client credentials configuration: %w", err)
 		}
 		grantType = svcOAuth2.GrantTypeClientCredentials
+	case "worker":
+		cfg, err = GetWorkerConfiguration()
+		if err != nil {
+			return "", fmt.Errorf("failed to get worker configuration: %w", err)
+		}
+		grantType = svcOAuth2.GrantTypeClientCredentials
 	default:
 		return "", &errs.PingCLIError{
 			Prefix: tokenManagerErrorPrefix,
