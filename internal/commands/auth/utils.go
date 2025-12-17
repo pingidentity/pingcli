@@ -4,6 +4,7 @@ package auth_internal
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -40,17 +41,31 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 	}
 
 	// Get and set the environment ID for API endpoints
-	endpointsEnvironmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get endpoints environment ID: %w", err)
-	}
-	if endpointsEnvironmentID == "" {
-		return nil, &errs.PingCLIError{
-			Prefix: "endpoints environment ID is not configured",
-			Err:    ErrEnvironmentIDNotConfigured,
+	// Prefer the environment ID already present on cfg; fallback to profile values.
+	var endpointsEnvironmentID string
+	if cfg.Endpoint.EnvironmentID != nil && strings.TrimSpace(*cfg.Endpoint.EnvironmentID) != "" {
+		endpointsEnvironmentID = *cfg.Endpoint.EnvironmentID
+	} else {
+		// Primary: general environment ID
+		endpointsEnvironmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get endpoints environment ID: %w", err)
 		}
+		// Fallback: deprecated worker environment ID (for backward compatibility)
+		if strings.TrimSpace(endpointsEnvironmentID) == "" {
+			workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+			if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
+				endpointsEnvironmentID = workerEnvID
+			}
+		}
+		if strings.TrimSpace(endpointsEnvironmentID) == "" {
+			return nil, &errs.PingCLIError{
+				Prefix: "endpoints environment ID is not configured",
+				Err:    ErrEnvironmentIDNotConfigured,
+			}
+		}
+		cfg = cfg.WithEnvironmentID(endpointsEnvironmentID)
 	}
-	cfg = cfg.WithEnvironmentID(endpointsEnvironmentID)
 
 	return cfg, nil
 }

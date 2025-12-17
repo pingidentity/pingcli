@@ -680,6 +680,13 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 			Err:    err,
 		}
 	}
+	if strings.TrimSpace(environmentID) == "" {
+		// Fallback: deprecated worker environment ID
+		workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+		if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
+			environmentID = workerEnvID
+		}
+	}
 	if strings.TrimSpace(environmentID) != "" {
 		cfg = cfg.WithEnvironmentID(environmentID)
 	}
@@ -904,6 +911,13 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 		return nil, &errs.PingCLIError{
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
+		}
+	}
+	if strings.TrimSpace(environmentID) == "" {
+		// Fallback: deprecated worker environment ID
+		workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+		if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
+			environmentID = workerEnvID
 		}
 	}
 	if strings.TrimSpace(environmentID) != "" {
