@@ -16,13 +16,13 @@ import (
 // TestLoginCommand_ClientCredentials_Integration tests the complete login flow with client credentials
 func TestLoginCommand_ClientCredentials_Integration(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
-	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET")
 	environmentID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 
 	if clientID == "" || clientSecret == "" || environmentID == "" || regionCode == "" {
-		t.Skip("Skipping integration test: missing TEST_PINGONE_* environment variables")
+		t.Skip("Skipping integration test: missing TEST_PINGONE_* environment variables for client credentials")
 	}
 
 	// Initialize configuration with test environment variables
@@ -186,13 +186,13 @@ func TestLoginCommand_HelpShorthandFlagValidation_Integration(t *testing.T) {
 // TestLogoutCommand_Integration tests logout functionality in real environment
 func TestLogoutCommand_Integration(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
-	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET")
 	environmentID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 
 	if clientID == "" || clientSecret == "" || environmentID == "" || regionCode == "" {
-		t.Skip("Skipping integration test: missing TEST_PINGONE_* environment variables")
+		t.Skip("Skipping integration test: missing TEST_PINGONE_* environment variables for client credentials")
 	}
 
 	// Initialize configuration with test environment variables

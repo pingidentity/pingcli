@@ -26,7 +26,7 @@ func NewLoginCommand() *cobra.Command {
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Long:                  "Authenticate the CLI to a supported provider, using one of the supported authorization grant types.",
 		RunE:                  authLoginRunE,
-		Short:                 "Authenticate",
+		Short:                 "Authenticate a supported provider",
 		Use:                   "login [flags]",
 	}
 

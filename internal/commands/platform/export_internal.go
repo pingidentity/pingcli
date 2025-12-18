@@ -71,6 +71,17 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
 	}
 
+	// Validate and prepare output directory before initializing services,
+	// so directory-related errors surface first, matching test expectations.
+	overwriteExportBool, err := strconv.ParseBool(overwriteExport)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+	}
+	if outputDir, err = createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
+		// createOrValidateOutputDir already returns a prefixed PingCLIError
+		return err
+	}
+
 	var exportableConnectors *[]connector.Exportable
 	es := new(customtypes.ExportServices)
 	if err = es.Set(exportServices); err != nil {
@@ -93,28 +104,25 @@ func RunInternalExport(ctx context.Context, commandVersion string) (err error) {
 
 	if es.ContainsPingOneService() {
 		if err = initPingOneServices(ctx, commandVersion); err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+			// initPingOneServices already returns a prefixed PingCLIError
+			return err
 		}
 	}
 
 	if es.ContainsPingFederateService() {
 		if err = initPingFederateServices(ctx, commandVersion); err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+			// initPingFederateServices already returns a prefixed PingCLIError
+			return err
 		}
 	}
 
 	exportableConnectors = getExportableConnectors(es)
 
-	overwriteExportBool, err := strconv.ParseBool(overwriteExport)
-	if err != nil {
-		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
-	}
-	if outputDir, err = createOrValidateOutputDir(outputDir, overwriteExportBool); err != nil {
-		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
-	}
+	// outputDir already validated above
 
 	if err := exportConnectors(exportableConnectors, exportFormat, outputDir, overwriteExportBool); err != nil {
-		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+		// exportConnectors already returns a prefixed PingCLIError
+		return err
 	}
 
 	output.Success(fmt.Sprintf("Export to directory '%s' complete.", outputDir), nil)

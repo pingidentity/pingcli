@@ -14,8 +14,8 @@ import (
 // TestAuthWorkflow_LoginLogoutClientCredentials tests complete login/logout flow with client credentials
 func TestAuthWorkflow_LoginLogoutClientCredentials(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
-	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET")
 	environmentID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 
@@ -59,8 +59,8 @@ func TestAuthWorkflow_LoginLogoutClientCredentials(t *testing.T) {
 // TestAuthWorkflow_MultipleAuthMethods tests using different auth methods with same environment
 func TestAuthWorkflow_MultipleAuthMethods(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
-	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET")
 	environmentID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 
@@ -96,8 +96,8 @@ func TestAuthWorkflow_MultipleAuthMethods(t *testing.T) {
 // TestAuthWorkflow_TokenPersistence tests that tokens persist across CLI invocations
 func TestAuthWorkflow_TokenPersistence(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
-	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET")
 	environmentID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 
@@ -148,8 +148,8 @@ func TestAuthWorkflow_TokenPersistence(t *testing.T) {
 // TestAuthWorkflow_SeparateTokenStorage tests that different auth methods store separate tokens
 func TestAuthWorkflow_SeparateTokenStorage(t *testing.T) {
 	// Skip if not in CI environment or missing credentials
-	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
-	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID")
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET")
 	environmentID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
 	regionCode := os.Getenv("TEST_PINGONE_REGION_CODE")
 

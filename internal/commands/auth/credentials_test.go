@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 )
 
@@ -597,5 +599,26 @@ func TestGetValidTokenSource_WorkerTypeAlias(t *testing.T) {
 	if !strings.Contains(err.Error(), "automatic client credentials authentication failed") &&
 		!strings.Contains(err.Error(), "client ID is not configured") {
 		t.Errorf("Expected client credentials error (worker->client_credentials), got: %v", err)
+	}
+}
+
+// Test that GetWorkerConfiguration falls back to worker environment ID when general env ID is empty
+func TestGetWorkerConfiguration_FallbackToWorkerEnvironmentID(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+	if koanfCfg, err := profiles.GetKoanfConfig(); err == nil {
+		_ = koanfCfg.KoanfInstance().Set(options.PingOneRegionCodeOption.KoanfKey, "NA")
+		_ = koanfCfg.KoanfInstance().Set(options.PingOneAuthenticationAPIEnvironmentIDOption.KoanfKey, "")
+		_ = koanfCfg.KoanfInstance().Set(options.PingOneAuthenticationWorkerEnvironmentIDOption.KoanfKey, "env-worker-xyz")
+		_ = koanfCfg.KoanfInstance().Set(options.PingOneAuthenticationWorkerClientIDOption.KoanfKey, "00000000-0000-0000-0000-000000000001")
+		_ = koanfCfg.KoanfInstance().Set(options.PingOneAuthenticationWorkerClientSecretOption.KoanfKey, "test-secret")
+	}
+
+	cfg, err := auth_internal.GetWorkerConfiguration()
+	if err != nil {
+		t.Fatalf("GetWorkerConfiguration returned error: %v", err)
+	}
+
+	if cfg.Endpoint.EnvironmentID == nil || *cfg.Endpoint.EnvironmentID != "env-worker-xyz" {
+		t.Fatalf("expected worker environmentID applied to config, got %+v", cfg.Endpoint.EnvironmentID)
 	}
 }

@@ -3,6 +3,7 @@
 package auth_test
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -351,9 +352,23 @@ func TestLoginCommand_ClientCredentialsOnlyExecution_Integration(t *testing.T) {
 	cmd.SetArgs([]string{"-c"})
 	err := cmd.Execute()
 
-	// With valid configuration, the login should succeed
-	if err != nil {
-		t.Errorf("Expected no error but got: %v", err)
+	// With valid configuration (TEST_PINGONE_CLIENT_CREDENTIALS_* set), login should succeed.
+	// Otherwise, expect an authentication/configuration error.
+	if os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID") != "" &&
+		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET") != "" &&
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID") != "" &&
+		os.Getenv("TEST_PINGONE_REGION_CODE") != "" {
+		if err != nil {
+			t.Errorf("Expected success with configured client credentials but got: %v", err)
+		}
+	} else {
+		if err == nil {
+			t.Errorf("Expected authentication/configuration error without client credentials configured")
+		} else if !strings.Contains(err.Error(), "client credentials") &&
+			!strings.Contains(err.Error(), "failed to get") &&
+			!strings.Contains(err.Error(), "failed to login") {
+			t.Errorf("Unexpected error message without configuration: %v", err)
+		}
 	}
 }
 
@@ -486,8 +501,22 @@ func TestLoginCommand_ClientCredentialsShorthandExecution_Integration(t *testing
 	cmd.SetArgs([]string{"-c"})
 	err := cmd.Execute()
 
-	// With valid configuration, the login should succeed
-	if err != nil {
-		t.Errorf("Expected no error but got: %v", err)
+	// With valid configuration (TEST_PINGONE_CLIENT_CREDENTIALS_* set), login should succeed.
+	// Otherwise, expect an authentication/configuration error.
+	if os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID") != "" &&
+		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET") != "" &&
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID") != "" &&
+		os.Getenv("TEST_PINGONE_REGION_CODE") != "" {
+		if err != nil {
+			t.Errorf("Expected success with configured client credentials but got: %v", err)
+		}
+	} else {
+		if err == nil {
+			t.Errorf("Expected authentication/configuration error without client credentials configured")
+		} else if !strings.Contains(err.Error(), "client credentials") &&
+			!strings.Contains(err.Error(), "failed to get") &&
+			!strings.Contains(err.Error(), "failed to login") {
+			t.Errorf("Unexpected error message without configuration: %v", err)
+		}
 	}
 }
