@@ -128,7 +128,7 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 	}
 	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)
 	// Use the SDK's GenerateKeychainAccountName with optional suffix
-	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType), suffix)
+	tokenKey := svcOAuth2.GenerateKeychainAccountNameWithSuffix(environmentID, clientID, string(grantType), suffix)
 	if tokenKey == "" || tokenKey == "default-token" {
 		return "", &errs.PingCLIError{
 			Prefix: tokenManagerErrorPrefix,
@@ -181,7 +181,7 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 	}
 	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)
 	// Use the SDK's GenerateKeychainAccountName with optional suffix
-	tokenKey := svcOAuth2.GenerateKeychainAccountName(environmentID, clientID, string(grantType), suffix)
+	tokenKey := svcOAuth2.GenerateKeychainAccountNameWithSuffix(environmentID, clientID, string(grantType), suffix)
 	if tokenKey == "" || tokenKey == "default-token" {
 		return "", &errs.PingCLIError{
 			Prefix: tokenManagerErrorPrefix,
