@@ -49,10 +49,10 @@ func initPingOneAuthenticationAPIEnvironmentIDOption() {
 }
 
 func initPingOneAuthenticationAuthorizationCodeClientIDOption() {
-	cobraParamName := "pingone-oidc-authorization-code-client-id"
+	cobraParamName := "pingone-authorization-code-client-id"
 	cobraValue := new(customtypes.UUID)
 	defaultValue := customtypes.UUID("")
-	envVar := "PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_CLIENT_ID"
+	envVar := "PINGCLI_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"
 
 	options.PingOneAuthenticationAuthorizationCodeClientIDOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -71,10 +71,10 @@ func initPingOneAuthenticationAuthorizationCodeClientIDOption() {
 }
 
 func initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption() {
-	cobraParamName := "pingone-oidc-authorization-code-redirect-uri-path"
+	cobraParamName := "pingone-authorization-code-redirect-uri-path"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_REDIRECT_URI_PATH"
+	envVar := "PINGCLI_PINGONE_AUTHORIZATION_CODE_REDIRECT_URI_PATH"
 
 	options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption = options.Option{
 		CobraParamName:  cobraParamName,
@@ -93,10 +93,10 @@ func initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption() {
 }
 
 func initPingOneAuthenticationAuthorizationCodeRedirectURIPortOption() {
-	cobraParamName := "pingone-oidc-authorization-code-redirect-uri-port"
+	cobraParamName := "pingone-authorization-code-redirect-uri-port"
 	cobraValue := new(customtypes.String)
 	defaultValue := customtypes.String("")
-	envVar := "PINGCLI_PINGONE_OIDC_AUTHORIZATION_CODE_REDIRECT_URI_PORT"
+	envVar := "PINGCLI_PINGONE_AUTHORIZATION_CODE_REDIRECT_URI_PORT"
 
 	options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption = options.Option{
 		CobraParamName:  cobraParamName,
