@@ -169,6 +169,12 @@ func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfi
 				return ErrClientIDRequired
 			}
 
+			// Validate UUID format
+			v := new(customtypes.UUID)
+			if err := v.Set(s); err != nil {
+				return err
+			}
+
 			return nil
 		},
 		rc,
@@ -184,6 +190,12 @@ func PromptForAuthorizationCodeConfig(rc io.ReadCloser) (*AuthorizationCodeConfi
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
 				return ErrEnvironmentIDRequired
+			}
+
+			// Validate UUID format
+			v := new(customtypes.UUID)
+			if err := v.Set(s); err != nil {
+				return err
 			}
 
 			return nil
@@ -272,6 +284,12 @@ func PromptForDeviceCodeConfig(rc io.ReadCloser) (*DeviceCodeConfig, error) {
 				return ErrClientIDRequired
 			}
 
+			// Validate UUID format
+			v := new(customtypes.UUID)
+			if err := v.Set(s); err != nil {
+				return err
+			}
+
 			return nil
 		},
 		rc,
@@ -287,6 +305,12 @@ func PromptForDeviceCodeConfig(rc io.ReadCloser) (*DeviceCodeConfig, error) {
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
 				return ErrEnvironmentIDRequired
+			}
+
+			// Validate UUID format
+			v := new(customtypes.UUID)
+			if err := v.Set(s); err != nil {
+				return err
 			}
 
 			return nil
@@ -318,6 +342,12 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (*ClientCredentialsConfi
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
 				return ErrClientIDRequired
+			}
+
+			// Validate UUID format
+			v := new(customtypes.UUID)
+			if err := v.Set(s); err != nil {
+				return err
 			}
 
 			return nil
@@ -352,6 +382,12 @@ func PromptForClientCredentialsConfig(rc io.ReadCloser) (*ClientCredentialsConfi
 		func(s string) error {
 			if strings.TrimSpace(s) == "" {
 				return ErrEnvironmentIDRequired
+			}
+
+			// Validate UUID format
+			v := new(customtypes.UUID)
+			if err := v.Set(s); err != nil {
+				return err
 			}
 
 			return nil

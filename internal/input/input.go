@@ -32,8 +32,11 @@ func RunPromptSecret(message string, validateFunc func(string) error, rc io.Read
 				return "", &errs.PingCLIError{Prefix: inputPromptErrorPrefix, Err: err}
 			}
 			s := strings.TrimSpace(string(bytes))
-			if validateFunc != nil && validateFunc(s) != nil {
-				continue
+			if validateFunc != nil {
+				if err := validateFunc(s); err != nil {
+					fmt.Printf("Invalid input: %v\n", err)
+					continue
+				}
 			}
 
 			return s, nil
@@ -47,8 +50,11 @@ func RunPromptSecret(message string, validateFunc func(string) error, rc io.Read
 			return "", &errs.PingCLIError{Prefix: inputPromptErrorPrefix, Err: err}
 		}
 		s := strings.TrimSpace(line)
-		if validateFunc != nil && validateFunc(s) != nil {
-			continue
+		if validateFunc != nil {
+			if err := validateFunc(s); err != nil {
+				fmt.Printf("Invalid input: %v\n", err)
+				continue
+			}
 		}
 
 		return s, nil
@@ -70,7 +76,7 @@ func RunPrompt(message string, validateFunc func(string) error, rc io.ReadCloser
 
 		if validateFunc != nil {
 			if vErr := validateFunc(userInput); vErr != nil {
-				_ = vErr
+				fmt.Printf("Invalid input: %v\n", vErr)
 
 				continue
 			}
