@@ -78,3 +78,12 @@ func (st *StorageType) String() string {
 
 	return string(*st)
 }
+
+func StorageTypeValidValues() []string {
+	return []string{
+		ENUM_STORAGE_TYPE_FILE_SYSTEM,
+		ENUM_STORAGE_TYPE_SECURE_LOCAL,
+		ENUM_STORAGE_TYPE_SECURE_REMOTE,
+		ENUM_STORAGE_TYPE_NONE,
+	}
+}

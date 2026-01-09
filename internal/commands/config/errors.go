@@ -43,7 +43,9 @@ var (
 	ErrMustBeInteger              = errors.New("the value assignment must be an integer")
 	ErrMustBeHttpMethod           = fmt.Errorf("the value assignment must be a valid HTTP method. Allowed [%s]", strings.Join(customtypes.HTTPMethodValidValues(), ", "))
 	ErrMustBeRequestService       = fmt.Errorf("the value assignment must be a valid request service. Allowed [%s]", strings.Join(customtypes.RequestServiceValidValues(), ", "))
-	ErrMustBeLicenseProduct       = fmt.Errorf("the value assignment must be a valid license product. Allowed [%s]", strings.Join(customtypes.LicenseProductValidValues(), ", "))
+	ErrMustBeLicenseProduct       = fmt.Errorf("must be one of: %s", strings.Join(customtypes.LicenseProductValidValues(), ", "))
 	ErrMustBeLicenseVersion       = errors.New("the value assignment must be a valid license version. Must be of the form 'major.minor'")
-	ErrTypeNotRecognized          = errors.New("the variable type for the configuration key is not recognized or supported")
+	ErrMustBeStorageType          = fmt.Errorf("must be one of: %s", strings.Join(customtypes.StorageTypeValidValues(), ", "))
+
+	ErrTypeNotRecognized = errors.New("the variable type for the configuration key is not recognized or supported")
 )
