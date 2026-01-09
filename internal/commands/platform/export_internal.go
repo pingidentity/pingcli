@@ -31,8 +31,6 @@ import (
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	pingfederateGoClient "github.com/pingidentity/pingfederate-go-client/v1230/configurationapi"
-	"github.com/pingidentity/pingone-go-client/config"
-	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
 )
 
 var (
@@ -389,78 +387,28 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	l.Debug().Msgf("Using unified authentication system with token source")
 
-	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+	tokenSource, err := auth.GetValidTokenSource(ctx)
 	if err != nil {
-		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to get valid token source: %w", err)}
 	}
 
-	if authType == "worker" {
-		authType = "client_credentials"
+	token, err := tokenSource.Token()
+	if err != nil {
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to get token: %w", err)}
 	}
 
-	var cfg *config.Configuration
-	var grantType svcOAuth2.GrantType
-
-	// Get client ID based on auth type
-	var clientID string
-	switch authType {
-	case "device_code":
-		cfg, err = auth.GetDeviceCodeConfiguration()
-		if err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
-		}
-		grantType = svcOAuth2.GrantTypeDeviceCode
-	case "authorization_code":
-		cfg, err = auth.GetAuthorizationCodeConfiguration()
-		if err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
-		}
-		grantType = svcOAuth2.GrantTypeAuthorizationCode
-	case "client_credentials":
-		cfg, err = auth.GetClientCredentialsConfiguration()
-		if err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
-		}
-		grantType = svcOAuth2.GrantTypeClientCredentials
-	default:
-		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'. Please configure worker credentials or a supported authorization grant type (authorization_code, device_code, client_credentials)", ErrPingOneUnrecognizedAuthType, authType)}
+	apiConfig := &pingoneGoClient.Config{
+		RegionCode:      &enumRegionCode,
+		UserAgentSuffix: &userAgent,
+		AccessToken:     &token.AccessToken,
 	}
 
-	if cfg != nil {
-		l.Debug().Msgf("Using configuration for auth type '%s'", authType)
-
-		// Set the grant type before generating the token key
-		cfg = cfg.WithGrantType(grantType)
-
-		// Get token source
-		tokenSource, err := cfg.TokenSource(ctx)
-		if err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to get token source: %w", err)}
-		}
-
-		// Get token
-		token, err := tokenSource.Token()
-		if err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to get token: %w", err)}
-		}
-
-		pingoneApiClientId = clientID
-
-		apiConfig := &pingoneGoClient.Config{
-			RegionCode:      &enumRegionCode,
-			UserAgentSuffix: &userAgent,
-			AccessToken:     &token.AccessToken,
-		}
-
-		pingoneApiClient, err = apiConfig.APIClient(ctx)
-		if err != nil {
-			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to initialize pingone API client: %w", err)}
-		}
-
-		return nil
+	pingoneApiClient, err = apiConfig.APIClient(ctx)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("failed to initialize pingone API client: %w", err)}
 	}
 
-	return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: %s", ErrPingOneUnrecognizedAuthType, authType)}
+	return nil
 }
 
 func createOrValidateOutputDir(outputDir string, overwriteExport bool) (resolvedOutputDir string, err error) {
