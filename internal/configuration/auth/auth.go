@@ -115,7 +115,7 @@ func initAuthStorageOption() {
 			NoOptDefVal: "",
 		},
 		Sensitive: false,
-		Type:      options.STORAGE_TYPE,
+		Type:      options.STRING,
 		KoanfKey:  "login.storage.type",
 	}
 }
