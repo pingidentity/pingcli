@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/pingidentity/pingone-go-client/config"
 	"golang.org/x/oauth2"
 )
 
@@ -38,8 +39,8 @@ func TestSaveTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	}
 
 	// Verify location indicates file storage only
-	if !location.File || location.Keychain {
-		t.Errorf("Expected file storage only, got Keychain=%v, File=%v", location.Keychain, location.File)
+	if location != config.StorageTypeFileSystem {
+		t.Errorf("Expected file storage only, got %v", location)
 	}
 
 	// Verify token was saved to file
@@ -80,7 +81,7 @@ func TestSaveTokenForMethod_WithKeychainEnabled(t *testing.T) {
 		// It should fall back to file storage
 		t.Logf("SaveTokenForMethod returned error (expected in environments without keychain): %v", err)
 	} else {
-		t.Logf("Token saved to: Keychain=%v, File=%v", location.Keychain, location.File)
+		t.Logf("Token saved to: %v", location)
 	}
 
 	// Token should be loadable from either keychain or file storage
@@ -198,7 +199,7 @@ func TestShouldUseKeychain_Default(t *testing.T) {
 	if err != nil {
 		t.Logf("SaveTokenForMethod with default settings returned error: %v", err)
 	} else {
-		t.Logf("Token saved with default settings to: Keychain=%v, File=%v", location.Keychain, location.File)
+		t.Logf("Token saved with default settings to: %v", location)
 	}
 
 	// Should be able to load the token
@@ -297,7 +298,7 @@ func TestSaveTokenForMethod_FileStorageFallback(t *testing.T) {
 	if err != nil {
 		t.Logf("SaveTokenForMethod returned error: %v", err)
 	} else {
-		t.Logf("Token saved - fallback test to: Keychain=%v, File=%v", location.Keychain, location.File)
+		t.Logf("Token saved - fallback test to: %v", location)
 	}
 
 	// Give a moment for file system operations to complete
@@ -348,8 +349,8 @@ func TestEnvironmentVariable_FileStorage(t *testing.T) {
 	}
 
 	// Verify location indicates file storage
-	if !location.File {
-		t.Errorf("Expected file storage with env var, got Keychain=%v, File=%v", location.Keychain, location.File)
+	if location != config.StorageTypeFileSystem {
+		t.Errorf("Expected file storage with env var, got %v", location)
 	}
 
 	// Verify token was saved to file (since file-storage is true)

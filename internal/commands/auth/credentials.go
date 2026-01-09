@@ -96,49 +96,50 @@ func generateTokenKey(providerName, profileName, environmentID, clientID, grantT
 	return fmt.Sprintf("token-%x_%s_%s_%s", hash[:8], providerName, grantType, profileName)
 }
 
-// StorageLocation indicates where credentials were saved
-type StorageLocation struct {
-	Keychain bool
-	File     bool
-}
-
 // LoginResult contains the result of a login operation
 type LoginResult struct {
 	Token    *oauth2.Token
 	NewAuth  bool
-	Location StorageLocation
+	Location config.StorageType
 }
 
 // SaveTokenForMethod saves an OAuth2 token to file storage using the specified authentication method key
 // Note: SDK handles keychain storage separately with its own token key format
-// Returns StorageLocation indicating where the token was saved
-func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation, error) {
-	location := StorageLocation{}
-
+// Returns config.StorageType indicating where the token was saved
+func SaveTokenForMethod(token *oauth2.Token, authMethod string) (config.StorageType, error) {
 	if token == nil {
-		return location, ErrNilToken
+		return config.StorageTypeNone, ErrNilToken
+	}
+
+	// Check for "none" storage type - do not save anywhere
+	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+	if strings.TrimSpace(strings.ToLower(v)) == string(config.StorageTypeNone) {
+		return config.StorageTypeNone, nil
 	}
 
 	// Avoid saving to keychain here: SDK handles keychain persistence via TokenSource.
 	// When keychain is enabled, do NOT write a file. Only indicate keychain is in use.
 	if shouldUseKeychain() {
-		location.Keychain = true
-
-		return location, nil
+		return config.StorageTypeSecureLocal, nil
 	}
 
 	// File-only mode: save only to file storage and error if unsuccessful.
 	if err := saveTokenToFile(token, authMethod); err != nil {
-		return location, err
+		return config.StorageTypeFileSystem, err
 	}
-	location.File = true
 
-	return location, nil
+	return config.StorageTypeFileSystem, nil
 }
 
 // LoadTokenForMethod loads an OAuth2 token from the keychain using the specified authentication method key
 // Falls back to file storage if keychain operations fail or if --use-keychain=false
 func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
+	// Check for "none" storage type - do not load from anywhere
+	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+	if strings.TrimSpace(strings.ToLower(v)) == string(config.StorageTypeNone) {
+		return nil, nil
+	}
+
 	// Check if user disabled keychain
 	if !shouldUseKeychain() {
 		// Directly load from file storage
@@ -472,10 +473,10 @@ func ClearToken() error {
 
 // ClearTokenForMethod removes the cached token for a specific authentication method
 // Clears from both keychain and file storage
-// Returns StorageLocation indicating what was cleared
-func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
+// Returns config.StorageType indicating what was cleared
+func ClearTokenForMethod(authMethod string) (config.StorageType, error) {
 	var errList []error
-	location := StorageLocation{}
+	clearedType := config.StorageTypeNone
 
 	// Clear from keychain
 	storage, err := getTokenStorage(authMethod)
@@ -486,7 +487,7 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 				Err:    err,
 			})
 		} else {
-			location.Keychain = true
+			clearedType = config.StorageTypeSecureLocal
 		}
 	}
 
@@ -497,10 +498,12 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 			Err:    err,
 		})
 	} else {
-		location.File = true
+		if clearedType == config.StorageTypeNone {
+			clearedType = config.StorageTypeFileSystem
+		}
 	}
 
-	return location, errors.Join(errList...)
+	return clearedType, errors.Join(errList...)
 }
 
 // PerformDeviceCodeLogin performs device code authentication, returning the result
@@ -612,11 +615,6 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
-	}
-
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
 	}
 
 	// Determine if this was new authentication
@@ -808,11 +806,6 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
-	}
-
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
 	}
 
 	// Determine if this was new authentication
@@ -1016,11 +1009,6 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
-	}
-
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
 	}
 
 	// Determine if this was new authentication

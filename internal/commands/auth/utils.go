@@ -69,14 +69,12 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 }
 
 // formatStorageLocation returns a human-friendly message for where credentials were cleared
-// based on StorageLocation flags.
-func formatStorageLocation(location StorageLocation) string {
-	switch {
-	case location.Keychain && location.File:
-		return "keychain and file storage"
-	case location.Keychain:
+// based on config.StorageType.
+func formatStorageLocation(location config.StorageType) string {
+	switch location {
+	case config.StorageTypeSecureLocal:
 		return "keychain"
-	case location.File:
+	case config.StorageTypeFileSystem:
 		return "file storage"
 	default:
 		return "storage"
