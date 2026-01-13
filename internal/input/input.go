@@ -35,6 +35,7 @@ func RunPromptSecret(message string, validateFunc func(string) error, rc io.Read
 			if validateFunc != nil {
 				if err := validateFunc(s); err != nil {
 					fmt.Printf("Invalid input: %v\n", err)
+
 					continue
 				}
 			}
@@ -53,6 +54,7 @@ func RunPromptSecret(message string, validateFunc func(string) error, rc io.Read
 		if validateFunc != nil {
 			if err := validateFunc(s); err != nil {
 				fmt.Printf("Invalid input: %v\n", err)
+
 				continue
 			}
 		}

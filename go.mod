@@ -7,8 +7,6 @@ tool (
 	github.com/pavius/impi/cmd/impi
 )
 
-replace github.com/pingidentity/pingone-go-client => ../pingone-go-client
-
 require (
 	github.com/fatih/color v1.18.0
 	github.com/hashicorp/go-hclog v1.6.3
@@ -25,7 +23,7 @@ require (
 	github.com/patrickcping/pingone-go-sdk-v2/mfa v0.23.2
 	github.com/patrickcping/pingone-go-sdk-v2/risk v0.21.0
 	github.com/pingidentity/pingfederate-go-client/v1230 v1230.0.3
-	github.com/pingidentity/pingone-go-client v0.2.0
+	github.com/pingidentity/pingone-go-client v0.5.1
 	github.com/rs/zerolog v1.34.0
 	github.com/spf13/cobra v1.10.1
 	github.com/spf13/pflag v1.0.10

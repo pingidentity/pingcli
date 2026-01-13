@@ -200,6 +200,7 @@ func displayLoginSuccess(token *oauth2.Token, newAuth bool, location config.Stor
 			storageMsg = "file storage"
 		default:
 			output.Success(fmt.Sprintf("Successfully logged in using %s.", selectedMethod), nil)
+
 			return
 		}
 
