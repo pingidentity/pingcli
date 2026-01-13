@@ -47,9 +47,13 @@ type Logger interface {
 	PluginError(message string, fields map[string]string) error
 }
 
+type Authentication interface {
+	GetToken() (string, error)
+}
+
 type PingCliCommand interface {
 	Configuration() (*PingCliCommandConfiguration, error)
-	Run(args []string, l Logger) error
+	Run(args []string, l Logger, a Authentication) error
 }
 
 type PingCliCommandGrpcPlugin struct {

@@ -19,6 +19,13 @@ message PingCliCommandConfigurationResponse {
 message PingCliCommandRunRequest {
   repeated string args = 1;
   uint32 logger = 2;
+  uint32 authentication = 3;
+}
+
+message AuthenticationToken {
+  string access_token = 1;
+  string token_type = 2;
+  int64 expiry = 3;
 }
 
 service PingCliCommand {
@@ -33,4 +40,8 @@ service Logger {
   rpc UserError(LoggerRequest) returns (Empty);
   rpc UserFatal(LoggerRequest) returns (Empty);
   rpc PluginError(LoggerRequest) returns (Empty);
+}
+
+service Authentication {
+  rpc GetToken(Empty) returns (AuthenticationToken);
 }

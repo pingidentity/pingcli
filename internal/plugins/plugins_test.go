@@ -42,7 +42,7 @@ func (m *mockPingCliCommand) Configuration() (*grpc.PingCliCommandConfiguration,
 	return testPluginConfig, nil
 }
 
-func (m *mockPingCliCommand) Run(args []string, l grpc.Logger) error {
+func (m *mockPingCliCommand) Run(args []string, l grpc.Logger, a grpc.Authentication) error {
 	if runErr := os.Getenv("PINGCLI_TEST_PLUGIN_RUN_ERROR"); runErr != "" {
 		return fmt.Errorf("%w: %s", errPluginRunError, runErr)
 	}

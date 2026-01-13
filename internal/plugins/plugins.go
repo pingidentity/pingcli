@@ -162,7 +162,8 @@ func createCmdRunE(pluginExecutable string) func(cmd *cobra.Command, args []stri
 			return &errs.PingCLIError{Prefix: pluginsErrorPrefix, Err: err}
 		}
 
-		err = plugin.Run(pluginArgs, &shared_logger.SharedLogger{})
+		authenticator := &PluginAuthenticator{}
+		err = plugin.Run(pluginArgs, &shared_logger.SharedLogger{}, authenticator)
 		if err != nil {
 			return &errs.PingCLIError{Prefix: pluginsErrorPrefix, Err: fmt.Errorf("%w: %w", ErrExecutePlugin, err)}
 		}

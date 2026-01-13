@@ -69,8 +69,26 @@ func (c *PingCliCommand) Configuration() (*grpc.PingCliCommandConfiguration, err
 // The `logger` parameter is a gRPC client that allows the plugin to send log
 // messages back to the host process, ensuring that all output is displayed
 // consistently through the main pingcli interface.
-func (c *PingCliCommand) Run(args []string, logger grpc.Logger) error {
+//
+// The `auth` parameter is a gRPC client that allows the plugin to request
+// an authentication token from the host process.
+func (c *PingCliCommand) Run(args []string, logger grpc.Logger, auth grpc.Authentication) error {
 	err := logger.Message(fmt.Sprintf("Args to plugin: %v", args), nil)
+	if err != nil {
+		return err
+	}
+
+	// Example: Request an authentication token from the host
+	token, err := auth.GetToken()
+	if err != nil {
+		errLog := logger.PluginError(fmt.Sprintf("Failed to get auth token: %v", err), nil)
+		if errLog != nil {
+			return errLog
+		}
+		return err
+	}
+
+	err = logger.Message(fmt.Sprintf("Successfully received auth token: %s...", token[:10]), nil)
 	if err != nil {
 		return err
 	}

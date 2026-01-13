@@ -31,26 +31,30 @@ func (c *PingCliCommandGRPCClient) Configuration() (*PingCliCommandConfiguration
 	}, nil
 }
 
-func (c *PingCliCommandGRPCClient) Run(args []string, l Logger) error {
-	loggerServer := &LoggerGRPCServer{
-		Impl: l,
-	}
+func (m *PingCliCommandGRPCClient) Run(args []string, l Logger, a Authentication) error {
+	loggerServer := &LoggerGRPCServer{Impl: l}
+	authenticationServer := &AuthenticationGRPCServer{Impl: a}
 
 	var s *grpc.Server
 	serverFunc := func(opts []grpc.ServerOption) *grpc.Server {
 		s = grpc.NewServer(opts...)
 		proto.RegisterLoggerServer(s, loggerServer)
-
+		proto.RegisterAuthenticationServer(s, authenticationServer)
 		return s
 	}
 
-	brokerId := c.broker.NextId()
-	go c.broker.AcceptAndServe(brokerId, serverFunc)
+	brokerID := m.broker.NextId()
+	go m.broker.AcceptAndServe(brokerID, serverFunc)
 
-	_, err := c.client.Run(context.Background(), &proto.PingCliCommandRunRequest{
-		Args:   args,
-		Logger: &brokerId,
+	authenticationBrokerID := m.broker.NextId()
+	go m.broker.AcceptAndServe(authenticationBrokerID, serverFunc)
+
+	_, err := m.client.Run(context.Background(), &proto.PingCliCommandRunRequest{
+		Args:           args,
+		Logger:         &brokerID,
+		Authentication: &authenticationBrokerID,
 	})
 
+	s.Stop()
 	return err
 }

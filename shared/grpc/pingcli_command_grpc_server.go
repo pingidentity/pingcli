@@ -41,10 +41,20 @@ func (s *PingCliCommandGRPCServer) Run(ctx context.Context, req *proto.PingCliCo
 	if err != nil {
 		return nil, err
 	}
+
+	connAuth, err := s.broker.Dial(req.GetAuthentication())
+	if err != nil {
+		return nil, err
+	}
+
 	defer func() {
 		cErr := conn.Close()
 		if cErr != nil {
 			err = errors.Join(err, cErr)
+		}
+		cErrAuth := connAuth.Close()
+		if cErr != nil {
+			err = errors.Join(err, cErrAuth)
 		}
 	}()
 
@@ -52,7 +62,11 @@ func (s *PingCliCommandGRPCServer) Run(ctx context.Context, req *proto.PingCliCo
 		proto.NewLoggerClient(conn),
 	}
 
-	err = s.Impl.Run(req.GetArgs(), loggerClient)
+	authClient := &AuthenticationGRPCClient{
+		proto.NewAuthenticationClient(connAuth),
+	}
+
+	err = s.Impl.Run(req.GetArgs(), loggerClient, authClient)
 
 	return &proto.Empty{}, err
 }
