@@ -137,7 +137,7 @@ func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 	// Check for "none" storage type - do not load from anywhere
 	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
 	if strings.TrimSpace(strings.ToLower(v)) == string(config.StorageTypeNone) {
-		return nil, nil
+		return nil, nil //nolint:nilnil // returning nil token and nil error is valid here to indicate no token found without failure
 	}
 
 	// Check if user disabled keychain
@@ -497,10 +497,8 @@ func ClearTokenForMethod(authMethod string) (config.StorageType, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		})
-	} else {
-		if clearedType == config.StorageTypeNone {
-			clearedType = config.StorageTypeFileSystem
-		}
+	} else if clearedType == config.StorageTypeNone {
+		clearedType = config.StorageTypeFileSystem
 	}
 
 	return clearedType, errors.Join(errList...)
