@@ -32,14 +32,14 @@ PingCLI notes:
 
 Configure your PingOne application to support `authorization_code`:
 - Enable grant type: `authorization_code`
-- Set redirect URI(s). PingCLI defaults to `http://localhost:<port><path>` with path `/callback` and port `8085` (customizable in CLI)
+- Set redirect URI(s). PingCLI defaults to `http://localhost:<port><path>` with path `/callback` and port `7464` (customizable in CLI)
 - Create Client ID
 
 Collect for PingCLI:
 - Environment ID
 - Client ID
 - Redirect URI path (e.g., `/callback`)
-- Redirect URI port (e.g., `8085`)
+- Redirect URI port (e.g., `7464`)
 
 ### Device code
 

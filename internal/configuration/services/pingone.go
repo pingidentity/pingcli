@@ -8,6 +8,7 @@ import (
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingone-go-client/config"
 	"github.com/spf13/pflag"
 )
 
@@ -73,7 +74,7 @@ func initPingOneAuthenticationAuthorizationCodeClientIDOption() {
 func initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption() {
 	cobraParamName := "pingone-authorization-code-redirect-uri-path"
 	cobraValue := new(customtypes.String)
-	defaultValue := customtypes.String("")
+	defaultValue := customtypes.String(config.GetDefaultAuthorizationCodeRedirectURIPath())
 	envVar := "PINGCLI_PINGONE_AUTHORIZATION_CODE_REDIRECT_URI_PATH"
 
 	options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption = options.Option{
@@ -82,8 +83,9 @@ func initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:  cobraParamName,
-			Usage: "The redirect URI path to use when using the authorization code authorization grant type to authenticate to the PingOne management API.",
+			Name: cobraParamName,
+			Usage: fmt.Sprintf("The redirect URI path to use when using the authorization code authorization grant type to authenticate to the PingOne management API. (default %s)",
+				config.GetDefaultAuthorizationCodeRedirectURIPath()),
 			Value: cobraValue,
 		},
 		Sensitive: false,
@@ -95,7 +97,7 @@ func initPingOneAuthenticationAuthorizationCodeRedirectURIPathOption() {
 func initPingOneAuthenticationAuthorizationCodeRedirectURIPortOption() {
 	cobraParamName := "pingone-authorization-code-redirect-uri-port"
 	cobraValue := new(customtypes.String)
-	defaultValue := customtypes.String("")
+	defaultValue := customtypes.String(config.GetDefaultAuthorizationCodeRedirectURIPort())
 	envVar := "PINGCLI_PINGONE_AUTHORIZATION_CODE_REDIRECT_URI_PORT"
 
 	options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption = options.Option{
@@ -104,8 +106,9 @@ func initPingOneAuthenticationAuthorizationCodeRedirectURIPortOption() {
 		DefaultValue:    &defaultValue,
 		EnvVar:          envVar,
 		Flag: &pflag.Flag{
-			Name:  cobraParamName,
-			Usage: "The redirect URI port to use when using the authorization code authorization grant type to authenticate to the PingOne management API.",
+			Name: cobraParamName,
+			Usage: fmt.Sprintf("The redirect URI port to use when using the authorization code authorization grant type to authenticate to the PingOne management API. (default %s)",
+				config.GetDefaultAuthorizationCodeRedirectURIPort()),
 			Value: cobraValue,
 		},
 		Sensitive: false,
