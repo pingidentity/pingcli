@@ -357,6 +357,8 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrRegionCodeRequired}
 	}
 
+	authType, _ := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+
 	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
 	if v := strings.TrimSpace(os.Getenv("PINGCLI_PINGONE_APPEND_USER_AGENT")); v != "" {
 		userAgent = fmt.Sprintf("%s %s", userAgent, v)
@@ -364,7 +366,10 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 
 	enumRegionCode := management.EnumRegionCode(regionCode)
 
-	if workerClientID != "" && workerClientSecret != "" && workerEnvironmentID != "" {
+	// Only use legacy worker authentication if explicitly configured or if no auth type is specified (legacy fallback)
+	useLegacyWorker := strings.EqualFold(authType, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER) || authType == ""
+
+	if useLegacyWorker && workerClientID != "" && workerClientSecret != "" && workerEnvironmentID != "" {
 		l.Debug().Msgf("Using worker authentication with client credentials")
 
 		pingoneApiClientId = workerClientID
