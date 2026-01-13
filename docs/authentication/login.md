@@ -188,35 +188,6 @@ pingcli config set service.pingone.authentication.clientCredentials.clientSecret
 2. Receives access token (no refresh token)
 3. Stores token for API calls. CLI will use access token that has roles associated with client application.
 
-## Examples
-
-### Interactive Development
-
-```bash
-# Configure device code settings
-pingcli config set service.pingone.regionCode=NA
-pingcli config set service.pingone.authentication.environmentID=abcd1234-ac12-ab12-ab12-abcdef123456
-pingcli config set service.pingone.authentication.deviceCode.clientID=abcd1234-ac12-ab12-ab12-abcdef123456
-
-# Login (--provider defaults to pingone)
-pingcli login --device-code
-
-# Explicitly specify provider
-pingcli login --device-code --provider pingone
-```
-
-### CI/CD Pipeline
-
-```bash
-# Set via environment variables
-export PINGCLI_PINGONE_AUTHORIZATION_CODE_CLIENT_ID="$CI_CLIENT_ID"
-export PINGCLI_PINGONE_AUTHORIZATION_CODE_CLIENT_SECRET="$CI_CLIENT_SECRET"
-export PINGCLI_PINGONE_ENVIRONMENT_ID="$CI_ENV_ID"
-
-# Login with file-only storage (skip keychain)
-pingcli login --client-credentials --file-storage
-```
-
 ## Token Storage
 
 Ping CLI offers a number of storage options:
@@ -290,6 +261,35 @@ pingcli login --device-code --storage=none
 
 - CI/CD pipelines where human interaction is unavailable and authorization relies on client credentials.
 - When you want to guarantee tokens are not stored on the host machine.
+
+## Examples
+
+### Interactive Development
+
+```bash
+# Configure device code settings
+pingcli config set service.pingone.regionCode=NA
+pingcli config set service.pingone.authentication.environmentID=abcd1234-ac12-ab12-ab12-abcdef123456
+pingcli config set service.pingone.authentication.deviceCode.clientID=abcd1234-ac12-ab12-ab12-abcdef123456
+
+# Login (--provider defaults to pingone)
+pingcli login --device-code
+
+# Explicitly specify provider
+pingcli login --device-code --provider pingone
+```
+
+### CI/CD Pipeline
+
+```bash
+# Set via environment variables
+export PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID="$CI_CLIENT_ID"
+export PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET="$CI_CLIENT_SECRET"
+export PINGCLI_PINGONE_ENVIRONMENT_ID="$CI_ENV_ID"
+
+# Login with file-only storage (skip keychain)
+pingcli login --client-credentials --file-storage
+```
 
 ## See Also
 
