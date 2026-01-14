@@ -98,6 +98,6 @@ The configuration file is created at `.pingcli/config.yaml` in the user's home d
 |===
 |Configuration Key |Equivalent Parameter |Environment Variable |Data Type |Purpose
 
-| `login.storage.type` | `--storage` | PINGCLI_AUTH_STORAGE | String (Enum) | Auth token storage (default: secure_local)   secure_local  - Use OS keychain (default)   file_system   - Store tokens in ~/.pingcli/credentials   none          - Do not persist tokens
+| `login.storage.type` | `--storage` | PINGCLI_LOGIN_STORAGE_TYPE | String (Enum) | Auth token storage (default: secure_local)   secure_local  - Use OS keychain (default)   file_system   - Store tokens in ~/.pingcli/credentials   none          - Do not persist tokens
 |===
 
