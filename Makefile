@@ -187,18 +187,18 @@ _run_pf_container:
 
 _wait_for_pf:
 	@echo "  > Docker: Waiting for container to become healthy (up to 4 minutes)..."
-	timeout=240
-	while test $$timeout -gt 0; do
-		status=$$(docker inspect --format='{{json .State.Health.Status}}' $(CONTAINER_NAME) 2>/dev/null || echo "")
-		if test "$$status" = '"healthy"'; then
-			echo "✅ Docker: Container is healthy."
-			exit 0
-		fi
-		sleep 1
-		timeout=$$((timeout - 1))
-	done
-	echo "Error: Container did not become healthy within the timeout period."
-	$(DOCKER) logs $(CONTAINER_NAME) || echo "No logs available."
+	@timeout=240; \
+	while [ $$timeout -gt 0 ]; do \
+		status=$$($(DOCKER) inspect --format='{{json .State.Health.Status}}' $(CONTAINER_NAME) 2>/dev/null || echo ""); \
+		if [ "$$status" = '"healthy"' ]; then \
+			echo "✅ Docker: Container is healthy."; \
+			exit 0; \
+		fi; \
+		sleep 1; \
+		timeout=$$((timeout - 1)); \
+	done; \
+	echo "Error: Container did not become healthy within the timeout period."; \
+	$(DOCKER) logs $(CONTAINER_NAME) || echo "No logs available."; \
 	exit 1
 
 _stop_pf_container:
