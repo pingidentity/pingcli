@@ -2,7 +2,7 @@
 
 | Config File Property | Equivalent Parameter | Environment Variable | Type | Purpose |
 |---|---|---|---|---|
-| login.storage.type | --storage | PINGCLI_LOGIN_STORAGE_TYPE | 14 | Auth token storage (default: secure_local). Values: secure_local, file_system, none. |
+| login.storage.type | --storage-type | PINGCLI_LOGIN_STORAGE_TYPE | 14 | Auth token storage (default: secure_local). Values: secure_local, file_system, none. |
 
 #### export Properties
 

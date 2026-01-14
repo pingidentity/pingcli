@@ -93,7 +93,7 @@ pingcli login [flags]
 
 ### Storage Options
 
-- `--storage` - Auth token storage type (default: secure_local)
+- `--storage-type` - Auth token storage type (default: secure_local)
   - `secure_local`  - Use OS keychain (default)
   - `file_system`   - Store tokens on a file in ~/.pingcli/credentials
   - `none`          - Do not persist tokens
@@ -234,15 +234,15 @@ pingcli login --device-code
 
 ##### File System Storage
 
-Use `--storage=file_system` flag or `pingcli config set login.storage.type="file_system"` to explicitly skip keychain:
+Use `--storage-type=file_system` flag or `pingcli config set login.storage.type="file_system"` to explicitly skip keychain:
 
 ```bash
-pingcli login --device-code --storage=file_system
+pingcli login --device-code --storage-type=file_system
 # Output: Successfully logged in using device_code. 
 #         Credentials saved to file storage for profile 'default'.
 ```
 
-**When to use `--storage=file_system`:**
+**When to use `--storage-type=file_system`:**
 
 - SSH sessions where keychain is unavailable
 - Systems without keychain support
@@ -250,14 +250,14 @@ pingcli login --device-code --storage=file_system
 
 ##### No Storage
 
-Use `--storage=none` flag or `pingcli config set login.storage.type="none"` to explicitly skip token storage. This means, a new authentication will be run for each Ping CLI command instantiation.
+Use `--storage-type=none` flag or `pingcli config set login.storage.type="none"` to explicitly skip token storage. This means, a new authentication will be run for each Ping CLI command instantiation.
 
 ```bash
-pingcli login --device-code --storage=none
+pingcli login --device-code --storage-type=none
 # Output: Successfully logged in using device_code. 
 ```
 
-**When to use `--storage=none`:**
+**When to use `--storage-type=none`:**
 
 - CI/CD pipelines where human interaction is unavailable and authorization relies on client credentials.
 - When you want to guarantee tokens are not stored on the host machine.
