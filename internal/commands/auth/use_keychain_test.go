@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
-	"github.com/pingidentity/pingone-go-client/config"
 	"golang.org/x/oauth2"
 )
 
@@ -39,8 +38,8 @@ func TestSaveTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	}
 
 	// Verify location indicates file storage only
-	if location != config.StorageTypeFileSystem {
-		t.Errorf("Expected file storage only, got %v", location)
+	if !location.File || location.Keychain {
+		t.Errorf("Expected file storage only (File=true, Keychain=false), got %+v", location)
 	}
 
 	// Verify token was saved to file
@@ -349,8 +348,8 @@ func TestEnvironmentVariable_FileStorage(t *testing.T) {
 	}
 
 	// Verify location indicates file storage
-	if location != config.StorageTypeFileSystem {
-		t.Errorf("Expected file storage with env var, got %v", location)
+	if !location.File || location.Keychain {
+		t.Errorf("Expected file storage with env var (File=true, Keychain=false), got %+v", location)
 	}
 
 	// Verify token was saved to file (since file-storage is true)

@@ -189,16 +189,12 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 }
 
 // displayLoginSuccess displays the successful login message
-func displayLoginSuccess(token *oauth2.Token, newAuth bool, location config.StorageType, selectedMethod, profileName string) {
+func displayLoginSuccess(token *oauth2.Token, newAuth bool, location StorageLocation, selectedMethod, profileName string) {
 	if newAuth {
 		// Build storage location message
-		var storageMsg string
-		switch location {
-		case config.StorageTypeSecureLocal:
-			storageMsg = "keychain"
-		case config.StorageTypeFileSystem:
-			storageMsg = "file storage"
-		default:
+		storageMsg := formatStorageLocation(location)
+
+		if storageMsg == "storage" {
 			output.Success(fmt.Sprintf("Successfully logged in using %s.", selectedMethod), nil)
 
 			return

@@ -96,50 +96,49 @@ func generateTokenKey(providerName, profileName, environmentID, clientID, grantT
 	return fmt.Sprintf("token-%x_%s_%s_%s", hash[:8], providerName, grantType, profileName)
 }
 
+// StorageLocation indicates where credentials were saved
+type StorageLocation struct {
+	Keychain bool
+	File     bool
+}
+
 // LoginResult contains the result of a login operation
 type LoginResult struct {
 	Token    *oauth2.Token
 	NewAuth  bool
-	Location config.StorageType
+	Location StorageLocation
 }
 
 // SaveTokenForMethod saves an OAuth2 token to file storage using the specified authentication method key
 // Note: SDK handles keychain storage separately with its own token key format
-// Returns config.StorageType indicating where the token was saved
-func SaveTokenForMethod(token *oauth2.Token, authMethod string) (config.StorageType, error) {
-	if token == nil {
-		return config.StorageTypeNone, ErrNilToken
-	}
+// Returns StorageLocation indicating where the token was saved
+func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation, error) {
+	location := StorageLocation{}
 
-	// Check for "none" storage type - do not save anywhere
-	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
-	if strings.TrimSpace(strings.ToLower(v)) == string(config.StorageTypeNone) {
-		return config.StorageTypeNone, nil
+	if token == nil {
+		return location, ErrNilToken
 	}
 
 	// Avoid saving to keychain here: SDK handles keychain persistence via TokenSource.
 	// When keychain is enabled, do NOT write a file. Only indicate keychain is in use.
 	if shouldUseKeychain() {
-		return config.StorageTypeSecureLocal, nil
+		location.Keychain = true
+
+		return location, nil
 	}
 
 	// File-only mode: save only to file storage and error if unsuccessful.
 	if err := saveTokenToFile(token, authMethod); err != nil {
-		return config.StorageTypeFileSystem, err
+		return location, err
 	}
+	location.File = true
 
-	return config.StorageTypeFileSystem, nil
+	return location, nil
 }
 
 // LoadTokenForMethod loads an OAuth2 token from the keychain using the specified authentication method key
 // Falls back to file storage if keychain operations fail or if --use-keychain=false
 func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
-	// Check for "none" storage type - do not load from anywhere
-	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
-	if strings.TrimSpace(strings.ToLower(v)) == string(config.StorageTypeNone) {
-		return nil, nil //nolint:nilnil // returning nil token and nil error is valid here to indicate no token found without failure
-	}
-
 	// Check if user disabled keychain
 	if !shouldUseKeychain() {
 		// Directly load from file storage
@@ -371,7 +370,10 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 						if oauthCfg != nil {
 							baseTS := oauthCfg.TokenSource(ctx, existingToken)
 
-							return oauth2.ReuseTokenSource(nil, baseTS), nil
+							return &fileSaveTokenSource{
+								src:        baseTS,
+								authMethod: tokenKey,
+							}, nil
 						}
 					}
 				}
@@ -384,6 +386,16 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 			return nil, &errs.PingCLIError{
 				Prefix: credentialsErrorPrefix,
 				Err:    err,
+			}
+		}
+
+		if !shouldUseKeychain() {
+			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+			if err == nil && tokenKey != "" {
+				return &fileSaveTokenSource{
+					src:        tokenSource,
+					authMethod: tokenKey,
+				}, nil
 			}
 		}
 
@@ -473,10 +485,10 @@ func ClearToken() error {
 
 // ClearTokenForMethod removes the cached token for a specific authentication method
 // Clears from both keychain and file storage
-// Returns config.StorageType indicating what was cleared
-func ClearTokenForMethod(authMethod string) (config.StorageType, error) {
+// Returns StorageLocation indicating what was cleared
+func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 	var errList []error
-	clearedType := config.StorageTypeNone
+	location := StorageLocation{}
 
 	// Clear from keychain
 	storage, err := getTokenStorage(authMethod)
@@ -487,7 +499,7 @@ func ClearTokenForMethod(authMethod string) (config.StorageType, error) {
 				Err:    err,
 			})
 		} else {
-			clearedType = config.StorageTypeSecureLocal
+			location.Keychain = true
 		}
 	}
 
@@ -497,11 +509,11 @@ func ClearTokenForMethod(authMethod string) (config.StorageType, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		})
-	} else if clearedType == config.StorageTypeNone {
-		clearedType = config.StorageTypeFileSystem
+	} else {
+		location.File = true
 	}
 
-	return clearedType, errors.Join(errList...)
+	return location, errors.Join(errList...)
 }
 
 // PerformDeviceCodeLogin performs device code authentication, returning the result
@@ -613,6 +625,11 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
+	}
+
+	// SDK handles keychain storage separately - mark if keychain is enabled
+	if shouldUseKeychain() {
+		location.Keychain = true
 	}
 
 	// Determine if this was new authentication
@@ -804,6 +821,11 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
+	}
+
+	// SDK handles keychain storage separately - mark if keychain is enabled
+	if shouldUseKeychain() {
+		location.Keychain = true
 	}
 
 	// Determine if this was new authentication
@@ -1009,6 +1031,11 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
+	// SDK handles keychain storage separately - mark if keychain is enabled
+	if shouldUseKeychain() {
+		location.Keychain = true
+	}
+
 	// Determine if this was new authentication
 	// If we had an existing token with the same expiry, it's cached
 	// If expiry is different, new auth was performed
@@ -1156,6 +1183,9 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName))
 
 	// Apply Environment ID for consistent token key generation and endpoints
+	// For worker authentication, respect the worker environment ID if set, otherwise fall back to the generic environment ID
+	workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+
 	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
@@ -1163,6 +1193,11 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 			Err:    err,
 		}
 	}
+
+	if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
+		environmentID = workerEnvID
+	}
+
 	if strings.TrimSpace(environmentID) != "" {
 		cfg = cfg.WithEnvironmentID(environmentID)
 	}
@@ -1174,4 +1209,23 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 	}
 
 	return cfg, nil
+}
+
+// fileSaveTokenSource wraps a TokenSource to save the token to file on every refresh
+type fileSaveTokenSource struct {
+	src        oauth2.TokenSource
+	authMethod string
+}
+
+func (s *fileSaveTokenSource) Token() (*oauth2.Token, error) {
+	t, err := s.src.Token()
+	if err != nil {
+		return nil, err
+	}
+
+	if err := saveTokenToFile(t, s.authMethod); err != nil {
+		return nil, err
+	}
+
+	return t, nil
 }

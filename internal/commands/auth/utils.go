@@ -69,14 +69,19 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 }
 
 // formatStorageLocation returns a human-friendly message for where credentials were cleared
-// based on config.StorageType.
-func formatStorageLocation(location config.StorageType) string {
-	switch location {
-	case config.StorageTypeSecureLocal:
-		return "keychain"
-	case config.StorageTypeFileSystem:
-		return "file storage"
-	default:
+// based on StorageLocation.
+func formatStorageLocation(location StorageLocation) string {
+	var locs []string
+	if location.Keychain {
+		locs = append(locs, "keychain")
+	}
+	if location.File {
+		locs = append(locs, "file storage")
+	}
+
+	if len(locs) == 0 {
 		return "storage"
 	}
+
+	return strings.Join(locs, " and ")
 }
