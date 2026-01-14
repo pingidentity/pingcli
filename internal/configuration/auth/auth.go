@@ -97,7 +97,7 @@ func initAuthStorageOption() {
 	cobraValue := new(customtypes.StorageType)
 	// Default to secure local (keychain) storage when not specified
 	defaultValue := customtypes.StorageType(config.StorageTypeSecureLocal)
-	envVar := "PINGCLI_AUTH_STORAGE"
+	envVar := "PINGCLI_LOGIN_STORAGE_TYPE"
 
 	options.AuthStorageOption = options.Option{
 		CobraParamName:  cobraParamName,
