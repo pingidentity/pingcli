@@ -92,7 +92,7 @@ func initAuthMethodAuthorizationCodeOption() {
 
 // initAuthStorageOption initializes the --storage-type flag for controlling file storage of auth tokens
 func initAuthStorageOption() {
-	cobraParamName := "storage"
+	cobraParamName := "storage-type"
 	// Use custom type wrapper compatible with pflag.Value
 	cobraValue := new(customtypes.StorageType)
 	// Default to secure local (keychain) storage when not specified
