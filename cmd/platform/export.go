@@ -106,6 +106,7 @@ func initGeneralExportFlags(cmd *cobra.Command) {
 }
 
 func initPingOneExportFlags(cmd *cobra.Command) {
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAPIEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption.Flag)

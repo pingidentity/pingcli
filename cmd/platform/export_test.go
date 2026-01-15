@@ -266,7 +266,7 @@ func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	outputDir := t.TempDir()
 
-	expectedErrorPattern := `failed to initialize pingone API client.*Check worker client ID, worker client secret, worker environment ID, and pingone region code`
+	expectedErrorPattern := `client credentials client ID is not configured`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
@@ -274,6 +274,8 @@ func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
 		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
 		"--"+options.PingOneAuthenticationWorkerClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
 		"--"+options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName, "invalid",
+		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, "", // Explicitly empty to override config
+		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, "", // Explicitly empty to override config
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
 	)
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -487,16 +489,17 @@ func TestPlatformExportCmd_PingOneClientCredentialsAuthMissingClientID(t *testin
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
 		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
-		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
+		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, "", // Explicitly empty to override config
+		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, "dummy-secret",
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 
 	// May succeed if worker credentials are configured as fallback
 	if err == nil {
 		t.Skip("Export succeeded - worker credentials available as fallback")
 	}
-	// Should get error about missing environment ID
-	if !strings.Contains(err.Error(), "environment ID is empty") {
-		t.Errorf("Expected 'environment ID is empty' error, got: %v", err)
+	// Should get error about missing client ID
+	if !strings.Contains(err.Error(), "client credentials client ID is not configured") {
+		t.Errorf("Expected 'client credentials client ID is not configured' error, got: %v", err)
 	}
 }
 
@@ -510,7 +513,8 @@ func TestPlatformExportCmd_PingOneDeviceCodeAuthMissingEnvironmentID(t *testing.
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
 		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
-		"--"+options.PingOneAuthenticationDeviceCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),
+		"--"+options.PingOneAuthenticationDeviceCodeClientIDOption.CobraParamName, "4aa41d08-0348-43d9-813d-d9255a2c4125", // Valid UUID format
+		"--"+options.PingOneAuthenticationAPIEnvironmentIDOption.CobraParamName, "", // Explicitly empty to override config
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 
 	// May succeed if worker credentials are configured as fallback
@@ -518,8 +522,8 @@ func TestPlatformExportCmd_PingOneDeviceCodeAuthMissingEnvironmentID(t *testing.
 		t.Skip("Export succeeded - worker credentials available as fallback")
 	}
 	// Should get error about missing environment ID
-	if !strings.Contains(err.Error(), "environment ID is empty") {
-		t.Errorf("Expected 'environment ID is empty' error, got: %v", err)
+	if !strings.Contains(err.Error(), "environment ID is not configured") {
+		t.Errorf("Expected 'environment ID is not configured' error, got: %v", err)
 	}
 }
 
@@ -534,15 +538,16 @@ func TestPlatformExportCmd_PingOneNewAuthMissingRegionCode(t *testing.T) {
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
 		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_ID"),
-		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"))
+		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
+		"--"+options.PingOneRegionCodeOption.CobraParamName, "")
 
 	// May succeed if worker credentials with region code are configured as fallback
 	if err == nil {
 		t.Skip("Export succeeded - worker credentials with region code available as fallback")
 	}
 	// Should get error about missing region code
-	if !strings.Contains(err.Error(), "pingone region code is empty") {
-		t.Errorf("Expected 'pingone region code is empty' error, got: %v", err)
+	if !strings.Contains(err.Error(), "region code is required") {
+		t.Errorf("Expected 'region code is required' error, got: %v", err)
 	}
 }
 
