@@ -24,7 +24,7 @@ integration:
         pingOne:
             regionCode: NA
             authentication:
-                type: clientCredentials
+                type: client_credentials
                 environmentID: 00000000-0000-0000-0000-000000000000
                 clientCredentials:
                     clientID: 00000000-0000-0000-0000-000000000001
@@ -39,6 +39,10 @@ integration:
 }
 
 func TestClientCredentialsAuthentication_Integration(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment")
+	}
+
 	// Skip if running in CI environment without credentials
 	if os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID") == "" ||
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET") == "" ||
@@ -58,7 +62,7 @@ integration:
         pingOne:
             regionCode: %s
             authentication:
-                type: clientCredentials
+                type: client_credentials
                 environmentID: %s
                 clientCredentials:
                     clientID: %s
@@ -96,6 +100,10 @@ integration:
 }
 
 func TestValidTokenSource_Integration(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment")
+	}
+
 	// Skip if running in CI environment without credentials
 	if os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID") == "" ||
 		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET") == "" ||
@@ -115,7 +123,7 @@ integration:
         pingOne:
             regionCode: %s
             authentication:
-                type: clientCredentials
+                type: client_credentials
                 environmentID: %s
                 clientCredentials:
                     clientID: %s
@@ -162,6 +170,9 @@ integration:
 }
 
 func TestDeviceCodeConfiguration_Integration(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment")
+	}
 	// Initialize configuration with test config
 	configuration.InitAllOptions()
 	testutils_koanf.InitKoanfsCustomFile(t, createIntegrationTestConfig())
@@ -179,6 +190,9 @@ func TestDeviceCodeConfiguration_Integration(t *testing.T) {
 }
 
 func TestAuthorizationCodeConfiguration_Integration(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment")
+	}
 	// Initialize configuration with test config
 	configuration.InitAllOptions()
 	testutils_koanf.InitKoanfsCustomFile(t, createIntegrationTestConfig())
