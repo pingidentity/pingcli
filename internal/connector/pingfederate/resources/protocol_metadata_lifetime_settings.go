@@ -33,7 +33,7 @@ func (r *PingFederateProtocolMetadataLifetimeSettingsResource) ExportAll() (*[]c
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	protocolMetadataLifetimeSettingsId := "protocol_metadata_lifetime_settings_singleton_id"
 	protocolMetadataLifetimeSettingsName := "Protocol Metadata Lifetime Settings"

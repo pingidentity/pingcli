@@ -33,7 +33,7 @@ func (r *PingFederateDefaultUrlsResource) ExportAll() (*[]connector.ImportBlock,
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	defaultUrlsId := "default_urls_singleton_id"
 	defaultUrlsName := "Default Urls"

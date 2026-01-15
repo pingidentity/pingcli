@@ -33,7 +33,7 @@ func (r *PingFederateSpIdpConnectionResource) ExportAll() (*[]connector.ImportBl
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	spIdpConnectionData, err := r.getSpIdpConnectionData()
 	if err != nil {

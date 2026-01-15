@@ -35,7 +35,7 @@ func (r *PingFederateOauthAuthenticationPolicyContractMappingResource) ExportAll
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	oauthAuthenticationPolicyContractMappingData, err := r.getOauthAuthenticationPolicyContractMappingData()
 	if err != nil {

@@ -37,7 +37,7 @@ func (r *PingOneLanguageResource) ExportAll() (*[]connector.ImportBlock, error) 
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	languageData, err := r.getLanguageData()
 	if err != nil {

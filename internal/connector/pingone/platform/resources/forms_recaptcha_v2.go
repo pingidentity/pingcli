@@ -33,7 +33,7 @@ func (r *PingOneFormsRecaptchaV2Resource) ExportAll() (*[]connector.ImportBlock,
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	ok, err := r.checkFormsRecaptchaV2Data()
 	if err != nil {

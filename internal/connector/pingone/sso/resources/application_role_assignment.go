@@ -39,7 +39,7 @@ func (r *PingOneApplicationRoleAssignmentResource) ExportAll() (*[]connector.Imp
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	applicationData, err := r.getApplicationData()
 	if err != nil {

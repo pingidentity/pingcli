@@ -33,7 +33,7 @@ func (r *PingFederateRedirectValidationResource) ExportAll() (*[]connector.Impor
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	redirectValidationId := "redirect_validation_singleton_id"
 	redirectValidationName := "Redirect Validation"

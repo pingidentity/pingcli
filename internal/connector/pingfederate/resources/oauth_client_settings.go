@@ -33,7 +33,7 @@ func (r *PingFederateOauthClientSettingsResource) ExportAll() (*[]connector.Impo
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	oauthClientSettingsId := "oauth_client_settings_singleton_id"
 	oauthClientSettingsName := "Oauth Client Settings"

@@ -37,7 +37,7 @@ func (r *PingOneRiskPredictorResource) ExportAll() (*[]connector.ImportBlock, er
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	riskPredictorData, err := r.getRiskPredictorData()
 	if err != nil {

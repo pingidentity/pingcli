@@ -33,7 +33,7 @@ func (r *PingFederateKeypairsSslServerSettingsResource) ExportAll() (*[]connecto
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	keypairsSslServerSettingsId := "keypairs_ssl_server_settings_singleton_id"
 	keypairsSslServerSettingsName := "Keypairs Ssl Server Settings"

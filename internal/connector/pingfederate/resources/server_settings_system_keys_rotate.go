@@ -33,7 +33,7 @@ func (r *PingFederateServerSettingsSystemKeysRotateResource) ExportAll() (*[]con
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	serverSettingsSystemKeysRotateId := "server_settings_system_keys_rotate_singleton_id"
 	serverSettingsSystemKeysRotateName := "Server Settings System Keys Rotate"
