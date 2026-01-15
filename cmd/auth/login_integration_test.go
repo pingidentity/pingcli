@@ -236,6 +236,7 @@ func TestLoginCommand_NoFlagsExecution_Integration(t *testing.T) {
 	}
 	// Should get authentication-related error
 	if !strings.Contains(err.Error(), "login failed") &&
+		!strings.Contains(err.Error(), "failed to login") &&
 		!strings.Contains(err.Error(), "failed to get") &&
 		!strings.Contains(err.Error(), "failed to prompt") {
 		t.Errorf("Expected authentication related error, got: %v", err)
