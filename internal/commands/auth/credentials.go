@@ -28,6 +28,7 @@ const (
 
 var (
 	credentialsErrorPrefix = "failed to manage credentials"
+	ErrStorageDisabled     = errors.New("token storage is disabled")
 )
 
 // getTokenStorage returns the appropriate keychain storage instance for the given authentication method
@@ -152,7 +153,7 @@ func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 		if strings.EqualFold(strings.TrimSpace(v), string(config.StorageTypeNone)) {
 			return nil, &errs.PingCLIError{
 				Prefix: credentialsErrorPrefix,
-				Err:    fmt.Errorf("token storage is disabled"),
+				Err:    ErrStorageDisabled,
 			}
 		}
 
@@ -1238,7 +1239,7 @@ func (s *fileSaveTokenSource) Token() (*oauth2.Token, error) {
 		return nil, err
 	}
 
-	if err := saveTokenToFile(t, s.authMethod); err != nil {
+	if _, err := SaveTokenForMethod(t, s.authMethod); err != nil {
 		return nil, err
 	}
 
