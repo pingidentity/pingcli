@@ -4,13 +4,17 @@ package auth_internal_test
 
 import (
 	"context"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"golang.org/x/oauth2"
 )
 
 func TestPerformDeviceCodeLogin_MissingConfiguration(t *testing.T) {
@@ -637,4 +641,83 @@ func TestGetWorkerConfiguration_FallbackToWorkerEnvironmentID(t *testing.T) {
 	}
 	// Unset environment variable to ensure Koanf value is used
 	t.Setenv("PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID", "")
+}
+
+func TestSaveTokenForMethod_StorageTypeNone(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	// Set storage type to "none" in the mock configuration
+	koanfCfg, err := profiles.GetKoanfConfig()
+	if err != nil {
+		t.Fatalf("Failed to get koanf config: %v", err)
+	}
+	// Use the correct key pattern for the profile option
+	// The option is registered under the active profile "default"
+	err = koanfCfg.KoanfInstance().Set("default."+options.AuthStorageOption.KoanfKey, "none")
+	if err != nil {
+		t.Fatalf("Failed to set storage option: %v", err)
+	}
+
+	// Verify the option was set correctly
+	val, err := profiles.GetOptionValue(options.AuthStorageOption)
+	if err != nil {
+		t.Fatalf("Failed to get option value: %v", err)
+	}
+	if !strings.EqualFold(val, "none") {
+		t.Fatalf("Expected storage type 'none', got '%s'", val)
+	}
+
+	// Create a dummy token
+	token := &oauth2.Token{
+		AccessToken:  "test-access-token",
+		RefreshToken: "test-refresh-token",
+		Expiry:       time.Now().Add(1 * time.Hour),
+		TokenType:    "Bearer",
+	}
+
+	testKey := "test-token-key-none-storage"
+
+	// Attempt to save the token
+	location, err := auth_internal.SaveTokenForMethod(token, testKey)
+	if err != nil {
+		t.Fatalf("SaveTokenForMethod returned error: %v", err)
+	}
+
+	// Verify neither File nor Keychain storage was used
+	if location.File {
+		t.Error("Expected File storage to be false, got true")
+	}
+	if location.Keychain {
+		t.Error("Expected Keychain storage to be false, got true")
+	}
+
+	// Double check local file system to be sure
+	homeDir, _ := os.UserHomeDir()
+	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsFile := filepath.Join(credentialsDir, testKey+".json")
+
+	if _, err := os.Stat(credentialsFile); !os.IsNotExist(err) {
+		t.Errorf("Token file should not exist when storage-type is none, but found at: %s", credentialsFile)
+		// cleanup
+		os.Remove(credentialsFile)
+	}
+}
+
+func TestLoadTokenForMethod_StorageTypeNone(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	// Set storage type to "none"
+	koanfCfg, _ := profiles.GetKoanfConfig()
+	_ = koanfCfg.KoanfInstance().Set("default."+options.AuthStorageOption.KoanfKey, "none")
+
+	testKey := "test-token-key-none-load"
+
+	// Attempt to load token
+	_, err := auth_internal.LoadTokenForMethod(testKey)
+
+	if err == nil {
+		t.Error("Expected error when loading token with storage-type: none, got nil")
+	} else if !strings.Contains(err.Error(), "token storage is disabled") {
+		t.Errorf("Expected error 'token storage is disabled', got: %v", err)
+	}
 }

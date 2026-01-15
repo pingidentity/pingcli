@@ -127,6 +127,12 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		return location, nil
 	}
 
+	// Check if persistence is disabled
+	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+	if strings.EqualFold(strings.TrimSpace(v), string(config.StorageTypeNone)) {
+		return location, nil
+	}
+
 	// File-only mode: save only to file storage and error if unsuccessful.
 	if err := saveTokenToFile(token, authMethod); err != nil {
 		return location, err
@@ -141,6 +147,15 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 	// Check if user disabled keychain
 	if !shouldUseKeychain() {
+		// Check if persistence is disabled
+		v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+		if strings.EqualFold(strings.TrimSpace(v), string(config.StorageTypeNone)) {
+			return nil, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    fmt.Errorf("token storage is disabled"),
+			}
+		}
+
 		// Directly load from file storage
 		return loadTokenFromFile(authMethod)
 	}
