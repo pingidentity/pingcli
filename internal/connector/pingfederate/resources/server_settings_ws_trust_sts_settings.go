@@ -33,7 +33,7 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsResource) ExportAll() (*[]c
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	serverSettingsWsTrustStsSettingsId := "server_settings_ws_trust_sts_settings_singleton_id"
 	serverSettingsWsTrustStsSettingsName := "Server Settings Ws Trust Sts Settings"

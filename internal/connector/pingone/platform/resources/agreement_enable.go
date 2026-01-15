@@ -33,7 +33,7 @@ func (r *PingOneAgreementEnableResource) ExportAll() (*[]connector.ImportBlock, 
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	agreementImportBlocks, err := Agreement(r.clientInfo).ExportAll()
 	if err != nil {

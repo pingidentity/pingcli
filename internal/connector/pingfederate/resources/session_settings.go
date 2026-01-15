@@ -33,7 +33,7 @@ func (r *PingFederateSessionSettingsResource) ExportAll() (*[]connector.ImportBl
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	sessionSettingsId := "session_settings_singleton_id"
 	sessionSettingsName := "Session Settings"

@@ -33,7 +33,7 @@ func (r *PingFederateOpenidConnectSettingsResource) ExportAll() (*[]connector.Im
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	openidConnectSettingsId := "openid_connect_settings_singleton_id"
 	openidConnectSettingsName := "Openid Connect Settings"

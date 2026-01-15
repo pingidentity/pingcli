@@ -33,7 +33,7 @@ func (r *PingFederateKeypairsOauthOpenidConnectResource) ExportAll() (*[]connect
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	keypairsOauthOpenidConnectId := "keypairs_oauth_openid_connect_singleton_id"
 	keypairsOauthOpenidConnectName := "Keypairs Oauth Openid Connect"

@@ -37,7 +37,7 @@ func (r *PingOneAuthorizeApplicationRoleResource) ExportAll() (*[]connector.Impo
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	authorizeApplicationRoleData, err := r.getAuthorizeApplicationRoleData()
 	if err != nil {

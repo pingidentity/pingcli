@@ -33,7 +33,7 @@ func (r *PingFederateOauthTokenExchangeGeneratorSettingsResource) ExportAll() (*
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	oauthTokenExchangeGeneratorSettingsId := "oauth_token_exchange_generator_settings_singleton_id" //#nosec G101 -- This is not hard-coded credentials
 	oauthTokenExchangeGeneratorSettingsName := "Oauth Token Exchange Generator Settings"            //#nosec G101 -- This is not hard-coded credentials

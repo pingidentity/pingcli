@@ -33,7 +33,7 @@ func (r *PingFederateAuthenticationPoliciesResource) ExportAll() (*[]connector.I
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	authenticationPoliciesId := "authentication_policies_singleton_id"
 	authenticationPoliciesName := "Authentication Policies"
