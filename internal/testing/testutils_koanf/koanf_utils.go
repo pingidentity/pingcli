@@ -179,30 +179,30 @@ func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 
 func GetDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
-		outputDirectoryReplacement,                                 // default export outputDirectory
-		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,            // default export services
-		os.Getenv("TEST_PINGCLI_DEVOPS_USER"),                      // default license devopsUser
-		os.Getenv("TEST_PINGCLI_DEVOPS_KEY"),                       // default license devopsKey
-		os.Getenv("TEST_PINGONE_REGION_CODE"),                      // default service pingOne regionCode
-		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),                   // default service pingOne authentication environmentID
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),                 // default service pingOne worker clientID
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),             // default service pingOne worker clientSecret
-		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID"),     // default service pingOne clientCredentials clientID
-		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET"), // default service pingOne clientCredentials clientSecret
-		os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"),     // default service pingOne authorizationCode clientID
-		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),            // default service pingOne deviceCode clientID
-		outputDirectoryReplacement,                                 // production export outputDirectory
-		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,            // production export services
-		os.Getenv("TEST_PINGCLI_DEVOPS_USER"),                      // production license devopsUser
-		os.Getenv("TEST_PINGCLI_DEVOPS_KEY"),                       // production license devopsKey
-		os.Getenv("TEST_PINGONE_REGION_CODE"),                      // production service pingOne regionCode
-		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),                   // production service pingOne authentication environmentID
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),                 // production service pingOne worker clientID
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),             // production service pingOne worker clientSecret
-		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID"),     // production service pingOne clientCredentials clientID
-		os.Getenv("TEST_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET"), // production service pingOne clientCredentials clientSecret
-		os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"),     // production service pingOne authorizationCode clientID
-		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),            // production service pingOne deviceCode clientID
+		outputDirectoryReplacement,                             // default export outputDirectory
+		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,        // default export services
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_USER"),            // default license devopsUser
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_KEY"),             // default license devopsKey
+		os.Getenv("TEST_PINGONE_REGION_CODE"),                  // default service pingOne regionCode
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),               // default service pingOne authentication environmentID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),             // default service pingOne worker clientID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),         // default service pingOne worker clientSecret
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),             // default service pingOne clientCredentials clientID: utilizes the worker app credentials
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),         // default service pingOne clientCredentials clientSecret: utilizes the worker app credentials
+		os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"), // default service pingOne authorizationCode clientID
+		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),        // default service pingOne deviceCode clientID
+		outputDirectoryReplacement,                             // production export outputDirectory
+		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,        // production export services
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_USER"),            // production license devopsUser
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_KEY"),             // production license devopsKey
+		os.Getenv("TEST_PINGONE_REGION_CODE"),                  // production service pingOne regionCode
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),               // production service pingOne authentication environmentID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),             // production service pingOne worker clientID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),         // production service pingOne worker clientSecret
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),             // production service pingOne clientCredentials clientID: utilizes the worker app credentials
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),         // production service pingOne clientCredentials clientSecret: utilizes the worker app credentials
+		os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"), // production service pingOne authorizationCode clientID
+		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),        // production service pingOne deviceCode clientID
 	)
 }
 

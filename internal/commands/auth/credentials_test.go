@@ -699,7 +699,7 @@ func TestSaveTokenForMethod_StorageTypeNone(t *testing.T) {
 	if _, err := os.Stat(credentialsFile); !os.IsNotExist(err) {
 		t.Errorf("Token file should not exist when storage-type is none, but found at: %s", credentialsFile)
 		// cleanup
-		os.Remove(credentialsFile)
+		_ = os.Remove(credentialsFile)
 	}
 }
 
