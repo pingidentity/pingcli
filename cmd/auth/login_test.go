@@ -8,6 +8,8 @@ import (
 	"testing"
 
 	"github.com/pingidentity/pingcli/cmd/auth"
+	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
@@ -132,6 +134,8 @@ func TestLoginCommand_BooleanFlagBehavior(t *testing.T) {
 }
 
 func TestLoginCommand_DefaultAuthorizationCode(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	// Test that when no flags are provided, it defaults to auth_code
 	// With valid credentials configured, may succeed; otherwise should fail
 	err := testutils_cobra.ExecutePingcli(t, "login")
@@ -140,10 +144,12 @@ func TestLoginCommand_DefaultAuthorizationCode(t *testing.T) {
 		t.Skip("Login succeeded with configured auth_code credentials")
 	}
 	// Error expected when credentials not configured
+	// The error might be "authorization code" (default) or "client credentials" (configured in testutils)
 	if !strings.Contains(err.Error(), "authorization code") &&
+		!strings.Contains(err.Error(), "client credentials") &&
 		!strings.Contains(err.Error(), "failed to prompt for reconfiguration") &&
 		!strings.Contains(err.Error(), "failed to get") {
-		t.Errorf("Expected auth code related error, got: %v", err)
+		t.Errorf("Expected auth code or client credentials related error, got: %v", err)
 	}
 }
 
@@ -186,6 +192,8 @@ func TestLoginCommand_MutuallyExclusiveFlags(t *testing.T) {
 }
 
 func TestLoginCommand_SpecificAuthMethod(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
 	testCases := []struct {
 		name                 string
 		flag                 string
@@ -231,6 +239,13 @@ func TestLoginCommand_SpecificAuthMethod(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			// Skip client credentials tests if environment variables are not set
+			if tc.expectSuccess && (strings.Contains(tc.flag, "client-credentials") || strings.Contains(tc.flag, "-c")) {
+				if val, _ := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption); val == "" {
+					t.Skip("Skipping test: Client Credentials Client ID not configured")
+				}
+			}
+
 			err := testutils_cobra.ExecutePingcli(t, "login", tc.flag)
 			switch {
 			case tc.expectSuccess:

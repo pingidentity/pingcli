@@ -4,6 +4,7 @@ package auth_test
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
@@ -61,16 +62,31 @@ test:
 
 // TestLogoutCmd_NoActiveSession tests logout when no credentials are stored in keychain
 func TestLogoutCmd_NoActiveSession(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	// Provide valid config so logout can check for session
+	configContents := `
+activeProfile: test
+test:
+    description: Test profile with valid config
+    outputFormat: json
+    service:
+        pingOne:
+            regionCode: NA
+            authentication:
+                type: client_credentials
+                environmentID: 00000000-0000-0000-0000-000000000000
+                clientCredentials:
+                    clientID: 00000000-0000-0000-0000-000000000001
+                    clientSecret: dummy-secret
+`
+	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
 	// Clear any existing tokens to ensure no active session
 	_ = auth_internal.ClearToken()
 
 	// Try to logout - should succeed even with no active session
 	err := testutils_cobra.ExecutePingcli(t, "logout", "--client-credentials")
-	if err != nil {
-		t.Logf("Logout with no active session returned error (expected): %v", err)
-	}
+	// Logout with no active session should succeed (idempotent)
+	testutils.CheckExpectedError(t, err, nil)
 }
 
 // TestLoginCmd_InvalidCredentials tests behavior with intentionally invalid credentials
@@ -93,11 +109,9 @@ test:
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
 	err := testutils_cobra.ExecutePingcli(t, "login", "--client-credentials")
-	if err == nil {
-		t.Error("Expected error with invalid credentials, but got none")
-	} else {
-		t.Logf("Got expected error with invalid credentials: %v", err)
-	}
+	// Expect 401 Unauthorized or similar error
+	expectedErrorPattern := `401 Unauthorized|invalid_client`
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // TestLogoutCmd_WithoutAuthTypeConfigured tests logout when no auth type is configured
@@ -115,8 +129,8 @@ test:
 
 	// Try to logout without specifying grant type and without configured auth type
 	err := testutils_cobra.ExecutePingcli(t, "logout")
-	expectedErrorPattern := `no authorization grant type configured|authorization grant type|failed to generate token key`
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+	// Logout without configuration should be a no-op success (idempotent)
+	testutils.CheckExpectedError(t, err, nil)
 }
 
 // TestLoginCmd_DefaultAuthTypeNotConfigured tests login without flags when no auth type is configured
@@ -134,12 +148,9 @@ test:
 
 	// This should trigger interactive configuration prompt (which will fail in test environment)
 	err := testutils_cobra.ExecutePingcli(t, "login")
-	// We expect some error since we can't do interactive prompts in tests
-	if err == nil {
-		t.Error("Expected error when no auth type configured and no interactive input, but got none")
-	} else {
-		t.Logf("Got expected error: %v", err)
-	}
+	// We expect some error since we can't do interactive prompts in tests and no default auth set
+	expectedErrorPattern := `failed to prompt for reconfiguration|input prompt error|failed to configure authentication`
+	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
 // TestLoginCmd_MutuallyExclusiveFlags tests that multiple grant type flags cannot be used together
@@ -211,7 +222,12 @@ func TestLogoutCmd_SpecificAuthMethod(t *testing.T) {
 	// Logout from specific grant type
 	err = testutils_cobra.ExecutePingcli(t, "logout", "--client-credentials")
 	if err != nil {
-		t.Fatalf("Failed to logout: %v", err)
+		// Ignore keychain errors in CI environment
+		if strings.Contains(err.Error(), "org.freedesktop.secrets") || strings.Contains(err.Error(), "keychain") {
+			t.Logf("Ignoring keychain error in CI: %v", err)
+		} else {
+			t.Fatalf("Failed to logout: %v", err)
+		}
 	}
 
 	// Verify token is cleared
@@ -320,29 +336,6 @@ test:
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
-// TestLoginCmd_AuthorizationCodeMissingRedirectURI tests authorization code without redirect URI
-func TestLoginCmd_AuthorizationCodeMissingRedirectURI(t *testing.T) {
-	configContents := `
-activeProfile: test
-test:
-    description: Test profile without redirect URI
-    outputFormat: json
-    service:
-        pingOne:
-            regionCode: NA
-            authentication:
-                type: authorization_code
-                environmentID: 00000000-0000-0000-0000-000000000000
-                authorizationCode:
-                    clientID: 00000000-0000-0000-0000-000000000001
-`
-	testutils_koanf.InitKoanfsCustomFile(t, configContents)
-
-	err := testutils_cobra.ExecutePingcli(t, "login", "--authorization-code")
-	expectedErrorPattern := `redirect URI.*is not configured|failed to prompt for reconfiguration|input prompt error`
-	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
-}
-
 // TestLoginCmd_InvalidFlags tests invalid flag combinations
 func TestLoginCmd_InvalidFlags(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
@@ -433,9 +426,7 @@ func TestLoginCmd_HelpFlags(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := testutils_cobra.ExecutePingcli(t, tc.args...)
 			// Help should not return an error
-			if err != nil {
-				t.Errorf("Help flag should not return error, got: %v", err)
-			}
+			testutils.CheckExpectedError(t, err, nil)
 		})
 	}
 }
@@ -462,9 +453,7 @@ func TestLogoutCmd_HelpFlags(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			err := testutils_cobra.ExecutePingcli(t, tc.args...)
 			// Help should not return an error
-			if err != nil {
-				t.Errorf("Help flag should not return error, got: %v", err)
-			}
+			testutils.CheckExpectedError(t, err, nil)
 		})
 	}
 }

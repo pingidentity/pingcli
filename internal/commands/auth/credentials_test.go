@@ -26,7 +26,8 @@ func TestPerformDeviceCodeLogin_MissingConfiguration(t *testing.T) {
 	// Can fail at configuration stage or authentication stage depending on what's configured
 	if err != nil && !strings.Contains(err.Error(), "failed to get device code configuration") &&
 		!strings.Contains(err.Error(), "device auth request failed") &&
-		!strings.Contains(err.Error(), "failed to get token") {
+		!strings.Contains(err.Error(), "failed to get token") &&
+		!strings.Contains(err.Error(), "client ID is not configured") {
 		t.Errorf("Expected configuration or authentication error, got: %v", err)
 	}
 }
@@ -50,7 +51,8 @@ func TestPerformClientCredentialsLogin_MissingConfiguration(t *testing.T) {
 			t.Log("Note: Authentication succeeded using cached token")
 		}
 	} else if !strings.Contains(err.Error(), "failed to get client credentials configuration") &&
-		!strings.Contains(err.Error(), "failed to get token") {
+		!strings.Contains(err.Error(), "failed to get token") &&
+		!strings.Contains(err.Error(), "client ID is not configured") {
 		// Error - missing or invalid configuration
 		t.Errorf("Expected configuration or authentication error, got: %v", err)
 	}
@@ -66,7 +68,7 @@ func TestPerformAuthorizationCodeLogin_MissingConfiguration(t *testing.T) {
 	if err == nil {
 		t.Error("Expected error, but got nil")
 	}
-	if err != nil && !strings.Contains(err.Error(), "failed to get authorization code configuration") {
+	if err != nil && !strings.Contains(err.Error(), "failed to get authorization code configuration") && !strings.Contains(err.Error(), "client ID is not configured") {
 		t.Errorf("Expected error to contain 'failed to get authorization code configuration', got: %v", err)
 	}
 }
@@ -242,7 +244,8 @@ func TestGetValidTokenSource_NoCache(t *testing.T) {
 		!strings.Contains(err.Error(), "automatic device code authentication failed") &&
 		!strings.Contains(err.Error(), "failed to get client credentials configuration") &&
 		!strings.Contains(err.Error(), "failed to get device code configuration") &&
-		!strings.Contains(err.Error(), "failed to get authorization code configuration") {
+		!strings.Contains(err.Error(), "failed to get authorization code configuration") &&
+		!strings.Contains(err.Error(), "client ID is not configured") {
 		// Error - authentication failed or configuration missing
 		t.Errorf("Expected authentication-related error, got: %s", err.Error())
 	}
@@ -435,6 +438,7 @@ func TestGetValidTokenSource_AutomaticDeviceCodeAuth(t *testing.T) {
 		"failed to get client credentials configuration",
 		"failed to get device code configuration",
 		"failed to get authorization code configuration",
+		"client ID is not configured",
 	}
 
 	errorMatched := false
@@ -479,6 +483,7 @@ func TestGetValidTokenSource_AutomaticAuthorizationCodeAuth(t *testing.T) {
 		"automatic client credentials authentication failed", // test env: worker -> client_credentials
 		"failed to get client credentials configuration",
 		"failed to get authorization code configuration",
+		"client ID is not configured",
 	}
 
 	errorMatched := false
@@ -527,6 +532,7 @@ func TestGetValidTokenSource_AutomaticClientCredentialsAuth(t *testing.T) {
 		"automatic device code authentication failed",
 		"automatic authorization code authentication failed",
 		"automatic client credentials authentication failed",
+		"failed to manage credentials", // Covers "client credentials client ID is not configured"
 		"failed to get authorization grant type",
 		"failed to get client credentials configuration",
 		"failed to get device code configuration",
@@ -604,13 +610,17 @@ func TestGetValidTokenSource_WorkerTypeAlias(t *testing.T) {
 
 // Test that GetWorkerConfiguration falls back to worker environment ID when general env ID is empty
 func TestGetWorkerConfiguration_FallbackToWorkerEnvironmentID(t *testing.T) {
+	// Unset environment variable to ensure Koanf value is used
+	t.Setenv("PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_ENVIRONMENT_ID", "")
+
 	testutils_koanf.InitKoanfs(t)
 	if koanfCfg, err := profiles.GetKoanfConfig(); err == nil {
-		_ = koanfCfg.KoanfInstance().Set(options.PingOneRegionCodeOption.KoanfKey, "NA")
-		_ = koanfCfg.KoanfInstance().Set(options.PingOneAuthenticationAPIEnvironmentIDOption.KoanfKey, "")
-		_ = koanfCfg.KoanfInstance().Set(options.PingOneAuthenticationWorkerEnvironmentIDOption.KoanfKey, "env-worker-xyz")
-		_ = koanfCfg.KoanfInstance().Set(options.PingOneAuthenticationWorkerClientIDOption.KoanfKey, "00000000-0000-0000-0000-000000000001")
-		_ = koanfCfg.KoanfInstance().Set(options.PingOneAuthenticationWorkerClientSecretOption.KoanfKey, "test-secret")
+		_ = koanfCfg.KoanfInstance().Set("default."+options.PingOneRegionCodeOption.KoanfKey, "NA")
+		_ = koanfCfg.KoanfInstance().Set("default."+options.PingOneAuthenticationAPIEnvironmentIDOption.KoanfKey, "")
+		_ = koanfCfg.KoanfInstance().Set("default."+options.PingOneAuthenticationWorkerEnvironmentIDOption.KoanfKey, "env-worker-xyz")
+		_ = koanfCfg.KoanfInstance().Set("default."+options.PingOneAuthenticationWorkerClientIDOption.KoanfKey, "00000000-0000-0000-0000-000000000001")
+		_ = koanfCfg.KoanfInstance().Set("default."+options.PingOneAuthenticationWorkerClientSecretOption.KoanfKey, "test-secret")
 	}
 
 	cfg, err := auth_internal.GetWorkerConfiguration()
@@ -619,6 +629,12 @@ func TestGetWorkerConfiguration_FallbackToWorkerEnvironmentID(t *testing.T) {
 	}
 
 	if cfg.Endpoint.EnvironmentID == nil || *cfg.Endpoint.EnvironmentID != "env-worker-xyz" {
-		t.Fatalf("expected worker environmentID applied to config, got %+v", cfg.Endpoint.EnvironmentID)
+		val := "<nil>"
+		if cfg.Endpoint.EnvironmentID != nil {
+			val = *cfg.Endpoint.EnvironmentID
+		}
+		t.Fatalf("expected worker environmentID applied to config, got %s", val)
 	}
+	// Unset environment variable to ensure Koanf value is used
+	t.Setenv("PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID", "")
 }
