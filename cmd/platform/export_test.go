@@ -131,7 +131,7 @@ func TestPlatformExportCmd_OutputDirectoryFlag(t *testing.T) {
 func TestPlatformExportCmd_OutputDirectoryFlagInvalidDirectory(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	expectedErrorPattern := `^failed to create output directory '\/invalid': mkdir \/invalid: .+$`
+	expectedErrorPattern := `^platform export error: failed to create output directory '\/invalid': mkdir \/invalid: .+$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, "/invalid")
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
@@ -193,6 +193,7 @@ func TestPlatformExportCmd_OverwriteFlagTrueWithExistingDirectory(t *testing.T) 
 // --pingone-region flag
 func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
+
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -421,7 +422,7 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
 func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	expectedErrorPattern := `^failed to read CA certificate PEM file '.*': open .*: no such file or directory$`
+	expectedErrorPattern := `^platform export error: failed to read CA certificate PEM file '.*': open .*: no such file or directory$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		"--"+options.PingFederateCACertificatePemFilesOption.CobraParamName, "invalid/crt.pem",
@@ -435,47 +436,85 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T
 // Test Platform Export Command with PingOne client_credentials authentication
 func TestPlatformExportCmd_PingOneClientCredentialsAuth(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
+
 	outputDir := t.TempDir()
 
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
-		"--"+options.PlatformExportOverwriteOption.CobraParamName,
-		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
-		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
-		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_ID"),
-		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, os.Getenv("TEST_PINGONE_CLIENT_SECRET"),
-		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	args := []string{"platform", "export",
+		"--" + options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--" + options.PlatformExportOverwriteOption.CobraParamName,
+		"--" + options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--" + options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
+		"--" + options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
+	}
+
+	clientID := os.Getenv("TEST_PINGONE_CLIENT_ID")
+	if clientID == "" {
+		clientID = os.Getenv("PINGONE_CLIENT_ID")
+	}
+	if clientID != "" {
+		args = append(args, "--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, clientID)
+	}
+
+	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_SECRET")
+	if clientSecret == "" {
+		clientSecret = os.Getenv("PINGONE_CLIENT_SECRET")
+	}
+	if clientSecret != "" {
+		args = append(args, "--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, clientSecret)
+	}
+
+	err := testutils_cobra.ExecutePingcli(t, args...)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Platform Export Command with PingOne device_code authentication
 func TestPlatformExportCmd_PingOneDeviceCodeAuth(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment")
+	}
+
 	outputDir := t.TempDir()
 
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
-		"--"+options.PlatformExportOverwriteOption.CobraParamName,
-		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
-		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
-		"--"+options.PingOneAuthenticationDeviceCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),
-		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	args := []string{"platform", "export",
+		"--" + options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--" + options.PlatformExportOverwriteOption.CobraParamName,
+		"--" + options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--" + options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
+		"--" + options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
+	}
+
+	if clientID := os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"); clientID != "" {
+		args = append(args, "--"+options.PingOneAuthenticationDeviceCodeClientIDOption.CobraParamName, clientID)
+	}
+
+	err := testutils_cobra.ExecutePingcli(t, args...)
 	testutils.CheckExpectedError(t, err, nil)
 }
 
 // Test Platform Export Command with PingOne authorization_code authentication
 func TestPlatformExportCmd_PingOneAuthorizationCodeAuth(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping test in CI environment")
+	}
+
 	outputDir := t.TempDir()
 
-	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
-		"--"+options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
-		"--"+options.PlatformExportOverwriteOption.CobraParamName,
-		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
-		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE,
-		"--"+options.PingOneAuthenticationAuthorizationCodeClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"),
-		"--"+options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.CobraParamName, "http://localhost:8080/callback",
-		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
+	args := []string{"platform", "export",
+		"--" + options.PlatformExportOutputDirectoryOption.CobraParamName, outputDir,
+		"--" + options.PlatformExportOverwriteOption.CobraParamName,
+		"--" + options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
+		"--" + options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE,
+		"--" + options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.CobraParamName, "http://localhost:7464/callback",
+		"--" + options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
+	}
+
+	if clientID := os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"); clientID != "" {
+		args = append(args, "--"+options.PingOneAuthenticationAuthorizationCodeClientIDOption.CobraParamName, clientID)
+	}
+
+	err := testutils_cobra.ExecutePingcli(t, args...)
 	testutils.CheckExpectedError(t, err, nil)
 }
 

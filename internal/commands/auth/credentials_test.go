@@ -646,6 +646,9 @@ func TestGetWorkerConfiguration_FallbackToWorkerEnvironmentID(t *testing.T) {
 func TestSaveTokenForMethod_StorageTypeNone(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
+	// Unset environment variable to prevent it from overriding the koanf config
+	t.Setenv(options.AuthStorageOption.EnvVar, "")
+
 	// Set storage type to "none" in the mock configuration
 	koanfCfg, err := profiles.GetKoanfConfig()
 	if err != nil {
@@ -705,6 +708,9 @@ func TestSaveTokenForMethod_StorageTypeNone(t *testing.T) {
 
 func TestLoadTokenForMethod_StorageTypeNone(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
+
+	// Unset environment variable to prevent it from overriding the koanf config
+	t.Setenv(options.AuthStorageOption.EnvVar, "")
 
 	// Set storage type to "none"
 	koanfCfg, _ := profiles.GetKoanfConfig()

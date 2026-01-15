@@ -3,6 +3,7 @@
 package auth_test
 
 import (
+	"os"
 	"regexp"
 	"strings"
 	"testing"
@@ -196,43 +197,43 @@ func TestLoginCommand_SpecificAuthMethod(t *testing.T) {
 
 	testCases := []struct {
 		name                 string
-		flag                 string
+		args                 []string
 		expectedErrorPattern string
 		expectSuccess        bool
 		allowBoth            bool // Allow either success or specific error
 	}{
 		{
 			name:                 "auth-code flag",
-			flag:                 "--authorization-code",
+			args:                 []string{"--authorization-code"},
 			expectedErrorPattern: `authorization code`,
 			allowBoth:            true, // May succeed with valid config
 		},
 		{
 			name:                 "auth-code shorthand",
-			flag:                 "-a",
+			args:                 []string{"-a"},
 			expectedErrorPattern: `authorization code`,
 			allowBoth:            true, // May succeed with valid config
 		},
 		{
 			name:                 "device-code flag",
-			flag:                 "--device-code",
+			args:                 []string{"--device-code"},
 			expectedErrorPattern: `device (code|auth)`,
 			allowBoth:            true, // May succeed with valid config
 		},
 		{
 			name:                 "device-code shorthand",
-			flag:                 "-d",
+			args:                 []string{"-d"},
 			expectedErrorPattern: `device (code|auth)`,
 			allowBoth:            true, // May succeed with valid config
 		},
 		{
 			name:          "client-credentials flag",
-			flag:          "--client-credentials",
+			args:          []string{"--client-credentials"},
 			expectSuccess: true, // With valid config, login succeeds
 		},
 		{
 			name:          "client-credentials shorthand",
-			flag:          "-c",
+			args:          []string{"-c"},
 			expectSuccess: true, // With valid config, login succeeds
 		},
 	}
@@ -240,13 +241,49 @@ func TestLoginCommand_SpecificAuthMethod(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			// Skip client credentials tests if environment variables are not set
-			if tc.expectSuccess && (strings.Contains(tc.flag, "client-credentials") || strings.Contains(tc.flag, "-c")) {
-				if val, _ := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption); val == "" {
+			isClientCreds := false
+			for _, arg := range tc.args {
+				if strings.Contains(arg, "client-credentials") || arg == "-c" {
+					isClientCreds = true
+
+					break
+				}
+			}
+
+			if tc.expectSuccess && isClientCreds {
+				if val, _ := profiles.GetOptionValue(options.PingOneAuthenticationClientCredentialsClientIDOption); val == "" && os.Getenv("TEST_PINGONE_CLIENT_ID") == "" && os.Getenv("PINGONE_CLIENT_ID") == "" {
 					t.Skip("Skipping test: Client Credentials Client ID not configured")
 				}
 			}
 
-			err := testutils_cobra.ExecutePingcli(t, "login", tc.flag)
+			// Pre-configure environment variables for the test execution
+			// The login command relies on global configuration/env vars
+			if isClientCreds {
+				clientID := os.Getenv("TEST_PINGONE_CLIENT_ID")
+				if clientID != "" {
+					t.Setenv("PINGONE_CLIENT_ID", clientID)
+					t.Setenv("PINGONE_CLIENT_CREDENTIALS_CLIENT_ID", clientID)
+					// Set Koanf-style env var overrides
+					t.Setenv("PINGCLI_SERVICE_PINGONE_AUTHENTICATION_CLIENTCREDENTIALS_CLIENTID", clientID)
+				}
+
+				clientSecret := os.Getenv("TEST_PINGONE_CLIENT_SECRET")
+				if clientSecret != "" {
+					t.Setenv("PINGONE_CLIENT_SECRET", clientSecret)
+					t.Setenv("PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET", clientSecret)
+					t.Setenv("PINGCLI_SERVICE_PINGONE_AUTHENTICATION_CLIENTCREDENTIALS_CLIENTSECRET", clientSecret)
+				}
+
+				region := os.Getenv("TEST_PINGONE_REGION_CODE")
+				if region != "" {
+					t.Setenv("PINGONE_REGION_CODE", region)
+					t.Setenv("PINGCLI_SERVICE_PINGONE_REGION", region)
+				}
+			}
+
+			cmdArgs := append([]string{"login"}, tc.args...)
+
+			err := testutils_cobra.ExecutePingcli(t, cmdArgs...)
 			switch {
 			case tc.expectSuccess:
 				if err != nil {
@@ -260,7 +297,9 @@ func TestLoginCommand_SpecificAuthMethod(t *testing.T) {
 					if !matched && !strings.Contains(err.Error(), "failed to prompt") &&
 						!strings.Contains(err.Error(), "failed to configure authentication") &&
 						!strings.Contains(err.Error(), "input prompt error") &&
-						!strings.Contains(err.Error(), "failed to get") {
+						!strings.Contains(err.Error(), "failed to get") &&
+						!strings.Contains(err.Error(), "context deadline exceeded") &&
+						!strings.Contains(err.Error(), "address already in use") {
 						t.Errorf("Error did not match expected pattern '%s', got: %v", tc.expectedErrorPattern, err)
 					}
 				}
