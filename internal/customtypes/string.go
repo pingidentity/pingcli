@@ -40,5 +40,6 @@ func (s *String) String() string {
 
 func StringPtr(val string) *String {
 	s := String(val)
+
 	return &s
 }
