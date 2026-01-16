@@ -30,6 +30,8 @@ func TestRequestPingOne_RealAuth(t *testing.T) {
 
 	// Set service to pingone
 	t.Setenv("PINGCLI_REQUEST_SERVICE", "pingone")
+	// Disable keychain storage for integration tests to avoid system dependencies
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "none")
 
 	// Clear any existing tokens to ensure fresh authentication
 	err := auth_internal.ClearToken()
