@@ -8,7 +8,6 @@ import (
 	"regexp"
 	"testing"
 
-	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
@@ -23,9 +22,11 @@ type testCase struct {
 	checkTfFiles               bool
 	nilContext                 bool
 	cACertPemFiles             customtypes.StringSlice
+	pingOneAuthType            customtypes.PingOneAuthenticationType
+	authStorageType            customtypes.StorageType
 	pfAuthType                 customtypes.PingFederateAuthenticationType
 	pfAccessToken              customtypes.String
-	pfClientId                 customtypes.String
+	pfClientId                 *customtypes.String
 	pfClientSecret             customtypes.String
 	pfTokenURL                 customtypes.String
 	outputDir                  customtypes.String
@@ -55,11 +56,14 @@ func Test_RunInternalExport(t *testing.T) {
 				customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
 				customtypes.ENUM_EXPORT_SERVICE_PINGONE_SSO,
 			},
-			checkTfFiles: true,
+			pingOneAuthType: customtypes.PingOneAuthenticationType(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER),
+			authStorageType: customtypes.StorageType(customtypes.ENUM_STORAGE_TYPE_NONE),
+			checkTfFiles:    true,
 		},
 		{
 			name:     "Test export with no services selected",
 			services: []string{},
+			// No config means no interaction with PingOne auth type, so technically doesn't need it, but good practice if it starts doing verification
 		},
 		// TODO - The PF Container used for testing needs to support Access Token Auth
 		// {
@@ -93,14 +97,14 @@ func Test_RunInternalExport(t *testing.T) {
 			name:          "Test empty client credentials - PingFederate Client Credentials Auth",
 			services:      []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
 			pfAuthType:    customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS),
-			pfClientId:    "",
-			expectedError: ErrPingFederateInit,
+			pfClientId:    customtypes.StringPtr(""),
+			expectedError: ErrClientCredentialsEmpty,
 		},
 		{
 			name:           "Test invalid client credentials - PingFederate Client Credentials Auth",
 			services:       []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
 			pfAuthType:     customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS),
-			pfClientId:     "invalid-client-id",
+			pfClientId:     customtypes.StringPtr("invalid-client-id"),
 			pfClientSecret: "invalid-client-secret",
 			pfTokenURL:     "http://localhost:9031/pf-admin-api/v1/oauth/token",
 			expectedError:  ErrPingFederateInit,
@@ -126,7 +130,7 @@ func Test_RunInternalExport(t *testing.T) {
 			name:           "Test with malformed PEM file - PingFederate",
 			services:       []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
 			cACertPemFiles: *malformedCaCertPemFile,
-			expectedError:  auth_internal.ErrPingFederateCACertParse,
+			expectedError:  ErrPingFederateCACertParse,
 		},
 		{
 			name:          "Test invalid PingFederate Auth Type",
@@ -155,6 +159,8 @@ func Test_RunInternalExport(t *testing.T) {
 			overwriteOutputDirLocation: true,
 			changeWorkingDir:           true,
 			checkTfFiles:               true,
+			pingOneAuthType:            customtypes.PingOneAuthenticationType(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER),
+			authStorageType:            customtypes.StorageType(customtypes.ENUM_STORAGE_TYPE_NONE),
 		},
 		{
 			name:                       "Test unreable output directory",
@@ -177,12 +183,29 @@ func Test_RunInternalExport(t *testing.T) {
 			overwriteOutputDirLocation: true,
 			overwriteOnExport:          true,
 			checkTfFiles:               true,
+			pingOneAuthType:            customtypes.PingOneAuthenticationType(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER),
+			authStorageType:            customtypes.StorageType(customtypes.ENUM_STORAGE_TYPE_NONE),
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			testutils_koanf.InitKoanfs(t)
+
+			if tc.pingOneAuthType == customtypes.PingOneAuthenticationType(customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER) {
+				if v := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"); v != "" {
+					t.Setenv("PINGCLI_PINGONE_WORKER_CLIENT_ID", v)
+				}
+				if v := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"); v != "" {
+					t.Setenv("PINGCLI_PINGONE_WORKER_CLIENT_SECRET", v)
+				}
+				// Use worker env ID if present, otherwise default to configured env ID
+				if v := os.Getenv("TEST_PINGONE_WORKER_ENVIRONMENT_ID"); v != "" {
+					t.Setenv("PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID", v)
+				} else if v := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"); v != "" {
+					t.Setenv("PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID", v)
+				}
+			}
 
 			setupTestCase(t, tc)
 
@@ -224,47 +247,98 @@ func setupTestCase(t *testing.T, tc testCase) {
 	if tc.services != nil {
 		options.PlatformExportServiceOption.Flag.Changed = true
 		options.PlatformExportServiceOption.CobraParamValue = &tc.services
+		t.Cleanup(func() {
+			options.PlatformExportServiceOption.Flag.Changed = false
+			options.PlatformExportServiceOption.CobraParamValue = nil
+		})
+	}
+
+	if tc.pingOneAuthType != "" {
+		// Set runtime PingOne Auth Type (and clear via Cleanup = logout)
+		options.PingOneAuthenticationTypeOption.Flag.Changed = true
+		options.PingOneAuthenticationTypeOption.CobraParamValue = &tc.pingOneAuthType
+		t.Cleanup(func() {
+			options.PingOneAuthenticationTypeOption.Flag.Changed = false
+			options.PingOneAuthenticationTypeOption.CobraParamValue = nil
+		})
+	}
+
+	if tc.authStorageType != "" {
+		options.AuthStorageOption.Flag.Changed = true
+		options.AuthStorageOption.CobraParamValue = &tc.authStorageType
+		t.Cleanup(func() {
+			options.AuthStorageOption.Flag.Changed = false
+			options.AuthStorageOption.CobraParamValue = nil
+		})
 	}
 
 	if tc.cACertPemFiles != nil {
 		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "cACertPemFiles is only applicable to PingFederate service export")
 		options.PingFederateCACertificatePemFilesOption.Flag.Changed = true
 		options.PingFederateCACertificatePemFilesOption.CobraParamValue = &tc.cACertPemFiles
+		t.Cleanup(func() {
+			options.PingFederateCACertificatePemFilesOption.Flag.Changed = false
+			options.PingFederateCACertificatePemFilesOption.CobraParamValue = nil
+		})
 	}
 
 	if tc.pfAuthType != "" {
 		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfAuthType is only applicable to PingFederate service export")
 		options.PingFederateAuthenticationTypeOption.Flag.Changed = true
 		options.PingFederateAuthenticationTypeOption.CobraParamValue = &tc.pfAuthType
+		t.Cleanup(func() {
+			options.PingFederateAuthenticationTypeOption.Flag.Changed = false
+			options.PingFederateAuthenticationTypeOption.CobraParamValue = nil
+		})
 	}
 
 	if tc.pfAccessToken != "" {
 		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfAccessToken is only applicable to PingFederate service export")
 		options.PingFederateAccessTokenAuthAccessTokenOption.Flag.Changed = true
 		options.PingFederateAccessTokenAuthAccessTokenOption.CobraParamValue = &tc.pfAccessToken
+		t.Cleanup(func() {
+			options.PingFederateAccessTokenAuthAccessTokenOption.Flag.Changed = false
+			options.PingFederateAccessTokenAuthAccessTokenOption.CobraParamValue = nil
+		})
 	}
 
-	if tc.pfClientId != "" {
+	if tc.pfClientId != nil {
 		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfClientId is only applicable to PingFederate service export")
 		options.PingFederateClientCredentialsAuthClientIDOption.Flag.Changed = true
-		options.PingFederateClientCredentialsAuthClientIDOption.CobraParamValue = &tc.pfClientId
+		options.PingFederateClientCredentialsAuthClientIDOption.CobraParamValue = tc.pfClientId
+		t.Cleanup(func() {
+			options.PingFederateClientCredentialsAuthClientIDOption.Flag.Changed = false
+			options.PingFederateClientCredentialsAuthClientIDOption.CobraParamValue = nil
+		})
 	}
 
 	if tc.pfClientSecret != "" {
 		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfClientSecret is only applicable to PingFederate service export")
 		options.PingFederateClientCredentialsAuthClientSecretOption.Flag.Changed = true
 		options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamValue = &tc.pfClientSecret
+		t.Cleanup(func() {
+			options.PingFederateClientCredentialsAuthClientSecretOption.Flag.Changed = false
+			options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamValue = nil
+		})
 	}
 
 	if tc.pfTokenURL != "" {
 		require.Contains(t, tc.services, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE, "pfTokenURL is only applicable to PingFederate service export")
 		options.PingFederateClientCredentialsAuthTokenURLOption.Flag.Changed = true
 		options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamValue = &tc.pfTokenURL
+		t.Cleanup(func() {
+			options.PingFederateClientCredentialsAuthTokenURLOption.Flag.Changed = false
+			options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamValue = nil
+		})
 	}
 
 	if tc.overwriteOutputDirLocation {
 		options.PlatformExportOutputDirectoryOption.Flag.Changed = true
 		options.PlatformExportOutputDirectoryOption.CobraParamValue = &tc.outputDir
+		t.Cleanup(func() {
+			options.PlatformExportOutputDirectoryOption.Flag.Changed = false
+			options.PlatformExportOutputDirectoryOption.CobraParamValue = nil
+		})
 	}
 
 	if tc.changeWorkingDir {
@@ -281,6 +355,10 @@ func setupTestCase(t *testing.T, tc testCase) {
 	if tc.overwriteOnExport {
 		options.PlatformExportOverwriteOption.Flag.Changed = true
 		options.PlatformExportOverwriteOption.CobraParamValue = &tc.overwriteOnExport
+		t.Cleanup(func() {
+			options.PlatformExportOverwriteOption.Flag.Changed = false
+			options.PlatformExportOverwriteOption.CobraParamValue = nil
+		})
 	}
 }
 
