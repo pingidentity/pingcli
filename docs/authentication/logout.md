@@ -37,7 +37,7 @@ If no flag is provided, clears tokens for **all** authentication methods.
    - **Linux**: Secret Service API (GNOME Keyring/KDE KWallet)
 
 2. **File Storage:**
-   - `~/.pingcli/credentials/<env-id>_<client-id>_<method>.json` - Encrypted token files
+   - `~/.pingcli/credentials/<env-id>_<client-id>_<method>.json` - token files
 
 ### Cache
 - PingOne API client cache
@@ -109,7 +109,7 @@ pingcli request get /environments
 
 Expected response:
 ```
-Error: no valid authentication token found. Please run 'pingcli auth login --device-code' to authenticate
+Error: no valid authentication token found. Please run 'pingcli login --device-code' to authenticate
 ```
 
 ## Manual Token Removal
@@ -172,7 +172,7 @@ rm ~/.pingcli/credentials/<env-id>_<client-id>_device_code.json
 ### Development Workflow
 ```bash
 # Start session
-pingcli auth login --device-code
+pingcli login --device-code
 
 # Work with APIs
 pingcli request get /environments
@@ -185,7 +185,7 @@ pingcli logout
 ```yaml
 # Example GitHub Actions
 - name: Authenticate
-  run: pingcli auth login --client-credentials
+  run: pingcli login --client-credentials
 
 - name: Run commands
   run: |
