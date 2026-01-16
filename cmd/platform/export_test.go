@@ -495,6 +495,10 @@ func TestPlatformExportCmd_PingOneDeviceCodeAuth(t *testing.T) {
 		"--" + options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
 	}
 
+	if envID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"); envID != "" {
+		args = append(args, "--"+options.PingOneAuthenticationAPIEnvironmentIDOption.CobraParamName, envID)
+	}
+
 	if clientID := os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"); clientID != "" {
 		args = append(args, "--"+options.PingOneAuthenticationDeviceCodeClientIDOption.CobraParamName, clientID)
 	}
@@ -522,6 +526,10 @@ func TestPlatformExportCmd_PingOneAuthorizationCodeAuth(t *testing.T) {
 		"--" + options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE,
 		"--" + options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.CobraParamName, "/callback",
 		"--" + options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
+	}
+
+	if envID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"); envID != "" {
+		args = append(args, "--"+options.PingOneAuthenticationAPIEnvironmentIDOption.CobraParamName, envID)
 	}
 
 	if clientID := os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"); clientID != "" {
@@ -621,6 +629,7 @@ func TestPlatformExportCmd_PingOneInvalidAuthType(t *testing.T) {
 
 func setupTestEnv(t *testing.T) {
 	t.Helper()
+
 	t.Setenv("PINGCLI_PINGONE_AUTHENTICATION_TYPE", "worker")
 	if v := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"); v != "" {
 		t.Setenv("PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID", v)

@@ -214,6 +214,12 @@ func TestGetAuthorizationCodeConfiguration_MissingEnvironmentID(t *testing.T) {
 	if os.Getenv("CI") != "" {
 		t.Skip("Skipping test in CI environment")
 	}
+	// Clear environment variables that might interfere
+	t.Setenv("PINGCLI_PINGONE_AUTHENTICATION_ENVIRONMENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_ENVIRONMENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID", "")
+	t.Setenv("TEST_PINGONE_ENVIRONMENT_ID", "")
+
 	testutils_koanf.InitKoanfs(t)
 
 	// Explicitly unset the environment ID to force the error

@@ -105,8 +105,8 @@ func TestAuthOptionShorthandFlags(t *testing.T) {
 	}
 
 	authorizationCodeOption := options.AuthMethodAuthorizationCodeOption
-	if authorizationCodeOption.Flag.Shorthand != "z" {
-		t.Errorf("Expected shorthand to be 'z', got %q", authorizationCodeOption.Flag.Shorthand)
+	if authorizationCodeOption.Flag.Shorthand != "a" {
+		t.Errorf("Expected shorthand to be 'a', got %q", authorizationCodeOption.Flag.Shorthand)
 	}
 }
 

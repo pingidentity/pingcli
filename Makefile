@@ -118,7 +118,7 @@ protogen: ## Generate Go code from .proto files
 	protoc --proto_path=./internal/proto --go_out=./internal --go-grpc_out=./internal ./internal/proto/*.proto
 	echo "✅ gRPC code generated."
 
-test: ## Run all tests
+test: _check_ping_env ## Run all tests
 	@echo "  > Test: Running all Go tests..."
 	@for dir in $(TEST_DIRS); do \
 		$(GOTEST) $$dir; \

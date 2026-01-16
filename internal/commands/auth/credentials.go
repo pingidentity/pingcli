@@ -43,22 +43,17 @@ func shouldUseKeychain() bool {
 	if err != nil {
 		return true // default to keychain
 	}
-	s := strings.TrimSpace(strings.ToLower(v))
-	if s == "" {
-		return true // default to keychain
-	}
-	// Back-compat: boolean handling (true => file_system, false => secure_local)
-	if s == "true" {
-		return false
-	}
-	if s == "false" {
-		return true
-	}
-	switch s {
+
+	switch v {
 	case string(config.StorageTypeSecureLocal):
 		return true
 	case string(config.StorageTypeFileSystem), string(config.StorageTypeNone), string(config.StorageTypeSecureRemote):
 		return false
+
+	case "true":
+		return false
+	case "false":
+		return true
 	default:
 		// Unrecognized: lean secure by not disabling keychain
 		return true
@@ -709,16 +704,15 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 			Err:    err,
 		}
 	}
+
 	if strings.TrimSpace(environmentID) == "" {
-		// Fallback: deprecated worker environment ID
-		workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
-		if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
-			environmentID = workerEnvID
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrEnvironmentIDNotConfigured,
 		}
 	}
-	if strings.TrimSpace(environmentID) != "" {
-		cfg = cfg.WithEnvironmentID(environmentID)
-	}
+
+	cfg = cfg.WithEnvironmentID(environmentID)
 
 	// Apply region configuration
 	cfg, err = applyRegionConfiguration(cfg)
@@ -942,16 +936,15 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 			Err:    err,
 		}
 	}
+
 	if strings.TrimSpace(environmentID) == "" {
-		// Fallback: deprecated worker environment ID
-		workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
-		if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
-			environmentID = workerEnvID
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrEnvironmentIDNotConfigured,
 		}
 	}
-	if strings.TrimSpace(environmentID) != "" {
-		cfg = cfg.WithEnvironmentID(environmentID)
-	}
+
+	cfg = cfg.WithEnvironmentID(environmentID)
 
 	// Apply region configuration
 	cfg, err = applyRegionConfiguration(cfg)

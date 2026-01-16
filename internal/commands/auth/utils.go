@@ -49,13 +49,6 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 		if err != nil {
 			return nil, fmt.Errorf("failed to get endpoints environment ID: %w", err)
 		}
-		// Fallback: deprecated worker environment ID (for backward compatibility)
-		if strings.TrimSpace(endpointsEnvironmentID) == "" {
-			workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
-			if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
-				endpointsEnvironmentID = workerEnvID
-			}
-		}
 		if strings.TrimSpace(endpointsEnvironmentID) == "" {
 			return nil, &errs.PingCLIError{
 				Prefix: "endpoints environment ID is not configured",

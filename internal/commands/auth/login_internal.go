@@ -76,22 +76,19 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 		}
 
 		// Determine which authentication method was requested and convert to auth type format
-		// If flags were provided, they take precedence. Otherwise, preserve configured authType (including legacy 'worker').
 		if flagProvided {
 			switch {
 			case deviceCodeStr == "true":
 				authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
 			case clientCredentialsStr == "true":
 				authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
-			default:
+			case authorizationCodeStr == "true":
 				authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
+			default:
+				return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: ErrInvalidAuthType}
 			}
 		}
 
-		// Perform login based on auth type (ensure not empty)
-		if strings.TrimSpace(authType) == "" {
-			return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: ErrInvalidAuthType}
-		}
 		err = performLoginByConfiguredType(ctx, authType, profileName)
 		if err != nil {
 			return err
