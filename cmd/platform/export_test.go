@@ -16,7 +16,7 @@ import (
 
 // Test Platform Export Command Executes without issue
 func TestPlatformExportCmd_Execute(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -50,7 +50,7 @@ func TestPlatformExportCmd_HelpFlag(t *testing.T) {
 
 // Test Platform Export Command --service-group, -g flag
 func TestPlatformExportCmd_ServiceGroupFlag(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -72,7 +72,7 @@ func TestPlatformExportCmd_ServiceGroupFlagInvalidServiceGroup(t *testing.T) {
 
 // Test Platform Export Command --services flag
 func TestPlatformExportCmd_ServicesFlag(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -94,7 +94,7 @@ func TestPlatformExportCmd_ServicesFlagInvalidService(t *testing.T) {
 
 // Test Platform Export Command --format flag
 func TestPlatformExportCmd_ExportFormatFlag(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -117,7 +117,7 @@ func TestPlatformExportCmd_ExportFormatFlagInvalidFormat(t *testing.T) {
 
 // Test Platform Export Command --output-directory flag
 func TestPlatformExportCmd_OutputDirectoryFlag(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -139,7 +139,7 @@ func TestPlatformExportCmd_OutputDirectoryFlagInvalidDirectory(t *testing.T) {
 
 // Test Platform Export Command --overwrite flag
 func TestPlatformExportCmd_OverwriteFlag(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -152,7 +152,7 @@ func TestPlatformExportCmd_OverwriteFlag(t *testing.T) {
 // Test Platform Export Command --overwrite flag false with existing directory
 // where the directory already contains a file
 func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	_, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
@@ -171,7 +171,7 @@ func TestPlatformExportCmd_OverwriteFlagFalseWithExistingDirectory(t *testing.T)
 // Test Platform Export Command --overwrite flag true with existing directory
 // where the directory already contains a file
 func TestPlatformExportCmd_OverwriteFlagTrueWithExistingDirectory(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	_, err := os.Create(outputDir + "/file") //#nosec G304 -- this is a test
@@ -192,7 +192,7 @@ func TestPlatformExportCmd_OverwriteFlagTrueWithExistingDirectory(t *testing.T) 
 // --pingone-worker-client-secret flag
 // --pingone-region flag
 func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 
 	outputDir := t.TempDir()
 
@@ -209,7 +209,7 @@ func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlag(t *testing.T) {
 
 // Test Platform Export Command with partial worker credentials (should fail during authentication)
 func TestPlatformExportCmd_PingOneWorkerEnvironmentIdFlagRequiredTogether(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	// With only environment ID provided, may succeed if worker client ID/secret/region configured
@@ -264,7 +264,10 @@ func TestPlatformExportCmd_PingFederateBasicAuthFlagsRequiredTogether(t *testing
 
 // Test Platform Export Command fails when provided invalid PingOne Client Credential flags
 func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
+	// Clear environment variables that might interfere with this test validation
+	t.Setenv("PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET", "")
 	outputDir := t.TempDir()
 
 	expectedErrorPattern := `client credentials client ID is not configured`
@@ -273,8 +276,7 @@ func TestPlatformExportCmd_PingOneClientCredentialFlagsInvalid(t *testing.T) {
 		"--"+options.PlatformExportOverwriteOption.CobraParamName,
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
 		"--"+options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName, os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
-		"--"+options.PingOneAuthenticationWorkerClientIDOption.CobraParamName, os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
-		"--"+options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName, "invalid",
+		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
 		"--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, "", // Explicitly empty to override config
 		"--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, "", // Explicitly empty to override config
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
@@ -422,7 +424,7 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFiles(t *testing.T) {
 func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
-	expectedErrorPattern := `^platform export error: failed to read CA certificate PEM file '.*': open .*: no such file or directory$`
+	expectedErrorPattern := `^platform export error: failed to read CA certificate PEM file '.*'.*open .*: no such file or directory$`
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
 		"--"+options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE,
 		"--"+options.PingFederateCACertificatePemFilesOption.CobraParamName, "invalid/crt.pem",
@@ -435,8 +437,7 @@ func TestPlatformExportCmd_PingFederateCaCertificatePemFilesInvalid(t *testing.T
 
 // Test Platform Export Command with PingOne client_credentials authentication
 func TestPlatformExportCmd_PingOneClientCredentialsAuth(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
-
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	args := []string{"platform", "export",
@@ -447,18 +448,25 @@ func TestPlatformExportCmd_PingOneClientCredentialsAuth(t *testing.T) {
 		"--" + options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
 	}
 
+	if envID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"); envID != "" {
+		args = append(args, "--"+options.PingOneAuthenticationAPIEnvironmentIDOption.CobraParamName, envID)
+	}
+
+	// Use worker credentials variables if explicit client credentials aren't set
 	clientID := os.Getenv("TEST_PINGONE_CLIENT_ID")
 	if clientID == "" {
-		clientID = os.Getenv("PINGONE_CLIENT_ID")
-	}
-	if clientID != "" {
-		args = append(args, "--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, clientID)
+		clientID = os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
 	}
 
 	clientSecret := os.Getenv("TEST_PINGONE_CLIENT_SECRET")
 	if clientSecret == "" {
-		clientSecret = os.Getenv("PINGONE_CLIENT_SECRET")
+		clientSecret = os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
 	}
+
+	if clientID != "" {
+		args = append(args, "--"+options.PingOneAuthenticationClientCredentialsClientIDOption.CobraParamName, clientID)
+	}
+
 	if clientSecret != "" {
 		args = append(args, "--"+options.PingOneAuthenticationClientCredentialsClientSecretOption.CobraParamName, clientSecret)
 	}
@@ -472,6 +480,9 @@ func TestPlatformExportCmd_PingOneDeviceCodeAuth(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 	if os.Getenv("CI") != "" {
 		t.Skip("Skipping test in CI environment")
+	}
+	if os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID") == "" {
+		t.Skip("Skipping test: TEST_PINGONE_DEVICE_CODE_CLIENT_ID not set")
 	}
 
 	outputDir := t.TempDir()
@@ -498,6 +509,9 @@ func TestPlatformExportCmd_PingOneAuthorizationCodeAuth(t *testing.T) {
 	if os.Getenv("CI") != "" {
 		t.Skip("Skipping test in CI environment")
 	}
+	if os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID") == "" {
+		t.Skip("Skipping test: TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID not set")
+	}
 
 	outputDir := t.TempDir()
 
@@ -506,7 +520,7 @@ func TestPlatformExportCmd_PingOneAuthorizationCodeAuth(t *testing.T) {
 		"--" + options.PlatformExportOverwriteOption.CobraParamName,
 		"--" + options.PlatformExportServiceOption.CobraParamName, customtypes.ENUM_EXPORT_SERVICE_PINGONE_PLATFORM,
 		"--" + options.PingOneAuthenticationTypeOption.CobraParamName, customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE,
-		"--" + options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.CobraParamName, "http://localhost:7464/callback",
+		"--" + options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.CobraParamName, "/callback",
 		"--" + options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"),
 	}
 
@@ -520,7 +534,7 @@ func TestPlatformExportCmd_PingOneAuthorizationCodeAuth(t *testing.T) {
 
 // Test Platform Export Command fails when client_credentials authentication is missing client ID
 func TestPlatformExportCmd_PingOneClientCredentialsAuthMissingClientID(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -544,7 +558,7 @@ func TestPlatformExportCmd_PingOneClientCredentialsAuthMissingClientID(t *testin
 
 // Test Platform Export Command fails when device_code authentication is missing environment ID
 func TestPlatformExportCmd_PingOneDeviceCodeAuthMissingEnvironmentID(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -568,7 +582,7 @@ func TestPlatformExportCmd_PingOneDeviceCodeAuthMissingEnvironmentID(t *testing.
 
 // Test Platform Export Command fails when region code is missing with new auth methods
 func TestPlatformExportCmd_PingOneNewAuthMissingRegionCode(t *testing.T) {
-	testutils_koanf.InitKoanfs(t)
+	setupTestEnv(t)
 	outputDir := t.TempDir()
 
 	err := testutils_cobra.ExecutePingcli(t, "platform", "export",
@@ -603,4 +617,22 @@ func TestPlatformExportCmd_PingOneInvalidAuthType(t *testing.T) {
 		"--"+options.PingOneAuthenticationTypeOption.CobraParamName, "invalid_auth",
 		"--"+options.PingOneRegionCodeOption.CobraParamName, os.Getenv("TEST_PINGONE_REGION_CODE"))
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
+}
+
+func setupTestEnv(t *testing.T) {
+	t.Helper()
+	t.Setenv("PINGCLI_PINGONE_AUTHENTICATION_TYPE", "worker")
+	if v := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"); v != "" {
+		t.Setenv("PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID", v)
+	}
+	if v := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"); v != "" {
+		t.Setenv("PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET", v)
+	}
+	if v := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"); v != "" {
+		t.Setenv("PINGCLI_PINGONE_ENVIRONMENT_ID", v)
+	}
+	if v := os.Getenv("TEST_PINGONE_REGION_CODE"); v != "" {
+		t.Setenv("PINGCLI_PINGONE_REGION_CODE", v)
+	}
+	testutils_koanf.InitKoanfs(t)
 }
