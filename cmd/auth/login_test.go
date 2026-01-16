@@ -135,7 +135,6 @@ func TestLoginCommand_BooleanFlagBehavior(t *testing.T) {
 }
 
 func TestLoginCommand_DefaultAuthorizationCode(t *testing.T) {
-
 	testutils_koanf.InitKoanfs(t)
 
 	// Test that when no flags are provided, it defaults to auth_code

@@ -446,10 +446,12 @@ func ClearToken() error {
 			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
 			if err == nil {
 				// Clear from keychain using current config
-				keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-				if err == nil {
-					if err := keychainStorage.ClearToken(); err != nil {
-						errs = append(errs, err)
+				if shouldUseKeychain() {
+					keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+					if err == nil {
+						if err := keychainStorage.ClearToken(); err != nil {
+							errs = append(errs, err)
+						}
 					}
 				}
 				// Clear from file storage using current config
@@ -479,10 +481,12 @@ func ClearToken() error {
 	methods := []string{deviceCodeTokenKey, authorizationCodeTokenKey, clientCredentialsTokenKey}
 
 	for _, method := range methods {
-		storage, err := getTokenStorage(method)
-		if err == nil {
-			if err := storage.ClearToken(); err != nil {
-				errs = append(errs, err)
+		if shouldUseKeychain() {
+			storage, err := getTokenStorage(method)
+			if err == nil {
+				if err := storage.ClearToken(); err != nil {
+					errs = append(errs, err)
+				}
 			}
 		}
 		// Also clear from file storage
@@ -502,15 +506,17 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 	location := StorageLocation{}
 
 	// Clear from keychain
-	storage, err := getTokenStorage(authMethod)
-	if err == nil {
-		if err := storage.ClearToken(); err != nil {
-			errList = append(errList, &errs.PingCLIError{
-				Prefix: credentialsErrorPrefix,
-				Err:    err,
-			})
-		} else {
-			location.Keychain = true
+	if shouldUseKeychain() {
+		storage, err := getTokenStorage(authMethod)
+		if err == nil {
+			if err := storage.ClearToken(); err != nil {
+				errList = append(errList, &errs.PingCLIError{
+					Prefix: credentialsErrorPrefix,
+					Err:    err,
+				})
+			} else {
+				location.Keychain = true
+			}
 		}
 	}
 
