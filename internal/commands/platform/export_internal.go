@@ -154,7 +154,7 @@ func initPingFederateServices(ctx context.Context, pingcliVersion string) (err e
 				Prefix: exportErrorPrefix,
 				Err: &errs.PingCLIError{
 					Prefix: fmt.Sprintf("failed to read CA certificate PEM file '%s'", caCertPemFile),
-					Err:    err,
+					Err:    fmt.Errorf("%w: %w", ErrReadCaCertPemFile, err),
 				},
 			}
 		}
