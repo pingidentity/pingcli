@@ -531,8 +531,8 @@ github.com/pelletier/go-toml/v2 v2.2.4 h1:mye9XuhQ6gvn5h28+VilKrrPoQVanw5PMw/TB0
 github.com/pelletier/go-toml/v2 v2.2.4/go.mod h1:2gIqNv+qfxSVS7cM2xJQKtLSTLUE9V8t9Stt+h56mCY=
 github.com/pingidentity/pingfederate-go-client/v1230 v1230.0.3 h1:rXExdhfD3KyicPBsC8uDqYXIQ6yTE85k21H2xpiDP1o=
 github.com/pingidentity/pingfederate-go-client/v1230 v1230.0.3/go.mod h1:MGHFs12NFixF0Dvylo2TjgRo51j2Cke3ed/W7ND5koE=
-github.com/pingidentity/pingone-go-client v0.5.1 h1:QmaE9e8tcK9/D8hMVjHb7NLgmMQU6VT5ow+UysdYp1c=
-github.com/pingidentity/pingone-go-client v0.5.1/go.mod h1:fxqU5qa5xUHsg6Trb5AWaCpDYEd7NC9Ea4mRpTxzHNI=
+github.com/pingidentity/pingone-go-client v0.6.0 h1:4PdrixUj9UPD1v7R3xjh9HW7G7qUwLJeJ9xdxGmOzPc=
+github.com/pingidentity/pingone-go-client v0.6.0/go.mod h1:fxqU5qa5xUHsg6Trb5AWaCpDYEd7NC9Ea4mRpTxzHNI=
 github.com/pkg/errors v0.8.0/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
