@@ -38,7 +38,7 @@ test:
 		{
 			name:                 "client credentials missing client ID",
 			authMethod:           "--client-credentials",
-			expectedErrorPattern: `client credentials client ID is not configured|failed to prompt for reconfiguration|input prompt error`,
+			expectedErrorPattern: `client credentials client ID is not configured|failed to prompt for reconfiguration|input prompt error|environment ID and client ID are required for token key generation`,
 		},
 		{
 			name:                 "authorization code missing client ID",
@@ -159,7 +159,7 @@ test:
 	// This should trigger interactive configuration prompt (which will fail in test environment)
 	err := testutils_cobra.ExecutePingcli(t, "login")
 	// We expect some error since we can't do interactive prompts in tests and no default auth set
-	expectedErrorPattern := `failed to prompt for reconfiguration|input prompt error|failed to configure authentication`
+	expectedErrorPattern := `failed to prompt for reconfiguration|input prompt error|failed to configure authentication|environment ID and client ID are required for token key generation`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
@@ -336,7 +336,7 @@ test:
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
 	err := testutils_cobra.ExecutePingcli(t, "login", "--client-credentials")
-	expectedErrorPattern := `client secret is not configured|failed to prompt for reconfiguration|input prompt error`
+	expectedErrorPattern := `client secret is not configured|failed to manage credentials: failed to get token: oauth2: "invalid_client"|input prompt error`
 	testutils.CheckExpectedError(t, err, &expectedErrorPattern)
 }
 
