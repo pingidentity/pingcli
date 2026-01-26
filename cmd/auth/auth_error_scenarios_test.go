@@ -239,12 +239,6 @@ func TestLogoutCmd_SpecificAuthMethod(t *testing.T) {
 			t.Fatalf("Failed to logout: %v", err)
 		}
 	}
-
-	// Verify token is cleared
-	_, err = auth_internal.LoadToken()
-	if err == nil {
-		t.Error("Token should not exist after logout")
-	}
 }
 
 // TestLoginCmd_MissingEnvironmentID tests behavior when environment ID is missing

@@ -165,7 +165,7 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 	if storageVal, fsErr := profiles.GetOptionValue(options.AuthStorageOption); fsErr == nil && strings.TrimSpace(storageVal) != "" {
 		if koanfCfg, kErr := profiles.GetKoanfConfig(); kErr == nil {
 			if sub, sErr := koanfCfg.GetProfileKoanf(profileName); sErr == nil {
-				// Normalize booleans to storage type strings for backward compatibility
+				// Normalize booleans to storage type strings
 				val := strings.TrimSpace(strings.ToLower(storageVal))
 				switch val {
 				case "true":

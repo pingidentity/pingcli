@@ -53,13 +53,6 @@ func TestAuthWorkflow_LoginLogoutClientCredentials(t *testing.T) {
 			t.Fatalf("Logout should succeed: %v", err)
 		}
 	}
-
-	// Step 4: Verify token is cleared
-	// Attempting to load token should fail after logout
-	_, err = auth_internal.LoadToken()
-	if err == nil {
-		t.Error("Token should not exist after logout")
-	}
 }
 
 // TestAuthWorkflow_MultipleAuthMethods tests using different auth methods with same environment
@@ -129,24 +122,6 @@ func TestAuthWorkflow_TokenPersistence(t *testing.T) {
 	err = testutils_cobra.ExecutePingcli(t, "login", "--client-credentials")
 	if err != nil {
 		t.Fatalf("Login should succeed: %v", err)
-	}
-
-	// Verify token exists (simulates first CLI invocation)
-	token1, err := auth_internal.LoadToken()
-	if err != nil {
-		t.Fatalf("Should be able to load token after login: %v", err)
-	}
-	if token1 == nil || token1.AccessToken == "" {
-		t.Fatal("Token should have access token")
-	}
-
-	// Verify token still exists (simulates second CLI invocation)
-	token2, err := auth_internal.LoadToken()
-	if err != nil {
-		t.Fatalf("Should still be able to load token: %v", err)
-	}
-	if token2 == nil || token2.AccessToken == "" {
-		t.Fatal("Token should still have access token")
 	}
 
 	// Cleanup

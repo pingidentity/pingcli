@@ -177,7 +177,7 @@ func validateProfileValues(pName string, profileKoanf *koanf.Koanf) (err error) 
 			}
 		case options.PINGONE_REGION_CODE:
 			switch typedValue := vValue.(type) {
-			case *customtypes.String:
+			case *customtypes.PingOneRegionCode:
 				continue
 			case string:
 				// Allow empty string as a default value

@@ -434,22 +434,6 @@ func TestSaveToken_NilToken(t *testing.T) {
 	}
 }
 
-func TestLoadToken_ErrorCases(t *testing.T) {
-	// Clear any existing token first
-	_ = auth_internal.ClearToken()
-
-	// Test when token doesn't exist in keychain
-	_, err := auth_internal.LoadToken()
-
-	// Should get an error when token doesn't exist (could be nil token or keychain error)
-	// We just verify an error or nil token is returned
-	if err == nil {
-		// If no error, then token should be nil
-		// This is also a valid case - no token found
-		t.Skip("No cached token found (expected)")
-	}
-}
-
 func TestGetValidTokenSource_ErrorPaths(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 

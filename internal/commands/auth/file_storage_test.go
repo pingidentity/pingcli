@@ -3,6 +3,8 @@
 package auth_internal
 
 import (
+	"crypto/sha256"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -386,4 +388,24 @@ func TestGenerateTokenKey_Consistency(t *testing.T) {
 	if key1 == key7 {
 		t.Error("Different services should produce different keys")
 	}
+}
+
+// generateTokenKey generates a unique token key based on provider, environmentID, clientID, and grantType
+// Format: token-<hash>_<service>_<grantType>_<profile>.json
+// The hash is based on service:environmentID:clientID:grantType for uniqueness
+// Service and profile name are added as suffixes to enable service-specific token management and cleanup
+func generateTokenKey(providerName, profileName, environmentID, clientID, grantType string) string {
+	if providerName == "" || environmentID == "" || clientID == "" || grantType == "" {
+		return ""
+	}
+
+	// Hash service + environment + client + grant type for uniqueness
+	hash := sha256.Sum256([]byte(fmt.Sprintf("%s:%s:%s:%s", providerName, environmentID, clientID, grantType)))
+
+	// Add profile name as suffix (default to "default" if empty)
+	if profileName == "" {
+		profileName = "default"
+	}
+
+	return fmt.Sprintf("token-%x_%s_%s_%s", hash[:8], providerName, grantType, profileName)
 }

@@ -35,19 +35,6 @@ func (st *StorageType) Set(v string) error {
 
 	s := strings.TrimSpace(strings.ToLower(v))
 
-	// Backward compatibility: interpret legacy boolean semantics
-	// "true" => file_system (file only), "false" => secure_local (keychain)
-	if s == "true" {
-		*st = StorageType(ENUM_STORAGE_TYPE_FILE_SYSTEM)
-
-		return nil
-	}
-	if s == "false" {
-		*st = StorageType(ENUM_STORAGE_TYPE_SECURE_LOCAL)
-
-		return nil
-	}
-
 	switch s {
 	case string(config.StorageTypeFileSystem):
 		*st = StorageType(ENUM_STORAGE_TYPE_FILE_SYSTEM)

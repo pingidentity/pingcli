@@ -4,7 +4,6 @@ package auth_internal
 
 import (
 	"context"
-	"crypto/sha256"
 	"errors"
 	"fmt"
 	"strings"
@@ -27,8 +26,8 @@ const (
 )
 
 var (
-	credentialsErrorPrefix = "failed to manage credentials"
-	ErrStorageDisabled     = errors.New("token storage is disabled")
+	credentialsErrorPrefix  = "failed to manage credentials"
+	tokenManagerErrorPrefix = "failed to manage token"
 )
 
 // getTokenStorage returns the appropriate keychain storage instance for the given authentication method
@@ -49,11 +48,6 @@ func shouldUseKeychain() bool {
 		return true
 	case string(config.StorageTypeFileSystem), string(config.StorageTypeNone), string(config.StorageTypeSecureRemote):
 		return false
-
-	case "true":
-		return false
-	case "false":
-		return true
 	default:
 		// Unrecognized: lean secure by not disabling keychain
 		return true
@@ -70,26 +64,6 @@ func getStorageType() config.StorageType {
 	}
 	// For file_system/none/secure_remote, avoid SDK persistence (pingcli manages file persistence)
 	return config.StorageTypeNone
-}
-
-// generateTokenKey generates a unique token key based on provider, environmentID, clientID, and grantType
-// Format: token-<hash>_<service>_<grantType>_<profile>.json
-// The hash is based on service:environmentID:clientID:grantType for uniqueness
-// Service and profile name are added as suffixes to enable service-specific token management and cleanup
-func generateTokenKey(providerName, profileName, environmentID, clientID, grantType string) string {
-	if providerName == "" || environmentID == "" || clientID == "" || grantType == "" {
-		return ""
-	}
-
-	// Hash service + environment + client + grant type for uniqueness
-	hash := sha256.Sum256([]byte(fmt.Sprintf("%s:%s:%s:%s", providerName, environmentID, clientID, grantType)))
-
-	// Add profile name as suffix (default to "default" if empty)
-	if profileName == "" {
-		profileName = "default"
-	}
-
-	return fmt.Sprintf("token-%x_%s_%s_%s", hash[:8], providerName, grantType, profileName)
 }
 
 // StorageLocation indicates where credentials were saved
@@ -123,12 +97,6 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		return location, nil
 	}
 
-	// Check if persistence is disabled
-	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
-	if strings.EqualFold(strings.TrimSpace(v), string(config.StorageTypeNone)) {
-		return location, nil
-	}
-
 	// File-only mode: save only to file storage and error if unsuccessful.
 	if err := saveTokenToFile(token, authMethod); err != nil {
 		return location, err
@@ -143,15 +111,6 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 	// Check if user disabled keychain
 	if !shouldUseKeychain() {
-		// Check if persistence is disabled
-		v, _ := profiles.GetOptionValue(options.AuthStorageOption)
-		if strings.EqualFold(strings.TrimSpace(v), string(config.StorageTypeNone)) {
-			return nil, &errs.PingCLIError{
-				Prefix: credentialsErrorPrefix,
-				Err:    ErrStorageDisabled,
-			}
-		}
-
 		// Directly load from file storage
 		return loadTokenFromFile(authMethod)
 	}
@@ -183,95 +142,6 @@ func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 	}
 }
 
-// LoadToken attempts to load an OAuth2 token from the keychain, trying configured auth methods first
-func LoadToken() (*oauth2.Token, error) {
-	// First, try to load using configuration-based keys from the active profile
-	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
-	if err == nil && authType != "" {
-		// Normalize auth type to snake_case format and handle camelCase aliases
-		switch authType {
-		case "clientCredentials":
-			authType = "client_credentials"
-		case "deviceCode":
-			authType = "device_code"
-		case "authorizationCode":
-			authType = "authorization_code"
-		case "authorization_code":
-			authType = "authorization_code"
-		}
-
-		// Try to get configuration for the configured grant type
-		var cfg *config.Configuration
-		var grantType svcOAuth2.GrantType
-		switch authType {
-		case "device_code":
-			cfg, err = GetDeviceCodeConfiguration()
-			if err != nil {
-				return nil, &errs.PingCLIError{
-					Prefix: credentialsErrorPrefix,
-					Err:    err,
-				}
-			}
-			grantType = svcOAuth2.GrantTypeDeviceCode
-		case "authorization_code":
-			cfg, err = GetAuthorizationCodeConfiguration()
-			if err != nil {
-				return nil, &errs.PingCLIError{
-					Prefix: credentialsErrorPrefix,
-					Err:    err,
-				}
-			}
-			grantType = svcOAuth2.GrantTypeAuthorizationCode
-		case "client_credentials":
-			cfg, err = GetClientCredentialsConfiguration()
-			if err != nil {
-				return nil, &errs.PingCLIError{
-					Prefix: credentialsErrorPrefix,
-					Err:    err,
-				}
-			}
-			grantType = svcOAuth2.GrantTypeClientCredentials
-		case "worker":
-			cfg, err = GetWorkerConfiguration()
-			if err != nil {
-				return nil, &errs.PingCLIError{
-					Prefix: credentialsErrorPrefix,
-					Err:    err,
-				}
-			}
-			grantType = svcOAuth2.GrantTypeClientCredentials
-		}
-
-		if cfg != nil {
-			// Set the grant type before generating the token key
-			cfg = cfg.WithGrantType(grantType)
-			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
-			if err != nil {
-				return nil, &errs.PingCLIError{
-					Prefix: credentialsErrorPrefix,
-					Err:    err,
-				}
-			}
-
-			token, err := LoadTokenForMethod(tokenKey)
-			if err != nil {
-				return nil, &errs.PingCLIError{
-					Prefix: credentialsErrorPrefix,
-					Err:    err,
-				}
-			}
-
-			return token, nil
-		}
-	}
-
-	// No authorization grant type configured
-	return nil, &errs.PingCLIError{
-		Prefix: credentialsErrorPrefix,
-		Err:    ErrUnsupportedAuthType,
-	}
-}
-
 // GetValidTokenSource returns a valid OAuth2 token source for the configured authentication method
 func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	// First, try to load using configuration-based keys from the active profile
@@ -289,8 +159,6 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		authType = "client_credentials"
 	case "deviceCode":
 		authType = "device_code"
-	case "authorizationCode":
-		authType = "authorization_code"
 	case "authorization_code":
 		authType = "authorization_code"
 	}
@@ -381,10 +249,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 						if oauthCfg != nil {
 							baseTS := oauthCfg.TokenSource(ctx, existingToken)
 
-							return &fileSaveTokenSource{
-								src:        baseTS,
-								authMethod: tokenKey,
-							}, nil
+							return oauth2.ReuseTokenSource(nil, baseTS), nil
 						}
 					}
 				}
@@ -397,16 +262,6 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 			return nil, &errs.PingCLIError{
 				Prefix: credentialsErrorPrefix,
 				Err:    err,
-			}
-		}
-
-		if !shouldUseKeychain() {
-			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
-			if err == nil && tokenKey != "" {
-				return &fileSaveTokenSource{
-					src:        tokenSource,
-					authMethod: tokenKey,
-				}, nil
 			}
 		}
 
@@ -446,12 +301,10 @@ func ClearToken() error {
 			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
 			if err == nil {
 				// Clear from keychain using current config
-				if shouldUseKeychain() {
-					keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-					if err == nil {
-						if err := keychainStorage.ClearToken(); err != nil {
-							errs = append(errs, err)
-						}
+				keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+				if err == nil {
+					if err := keychainStorage.ClearToken(); err != nil {
+						errs = append(errs, err)
 					}
 				}
 				// Clear from file storage using current config
@@ -477,16 +330,14 @@ func ClearToken() error {
 		}
 	}
 
-	// Also clear tokens using simple string keys for backward compatibility
+	// Also clear tokens using simple string keys
 	methods := []string{deviceCodeTokenKey, authorizationCodeTokenKey, clientCredentialsTokenKey}
 
 	for _, method := range methods {
-		if shouldUseKeychain() {
-			storage, err := getTokenStorage(method)
-			if err == nil {
-				if err := storage.ClearToken(); err != nil {
-					errs = append(errs, err)
-				}
+		storage, err := getTokenStorage(method)
+		if err == nil {
+			if err := storage.ClearToken(); err != nil {
+				errs = append(errs, err)
 			}
 		}
 		// Also clear from file storage
@@ -506,17 +357,15 @@ func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
 	location := StorageLocation{}
 
 	// Clear from keychain
-	if shouldUseKeychain() {
-		storage, err := getTokenStorage(authMethod)
-		if err == nil {
-			if err := storage.ClearToken(); err != nil {
-				errList = append(errList, &errs.PingCLIError{
-					Prefix: credentialsErrorPrefix,
-					Err:    err,
-				})
-			} else {
-				location.Keychain = true
-			}
+	storage, err := getTokenStorage(authMethod)
+	if err == nil {
+		if err := storage.ClearToken(); err != nil {
+			errList = append(errList, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    err,
+			})
+		} else {
+			location.Keychain = true
 		}
 	}
 
@@ -710,15 +559,16 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 			Err:    err,
 		}
 	}
-
 	if strings.TrimSpace(environmentID) == "" {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    ErrEnvironmentIDNotConfigured,
+		// Fallback: deprecated worker environment ID
+		workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+		if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
+			environmentID = workerEnvID
 		}
 	}
-
-	cfg = cfg.WithEnvironmentID(environmentID)
+	if strings.TrimSpace(environmentID) != "" {
+		cfg = cfg.WithEnvironmentID(environmentID)
+	}
 
 	// Apply region configuration
 	cfg, err = applyRegionConfiguration(cfg)
@@ -942,15 +792,16 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 			Err:    err,
 		}
 	}
-
 	if strings.TrimSpace(environmentID) == "" {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    ErrEnvironmentIDNotConfigured,
+		// Fallback: deprecated worker environment ID
+		workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+		if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
+			environmentID = workerEnvID
 		}
 	}
-
-	cfg = cfg.WithEnvironmentID(environmentID)
+	if strings.TrimSpace(environmentID) != "" {
+		cfg = cfg.WithEnvironmentID(environmentID)
+	}
 
 	// Apply region configuration
 	cfg, err = applyRegionConfiguration(cfg)
@@ -1198,9 +1049,6 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName))
 
 	// Apply Environment ID for consistent token key generation and endpoints
-	// For worker authentication, respect the worker environment ID if set, otherwise fall back to the generic environment ID
-	workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
-
 	environmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
 	if err != nil {
 		return nil, &errs.PingCLIError{
@@ -1208,11 +1056,6 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 			Err:    err,
 		}
 	}
-
-	if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
-		environmentID = workerEnvID
-	}
-
 	if strings.TrimSpace(environmentID) != "" {
 		cfg = cfg.WithEnvironmentID(environmentID)
 	}
@@ -1226,21 +1069,55 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 	return cfg, nil
 }
 
-// fileSaveTokenSource wraps a TokenSource to save the token to file on every refresh
-type fileSaveTokenSource struct {
-	src        oauth2.TokenSource
-	authMethod string
-}
-
-func (s *fileSaveTokenSource) Token() (*oauth2.Token, error) {
-	t, err := s.src.Token()
-	if err != nil {
-		return nil, err
+// GetAuthMethodKeyFromConfig generates a unique keychain account name from a configuration object
+// This uses the SDK's GenerateKeychainAccountName to ensure consistency with SDK token storage
+func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
+	if cfg == nil || cfg.Auth.GrantType == nil {
+		return "", ErrGrantTypeNotSet
 	}
 
-	if _, err := SaveTokenForMethod(t, s.authMethod); err != nil {
-		return nil, err
+	// Extract environment ID from the config object
+	environmentID := ""
+	if cfg.Endpoint.EnvironmentID != nil {
+		environmentID = *cfg.Endpoint.EnvironmentID
 	}
 
-	return t, nil
+	// Extract client ID based on grant type
+	grantType := *cfg.Auth.GrantType
+	clientID := ""
+	switch grantType {
+	case svcOAuth2.GrantTypeDeviceCode:
+		if cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
+			clientID = *cfg.Auth.DeviceCode.DeviceCodeClientID
+		}
+	case svcOAuth2.GrantTypeAuthorizationCode:
+		if cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
+			clientID = *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID
+		}
+	case svcOAuth2.GrantTypeClientCredentials:
+		if cfg.Auth.ClientCredentials != nil && cfg.Auth.ClientCredentials.ClientCredentialsClientID != nil {
+			clientID = *cfg.Auth.ClientCredentials.ClientCredentialsClientID
+		}
+	}
+
+	// Build suffix to disambiguate across provider/grant/profile for both keychain and files
+	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if profileName == "" {
+		profileName = "default"
+	}
+	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
+	if strings.TrimSpace(providerName) == "" {
+		providerName = "pingone"
+	}
+	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)
+	// Use the SDK's GenerateKeychainAccountName with optional suffix
+	tokenKey := svcOAuth2.GenerateKeychainAccountNameWithSuffix(environmentID, clientID, string(grantType), suffix)
+	if tokenKey == "" || tokenKey == "default-token" {
+		return "", &errs.PingCLIError{
+			Prefix: tokenManagerErrorPrefix,
+			Err:    ErrTokenKeyGenerationRequirements,
+		}
+	}
+
+	return tokenKey, nil
 }
