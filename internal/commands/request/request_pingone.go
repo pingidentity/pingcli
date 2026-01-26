@@ -17,6 +17,7 @@ import (
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/output"
 	"github.com/pingidentity/pingcli/internal/profiles"
+	"github.com/pingidentity/pingone-go-client/config"
 )
 
 // GetAPIURLForRegion builds the correct API URL based on region configuration
@@ -26,22 +27,22 @@ func GetAPIURLForRegion(uri string) (string, error) {
 		return "", fmt.Errorf("failed to get region code: %w", err)
 	}
 
-	var tld string
+	var tld config.TopLevelDomain
 	switch regionCode {
 	case customtypes.ENUM_PINGONE_REGION_CODE_AP:
-		tld = "asia"
+		tld = config.TopLevelDomainAPAC
 	case customtypes.ENUM_PINGONE_REGION_CODE_AU:
-		tld = "com.au"
+		tld = config.TopLevelDomainAU
 	case customtypes.ENUM_PINGONE_REGION_CODE_CA:
-		tld = "ca"
+		tld = config.TopLevelDomainCA
 	case customtypes.ENUM_PINGONE_REGION_CODE_EU:
-		tld = "eu"
+		tld = config.TopLevelDomainEU
 	case customtypes.ENUM_PINGONE_REGION_CODE_NA:
-		tld = "com"
+		tld = config.TopLevelDomainNA
 	case customtypes.ENUM_PINGONE_REGION_CODE_SG:
-		tld = "asia"
+		tld = config.TopLevelDomainSG
 	default:
-		tld = "com" // default to NA
+		tld = config.TopLevelDomainNA // default to NA
 	}
 
 	return fmt.Sprintf("https://api.pingone.%s/v1/%s", tld, uri), nil

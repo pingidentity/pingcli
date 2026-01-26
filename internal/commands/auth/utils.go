@@ -40,24 +40,6 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 		}
 	}
 
-	// Get and set the environment ID for API endpoints
-	// Prefer the environment ID already present on cfg; fallback to profile values.
-	var endpointsEnvironmentID string
-	if cfg.Endpoint.EnvironmentID == nil || strings.TrimSpace(*cfg.Endpoint.EnvironmentID) == "" {
-		// Primary: general environment ID
-		endpointsEnvironmentID, err = profiles.GetOptionValue(options.PingOneAuthenticationAPIEnvironmentIDOption)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get endpoints environment ID: %w", err)
-		}
-		if strings.TrimSpace(endpointsEnvironmentID) == "" {
-			return nil, &errs.PingCLIError{
-				Prefix: "endpoints environment ID is not configured",
-				Err:    ErrEnvironmentIDNotConfigured,
-			}
-		}
-		cfg = cfg.WithEnvironmentID(endpointsEnvironmentID)
-	}
-
 	return cfg, nil
 }
 

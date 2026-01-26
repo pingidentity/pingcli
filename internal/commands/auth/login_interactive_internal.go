@@ -684,11 +684,6 @@ func RunInteractiveAuthConfigForType(rc io.ReadCloser, desiredAuthType string) e
 	return SaveAuthConfigToProfile(desiredAuthType, clientID, clientSecret, environmentID, regionCode, redirectURIPath, redirectURIPort)
 }
 
-// PromptForReconfiguration asks the user if they want to reconfigure authentication
-func PromptForReconfiguration(rc io.ReadCloser) (bool, error) {
-	return input.RunPromptConfirm("Do you want to reconfigure authentication", rc)
-}
-
 // checkExistingCredentials checks if credentials already exist for the given auth type
 func checkExistingCredentials(authType string) (bool, error) {
 	koanfConfig, err := profiles.GetKoanfConfig()
