@@ -266,7 +266,7 @@ test:
                     clientID: 00000000-0000-0000-0000-000000000001
                     clientSecret: test-secret
 `,
-			expectedErrorPattern: `environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
+			expectedErrorPattern: `environment ID and client ID are required for token key generation|environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
 		{
 			name:       "authorization_code_missing_environment_id",
@@ -286,7 +286,7 @@ test:
                     redirectURIPath: /callback
                     redirectURIPort: "3000"
 `,
-			expectedErrorPattern: `environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
+			expectedErrorPattern: `environment ID and client ID are required for token key generation|environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
 		{
 			name:       "device_code_missing_environment_id",
@@ -304,7 +304,7 @@ test:
                 deviceCode:
                     clientID: 00000000-0000-0000-0000-000000000001
 `,
-			expectedErrorPattern: `environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
+			expectedErrorPattern: `environment ID and client ID are required for token key generation|environment ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
 	}
 
