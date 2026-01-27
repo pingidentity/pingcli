@@ -18,7 +18,7 @@ func TestSaveTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Set file-storage to true to disable keychain
-	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "true")
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "file_system")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-access-token",
@@ -60,7 +60,7 @@ func TestSaveTokenForMethod_WithKeychainEnabled(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Keychain is enabled by default (file-storage=false)
-	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "false")
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "secure_local")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-access-token-keychain",
@@ -123,7 +123,7 @@ func TestLoadTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Set file-storage to true to disable keychain
-	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "true")
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "file_system")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-load-access-token",
@@ -161,7 +161,7 @@ func TestLoadTokenForMethod_FallbackToFileStorage(t *testing.T) {
 
 	// This test verifies the fallback mechanism by using a fresh token key that keychain won't have
 	// We explicitly use file storage mode to ensure file storage is used
-	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "true")
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "file_system")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-fallback-token",
@@ -322,7 +322,7 @@ func TestSaveTokenForMethod_FileStorageFallback(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Keychain enabled by default (file-storage=false)
-	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "false")
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "secure_local")
 
 	testToken := &oauth2.Token{
 		AccessToken:  "test-fallback-save",
@@ -403,7 +403,7 @@ func TestEnvironmentVariable_FileStorage(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Set environment variable to use file storage (disables keychain)
-	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "true")
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "file_system")
 
 	// Reinitialize koanf to pick up environment variable
 	testutils_koanf.InitKoanfs(t)
