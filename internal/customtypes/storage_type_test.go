@@ -32,26 +32,6 @@ func TestStorageType_Set_ValidValues(t *testing.T) {
 	}
 }
 
-func TestStorageType_Set_BooleanCompatibility(t *testing.T) {
-	// "true" => file_system
-	var stTrue StorageType
-	if err := (&stTrue).Set("true"); err != nil {
-		t.Fatalf("Set(true) error: %v", err)
-	}
-	if got, want := stTrue.String(), ENUM_STORAGE_TYPE_FILE_SYSTEM; got != want {
-		t.Fatalf("Set(true) => %q, want %q", got, want)
-	}
-
-	// "false" => secure_local
-	var stFalse StorageType
-	if err := (&stFalse).Set("false"); err != nil {
-		t.Fatalf("Set(false) error: %v", err)
-	}
-	if got, want := stFalse.String(), ENUM_STORAGE_TYPE_SECURE_LOCAL; got != want {
-		t.Fatalf("Set(false) => %q, want %q", got, want)
-	}
-}
-
 func TestStorageType_Set_EmptyDefaultsToSecureLocal(t *testing.T) {
 	var st StorageType
 	if err := (&st).Set(""); err != nil {

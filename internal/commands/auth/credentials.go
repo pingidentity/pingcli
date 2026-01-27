@@ -59,7 +59,7 @@ func shouldUseKeychain() bool {
 func getStorageType() config.StorageType {
 	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
 	s := strings.TrimSpace(strings.ToLower(v))
-	if s == "false" || s == string(config.StorageTypeSecureLocal) || s == "" {
+	if s == string(config.StorageTypeSecureLocal) || s == "" {
 		return config.StorageTypeSecureLocal
 	}
 	// For file_system/none/secure_remote, avoid SDK persistence (pingcli manages file persistence)
@@ -89,6 +89,12 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		return location, ErrNilToken
 	}
 
+	// Check if storage is disabled
+	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+	if strings.EqualFold(v, string(config.StorageTypeNone)) {
+		return location, nil
+	}
+
 	// Avoid saving to keychain here: SDK handles keychain persistence via TokenSource.
 	// When keychain is enabled, do NOT write a file. Only indicate keychain is in use.
 	if shouldUseKeychain() {
@@ -109,6 +115,12 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 // LoadTokenForMethod loads an OAuth2 token from the keychain using the specified authentication method key
 // Falls back to file storage if keychain operations fail or if --use-keychain=false
 func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
+	// Check if storage is disabled
+	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+	if strings.EqualFold(v, string(config.StorageTypeNone)) {
+		return nil, ErrTokenStorageDisabled
+	}
+
 	// Check if user disabled keychain
 	if !shouldUseKeychain() {
 		// Directly load from file storage
@@ -568,6 +580,11 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	}
 	if strings.TrimSpace(environmentID) != "" {
 		cfg = cfg.WithEnvironmentID(environmentID)
+	} else {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrDeviceCodeEnvironmentIDNotConfigured,
+		}
 	}
 
 	// Apply region configuration
@@ -801,6 +818,11 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 	}
 	if strings.TrimSpace(environmentID) != "" {
 		cfg = cfg.WithEnvironmentID(environmentID)
+	} else {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrAuthorizationCodeEnvironmentIDNotConfigured,
+		}
 	}
 
 	// Apply region configuration
@@ -982,6 +1004,11 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 	}
 	if strings.TrimSpace(environmentID) != "" {
 		cfg = cfg.WithEnvironmentID(environmentID)
+	} else {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrClientCredentialsEnvironmentIDNotConfigured,
+		}
 	}
 
 	// Apply region configuration
@@ -1056,8 +1083,20 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 			Err:    err,
 		}
 	}
+	if strings.TrimSpace(environmentID) == "" {
+		// Fallback: worker environment ID
+		workerEnvID, wErr := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+		if wErr == nil && strings.TrimSpace(workerEnvID) != "" {
+			environmentID = workerEnvID
+		}
+	}
 	if strings.TrimSpace(environmentID) != "" {
 		cfg = cfg.WithEnvironmentID(environmentID)
+	} else {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrWorkerEnvironmentIDNotConfigured,
+		}
 	}
 
 	// Apply region configuration
