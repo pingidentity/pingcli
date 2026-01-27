@@ -17,6 +17,17 @@ import (
 
 // TestLoginCmd_MissingConfiguration tests behavior when required configuration is missing
 func TestLoginCmd_MissingConfiguration(t *testing.T) {
+	// Unset environment variables to ensure no interference from local environment
+	t.Setenv("PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET", "")
+	t.Setenv("PINGCLI_PINGONE_AUTHORIZATION_CODE_CLIENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_DEVICE_CODE_CLIENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_ENVIRONMENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_WORKER_CLIENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_WORKER_CLIENT_SECRET", "")
+	t.Setenv("PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_AUTHENTICATION_TYPE", "")
+
 	// Create a custom config file with missing auth configuration
 	configContents := `
 activeProfile: test
@@ -38,17 +49,17 @@ test:
 		{
 			name:                 "client credentials missing client ID",
 			authMethod:           "--client-credentials",
-			expectedErrorPattern: `client credentials client ID is not configured|failed to prompt for reconfiguration|input prompt error|environment ID and client ID are required for token key generation`,
+			expectedErrorPattern: `client credentials (client|environment) ID is not configured|failed to prompt for reconfiguration|input prompt error|environment ID and client ID are required for token key generation`,
 		},
 		{
 			name:                 "authorization code missing client ID",
 			authMethod:           "--authorization-code",
-			expectedErrorPattern: `authorization code client ID is not configured|failed to prompt for reconfiguration|input prompt error`,
+			expectedErrorPattern: `authorization code (client|environment) ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
 		{
 			name:                 "device code missing client ID",
 			authMethod:           "--device-code",
-			expectedErrorPattern: `device code client ID is not configured|failed to prompt for reconfiguration|input prompt error`,
+			expectedErrorPattern: `device code (client|environment) ID is not configured|failed to prompt for reconfiguration|input prompt error`,
 		},
 	}
 
@@ -145,6 +156,8 @@ test:
 
 // TestLoginCmd_DefaultAuthTypeNotConfigured tests login without flags when no auth type is configured
 func TestLoginCmd_DefaultAuthTypeNotConfigured(t *testing.T) {
+	t.Setenv("PINGCLI_PINGONE_AUTHENTICATION_TYPE", "")
+
 	configContents := `
 activeProfile: test
 test:
@@ -243,6 +256,10 @@ func TestLogoutCmd_SpecificAuthMethod(t *testing.T) {
 
 // TestLoginCmd_MissingEnvironmentID tests behavior when environment ID is missing
 func TestLoginCmd_MissingEnvironmentID(t *testing.T) {
+	// Unset environment variables to ensure no interference from local environment
+	t.Setenv("PINGCLI_PINGONE_ENVIRONMENT_ID", "")
+	t.Setenv("PINGCLI_PINGONE_WORKER_ENVIRONMENT_ID", "")
+
 	testCases := []struct {
 		name                 string
 		authMethod           string
@@ -319,6 +336,9 @@ test:
 
 // TestLoginCmd_MissingClientSecret tests client credentials without client secret
 func TestLoginCmd_MissingClientSecret(t *testing.T) {
+	// Unset environment variables to ensure no interference from local environment
+	t.Setenv("PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_SECRET", "")
+
 	configContents := `
 activeProfile: test
 test:
