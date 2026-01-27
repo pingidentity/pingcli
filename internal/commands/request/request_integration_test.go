@@ -15,7 +15,11 @@ import (
 
 // TestRequestPingOne_RealAuth tests the complete request flow with real authentication
 func TestRequestPingOne_RealAuth(t *testing.T) {
-	// Skip if not in CI environment or missing credentials
+	// Skip if in CI environment or missing credentials
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping integration test in CI environment")
+	}
+
 	clientID := os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID")
 	clientSecret := os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET")
 	environmentID := os.Getenv("TEST_PINGONE_ENVIRONMENT_ID")
