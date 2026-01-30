@@ -30,9 +30,19 @@ var (
 	tokenManagerErrorPrefix = "failed to manage token"
 )
 
+type tokenStorage interface {
+	SaveToken(token *oauth2.Token) error
+	LoadToken() (*oauth2.Token, error)
+	ClearToken() error
+}
+
+var newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
+	return svcOAuth2.NewKeychainStorage(serviceName, username)
+}
+
 // getTokenStorage returns the appropriate keychain storage instance for the given authentication method
-func getTokenStorage(authMethod string) (*svcOAuth2.KeychainStorage, error) {
-	return svcOAuth2.NewKeychainStorage("pingcli", authMethod)
+func getTokenStorage(authMethod string) (tokenStorage, error) {
+	return newKeychainStorage("pingcli", authMethod)
 }
 
 // shouldUseKeychain checks if keychain storage should be used based on the storage type
@@ -177,12 +187,25 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		return location, nil
 	}
 
-	// Avoid saving to keychain here: SDK handles keychain persistence via TokenSource.
-	// When keychain is enabled, do NOT write a file. Only indicate keychain is in use.
+	// When keychain is enabled, attempt to save to keychain.
+	// If keychain is unavailable or save fails, fall back to file storage.
 	if shouldUseKeychain() {
-		location.Keychain = true
+		storage, kcErr := getTokenStorage(authMethod)
+		if kcErr == nil {
+			if saveErr := storage.SaveToken(token); saveErr == nil {
+				location.Keychain = true
+				return location, nil
+			} else {
+				kcErr = saveErr
+			}
+		}
 
-		return location, nil
+		if err := saveTokenToFile(token, authMethod); err == nil {
+			location.File = true
+			return location, nil
+		} else {
+			return location, errors.Join(kcErr, err)
+		}
 	}
 
 	// File-only mode: save only to file storage and error if unsuccessful.
@@ -537,11 +560,6 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
-	}
-
 	// Determine if this was new authentication
 	// If we had an existing token with the same expiry, it's cached
 	// If expiry is different, new auth was performed
@@ -736,11 +754,6 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
-	}
-
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
 	}
 
 	// Determine if this was new authentication
@@ -949,11 +962,6 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
-	}
-
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
 	}
 
 	// Determine if this was new authentication
