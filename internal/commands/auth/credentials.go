@@ -194,6 +194,7 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		if kcErr == nil {
 			if saveErr := storage.SaveToken(token); saveErr == nil {
 				location.Keychain = true
+
 				return location, nil
 			} else {
 				kcErr = saveErr
@@ -202,6 +203,7 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 
 		if err := saveTokenToFile(token, authMethod); err == nil {
 			location.File = true
+
 			return location, nil
 		} else {
 			return location, errors.Join(kcErr, err)

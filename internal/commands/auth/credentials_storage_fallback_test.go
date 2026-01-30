@@ -13,13 +13,18 @@ import (
 	"golang.org/x/oauth2"
 )
 
+var (
+	errNotImplemented      = errors.New("not implemented")
+	errKeychainUnavailable = errors.New("keychain unavailable")
+)
+
 type mockTokenStorage struct {
 	saveErr error
 }
 
 func (m *mockTokenStorage) SaveToken(token *oauth2.Token) error { return m.saveErr }
 func (m *mockTokenStorage) LoadToken() (*oauth2.Token, error) {
-	return nil, errors.New("not implemented")
+	return nil, errNotImplemented
 }
 func (m *mockTokenStorage) ClearToken() error { return nil }
 
@@ -33,13 +38,15 @@ func (s *funcTokenStorage) SaveToken(token *oauth2.Token) error {
 	if s.saveFn == nil {
 		return nil
 	}
+
 	return s.saveFn(token)
 }
 
 func (s *funcTokenStorage) LoadToken() (*oauth2.Token, error) {
 	if s.loadFn == nil {
-		return nil, errors.New("not implemented")
+		return nil, errNotImplemented
 	}
+
 	return s.loadFn()
 }
 
@@ -47,6 +54,7 @@ func (s *funcTokenStorage) ClearToken() error {
 	if s.clearFn == nil {
 		return nil
 	}
+
 	return s.clearFn()
 }
 
@@ -61,7 +69,7 @@ func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
 	old := newKeychainStorage
 	t.Cleanup(func() { newKeychainStorage = old })
 	newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
-		return &mockTokenStorage{saveErr: errors.New("keychain unavailable")}, nil
+		return &mockTokenStorage{saveErr: errKeychainUnavailable}, nil
 	}
 
 	authMethod := "test-auth-method"
@@ -113,6 +121,7 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 		return &funcTokenStorage{
 			saveFn: func(*oauth2.Token) error {
 				sawSave = true
+
 				return nil
 			},
 		}, nil
