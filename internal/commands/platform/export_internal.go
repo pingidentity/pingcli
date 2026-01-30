@@ -508,6 +508,10 @@ func validatePingOneExportEnvID(ctx context.Context) (err error) {
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
 	}
 	if !ok {
+		if response != nil {
+			return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s' (HTTP %s)", ErrValidatePingOneEnvId, pingoneExportEnvID, response.Status)}
+		}
+
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: fmt.Errorf("%w: '%s'", ErrValidatePingOneEnvId, pingoneExportEnvID)}
 	}
 

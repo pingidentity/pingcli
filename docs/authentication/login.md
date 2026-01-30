@@ -31,6 +31,9 @@ PingCLI notes:
 
 - Auth type `worker` is applied as `client_credentials` under the hood
 - No refresh token is issued for `client_credentials`
+- If a previous version of `pingcli` was used, the `pingone.authentication.type` may be set to worker. The `pingcli` login command will interpret this as an intention to migrate away from the deprecated type and favor `client_credentials`. If another authentication type is preferred (e.g. `device_code` or `authorization_code`) edit the configuration file or pass an appropriate flag to the `login` command.
+
+> Deprecation Notice: The `worker` authentication type is deprecated and will be removed in a future release. Use `client_credentials` instead.
 
 > Deprecation Notice: The `worker` authentication type is deprecated and will be removed in a future release. Use `client_credentials` instead.
 

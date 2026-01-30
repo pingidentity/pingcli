@@ -30,9 +30,19 @@ var (
 	tokenManagerErrorPrefix = "failed to manage token"
 )
 
+type tokenStorage interface {
+	SaveToken(token *oauth2.Token) error
+	LoadToken() (*oauth2.Token, error)
+	ClearToken() error
+}
+
+var newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
+	return svcOAuth2.NewKeychainStorage(serviceName, username)
+}
+
 // getTokenStorage returns the appropriate keychain storage instance for the given authentication method
-func getTokenStorage(authMethod string) (*svcOAuth2.KeychainStorage, error) {
-	return svcOAuth2.NewKeychainStorage("pingcli", authMethod)
+func getTokenStorage(authMethod string) (tokenStorage, error) {
+	return newKeychainStorage("pingcli", authMethod)
 }
 
 // shouldUseKeychain checks if keychain storage should be used based on the storage type
@@ -79,6 +89,73 @@ type LoginResult struct {
 	Location StorageLocation
 }
 
+func getConfigForCurrentAuthType() (*config.Configuration, error) {
+	// First, try to load using configuration-based keys from the active profile
+	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+	if err != nil || authType == "" {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    ErrUnsupportedAuthType,
+		}
+	}
+
+	// Try to get configuration for the configured grant type
+	var cfg *config.Configuration
+	var grantType svcOAuth2.GrantType
+	switch authType {
+	case "device_code":
+		cfg, err = GetDeviceCodeConfiguration()
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    err,
+			}
+		}
+		grantType = svcOAuth2.GrantTypeDeviceCode
+	case "authorization_code":
+		cfg, err = GetAuthorizationCodeConfiguration()
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    err,
+			}
+		}
+		grantType = svcOAuth2.GrantTypeAuthorizationCode
+	case "client_credentials":
+		cfg, err = GetClientCredentialsConfiguration()
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    err,
+			}
+		}
+		grantType = svcOAuth2.GrantTypeClientCredentials
+	case "worker":
+		cfg, err = GetWorkerConfiguration()
+		if err != nil {
+			return nil, &errs.PingCLIError{
+				Prefix: credentialsErrorPrefix,
+				Err:    err,
+			}
+		}
+		grantType = svcOAuth2.GrantTypeClientCredentials
+	default:
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    fmt.Errorf("%w: %s", ErrUnsupportedAuthType, authType),
+		}
+	}
+
+	if cfg != nil {
+		return cfg.WithGrantType(grantType), nil
+	}
+
+	return nil, &errs.PingCLIError{
+		Prefix: credentialsErrorPrefix,
+		Err:    ErrUnsupportedAuthType,
+	}
+}
+
 // SaveTokenForMethod saves an OAuth2 token to file storage using the specified authentication method key
 // Note: SDK handles keychain storage separately with its own token key format
 // Returns StorageLocation indicating where the token was saved
@@ -89,18 +166,48 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		return location, ErrNilToken
 	}
 
-	// Check if storage is disabled
+	// If no specific auth method key is provided, derive it from the current configuration
+	if authMethod == "" {
+		cfg, err := getConfigForCurrentAuthType()
+		if err != nil {
+			return location, err
+		}
+
+		derivedKey, err := GetAuthMethodKeyFromConfig(cfg)
+		if err != nil {
+			return location, err
+		}
+		authMethod = derivedKey
+	}
+
+	// Check storage option
 	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+
 	if strings.EqualFold(v, string(config.StorageTypeNone)) {
 		return location, nil
 	}
 
-	// Avoid saving to keychain here: SDK handles keychain persistence via TokenSource.
-	// When keychain is enabled, do NOT write a file. Only indicate keychain is in use.
+	// When keychain is enabled, attempt to save to keychain.
+	// If keychain is unavailable or save fails, fall back to file storage.
 	if shouldUseKeychain() {
-		location.Keychain = true
+		storage, kcErr := getTokenStorage(authMethod)
+		if kcErr == nil {
+			if saveErr := storage.SaveToken(token); saveErr == nil {
+				location.Keychain = true
 
-		return location, nil
+				return location, nil
+			} else {
+				kcErr = saveErr
+			}
+		}
+
+		if err := saveTokenToFile(token, authMethod); err == nil {
+			location.File = true
+
+			return location, nil
+		} else {
+			return location, errors.Join(kcErr, err)
+		}
 	}
 
 	// File-only mode: save only to file storage and error if unsuccessful.
@@ -156,76 +263,12 @@ func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 
 // GetValidTokenSource returns a valid OAuth2 token source for the configured authentication method
 func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
-	// First, try to load using configuration-based keys from the active profile
-	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
-	if err != nil || authType == "" {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    ErrUnsupportedAuthType,
-		}
-	}
-
-	// Normalize auth type to snake_case format and handle camelCase aliases
-	switch authType {
-	case "clientCredentials":
-		authType = "client_credentials"
-	case "deviceCode":
-		authType = "device_code"
-	case "authorization_code":
-		authType = "authorization_code"
-	}
-
-	// Try to get configuration for the configured grant type
-	var cfg *config.Configuration
-	var grantType svcOAuth2.GrantType
-	switch authType {
-	case "device_code":
-		cfg, err = GetDeviceCodeConfiguration()
-		if err != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: credentialsErrorPrefix,
-				Err:    err,
-			}
-		}
-		grantType = svcOAuth2.GrantTypeDeviceCode
-	case "authorization_code":
-		cfg, err = GetAuthorizationCodeConfiguration()
-		if err != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: credentialsErrorPrefix,
-				Err:    err,
-			}
-		}
-		grantType = svcOAuth2.GrantTypeAuthorizationCode
-	case "client_credentials":
-		cfg, err = GetClientCredentialsConfiguration()
-		if err != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: credentialsErrorPrefix,
-				Err:    err,
-			}
-		}
-		grantType = svcOAuth2.GrantTypeClientCredentials
-	case "worker":
-		cfg, err = GetWorkerConfiguration()
-		if err != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: credentialsErrorPrefix,
-				Err:    err,
-			}
-		}
-		grantType = svcOAuth2.GrantTypeClientCredentials
-	default:
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    fmt.Errorf("%w: %s", ErrUnsupportedAuthType, authType),
-		}
+	cfg, err := getConfigForCurrentAuthType()
+	if err != nil {
+		return nil, err
 	}
 
 	if cfg != nil {
-		// Set the grant type before getting the token source
-		cfg = cfg.WithGrantType(grantType)
-
 		// If using file storage, try to seed refresh from existing file token before new login
 		if !shouldUseKeychain() {
 			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
@@ -234,6 +277,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 					// Build minimal oauth2.Config for refresh using SDK endpoints
 					endpoints, eerr := cfg.AuthEndpoints()
 					if eerr == nil {
+						grantType := *cfg.Auth.GrantType
 						var oauthCfg *oauth2.Config
 						switch grantType {
 						case svcOAuth2.GrantTypeDeviceCode:
@@ -274,6 +318,19 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 			return nil, &errs.PingCLIError{
 				Prefix: credentialsErrorPrefix,
 				Err:    err,
+			}
+		}
+
+		// If we are not using keychain (e.g. file storage), we need to wrap the source
+		// to capture and persist the token to file when it is refreshed or created.
+		// The SDK's TokenSource only handles keychain persistence internally.
+		if !shouldUseKeychain() {
+			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
+			if err == nil {
+				return &filePersistingTokenSource{
+					source:     tokenSource,
+					authMethod: tokenKey,
+				}, nil
 			}
 		}
 
@@ -1159,4 +1216,24 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 	}
 
 	return tokenKey, nil
+}
+
+// filePersistingTokenSource wraps an oauth2.TokenSource to save tokens to file on refresh/login
+type filePersistingTokenSource struct {
+	source     oauth2.TokenSource
+	authMethod string
+}
+
+// Token satisfies the oauth2.TokenSource interface
+func (s *filePersistingTokenSource) Token() (*oauth2.Token, error) {
+	t, err := s.source.Token()
+	if err != nil {
+		return nil, err
+	}
+
+	// Save the token to file
+	// We ignore errors here as we still want to return the token for use
+	_, _ = SaveTokenForMethod(t, s.authMethod)
+
+	return t, nil
 }
