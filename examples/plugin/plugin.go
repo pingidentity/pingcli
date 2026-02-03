@@ -80,7 +80,7 @@ func (c *PingCliCommand) Run(args []string, logger grpc.Logger, auth grpc.Authen
 
 	// Example: Request an authentication token from the host
 	token, err := auth.GetToken()
-	if err != nil {
+	if err != nil || token == "" {
 		errLog := logger.PluginError(fmt.Sprintf("Failed to get auth token: %v", err), nil)
 		if errLog != nil {
 			return errLog
@@ -88,7 +88,7 @@ func (c *PingCliCommand) Run(args []string, logger grpc.Logger, auth grpc.Authen
 		return err
 	}
 
-	err = logger.Message(fmt.Sprintf("Successfully received auth token: %s...", token[:10]), nil)
+	err = logger.Message("Successfully received auth token", nil)
 	if err != nil {
 		return err
 	}
