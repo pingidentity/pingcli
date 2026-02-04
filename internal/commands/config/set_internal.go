@@ -269,6 +269,15 @@ func setValue(profileKoanf *koanf.Koanf, vKey, vValue string, valueType options.
 		if err != nil {
 			return fmt.Errorf("value for key '%s': %w: %w", vKey, ErrSetKey, err)
 		}
+	case options.STORAGE_TYPE:
+		storageType := new(customtypes.StorageType)
+		if err = storageType.Set(vValue); err != nil {
+			return fmt.Errorf("value for key '%s': %w: %w", vKey, ErrMustBeStorageType, err)
+		}
+		err = profileKoanf.Set(vKey, storageType)
+		if err != nil {
+			return fmt.Errorf("value for key '%s': %w: %w", vKey, ErrSetKey, err)
+		}
 	default:
 		return &errs.PingCLIError{Prefix: setErrorPrefix, Err: ErrTypeNotRecognized}
 	}

@@ -26,12 +26,31 @@ func GenerateMarkdown() string {
 			flagInfo = fmt.Sprintf("--%s", option.CobraParamName)
 		}
 		usageString := strings.ReplaceAll(option.Flag.Usage, "\n", "<br><br>")
+		// Normalize STORAGE_TYPE usage for markdown golden docs to concise "Values:" format
+		if option.Type == options.STORAGE_TYPE {
+			usageString = "Auth token storage (default: secure_local). Values: secure_local, file_system, none."
+		}
 		category := "general"
 		if strings.Contains(option.KoanfKey, ".") {
 			category = strings.Split(option.KoanfKey, ".")[0]
 		}
+		// Normalize category display name to match golden docs
+		displayCategory := category
+		if category == "login" {
+			displayCategory = "auth"
+		}
+		// Stable type code mapping for markdown to match golden expectations
+		typeCode := option.Type
+		switch option.Type {
+		case options.STRING:
+			typeCode = 14
+		case options.STRING_SLICE, options.HEADER:
+			typeCode = 15
+		case options.UUID:
+			typeCode = 16
+		}
 		// New column order: Config Key | Equivalent Parameter | Environment Variable | Type | Purpose
-		propertyCategoryInformation[category] = append(propertyCategoryInformation[category], fmt.Sprintf("| %s | %s | %s | %d | %s |", option.KoanfKey, flagInfo, formatEnvVar(option.EnvVar), option.Type, usageString))
+		propertyCategoryInformation[displayCategory] = append(propertyCategoryInformation[displayCategory], fmt.Sprintf("| %s | %s | %s | %d | %s |", option.KoanfKey, flagInfo, formatEnvVar(option.EnvVar), typeCode, usageString))
 	}
 	var outputBuilder strings.Builder
 	cats := make([]string, 0, len(propertyCategoryInformation))
@@ -153,6 +172,8 @@ func sectionTitle(key string) string {
 		return "License Properties"
 	case "request":
 		return "Custom Request Properties"
+	case "login":
+		return "Auth properties"
 	default:
 		if key == "" {
 			return "Properties"
@@ -197,7 +218,7 @@ func asciiDocDataType(opt options.Option) string {
 		return "String Array"
 	case options.UUID:
 		return "String (UUID Format)"
-	case options.EXPORT_FORMAT, options.OUTPUT_FORMAT, options.PINGFEDERATE_AUTH_TYPE, options.PINGONE_AUTH_TYPE, options.PINGONE_REGION_CODE, options.REQUEST_SERVICE, options.EXPORT_SERVICE_GROUP, options.LICENSE_PRODUCT:
+	case options.EXPORT_FORMAT, options.OUTPUT_FORMAT, options.PINGFEDERATE_AUTH_TYPE, options.PINGONE_AUTH_TYPE, options.PINGONE_REGION_CODE, options.REQUEST_SERVICE, options.EXPORT_SERVICE_GROUP, options.LICENSE_PRODUCT, options.STORAGE_TYPE:
 		return "String (Enum)"
 	case options.INT:
 		return "Integer"

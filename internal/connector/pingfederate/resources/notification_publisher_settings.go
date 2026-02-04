@@ -33,7 +33,7 @@ func (r *PingFederateNotificationPublisherSettingsResource) ExportAll() (*[]conn
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	notificationPublisherSettingsId := "notification_publisher_settings_singleton_id"
 	notificationPublisherSettingsName := "Notification Publisher Settings"

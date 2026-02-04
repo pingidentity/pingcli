@@ -120,11 +120,10 @@ protogen: ## Generate Go code from .proto files
 
 test: _check_ping_env ## Run all tests
 	@echo "  > Test: Running all Go tests..."
-	for dir in $(TEST_DIRS); do
-		echo "    -> $$dir"
-		$(GOTEST) $$dir
+	@for dir in $(TEST_DIRS); do \
+		$(GOTEST) $$dir; \
 	done
-	echo "✅ All tests passed."
+	@echo "✅ All tests passed."
 
 devcheck: install importfmtlint fmt vet golangcilint spincontainer test removetestcontainer ## Run the full suite of development checks and tests
 	@echo "✅ All development checks passed successfully."
@@ -188,18 +187,18 @@ _run_pf_container:
 
 _wait_for_pf:
 	@echo "  > Docker: Waiting for container to become healthy (up to 4 minutes)..."
-	timeout=240
-	while test $$timeout -gt 0; do
-		status=$$(docker inspect --format='{{json .State.Health.Status}}' $(CONTAINER_NAME) 2>/dev/null || echo "")
-		if test "$$status" = '"healthy"'; then
-			echo "✅ Docker: Container is healthy."
-			exit 0
-		fi
-		sleep 1
-		timeout=$$((timeout - 1))
-	done
-	echo "Error: Container did not become healthy within the timeout period."
-	$(DOCKER) logs $(CONTAINER_NAME) || echo "No logs available."
+	@timeout=240; \
+	while [ $$timeout -gt 0 ]; do \
+		status=$$($(DOCKER) inspect --format='{{json .State.Health.Status}}' $(CONTAINER_NAME) 2>/dev/null || echo ""); \
+		if [ "$$status" = '"healthy"' ]; then \
+			echo "✅ Docker: Container is healthy."; \
+			exit 0; \
+		fi; \
+		sleep 1; \
+		timeout=$$((timeout - 1)); \
+	done; \
+	echo "Error: Container did not become healthy within the timeout period."; \
+	$(DOCKER) logs $(CONTAINER_NAME) || echo "No logs available."; \
 	exit 1
 
 _stop_pf_container:

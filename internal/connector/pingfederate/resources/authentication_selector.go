@@ -33,7 +33,7 @@ func (r *PingFederateAuthenticationSelectorResource) ExportAll() (*[]connector.I
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	authenticationSelectorData, err := r.getAuthenticationSelectorData()
 	if err != nil {

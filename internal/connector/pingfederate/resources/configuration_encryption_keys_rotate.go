@@ -33,7 +33,7 @@ func (r *PingFederateConfigurationEncryptionKeysRotateResource) ExportAll() (*[]
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	configurationEncryptionKeysRotateId := "configuration_encryption_keys_rotate_singleton_id"
 	configurationEncryptionKeysRotateName := "Configuration Encryption Keys Rotate"

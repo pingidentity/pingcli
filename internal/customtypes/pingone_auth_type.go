@@ -12,7 +12,10 @@ import (
 )
 
 const (
-	ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER string = "worker"
+	ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS string = "client_credentials"
+	ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE string = "authorization_code"
+	ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE        string = "device_code"
+	ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER             string = "worker"
 )
 
 var (
@@ -31,6 +34,12 @@ func (pat *PingOneAuthenticationType) Set(authType string) error {
 	}
 
 	switch {
+	case strings.EqualFold(authType, ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS):
+		*pat = PingOneAuthenticationType(ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS)
+	case strings.EqualFold(authType, ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE):
+		*pat = PingOneAuthenticationType(ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE)
+	case strings.EqualFold(authType, ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE):
+		*pat = PingOneAuthenticationType(ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE)
 	case strings.EqualFold(authType, ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER):
 		*pat = PingOneAuthenticationType(ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER)
 	case strings.EqualFold(authType, ""):
@@ -56,6 +65,9 @@ func (pat *PingOneAuthenticationType) String() string {
 
 func PingOneAuthenticationTypeValidValues() []string {
 	types := []string{
+		ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS,
+		ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE,
+		ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE,
 		ENUM_PINGONE_AUTHENTICATION_TYPE_WORKER,
 	}
 

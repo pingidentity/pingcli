@@ -37,7 +37,7 @@ const (
   Export Configuration as Code packages for PingFederate, specifying the PingFederate connection details using basic authentication.
     pingcli platform export --services pingfederate --pingfederate-authentication-type basicAuth --pingfederate-username administrator --pingfederate-password 2FederateM0re --pingfederate-https-host https://pingfederate-admin.bxretail.org
 
-  Export Configuration as Code packages for PingFederate, specifying the PingFederate connection details using OAuth 2.0 client credentials.
+  Export Configuration as Code packages for PingFederate, specifying OAuth 2.0 client credentials.
     pingcli platform export --services pingfederate --pingfederate-authentication-type clientCredentialsAuth --pingfederate-client-id clientID --pingfederate-client-secret clientSecret --pingfederate-token-url https://pingfederate-admin.bxretail.org/as/token.oauth2
 
   Export Configuration as Code packages for PingFederate, specifying optional connection properties
@@ -47,7 +47,7 @@ const (
 func NewExportCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Args:                  common.ExactArgs(0),
-		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
+		DisableFlagsInUseLine: true,
 		Example:               commandExamples,
 		Long: "Export Configuration as Code packages for the Ping Platform.\n\n" +
 			"The CLI can export Terraform HCL to use with released Terraform providers.\n" +
@@ -66,7 +66,6 @@ func NewExportCommand() *cobra.Command {
 	initPingFederateAccessTokenFlags(cmd)
 	initPingFederateClientCredentialsFlags(cmd)
 
-	// auto-completion
 	err := cmd.RegisterFlagCompletionFunc(options.PlatformExportExportFormatOption.CobraParamName, autocompletion.PlatformExportFormatFunc)
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Unable to register auto completion for platform export flag %s: %v", options.PlatformExportExportFormatOption.CobraParamName, err), nil)
@@ -87,7 +86,6 @@ func NewExportCommand() *cobra.Command {
 
 func exportRunE(cmd *cobra.Command, args []string) error {
 	l := logger.Get()
-
 	l.Debug().Msgf("Platform Export Subcommand Called.")
 
 	err := platform_internal.RunInternalExport(cmd.Context(), cmd.Root().Version)
@@ -108,28 +106,26 @@ func initGeneralExportFlags(cmd *cobra.Command) {
 }
 
 func initPingOneExportFlags(cmd *cobra.Command) {
-	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAPIEnvironmentIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientSecretOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
-	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
-
-	cmd.MarkFlagsRequiredTogether(
-		options.PingOneAuthenticationWorkerEnvironmentIDOption.CobraParamName,
-		options.PingOneAuthenticationWorkerClientIDOption.CobraParamName,
-		options.PingOneAuthenticationWorkerClientSecretOption.CobraParamName,
-		options.PingOneRegionCodeOption.CobraParamName,
-	)
 }
 
 func initPingFederateGeneralFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingFederateHTTPSHostOption.Flag)
 	cmd.Flags().AddFlag(options.PingFederateAdminAPIPathOption.Flag)
-
 	cmd.MarkFlagsRequiredTogether(
 		options.PingFederateHTTPSHostOption.CobraParamName,
 		options.PingFederateAdminAPIPathOption.CobraParamName)
-
 	cmd.Flags().AddFlag(options.PingFederateXBypassExternalValidationHeaderOption.Flag)
 	cmd.Flags().AddFlag(options.PingFederateCACertificatePemFilesOption.Flag)
 	cmd.Flags().AddFlag(options.PingFederateInsecureTrustAllTLSOption.Flag)
@@ -139,7 +135,6 @@ func initPingFederateGeneralFlags(cmd *cobra.Command) {
 func initPingFederateBasicAuthFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingFederateBasicAuthUsernameOption.Flag)
 	cmd.Flags().AddFlag(options.PingFederateBasicAuthPasswordOption.Flag)
-
 	cmd.MarkFlagsRequiredTogether(
 		options.PingFederateBasicAuthUsernameOption.CobraParamName,
 		options.PingFederateBasicAuthPasswordOption.CobraParamName,
@@ -154,11 +149,9 @@ func initPingFederateClientCredentialsFlags(cmd *cobra.Command) {
 	cmd.Flags().AddFlag(options.PingFederateClientCredentialsAuthClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingFederateClientCredentialsAuthClientSecretOption.Flag)
 	cmd.Flags().AddFlag(options.PingFederateClientCredentialsAuthTokenURLOption.Flag)
-
 	cmd.MarkFlagsRequiredTogether(
 		options.PingFederateClientCredentialsAuthClientIDOption.CobraParamName,
 		options.PingFederateClientCredentialsAuthClientSecretOption.CobraParamName,
 		options.PingFederateClientCredentialsAuthTokenURLOption.CobraParamName)
-
 	cmd.Flags().AddFlag(options.PingFederateClientCredentialsAuthScopesOption.Flag)
 }

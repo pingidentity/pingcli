@@ -33,7 +33,7 @@ func (r *PingFederateServerSettingsGeneralResource) ExportAll() (*[]connector.Im
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	serverSettingsGeneralId := "server_settings_general_singleton_id"
 	serverSettingsGeneralName := "Server Settings General"

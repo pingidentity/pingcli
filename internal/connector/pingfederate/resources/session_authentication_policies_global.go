@@ -33,7 +33,7 @@ func (r *PingFederateSessionAuthenticationPoliciesGlobalResource) ExportAll() (*
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	sessionAuthenticationPoliciesGlobalId := "session_authentication_policies_global_singleton_id"
 	sessionAuthenticationPoliciesGlobalName := "Session Authentication Policies Global"

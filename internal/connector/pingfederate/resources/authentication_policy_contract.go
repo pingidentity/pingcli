@@ -33,7 +33,7 @@ func (r *PingFederateAuthenticationPolicyContractResource) ExportAll() (*[]conne
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	authenticationPolicyContractData, err := r.getAuthenticationPolicyContractData()
 	if err != nil {

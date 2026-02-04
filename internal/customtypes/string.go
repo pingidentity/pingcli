@@ -37,3 +37,9 @@ func (s *String) String() string {
 
 	return string(*s)
 }
+
+func StringPtr(val string) *String {
+	s := String(val)
+
+	return &s
+}

@@ -71,13 +71,28 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 
 	// --service, -s
 	cmd.Flags().AddFlag(options.RequestServiceOption.Flag)
-	// auto-completion
 	err = cmd.RegisterFlagCompletionFunc(options.RequestServiceOption.CobraParamName, autocompletion.RequestServiceFunc)
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Unable to register auto completion for request flag %s: %v", options.RequestServiceOption.CobraParamName, err), nil)
 	}
 
+	initPingOneRequestFlags(cmd)
+
 	return cmd
+}
+
+func initPingOneRequestFlags(cmd *cobra.Command) {
+	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationTypeOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeRedirectURIPathOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAuthorizationCodeRedirectURIPortOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationDeviceCodeClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientIDOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneAuthenticationClientCredentialsClientSecretOption.Flag)
+	cmd.Flags().AddFlag(options.PingOneRegionCodeOption.Flag)
 }
 
 func requestRunE(cmd *cobra.Command, args []string) error {

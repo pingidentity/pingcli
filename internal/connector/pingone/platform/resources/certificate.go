@@ -35,7 +35,7 @@ func (r *PingOneCertificateResource) ExportAll() (*[]connector.ImportBlock, erro
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	certificateData, err := r.getCertificateData()
 	if err != nil {

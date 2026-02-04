@@ -35,7 +35,7 @@ func (r *PingFederateServerSettingsWsTrustStsSettingsIssuerCertificateResource) 
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	serverSettingsWsTrustStsSettingsIssuerCertificateData, err := r.getServerSettingsWsTrustStsSettingsIssuerCertificateData()
 	if err != nil {
