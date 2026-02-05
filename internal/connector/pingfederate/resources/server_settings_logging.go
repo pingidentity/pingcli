@@ -33,7 +33,7 @@ func (r *PingFederateServerSettingsLoggingResource) ExportAll() (*[]connector.Im
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	serverSettingsLoggingId := "server_settings_logging_singleton_id"
 	serverSettingsLoggingName := "Server Settings Logging"

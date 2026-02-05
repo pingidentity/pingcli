@@ -32,11 +32,20 @@ jobs:
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      - name: Import GPG key
+      - 
+        name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.GPG_PASSPHRASE }}
+      - 
+        name: Generate Token
+        uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ secrets.GORELEASER_HOMEBREW_TAP_GITHUB_APP_ID }}
+          private-key: ${{ secrets.GORELEASER_HOMEBREW_TAP_GITHUB_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
       -
         name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
@@ -48,4 +57,4 @@ jobs:
           args: release --clean 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GORELEASER_HOMEBREW_TAP_GITHUB_PAT: ${{ secrets.GORELEASER_HOMEBREW_TAP_GITHUB_PAT }}
+          GORELEASER_HOMEBREW_TAP_GITHUB_PAT: ${{ steps.app-token.outputs.token }}

@@ -37,7 +37,7 @@ func (r *PingOneSignOnPolicyResource) ExportAll() (*[]connector.ImportBlock, err
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	signOnPolicyData, err := r.getSignOnPolicyData()
 	if err != nil {

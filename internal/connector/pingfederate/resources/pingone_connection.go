@@ -33,7 +33,7 @@ func (r *PingFederatePingoneConnectionResource) ExportAll() (*[]connector.Import
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	pingoneConnectionData, err := r.getPingoneConnectionData()
 	if err != nil {

@@ -37,7 +37,7 @@ func (r *PingOneAuthorizeApiServiceResource) ExportAll() (*[]connector.ImportBlo
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	authorizeApiServiceData, err := r.getAuthorizeApiServiceData()
 	if err != nil {

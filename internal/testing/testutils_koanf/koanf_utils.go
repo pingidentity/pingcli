@@ -5,7 +5,6 @@ package testutils_koanf
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -29,7 +28,7 @@ default:
     noColor: true
     outputFormat: text
     export:
-        outputDirectory: %s
+        outputDirectory: "%s"
         services: ["%s"]
     license:
         devopsUser: %s
@@ -38,11 +37,18 @@ default:
         pingOne:
             regionCode: %s
             authentication:
-                type: worker
+                type: client_credentials
+                environmentID: %s
                 worker:
                     clientID: %s
                     clientSecret: %s
-                    environmentID: %s
+                clientCredentials:
+                    clientID: %s
+                    clientSecret: %s
+                authorizationCode:
+                    clientID: %s
+                deviceCode:
+                    clientID: %s
         pingFederate:
             adminAPIPath: /pf-admin-api/v1
             authentication:
@@ -57,8 +63,36 @@ production:
     description: "test profile description"
     noColor: true
     outputFormat: text
+    export:
+        outputDirectory: "%s"
+        services: ["%s"]
+    license:
+        devopsUser: %s
+        devopsKey: %s
     service:
+        pingOne:
+            regionCode: %s
+            authentication:
+                type: client_credentials
+                environmentID: %s
+                worker:
+                    clientID: %s
+                    clientSecret: %s
+                clientCredentials:
+                    clientID: %s
+                    clientSecret: %s
+                authorizationCode:
+                    clientID: %s
+                deviceCode:
+                    clientID: %s
         pingFederate:
+            adminAPIPath: /pf-admin-api/v1
+            authentication:
+                type: basicAuth
+                basicAuth:
+                    username: Administrator
+                    password: 2FederateM0re
+            httpsHost: https://localhost:9999
             insecureTrustAllTLS: false
             xBypassExternalValidationHeader: false`
 
@@ -68,7 +102,7 @@ default:
     nocolor: true
     outputformat: text
     export:
-        outputdirectory: %s
+        outputdirectory: "%s"
         servicegroup: %s
         services: ["%s"]
     service:
@@ -104,10 +138,10 @@ func CreateConfigFile(t *testing.T) string {
 	t.Helper()
 
 	if configFileContents == "" {
-		configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir(), 1)
+		configFileContents = strings.ReplaceAll(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir())
 	}
 
-	configFilePath := filepath.Join(t.TempDir(), "config.yaml")
+	configFilePath := t.TempDir() + "/config.yaml"
 	if err := os.WriteFile(configFilePath, []byte(configFileContents), 0600); err != nil {
 		t.Fatalf("Failed to create config file: %s", err)
 	}
@@ -115,52 +149,75 @@ func CreateConfigFile(t *testing.T) string {
 	return configFilePath
 }
 
-func configureMainKoanf(t *testing.T) *profiles.KoanfConfig {
+func configureMainKoanf(t *testing.T) {
 	t.Helper()
 
 	configFilePath = CreateConfigFile(t)
-	koanfConfig := profiles.NewKoanfConfig(configFilePath)
+	mainKoanf := profiles.NewKoanfConfig(configFilePath)
 
-	if err := koanfConfig.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
+	if err := mainKoanf.KoanfInstance().Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
 		t.Fatalf("Failed to load configuration from file '%s': %v", configFilePath, err)
 	}
-
-	return koanfConfig
 }
 
-func InitKoanfs(t *testing.T) *profiles.KoanfConfig {
+func InitKoanfs(t *testing.T) {
 	t.Helper()
 
 	configuration.InitAllOptions()
 
-	configFileContents = strings.Replace(GetDefaultConfigFileContents(), outputDirectoryReplacement, filepath.Join(t.TempDir(), "config.yaml"), 1)
+	configFileContents = strings.ReplaceAll(GetDefaultConfigFileContents(), outputDirectoryReplacement, t.TempDir()+"/config.yaml")
 
-	return configureMainKoanf(t)
+	configureMainKoanf(t)
 }
 
 func InitKoanfsCustomFile(t *testing.T, fileContents string) {
 	t.Helper()
 
-	configuration.InitAllOptions()
-
-	configFileContents = strings.Replace(fileContents, outputDirectoryReplacement, filepath.Join(t.TempDir(), "config.yaml"), 1)
+	configFileContents = fileContents
 	configureMainKoanf(t)
+}
+
+func getEnvFallback(keys ...string) string {
+	for _, key := range keys {
+		val := os.Getenv(key)
+		if val != "" {
+			return val
+		}
+	}
+
+	return ""
 }
 
 func GetDefaultConfigFileContents() string {
 	return fmt.Sprintf(defaultConfigFileContentsPattern,
-		outputDirectoryReplacement,
-		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,
-		os.Getenv("TEST_PING_IDENTITY_DEVOPS_USER"),
-		os.Getenv("TEST_PING_IDENTITY_DEVOPS_KEY"),
-		os.Getenv("TEST_PINGONE_REGION_CODE"),
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),
-		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),
-		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),
+		outputDirectoryReplacement,                                                                                 // default export outputDirectory
+		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,                                                            // default export services
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_USER"),                                                                // default license devopsUser
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_KEY"),                                                                 // default license devopsKey
+		os.Getenv("TEST_PINGONE_REGION_CODE"),                                                                      // default service pingOne regionCode
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),                                                                   // default service pingOne authentication environmentID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),                                                                 // default service pingOne worker clientID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),                                                             // default service pingOne worker clientSecret
+		getEnvFallback("TEST_PINGONE_CLIENT_ID", "PINGONE_CLIENT_ID", "TEST_PINGONE_WORKER_CLIENT_ID"),             // default service pingOne clientCredentials clientID: utilizes the client credentials or worker app credentials
+		getEnvFallback("TEST_PINGONE_CLIENT_SECRET", "PINGONE_CLIENT_SECRET", "TEST_PINGONE_WORKER_CLIENT_SECRET"), // default service pingOne clientCredentials clientSecret: utilizes the client credentials or worker app credentials
+		os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"),                                                     // default service pingOne authorizationCode clientID
+		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),                                                            // default service pingOne deviceCode clientID
+		outputDirectoryReplacement,                                                                                 // production export outputDirectory
+		customtypes.ENUM_EXPORT_SERVICE_PINGONE_PROTECT,                                                            // production export services
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_USER"),                                                                // production license devopsUser
+		os.Getenv("TEST_PING_IDENTITY_DEVOPS_KEY"),                                                                 // production license devopsKey
+		os.Getenv("TEST_PINGONE_REGION_CODE"),                                                                      // production service pingOne regionCode
+		os.Getenv("TEST_PINGONE_ENVIRONMENT_ID"),                                                                   // production service pingOne authentication environmentID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_ID"),                                                                 // production service pingOne worker clientID
+		os.Getenv("TEST_PINGONE_WORKER_CLIENT_SECRET"),                                                             // production service pingOne worker clientSecret
+		getEnvFallback("TEST_PINGONE_CLIENT_ID", "PINGONE_CLIENT_ID", "TEST_PINGONE_WORKER_CLIENT_ID"),             // production service pingOne clientCredentials clientID: utilizes the client credentials or worker app credentials
+		getEnvFallback("TEST_PINGONE_CLIENT_SECRET", "PINGONE_CLIENT_SECRET", "TEST_PINGONE_WORKER_CLIENT_SECRET"), // production service pingOne clientCredentials clientSecret: utilizes the client credentials or worker app credentials
+		os.Getenv("TEST_PINGONE_AUTHORIZATION_CODE_CLIENT_ID"),                                                     // production service pingOne authorizationCode clientID
+		os.Getenv("TEST_PINGONE_DEVICE_CODE_CLIENT_ID"),                                                            // production service pingOne deviceCode clientID
 	)
 }
 
-func GetDefaultLegacyConfigFileContents() string {
+func ReturnDefaultLegacyConfigFileContents() string {
 	return fmt.Sprintf(defaultLegacyConfigFileContentsPattern,
 		outputDirectoryReplacement,
 		customtypes.ENUM_EXPORT_SERVICE_GROUP_PINGONE,

@@ -13,6 +13,8 @@
 *** xref:command_reference:pingcli_config_view-profile.adoc[]
 ** xref:command_reference:pingcli_feedback.adoc[]
 ** xref:command_reference:pingcli_license.adoc[]
+** xref:command_reference:pingcli_login.adoc[]
+** xref:command_reference:pingcli_logout.adoc[]
 ** xref:command_reference:pingcli_platform.adoc[]
 *** xref:command_reference:pingcli_platform_export.adoc[]
 ** xref:command_reference:pingcli_plugin.adoc[]
@@ -20,4 +22,3 @@
 *** xref:command_reference:pingcli_plugin_list.adoc[]
 *** xref:command_reference:pingcli_plugin_remove.adoc[]
 ** xref:command_reference:pingcli_request.adoc[]
-

@@ -33,7 +33,7 @@ func (r *PingFederateOauthAccessTokenManagerSettingsResource) ExportAll() (*[]co
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	oauthAccessTokenManagerSettingsId := "oauth_access_token_manager_settings_singleton_id" //#nosec G101 -- This is not hard-coded credentials
 	oauthAccessTokenManagerSettingsName := "Oauth Access Token Manager Settings"            //#nosec G101 -- This is not hard-coded credentials

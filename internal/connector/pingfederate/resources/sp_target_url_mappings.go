@@ -33,7 +33,7 @@ func (r *PingFederateSpTargetUrlMappingsResource) ExportAll() (*[]connector.Impo
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	spTargetUrlMappingsId := "sp_target_url_mappings_singleton_id"
 	spTargetUrlMappingsName := "Sp Target Url Mappings"

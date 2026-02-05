@@ -35,7 +35,7 @@ func (r *PingFederateOauthIdpAdapterMappingResource) ExportAll() (*[]connector.I
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	oauthIdpAdapterMappingData, err := r.getOauthIdpAdapterMappingData()
 	if err != nil {

@@ -35,7 +35,7 @@ func (r *PingFederateOauthTokenExchangeTokenGeneratorMappingResource) ExportAll(
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	oauthTokenExchangeTokenGeneratorMappingData, err := r.getOauthTokenExchangeTokenGeneratorMappingData()
 	if err != nil {

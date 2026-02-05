@@ -33,7 +33,7 @@ func (r *PingOneAdministratorSecurityResource) ExportAll() (*[]connector.ImportB
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	ok, err := r.checkAdministratorSecurityData()
 	if err != nil {

@@ -33,7 +33,7 @@ func (r *PingFederateOauthCibaServerPolicySettingsResource) ExportAll() (*[]conn
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	oauthCibaServerPolicySettingsId := "oauth_ciba_server_policy_settings_singleton_id"
 	oauthCibaServerPolicySettingsName := "Oauth Ciba Server Policy Settings"

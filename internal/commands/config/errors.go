@@ -27,7 +27,7 @@ var (
 	// Set errors
 	ErrEmptyValue                 = errors.New("the set value provided is empty. Use 'pingcli config unset %s' to unset a key's configuration")
 	ErrKeyAssignmentFormat        = errors.New("invalid key-value assignment. Expect 'key=value' format")
-	ErrActiveProfileAssignment    = errors.New("invalid active profile assignment. Please use the 'pingcli config set active-profile <profile-name>' command to set the active profile")
+	ErrActiveProfileAssignment    = errors.New("invalid active profile assignment. Please use the 'pingcli config set-active-profile <profile-name>' command to set the active profile")
 	ErrSetKey                     = errors.New("unable to set key in configuration profile")
 	ErrMustBeBoolean              = errors.New("the value assignment must be a boolean. Allowed [true, false]")
 	ErrMustBeExportFormat         = fmt.Errorf("the value assignment must be a valid export format. Allowed [%s]", strings.Join(customtypes.ExportFormatValidValues(), ", "))
@@ -43,7 +43,9 @@ var (
 	ErrMustBeInteger              = errors.New("the value assignment must be an integer")
 	ErrMustBeHttpMethod           = fmt.Errorf("the value assignment must be a valid HTTP method. Allowed [%s]", strings.Join(customtypes.HTTPMethodValidValues(), ", "))
 	ErrMustBeRequestService       = fmt.Errorf("the value assignment must be a valid request service. Allowed [%s]", strings.Join(customtypes.RequestServiceValidValues(), ", "))
-	ErrMustBeLicenseProduct       = fmt.Errorf("the value assignment must be a valid license product. Allowed [%s]", strings.Join(customtypes.LicenseProductValidValues(), ", "))
+	ErrMustBeLicenseProduct       = fmt.Errorf("must be one of: %s", strings.Join(customtypes.LicenseProductValidValues(), ", "))
 	ErrMustBeLicenseVersion       = errors.New("the value assignment must be a valid license version. Must be of the form 'major.minor'")
-	ErrTypeNotRecognized          = errors.New("the variable type for the configuration key is not recognized or supported")
+	ErrMustBeStorageType          = fmt.Errorf("must be one of: %s", strings.Join(customtypes.StorageTypeValidValues(), ", "))
+
+	ErrTypeNotRecognized = errors.New("the variable type for the configuration key is not recognized or supported")
 )

@@ -33,7 +33,7 @@ func (r *PingFederateKerberosRealmSettingsResource) ExportAll() (*[]connector.Im
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	kerberosRealmSettingsId := "kerberos_realm_settings_singleton_id"
 	kerberosRealmSettingsName := "Kerberos Realm Settings"

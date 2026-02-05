@@ -33,7 +33,7 @@ func (r *PingFederateExtendedPropertiesResource) ExportAll() (*[]connector.Impor
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	extendedPropertiesId := "extended_properties_singleton_id"
 	extendedPropertiesName := "Extended Properties"

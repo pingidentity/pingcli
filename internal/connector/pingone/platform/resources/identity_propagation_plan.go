@@ -37,7 +37,7 @@ func (r *PingOneIdentityPropagationPlanResource) ExportAll() (*[]connector.Impor
 	l := logger.Get()
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
-	importBlocks := []connector.ImportBlock{}
+	importBlocks := make([]connector.ImportBlock, 0, 1)
 
 	identityPropagationPlanData, err := r.getIdentityPropagationPlanData()
 	if err != nil {

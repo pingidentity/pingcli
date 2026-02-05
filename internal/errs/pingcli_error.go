@@ -13,6 +13,10 @@ type PingCLIError struct {
 	Prefix string
 }
 
+var (
+	ErrInvalidInput = errors.New("invalid input")
+)
+
 func (e *PingCLIError) Error() string {
 	if e == nil || e.Err == nil {
 		return ""

@@ -159,7 +159,6 @@ func renderSingle(c *cobra.Command, createdDate, revDate, resourcePrefix string)
 			name := strings.ReplaceAll(sc.CommandPath(), " ", "_") + ".adoc"
 			fmt.Fprintf(&sb, "* xref:%s[] - %s\n", name, firstLine(sc.Short, sc.Long))
 		}
-		sb.WriteString("\n")
 		subcommandsBlock = sb.String()
 	}
 
@@ -338,7 +337,6 @@ func renderNav(root *cobra.Command) string {
 		file := strings.ReplaceAll(c.CommandPath(), " ", "_") + ".adoc"
 		fmt.Fprintf(&b, "%s xref:command_reference:%s[]\n", stars, file)
 	})
-	b.WriteString("\n")
 
 	return b.String()
 }

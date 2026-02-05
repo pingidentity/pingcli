@@ -28,11 +28,15 @@ The following parameters can be configured in Ping CLI's static configuration fi
 | service.pingFederate.httpsHost | ENUM_STRING | --pingfederate-https-host | The PingFederate HTTPS host used to communicate with PingFederate's admin API.<br><br>Example: `https://pingfederate-admin.bxretail.org` |
 | service.pingFederate.insecureTrustAllTLS | ENUM_BOOL | --pingfederate-insecure-trust-all-tls | Trust any certificate when connecting to the PingFederate server admin API.<br><br>This is insecure and shouldn't be enabled outside of testing. |
 | service.pingFederate.xBypassExternalValidationHeader | ENUM_BOOL | --pingfederate-x-bypass-external-validation-header | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). |
-| service.pingOne.authentication.type | ENUM_PINGONE_AUTH_TYPE | --pingone-authentication-type | The authentication type to use to authenticate to the PingOne management API.<br><br>Options are: worker.<br><br>Example: `worker` |
-| service.pingOne.authentication.worker.clientID | ENUM_UUID | --pingone-worker-client-id | The worker client ID used to authenticate to the PingOne management API. |
-| service.pingOne.authentication.worker.clientSecret | ENUM_STRING | --pingone-worker-client-secret | The worker client secret used to authenticate to the PingOne management API. |
-| service.pingOne.authentication.worker.environmentID | ENUM_UUID | --pingone-worker-environment-id | The ID of the PingOne environment that contains the worker client used to authenticate to the PingOne management API. |
-| service.pingOne.regionCode | ENUM_PINGONE_REGION_CODE | --pingone-region-code | The region code of the PingOne tenant.<br><br>Options are: AP, AU, CA, EU, NA.<br><br>Example: `NA` |
+| service.pingOne.authentication.authCode.clientID | ENUM_STRING | | The authorization code client ID used to authenticate to the PingOne management API when using OAuth 2.0 authorization code flow. |
+| service.pingOne.authentication.authCode.environmentID | ENUM_UUID | | The ID of the PingOne environment that contains the authorization code client used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.authCode.redirectURI | ENUM_STRING | | The redirect URI configured for the authorization code client application.<br><br>Example: `http://127.0.0.1:7464/callback` |
+| service.pingOne.authentication.clientCredentials.clientID | ENUM_STRING | | The client credentials client ID used to authenticate to the PingOne management API when using OAuth 2.0 client credentials flow. |
+| service.pingOne.authentication.clientCredentials.clientSecret | ENUM_STRING | | The client credentials client secret used to authenticate to the PingOne management API when using OAuth 2.0 client credentials flow. |
+| service.pingOne.authentication.clientCredentials.environmentID | ENUM_UUID | | The ID of the PingOne environment that contains the client credentials application used to authenticate to the PingOne management API. |
+| service.pingOne.authentication.deviceCode.clientID | ENUM_STRING | | The device code client ID used to authenticate to the PingOne management API when using OAuth 2.0 device code flow. |
+| service.pingOne.authentication.deviceCode.environmentID | ENUM_UUID | | The ID of the PingOne environment that contains the device code client used to authenticate to the PingOne management API. |
+| service.pingOne.regionCode | ENUM_PINGONE_REGION_CODE | --pingone-region-code | The region code of the PingOne tenant.<br><br>Options are: AP, AU, CA, EU, NA, SG.<br><br>Example: `NA` |
 
 #### Platform Export Properties
 
