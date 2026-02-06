@@ -16,6 +16,7 @@ var (
 	ErrRegionCodeRequired             = errors.New("region code is required and must be valid. Please run 'pingcli config set service.pingone.regionCode=<region>'")
 	ErrEnvironmentIDNotConfigured     = errors.New("environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.environmentID=<your-env-id>'")
 	ErrTokenStorageDisabled           = errors.New("token storage is disabled")
+	ErrInvalidAuthMethod              = errors.New("invalid authentication method flag provided")
 
 	// Device code errors
 	ErrDeviceCodeClientIDNotConfigured      = errors.New("device code client ID is not configured. Please run 'pingcli config set service.pingone.authentication.deviceCode.clientID=<your-client-id>'")

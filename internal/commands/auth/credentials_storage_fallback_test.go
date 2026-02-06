@@ -26,12 +26,14 @@ func (m *mockTokenStorage) SaveToken(token *oauth2.Token) error { return m.saveE
 func (m *mockTokenStorage) LoadToken() (*oauth2.Token, error) {
 	return nil, errNotImplemented
 }
-func (m *mockTokenStorage) ClearToken() error { return nil }
+func (m *mockTokenStorage) ClearToken() error     { return nil }
+func (m *mockTokenStorage) ClearAllTokens() error { return nil }
 
 type funcTokenStorage struct {
-	saveFn  func(*oauth2.Token) error
-	loadFn  func() (*oauth2.Token, error)
-	clearFn func() error
+	saveFn     func(*oauth2.Token) error
+	loadFn     func() (*oauth2.Token, error)
+	clearFn    func() error
+	clearAllFn func() error
 }
 
 func (s *funcTokenStorage) SaveToken(token *oauth2.Token) error {
@@ -56,6 +58,14 @@ func (s *funcTokenStorage) ClearToken() error {
 	}
 
 	return s.clearFn()
+}
+
+func (s *funcTokenStorage) ClearAllTokens() error {
+	if s.clearAllFn == nil {
+		return nil
+	}
+
+	return s.clearAllFn()
 }
 
 func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
@@ -150,5 +160,38 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 	filePath := filepath.Join(tmp, ".pingcli", "credentials", authMethod+".json")
 	if _, statErr := os.Stat(filePath); statErr == nil {
 		t.Fatalf("expected no credentials file at %s when keychain save succeeds", filePath)
+	}
+}
+
+func TestClearToken_UsesClearAllTokens(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	// Ensure keychain is the selected storage mode
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "secure_local")
+
+	old := newKeychainStorage
+	t.Cleanup(func() { newKeychainStorage = old })
+
+	sawClearAll := false
+	newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
+		return &funcTokenStorage{
+			clearAllFn: func() error {
+				sawClearAll = true
+
+				return nil
+			},
+		}, nil
+	}
+
+	// Calling ClearToken should trigger ClearAllTokens on the storage
+	// because ClearToken() in credentials.go calls newKeychainStorage("pingcli", "clearAllTokens")
+	// and then invokes ClearAllTokens()
+	err := ClearToken()
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if !sawClearAll {
+		t.Error("Expected ClearAllTokens to be called on storage backend")
 	}
 }
