@@ -177,6 +177,7 @@ func TestClearToken_UsesClearAllTokens(t *testing.T) {
 		return &funcTokenStorage{
 			clearAllFn: func() error {
 				sawClearAll = true
+
 				return nil
 			},
 		}, nil
