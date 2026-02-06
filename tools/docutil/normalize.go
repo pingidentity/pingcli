@@ -1,3 +1,5 @@
+// Copyright © 2026 Ping Identity Corporation
+
 // Package docutil provides small helpers for documentation generators to share.
 package docutil
 
