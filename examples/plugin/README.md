@@ -6,7 +6,9 @@ Welcome to the developer guide for creating `pingcli` plugins! This document pro
 
 - [Introduction](#introduction)
 - [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
 - [How Plugins Work](#how-plugins-work)
+- [Authentication](#authentication)
 - [Building a Plugin](#building-a-plugin)
 - [Registering and Managing Plugins](#registering-and-managing-plugins)
   - [Adding a Plugin](#adding-a-plugin)
@@ -29,13 +31,39 @@ The `pingcli` plugin system allows developers to create new commands that integr
 - [HashiCorp go-plugin](https://github.com/hashicorp/go-plugin) (used by both host and plugin)
 - **Ping CLI v0.7.0+** installed and configured
 
+## Quick Start
+You can quickly build and test the example plugin provided in this directory.
+
+1.  **Build the plugin**:
+    Run this command from the root of the repository:
+    ```bash
+    go build -o "$HOME/go/bin/pingcli-example-plugin" ./examples/plugin
+    ```
+    *Note: This assumes `$HOME/go/bin` is in your system PATH, which is standard for Go development.*
+
+2.  **Register the plugin**:
+    ```bash
+    pingcli plugin add pingcli-example-plugin
+    ```
+
+3.  **Run the command**:
+    ```bash
+    pingcli pingcli-example-plugin --hello world
+    ```
+
 ## How Plugins Work
 
 1.  **Discovery**: When `pingcli` starts, it loads a list of registered plugin executables from its configuration profile. This list is managed by the `pingcli plugin` command. Plugins must be on your system `PATH`
 2.  **Handshake**: For each registered plugin, `pingcli` launches the executable as a child process. A secure handshake is performed to verify that the child process is a valid plugin and is compatible with the host.
 3.  **Communication**: Once the handshake is complete, the host and plugin communicate over gRPC. The host can call functions defined in the plugin (like `Run`), and the plugin can send log messages back to the host.
 4.  **Execution**: When a user runs a command provided by a plugin, `pingcli` invokes the corresponding gRPC method in the plugin process, passing along any arguments and flags.
-5. **Compatibility**: The Handshake process includes a ProtocolVersion check. This ensures that the plugin and the pingcli host are compatible, preventing issues if the underlying gRPC interface changes in future versions of pingcli.
+5.  **Compatibility**: The Handshake process includes a ProtocolVersion check. This ensures that the plugin and the pingcli host are compatible, preventing issues if the underlying gRPC interface changes in future versions of pingcli.
+
+## Authentication
+
+Plugins can leverage the host `pingcli`'s authenticated session to make API calls to supported services. This avoids the need for plugins to manage credentials or perform OAuth flows themselves.
+
+For detailed documentation and usage examples, see [AUTHENTICATION.md](AUTHENTICATION.md).
 
 ## Building a Plugin
 
@@ -104,6 +132,7 @@ This is the main entry point for your command's logic. It is executed when a use
 
 -   `args []string`: A slice of strings containing all the command-line arguments and flags that were passed to your command. For example, if a user runs `pingcli my-command first-arg --verbose`, the `args` slice will be `["first-arg", "--verbose"]`.
 -   `logger grpc.Logger`: A gRPC client that allows your plugin to send log messages back to the `pingcli` host. **This is the only way your plugin should produce output.**
+-   `auth grpc.Authentication`: A gRPC client that allows your plugin to request an authentication token from the host.
 
 ## Logging from Plugins
 
@@ -125,6 +154,8 @@ The `logger` interface provides several methods for different log levels:
 
 - **Handshake failed:**  
   Check that both host and plugin use compatible protocol versions.
+  
+  *Note for macOS users*: In some environments, simply running the plugin process might require setting `export GOMAXPROCS=1` before running `pingcli` if you encounter stability issues during handshake, though this is rare.
 
 - **gRPC errors:**  
   Ensure your plugin implements the correct interface and uses the expected gRPC protocol.

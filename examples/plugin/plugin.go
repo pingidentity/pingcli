@@ -21,10 +21,10 @@ import (
 // like a native command.
 var (
 	// Example provides one or more usage examples for the command.
-	Example = "pingcli plugin-command --flag value"
+	Example = "pingcli pingcli-example-plugin --flag value"
 
 	// Long provides a detailed description of the command. It's shown in the
-	// help text when a user runs `pingcli help plugin-command`.
+	// help text when a user runs `pingcli help pingcli-example-plugin`.
 	Long = `This command is an example of a plugin command that can be used with pingcli. 
 	It demonstrates how to implement a custom command that can be executed by the pingcli host process`
 
@@ -32,7 +32,7 @@ var (
 	Short = "An example plugin command for pingcli"
 
 	// Use defines the command's name and its arguments/flags syntax.
-	Use = "plugin-command [flags]"
+	Use = "pingcli-example-plugin [flags]"
 )
 
 // PingCliCommand is the implementation of the grpc.PingCliCommand interface.
@@ -73,36 +73,43 @@ func (c *PingCliCommand) Configuration() (*grpc.PingCliCommandConfiguration, err
 // The `auth` parameter is a gRPC client that allows the plugin to request
 // an authentication token from the host process.
 func (c *PingCliCommand) Run(args []string, logger grpc.Logger, auth grpc.Authentication) error {
-	err := logger.Message(fmt.Sprintf("Args to plugin: %v", args), nil)
-	if err != nil {
-		return err
-	}
-
-	// Example: Request an authentication token from the host
-	token, err := auth.GetToken()
-	if err != nil || token == "" {
-		errLog := logger.PluginError(fmt.Sprintf("Failed to get auth token: %v", err), nil)
-		if errLog != nil {
-			return errLog
+	// 1. Process arguments
+	if len(args) > 0 {
+		if err := logger.Message(fmt.Sprintf("Received arguments: %v", args), nil); err != nil {
+			return err
 		}
+	} else {
+		if err := logger.Message("No arguments provided. Usage: pingcli plugin-command [args]", nil); err != nil {
+			return err
+		}
+	}
+
+	// 2. Obtain Authentication Token
+	// Plugins delegate authentication to the host. The host manages the active session
+	// and provides a valid access token for the currently selected profile.
+	token, err := auth.GetToken()
+	if err != nil {
+		// Log the error concisely as a plugin error for debugging
+		if logErr := logger.PluginError(fmt.Sprintf("Authentication failed: %v", err), nil); logErr != nil {
+			return logErr
+		}
+		// Return the error to the host to stop execution
+		return fmt.Errorf("authentication required: %w", err)
+	}
+
+	if resultErr := logger.Success("Successfully authenticated!", nil); resultErr != nil {
+		return resultErr
+	}
+
+	// 3. Command Logic (Example)
+	// Use the token to make an API call. For demonstration, we just log it.
+	// In a real plugin, you would use this token in the Authorization header:
+	// req.Header.Set("Authorization", "Bearer " + token)
+	if err := logger.Message(fmt.Sprintf("Token (truncated): %s...", token[:10]), nil); err != nil {
 		return err
 	}
 
-	err = logger.Message("Successfully received auth token", nil)
-	if err != nil {
-		return err
-	}
-
-	err = logger.Warn("Warning from plugin", nil)
-	if err != nil {
-		return err
-	}
-
-	err = logger.PluginError("Error from plugin", map[string]string{
-		"key":   "value",
-		"debug": "info",
-	})
-	if err != nil {
+	if err := logger.Warn("This is an example plugin command.", nil); err != nil {
 		return err
 	}
 
