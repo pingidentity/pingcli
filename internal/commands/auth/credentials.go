@@ -34,6 +34,7 @@ type tokenStorage interface {
 	SaveToken(token *oauth2.Token) error
 	LoadToken() (*oauth2.Token, error)
 	ClearToken() error
+	ClearAllTokens() error
 }
 
 var newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
@@ -348,6 +349,18 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 // to handle cases where users switch between authentication methods
 func ClearToken() error {
 	var errs []error
+
+	// First, attempt to clear ALL keychain entries for the pingcli service
+	// This ensures we clean up tokens from previous configurations (stale Client IDs, etc.)
+	// We use a dummy username because the constructor requires it, but ClearAllTokens operates at service level
+	if ks, err := newKeychainStorage("pingcli", "clearAllTokens"); err == nil {
+		if err := ks.ClearAllTokens(); err != nil {
+			errs = append(errs, err)
+		} else {
+			// Successfully cleared all keychain tokens
+			return nil
+		}
+	}
 
 	// Clear configuration-based tokens for all auth methods
 	// Also clear any old tokens from previous configurations with different client IDs

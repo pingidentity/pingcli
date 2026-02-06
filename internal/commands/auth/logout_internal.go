@@ -58,8 +58,10 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
 	case clientCredentialsStr == "true":
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
-	default:
+	case authorizationCodeStr == "true":
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
+	default:
+		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: fmt.Errorf("invalid authentication method flag provided")}
 	}
 
 	// Generate token key for the selected grant type

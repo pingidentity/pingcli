@@ -26,12 +26,14 @@ func (m *mockTokenStorage) SaveToken(token *oauth2.Token) error { return m.saveE
 func (m *mockTokenStorage) LoadToken() (*oauth2.Token, error) {
 	return nil, errNotImplemented
 }
-func (m *mockTokenStorage) ClearToken() error { return nil }
+func (m *mockTokenStorage) ClearToken() error     { return nil }
+func (m *mockTokenStorage) ClearAllTokens() error { return nil }
 
 type funcTokenStorage struct {
-	saveFn  func(*oauth2.Token) error
-	loadFn  func() (*oauth2.Token, error)
-	clearFn func() error
+	saveFn     func(*oauth2.Token) error
+	loadFn     func() (*oauth2.Token, error)
+	clearFn    func() error
+	clearAllFn func() error
 }
 
 func (s *funcTokenStorage) SaveToken(token *oauth2.Token) error {
@@ -56,6 +58,14 @@ func (s *funcTokenStorage) ClearToken() error {
 	}
 
 	return s.clearFn()
+}
+
+func (s *funcTokenStorage) ClearAllTokens() error {
+	if s.clearAllFn == nil {
+		return nil
+	}
+
+	return s.clearAllFn()
 }
 
 func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
