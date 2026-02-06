@@ -162,3 +162,35 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 		t.Fatalf("expected no credentials file at %s when keychain save succeeds", filePath)
 	}
 }
+
+func TestClearToken_UsesClearAllTokens(t *testing.T) {
+	testutils_koanf.InitKoanfs(t)
+
+	// Ensure keychain is the selected storage mode
+	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "secure_local")
+
+	old := newKeychainStorage
+	t.Cleanup(func() { newKeychainStorage = old })
+
+	sawClearAll := false
+	newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
+		return &funcTokenStorage{
+			clearAllFn: func() error {
+				sawClearAll = true
+				return nil
+			},
+		}, nil
+	}
+
+	// Calling ClearToken should trigger ClearAllTokens on the storage
+	// because ClearToken() in credentials.go calls newKeychainStorage("pingcli", "clearAllTokens")
+	// and then invokes ClearAllTokens()
+	err := ClearToken()
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	if !sawClearAll {
+		t.Error("Expected ClearAllTokens to be called on storage backend")
+	}
+}
