@@ -3,8 +3,6 @@
 package auth_internal
 
 import (
-	"crypto/sha256"
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"

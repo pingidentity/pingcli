@@ -562,11 +562,6 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
-	}
-
 	// Determine if this was new authentication
 	// If we had an existing token with the same expiry, it's cached
 	// If expiry is different, new auth was performed
@@ -761,11 +756,6 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
-	}
-
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
 	}
 
 	// Determine if this was new authentication
@@ -974,11 +964,6 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		}
-	}
-
-	// SDK handles keychain storage separately - mark if keychain is enabled
-	if shouldUseKeychain() {
-		location.Keychain = true
 	}
 
 	// Determine if this was new authentication

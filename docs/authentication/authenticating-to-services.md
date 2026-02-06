@@ -1,46 +1,33 @@
-# Authentication to Service
+# Authenticating to Services
 
-This guide covers authenticating Ping CLI to PingOne and clearing credentials when you are done.
+This document covers the available options for authenticating to services in `pingcli`: login flows, logout behavior, token storage, configuration, and practical token retrieval across environments.
 
-## Quick start
+## Interactive Login
 
-1. Configure settings:
+First, ensure the [Prerequisites](#prerequisites-configure-a-pingone-application) are met.
+Then, run `pingcli login` to interact with Ping CLI prompts to configure authentication parameters and launch a login flow:
 
-  ```bash
-  pingcli config set service.pingone.regionCode=NA
-  pingcli config set service.pingone.authentication.environmentID=<your-env-id>
-  pingcli config set service.pingone.authentication.deviceCode.clientID=<your-client-id>
-  ```
-
-2. Login:
-
-  ```bash
-  pingcli login --device-code
-  ```
-
-3. Use authenticated commands:
-
-  ```bash
-  pingcli request get /environments
-  ```
-
-4. Logout when done:
-
-  ```bash
-  pingcli logout
-  ```
+```bash
+$ pingcli login
+No authentication methods configured. Let's set one up!
+Use the arrow keys to navigate: ↓ ↑ → ←
+? Select authorization grant type for this profile:
+  ▸ device_code
+    authorization_code
+    client_credentials
+```
 
 ## Prerequisites: Configure a PingOne Application
 
-Before running `pingcli login`, configure a PingOne application for the grant type you intend to use. PingCLI supports:
+Before authenticating to a Ping service from Ping CLI, ensure the platform is prepared with a configured application. For the PingOne platform, Ping CLI supports:
 
-- `client_credentials` (recommended for service/automation; legacy `worker` maps to this)
+- `client_credentials` (recommended for service/automation; legacy pingcli `worker` authentication maps to this)
 - `authorization_code` (interactive browser login)
 - `device_code` (interactive terminal login on headless environments)
 
-See the PingOne Platform API documentation:
+For guidance on which authorization flow to use see [Authorization Flow Recommendations](#auhtorization-flow-recommendations).
 
-- Application operations: <https://apidocs.pingidentity.com/pingone/platform/v1/api/#application-operations>
+For guidance on how to configure applications in PingOne see [PingOne Platform Application documentation](https://docs.pingidentity.com/pingone/applications/p1_applications_add_applications.html)
 
 ### Client credentials (Worker)
 
@@ -49,17 +36,16 @@ Configure your PingOne application to support `client_credentials`:
 - Enable grant type: `client_credentials`
 - Create Client ID and Client Secret
 
-Collect for PingCLI:
+Collect for Ping CLI:
 
-- Environment ID
+- Environment ID (the environment containing the application)
 - Client ID
 - Client Secret
 
-Notes:
+Ping CLI notes:
 
-- Auth type `worker` is applied as `client_credentials` under the hood
 - No refresh token is issued for `client_credentials`
-- If a previous version of `pingcli` was used, `pingone.authentication.type` may be set to `worker`. `pingcli login` will interpret this as an intention to migrate away from the deprecated type and favor `client_credentials`. To use `device_code` or `authorization_code` instead, update your configuration or pass the appropriate login flag.
+- If a previous version of `pingcli` was used, the `pingone.authentication.type` may be set to `worker`. The `pingcli` login command will interpret this as an intention to migrate away from the deprecated type and favor `client_credentials`. If another authentication type is preferred (e.g. `device_code` or `authorization_code`) edit the configuration file or pass an appropriate flag to the `login` command.
 
 > Deprecation Notice: The `worker` authentication type is deprecated and will be removed in a future release. Use `client_credentials` instead.
 
@@ -70,10 +56,10 @@ Configure your PingOne application to support `authorization_code`:
 - Enable Response Type: `Code`
 - Enable Grant Type: `Authorization Code`
 - Select PKCE Enforcement: `OPTIONAL` (PKCE will be used by pingcli by default)
-- Optionally enable Refresh Token
-- Set redirect URI(s). PingCLI defaults to `http://127.0.0.1:7464/callback` with path `/callback` and port `7464` (customizable)
+- Optionally Enable Refresh Token
+- Set redirect URI(s). By default, Ping CLI will receive the redirect at: `http://127.0.0.1:7464/callback`. `/callback` and port `7464` are customizable in CLI
 
-Collect for PingCLI:
+Collect for Ping CLI:
 
 - Environment ID
 - Client ID
@@ -82,33 +68,32 @@ Collect for PingCLI:
 
 ### Device code
 
-Configure your PingOne application to support device code:
+Configure your PingOne application to support `device_code`:
 
 - Enable grant type: `Device Authorization`
-- Optionally enable Refresh Token
 
-Collect for PingCLI:
+Collect for Ping CLI:
 
 - Environment ID
 - Client ID
 
-### Region selection
+## Login Configuration
 
-PingCLI prompts for your PingOne region and uses it to route API requests. Supported codes: `AP`, `AU`, `CA`, `EU`, `NA`, `SG`.
+The command `pingcli login` with allow CLI to access a service using one of three supported flows and launch the interactive prompt if configuration is not set. By default, the CLI will securely store tokens for subsequent API calls.
 
-## Login (`pingcli login`)
+Ping CLI reads settings from the active profile inside `$HOME/.pingcli/config.yaml` by default.
 
-Login using one of three supported OAuth2 flows. The CLI will securely store tokens for subsequent API calls.
+You can configure values either by:
 
-### Usage
+- Using `pingcli config set` command
+- Editing the YAML config file directly.
+- Using `pingcli login` when no previous configuration exists
 
 ```bash
 pingcli login [flags]
 ```
 
-### Flags
-
-#### Authentication Method (required - choose one)
+### Login Flags (required - choose one)
 
 - `-d, --device-code` - Use device code flow (recommended for interactive use)
 - `-a, --auth-code` - Use authorization code flow (requires browser)
@@ -125,21 +110,17 @@ pingcli login [flags]
   - `file_system`  - Store tokens at `~/.pingcli/credentials`
   - `none`         - Do not persist tokens
 
-### Authentication flows
+### Common Configuration
 
-### Interactive authentication
-
-If you run `pingcli login` without specifying an authentication method flag (and no type is set in configuration), Ping CLI prompts you to select a method:
+These settings are used by all PingOne grant types:
 
 ```bash
-$ pingcli login
-? Select authentication method:
-  ▸ device_code (configured)
-    authorization_code (configured)
-    client_credentials (not configured)
+pingcli config set service.pingOne.regionCode=NA
+pingcli config set service.pingOne.authentication.environmentID=<PINGONE_ENVIRONMENT_ID>
+pingcli config set service.pingOne.authentication.type=<device_code|authorization_code|client_credentials>
 ```
 
-#### Device Code Flow (`--device-code`)
+### Device Code Flow (`--device-code`)
 
 ```bash
 pingcli login --device-code
@@ -152,7 +133,7 @@ pingcli config set service.pingone.authentication.environmentID=<env-id>
 pingcli config set service.pingone.authentication.deviceCode.clientID=<client-id>
 ```
 
-#### Authorization Code Flow (`--auth-code`)
+### Authorization Code Flow (`--auth-code`)
 
 ```bash
 pingcli login --auth-code
@@ -167,7 +148,7 @@ pingcli config set service.pingone.authentication.authorizationCode.redirectURIP
 pingcli config set service.pingone.authentication.authorizationCode.redirectURIPort="7464"
 ```
 
-#### Client Credentials Flow (`--client-credentials`)
+### Client Credentials Flow (`--client-credentials`)
 
 ```bash
 pingcli login --client-credentials
@@ -181,7 +162,17 @@ pingcli config set service.pingone.authentication.clientCredentials.clientID=<cl
 pingcli config set service.pingone.authentication.clientCredentials.clientSecret=<client-secret>
 ```
 
-## Token storage
+### Region selection
+
+During interactive configuration Ping CLI prompts for your PingOne region and uses it to route API requests. Supported codes: `AP`, `AU`, `CA`, `EU`, `NA`, `SG`.
+
+```bash
+pingcli config set service.pingOne.regionCode=<region-code>
+```
+
+## Token Management
+
+Upon successful authentication via `pingcli login` the CLI will optionally store, retrieve and refresh access tokens as needed for subsequent commands.
 
 Ping CLI offers a number of storage options:
 
@@ -189,37 +180,21 @@ Ping CLI offers a number of storage options:
 - `file_system`: File storage at `~/.pingcli/credentials`
 - `none`: Tokens are not stored
 
-### Recommended: keychain with automatic fallback
+### Recommended Token Storage
 
 Default behavior is `secure_local`. Ping CLI attempts to store credentials in the OS credential store.
 
-If keychain storage fails (unavailable, permission denied, etc.) or `--storage-type=file_system` is selected, Ping CLI uses file storage at `~/.pingcli/credentials`.
+If keychain storage fails (unavailable, permission denied, etc.) or `--storage-type=file_system` is selected, Ping CLI uses file storage in the `~/.pingcli/credentials` directory.
 
-#### Where tokens are stored
-
-- **OS credential stores** (when `--storage-type=secure_local`):
-  - macOS: Keychain Services
-  - Windows: Windows Credential Manager
-  - Linux: Secret Service API (GNOME Keyring/KDE KWallet)
-- **File storage** (when `--storage-type=file_system`, or as fallback): `~/.pingcli/credentials/`
-
-#### Token retrieval
-
-When keychain is enabled, Ping CLI attempts keychain first and falls back to file storage if keychain operations fail. When `--storage-type=file_system` is selected, Ping CLI uses file storage exclusively.
-
-## Logout (`pingcli logout`)
+## Logout Command
 
 Clear stored authentication tokens from both keychain and file storage.
-
-### Usage
 
 ```bash
 pingcli logout [flags]
 ```
 
-### Flags
-
-#### Authentication Method (optional)
+### Logout Flags (optional)
 
 - `-d, --device-code` - Clear only device code tokens
 - `-a, --auth-code` - Clear only authorization code tokens
@@ -227,7 +202,7 @@ pingcli logout [flags]
 
 If no flag is provided, clears tokens for all authentication methods.
 
-## What gets cleared
+### What gets cleared
 
 ### Tokens
 
@@ -239,7 +214,7 @@ If no flag is provided, clears tokens for all authentication methods.
 
 Logout clears tokens from both the OS credential store (keychain/credential manager) and file storage under `~/.pingcli/credentials`.
 
-## Verification
+### Verification
 
 After logout, verify tokens are cleared:
 
@@ -249,15 +224,15 @@ pingcli request get /environments
 
 Expected response:
 
-```
+```text
 Error: no valid authentication token found. Please run 'pingcli login --device-code' to authenticate
 ```
 
-## Manual token removal
+### Manual token removal
 
-If logout fails, manually remove tokens from both storage locations.
+If logout fails, users can manually remove tokens from both storage locations.
 
-### Keychain/Credential store
+#### Keychain/Credential store**
 
 macOS:
 
@@ -277,128 +252,41 @@ Linux (GNOME):
 secret-tool clear service pingcli
 ```
 
-### File storage
+#### File storage
 
 ```bash
 rm -rf ~/.pingcli/credentials
 ```
 
-## See also
+## Auhtorization Flow Recommendations
 
-- [Authentication README](#authentication-commands)
+This section provides guidance on when to select each authorization type.
 
-# Authentication Commands
+### `client_credentials`
 
-## Authentication
+Use when:
 
-Main authentication commands for managing CLI authentication with PingOne services.
+- Running in CI/CD or other automation without direct human access during authentication
+- You want non-interactive auth (no browser, no prompts)
 
-### Available Commands
-- [`pingcli login`](login.md) - Authenticate using OAuth2 flows
-- [`pingcli logout`](logout.md) - Clear stored authentication tokens
+Notes:
 
-### Interactive Authentication
+- This is the best choice for “machine to machine” usage.
+- Legacy `worker` (if present in old configs) maps to `client_credentials`.
 
-When you run `pingcli login` without specifying an authentication method flag (or no type is set in the configuration), the CLI will prompt you to select from available methods:
+### `authorization_code`
 
-```bash
-$ pingcli login
-? Select authentication method:
-  ▸ device_code (configured)
-   authorization_code (configured)
-   client_credentials (not configured)
-```
+Use when:
 
-This interactive mode helps you choose the appropriate authentication flow for your use case without needing to remember the exact flag names. The status indicator shows whether each method has the required configuration settings:
-- **(configured)** - All required settings (client ID, environment ID, etc.) are present in your config
-- **(not configured)** - Missing one or more required configuration values
+- You’re working interactively and can complete a browser-based login on the same machine
+- You need a user-context token
+- You need to allow multiple users to use the same configuration.
 
-## Quick Start
+Ping CLI requires a redirect URI (path + port) that must be allowed by the PingOne application.
 
-1. **Configure authentication settings**:
-  ```bash
-  pingcli config set service.pingone.regionCode=NA
-  pingcli config set service.pingone.authentication.deviceCode.clientID=<your-client-id>
-  pingcli config set service.pingone.authentication.deviceCode.environmentID=<your-env-id>
-  ```
+### `device_code`
 
-2. **Authenticate**:
-  ```bash
-  pingcli login --device-code
-  ```
+Use when:
 
-3. **Use authenticated commands**:
-  ```bash
-  pingcli request get /environments
-  ```
-
-4. **Logout when done**:
-  ```bash
-  pingcli logout
-  ```
-
-## Technical Architecture
-
-### Token Storage
-
-pingcli uses a **dual storage system** to ensure tokens are accessible across different environments:
-
-1. **Primary Storage**: Secure platform credential stores (via [`pingone-go-client`](https://github.com/pingidentity/pingone-go-client) SDK)
-  - **macOS**: Keychain Services
-  - **Windows**: Windows Credential Manager  
-  - **Linux**: Secret Service API
-
-2. **Secondary Storage**: File-based storage at `~/.pingcli/credentials/`
-  - Automatically created and maintained
-  - One file per grant type (e.g., `<env-id>_<client-id>_device_code.json`)
-  - Provides compatibility with SSH sessions, containers, and CI/CD environments
-
-### Storage Behavior
-
-**Default: Dual Storage with Automatic Fallback**
-
-By default (`--file-storage=false`), tokens are stored in **both** locations simultaneously:
-- Keychain storage (primary) - for system-wide secure access
-- File storage (backup) - for reliability and portability
-
-```bash
-# Default: Saves to both keychain and file
-pingcli login --device-code
-# Output: Successfully logged in using device_code. 
-#         Credentials saved to keychain and file storage for profile 'default'.
-```
-
-**Fallback Protection:**
-If keychain storage fails (unavailable, permission issues, etc.), the system automatically falls back to file storage only:
-```bash
-# Keychain unavailable - automatically uses file storage
-pingcli login --device-code
-# Output: Successfully logged in using device_code. 
-#         Credentials saved to file storage for profile 'default'.
-```
-
-**File-Only Mode**
-
-Use the `--file-storage` flag to explicitly skip keychain and use only file storage:
-
-```bash
-# Explicitly use file storage only (skip keychain entirely)
-pingcli login --device-code --file-storage
-# Output: Successfully logged in using device_code. 
-#         Credentials saved to file storage for profile 'default'.
-```
-
-**When to use `--file-storage`:**
-- SSH sessions where keychain access is unavailable
-- Containers and Docker environments
-- CI/CD pipelines
-- Debugging keychain issues
-- When you want to ensure file-only storage (no keychain attempts)
-
-**Token Retrieval:**
-- Default: Attempts keychain first, automatically falls back to file storage if keychain fails
-- File-only mode (`--file-storage=true`): Uses file storage exclusively
-
-## See Also
-- [Authentication To Service](authentication-to-service.md)
-
+- You’re working interactively but don’t want/need a local redirect listener
+- You’re on a headless system (SSH, remote box) and can open a browser elsewhere to complete the verification
