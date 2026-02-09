@@ -40,7 +40,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 
 	if !flagProvided {
 		// No flag provided - clear ALL tokens (keychain and file storage)
-		if err := ClearToken(); err != nil {
+		if err := ClearAllTokens(); err != nil {
 			return fmt.Errorf("%s: %w", credentialsErrorPrefix, err)
 		}
 		// Report the storage cleared using common formatter
@@ -58,8 +58,10 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_DEVICE_CODE
 	case clientCredentialsStr == "true":
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS
-	default:
+	case authorizationCodeStr == "true":
 		authType = customtypes.ENUM_PINGONE_AUTHENTICATION_TYPE_AUTHORIZATION_CODE
+	default:
+		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: ErrInvalidAuthMethod}
 	}
 
 	// Generate token key for the selected grant type
@@ -69,7 +71,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	// Clear only the token for the specified grant type
-	location, err := ClearTokenForMethod(tokenKey)
+	location, err := ClearToken(tokenKey)
 	if err != nil {
 		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: fmt.Errorf("failed to clear %s credentials. in %s: %w", authType, formatStorageLocation(location), err)}
 	}

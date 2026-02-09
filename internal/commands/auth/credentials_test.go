@@ -12,6 +12,7 @@ import (
 
 	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/constants"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"golang.org/x/oauth2"
@@ -263,7 +264,7 @@ func TestClearToken(t *testing.T) {
 
 	// Test that ClearTokenForMethod doesn't panic when no token exists
 	// This should handle the case where keychain entry doesn't exist
-	_, err := auth_internal.ClearTokenForMethod(testKey)
+	_, err := auth_internal.ClearToken(testKey)
 
 	// Should not error when no token exists (handles ErrNotFound)
 	if err != nil {
@@ -285,7 +286,7 @@ func TestGetValidTokenSource_NoCache(t *testing.T) {
 	ctx := context.Background()
 
 	// Clear any existing token first
-	_ = auth_internal.ClearToken()
+	_ = auth_internal.ClearAllTokens()
 
 	// This should attempt automatic authentication since no token is cached
 	tokenSource, err := auth_internal.GetValidTokenSource(ctx)
@@ -446,7 +447,7 @@ func TestGetValidTokenSource_ErrorPaths(t *testing.T) {
 	ctx := context.Background()
 
 	// Clear any existing token first
-	_ = auth_internal.ClearToken()
+	_ = auth_internal.ClearAllTokens()
 
 	// Test without any cached token - should attempt automatic authentication
 	tokenSource, err := auth_internal.GetValidTokenSource(ctx)
@@ -484,7 +485,7 @@ func TestGetValidTokenSource_AutomaticDeviceCodeAuth(t *testing.T) {
 	ctx := context.Background()
 
 	// Clear any existing token first
-	_ = auth_internal.ClearToken()
+	_ = auth_internal.ClearAllTokens()
 
 	// Test that GetValidTokenSource attempts automatic authentication
 	// In test environment, auth type is "worker" which gets converted to "client_credentials"
@@ -543,7 +544,7 @@ func TestGetValidTokenSource_AutomaticAuthorizationCodeAuth(t *testing.T) {
 	ctx := context.Background()
 
 	// Clear any existing token first
-	_ = auth_internal.ClearToken()
+	_ = auth_internal.ClearAllTokens()
 
 	// Test automatic authentication behavior
 	// In test environment, auth type is "worker" which gets converted to "client_credentials"
@@ -589,7 +590,7 @@ func TestGetValidTokenSource_AutomaticClientCredentialsAuth(t *testing.T) {
 	ctx := context.Background()
 
 	// Clear any existing token first
-	_ = auth_internal.ClearToken()
+	_ = auth_internal.ClearAllTokens()
 
 	// Test client credentials auth by temporarily setting the auth type
 	// This would require configuration mocking for a complete test
@@ -642,7 +643,7 @@ func TestGetValidTokenSource_ValidCachedToken(t *testing.T) {
 	ctx := context.Background()
 
 	// Clear any existing token first
-	_ = auth_internal.ClearToken()
+	_ = auth_internal.ClearAllTokens()
 
 	// This test would require mocking a valid cached token
 	// For now, it documents the expected behavior:
@@ -676,7 +677,7 @@ func TestGetValidTokenSource_WorkerTypeAlias(t *testing.T) {
 	ctx := context.Background()
 
 	// Clear any existing token first
-	_ = auth_internal.ClearToken()
+	_ = auth_internal.ClearAllTokens()
 
 	// Test that "worker" auth type is treated as "client_credentials"
 	// In test environment, the auth type is typically "worker"
@@ -783,7 +784,7 @@ func TestSaveTokenForMethod_StorageTypeNone(t *testing.T) {
 
 	// Double check local file system to be sure
 	homeDir, _ := os.UserHomeDir()
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 	credentialsFile := filepath.Join(credentialsDir, testKey+".json")
 
 	if _, err := os.Stat(credentialsFile); !os.IsNotExist(err) {

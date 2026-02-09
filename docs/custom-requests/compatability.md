@@ -6,12 +6,12 @@ The following describes the CLI's support of each of these Ping platform service
 
 | Service             | Support | Roadmap |
 | ------------------- | ---- | ------- |
-| PingFederate Software | :x: | Coming 2025 |
+| PingFederate Software | :x: | Coming 2026 |
 | PingOne Advanced Identity Cloud | :x: | TBD |
-| PingOne Advanced Services PingFederate | :x: | Coming 2025 |
+| PingOne Advanced Services PingFederate | :x: | Coming 2026 |
 | PingOne Authorize   | :white_check_mark: |  |
 | PingOne Credentials | :white_check_mark: |  |
-| PingOne DaVinci     | :x: | Coming 2025 |
+| PingOne DaVinci     | :x: | Coming 2026 |
 | PingOne MFA         | :white_check_mark: |  |
 | PingOne Platform    | :white_check_mark: |  |
 | PingOne Protect     | :white_check_mark: |  |

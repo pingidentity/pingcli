@@ -1,5 +1,5 @@
 = Configuration Settings Reference
-:created-date: March 23, 2025
+:created-date: March 23, 2026
 :revdate: January 13, 2026
 :resourceid: pingcli_configuration_settings_reference
 

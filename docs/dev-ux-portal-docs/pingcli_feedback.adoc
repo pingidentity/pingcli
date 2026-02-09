@@ -1,6 +1,6 @@
 = pingcli feedback
-:created-date: September 18, 2025
-:revdate: September 18, 2025
+:created-date: September 18, 2026
+:revdate: September 18, 2026
 :resourceid: pingcli_command_reference_pingcli_feedback
 
 Help us improve the CLI. Report issues or send us feedback on using the CLI tool.

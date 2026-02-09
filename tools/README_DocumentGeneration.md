@@ -41,7 +41,7 @@ go run ./tools/generate-options-docs -o docs/dev-ux-portal-docs/general/cli-conf
 go run ./tools/generate-options-docs -asciidoc > docs/dev-ux-portal-docs/general/cli-configuration-settings-reference.adoc
 ```
 
-The AsciiDoc generator orders sections as: General, Service, Export, License, Request (as of September 2025 - new options may change this order).
+The AsciiDoc generator orders sections as: General, Service, Export, License, Request (as of September 2026 - new options may change this order).
 
 Data types: If a Data Type cell shows "N/A", it means the option's data type hasn't been mapped in the generator yet. Review and add a mapping in `tools/generate-options-docs/docgen/docgen.go` (see `asciiDocDataType`). This is intentional to surface new or unknown types for review rather than silently defaulting.
 
@@ -75,7 +75,7 @@ go run ./tools/generate-command-docs -o ./docs/dev-ux-portal-docs
 Override the date used in the page headers (for reproducible builds) with:
 
 ```shell
-go run ./tools/generate-command-docs -date "March 23, 2025" -o ./docs/dev-ux-portal-docs
+go run ./tools/generate-command-docs -date "March 23, 2026" -o ./docs/dev-ux-portal-docs
 ```
 
 ## Rebuilding All Documentation

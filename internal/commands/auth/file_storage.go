@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/pingidentity/pingcli/internal/constants"
 	"github.com/pingidentity/pingcli/internal/errs"
 	"golang.org/x/oauth2"
 )
@@ -32,7 +33,7 @@ func getCredentialsFilePath(authMethod string) (string, error) {
 		}
 	}
 
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 
 	// Create directory if it doesn't exist
 	if err := os.MkdirAll(credentialsDir, 0700); err != nil {
@@ -172,7 +173,7 @@ func clearAllTokenFilesForGrantType(providerName, grantType, profileName string)
 		}
 	}
 
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 
 	// Check if directory exists
 	if _, err := os.Stat(credentialsDir); os.IsNotExist(err) {
@@ -217,6 +218,57 @@ func clearAllTokenFilesForGrantType(providerName, grantType, profileName string)
 						Err:    err,
 					})
 				}
+			}
+		}
+	}
+
+	if len(errList) > 0 {
+		return &errs.PingCLIError{
+			Prefix: "failed to clear some token files",
+			Err:    errors.Join(errList...),
+		}
+	}
+
+	return nil
+}
+
+// clearAllCredentialFiles removes all internal credential files
+// This is used for a full logout/cleanup options
+func clearAllCredentialFiles() error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return &errs.PingCLIError{
+			Prefix: "failed to get home directory",
+			Err:    err,
+		}
+	}
+
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
+
+	// Check if directory exists
+	if _, err := os.Stat(credentialsDir); os.IsNotExist(err) {
+		return nil
+	}
+
+	// Read all files in credentials directory
+	files, err := os.ReadDir(credentialsDir)
+	if err != nil {
+		return &errs.PingCLIError{
+			Prefix: "failed to read credentials directory",
+			Err:    err,
+		}
+	}
+
+	var errList []error
+	for _, file := range files {
+		// Only remove files, leave directories if any (though typically there aren't any)
+		if !file.IsDir() {
+			filePath := filepath.Join(credentialsDir, file.Name())
+			if err := os.Remove(filePath); err != nil {
+				errList = append(errList, &errs.PingCLIError{
+					Prefix: fmt.Sprintf("failed to remove %s", file.Name()),
+					Err:    err,
+				})
 			}
 		}
 	}

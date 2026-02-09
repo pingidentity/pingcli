@@ -1,6 +1,6 @@
 = pingcli platform
-:created-date: September 18, 2025
-:revdate: September 18, 2025
+:created-date: September 18, 2026
+:revdate: September 18, 2026
 :resourceid: pingcli_command_reference_pingcli_platform
 
 Administer and manage the Ping integrated platform.
