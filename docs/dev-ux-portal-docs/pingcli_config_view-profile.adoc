@@ -1,6 +1,6 @@
 = pingcli config view-profile
-:created-date: September 18, 2025
-:revdate: September 18, 2025
+:created-date: September 18, 2026
+:revdate: September 18, 2026
 :resourceid: pingcli_command_reference_pingcli_config_view-profile
 
 View the stored configuration of a custom configuration profile.

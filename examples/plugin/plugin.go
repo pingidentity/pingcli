@@ -1,4 +1,4 @@
-// Copyright © 2025 Ping Identity Corporation
+// Copyright © 2026 Ping Identity Corporation
 
 // Package 'plugin' provides an example implementation of a Ping CLI command plugin.
 //

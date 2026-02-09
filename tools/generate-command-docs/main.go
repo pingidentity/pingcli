@@ -24,7 +24,7 @@ var (
 
 func main() {
 	outDir := flag.String("o", "./docs", "Output directory for AsciiDoc command pages")
-	date := flag.String("date", time.Now().Format("January 2, 2006"), "Created/revision date used in headers (e.g., March 23, 2025)")
+	date := flag.String("date", time.Now().Format("January 2, 2006"), "Created/revision date used in headers (e.g., March 23, 2026)")
 	resourcePrefix := flag.String("resource-prefix", "pingcli_command_reference_", "Prefix for :resourceid:")
 	version := flag.String("version", "dev", "Version string for root command init")
 	commit := flag.String("commit", "dev", "Commit SHA for root command init")

@@ -12,7 +12,7 @@ The following describes the CLI's support of each of these Ping platform service
 | PingOne Advanced Services PingFederate | :large_orange_diamond: | Coming End 2024 |
 | PingOne Authorize   | :x: | Coming End 2024 |
 | PingOne Credentials | :x: | Coming End 2024 |
-| PingOne DaVinci     | :x: | Coming 2025 |
+| PingOne DaVinci     | :x: | Coming 2026 |
 | PingOne MFA         | :white_check_mark: |  |
 | PingOne Platform    | :white_check_mark: |  |
 | PingOne Protect     | :white_check_mark: |  |

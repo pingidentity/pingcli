@@ -1,7 +1,7 @@
 = pingcli license
 
-:created-date: September 18, 2025
-:revdate: October 8, 2025
+:created-date: September 18, 2026
+:revdate: October 8, 2026
 :resourceid: pingcli_command_reference_pingcli_license
 
 Request a new evaluation license.
