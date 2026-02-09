@@ -12,6 +12,7 @@ import (
 
 	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/constants"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"golang.org/x/oauth2"
@@ -783,7 +784,7 @@ func TestSaveTokenForMethod_StorageTypeNone(t *testing.T) {
 
 	// Double check local file system to be sure
 	homeDir, _ := os.UserHomeDir()
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 	credentialsFile := filepath.Join(credentialsDir, testKey+".json")
 
 	if _, err := os.Stat(credentialsFile); !os.IsNotExist(err) {

@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pingidentity/pingcli/internal/constants"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
@@ -91,7 +92,7 @@ func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
 	}
 
 	// Verify it actually wrote the expected file under HOME
-	filePath := filepath.Join(tmp, ".pingcli", "credentials", authMethod+".json")
+	filePath := filepath.Join(tmp, constants.PingCliDirName, constants.CredentialsDirName, authMethod+".json")
 	if _, statErr := os.Stat(filePath); statErr != nil {
 		t.Fatalf("expected credentials file to exist at %s, got stat error: %v", filePath, statErr)
 	}
@@ -144,7 +145,7 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 	}
 
 	// File should not be written when keychain save succeeds
-	filePath := filepath.Join(tmp, ".pingcli", "credentials", authMethod+".json")
+	filePath := filepath.Join(tmp, constants.PingCliDirName, constants.CredentialsDirName, authMethod+".json")
 	if _, statErr := os.Stat(filePath); statErr == nil {
 		t.Fatalf("expected no credentials file at %s when keychain save succeeds", filePath)
 	}

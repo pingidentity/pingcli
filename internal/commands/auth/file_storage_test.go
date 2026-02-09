@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pingidentity/pingcli/internal/constants"
 	"golang.org/x/oauth2"
 )
 
@@ -101,7 +102,7 @@ func TestGetCredentialsFilePath(t *testing.T) {
 	}
 
 	homeDir, _ := os.UserHomeDir()
-	expectedDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	expectedDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 
 	if !strings.HasPrefix(filePath, expectedDir) {
 		t.Errorf("File path %s does not start with expected directory %s", filePath, expectedDir)
@@ -124,7 +125,7 @@ func TestClearTokenFromFile_NotExists(t *testing.T) {
 func TestClearAllTokenFilesForGrantType(t *testing.T) {
 	// Create test tokens for different profiles and grant types
 	homeDir, _ := os.UserHomeDir()
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 	_ = os.MkdirAll(credentialsDir, 0700)
 
 	testFiles := []string{
@@ -190,7 +191,7 @@ func TestClearAllTokenFilesForGrantType_NoFiles(t *testing.T) {
 
 func TestClearAllTokenFilesForGrantType_DefaultProfile(t *testing.T) {
 	homeDir, _ := os.UserHomeDir()
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 	_ = os.MkdirAll(credentialsDir, 0700)
 
 	testFile := "token-abc12345_pingone_device_code_default.json"
