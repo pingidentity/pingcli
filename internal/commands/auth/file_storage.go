@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/pingidentity/pingcli/internal/constants"
 	"github.com/pingidentity/pingcli/internal/errs"
 	"golang.org/x/oauth2"
 )
@@ -32,7 +33,7 @@ func getCredentialsFilePath(authMethod string) (string, error) {
 		}
 	}
 
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 
 	// Create directory if it doesn't exist
 	if err := os.MkdirAll(credentialsDir, 0700); err != nil {
@@ -172,7 +173,7 @@ func clearAllTokenFilesForGrantType(providerName, grantType, profileName string)
 		}
 	}
 
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 
 	// Check if directory exists
 	if _, err := os.Stat(credentialsDir); os.IsNotExist(err) {
@@ -242,7 +243,7 @@ func clearAllCredentialFiles() error {
 		}
 	}
 
-	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+	credentialsDir := filepath.Join(homeDir, constants.PingCliDirName, constants.CredentialsDirName)
 
 	// Check if directory exists
 	if _, err := os.Stat(credentialsDir); os.IsNotExist(err) {
