@@ -38,7 +38,7 @@ func TestRequestPingOne_RealAuth(t *testing.T) {
 	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "none")
 
 	// Clear any existing tokens to ensure fresh authentication
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Fatalf("Failed to clear token: %v", err)
 	}
@@ -56,7 +56,7 @@ func TestRequestPingOne_RealAuth(t *testing.T) {
 	}
 
 	// Clean up
-	err = auth_internal.ClearToken()
+	err = auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Fatalf("Failed to clear token after test: %v", err)
 	}

@@ -75,7 +75,7 @@ integration:
 	testutils_koanf.InitKoanfsCustomFile(t, testConfig)
 
 	// Clear any existing tokens to ensure fresh authentication
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Fatalf("Should be able to clear existing tokens: %v", err)
 	}
@@ -136,7 +136,7 @@ integration:
 	testutils_koanf.InitKoanfsCustomFile(t, testConfig)
 
 	// Clear any existing tokens to ensure fresh authentication
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Fatalf("Should be able to clear existing tokens: %v", err)
 	}

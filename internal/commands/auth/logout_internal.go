@@ -40,7 +40,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 
 	if !flagProvided {
 		// No flag provided - clear ALL tokens (keychain and file storage)
-		if err := ClearToken(); err != nil {
+		if err := ClearAllTokens(); err != nil {
 			return fmt.Errorf("%s: %w", credentialsErrorPrefix, err)
 		}
 		// Report the storage cleared using common formatter
@@ -71,7 +71,7 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	// Clear only the token for the specified grant type
-	location, err := ClearTokenForMethod(tokenKey)
+	location, err := ClearToken(tokenKey)
 	if err != nil {
 		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: fmt.Errorf("failed to clear %s credentials. in %s: %w", authType, formatStorageLocation(location), err)}
 	}

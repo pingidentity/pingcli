@@ -10,62 +10,48 @@ import (
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
+	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
 )
 
 var (
-	errNotImplemented      = errors.New("not implemented")
 	errKeychainUnavailable = errors.New("keychain unavailable")
 )
 
-type mockTokenStorage struct {
-	saveErr error
+type MockTokenStorage struct {
+	mock.Mock
 }
 
-func (m *mockTokenStorage) SaveToken(token *oauth2.Token) error { return m.saveErr }
-func (m *mockTokenStorage) LoadToken() (*oauth2.Token, error) {
-	return nil, errNotImplemented
-}
-func (m *mockTokenStorage) ClearToken() error     { return nil }
-func (m *mockTokenStorage) ClearAllTokens() error { return nil }
+func (m *MockTokenStorage) SaveToken(token *oauth2.Token) error {
+	args := m.Called(token)
 
-type funcTokenStorage struct {
-	saveFn     func(*oauth2.Token) error
-	loadFn     func() (*oauth2.Token, error)
-	clearFn    func() error
-	clearAllFn func() error
+	return args.Error(0)
 }
 
-func (s *funcTokenStorage) SaveToken(token *oauth2.Token) error {
-	if s.saveFn == nil {
-		return nil
+func (m *MockTokenStorage) LoadToken() (*oauth2.Token, error) {
+	args := m.Called()
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
 	}
 
-	return s.saveFn(token)
-}
-
-func (s *funcTokenStorage) LoadToken() (*oauth2.Token, error) {
-	if s.loadFn == nil {
-		return nil, errNotImplemented
+	token, ok := args.Get(0).(*oauth2.Token)
+	if !ok {
+		return nil, args.Error(1)
 	}
 
-	return s.loadFn()
+	return token, args.Error(1)
 }
 
-func (s *funcTokenStorage) ClearToken() error {
-	if s.clearFn == nil {
-		return nil
-	}
+func (m *MockTokenStorage) ClearToken() error {
+	args := m.Called()
 
-	return s.clearFn()
+	return args.Error(0)
 }
 
-func (s *funcTokenStorage) ClearAllTokens() error {
-	if s.clearAllFn == nil {
-		return nil
-	}
+func (m *MockTokenStorage) ClearAllTokens() error {
+	args := m.Called()
 
-	return s.clearAllFn()
+	return args.Error(0)
 }
 
 func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
@@ -76,10 +62,13 @@ func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
 	// Ensure keychain is the selected storage mode (default is secure_local)
 	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "secure_local")
 
+	mockStorage := new(MockTokenStorage)
+	mockStorage.On("SaveToken", mock.Anything).Return(errKeychainUnavailable)
+
 	old := newKeychainStorage
 	t.Cleanup(func() { newKeychainStorage = old })
 	newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
-		return &mockTokenStorage{saveErr: errKeychainUnavailable}, nil
+		return mockStorage, nil
 	}
 
 	authMethod := "test-auth-method"
@@ -114,6 +103,8 @@ func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
 	if loaded.AccessToken != expectedToken.AccessToken {
 		t.Fatalf("expected access token %q, got %q", expectedToken.AccessToken, loaded.AccessToken)
 	}
+
+	mockStorage.AssertExpectations(t)
 }
 
 func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
@@ -126,15 +117,11 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 	old := newKeychainStorage
 	t.Cleanup(func() { newKeychainStorage = old })
 
-	sawSave := false
-	newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
-		return &funcTokenStorage{
-			saveFn: func(*oauth2.Token) error {
-				sawSave = true
+	mockStorage := new(MockTokenStorage)
+	mockStorage.On("SaveToken", mock.Anything).Return(nil)
 
-				return nil
-			},
-		}, nil
+	newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
+		return mockStorage, nil
 	}
 
 	authMethod := "test-auth-method-keychain"
@@ -146,9 +133,9 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 	} else {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	if !sawSave {
-		t.Fatalf("expected keychain SaveToken to be attempted")
-	}
+
+	mockStorage.AssertExpectations(t)
+
 	if !location.Keychain {
 		t.Fatalf("expected Keychain=true")
 	}
@@ -163,7 +150,7 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 	}
 }
 
-func TestClearToken_UsesClearAllTokens(t *testing.T) {
+func TestClearAllTokens_UsesStorageClearAll(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Ensure keychain is the selected storage mode
@@ -172,26 +159,17 @@ func TestClearToken_UsesClearAllTokens(t *testing.T) {
 	old := newKeychainStorage
 	t.Cleanup(func() { newKeychainStorage = old })
 
-	sawClearAll := false
-	newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
-		return &funcTokenStorage{
-			clearAllFn: func() error {
-				sawClearAll = true
+	mockStorage := new(MockTokenStorage)
+	mockStorage.On("ClearAllTokens").Return(nil)
 
-				return nil
-			},
-		}, nil
+	newKeychainStorage = func(serviceName, username string) (tokenStorage, error) {
+		return mockStorage, nil
 	}
 
-	// Calling ClearToken should trigger ClearAllTokens on the storage
-	// because ClearToken() in credentials.go calls newKeychainStorage("pingcli", "clearAllTokens")
-	// and then invokes ClearAllTokens()
-	err := ClearToken()
+	err := ClearAllTokens()
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
 
-	if !sawClearAll {
-		t.Error("Expected ClearAllTokens to be called on storage backend")
-	}
+	mockStorage.AssertExpectations(t)
 }

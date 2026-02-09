@@ -28,7 +28,7 @@ func TestAuthWorkflow_LoginLogoutClientCredentials(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Clear any existing tokens
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Logf("Warning: Failed to clear token before test: %v", err)
 	}
@@ -71,7 +71,7 @@ func TestAuthWorkflow_MultipleAuthMethods(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Clear any existing tokens
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Logf("Warning: Failed to clear token before test: %v", err)
 	}
@@ -113,7 +113,7 @@ func TestAuthWorkflow_TokenPersistence(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Clear any existing tokens
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Logf("Warning: Failed to clear token before test: %v", err)
 	}
@@ -147,7 +147,7 @@ func TestAuthWorkflow_SeparateTokenStorage(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Clear any existing tokens
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Logf("Warning: Failed to clear token before test: %v", err)
 	}

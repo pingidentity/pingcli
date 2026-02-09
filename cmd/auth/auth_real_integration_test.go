@@ -29,7 +29,7 @@ func TestLoginCommand_ClientCredentials_Integration(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
 
 	// Clear any existing tokens to ensure fresh authentication
-	err := auth_internal.ClearToken()
+	err := auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Fatalf("Failed to clear token: %v", err)
 	}
@@ -45,7 +45,7 @@ func TestLoginCommand_ClientCredentials_Integration(t *testing.T) {
 	// The absence of error from ExecutePingcli confirms successful authentication
 
 	// Clean up - clear token from keychain
-	err = auth_internal.ClearToken()
+	err = auth_internal.ClearAllTokens()
 	if err != nil {
 		t.Logf("Warning: Failed to clear token after test: %v", err)
 	}

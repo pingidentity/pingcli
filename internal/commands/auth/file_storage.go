@@ -230,3 +230,54 @@ func clearAllTokenFilesForGrantType(providerName, grantType, profileName string)
 
 	return nil
 }
+
+// clearAllCredentialFiles removes all internal credential files
+// This is used for a full logout/cleanup options
+func clearAllCredentialFiles() error {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return &errs.PingCLIError{
+			Prefix: "failed to get home directory",
+			Err:    err,
+		}
+	}
+
+	credentialsDir := filepath.Join(homeDir, ".pingcli", "credentials")
+
+	// Check if directory exists
+	if _, err := os.Stat(credentialsDir); os.IsNotExist(err) {
+		return nil
+	}
+
+	// Read all files in credentials directory
+	files, err := os.ReadDir(credentialsDir)
+	if err != nil {
+		return &errs.PingCLIError{
+			Prefix: "failed to read credentials directory",
+			Err:    err,
+		}
+	}
+
+	var errList []error
+	for _, file := range files {
+		// Only remove files, leave directories if any (though typically there aren't any)
+		if !file.IsDir() {
+			filePath := filepath.Join(credentialsDir, file.Name())
+			if err := os.Remove(filePath); err != nil {
+				errList = append(errList, &errs.PingCLIError{
+					Prefix: fmt.Sprintf("failed to remove %s", file.Name()),
+					Err:    err,
+				})
+			}
+		}
+	}
+
+	if len(errList) > 0 {
+		return &errs.PingCLIError{
+			Prefix: "failed to clear some token files",
+			Err:    errors.Join(errList...),
+		}
+	}
+
+	return nil
+}

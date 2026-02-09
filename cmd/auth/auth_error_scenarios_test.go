@@ -92,7 +92,7 @@ test:
 	testutils_koanf.InitKoanfsCustomFile(t, configContents)
 
 	// Clear any existing tokens to ensure no active session
-	_ = auth_internal.ClearToken()
+	_ = auth_internal.ClearAllTokens()
 
 	// Try to logout - should succeed even with no active session
 	err := testutils_cobra.ExecutePingcli(t, "logout", "--client-credentials")

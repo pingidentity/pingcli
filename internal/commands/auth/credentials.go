@@ -344,10 +344,10 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	}
 }
 
-// ClearToken removes all cached tokens from the keychain for all authentication methods.
+// ClearAllTokens removes all cached tokens from the keychain for all authentication methods.
 // This clears tokens from ALL grant types, not just the currently configured one,
 // to handle cases where users switch between authentication methods
-func ClearToken() error {
+func ClearAllTokens() error {
 	var errs []error
 
 	// First, attempt to clear ALL keychain entries for the pingcli service
@@ -356,85 +356,21 @@ func ClearToken() error {
 	if ks, err := newKeychainStorage("pingcli", "clearAllTokens"); err == nil {
 		if err := ks.ClearAllTokens(); err != nil {
 			errs = append(errs, err)
-		} else {
-			// Successfully cleared all keychain tokens
-			return nil
 		}
 	}
 
-	// Clear configuration-based tokens for all auth methods
-	// Also clear any old tokens from previous configurations with different client IDs
-	authMethods := []struct {
-		name      string
-		getConfig func() (*config.Configuration, error)
-		grantType svcOAuth2.GrantType
-	}{
-		{"client_credentials", GetClientCredentialsConfiguration, svcOAuth2.GrantTypeClientCredentials},
-		{"device_code", GetDeviceCodeConfiguration, svcOAuth2.GrantTypeDeviceCode},
-		{"authorization_code", GetAuthorizationCodeConfiguration, svcOAuth2.GrantTypeAuthorizationCode},
-	}
-
-	for _, method := range authMethods {
-		// Try to clear token with current configuration (if it exists)
-		cfg, err := method.getConfig()
-		if err == nil && cfg != nil {
-			// Set the grant type before generating the token key
-			cfg = cfg.WithGrantType(method.grantType)
-			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
-			if err == nil {
-				// Clear from keychain using current config
-				keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-				if err == nil {
-					if err := keychainStorage.ClearToken(); err != nil {
-						errs = append(errs, err)
-					}
-				}
-				// Clear from file storage using current config
-				if err := clearTokenFromFile(tokenKey); err != nil {
-					errs = append(errs, err)
-				}
-			}
-		}
-
-		// Always clear all token files for this grant type and current profile (handles old configurations)
-		// This is important even if the user isn't currently using this grant type
-		grantTypeStr := string(method.grantType)
-		profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-		if err != nil {
-			profileName = "default" // Fallback to default if we can't get profile name
-		}
-		providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-		if err != nil || providerName == "" {
-			providerName = "pingone" // Default to pingone
-		}
-		if err := clearAllTokenFilesForGrantType(providerName, grantTypeStr, profileName); err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	// Also clear tokens using simple string keys
-	methods := []string{deviceCodeTokenKey, authorizationCodeTokenKey, clientCredentialsTokenKey}
-
-	for _, method := range methods {
-		storage, err := getTokenStorage(method)
-		if err == nil {
-			if err := storage.ClearToken(); err != nil {
-				errs = append(errs, err)
-			}
-		}
-		// Also clear from file storage
-		if err := clearTokenFromFile(method); err != nil {
-			errs = append(errs, err)
-		}
+	// Clear all file-based tokens
+	if err := clearAllCredentialFiles(); err != nil {
+		errs = append(errs, err)
 	}
 
 	return errors.Join(errs...)
 }
 
-// ClearTokenForMethod removes the cached token for a specific authentication method
+// ClearToken removes the cached token for a specific authentication method
 // Clears from both keychain and file storage
 // Returns StorageLocation indicating what was cleared
-func ClearTokenForMethod(authMethod string) (StorageLocation, error) {
+func ClearToken(authMethod string) (StorageLocation, error) {
 	var errList []error
 	location := StorageLocation{}
 
