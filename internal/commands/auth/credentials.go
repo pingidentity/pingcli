@@ -46,10 +46,20 @@ func getTokenStorage(authMethod string) (tokenStorage, error) {
 	return newKeychainStorage("pingcli", authMethod)
 }
 
+// getAuthStorageOption retrieves and normalizes the auth storage option
+func getAuthStorageOption() (string, error) {
+	v, err := profiles.GetOptionValue(options.AuthStorageOption)
+	if err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(strings.ToLower(v)), nil
+}
+
 // shouldUseKeychain checks if keychain storage should be used based on the storage type
 // Returns true if storage type is secure_local (default), false for file_system/none
 func shouldUseKeychain() bool {
-	v, err := profiles.GetOptionValue(options.AuthStorageOption)
+	v, err := getAuthStorageOption()
 	if err != nil {
 		return true // default to keychain
 	}
@@ -68,8 +78,11 @@ func shouldUseKeychain() bool {
 // getStorageType returns the appropriate storage type for SDK keychain operations
 // SDK handles keychain storage, pingcli handles file storage separately
 func getStorageType() config.StorageType {
-	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
-	s := strings.TrimSpace(strings.ToLower(v))
+	s, err := getAuthStorageOption()
+	if err != nil {
+		return config.StorageTypeSecureLocal
+	}
+
 	if s == string(config.StorageTypeSecureLocal) || s == "" {
 		return config.StorageTypeSecureLocal
 	}
@@ -77,17 +90,11 @@ func getStorageType() config.StorageType {
 	return config.StorageTypeNone
 }
 
-// StorageLocation indicates where credentials were saved
-type StorageLocation struct {
-	Keychain bool
-	File     bool
-}
-
 // LoginResult contains the result of a login operation
 type LoginResult struct {
 	Token    *oauth2.Token
 	NewAuth  bool
-	Location StorageLocation
+	Location customtypes.StorageLocationType
 }
 
 func getConfigForCurrentAuthType() (*config.Configuration, error) {
@@ -159,9 +166,9 @@ func getConfigForCurrentAuthType() (*config.Configuration, error) {
 
 // SaveTokenForMethod saves an OAuth2 token to file storage using the specified authentication method key
 // Note: SDK handles keychain storage separately with its own token key format
-// Returns StorageLocation indicating where the token was saved
-func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation, error) {
-	location := StorageLocation{}
+// Returns StorageLocationType indicating where the token was saved
+func SaveTokenForMethod(token *oauth2.Token, authMethod string) (customtypes.StorageLocationType, error) {
+	var location customtypes.StorageLocationType
 
 	if token == nil {
 		return location, ErrNilToken
@@ -182,9 +189,12 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 	}
 
 	// Check storage option
-	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
+	v, err := getAuthStorageOption()
+	if err != nil {
+		return location, fmt.Errorf("%s: %w", credentialsErrorPrefix, err)
+	}
 
-	if strings.EqualFold(v, string(config.StorageTypeNone)) {
+	if v == string(config.StorageTypeNone) {
 		return location, nil
 	}
 
@@ -194,7 +204,7 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		storage, kcErr := getTokenStorage(authMethod)
 		if kcErr == nil {
 			if saveErr := storage.SaveToken(token); saveErr == nil {
-				location.Keychain = true
+				location = customtypes.StorageLocationKeychain
 
 				return location, nil
 			} else {
@@ -203,7 +213,7 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 		}
 
 		if err := saveTokenToFile(token, authMethod); err == nil {
-			location.File = true
+			location = customtypes.StorageLocationFile
 
 			return location, nil
 		} else {
@@ -215,7 +225,7 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 	if err := saveTokenToFile(token, authMethod); err != nil {
 		return location, err
 	}
-	location.File = true
+	location = customtypes.StorageLocationFile
 
 	return location, nil
 }
@@ -224,8 +234,11 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (StorageLocation
 // Falls back to file storage if keychain operations fail or if --use-keychain=false
 func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 	// Check if storage is disabled
-	v, _ := profiles.GetOptionValue(options.AuthStorageOption)
-	if strings.EqualFold(v, string(config.StorageTypeNone)) {
+	v, err := getAuthStorageOption()
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", credentialsErrorPrefix, err)
+	}
+	if v == string(config.StorageTypeNone) {
 		return nil, ErrTokenStorageDisabled
 	}
 
@@ -369,10 +382,10 @@ func ClearAllTokens() error {
 
 // ClearToken removes the cached token for a specific authentication method
 // Clears from both keychain and file storage
-// Returns StorageLocation indicating what was cleared
-func ClearToken(authMethod string) (StorageLocation, error) {
+// Returns StorageLocationType indicating what was cleared
+func ClearToken(authMethod string) (customtypes.StorageLocationType, error) {
 	var errList []error
-	location := StorageLocation{}
+	var location customtypes.StorageLocationType
 
 	// Clear from keychain
 	storage, err := getTokenStorage(authMethod)
@@ -383,7 +396,7 @@ func ClearToken(authMethod string) (StorageLocation, error) {
 				Err:    err,
 			})
 		} else {
-			location.Keychain = true
+			location = customtypes.StorageLocationKeychain
 		}
 	}
 
@@ -393,8 +406,8 @@ func ClearToken(authMethod string) (StorageLocation, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		})
-	} else {
-		location.File = true
+	} else if location == "" {
+		location = customtypes.StorageLocationFile
 	}
 
 	return location, errors.Join(errList...)
@@ -554,12 +567,12 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithStorageType(getStorageType()).WithStorageName("pingcli")
 
 	// Provide optional suffix so SDK keychain entries align with file names
-	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if strings.TrimSpace(profileName) == "" {
+	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil || strings.TrimSpace(profileName) == "" {
 		profileName = "default"
 	}
-	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
-	if strings.TrimSpace(providerName) == "" {
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeDeviceCode), profileName))
@@ -787,12 +800,12 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 		WithStorageName("pingcli")
 
 	// Provide optional suffix so SDK keychain entries align with file names
-	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if strings.TrimSpace(profileName) == "" {
+	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil || strings.TrimSpace(profileName) == "" {
 		profileName = "default"
 	}
-	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
-	if strings.TrimSpace(providerName) == "" {
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeAuthorizationCode), profileName))
@@ -975,12 +988,12 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		WithStorageName("pingcli")
 
 	// Provide optional suffix so SDK keychain entries align with file names
-	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if strings.TrimSpace(profileName) == "" {
+	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil || strings.TrimSpace(profileName) == "" {
 		profileName = "default"
 	}
-	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
-	if strings.TrimSpace(providerName) == "" {
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName))
@@ -1056,12 +1069,12 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 		WithStorageName("pingcli")
 
 	// Provide optional suffix so SDK keychain entries align with file names
-	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if strings.TrimSpace(profileName) == "" {
+	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil || strings.TrimSpace(profileName) == "" {
 		profileName = "default"
 	}
-	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
-	if strings.TrimSpace(providerName) == "" {
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName))
@@ -1131,12 +1144,12 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 	}
 
 	// Build suffix to disambiguate across provider/grant/profile for both keychain and files
-	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if profileName == "" {
+	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil || profileName == "" {
 		profileName = "default"
 	}
-	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
-	if strings.TrimSpace(providerName) == "" {
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
 		providerName = "pingone"
 	}
 	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/constants"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
@@ -84,10 +85,10 @@ func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	if location.Keychain {
+	if location == customtypes.StorageLocationKeychain {
 		t.Fatalf("expected Keychain=false, got true")
 	}
-	if !location.File {
+	if location != customtypes.StorageLocationFile {
 		t.Fatalf("expected File=true, got false")
 	}
 
@@ -137,10 +138,10 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 
 	mockStorage.AssertExpectations(t)
 
-	if !location.Keychain {
+	if location != customtypes.StorageLocationKeychain {
 		t.Fatalf("expected Keychain=true")
 	}
-	if location.File {
+	if location == customtypes.StorageLocationFile {
 		t.Fatalf("expected File=false")
 	}
 

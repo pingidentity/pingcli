@@ -15,14 +15,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	logoutErrorPrefix = "failed to logout"
+)
+
 // AuthLogoutRunE implements the logout command logic, clearing credentials from both
 // keychain and file storage. If no grant type flag is provided, clears all tokens.
 // If a specific grant type flag is provided, clears only that method's token.
 func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	// Check if any grant type flags were provided
-	deviceCodeStr, _ := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
-	clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
-	authorizationCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
+	deviceCodeStr, err := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: logoutErrorPrefix, Err: err}
+	}
+
+	clientCredentialsStr, err := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: logoutErrorPrefix, Err: err}
+	}
+
+	authorizationCodeStr, err := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: logoutErrorPrefix, Err: err}
+	}
 
 	flagProvided := deviceCodeStr == "true" || clientCredentialsStr == "true" || authorizationCodeStr == "true"
 
@@ -147,12 +162,12 @@ func GetAuthMethodKey(authMethod string) (string, error) {
 	}
 
 	// Build suffix to disambiguate across provider/grant/profile for both keychain and files
-	profileName, _ := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if profileName == "" {
+	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
+	if err != nil || profileName == "" {
 		profileName = "default"
 	}
-	providerName, _ := profiles.GetOptionValue(options.AuthProviderOption)
-	if strings.TrimSpace(providerName) == "" {
+	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
+	if err != nil || strings.TrimSpace(providerName) == "" {
 		providerName = "pingone"
 	}
 	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)

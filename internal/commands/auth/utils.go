@@ -4,7 +4,6 @@ package auth_internal
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
@@ -44,19 +43,14 @@ func applyRegionConfiguration(cfg *config.Configuration) (*config.Configuration,
 }
 
 // formatStorageLocation returns a human-friendly message for where credentials were cleared
-// based on StorageLocation.
-func formatStorageLocation(location StorageLocation) string {
-	var locs []string
-	if location.Keychain {
-		locs = append(locs, "keychain")
-	}
-	if location.File {
-		locs = append(locs, "file storage")
-	}
-
-	if len(locs) == 0 {
+// based on StorageLocationType.
+func formatStorageLocation(location customtypes.StorageLocationType) string {
+	switch location {
+	case customtypes.StorageLocationKeychain:
+		return "keychain"
+	case customtypes.StorageLocationFile:
+		return "file storage"
+	default:
 		return "storage"
 	}
-
-	return strings.Join(locs, " and ")
 }

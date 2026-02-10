@@ -13,6 +13,7 @@ import (
 	auth_internal "github.com/pingidentity/pingcli/internal/commands/auth"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/constants"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"golang.org/x/oauth2"
@@ -775,10 +776,10 @@ func TestSaveTokenForMethod_StorageTypeNone(t *testing.T) {
 	}
 
 	// Verify neither File nor Keychain storage was used
-	if location.File {
+	if location == customtypes.StorageLocationFile {
 		t.Error("Expected File storage to be false, got true")
 	}
-	if location.Keychain {
+	if location == customtypes.StorageLocationKeychain {
 		t.Error("Expected Keychain storage to be false, got true")
 	}
 

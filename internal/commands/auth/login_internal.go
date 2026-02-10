@@ -46,9 +46,20 @@ func AuthLoginRunE(cmd *cobra.Command, args []string) error {
 	switch provider {
 	case customtypes.ENUM_AUTH_PROVIDER_PINGONE:
 		// Determine desired authentication method
-		deviceCodeStr, _ := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
-		clientCredentialsStr, _ := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
-		authorizationCodeStr, _ := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
+		deviceCodeStr, err := profiles.GetOptionValue(options.AuthMethodDeviceCodeOption)
+		if err != nil {
+			return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: err}
+		}
+
+		clientCredentialsStr, err := profiles.GetOptionValue(options.AuthMethodClientCredentialsOption)
+		if err != nil {
+			return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: err}
+		}
+
+		authorizationCodeStr, err := profiles.GetOptionValue(options.AuthMethodAuthorizationCodeOption)
+		if err != nil {
+			return &errs.PingCLIError{Prefix: loginErrorPrefix, Err: err}
+		}
 
 		flagProvided := deviceCodeStr == "true" || clientCredentialsStr == "true" || authorizationCodeStr == "true"
 
@@ -186,7 +197,7 @@ func performLoginByConfiguredType(ctx context.Context, authType, profileName str
 }
 
 // displayLoginSuccess displays the successful login message
-func displayLoginSuccess(token *oauth2.Token, newAuth bool, location StorageLocation, selectedMethod, profileName string) {
+func displayLoginSuccess(token *oauth2.Token, newAuth bool, location customtypes.StorageLocationType, selectedMethod, profileName string) {
 	if newAuth {
 		// Build storage location message
 		storageMsg := formatStorageLocation(location)

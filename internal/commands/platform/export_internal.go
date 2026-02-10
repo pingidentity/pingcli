@@ -345,9 +345,18 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrNilContext}
 	}
 
-	workerClientID, _ := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
-	workerClientSecret, _ := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
-	workerEnvironmentID, _ := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+	workerClientID, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientIDOption)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+	}
+	workerClientSecret, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerClientSecretOption)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+	}
+	workerEnvironmentID, err := profiles.GetOptionValue(options.PingOneAuthenticationWorkerEnvironmentIDOption)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+	}
 	regionCode, err := profiles.GetOptionValue(options.PingOneRegionCodeOption)
 	if err != nil {
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
@@ -357,7 +366,10 @@ func initPingOneApiClient(ctx context.Context, pingcliVersion string) (err error
 		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: ErrRegionCodeRequired}
 	}
 
-	authType, _ := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+	authType, err := profiles.GetOptionValue(options.PingOneAuthenticationTypeOption)
+	if err != nil {
+		return &errs.PingCLIError{Prefix: exportErrorPrefix, Err: err}
+	}
 
 	userAgent := fmt.Sprintf("pingcli/%s", pingcliVersion)
 	if v := strings.TrimSpace(os.Getenv("PINGCLI_PINGONE_APPEND_USER_AGENT")); v != "" {
