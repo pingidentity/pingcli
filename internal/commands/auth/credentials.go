@@ -413,16 +413,8 @@ func ClearToken(authMethod string) (customtypes.StorageLocationType, error) {
 	return location, errors.Join(errList...)
 }
 
-// PerformDeviceCodeLogin performs device code authentication, returning the result
-func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
-	cfg, err := GetDeviceCodeConfiguration()
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
+// performLogin consolidates common authentication logic for different grant types
+func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcOAuth2.GrantType, defaultTokenKey string) (*LoginResult, error) {
 	// Get profile name for token key generation
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
@@ -435,16 +427,14 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
 	}
 
-	// Client ID and environment ID no longer needed for manual key generation
-
-	// Set grant type to device code
-	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeDeviceCode)
+	// Set grant type
+	cfg = cfg.WithGrantType(grantType)
 
 	// Use SDK-consistent token key generation to avoid mismatches
 	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
 	if err != nil || tokenKey == "" {
 		// Fallback to simple key if generation fails
-		tokenKey = deviceCodeTokenKey
+		tokenKey = defaultTokenKey
 	}
 
 	// Check if we have a valid cached token before calling TokenSource
@@ -473,17 +463,35 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	if !shouldUseKeychain() {
 		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.RefreshToken != "" {
 			endpoints, eerr := cfg.AuthEndpoints()
-			if eerr == nil && cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
-				var scopes []string
-				if cfg.Auth.DeviceCode.DeviceCodeScopes != nil {
-					scopes = *cfg.Auth.DeviceCode.DeviceCodeScopes
+			if eerr == nil {
+				var oauthCfg *oauth2.Config
+				switch grantType {
+				case svcOAuth2.GrantTypeDeviceCode:
+					if cfg.Auth.DeviceCode != nil && cfg.Auth.DeviceCode.DeviceCodeClientID != nil {
+						var scopes []string
+						if cfg.Auth.DeviceCode.DeviceCodeScopes != nil {
+							scopes = *cfg.Auth.DeviceCode.DeviceCodeScopes
+						}
+						oauthCfg = &oauth2.Config{ClientID: *cfg.Auth.DeviceCode.DeviceCodeClientID, Endpoint: endpoints.Endpoint, Scopes: scopes}
+					}
+				case svcOAuth2.GrantTypeAuthorizationCode:
+					if cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
+						var scopes []string
+						if cfg.Auth.AuthorizationCode.AuthorizationCodeScopes != nil {
+							scopes = *cfg.Auth.AuthorizationCode.AuthorizationCodeScopes
+						}
+						oauthCfg = &oauth2.Config{ClientID: *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID, Endpoint: endpoints.Endpoint, Scopes: scopes}
+					}
 				}
-				oauthCfg := &oauth2.Config{ClientID: *cfg.Auth.DeviceCode.DeviceCodeClientID, Endpoint: endpoints.Endpoint, Scopes: scopes}
-				baseTS := oauthCfg.TokenSource(ctx, existingToken)
-				tokenSource = oauth2.ReuseTokenSource(nil, baseTS)
+
+				if oauthCfg != nil {
+					baseTS := oauthCfg.TokenSource(ctx, existingToken)
+					tokenSource = oauth2.ReuseTokenSource(nil, baseTS)
+				}
 			}
 		}
 	}
+
 	// Fallback to SDK token source if we didn't create a seeded one
 	if tokenSource == nil {
 		var tsErr error
@@ -493,12 +501,6 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 				Prefix: credentialsErrorPrefix,
 				Err:    tsErr,
 			}
-		}
-	}
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
 		}
 	}
 
@@ -513,7 +515,13 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 
 	// Clean up old token files for this grant type and profile (in case configuration changed)
 	// Ignore errors from cleanup - we still want to save the new token
-	_ = clearAllTokenFilesForGrantType(providerName, string(svcOAuth2.GrantTypeDeviceCode), profileName)
+	err = clearAllTokenFilesForGrantType(providerName, string(grantType), profileName)
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    fmt.Errorf("failed to clean up old token files: %w", err),
+		}
+	}
 
 	// Save token using our own storage logic (handles both file and keychain based on flags)
 	location, err := SaveTokenForMethod(token, tokenKey)
@@ -529,12 +537,24 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 	// If expiry is different, new auth was performed
 	isNewAuth := existingTokenExpiry == nil || !token.Expiry.Equal(*existingTokenExpiry)
 
-	// NewAuth indicates whether new authentication was performed
 	return &LoginResult{
 		Token:    token,
 		NewAuth:  isNewAuth,
 		Location: location,
 	}, nil
+}
+
+// PerformDeviceCodeLogin performs device code authentication, returning the result
+func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
+	cfg, err := GetDeviceCodeConfiguration()
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+
+	return performLogin(ctx, cfg, svcOAuth2.GrantTypeDeviceCode, deviceCodeTokenKey)
 }
 
 // GetDeviceCodeConfiguration builds a device code authentication configuration from the CLI profile options
@@ -619,118 +639,7 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// Get profile name for token key generation
-	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if err != nil {
-		profileName = "default" // Fallback to default if we can't get profile name
-	}
-
-	// Get service name for token key generation
-	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || strings.TrimSpace(providerName) == "" {
-		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
-	}
-
-	// Client ID and environment ID no longer needed for manual key generation
-
-	// Set grant type to authorization code
-	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeAuthorizationCode)
-
-	// Use SDK-consistent token key generation to avoid mismatches
-	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
-	if err != nil || tokenKey == "" {
-		// Fallback to simple key if generation fails
-		tokenKey = authorizationCodeTokenKey
-	}
-
-	// Check if we have a valid cached token before calling TokenSource
-	// Store the existing token's expiry to compare later
-	var existingTokenExpiry *time.Time
-
-	// First try SDK keychain storage if enabled
-	if shouldUseKeychain() {
-		keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-		if err == nil {
-			if existingToken, err := keychainStorage.LoadToken(); err == nil && existingToken != nil && existingToken.Valid() {
-				existingTokenExpiry = &existingToken.Expiry
-			}
-		}
-	}
-
-	// If not found in keychain, check file storage
-	if existingTokenExpiry == nil {
-		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.Valid() {
-			existingTokenExpiry = &existingToken.Expiry
-		}
-	}
-
-	// If using file storage and we have a refresh token, seed refresh via oauth2.ReuseTokenSource
-	var tokenSource oauth2.TokenSource
-	if !shouldUseKeychain() {
-		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.RefreshToken != "" {
-			endpoints, eerr := cfg.AuthEndpoints()
-			if eerr == nil && cfg.Auth.AuthorizationCode != nil && cfg.Auth.AuthorizationCode.AuthorizationCodeClientID != nil {
-				var scopes []string
-				if cfg.Auth.AuthorizationCode.AuthorizationCodeScopes != nil {
-					scopes = *cfg.Auth.AuthorizationCode.AuthorizationCodeScopes
-				}
-				oauthCfg := &oauth2.Config{ClientID: *cfg.Auth.AuthorizationCode.AuthorizationCodeClientID, Endpoint: endpoints.Endpoint, Scopes: scopes}
-				baseTS := oauthCfg.TokenSource(ctx, existingToken)
-				tokenSource = oauth2.ReuseTokenSource(nil, baseTS)
-			}
-		}
-	}
-	// Fallback to SDK token source if we didn't create a seeded one
-	if tokenSource == nil {
-		var tsErr error
-		tokenSource, tsErr = cfg.TokenSource(ctx)
-		if tsErr != nil {
-			return nil, &errs.PingCLIError{
-				Prefix: credentialsErrorPrefix,
-				Err:    tsErr,
-			}
-		}
-	}
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
-	// Get token (SDK will return cached token if valid, or perform new authentication)
-	token, err := tokenSource.Token()
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
-	// Clean up old token files for this grant type and profile (in case configuration changed)
-	// Ignore errors from cleanup - we still want to save the new token
-	_ = clearAllTokenFilesForGrantType(providerName, string(svcOAuth2.GrantTypeAuthorizationCode), profileName)
-
-	// Save token using our own storage logic (handles both file and keychain based on flags)
-	location, err := SaveTokenForMethod(token, tokenKey)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
-	// Determine if this was new authentication
-	// If we had an existing token with the same expiry, it's cached
-	// If expiry is different, new auth was performed
-	isNewAuth := existingTokenExpiry == nil || !token.Expiry.Equal(*existingTokenExpiry)
-
-	// NewAuth indicates whether new authentication was performed
-	return &LoginResult{
-		Token:    token,
-		NewAuth:  isNewAuth,
-		Location: location,
-	}, nil
+	return performLogin(ctx, cfg, svcOAuth2.GrantTypeAuthorizationCode, authorizationCodeTokenKey)
 }
 
 // GetAuthorizationCodeConfiguration builds an authorization code authentication configuration from the CLI profile options
@@ -852,93 +761,7 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	// Get profile name for token key generation
-	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if err != nil {
-		profileName = "default" // Fallback to default if we can't get profile name
-	}
-
-	// Get service name for token key generation
-	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || strings.TrimSpace(providerName) == "" {
-		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
-	}
-
-	// Client ID and environment ID no longer needed for manual key generation
-
-	// Set grant type to client credentials
-	cfg = cfg.WithGrantType(svcOAuth2.GrantTypeClientCredentials)
-
-	// Use SDK-consistent token key generation to avoid mismatches
-	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
-	if err != nil || tokenKey == "" {
-		// Fallback to simple key if generation fails
-		tokenKey = clientCredentialsTokenKey
-	}
-
-	// Check if we have a valid cached token before calling TokenSource
-	// Store the existing token's expiry to compare later
-	var existingTokenExpiry *time.Time
-
-	// First try SDK keychain storage if enabled
-	if shouldUseKeychain() {
-		keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
-		if err == nil {
-			if existingToken, err := keychainStorage.LoadToken(); err == nil && existingToken != nil && existingToken.Valid() {
-				existingTokenExpiry = &existingToken.Expiry
-			}
-		}
-	}
-
-	// If not found in keychain, check file storage
-	if existingTokenExpiry == nil {
-		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.Valid() {
-			existingTokenExpiry = &existingToken.Expiry
-		}
-	}
-
-	// Get token source - SDK handles keychain storage based on configuration
-	tokenSource, err := cfg.TokenSource(ctx)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
-	// Get token (SDK will return cached token if valid, or perform new authentication)
-	token, err := tokenSource.Token()
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
-	// Clean up old token files for this grant type and profile (in case configuration changed)
-	// Ignore errors from cleanup - we still want to save the new token
-	_ = clearAllTokenFilesForGrantType(providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName)
-
-	// Save token using our own storage logic (handles both file and keychain based on flags)
-	location, err := SaveTokenForMethod(token, tokenKey)
-	if err != nil {
-		return nil, &errs.PingCLIError{
-			Prefix: credentialsErrorPrefix,
-			Err:    err,
-		}
-	}
-
-	// Determine if this was new authentication
-	// If we had an existing token with the same expiry, it's cached
-	// If expiry is different, new auth was performed
-	isNewAuth := existingTokenExpiry == nil || !token.Expiry.Equal(*existingTokenExpiry)
-
-	// NewAuth indicates whether new authentication was performed
-	return &LoginResult{
-		Token:    token,
-		NewAuth:  isNewAuth,
-		Location: location,
-	}, nil
+	return performLogin(ctx, cfg, svcOAuth2.GrantTypeClientCredentials, clientCredentialsTokenKey)
 }
 
 // GetClientCredentialsConfiguration builds a client credentials authentication configuration from the CLI profile options
