@@ -265,7 +265,7 @@ func TestClearToken(t *testing.T) {
 
 	// Test that ClearTokenForMethod doesn't panic when no token exists
 	// This should handle the case where keychain entry doesn't exist
-	_, err := auth_internal.ClearToken(testKey)
+	err := auth_internal.ClearToken(testKey)
 
 	// Should not error when no token exists (handles ErrNotFound)
 	if err != nil {

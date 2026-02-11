@@ -73,7 +73,7 @@ func TestSaveTokenForMethod_WithKeychainEnabled(t *testing.T) {
 	authMethod := "test-keychain-enabled"
 
 	t.Cleanup(func() {
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save token - should try keychain first
@@ -175,7 +175,7 @@ func TestLoadTokenForMethod_FallbackToFileStorage(t *testing.T) {
 
 	t.Cleanup(func() {
 		_ = clearTokenFromFile(authMethod)
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save token only to file storage (keychain disabled)
@@ -215,7 +215,7 @@ func TestShouldUseKeychain_Default(t *testing.T) {
 	authMethod := "test-default-keychain"
 
 	t.Cleanup(func() {
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save token - should try keychain by default
@@ -271,7 +271,7 @@ func TestClearToken_ClearsBothStorages(t *testing.T) {
 	authMethod := "test-clear-both-storages"
 
 	t.Cleanup(func() {
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save to file storage directly
@@ -287,7 +287,7 @@ func TestClearToken_ClearsBothStorages(t *testing.T) {
 	}
 
 	// Clear token - should remove from both keychain and file storage
-	_, err = ClearToken(authMethod)
+	err = ClearToken(authMethod)
 	if err != nil {
 		t.Logf("ClearToken returned error (may be expected if keychain not available): %v", err)
 	}
@@ -335,7 +335,7 @@ func TestSaveTokenForMethod_FileStorageFallback(t *testing.T) {
 	authMethod := "test-save-fallback"
 
 	t.Cleanup(func() {
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save token - will try keychain first (may succeed or fail depending on environment)

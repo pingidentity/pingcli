@@ -86,10 +86,10 @@ func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
 		t.Fatalf("expected no error, got %v", err)
 	}
 	if location == customtypes.StorageLocationKeychain {
-		t.Fatalf("expected Keychain=false, got true")
+		t.Fatalf("expected storage location to not be %s", customtypes.StorageLocationKeychain)
 	}
 	if location != customtypes.StorageLocationFile {
-		t.Fatalf("expected File=true, got false")
+		t.Fatalf("expected storage location %s, got %s", customtypes.StorageLocationFile, location)
 	}
 
 	// Verify it actually wrote the expected file under HOME
@@ -139,10 +139,10 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 	mockStorage.AssertExpectations(t)
 
 	if location != customtypes.StorageLocationKeychain {
-		t.Fatalf("expected Keychain=true")
+		t.Fatalf("expected storage location %s, got %s", customtypes.StorageLocationKeychain, location)
 	}
 	if location == customtypes.StorageLocationFile {
-		t.Fatalf("expected File=false")
+		t.Fatalf("expected storage location to not be %s", customtypes.StorageLocationFile)
 	}
 
 	// File should not be written when keychain save succeeds

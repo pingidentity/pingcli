@@ -86,9 +86,9 @@ func AuthLogoutRunE(cmd *cobra.Command, args []string) error {
 	}
 
 	// Clear only the token for the specified grant type
-	location, err := ClearToken(tokenKey)
+	err = ClearToken(tokenKey)
 	if err != nil {
-		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: fmt.Errorf("failed to clear %s credentials. in %s: %w", authType, formatStorageLocation(location), err)}
+		return &errs.PingCLIError{Prefix: credentialsErrorPrefix, Err: fmt.Errorf("failed to clear %s credentials: %w", authType, err)}
 	}
 
 	output.Success(fmt.Sprintf("Successfully logged out and cleared credentials from %s for service '%s' using profile '%s'.", authType, providerName, profileName), nil)

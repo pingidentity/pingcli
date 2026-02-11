@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/configuration/options"
+	"github.com/pingidentity/pingcli/internal/constants"
 	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/errs"
 	"github.com/pingidentity/pingcli/internal/profiles"
@@ -43,14 +44,17 @@ var newKeychainStorage = func(serviceName, username string) (tokenStorage, error
 
 // getTokenStorage returns the appropriate keychain storage instance for the given authentication method
 func getTokenStorage(authMethod string) (tokenStorage, error) {
-	return newKeychainStorage("pingcli", authMethod)
+	return newKeychainStorage(constants.PingCliName, authMethod)
 }
 
 // getAuthStorageOption retrieves and normalizes the auth storage option
 func getAuthStorageOption() (string, error) {
 	v, err := profiles.GetOptionValue(options.AuthStorageOption)
 	if err != nil {
-		return "", err
+		return "", &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
 	}
 
 	return strings.TrimSpace(strings.ToLower(v)), nil
@@ -58,20 +62,20 @@ func getAuthStorageOption() (string, error) {
 
 // shouldUseKeychain checks if keychain storage should be used based on the storage type
 // Returns true if storage type is secure_local (default), false for file_system/none
-func shouldUseKeychain() bool {
+func shouldUseKeychain() (bool, error) {
 	v, err := getAuthStorageOption()
 	if err != nil {
-		return true // default to keychain
+		return false, err
 	}
 
 	switch v {
 	case string(config.StorageTypeSecureLocal):
-		return true
+		return true, nil
 	case string(config.StorageTypeFileSystem), string(config.StorageTypeNone), string(config.StorageTypeSecureRemote):
-		return false
+		return false, nil
 	default:
 		// Unrecognized: lean secure by not disabling keychain
-		return true
+		return true, nil
 	}
 }
 
@@ -79,11 +83,7 @@ func shouldUseKeychain() bool {
 // SDK handles keychain storage, pingcli handles file storage separately
 func getStorageType() config.StorageType {
 	s, err := getAuthStorageOption()
-	if err != nil {
-		return config.StorageTypeSecureLocal
-	}
-
-	if s == string(config.StorageTypeSecureLocal) || s == "" {
+	if err != nil || s == string(config.StorageTypeSecureLocal) || s == "" {
 		return config.StorageTypeSecureLocal
 	}
 	// For file_system/none/secure_remote, avoid SDK persistence (pingcli manages file persistence)
@@ -191,7 +191,10 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (customtypes.Sto
 	// Check storage option
 	v, err := getAuthStorageOption()
 	if err != nil {
-		return location, fmt.Errorf("%s: %w", credentialsErrorPrefix, err)
+		return location, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
 	}
 
 	if v == string(config.StorageTypeNone) {
@@ -200,7 +203,11 @@ func SaveTokenForMethod(token *oauth2.Token, authMethod string) (customtypes.Sto
 
 	// When keychain is enabled, attempt to save to keychain.
 	// If keychain is unavailable or save fails, fall back to file storage.
-	if shouldUseKeychain() {
+	useKeychain, err := shouldUseKeychain()
+	if err != nil {
+		return location, err
+	}
+	if useKeychain {
 		storage, kcErr := getTokenStorage(authMethod)
 		if kcErr == nil {
 			if saveErr := storage.SaveToken(token); saveErr == nil {
@@ -236,14 +243,21 @@ func LoadTokenForMethod(authMethod string) (*oauth2.Token, error) {
 	// Check if storage is disabled
 	v, err := getAuthStorageOption()
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", credentialsErrorPrefix, err)
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
 	}
 	if v == string(config.StorageTypeNone) {
 		return nil, ErrTokenStorageDisabled
 	}
 
 	// Check if user disabled keychain
-	if !shouldUseKeychain() {
+	useKeychain, err := shouldUseKeychain()
+	if err != nil {
+		return nil, err
+	}
+	if !useKeychain {
 		// Directly load from file storage
 		return loadTokenFromFile(authMethod)
 	}
@@ -284,7 +298,11 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 
 	if cfg != nil {
 		// If using file storage, try to seed refresh from existing file token before new login
-		if !shouldUseKeychain() {
+		useKeychain, skErr := shouldUseKeychain()
+		if skErr != nil {
+			return nil, skErr
+		}
+		if !useKeychain {
 			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
 			if err == nil && tokenKey != "" {
 				if existingToken, ferr := loadTokenFromFile(tokenKey); ferr == nil && existingToken != nil && existingToken.RefreshToken != "" {
@@ -338,7 +356,11 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 		// If we are not using keychain (e.g. file storage), we need to wrap the source
 		// to capture and persist the token to file when it is refreshed or created.
 		// The SDK's TokenSource only handles keychain persistence internally.
-		if !shouldUseKeychain() {
+		useKeychain, skErr = shouldUseKeychain()
+		if skErr != nil {
+			return nil, skErr
+		}
+		if !useKeychain {
 			tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
 			if err == nil {
 				return &filePersistingTokenSource{
@@ -366,7 +388,7 @@ func ClearAllTokens() error {
 	// First, attempt to clear ALL keychain entries for the pingcli service
 	// This ensures we clean up tokens from previous configurations (stale Client IDs, etc.)
 	// We use a dummy username because the constructor requires it, but ClearAllTokens operates at service level
-	if ks, err := newKeychainStorage("pingcli", "clearAllTokens"); err == nil {
+	if ks, err := newKeychainStorage(constants.PingCliName, "clearAllTokens"); err == nil {
 		if err := ks.ClearAllTokens(); err != nil {
 			errs = append(errs, err)
 		}
@@ -382,10 +404,8 @@ func ClearAllTokens() error {
 
 // ClearToken removes the cached token for a specific authentication method
 // Clears from both keychain and file storage
-// Returns StorageLocationType indicating what was cleared
-func ClearToken(authMethod string) (customtypes.StorageLocationType, error) {
+func ClearToken(authMethod string) error {
 	var errList []error
-	var location customtypes.StorageLocationType
 
 	// Clear from keychain
 	storage, err := getTokenStorage(authMethod)
@@ -395,8 +415,6 @@ func ClearToken(authMethod string) (customtypes.StorageLocationType, error) {
 				Prefix: credentialsErrorPrefix,
 				Err:    err,
 			})
-		} else {
-			location = customtypes.StorageLocationKeychain
 		}
 	}
 
@@ -406,11 +424,9 @@ func ClearToken(authMethod string) (customtypes.StorageLocationType, error) {
 			Prefix: credentialsErrorPrefix,
 			Err:    err,
 		})
-	} else if location == "" {
-		location = customtypes.StorageLocationFile
 	}
 
-	return location, errors.Join(errList...)
+	return errors.Join(errList...)
 }
 
 // performLogin consolidates common authentication logic for different grant types
@@ -418,7 +434,7 @@ func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcO
 	// Get profile name for token key generation
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
-		profileName = "default" // Fallback to default if we can't get profile name
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
 	}
 
 	// Get service name for token key generation
@@ -433,7 +449,7 @@ func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcO
 	// Use SDK-consistent token key generation to avoid mismatches
 	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
 	if err != nil || tokenKey == "" {
-		// Fallback to simple key if generation fails
+		// Fallback to default key if generation fails, though this shouldn't happen with valid config
 		tokenKey = defaultTokenKey
 	}
 
@@ -442,8 +458,12 @@ func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcO
 	var existingTokenExpiry *time.Time
 
 	// First try SDK keychain storage if enabled
-	if shouldUseKeychain() {
-		keychainStorage, err := svcOAuth2.NewKeychainStorage("pingcli", tokenKey)
+	useKeychain, skErr := shouldUseKeychain()
+	if skErr != nil {
+		return nil, skErr
+	}
+	if useKeychain {
+		keychainStorage, err := svcOAuth2.NewKeychainStorage(constants.PingCliName, tokenKey)
 		if err == nil {
 			if existingToken, err := keychainStorage.LoadToken(); err == nil && existingToken != nil && existingToken.Valid() {
 				existingTokenExpiry = &existingToken.Expiry
@@ -451,19 +471,14 @@ func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcO
 		}
 	}
 
-	// If not found in keychain, check file storage
-	if existingTokenExpiry == nil {
-		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.Valid() {
-			existingTokenExpiry = &existingToken.Expiry
-		}
-	}
-
 	// If using file storage and we have a refresh token, seed refresh via oauth2.ReuseTokenSource
 	var tokenSource oauth2.TokenSource
-	if !shouldUseKeychain() {
+
+	if !useKeychain {
 		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.RefreshToken != "" {
 			endpoints, eerr := cfg.AuthEndpoints()
 			if eerr == nil {
+				grantType := *cfg.Auth.GrantType
 				var oauthCfg *oauth2.Config
 				switch grantType {
 				case svcOAuth2.GrantTypeDeviceCode:
@@ -584,12 +599,15 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithDeviceCodeScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag
-	cfg = cfg.WithStorageType(getStorageType()).WithStorageName("pingcli")
+	cfg = cfg.WithStorageType(getStorageType()).WithStorageName(constants.PingCliName)
 
 	// Provide optional suffix so SDK keychain entries align with file names
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if err != nil || strings.TrimSpace(profileName) == "" {
-		profileName = "default"
+	if err != nil {
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	if strings.TrimSpace(profileName) == "" {
+		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
 	if err != nil || strings.TrimSpace(providerName) == "" {
@@ -701,17 +719,20 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 		WithAuthorizationCodeRedirectURI(redirectURI)
 
 	// This is the default scope. Additional scopes can be appended by the user later if needed.
-	scopeDefaults := []string{"openid"}
+	scopeDefaults := []string{constants.OpenIDScope}
 	cfg = cfg.WithAuthorizationCodeScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).
-		WithStorageName("pingcli")
+		WithStorageName(constants.PingCliName)
 
 	// Provide optional suffix so SDK keychain entries align with file names
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if err != nil || strings.TrimSpace(profileName) == "" {
-		profileName = "default"
+	if err != nil {
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	if strings.TrimSpace(profileName) == "" {
+		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
 	if err != nil || strings.TrimSpace(providerName) == "" {
@@ -803,17 +824,20 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		WithClientCredentialsClientSecret(clientSecret)
 
 	// This is the default scope. Additional scopes can be appended by the user later if needed.
-	scopeDefaults := []string{"openid"}
+	scopeDefaults := []string{constants.OpenIDScope}
 	cfg = cfg.WithClientCredentialsScopes(scopeDefaults)
 
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).
-		WithStorageName("pingcli")
+		WithStorageName(constants.PingCliName)
 
 	// Provide optional suffix so SDK keychain entries align with file names
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if err != nil || strings.TrimSpace(profileName) == "" {
-		profileName = "default"
+	if err != nil {
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	if strings.TrimSpace(profileName) == "" {
+		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
 	if err != nil || strings.TrimSpace(providerName) == "" {
@@ -885,16 +909,19 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 	cfg = cfg.WithClientCredentialsClientID(clientID).
 		WithClientCredentialsClientSecret(clientSecret)
 	// Align default scopes with client credentials flow
-	scopeDefaults := []string{"openid"}
+	scopeDefaults := []string{constants.OpenIDScope}
 	cfg = cfg.WithClientCredentialsScopes(scopeDefaults)
 	// Configure storage options based on --file-storage flag
 	cfg = cfg.WithStorageType(getStorageType()).
-		WithStorageName("pingcli")
+		WithStorageName(constants.PingCliName)
 
 	// Provide optional suffix so SDK keychain entries align with file names
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if err != nil || strings.TrimSpace(profileName) == "" {
-		profileName = "default"
+	if err != nil {
+		return nil, &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	if strings.TrimSpace(profileName) == "" {
+		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
 	if err != nil || strings.TrimSpace(providerName) == "" {
@@ -968,12 +995,15 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 
 	// Build suffix to disambiguate across provider/grant/profile for both keychain and files
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
-	if err != nil || profileName == "" {
-		profileName = "default"
+	if err != nil {
+		return "", &errs.PingCLIError{Prefix: loginInteractiveErrorPrefix, Err: err}
+	}
+	if profileName == "" {
+		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
 	if err != nil || strings.TrimSpace(providerName) == "" {
-		providerName = "pingone"
+		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)
 	// Use the SDK's GenerateKeychainAccountName with optional suffix
