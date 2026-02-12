@@ -19,13 +19,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// Token storage keys for different authentication methods
-const (
-	deviceCodeTokenKey        = "device-code-token"
-	authorizationCodeTokenKey = "authorization-code-token" // #nosec G101 -- This is a keychain identifier, not a credential
-	clientCredentialsTokenKey = "client-credentials-token"
-)
-
 var (
 	credentialsErrorPrefix  = "failed to manage credentials"
 	tokenManagerErrorPrefix = "failed to manage token"
@@ -164,7 +157,7 @@ func getConfigForCurrentAuthType() (*config.Configuration, error) {
 	}
 }
 
-// SaveTokenForMethod saves an OAuth2 token to file storage using the specified authentication method key
+// SaveTokenForMethod saves an OAuth2 token to storage (keychain or file) using the specified authentication method key
 // Note: SDK handles keychain storage separately with its own token key format
 // Returns StorageLocationType indicating where the token was saved
 func SaveTokenForMethod(token *oauth2.Token, authMethod string) (customtypes.StorageLocationType, error) {
@@ -379,7 +372,7 @@ func GetValidTokenSource(ctx context.Context) (oauth2.TokenSource, error) {
 	}
 }
 
-// ClearAllTokens removes all cached tokens from the keychain for all authentication methods.
+// ClearAllTokens removes all cached tokens from keychain and file storage for all authentication methods.
 // This clears tokens from ALL grant types, not just the currently configured one,
 // to handle cases where users switch between authentication methods
 func ClearAllTokens() error {
@@ -430,7 +423,7 @@ func ClearToken(authMethod string) error {
 }
 
 // performLogin consolidates common authentication logic for different grant types
-func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcOAuth2.GrantType, defaultTokenKey string) (*LoginResult, error) {
+func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcOAuth2.GrantType) (*LoginResult, error) {
 	// Get profile name for token key generation
 	profileName, err := profiles.GetOptionValue(options.RootActiveProfileOption)
 	if err != nil {
@@ -439,7 +432,13 @@ func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcO
 
 	// Get service name for token key generation
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || strings.TrimSpace(providerName) == "" {
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE // Default to pingone
 	}
 
@@ -448,9 +447,11 @@ func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcO
 
 	// Use SDK-consistent token key generation to avoid mismatches
 	tokenKey, err := GetAuthMethodKeyFromConfig(cfg)
-	if err != nil || tokenKey == "" {
-		// Fallback to default key if generation fails, though this shouldn't happen with valid config
-		tokenKey = defaultTokenKey
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
 	}
 
 	// Check if we have a valid cached token before calling TokenSource
@@ -468,6 +469,13 @@ func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcO
 			if existingToken, err := keychainStorage.LoadToken(); err == nil && existingToken != nil && existingToken.Valid() {
 				existingTokenExpiry = &existingToken.Expiry
 			}
+		}
+	}
+
+	// If not found in keychain, check file storage
+	if existingTokenExpiry == nil {
+		if existingToken, err := loadTokenFromFile(tokenKey); err == nil && existingToken != nil && existingToken.Valid() {
+			existingTokenExpiry = &existingToken.Expiry
 		}
 	}
 
@@ -529,7 +537,6 @@ func performLogin(ctx context.Context, cfg *config.Configuration, grantType svcO
 	}
 
 	// Clean up old token files for this grant type and profile (in case configuration changed)
-	// Ignore errors from cleanup - we still want to save the new token
 	err = clearAllTokenFilesForGrantType(providerName, string(grantType), profileName)
 	if err != nil {
 		return nil, &errs.PingCLIError{
@@ -569,7 +576,7 @@ func PerformDeviceCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	return performLogin(ctx, cfg, svcOAuth2.GrantTypeDeviceCode, deviceCodeTokenKey)
+	return performLogin(ctx, cfg, svcOAuth2.GrantTypeDeviceCode)
 }
 
 // GetDeviceCodeConfiguration builds a device code authentication configuration from the CLI profile options
@@ -610,7 +617,13 @@ func GetDeviceCodeConfiguration() (*config.Configuration, error) {
 		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || strings.TrimSpace(providerName) == "" {
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeDeviceCode), profileName))
@@ -657,7 +670,7 @@ func PerformAuthorizationCodeLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	return performLogin(ctx, cfg, svcOAuth2.GrantTypeAuthorizationCode, authorizationCodeTokenKey)
+	return performLogin(ctx, cfg, svcOAuth2.GrantTypeAuthorizationCode)
 }
 
 // GetAuthorizationCodeConfiguration builds an authorization code authentication configuration from the CLI profile options
@@ -735,7 +748,13 @@ func GetAuthorizationCodeConfiguration() (*config.Configuration, error) {
 		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || strings.TrimSpace(providerName) == "" {
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeAuthorizationCode), profileName))
@@ -782,7 +801,7 @@ func PerformClientCredentialsLogin(ctx context.Context) (*LoginResult, error) {
 		}
 	}
 
-	return performLogin(ctx, cfg, svcOAuth2.GrantTypeClientCredentials, clientCredentialsTokenKey)
+	return performLogin(ctx, cfg, svcOAuth2.GrantTypeClientCredentials)
 }
 
 // GetClientCredentialsConfiguration builds a client credentials authentication configuration from the CLI profile options
@@ -840,7 +859,13 @@ func GetClientCredentialsConfiguration() (*config.Configuration, error) {
 		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || strings.TrimSpace(providerName) == "" {
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName))
@@ -924,7 +949,13 @@ func GetWorkerConfiguration() (*config.Configuration, error) {
 		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || strings.TrimSpace(providerName) == "" {
+	if err != nil {
+		return nil, &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	cfg = cfg.WithStorageOptionalSuffix(fmt.Sprintf("_%s_%s_%s", providerName, string(svcOAuth2.GrantTypeClientCredentials), profileName))
@@ -1002,7 +1033,13 @@ func GetAuthMethodKeyFromConfig(cfg *config.Configuration) (string, error) {
 		profileName = constants.DefaultProfileName
 	}
 	providerName, err := profiles.GetOptionValue(options.AuthProviderOption)
-	if err != nil || strings.TrimSpace(providerName) == "" {
+	if err != nil {
+		return "", &errs.PingCLIError{
+			Prefix: credentialsErrorPrefix,
+			Err:    err,
+		}
+	}
+	if strings.TrimSpace(providerName) == "" {
 		providerName = customtypes.ENUM_AUTH_PROVIDER_PINGONE
 	}
 	suffix := fmt.Sprintf("_%s_%s_%s", providerName, string(grantType), profileName)
