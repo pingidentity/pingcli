@@ -6,4 +6,6 @@ const (
 	PingCliName        = "pingcli"
 	PingCliDirName     = ".pingcli"
 	CredentialsDirName = "credentials"
+	DefaultProfileName = "default"
+	OpenIDScope        = "openid"
 )

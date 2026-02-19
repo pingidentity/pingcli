@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/pingidentity/pingcli/internal/constants"
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
@@ -84,11 +85,11 @@ func TestSaveTokenForMethod_FallsBackToFileWhenKeychainSaveFails(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error, got %v", err)
 	}
-	if location.Keychain {
-		t.Fatalf("expected Keychain=false, got true")
+	if location == customtypes.StorageLocationKeychain {
+		t.Fatalf("expected storage location to not be %s", customtypes.StorageLocationKeychain)
 	}
-	if !location.File {
-		t.Fatalf("expected File=true, got false")
+	if location != customtypes.StorageLocationFile {
+		t.Fatalf("expected storage location %s, got %s", customtypes.StorageLocationFile, location)
 	}
 
 	// Verify it actually wrote the expected file under HOME
@@ -137,11 +138,11 @@ func TestSaveTokenForMethod_UsesKeychainWhenAvailable(t *testing.T) {
 
 	mockStorage.AssertExpectations(t)
 
-	if !location.Keychain {
-		t.Fatalf("expected Keychain=true")
+	if location != customtypes.StorageLocationKeychain {
+		t.Fatalf("expected storage location %s, got %s", customtypes.StorageLocationKeychain, location)
 	}
-	if location.File {
-		t.Fatalf("expected File=false")
+	if location == customtypes.StorageLocationFile {
+		t.Fatalf("expected storage location to not be %s", customtypes.StorageLocationFile)
 	}
 
 	// File should not be written when keychain save succeeds

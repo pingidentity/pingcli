@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/pingidentity/pingcli/internal/customtypes"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	svcOAuth2 "github.com/pingidentity/pingone-go-client/oauth2"
 	"golang.org/x/oauth2"
@@ -40,8 +41,8 @@ func TestSaveTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	}
 
 	// Verify location indicates file storage only
-	if !location.File || location.Keychain {
-		t.Errorf("Expected file storage only (File=true, Keychain=false), got %+v", location)
+	if location != customtypes.StorageLocationFile {
+		t.Errorf("Expected file storage only, got %+v", location)
 	}
 
 	// Verify token was saved to file
@@ -72,7 +73,7 @@ func TestSaveTokenForMethod_WithKeychainEnabled(t *testing.T) {
 	authMethod := "test-keychain-enabled"
 
 	t.Cleanup(func() {
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save token - should try keychain first
@@ -84,9 +85,9 @@ func TestSaveTokenForMethod_WithKeychainEnabled(t *testing.T) {
 	} else {
 		t.Logf("Token saved to: %v", location)
 
-		// If it's expected to be in keychain (location.Keychain=true), we must manually save it there
+		// If it's expected to be in keychain (location == StorageLocationKeychain), we must manually save it there
 		// because SaveTokenForMethod doesn't actually perform the save (it assumes SDK did it)
-		if location.Keychain {
+		if location == customtypes.StorageLocationKeychain {
 			storage, sErr := svcOAuth2.NewKeychainStorage("pingcli", authMethod)
 			if sErr != nil {
 				if strings.Contains(sErr.Error(), "keychain") || strings.Contains(sErr.Error(), "freedesktop") {
@@ -174,7 +175,7 @@ func TestLoadTokenForMethod_FallbackToFileStorage(t *testing.T) {
 
 	t.Cleanup(func() {
 		_ = clearTokenFromFile(authMethod)
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save token only to file storage (keychain disabled)
@@ -214,7 +215,7 @@ func TestShouldUseKeychain_Default(t *testing.T) {
 	authMethod := "test-default-keychain"
 
 	t.Cleanup(func() {
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save token - should try keychain by default
@@ -224,8 +225,8 @@ func TestShouldUseKeychain_Default(t *testing.T) {
 	} else {
 		t.Logf("Token saved with default settings to: %v", location)
 
-		// If it's expected to be in keychain (location.Keychain=true), we must manually save it there
-		if location.Keychain {
+		// If it's expected to be in keychain (location == StorageLocationKeychain), we must manually save it there
+		if location == customtypes.StorageLocationKeychain {
 			storage, sErr := svcOAuth2.NewKeychainStorage("pingcli", authMethod)
 			if sErr != nil {
 				if strings.Contains(sErr.Error(), "keychain") || strings.Contains(sErr.Error(), "freedesktop") {
@@ -270,7 +271,7 @@ func TestClearToken_ClearsBothStorages(t *testing.T) {
 	authMethod := "test-clear-both-storages"
 
 	t.Cleanup(func() {
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save to file storage directly
@@ -286,7 +287,7 @@ func TestClearToken_ClearsBothStorages(t *testing.T) {
 	}
 
 	// Clear token - should remove from both keychain and file storage
-	_, err = ClearToken(authMethod)
+	err = ClearToken(authMethod)
 	if err != nil {
 		t.Logf("ClearToken returned error (may be expected if keychain not available): %v", err)
 	}
@@ -334,7 +335,7 @@ func TestSaveTokenForMethod_FileStorageFallback(t *testing.T) {
 	authMethod := "test-save-fallback"
 
 	t.Cleanup(func() {
-		_, _ = ClearToken(authMethod)
+		_ = ClearToken(authMethod)
 	})
 
 	// Save token - will try keychain first (may succeed or fail depending on environment)
@@ -344,8 +345,8 @@ func TestSaveTokenForMethod_FileStorageFallback(t *testing.T) {
 	} else {
 		t.Logf("Token saved - fallback test to: %v", location)
 
-		// If it's expected to be in keychain (location.Keychain=true), we must manually save it there
-		if location.Keychain {
+		// If it's expected to be in keychain (location == StorageLocationKeychain), we must manually save it there
+		if location == customtypes.StorageLocationKeychain {
 			storage, sErr := svcOAuth2.NewKeychainStorage("pingcli", authMethod)
 			if sErr == nil {
 				// Don't skip here if save fails, because we are testing fallback?
@@ -427,8 +428,8 @@ func TestEnvironmentVariable_FileStorage(t *testing.T) {
 	}
 
 	// Verify location indicates file storage
-	if !location.File || location.Keychain {
-		t.Errorf("Expected file storage with env var (File=true, Keychain=false), got %+v", location)
+	if location != customtypes.StorageLocationFile {
+		t.Errorf("Expected file storage with env var, got %+v", location)
 	}
 
 	// Verify token was saved to file (since file-storage is true)
