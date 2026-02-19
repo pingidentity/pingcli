@@ -1,3 +1,3 @@
-```release-note:enhancement
-code refactor for storage logic and duplication
+```release-note:bug
+fix issue where stale tokens were not removed from keychain
 ```
