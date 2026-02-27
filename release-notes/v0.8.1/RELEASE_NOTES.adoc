@@ -1,0 +1,11 @@
+= Release Notes for v0.8.1
+:toc:
+:toclevels: 3
+:sectnums:
+
+Release Date: 2026-02-27
+
+== BUG FIXES
+* link:https://github.com/pingidentity/pingcli/commit/25cb490[25cb490] fix issue where stale tokens were not removed from keychain link:https://github.com/pingidentity/pingcli/pull/157[#157]
+* link:https://github.com/pingidentity/pingcli/commit/391fa8a[391fa8a] fix request failure in license command link:https://github.com/pingidentity/pingcli/pull/159[#159]
+
