@@ -1,0 +1,3 @@
+```release-note:bug
+fix request failure in license command
+```
