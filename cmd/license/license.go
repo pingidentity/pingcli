@@ -27,6 +27,7 @@ func NewLicenseCommand() *cobra.Command {
 		Args:                  common.ExactArgs(0),
 		DisableFlagsInUseLine: true, // We write our own flags in @Use attribute
 		Example:               licenseCommandExamples,
+		Deprecated:            "This command is deprecated and will be removed in a future release.",
 		Long: `Request a new evaluation license for a specific product and version.
 
 The new license request will be sent to the Ping Identity license server.`,
