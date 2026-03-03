@@ -1,0 +1,3 @@
+```release-note:deprecation
+license command deprecation
+```
