@@ -1,0 +1,10 @@
+= Release Notes for v0.8.2
+:toc:
+:toclevels: 3
+:sectnums:
+
+Release Date: 2026-03-03
+
+== DEPRECATIONS
+* link:https://github.com/pingidentity/pingcli/commit/c27cf57[c27cf57] license command deprecation link:https://github.com/pingidentity/pingcli/pull/161[#161]
+
