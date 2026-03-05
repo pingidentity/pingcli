@@ -1,16 +1,27 @@
-= pingcli plugin
-:created-date: September 18, 2025
+= pingcli login
+:created-date: March 5, 2026
 :revdate: March 5, 2026
-:resourceid: pingcli_command_reference_pingcli_plugin
+:resourceid: pingcli_command_reference_pingcli_login
 
-Manage Ping CLI plugins.
+Authenticate a supported provider
 
 == Synopsis
 
-Manage Ping CLI plugins.
+Authenticate the CLI to a supported provider, using one of the supported authorization grant types.
 
 ----
-pingcli plugin
+pingcli login [flags]
+----
+
+== Options
+
+----
+  -a, --authorization-code    Use authorization code flow
+  -h, --help                  help for login
+  -c, --client-credentials    Use client credentials flow
+  -d, --device-code           Use device authorization flow
+  -p, --provider string       Authentication provider to use. Defaults to 'pingone' if not specified.
+      --storage-type string   Auth token storage (default: secure_local)   secure_local  - Use OS keychain (default)   file_system   - Store tokens in ~/.pingcli/credentials   none          - Do not persist tokens
 ----
 
 == Options inherited from parent commands
@@ -27,8 +38,3 @@ pingcli plugin
 
 * xref:pingcli.adoc[]	 - A CLI tool for managing the configuration of Ping Identity products.
 
-== Subcommands
-
-* xref:pingcli_plugin_add.adoc[] - Add a plugin to use with Ping CLI
-* xref:pingcli_plugin_list.adoc[] - List all plugins currently in use with Ping CLI
-* xref:pingcli_plugin_remove.adoc[] - Remove a plugin from Ping CLI

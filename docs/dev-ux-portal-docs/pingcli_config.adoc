@@ -1,6 +1,6 @@
 = pingcli config
-:created-date: September 18, 2026
-:revdate: September 18, 2026
+:created-date: September 18, 2025
+:revdate: March 5, 2026
 :resourceid: pingcli_command_reference_pingcli_config
 
 Manage the CLI configuration.
@@ -53,4 +53,3 @@ pingcli config
 * xref:pingcli_config_set-active-profile.adoc[] - Set a custom configuration profile as the in-use profile.
 * xref:pingcli_config_unset.adoc[] - Unset stored configuration settings for the CLI.
 * xref:pingcli_config_view-profile.adoc[] - View the stored configuration of a custom configuration profile.
-

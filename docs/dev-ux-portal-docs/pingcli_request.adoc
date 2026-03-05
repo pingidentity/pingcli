@@ -1,6 +1,6 @@
 = pingcli request
-:created-date: September 18, 2026
-:revdate: September 18, 2026
+:created-date: September 18, 2025
+:revdate: March 5, 2026
 :resourceid: pingcli_command_reference_pingcli_request
 
 Send a custom REST API request to a Ping platform service.
@@ -41,13 +41,24 @@ pingcli request [flags] API_URI
 == Options
 
 ----
-  -f, --fail                 Return non-zero exit code when HTTP custom request returns a failure status code.
-  -h, --help                 help for request
-  -m, --http-method string   The HTTP method to use for the request. (default GET) Options are: DELETE, GET, PATCH, POST, PUT. Example: 'POST'
-  -r, --header []string      A custom header to send in the request. Example: --header "Content-Type: application/vnd.pingidentity.user.import+json"
-  -s, --service string       The Ping service (configured in the active profile) to send the custom request to. Options are: pingone. Example: 'pingone'
-      --data string          The file containing data to send in the request.  Example: './data.json'
-      --data-raw string      The raw data to send in the request.  Example: '{"name": "My environment"}'
+  -f, --fail                                                  Return non-zero exit code when HTTP custom request returns a failure status code.
+  -h, --help                                                  help for request
+  -m, --http-method string                                    The HTTP method to use for the request. (default GET) Options are: DELETE, GET, PATCH, POST, PUT. Example: 'POST'
+  -r, --header []string                                       A custom header to send in the request. Example: --header "Content-Type: application/vnd.pingidentity.user.import+json"
+  -s, --service string                                        The Ping service (configured in the active profile) to send the custom request to. Options are: pingone. Example: 'pingone'
+      --data string                                           The file containing data to send in the request.  Example: './data.json'
+      --data-raw string                                       The raw data to send in the request.  Example: '{"name": "My environment"}'
+      --pingone-authentication-type string                    The authorization grant type to use to authenticate to the PingOne management API. (default worker) Options are: authorization_code, client_credentials, device_code, worker.
+      --pingone-authorization-code-client-id string           The authorization code client ID used to authenticate to the PingOne management API.
+      --pingone-authorization-code-redirect-uri-path string   The redirect URI path to use when using the authorization code authorization grant type to authenticate to the PingOne management API. (default /callback)
+      --pingone-authorization-code-redirect-uri-port string   The redirect URI port to use when using the authorization code authorization grant type to authenticate to the PingOne management API. (default 7464)
+      --pingone-client-credentials-client-id string           The client credentials client ID used to authenticate to the PingOne management API.
+      --pingone-client-credentials-client-secret string       The client credentials client secret used to authenticate to the PingOne management API.
+      --pingone-device-code-client-id string                  The device code client ID used to authenticate to the PingOne management API.
+      --pingone-region-code string                            The region code of the PingOne tenant. Options are: AP, AU, CA, EU, NA, SG. Example: 'NA'
+      --pingone-worker-client-id string                       DEPRECATED: Use --pingone-client-credentials-client-id instead. The worker client ID used to authenticate to the PingOne management API.
+      --pingone-worker-client-secret string                   DEPRECATED: Use --pingone-client-credentials-client-secret instead. The worker client secret used to authenticate to the PingOne management API.
+      --pingone-worker-environment-id string                  DEPRECATED: Use --pingone-environment-id instead. The ID of the PingOne environment that contains the worker client used to authenticate to the PingOne management API.
 ----
 
 == Options inherited from parent commands
