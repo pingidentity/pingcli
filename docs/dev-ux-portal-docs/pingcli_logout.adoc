@@ -1,16 +1,25 @@
-= pingcli plugin
-:created-date: September 18, 2025
+= pingcli logout
+:created-date: March 5, 2026
 :revdate: March 5, 2026
-:resourceid: pingcli_command_reference_pingcli_plugin
+:resourceid: pingcli_command_reference_pingcli_logout
 
-Manage Ping CLI plugins.
+Logout user from the CLI
 
 == Synopsis
 
-Manage Ping CLI plugins.
+Logout user from the CLI by clearing stored credentials. Credentials are cleared from both keychain and file storage. By default, uses the authentication method configured in the active profile. You can specify a different authentication method using the grant type flags.
 
 ----
-pingcli plugin
+pingcli logout [flags]
+----
+
+== Options
+
+----
+  -a, --authorization-code   Use authorization code flow
+  -h, --help                 help for logout
+  -c, --client-credentials   Use client credentials flow
+  -d, --device-code          Use device authorization flow
 ----
 
 == Options inherited from parent commands
@@ -27,8 +36,3 @@ pingcli plugin
 
 * xref:pingcli.adoc[]	 - A CLI tool for managing the configuration of Ping Identity products.
 
-== Subcommands
-
-* xref:pingcli_plugin_add.adoc[] - Add a plugin to use with Ping CLI
-* xref:pingcli_plugin_list.adoc[] - List all plugins currently in use with Ping CLI
-* xref:pingcli_plugin_remove.adoc[] - Remove a plugin from Ping CLI
