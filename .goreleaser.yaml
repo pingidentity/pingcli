@@ -78,7 +78,7 @@ checksum:
   # Disable the generation/upload of the checksum file.
   disable: false
 
-brews:
+homebrew_casks:
   - # Git author used to commit to the repository.
     commit_author:
       name: "goreleaserbot"
@@ -87,10 +87,10 @@ brews:
     # The project name and current git tag are used in the format string.
     #
     # Templates: allowed.
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
+    commit_msg_template: "Brew cask update for {{ .ProjectName }} version {{ .Tag }}"
 
-    # Directory inside the repository to put the formula.
-    directory: "Formula"
+    binaries:
+      - "pingcli"
 
     # Caveats for the user of your binary.
     # caveats: "How to use this binary"
@@ -106,13 +106,8 @@ brews:
     # Default: inferred from global metadata.
     description: "The Ping CLI is a unified command line interface for configuring and managing Ping Identity Services."
 
-    # SPDX identifier of your app's license.
-    #
-    # Default: inferred from global metadata.
-    license: "Apache License 2.0"
-
     # Setting this will prevent goreleaser to actually try to commit the updated
-    # formula - instead, the formula file will be stored on the dist directory
+    # cask - instead, the cask file will be stored on the dist directory
     # only, leaving the responsibility of publishing it to the user.
     # If set to auto, the release will not be uploaded to the homebrew tap
     # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1
@@ -120,7 +115,7 @@ brews:
     # Templates: allowed.
     skip_upload: "auto"
 
-    # So you can `brew test` your formula.
+    # So you can `brew test` your cask.
     #
     # Template: allowed
     # test: |
