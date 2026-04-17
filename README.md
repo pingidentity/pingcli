@@ -51,7 +51,7 @@ Use PingIdentity's Homebrew tap to install Ping CLI
 
 ``` shell
 brew tap pingidentity/tap
-brew install --cask pingcli
+brew install pingcli
 ```
 
 #### Manual Installation
@@ -80,7 +80,7 @@ Use PingIdentity's Homebrew tap to install Ping CLI
 
 ``` shell
 brew tap pingidentity/tap
-brew install --cask pingcli
+brew install pingcli
 ```
 
 ##### Alpine (.apk)
