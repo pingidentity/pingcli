@@ -28,12 +28,12 @@ func CheckSingletonResource(response *http.Response, err error, apiFuncName, res
 	}
 
 	if response.StatusCode == http.StatusNoContent {
-		// output.Warn("API client 204 No Content response.", map[string]interface{}{
-		// 	"API Function Name": apiFuncName,
-		// 	"Resource Type":     resourceType,
-		// 	"Response Code":     response.Status,
-		// 	"Response Body":     response.Body,
-		// })
+		output.Warn("API client 204 No Content response.", map[string]interface{}{
+			"API Function Name": apiFuncName,
+			"Resource Type":     resourceType,
+			"Response Code":     response.Status,
+			"Response Body":     response.Body,
+		})
 
 		return false, nil
 	}

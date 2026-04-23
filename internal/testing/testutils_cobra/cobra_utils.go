@@ -57,5 +57,7 @@ func ExecutePingcliCaptureCobraOutput(t *testing.T, args ...string) (output stri
 	root.SetOut(&stdout)
 	root.SetErr(&stdout)
 
-	return stdout.String(), root.Execute()
+	err = root.Execute()
+
+	return stdout.String(), err
 }

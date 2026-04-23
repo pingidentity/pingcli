@@ -16,6 +16,7 @@ import (
 	request_internal "github.com/pingidentity/pingcli/internal/commands/request"
 	"github.com/pingidentity/pingcli/internal/configuration/options"
 	"github.com/pingidentity/pingcli/internal/customtypes"
+	"github.com/pingidentity/pingcli/internal/profiles"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_cobra"
 	"github.com/pingidentity/pingcli/internal/testing/testutils_koanf"
 	"github.com/stretchr/testify/assert"
@@ -178,11 +179,15 @@ func Test_RequestCommand_ClientCredentialsEnvironmentErrorUsesSupportedConfigKey
 	t.Setenv(options.PingOneAuthenticationClientCredentialsClientIDOption.EnvVar, "00000000-0000-0000-0000-000000000001")
 	t.Setenv(options.PingOneAuthenticationClientCredentialsClientSecretOption.EnvVar, "test-secret")
 
+	koanfCfg, err := profiles.GetKoanfConfig()
+	require.NoError(t, err)
+	require.NoError(t, koanfCfg.KoanfInstance().Set("default."+options.PingOneAuthenticationAPIEnvironmentIDOption.KoanfKey, ""))
+
 	message := auth_internal.ErrClientCredentialsEnvironmentIDNotConfigured.Error()
 	assert.Contains(t, message, "service.pingOne.authentication.environmentID")
 	assert.NotContains(t, message, "service.pingone.authentication.clientCredentials.environmentID")
 
-	_, err := auth_internal.GetClientCredentialsConfiguration()
+	_, err = auth_internal.GetClientCredentialsConfiguration()
 	require.Error(t, err)
 	assert.ErrorContains(t, err, "service.pingOne.authentication.environmentID")
 	assert.False(t, strings.Contains(err.Error(), "service.pingone."))
