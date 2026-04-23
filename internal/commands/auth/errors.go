@@ -13,31 +13,31 @@ var (
 	ErrUnsupportedAuthMethod          = errors.New("unsupported grant type")
 	ErrTokenKeyGenerationRequirements = errors.New("environment ID and client ID are required for token key generation")
 	ErrGrantTypeNotSet                = errors.New("configuration does not have grant type set")
-	ErrRegionCodeRequired             = errors.New("region code is required and must be valid. Please run 'pingcli config set service.pingone.regionCode=<region>'")
-	ErrEnvironmentIDNotConfigured     = errors.New("environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.environmentID=<your-env-id>'")
+	ErrRegionCodeRequired             = errors.New("region code is required and must be valid. Please run 'pingcli config set service.pingOne.regionCode=<region>'")
+	ErrEnvironmentIDNotConfigured     = errors.New("environment ID is not configured. Please run 'pingcli config set service.pingOne.authentication.environmentID=<your-env-id>'")
 	ErrTokenStorageDisabled           = errors.New("token storage is disabled")
 	ErrInvalidAuthMethod              = errors.New("invalid authentication method flag provided")
 
 	// Device code errors
-	ErrDeviceCodeClientIDNotConfigured      = errors.New("device code client ID is not configured. Please run 'pingcli config set service.pingone.authentication.deviceCode.clientID=<your-client-id>'")
-	ErrDeviceCodeEnvironmentIDNotConfigured = errors.New("device code environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.deviceCode.environmentID=<your-env-id>'")
+	ErrDeviceCodeClientIDNotConfigured      = errors.New("device code client ID is not configured. Please run 'pingcli config set service.pingOne.authentication.deviceCode.clientID=<your-client-id>'")
+	ErrDeviceCodeEnvironmentIDNotConfigured = errors.New("device code environment ID is not configured. Please run 'pingcli config set service.pingOne.authentication.environmentID=<your-env-id>'")
 
 	// Auth code errors
-	ErrAuthorizationCodeClientIDNotConfigured        = errors.New("authorization code client ID is not configured. Please run 'pingcli config set service.pingone.authentication.authorizationCode.clientID=<your-client-id>'")
-	ErrAuthorizationCodeEnvironmentIDNotConfigured   = errors.New("authorization code environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.authorizationCode.environmentID=<your-env-id>'")
-	ErrAuthorizationCodeRedirectURINotConfigured     = errors.New("authorization code redirect URI is not configured. Please run 'pingcli config set service.pingone.authentication.authorizationCode.redirectURI=<your-redirect-uri>'")
-	ErrAuthorizationCodeRedirectURIPathNotConfigured = errors.New("authorization code redirect URI path is not configured. Please run 'pingcli config set service.pingone.authentication.authorizationCode.redirectURIPath=<path>'")
-	ErrAuthorizationCodeRedirectURIPortNotConfigured = errors.New("authorization code redirect URI port is not configured. Please run 'pingcli config set service.pingone.authentication.authorizationCode.redirectURIPort=<port>'")
+	ErrAuthorizationCodeClientIDNotConfigured        = errors.New("authorization code client ID is not configured. Please run 'pingcli config set service.pingOne.authentication.authorizationCode.clientID=<your-client-id>'")
+	ErrAuthorizationCodeEnvironmentIDNotConfigured   = errors.New("authorization code environment ID is not configured. Please run 'pingcli config set service.pingOne.authentication.environmentID=<your-env-id>'")
+	ErrAuthorizationCodeRedirectURINotConfigured     = errors.New("authorization code redirect URI is not configured. Please run 'pingcli config set service.pingOne.authentication.authorizationCode.redirectURI=<your-redirect-uri>'")
+	ErrAuthorizationCodeRedirectURIPathNotConfigured = errors.New("authorization code redirect URI path is not configured. Please run 'pingcli config set service.pingOne.authentication.authorizationCode.redirectURIPath=<path>'")
+	ErrAuthorizationCodeRedirectURIPortNotConfigured = errors.New("authorization code redirect URI port is not configured. Please run 'pingcli config set service.pingOne.authentication.authorizationCode.redirectURIPort=<port>'")
 
 	// Client credentials errors
-	ErrClientCredentialsClientIDNotConfigured      = errors.New("client credentials client ID is not configured. Please run 'pingcli config set service.pingone.authentication.clientCredentials.clientID=<your-client-id>'")
-	ErrClientCredentialsClientSecretNotConfigured  = errors.New("client credentials client secret is not configured. Please run 'pingcli config set service.pingone.authentication.clientCredentials.clientSecret=<your-client-secret>'")
-	ErrClientCredentialsEnvironmentIDNotConfigured = errors.New("client credentials environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.clientCredentials.environmentID=<your-env-id>'")
+	ErrClientCredentialsClientIDNotConfigured      = errors.New("client credentials client ID is not configured. Please run 'pingcli config set service.pingOne.authentication.clientCredentials.clientID=<your-client-id>'")
+	ErrClientCredentialsClientSecretNotConfigured  = errors.New("client credentials client secret is not configured. Please run 'pingcli config set service.pingOne.authentication.clientCredentials.clientSecret=<your-client-secret>'")
+	ErrClientCredentialsEnvironmentIDNotConfigured = errors.New("client credentials environment ID is not configured. Please run 'pingcli config set service.pingOne.authentication.environmentID=<your-env-id>'")
 
 	// Worker errors
-	ErrWorkerClientIDNotConfigured      = errors.New("worker client ID is not configured. Please run 'pingcli config set service.pingone.authentication.worker.clientID=<your-client-id>'")
-	ErrWorkerClientSecretNotConfigured  = errors.New("worker client secret is not configured. Please run 'pingcli config set service.pingone.authentication.worker.clientSecret=<your-client-secret>'")
-	ErrWorkerEnvironmentIDNotConfigured = errors.New("worker environment ID is not configured. Please run 'pingcli config set service.pingone.authentication.worker.environmentID=<your-env-id>'")
+	ErrWorkerClientIDNotConfigured      = errors.New("worker client ID is not configured. Please run 'pingcli config set service.pingOne.authentication.worker.clientID=<your-client-id>'")
+	ErrWorkerClientSecretNotConfigured  = errors.New("worker client secret is not configured. Please run 'pingcli config set service.pingOne.authentication.worker.clientSecret=<your-client-secret>'")
+	ErrWorkerEnvironmentIDNotConfigured = errors.New("worker environment ID is not configured. Please run 'pingcli config set service.pingOne.authentication.worker.environmentID=<your-env-id>'")
 
 	// PingFederate errors
 	ErrPingFederateContextNil  = errors.New("failed to initialize PingFederate services. context is nil")

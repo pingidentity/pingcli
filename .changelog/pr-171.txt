@@ -1,0 +1,3 @@
+```release-note:bug
+Add missing PingOne Authentication Environment ID option to request command
+```

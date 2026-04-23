@@ -82,6 +82,7 @@ The command offers a cURL-like experience to interact with the Ping platform ser
 }
 
 func initPingOneRequestFlags(cmd *cobra.Command) {
+	cmd.Flags().AddFlag(options.PingOneAuthenticationAPIEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerEnvironmentIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientIDOption.Flag)
 	cmd.Flags().AddFlag(options.PingOneAuthenticationWorkerClientSecretOption.Flag)
