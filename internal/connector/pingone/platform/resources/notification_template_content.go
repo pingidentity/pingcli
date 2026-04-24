@@ -135,7 +135,7 @@ func (r *PingOneNotificationTemplateContentResource) getTemplateNames() (arr []m
 		// When PingOne services are not enabled in an environment,
 		// the response code for the templates related to that service is
 		// 400 Bad Request - "CONSTRAINT_VIOLATION"
-		if err != nil && response.StatusCode == http.StatusBadRequest && response.Status == "400 Bad Request" {
+		if err != nil && response != nil && response.StatusCode == http.StatusBadRequest && response.Status == "400 Bad Request" {
 			defer func() {
 				cErr := response.Body.Close()
 				if cErr != nil {

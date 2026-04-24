@@ -56,6 +56,7 @@ func GetAuthorizeAPIObjectsFromIterator[T any](iter authorize.EntityArrayPagedIt
 
 func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPagedIterator, clientFuncName, extractionFuncName, resourceType string) ([]T, error) {
 	apiObjects := []T{}
+	seenNextLinks := map[string]struct{}{}
 
 	for cursor, err := range iter {
 		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, clientFuncName, resourceType)
@@ -84,6 +85,23 @@ func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPaged
 		}
 
 		apiObjects = append(apiObjects, apiObject...)
+
+		hasNext := false
+		nextLink := ""
+		if cursor.EntityArray != nil {
+			hasNext = cursor.EntityArray.HasPaginationNext()
+			if hasNext {
+				link := cursor.EntityArray.GetPaginationNextLink()
+				nextLink = link.Href
+			}
+		}
+
+		if hasNext && nextLink != "" {
+			if _, ok := seenNextLinks[nextLink]; ok {
+				break
+			}
+			seenNextLinks[nextLink] = struct{}{}
+		}
 	}
 
 	return apiObjects, nil
