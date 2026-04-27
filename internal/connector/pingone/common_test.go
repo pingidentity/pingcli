@@ -5,6 +5,7 @@ package pingone
 import (
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 	"testing"
 
@@ -12,12 +13,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestGetManagementAPIObjectsFromIterator_StopsOnRepeatingNextLink(t *testing.T) {
+func TestGetManagementAPIObjectsFromIterator_StopsOnRepeatingPageURL(t *testing.T) {
 	cursors := []management.PagedCursor{
-		newManagementCursor("link-a"),
-		newManagementCursor("link-b"),
-		newManagementCursor("link-a"),
-		newManagementCursor("link-c"),
+		newManagementCursor(t, "https://example.test/page-a", "https://example.test/page-b"),
+		newManagementCursor(t, "https://example.test/page-b", "https://example.test/page-a"),
+		newManagementCursor(t, "https://example.test/page-a", "https://example.test/page-b"),
+		newManagementCursor(t, "https://example.test/page-c", "https://example.test/page-d"),
 	}
 	yieldCount := 0
 	iter := management.EntityArrayPagedIterator(func(yield func(management.PagedCursor, error) bool) {
@@ -37,14 +38,15 @@ func TestGetManagementAPIObjectsFromIterator_StopsOnRepeatingNextLink(t *testing
 	)
 
 	require.NoError(t, err)
-	require.Len(t, apiObjects, 3)
+	require.Len(t, apiObjects, 2)
 	require.Equal(t, 3, yieldCount)
 }
 
-func newManagementCursor(nextLink string) management.PagedCursor {
+func newManagementCursor(t *testing.T, pageURL, nextLink string) management.PagedCursor {
+	t.Helper()
 	return management.PagedCursor{
 		EntityArray:  newManagementEntityArray(nextLink),
-		HTTPResponse: newOKResponse(),
+		HTTPResponse: newOKResponse(t, pageURL),
 	}
 }
 
@@ -65,10 +67,15 @@ func newManagementEntityArray(nextLink string) *management.EntityArray {
 	return &entityArray
 }
 
-func newOKResponse() *http.Response {
+func newOKResponse(t *testing.T, pageURL string) *http.Response {
+	t.Helper()
+	parsedURL, err := url.Parse(pageURL)
+	require.NoError(t, err)
+
 	return &http.Response{
 		StatusCode: http.StatusOK,
 		Status:     "200 OK",
 		Body:       io.NopCloser(strings.NewReader("{}")),
+		Request:    &http.Request{URL: parsedURL},
 	}
 }

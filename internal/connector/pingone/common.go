@@ -56,7 +56,7 @@ func GetAuthorizeAPIObjectsFromIterator[T any](iter authorize.EntityArrayPagedIt
 
 func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPagedIterator, clientFuncName, extractionFuncName, resourceType string) ([]T, error) {
 	apiObjects := []T{}
-	seenNextLinks := map[string]struct{}{}
+	seenPageURLs := map[string]struct{}{}
 
 	for cursor, err := range iter {
 		ok, err := common.HandleClientResponse(cursor.HTTPResponse, err, clientFuncName, resourceType)
@@ -66,6 +66,17 @@ func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPaged
 		// A warning was given when handling the client response. Return nil apiObjects to skip export of resource
 		if !ok {
 			return nil, nil
+		}
+
+		pageURL := ""
+		if cursor.HTTPResponse != nil && cursor.HTTPResponse.Request != nil && cursor.HTTPResponse.Request.URL != nil {
+			pageURL = cursor.HTTPResponse.Request.URL.String()
+		}
+		if pageURL != "" {
+			if _, ok := seenPageURLs[pageURL]; ok {
+				break
+			}
+			seenPageURLs[pageURL] = struct{}{}
 		}
 
 		nilErr := &errs.PingCLIError{Prefix: pingoneConnectorCommonErrorPrefix, Err: common.DataNilError(resourceType, cursor.HTTPResponse)}
@@ -85,23 +96,6 @@ func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPaged
 		}
 
 		apiObjects = append(apiObjects, apiObject...)
-
-		hasNext := false
-		nextLink := ""
-		if cursor.EntityArray != nil {
-			hasNext = cursor.EntityArray.HasPaginationNext()
-			if hasNext {
-				link := cursor.EntityArray.GetPaginationNextLink()
-				nextLink = link.Href
-			}
-		}
-
-		if hasNext && nextLink != "" {
-			if _, ok := seenNextLinks[nextLink]; ok {
-				break
-			}
-			seenNextLinks[nextLink] = struct{}{}
-		}
 	}
 
 	return apiObjects, nil
