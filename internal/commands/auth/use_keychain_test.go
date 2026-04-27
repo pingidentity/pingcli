@@ -126,6 +126,7 @@ func TestLoadTokenForMethod_WithKeychainDisabled(t *testing.T) {
 	// Set file-storage to true to disable keychain
 	t.Setenv("PINGCLI_LOGIN_STORAGE_TYPE", "file_system")
 
+	// #nosec G101 -- test token values only
 	testToken := &oauth2.Token{
 		AccessToken:  "test-load-access-token",
 		TokenType:    "Bearer",
@@ -409,6 +410,7 @@ func TestEnvironmentVariable_FileStorage(t *testing.T) {
 	// Reinitialize koanf to pick up environment variable
 	testutils_koanf.InitKoanfs(t)
 
+	// #nosec G101 -- test token values only
 	testToken := &oauth2.Token{
 		AccessToken: "test-env-var-token",
 		TokenType:   "Bearer",

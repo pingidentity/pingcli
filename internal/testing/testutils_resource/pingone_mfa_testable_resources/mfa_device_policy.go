@@ -73,9 +73,9 @@ func createMfaDevicePolicy(t *testing.T, clientInfo *connector.ClientInfo, resou
 					OtpLength: utils.Pointer(int32(8)),
 				},
 			},
-			Mobile: mfa.DeviceAuthenticationPolicyMobile{
+			Mobile: mfa.DeviceAuthenticationPolicyCommonMobile{
 				Enabled: true,
-				Otp: mfa.DeviceAuthenticationPolicyMobileOtp{
+				Otp: mfa.DeviceAuthenticationPolicyCommonMobileOtp{
 					Failure: mfa.DeviceAuthenticationPolicyOfflineDeviceOtpFailure{
 						Count: 3,
 						CoolDown: mfa.DeviceAuthenticationPolicyOfflineDeviceOtpFailureCoolDown{
@@ -84,11 +84,11 @@ func createMfaDevicePolicy(t *testing.T, clientInfo *connector.ClientInfo, resou
 						},
 					},
 				},
-				Applications: []mfa.DeviceAuthenticationPolicyMobileApplicationsInner{},
+				Applications: []mfa.DeviceAuthenticationPolicyCommonMobileApplicationsInner{},
 			},
-			Totp: mfa.DeviceAuthenticationPolicyTotp{
+			Totp: mfa.DeviceAuthenticationPolicyCommonTotp{
 				Enabled: true,
-				Otp: mfa.DeviceAuthenticationPolicyTotpOtp{
+				Otp: mfa.DeviceAuthenticationPolicyPingIDDeviceOtp{
 					Failure: mfa.DeviceAuthenticationPolicyOfflineDeviceOtpFailure{
 						Count: 3,
 						CoolDown: mfa.DeviceAuthenticationPolicyOfflineDeviceOtpFailureCoolDown{

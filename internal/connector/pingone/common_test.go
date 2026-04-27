@@ -44,6 +44,7 @@ func TestGetManagementAPIObjectsFromIterator_StopsOnRepeatingPageURL(t *testing.
 
 func newManagementCursor(t *testing.T, pageURL, nextLink string) management.PagedCursor {
 	t.Helper()
+
 	return management.PagedCursor{
 		EntityArray:  newManagementEntityArray(nextLink),
 		HTTPResponse: newOKResponse(t, pageURL),

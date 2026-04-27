@@ -63,7 +63,7 @@ func GenerateMarkdown() string {
 	for _, category := range cats {
 		properties := propertyCategoryInformation[category]
 		slices.Sort(properties)
-		outputBuilder.WriteString(fmt.Sprintf("#### %s Properties\n\n", category))
+		fmt.Fprintf(&outputBuilder, "#### %s Properties\n\n", category)
 		outputBuilder.WriteString("| Config File Property | Equivalent Parameter | Environment Variable | Type | Purpose |\n")
 		outputBuilder.WriteString("|---|---|---|---|---|\n")
 		for _, property := range properties {
@@ -109,8 +109,8 @@ func GenerateAsciiDocWithDates(created, revdate string) string {
 	}
 	var b strings.Builder
 	b.WriteString("= Configuration Settings Reference\n")
-	b.WriteString(fmt.Sprintf(":created-date: %s\n", created))
-	b.WriteString(fmt.Sprintf(":revdate: %s\n", revdate))
+	fmt.Fprintf(&b, ":created-date: %s\n", created)
+	fmt.Fprintf(&b, ":revdate: %s\n", revdate)
 	b.WriteString(":resourceid: pingcli_configuration_settings_reference\n\n")
 	b.WriteString("The following configuration settings can be applied when using Ping CLI.\n\n")
 	b.WriteString("The following configuration settings can be applied by using the xref:command_reference:pingcli_config_set.adoc[`config set` command] to persist the configuration value for a given **Configuration Key** in the Ping CLI configuration file.\n\n")
@@ -152,7 +152,7 @@ func GenerateAsciiDocWithDates(created, revdate string) string {
 			eqParam := asciiDocEquivalentParameter(opt)
 			envVar := opt.EnvVar
 			purpose := sanitizeUsage(opt)
-			b.WriteString(fmt.Sprintf("| `%s` | %s | %s | %s | %s\n", key, eqParam, formatEnvVar(envVar), dataType, purpose))
+			fmt.Fprintf(&b, "| `%s` | %s | %s | %s | %s\n", key, eqParam, formatEnvVar(envVar), dataType, purpose)
 		}
 		b.WriteString("|===\n\n")
 	}

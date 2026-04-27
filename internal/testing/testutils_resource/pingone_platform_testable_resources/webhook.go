@@ -35,6 +35,10 @@ func createWebhook(t *testing.T, clientInfo *connector.ClientInfo, resourceType 
 	}
 
 	request := clientInfo.PingOneApiClient.ManagementAPIClient.SubscriptionsWebhooksApi.CreateSubscription(clientInfo.PingOneContext, clientInfo.PingOneExportEnvironmentID)
+	endpoint := management.NewSubscriptionHttpEndpoint("https://subscriptionendpoint.com")
+	endpoint.Headers = &map[string]string{
+		"some-header": "some-value",
+	}
 	clientStruct := management.Subscription{
 		Name: "SubscriptionName1",
 		FilterOptions: management.SubscriptionFilterOptions{
@@ -43,13 +47,8 @@ func createWebhook(t *testing.T, clientInfo *connector.ClientInfo, resourceType 
 				"USER.UPDATED",
 			},
 		},
-		HttpEndpoint: management.SubscriptionHttpEndpoint{
-			Url: "https://subscriptionendpoint.com",
-			Headers: &map[string]string{
-				"some-header": "some-value",
-			},
-		},
-		Format:                management.ENUMSUBSCRIPTIONFORMAT_ACTIVITY,
+		HttpEndpoint:          endpoint,
+		Format:                management.ENUMSUBSCRIPTIONFORMAT_ACTIVITY.Ptr(),
 		VerifyTlsCertificates: false,
 		Enabled:               true,
 	}

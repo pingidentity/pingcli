@@ -27,7 +27,7 @@ func Test_RunInternalRequestWithFail(t *testing.T) {
 		t.Fatal("This should never run due to internal request resulting in os.Exit(1)")
 	} else {
 		cmdName := os.Args[0]
-		cmd := exec.CommandContext(t.Context(), cmdName, "-test.run=Test_RunInternalRequestWithFail") //#nosec G204 -- This is a test
+		cmd := exec.CommandContext(t.Context(), cmdName, "-test.run=Test_RunInternalRequestWithFail") // #nosec G204,G702 -- test executes current binary
 		cmd.Env = append(os.Environ(), "RUN_INTERNAL_FAIL_TEST=true")
 		err := cmd.Run()
 

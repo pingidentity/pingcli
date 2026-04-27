@@ -52,7 +52,7 @@ func main() {
 		}
 	}
 
-	if err := os.WriteFile(*outFile, []byte(content), 0o600); err != nil {
+	if err := os.WriteFile(*outFile, []byte(content), 0o600); err != nil { // #nosec G703 -- output path is user-provided
 		fmt.Fprintf(os.Stderr, "failed to write file: %v\n", err)
 		os.Exit(1)
 	}

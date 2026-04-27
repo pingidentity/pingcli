@@ -24,9 +24,9 @@ var (
 func RunPromptSecret(message string, validateFunc func(string) error, rc io.ReadCloser) (string, error) {
 	// Prefer terminal password read to avoid any UI redraws.
 	for {
-		if term.IsTerminal(int(os.Stdin.Fd())) {
+		if term.IsTerminal(int(os.Stdin.Fd())) { // #nosec G115 -- stdin fd fits into int on supported platforms
 			fmt.Printf("%s: ", message)
-			bytes, err := term.ReadPassword(int(os.Stdin.Fd()))
+			bytes, err := term.ReadPassword(int(os.Stdin.Fd())) // #nosec G115 -- stdin fd fits into int on supported platforms
 			fmt.Println()
 			if err != nil {
 				return "", &errs.PingCLIError{Prefix: inputPromptErrorPrefix, Err: err}

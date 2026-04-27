@@ -40,7 +40,7 @@ func createIdentityProvider(t *testing.T, clientInfo *connector.ClientInfo, reso
 		IdentityProviderOIDC: &management.IdentityProviderOIDC{
 			AuthorizationEndpoint:   "https://example.com/auth",
 			ClientId:                "clientId",
-			ClientSecret:            "clientSecret",
+			ClientSecret:            "clientSecret", // #nosec G101 -- test fixture only
 			Description:             utils.Pointer("Custom OpenID Connect Provider"),
 			DiscoveryEndpoint:       utils.Pointer("https://example.com/.well-known/openid-configuration"),
 			Enabled:                 true,

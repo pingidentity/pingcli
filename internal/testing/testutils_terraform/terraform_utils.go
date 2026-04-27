@@ -182,7 +182,7 @@ provider "pingone" {
 
 	// Write main.tf to testing directory
 	mainTFFilepath := filepath.Join(exportDir, "main.tf")
-	if err := os.WriteFile(mainTFFilepath, []byte(mainTFFileContents), 0600); err != nil {
+	if err := os.WriteFile(mainTFFilepath, []byte(mainTFFileContents), 0600); err != nil { // #nosec G703 -- path is derived from temp dir
 		t.Fatalf("Failed to write main.tf to testing directory: %v", err)
 	}
 

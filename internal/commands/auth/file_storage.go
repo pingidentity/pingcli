@@ -76,6 +76,7 @@ func saveTokenToFile(token *oauth2.Token, authMethod string) error {
 	}
 
 	// Marshal to JSON
+	// #nosec G117 -- token fields are expected to be serialized for file storage
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return &errs.PingCLIError{

@@ -174,7 +174,7 @@ func ParseArgsForConfigFile(args []string) string {
 
 func checkCfgFileLocation(cfgFile string) {
 	// Check existence of configuration file
-	_, err := os.Stat(cfgFile)
+	_, err := os.Stat(cfgFile) // #nosec G703 -- config path is user-provided by design
 	if os.IsNotExist(err) {
 		// Only create a new configuration file if it is the default configuration file location
 		if cfgFile == options.RootConfigOption.DefaultValue.String() {
@@ -193,7 +193,7 @@ func createConfigFile(cfgFile string) {
 	output.Message(fmt.Sprintf("Creating new Ping CLI configuration file at: %s", cfgFile), nil)
 
 	// MkdirAll does nothing if directories already exist. Create needed directories for config file location.
-	err := os.MkdirAll(filepath.Dir(cfgFile), os.FileMode(0700))
+	err := os.MkdirAll(filepath.Dir(cfgFile), os.FileMode(0700)) // #nosec G703 -- config directory is user-provided by design
 	if err != nil {
 		output.SystemError(fmt.Sprintf("Failed to make the directory for the new configuration file '%s': %v", cfgFile, err), nil)
 	}
