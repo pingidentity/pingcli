@@ -47,7 +47,7 @@ func TestCommandDocGeneration(t *testing.T) {
 
 		goldenPath := filepath.Join(goldenDir, f)
 		if *update {
-			if err := os.WriteFile(goldenPath, []byte(got), 0o600); err != nil {
+			if err := os.WriteFile(goldenPath, []byte(got), 0o600); err != nil { // #nosec G703 -- test writes approved golden output
 				t.Fatalf("write golden %s: %v", f, err)
 			}
 			t.Logf("updated golden: %s", f)

@@ -105,7 +105,7 @@ func Test_RunInternalExport(t *testing.T) {
 			services:       []string{customtypes.ENUM_EXPORT_SERVICE_PINGFEDERATE},
 			pfAuthType:     customtypes.PingFederateAuthenticationType(customtypes.ENUM_PINGFEDERATE_AUTHENTICATION_TYPE_CLIENT_CREDENTIALS),
 			pfClientId:     customtypes.StringPtr("invalid-client-id"),
-			pfClientSecret: "invalid-client-secret",
+			pfClientSecret: "invalid-client-secret", // #nosec G101 -- test credential value
 			pfTokenURL:     "http://localhost:9031/pf-admin-api/v1/oauth/token",
 			expectedError:  ErrPingFederateInit,
 		},

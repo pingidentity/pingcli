@@ -43,7 +43,7 @@ func createMfaApplicationPushCredential(t *testing.T, clientInfo *connector.Clie
 		MFAPushCredentialHMS: &mfa.MFAPushCredentialHMS{
 			Type:         mfa.ENUMMFAPUSHCREDENTIALATTRTYPE_HMS,
 			ClientId:     "897389789432",
-			ClientSecret: "B23897498",
+			ClientSecret: "B23897498", // #nosec G101 -- test fixture only
 		},
 	}
 
