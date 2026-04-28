@@ -1,3 +1,3 @@
 ```release-note:bug
-Resolve issue where platform export PingOne service group does not complete
+Resolve issue where platform export PingOne service group does not complete when exporting notification templates
 ```
