@@ -184,9 +184,7 @@ func TestPlatformTerraformPlan(t *testing.T) {
 		{
 			name:             "NotificationTemplateContent",
 			testableResource: pingone_platform_testable_resources.NotificationTemplateContent(t, clientInfo),
-			ignoredErrors: []string{
-				"Error: Cannot import non-existent remote object",
-			},
+			ignoredErrors:    nil,
 		},
 		{
 			name:             "PhoneDeliverySettings",

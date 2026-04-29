@@ -194,6 +194,7 @@ func (r *PingOneNotificationTemplateContentResource) getNotificationTemplateCont
 			notificationTemplateContentLocale           *string
 			notificationTemplateContentLocaleOk         bool
 			notificationTemplateContentVariant          string
+			notificationTemplateContentIsDefault        bool
 		)
 
 		switch {
@@ -202,24 +203,36 @@ func (r *PingOneNotificationTemplateContentResource) getNotificationTemplateCont
 			notificationTemplateContentDeliveryMethod, notificationTemplateContentDeliveryMethodOk = notificationTemplateContent.TemplateContentPush.GetDeliveryMethodOk()
 			notificationTemplateContentLocale, notificationTemplateContentLocaleOk = notificationTemplateContent.TemplateContentPush.GetLocaleOk()
 			notificationTemplateContentVariant = notificationTemplateContent.TemplateContentPush.GetVariant()
+			notificationTemplateContentIsDefault = notificationTemplateContent.TemplateContentPush.GetDefault()
 		case notificationTemplateContent.TemplateContentSMS != nil:
 			notificationTemplateContentId, notificationTemplateContentIdOk = notificationTemplateContent.TemplateContentSMS.GetIdOk()
 			notificationTemplateContentDeliveryMethod, notificationTemplateContentDeliveryMethodOk = notificationTemplateContent.TemplateContentSMS.GetDeliveryMethodOk()
 			notificationTemplateContentLocale, notificationTemplateContentLocaleOk = notificationTemplateContent.TemplateContentSMS.GetLocaleOk()
 			notificationTemplateContentVariant = notificationTemplateContent.TemplateContentSMS.GetVariant()
+			notificationTemplateContentIsDefault = notificationTemplateContent.TemplateContentSMS.GetDefault()
 		case notificationTemplateContent.TemplateContentEmail != nil:
 			notificationTemplateContentId, notificationTemplateContentIdOk = notificationTemplateContent.TemplateContentEmail.GetIdOk()
 			notificationTemplateContentDeliveryMethod, notificationTemplateContentDeliveryMethodOk = notificationTemplateContent.TemplateContentEmail.GetDeliveryMethodOk()
 			notificationTemplateContentLocale, notificationTemplateContentLocaleOk = notificationTemplateContent.TemplateContentEmail.GetLocaleOk()
 			notificationTemplateContentVariant = notificationTemplateContent.TemplateContentEmail.GetVariant()
+			notificationTemplateContentIsDefault = notificationTemplateContent.TemplateContentEmail.GetDefault()
 		case notificationTemplateContent.TemplateContentVoice != nil:
 			notificationTemplateContentId, notificationTemplateContentIdOk = notificationTemplateContent.TemplateContentVoice.GetIdOk()
 			notificationTemplateContentDeliveryMethod, notificationTemplateContentDeliveryMethodOk = notificationTemplateContent.TemplateContentVoice.GetDeliveryMethodOk()
 			notificationTemplateContentLocale, notificationTemplateContentLocaleOk = notificationTemplateContent.TemplateContentVoice.GetLocaleOk()
 			notificationTemplateContentVariant = notificationTemplateContent.TemplateContentVoice.GetVariant()
+			notificationTemplateContentIsDefault = notificationTemplateContent.TemplateContentVoice.GetDefault()
 		default:
 			output.Warn(fmt.Sprintf("Template content '%v' for template '%s' is not one of: Push, SMS, Email, or Voice. Skipping export.", notificationTemplateContent, templateName), nil)
 
+			continue
+		}
+
+		// Skip predefined default template contents. They are not importable
+		// by the PingOne Terraform provider (the import returns
+		// "Cannot import non-existent remote object"), and only customized
+		// content can be managed as a resource.
+		if notificationTemplateContentIsDefault {
 			continue
 		}
 

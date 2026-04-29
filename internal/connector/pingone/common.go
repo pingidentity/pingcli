@@ -56,6 +56,11 @@ func GetAuthorizeAPIObjectsFromIterator[T any](iter authorize.EntityArrayPagedIt
 
 func GetManagementAPIObjectsFromIterator[T any](iter management.EntityArrayPagedIterator, clientFuncName, extractionFuncName, resourceType string) ([]T, error) {
 	apiObjects := []T{}
+	// Guard against pagination loops: some PingOne endpoints (e.g.
+	// notification template contents) have been observed returning a HAL
+	// `next` link that points back to a previously fetched page, which
+	// causes the SDK iterator to loop indefinitely. Track page URLs and
+	// stop when we see one a second time.
 	seenPageURLs := map[string]struct{}{}
 
 	for cursor, err := range iter {
