@@ -50,7 +50,6 @@ func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.I
 	l.Debug().Msgf("Exporting all '%s' Resources...", r.ResourceType())
 
 	importBlocks := make([]connector.ImportBlock, 0, 1)
-	seenImportKeys := map[string]struct{}{}
 
 	enabledLocales, err := r.getEnabledLocales()
 	if err != nil {
@@ -76,12 +75,6 @@ func (r *PingOneNotificationTemplateContentResource) ExportAll() (*[]connector.I
 
 			// Only export template content if the locale is enabled
 			if enabledLocales[templateContentLocale] {
-				importKey := fmt.Sprintf("%s|%s|%s|%s|%s", string(templateName), templateContentDeliveryMethod, templateContentLocale, templateContentVariant, templateContentId)
-				if _, ok := seenImportKeys[importKey]; ok {
-					continue
-				}
-				seenImportKeys[importKey] = struct{}{}
-
 				commentData := map[string]string{
 					"Resource Type":                    r.ResourceType(),
 					"Template Name":                    string(templateName),
