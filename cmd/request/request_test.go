@@ -111,6 +111,10 @@ func Test_RequestCommand_Validation(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			testutils_koanf.InitKoanfs(t)
 
+			if tc.name == "Happy Path - with header" && (os.Getenv("CI") != "" || os.Getenv("GITHUB_ACTIONS") != "") {
+				t.Skip("Skipping live request test in CI environment due to keychain warning")
+			}
+
 			err := testutils_cobra.ExecutePingcli(t, append([]string{"request"}, tc.args...)...)
 
 			if !tc.expectErr {
@@ -134,6 +138,7 @@ func Test_RequestCommand_Validation(t *testing.T) {
 // making a real API call and validating the JSON output.
 func Test_RequestCommand_E2E(t *testing.T) {
 	testutils_koanf.InitKoanfs(t)
+	t.Setenv(options.AuthStorageOption.EnvVar, customtypes.ENUM_STORAGE_TYPE_NONE)
 
 	originalStdout := os.Stdout
 	r, w, err := os.Pipe()
