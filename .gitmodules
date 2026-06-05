@@ -1,3 +1,0 @@
-[submodule "shared-configs"]
-	path = shared-configs
-	url = git@github-emu:ping-internal/cdi-shared-configs.git
