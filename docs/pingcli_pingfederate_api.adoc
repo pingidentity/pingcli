@@ -1,0 +1,87 @@
+= pingcli pingfederate api
+:created-date: May 15, 2026
+:revdate: May 15, 2026
+:resourceid: pingcli_command_reference_pingcli_pingfederate_api
+
+Send a custom REST API request to the management API of PingFederate.
+
+== Synopsis
+
+Send a custom REST API request to the management API of PingFederate
+
+The custom REST API request is most powerful when product connection details have been configured in the CLI configuration file.
+
+The command offers a cURL-like experience to interact with the Ping products and services, with authentication and environment details dynamically filled by the CLI.
+
+----
+pingcli pingfederate api [flags] API_URI
+----
+
+== Examples
+
+----
+    Send a custom API request to the configured PingFederate server, making a GET request against the /serverSettings endpoint.
+    pingcli pingfederate api serverSettings
+
+  Send a custom API request to the configured PingFederate server, making a GET request to retrieve JSON configuration for authentication policies.
+    pingcli pingfederate api --http-method GET --output-format json authenticationPolicies/default
+
+  Send a custom API request to the configured PingFederate server, making a POST request to create a new data store with JSON data sourced from a file.
+    pingcli pingfederate api --http-method POST --data ./my-data-store.json dataStores
+
+  Send a custom API request to the configured PingFederate server, making a PUT request using raw JSON data.
+    pingcli pingfederate api --http-method PUT --data-raw '{"name": "My data store"}' dataStores/my-data-store-id
+
+  Send a custom API request to the configured PingFederate server, making a DELETE request to remove a data store.
+    pingcli pingfederate api --http-method DELETE dataStores/my-data-store-id
+----
+
+== Options
+
+----
+  -f, --fail                                                  Return non-zero exit code when HTTP custom API request returns a failure status code.
+  -h, --help                                                  help for api
+  -m, --http-method string                                    The HTTP method to use for the request. (default GET) Options are: DELETE, GET, PATCH, POST, PUT. Example: 'POST'
+  -r, --header []string                                       A custom header to send in the request. Example: --header "Content-Type: application/vnd.pingidentity.user.import+json"
+      --data string                                           The file containing data to send in the request.  Example: './data.json'
+      --data-raw string                                       The raw data to send in the request.  Example: '{"name": "My environment"}'
+      --pingfederate-access-token string                      The PingFederate access token used to authenticate to the PingFederate admin API when using a custom OAuth 2.0 token method.
+      --pingfederate-admin-api-path string                    The PingFederate API URL path used to communicate with PingFederate's admin API. (default /pf-admin-api/v1)
+      --pingfederate-authentication-oauth-grant-type string   The authentication type to use when connecting to the PingFederate admin API. Options are: client_credentials. Example: 'client_credentials'
+      --pingfederate-authentication-type string               The authentication type to use when connecting to the PingFederate admin API. Options are: accessTokenAuth, basicAuth, clientCredentialsAuth, oauth. Example: 'oauth'
+      --pingfederate-ca-certificate-pem-files []string        Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS. (default []) Accepts a comma-separated string to delimit multiple PEM files.
+      --pingfederate-client-id string                         The PingFederate client ID used to authenticate to the PingFederate admin API when using the client credentials authentication type.
+      --pingfederate-client-secret string                     The PingFederate client secret used to authenticate to the PingFederate admin API when using the client credentials authentication type.
+      --pingfederate-https-host string                        The PingFederate HTTPS host used to communicate with PingFederate's admin API. Example: 'https://pingfederate-admin.bxretail.org'
+      --pingfederate-insecure-trust-all-tls                   Trust any certificate when connecting to the PingFederate server admin API. (default false) This is insecure and shouldn't be enabled outside of testing.
+      --pingfederate-oauth-client-id string                   The PingFederate OAuth client ID used when the authentication type is 'oauth' with a client credentials grant type.
+      --pingfederate-oauth-client-secret string               The PingFederate OAuth client secret used when the authentication type is 'oauth' with a client credentials grant type.
+      --pingfederate-oauth-scopes []string                    The PingFederate OAuth scopes used when the authentication type is 'oauth' with a client credentials grant type. (default []) Accepts a comma-separated string to delimit multiple scopes.
+      --pingfederate-oauth-token-url string                   The PingFederate OAuth token URL used when the authentication type is 'oauth' with a client credentials grant type.
+      --pingfederate-password string                          The PingFederate password used to authenticate to the PingFederate admin API when using basic authentication.
+      --pingfederate-scopes []string                          The PingFederate scopes used to authenticate to the PingFederate admin API when using the client credentials authentication type. (default []) Accepts a comma-separated string to delimit multiple scopes. Example: 'openid,profile'
+      --pingfederate-software-version string                  The PingFederate software version to use when connecting to the PingFederate admin API. This is used to select the correct SDK version for authentication. After successful authentication, the actual running version is auto-detected from the API. (default 13.0) Example: '13.0'
+      --pingfederate-token-url string                         The PingFederate token URL used to authenticate to the PingFederate admin API when using the client credentials authentication type.
+      --pingfederate-username string                          The PingFederate username used to authenticate to the PingFederate admin API when using basic authentication. Example: 'administrator'
+      --pingfederate-x-bypass-external-validation-header      Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false)
+      --template string                                       A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
+----
+
+== Options inherited from parent commands
+
+----
+  -C, --config string           The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
+  -D, --detailed-exitcode       Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings.
+  -O, --output-format string    Specify the console output format. (default text) Options are: json, ndjson, text.
+  -P, --profile string          The name of a configuration profile to use.
+      --debug                   Enable debug output for error messages, including stack traces and transaction IDs. (default false)
+      --log-file string         Write logs to a file at the given path. File logging is disabled when not set.
+      --log-file-level string   Set the file log level. Options are: DEBUG, INFO, WARN, ERROR. (default DEBUG)
+      --log-level string        Set the console log level. Options are: DEBUG, INFO, WARN, ERROR. (default WARN)
+      --no-color                Disable text output in color. (default false)
+----
+
+== More information
+
+* xref:pingcli_pingfederate.adoc[]	 - Administration tools for PingFederate deployed as software
+

@@ -1,0 +1,53 @@
+= pingcli agent-skills install
+:created-date: May 15, 2026
+:revdate: May 15, 2026
+:resourceid: pingcli_command_reference_pingcli_agent-skills_install
+
+Install an agent skill from the remote source
+
+== Synopsis
+
+Install an agent skill from the remote source to the output directory.
+The skill directory and all its files are copied to <output-dir>/<skill-name>.
+The output directory defaults to .claude/skills in the current working directory and is
+created automatically if it does not exist.
+
+----
+pingcli agent-skills install skill-name [flags]
+----
+
+== Examples
+
+----
+  Install an agent skill to the default location (.claude/skills in the current directory).
+    pingcli agent-skills install pingcli-plugin-builder
+
+  Install an agent skill to a custom directory.
+    pingcli agent-skills install pingcli-plugin-builder --output-dir /path/to/my/skills
+----
+
+== Options
+
+----
+      --output-dir string   Directory to install the skill into. The skill will be placed at <output-dir>/<skill-name>. Defaults to .claude/skills in the current working directory.
+  -h, --help                help for install
+----
+
+== Options inherited from parent commands
+
+----
+  -C, --config string           The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml)
+  -D, --detailed-exitcode       Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings.
+  -O, --output-format string    Specify the console output format. (default text) Options are: json, ndjson, text.
+  -P, --profile string          The name of a configuration profile to use.
+      --debug                   Enable debug output for error messages, including stack traces and transaction IDs. (default false)
+      --log-file string         Write logs to a file at the given path. File logging is disabled when not set.
+      --log-file-level string   Set the file log level. Options are: DEBUG, INFO, WARN, ERROR. (default DEBUG)
+      --log-level string        Set the console log level. Options are: DEBUG, INFO, WARN, ERROR. (default WARN)
+      --no-color                Disable text output in color. (default false)
+----
+
+== More information
+
+* xref:pingcli_agent-skills.adoc[]	 - Find and install agent skills for Ping CLI.
+

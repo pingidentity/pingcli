@@ -1,0 +1,55 @@
+# `pingcli pingone applications application-secrets rotate`
+Rotate an application secret
+
+## Synopsis
+
+Rotate the secret for a PingOne application. The API generates a new secret and moves the existing secret to the previous-secret slot. Use --previous-expires-in or --previous-expires-at to keep the previous secret valid during a migration window (max 720h). Without either flag the previous secret expires immediately.
+
+```
+pingcli pingone applications application-secrets rotate [flags]
+```
+
+## Examples
+
+```
+# Rotate the application secret (generates a new secret; the previous secret
+  # is discarded immediately)
+  pingcli pingone applications application-secrets rotate --environment-id <env-id> --application-id <app-id>
+
+  # Rotate and keep the previous secret valid for 24 hours
+  pingcli pingone applications application-secrets rotate --environment-id <env-id> --application-id <app-id> --previous-expires-in 24h
+
+  # Rotate and keep the previous secret valid until a specific time
+  pingcli pingone applications application-secrets rotate --environment-id <env-id> --application-id <app-id> --previous-expires-at 2027-01-01T00:00:00Z
+```
+
+## Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-h, --help` | `` | help for rotate |
+| `-a, --application-id string` | `` | The application ID |
+| `-e, --environment-id string` | `` | The PingOne environment ID |
+| `--previous-expires-at timestamp` | `` | Absolute expiry time for the previous secret in RFC3339 format (e.g. 2027-01-01T00:00:00Z). Must be in the future and within 720h. Mutually exclusive with --previous-expires-in. |
+| `--previous-expires-in duration` | `` | How long the previous secret remains valid after rotation (e.g. 24h, 30m). Supported range: 1m–720h (30 days). Mutually exclusive with --previous-expires-at. |
+
+
+## Inherited Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-C, --config string` | `` | The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml) |
+| `-D, --detailed-exitcode` | `` | Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. |
+| `-O, --output-format string` | `` | Specify the console output format. (default text) Options are: json, ndjson, ndjson-wrapped, text. |
+| `-P, --profile string` | `` | The name of a configuration profile to use. |
+| `--debug` | `` | Enable debug output for error messages, including stack traces and transaction IDs. (default false) |
+| `--log-file string` | `` | Write logs to a file at the given path. File logging is disabled when not set. |
+| `--log-file-level string` | `` | Set the file log level. Options are: DEBUG, INFO, WARN, ERROR. (default DEBUG) |
+| `--log-level string` | `` | Set the console log level. Options are: DEBUG, INFO, WARN, ERROR. (default WARN) |
+| `--no-color` | `` | Disable text output in color. (default false) |
+| `--query string` | `` | JMESPath expression to filter JSON output. Requires -O json, ndjson, or ndjson-wrapped. Example: --query 'data[?enabled].name' |
+
+
+## Parent Command
+
+- [`pingcli pingone applications application-secrets`](cmd-pingcli-pingone-applications-application-secrets.md) — Application Secrets
