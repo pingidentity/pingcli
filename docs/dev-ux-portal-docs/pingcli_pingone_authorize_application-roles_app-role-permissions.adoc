@@ -1,16 +1,16 @@
-= pingcli pingone users user-devices
-:created-date: June 5, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_users_user-devices
+= pingcli pingone authorize application-roles app-role-permissions
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_pingone_authorize_application-roles_app-role-permissions
 
-User MFA Devices
+Application Role Permissions
 
 == Synopsis
 
-User MFA Devices
+Application Role Permissions
 
 ----
-pingcli pingone users user-devices [flags]
+pingcli pingone authorize application-roles app-role-permissions [flags]
 ----
 
 == Options inherited from parent commands
@@ -30,10 +30,12 @@ pingcli pingone users user-devices [flags]
 
 == More information
 
-* xref:pingcli_pingone_users.adoc[]	 - Users
+* xref:pingcli_pingone_authorize_application-roles.adoc[]	 - Application Roles
 
 == Subcommands
 
-* xref:pingcli_pingone_users_user-devices_delete.adoc[] - Delete a user MFA device
-* xref:pingcli_pingone_users_user-devices_get.adoc[] - Read a specific user MFA device
-* xref:pingcli_pingone_users_user-devices_list.adoc[] - List all user MFA devices
+* xref:pingcli_pingone_authorize_application-roles_app-role-permissions_create.adoc[] - Create a new application role permission
+* xref:pingcli_pingone_authorize_application-roles_app-role-permissions_delete.adoc[] - Delete an application role permission
+* xref:pingcli_pingone_authorize_application-roles_app-role-permissions_get.adoc[] - Read a specific application role permission
+* xref:pingcli_pingone_authorize_application-roles_app-role-permissions_list.adoc[] - List all application role permissions
+* xref:pingcli_pingone_authorize_application-roles_app-role-permissions_template.adoc[] - Generate an application role permission JSON template

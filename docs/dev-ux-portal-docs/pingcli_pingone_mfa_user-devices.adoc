@@ -1,16 +1,16 @@
-= pingcli pingone app-role-holder-assignments
-:created-date: June 2, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_app-role-holder-assignments
+= pingcli pingone mfa user-devices
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_pingone_mfa_user-devices
 
-App Role Holder Assignments
+User MFA Devices
 
 == Synopsis
 
-Manage application role holder assignments in PingOne
+User MFA Devices
 
 ----
-pingcli pingone app-role-holder-assignments [flags]
+pingcli pingone mfa user-devices [flags]
 ----
 
 == Options inherited from parent commands
@@ -30,8 +30,10 @@ pingcli pingone app-role-holder-assignments [flags]
 
 == More information
 
-* xref:pingcli_pingone.adoc[]	 - Administration tools for the PingOne platform.
+* xref:pingcli_pingone_mfa.adoc[]	 - Administration tools for the PingOne MFA universal service.
 
 == Subcommands
 
-* xref:pingcli_pingone_app-role-holder-assignments_list.adoc[] - List all app role holder assignments
+* xref:pingcli_pingone_mfa_user-devices_delete.adoc[] - Delete a user MFA device
+* xref:pingcli_pingone_mfa_user-devices_get.adoc[] - Read a specific user MFA device
+* xref:pingcli_pingone_mfa_user-devices_list.adoc[] - List all user MFA devices

@@ -1,32 +1,16 @@
-= pingcli pingone app-role-permissions delete
-:created-date: June 1, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_app-role-permissions_delete
+= pingcli mfa user-devices
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_mfa_user-devices
 
-Delete an application role permission
+User MFA Devices
 
 == Synopsis
 
-Delete an application role permission from a PingOne environment
+User MFA Devices
 
 ----
-pingcli pingone app-role-permissions delete [flags]
-----
-
-== Examples
-
-----
-  # Delete an application role permission
-  pingcli pingone app-role-permissions delete --environment-id <env-id> --application-role-id <role-id> --permission-id <permission-id>
-----
-
-== Options
-
-----
-  -e, --environment-id string        The PingOne environment ID
-  -h, --help                         help for delete
-  -p, --permission-id string         The application role permission ID
-  -r, --application-role-id string   The application role ID
+pingcli mfa user-devices [flags]
 ----
 
 == Options inherited from parent commands
@@ -46,5 +30,10 @@ pingcli pingone app-role-permissions delete [flags]
 
 == More information
 
-* xref:pingcli_pingone_app-role-permissions.adoc[]	 - Application Role Permissions
+* xref:pingcli_mfa.adoc[]	 - Administration tools for the PingOne MFA universal service.
 
+== Subcommands
+
+* xref:pingcli_mfa_user-devices_delete.adoc[] - Delete a user MFA device
+* xref:pingcli_mfa_user-devices_get.adoc[] - Read a specific user MFA device
+* xref:pingcli_mfa_user-devices_list.adoc[] - List all user MFA devices

@@ -1,16 +1,33 @@
-= pingcli pingone app-role-permissions
-:created-date: June 1, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_app-role-permissions
+= pingcli pingone mfa user-devices get
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_pingone_mfa_user-devices_get
 
-Application Role Permissions
+Read a specific user MFA device
 
 == Synopsis
 
-Application Role Permissions
+Read a specific MFA device enrolled for a user in a PingOne environment
 
 ----
-pingcli pingone app-role-permissions [flags]
+pingcli pingone mfa user-devices get [flags]
+----
+
+== Examples
+
+----
+  # Read a specific user MFA device
+  pingcli pingone mfa user-devices get --environment-id <env-id> --user-id <user-id> --device-id <device-id>
+----
+
+== Options
+
+----
+  -d, --device-id string        The MFA device ID
+  -h, --help                    help for get
+  -e, --environment-id string   The PingOne environment ID
+  -u, --user-id string          The PingOne user ID
+      --template string         A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
 ----
 
 == Options inherited from parent commands
@@ -30,12 +47,5 @@ pingcli pingone app-role-permissions [flags]
 
 == More information
 
-* xref:pingcli_pingone.adoc[]	 - Administration tools for the PingOne platform.
+* xref:pingcli_pingone_mfa_user-devices.adoc[]	 - User MFA Devices
 
-== Subcommands
-
-* xref:pingcli_pingone_app-role-permissions_create.adoc[] - Create a new application role permission
-* xref:pingcli_pingone_app-role-permissions_delete.adoc[] - Delete an application role permission
-* xref:pingcli_pingone_app-role-permissions_get.adoc[] - Read a specific application role permission
-* xref:pingcli_pingone_app-role-permissions_list.adoc[] - List all application role permissions
-* xref:pingcli_pingone_app-role-permissions_template.adoc[] - Generate an application role permission JSON template

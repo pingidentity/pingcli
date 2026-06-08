@@ -1,32 +1,32 @@
-= pingcli pingone app-role-permissions list
-:created-date: June 1, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_app-role-permissions_list
+= pingcli mfa user-devices list
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_mfa_user-devices_list
 
-List all application role permissions
+List all user MFA devices
 
 == Synopsis
 
-List all application role permissions for a role in a PingOne environment
+List all MFA devices enrolled for a user in a PingOne environment
 
 ----
-pingcli pingone app-role-permissions list [flags]
+pingcli mfa user-devices list [flags]
 ----
 
 == Examples
 
 ----
-  # List all application role permissions for a role in an environment
-  pingcli pingone app-role-permissions list --environment-id <env-id> --application-role-id <role-id>
+  # List all MFA devices for a user
+  pingcli mfa user-devices list --environment-id <env-id> --user-id <user-id>
 ----
 
 == Options
 
 ----
-  -e, --environment-id string        The PingOne environment ID
-  -h, --help                         help for list
-  -r, --application-role-id string   The application role ID
-      --template string              A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
+  -e, --environment-id string   The PingOne environment ID
+  -h, --help                    help for list
+  -u, --user-id string          The PingOne user ID
+      --template string         A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
 ----
 
 == Options inherited from parent commands
@@ -46,5 +46,5 @@ pingcli pingone app-role-permissions list [flags]
 
 == More information
 
-* xref:pingcli_pingone_app-role-permissions.adoc[]	 - Application Role Permissions
+* xref:pingcli_mfa_user-devices.adoc[]	 - User MFA Devices
 

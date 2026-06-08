@@ -1,6 +1,6 @@
 = pingcli pingone
 :created-date: March 3, 2026
-:revdate: June 5, 2026
+:revdate: June 8, 2026
 :resourceid: pingcli_command_reference_pingcli_pingone
 
 Administration tools for the PingOne platform.
@@ -40,8 +40,6 @@ pingcli pingone
 
 * xref:pingcli_pingone_agreements.adoc[] - Agreements
 * xref:pingcli_pingone_api.adoc[] - Send a custom REST API request to the management API of PingOne.
-* xref:pingcli_pingone_app-role-holder-assignments.adoc[] - App Role Holder Assignments
-* xref:pingcli_pingone_app-role-permissions.adoc[] - Application Role Permissions
 * xref:pingcli_pingone_applications.adoc[] - Applications
 * xref:pingcli_pingone_auth.adoc[] - Authenticate Ping CLI to the PingOne management APIs.
 * xref:pingcli_pingone_authorize.adoc[] - Administration tools for the PingOne Authorize universal service.

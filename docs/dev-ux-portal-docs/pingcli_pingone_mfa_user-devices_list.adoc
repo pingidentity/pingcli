@@ -1,42 +1,32 @@
-= pingcli pingone app-role-permissions template
-:created-date: June 1, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_app-role-permissions_template
+= pingcli pingone mfa user-devices list
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_pingone_mfa_user-devices_list
 
-Generate an application role permission JSON template
+List all user MFA devices
 
 == Synopsis
 
-Generate a JSON skeleton template for application role permission create bodies
+List all MFA devices enrolled for a user in a PingOne environment
 
 ----
-pingcli pingone app-role-permissions template [flags]
+pingcli pingone mfa user-devices list [flags]
 ----
 
 == Examples
 
 ----
-  # Generate a template and save to a file
-  pingcli pingone app-role-permissions template > permission.json
-
-  # Edit the template (set id to the permission UUID), then create the role permission
-  pingcli pingone app-role-permissions template --environment-id <env-id> --application-role-id <role-id> --from-file permission.json
-Use the JSON template as a starting point:
-  1. Run the template command to generate the body skeleton.
-  2. Edit the file, replacing placeholder values with real data.
-  3. Feed the edited file back to the create or replace action via --from-file.
-
-Example workflow:
-  pingcli pingone app-role-permissions template > body.json
-  # edit body.json
-  pingcli pingone app-role-permissions create --from-file body.json
+  # List all MFA devices for a user
+  pingcli pingone mfa user-devices list --environment-id <env-id> --user-id <user-id>
 ----
 
 == Options
 
 ----
-  -o, --output-file string   Write the JSON template to PATH instead of stdout. Overwrites any existing file.
-  -h, --help                 help for template
+  -e, --environment-id string   The PingOne environment ID
+  -h, --help                    help for list
+  -u, --user-id string          The PingOne user ID
+      --template string         A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
 ----
 
 == Options inherited from parent commands
@@ -56,5 +46,5 @@ Example workflow:
 
 == More information
 
-* xref:pingcli_pingone_app-role-permissions.adoc[]	 - Application Role Permissions
+* xref:pingcli_pingone_mfa_user-devices.adoc[]	 - User MFA Devices
 

@@ -1,33 +1,32 @@
-= pingcli pingone users user-devices get
-:created-date: June 5, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_users_user-devices_get
+= pingcli authorize application-roles application-role-assignments list
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_authorize_application-roles_application-role-assignments_list
 
-Read a specific user MFA device
+List all application role assignments
 
 == Synopsis
 
-Read a specific MFA device enrolled for a user in a PingOne environment
+List all application role assignments for an application role in a PingOne Authorize environment
 
 ----
-pingcli pingone users user-devices get [flags]
+pingcli authorize application-roles application-role-assignments list [flags]
 ----
 
 == Examples
 
 ----
-  # Read a specific user MFA device
-  pingcli pingone users user-devices get --environment-id <env-id> --user-id <user-id> --device-id <device-id>
+  # List all application role assignments for an application role in an environment
+  pingcli authorize application-roles application-role-assignments list --environment-id <env-id> --application-role-id <application-role-id>
 ----
 
 == Options
 
 ----
-  -d, --device-id string        The MFA device ID
-  -h, --help                    help for get
-  -e, --environment-id string   The PingOne environment ID
-  -u, --user-id string          The PingOne user ID
-      --template string         A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
+  -a, --application-role-id string   The application role ID
+  -h, --help                         help for list
+  -e, --environment-id string        The PingOne environment ID
+      --template string              A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
 ----
 
 == Options inherited from parent commands
@@ -47,5 +46,5 @@ pingcli pingone users user-devices get [flags]
 
 == More information
 
-* xref:pingcli_pingone_users_user-devices.adoc[]	 - User MFA Devices
+* xref:pingcli_authorize_application-roles_application-role-assignments.adoc[]	 - Application Role Assignments
 

@@ -1,33 +1,37 @@
-= pingcli pingone app-role-permissions get
-:created-date: June 1, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_app-role-permissions_get
+= pingcli authorize application-roles app-role-permissions create
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_authorize_application-roles_app-role-permissions_create
 
-Read a specific application role permission
+Create a new application role permission
 
 == Synopsis
 
-Read a specific application role permission in a PingOne environment
+Create a new application role permission in a PingOne Authorize environment
 
 ----
-pingcli pingone app-role-permissions get [flags]
+pingcli authorize application-roles app-role-permissions create [flags]
 ----
 
 == Examples
 
 ----
-  # Read a specific application role permission
-  pingcli pingone app-role-permissions get --environment-id <env-id> --application-role-id <role-id> --permission-id <permission-id>
+
+
+  # Create a new application role permission from a JSON file
+  pingcli authorize application-roles app-role-permissions create --environment-id <env-id> --application-role-id <role-id> --from-file permission.json
+
+  # Create a new application role permission from stdin
+  pingcli authorize application-roles app-role-permissions create --environment-id <env-id> --application-role-id <role-id> --from-file - < permission.json
 ----
 
 == Options
 
 ----
   -e, --environment-id string        The PingOne environment ID
-  -h, --help                         help for get
-  -p, --permission-id string         The application role permission ID
+  -h, --help                         help for create
+  -f, --from-file string             Path to a JSON file containing the request body, or "-" to read from stdin.
   -r, --application-role-id string   The application role ID
-      --template string              A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
 ----
 
 == Options inherited from parent commands
@@ -47,5 +51,5 @@ pingcli pingone app-role-permissions get [flags]
 
 == More information
 
-* xref:pingcli_pingone_app-role-permissions.adoc[]	 - Application Role Permissions
+* xref:pingcli_authorize_application-roles_app-role-permissions.adoc[]	 - Application Role Permissions
 

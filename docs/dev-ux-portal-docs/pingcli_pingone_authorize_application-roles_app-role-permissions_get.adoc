@@ -1,32 +1,33 @@
-= pingcli pingone users user-devices delete
-:created-date: June 5, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_users_user-devices_delete
+= pingcli pingone authorize application-roles app-role-permissions get
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_pingone_authorize_application-roles_app-role-permissions_get
 
-Delete a user MFA device
+Read a specific application role permission
 
 == Synopsis
 
-Delete an MFA device enrolled for a user in a PingOne environment
+Read a specific application role permission in a PingOne Authorize environment
 
 ----
-pingcli pingone users user-devices delete [flags]
+pingcli pingone authorize application-roles app-role-permissions get [flags]
 ----
 
 == Examples
 
 ----
-  # Delete a user MFA device
-  pingcli pingone users user-devices delete --environment-id <env-id> --user-id <user-id> --device-id <device-id>
+  # Read a specific application role permission
+  pingcli pingone authorize application-roles app-role-permissions get --environment-id <env-id> --application-role-id <role-id> --permission-id <permission-id>
 ----
 
 == Options
 
 ----
-  -d, --device-id string        The MFA device ID
-  -h, --help                    help for delete
-  -e, --environment-id string   The PingOne environment ID
-  -u, --user-id string          The PingOne user ID
+  -e, --environment-id string        The PingOne environment ID
+  -h, --help                         help for get
+  -p, --permission-id string         The application role permission ID
+  -r, --application-role-id string   The application role ID
+      --template string              A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
 ----
 
 == Options inherited from parent commands
@@ -46,5 +47,5 @@ pingcli pingone users user-devices delete [flags]
 
 == More information
 
-* xref:pingcli_pingone_users_user-devices.adoc[]	 - User MFA Devices
+* xref:pingcli_pingone_authorize_application-roles_app-role-permissions.adoc[]	 - Application Role Permissions
 

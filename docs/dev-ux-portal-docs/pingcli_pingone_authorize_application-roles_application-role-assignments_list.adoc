@@ -1,16 +1,32 @@
-= pingcli authorize application-roles
-:created-date: June 1, 2026
+= pingcli pingone authorize application-roles application-role-assignments list
+:created-date: June 8, 2026
 :revdate: June 8, 2026
-:resourceid: pingcli_command_reference_pingcli_authorize_application-roles
+:resourceid: pingcli_command_reference_pingcli_pingone_authorize_application-roles_application-role-assignments_list
 
-Application Roles
+List all application role assignments
 
 == Synopsis
 
-Application Roles
+List all application role assignments for an application role in a PingOne Authorize environment
 
 ----
-pingcli authorize application-roles [flags]
+pingcli pingone authorize application-roles application-role-assignments list [flags]
+----
+
+== Examples
+
+----
+  # List all application role assignments for an application role in an environment
+  pingcli pingone authorize application-roles application-role-assignments list --environment-id <env-id> --application-role-id <application-role-id>
+----
+
+== Options
+
+----
+  -a, --application-role-id string   The application role ID
+  -h, --help                         help for list
+  -e, --environment-id string        The PingOne environment ID
+      --template string              A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
 ----
 
 == Options inherited from parent commands
@@ -30,16 +46,5 @@ pingcli authorize application-roles [flags]
 
 == More information
 
-* xref:pingcli_authorize.adoc[]	 - Administration tools for the PingOne Authorize universal service.
+* xref:pingcli_pingone_authorize_application-roles_application-role-assignments.adoc[]	 - Application Role Assignments
 
-== Subcommands
-
-* xref:pingcli_authorize_application-roles_app-role-permissions.adoc[] - Application Role Permissions
-* xref:pingcli_authorize_application-roles_application-role-assignments.adoc[] - Application Role Assignments
-* xref:pingcli_authorize_application-roles_apply.adoc[] - Create or update an application role
-* xref:pingcli_authorize_application-roles_create.adoc[] - Create a new application role
-* xref:pingcli_authorize_application-roles_delete.adoc[] - Delete an application role
-* xref:pingcli_authorize_application-roles_get.adoc[] - Read a specific application role
-* xref:pingcli_authorize_application-roles_list.adoc[] - List all application roles
-* xref:pingcli_authorize_application-roles_replace.adoc[] - Update an application role
-* xref:pingcli_authorize_application-roles_template.adoc[] - Generate an application role JSON template

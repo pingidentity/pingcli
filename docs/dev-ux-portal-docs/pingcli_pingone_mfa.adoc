@@ -1,6 +1,6 @@
 = pingcli pingone mfa
 :created-date: June 5, 2026
-:revdate: June 5, 2026
+:revdate: June 8, 2026
 :resourceid: pingcli_command_reference_pingcli_pingone_mfa
 
 Administration tools for the PingOne MFA universal service.
@@ -36,3 +36,4 @@ pingcli pingone mfa
 
 * xref:pingcli_pingone_mfa_mfa-device-policies.adoc[] - MFA Device Policies
 * xref:pingcli_pingone_mfa_mfa-settings.adoc[] - MFA Settings
+* xref:pingcli_pingone_mfa_user-devices.adoc[] - User MFA Devices

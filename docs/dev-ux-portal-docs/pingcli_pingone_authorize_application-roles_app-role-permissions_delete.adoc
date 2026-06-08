@@ -1,36 +1,31 @@
-= pingcli pingone app-role-permissions create
-:created-date: June 1, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_app-role-permissions_create
+= pingcli pingone authorize application-roles app-role-permissions delete
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_pingone_authorize_application-roles_app-role-permissions_delete
 
-Create a new application role permission
+Delete an application role permission
 
 == Synopsis
 
-Create a new application role permission in a PingOne environment
+Delete an application role permission from a PingOne Authorize environment
 
 ----
-pingcli pingone app-role-permissions create [flags]
+pingcli pingone authorize application-roles app-role-permissions delete [flags]
 ----
 
 == Examples
 
 ----
-
-
-  # Create a new application role permission from a JSON file
-  pingcli pingone app-role-permissions create --environment-id <env-id> --application-role-id <role-id> --from-file permission.json
-
-  # Create a new application role permission from stdin
-  pingcli pingone app-role-permissions create --environment-id <env-id> --application-role-id <role-id> --from-file - < permission.json
+  # Delete an application role permission
+  pingcli pingone authorize application-roles app-role-permissions delete --environment-id <env-id> --application-role-id <role-id> --permission-id <permission-id>
 ----
 
 == Options
 
 ----
   -e, --environment-id string        The PingOne environment ID
-  -h, --help                         help for create
-  -f, --from-file string             Path to a JSON file containing the request body, or "-" to read from stdin.
+  -h, --help                         help for delete
+  -p, --permission-id string         The application role permission ID
   -r, --application-role-id string   The application role ID
 ----
 
@@ -51,5 +46,5 @@ pingcli pingone app-role-permissions create [flags]
 
 == More information
 
-* xref:pingcli_pingone_app-role-permissions.adoc[]	 - Application Role Permissions
+* xref:pingcli_pingone_authorize_application-roles_app-role-permissions.adoc[]	 - Application Role Permissions
 

@@ -1,32 +1,32 @@
-= pingcli pingone users user-devices list
-:created-date: June 5, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_users_user-devices_list
+= pingcli authorize application-roles app-role-permissions delete
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_authorize_application-roles_app-role-permissions_delete
 
-List all user MFA devices
+Delete an application role permission
 
 == Synopsis
 
-List all MFA devices enrolled for a user in a PingOne environment
+Delete an application role permission from a PingOne Authorize environment
 
 ----
-pingcli pingone users user-devices list [flags]
+pingcli authorize application-roles app-role-permissions delete [flags]
 ----
 
 == Examples
 
 ----
-  # List all MFA devices for a user
-  pingcli pingone users user-devices list --environment-id <env-id> --user-id <user-id>
+  # Delete an application role permission
+  pingcli authorize application-roles app-role-permissions delete --environment-id <env-id> --application-role-id <role-id> --permission-id <permission-id>
 ----
 
 == Options
 
 ----
-  -e, --environment-id string   The PingOne environment ID
-  -h, --help                    help for list
-  -u, --user-id string          The PingOne user ID
-      --template string         A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
+  -e, --environment-id string        The PingOne environment ID
+  -h, --help                         help for delete
+  -p, --permission-id string         The application role permission ID
+  -r, --application-role-id string   The application role ID
 ----
 
 == Options inherited from parent commands
@@ -46,5 +46,5 @@ pingcli pingone users user-devices list [flags]
 
 == More information
 
-* xref:pingcli_pingone_users_user-devices.adoc[]	 - User MFA Devices
+* xref:pingcli_authorize_application-roles_app-role-permissions.adoc[]	 - Application Role Permissions
 

@@ -1,6 +1,6 @@
 = pingcli pingone users
 :created-date: May 27, 2026
-:revdate: June 5, 2026
+:revdate: June 8, 2026
 :resourceid: pingcli_command_reference_pingcli_pingone_users
 
 Users
@@ -42,7 +42,6 @@ pingcli pingone users [flags]
 * xref:pingcli_pingone_users_replace.adoc[] - Update a user
 * xref:pingcli_pingone_users_template.adoc[] - Generate a user JSON template
 * xref:pingcli_pingone_users_user-application-role-assignments.adoc[] - User Application Role Assignments
-* xref:pingcli_pingone_users_user-devices.adoc[] - User MFA Devices
 * xref:pingcli_pingone_users_user-identity-provider.adoc[] - User Identity Provider
 * xref:pingcli_pingone_users_user-population.adoc[] - User Population
 * xref:pingcli_pingone_users_user-role-assignments.adoc[] - User Role Assignments

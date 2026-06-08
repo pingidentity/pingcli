@@ -1,32 +1,32 @@
-= pingcli pingone app-role-holder-assignments list
-:created-date: June 2, 2026
-:revdate: June 5, 2026
-:resourceid: pingcli_command_reference_pingcli_pingone_app-role-holder-assignments_list
+= pingcli pingone mfa user-devices delete
+:created-date: June 8, 2026
+:revdate: June 8, 2026
+:resourceid: pingcli_command_reference_pingcli_pingone_mfa_user-devices_delete
 
-List all app role holder assignments
+Delete a user MFA device
 
 == Synopsis
 
-List all app role holder assignments for an application role in a PingOne environment
+Delete an MFA device enrolled for a user in a PingOne environment
 
 ----
-pingcli pingone app-role-holder-assignments list [flags]
+pingcli pingone mfa user-devices delete [flags]
 ----
 
 == Examples
 
 ----
-  # List all app role holder assignments for an application role in an environment
-  pingcli pingone app-role-holder-assignments list --environment-id <env-id> --application-role-id <application-role-id>
+  # Delete a user MFA device
+  pingcli pingone mfa user-devices delete --environment-id <env-id> --user-id <user-id> --device-id <device-id>
 ----
 
 == Options
 
 ----
-  -a, --application-role-id string   The application role ID
-  -h, --help                         help for list
-  -e, --environment-id string        The PingOne environment ID
-      --template string              A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}'
+  -d, --device-id string        The MFA device ID
+  -h, --help                    help for delete
+  -e, --environment-id string   The PingOne environment ID
+  -u, --user-id string          The PingOne user ID
 ----
 
 == Options inherited from parent commands
@@ -46,5 +46,5 @@ pingcli pingone app-role-holder-assignments list [flags]
 
 == More information
 
-* xref:pingcli_pingone_app-role-holder-assignments.adoc[]	 - App Role Holder Assignments
+* xref:pingcli_pingone_mfa_user-devices.adoc[]	 - User MFA Devices
 

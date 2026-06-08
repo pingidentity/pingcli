@@ -1,6 +1,6 @@
 = pingcli pingone authorize application-roles
 :created-date: June 5, 2026
-:revdate: June 5, 2026
+:revdate: June 8, 2026
 :resourceid: pingcli_command_reference_pingcli_pingone_authorize_application-roles
 
 Application Roles
@@ -34,6 +34,8 @@ pingcli pingone authorize application-roles [flags]
 
 == Subcommands
 
+* xref:pingcli_pingone_authorize_application-roles_app-role-permissions.adoc[] - Application Role Permissions
+* xref:pingcli_pingone_authorize_application-roles_application-role-assignments.adoc[] - Application Role Assignments
 * xref:pingcli_pingone_authorize_application-roles_apply.adoc[] - Create or update an application role
 * xref:pingcli_pingone_authorize_application-roles_create.adoc[] - Create a new application role
 * xref:pingcli_pingone_authorize_application-roles_delete.adoc[] - Delete an application role

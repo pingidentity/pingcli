@@ -1,16 +1,16 @@
-= pingcli authorize application-roles
-:created-date: June 1, 2026
+= pingcli authorize application-roles application-role-assignments
+:created-date: June 8, 2026
 :revdate: June 8, 2026
-:resourceid: pingcli_command_reference_pingcli_authorize_application-roles
+:resourceid: pingcli_command_reference_pingcli_authorize_application-roles_application-role-assignments
 
-Application Roles
+Application Role Assignments
 
 == Synopsis
 
-Application Roles
+Manage application role assignments in PingOne Authorize
 
 ----
-pingcli authorize application-roles [flags]
+pingcli authorize application-roles application-role-assignments [flags]
 ----
 
 == Options inherited from parent commands
@@ -30,16 +30,8 @@ pingcli authorize application-roles [flags]
 
 == More information
 
-* xref:pingcli_authorize.adoc[]	 - Administration tools for the PingOne Authorize universal service.
+* xref:pingcli_authorize_application-roles.adoc[]	 - Application Roles
 
 == Subcommands
 
-* xref:pingcli_authorize_application-roles_app-role-permissions.adoc[] - Application Role Permissions
-* xref:pingcli_authorize_application-roles_application-role-assignments.adoc[] - Application Role Assignments
-* xref:pingcli_authorize_application-roles_apply.adoc[] - Create or update an application role
-* xref:pingcli_authorize_application-roles_create.adoc[] - Create a new application role
-* xref:pingcli_authorize_application-roles_delete.adoc[] - Delete an application role
-* xref:pingcli_authorize_application-roles_get.adoc[] - Read a specific application role
-* xref:pingcli_authorize_application-roles_list.adoc[] - List all application roles
-* xref:pingcli_authorize_application-roles_replace.adoc[] - Update an application role
-* xref:pingcli_authorize_application-roles_template.adoc[] - Generate an application role JSON template
+* xref:pingcli_authorize_application-roles_application-role-assignments_list.adoc[] - List all application role assignments
