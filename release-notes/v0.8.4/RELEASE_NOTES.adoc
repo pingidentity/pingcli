@@ -1,0 +1,10 @@
+= Release Notes for v0.8.4
+:toc:
+:toclevels: 3
+:sectnums:
+
+Release Date: 2026-06-05
+
+== NOTES
+* link:https://github.com/pingidentity/pingcli/commit/8b93d3c[8b93d3c] Add missing PingOne Authentication Environment ID option to request command link:https://github.com/pingidentity/pingcli/pull/171[#171]
+
