@@ -7,6 +7,3 @@ export
 vendor
 env*.sh
 .env
-shared-configs/
-internal/
-public-repo-cleanup-plan.md
