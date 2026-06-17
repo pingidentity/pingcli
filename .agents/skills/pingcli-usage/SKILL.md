@@ -75,6 +75,14 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
       - [`pingcli authorize application-resource-permissions replace`](references/cmd-pingcli-authorize-application-resource-permissions-replace.md) — Update an application resource permission
       - [`pingcli authorize application-resource-permissions template`](references/cmd-pingcli-authorize-application-resource-permissions-template.md) — Generate an application resource permission JSON template
     - [`pingcli authorize application-roles`](references/cmd-pingcli-authorize-application-roles.md) — Application Roles
+      - [`pingcli authorize application-roles app-role-permissions`](references/cmd-pingcli-authorize-application-roles-app-role-permissions.md) — Application Role Permissions
+        - [`pingcli authorize application-roles app-role-permissions create`](references/cmd-pingcli-authorize-application-roles-app-role-permissions-create.md) — Create a new application role permission
+        - [`pingcli authorize application-roles app-role-permissions delete`](references/cmd-pingcli-authorize-application-roles-app-role-permissions-delete.md) — Delete an application role permission
+        - [`pingcli authorize application-roles app-role-permissions get`](references/cmd-pingcli-authorize-application-roles-app-role-permissions-get.md) — Read a specific application role permission
+        - [`pingcli authorize application-roles app-role-permissions list`](references/cmd-pingcli-authorize-application-roles-app-role-permissions-list.md) — List all application role permissions
+        - [`pingcli authorize application-roles app-role-permissions template`](references/cmd-pingcli-authorize-application-roles-app-role-permissions-template.md) — Generate an application role permission JSON template
+      - [`pingcli authorize application-roles application-role-assignments`](references/cmd-pingcli-authorize-application-roles-application-role-assignments.md) — Application Role Assignments
+        - [`pingcli authorize application-roles application-role-assignments list`](references/cmd-pingcli-authorize-application-roles-application-role-assignments-list.md) — List all application role assignments
       - [`pingcli authorize application-roles apply`](references/cmd-pingcli-authorize-application-roles-apply.md) — Create or update an application role
       - [`pingcli authorize application-roles create`](references/cmd-pingcli-authorize-application-roles-create.md) — Create a new application role
       - [`pingcli authorize application-roles delete`](references/cmd-pingcli-authorize-application-roles-delete.md) — Delete an application role
@@ -176,6 +184,10 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
       - [`pingcli mfa mfa-settings get`](references/cmd-pingcli-mfa-mfa-settings-get.md) — Read MFA settings
       - [`pingcli mfa mfa-settings replace`](references/cmd-pingcli-mfa-mfa-settings-replace.md) — Update MFA settings
       - [`pingcli mfa mfa-settings template`](references/cmd-pingcli-mfa-mfa-settings-template.md) — Generate an MFA settings JSON template
+    - [`pingcli mfa user-devices`](references/cmd-pingcli-mfa-user-devices.md) — User MFA Devices
+      - [`pingcli mfa user-devices delete`](references/cmd-pingcli-mfa-user-devices-delete.md) — Delete a user MFA device
+      - [`pingcli mfa user-devices get`](references/cmd-pingcli-mfa-user-devices-get.md) — Read a specific user MFA device
+      - [`pingcli mfa user-devices list`](references/cmd-pingcli-mfa-user-devices-list.md) — List all user MFA devices
   - [`pingcli pingfederate`](references/cmd-pingcli-pingfederate.md) — Administration tools for PingFederate deployed as software
     - [`pingcli pingfederate api`](references/cmd-pingcli-pingfederate-api.md) — Send a custom REST API request to the management API of PingFederate.
     - [`pingcli pingfederate auth`](references/cmd-pingcli-pingfederate-auth.md) — Authenticate Ping CLI to the PingFederate management APIs.
@@ -201,14 +213,6 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
       - [`pingcli pingone agreements replace`](references/cmd-pingcli-pingone-agreements-replace.md) — Update an agreement
       - [`pingcli pingone agreements template`](references/cmd-pingcli-pingone-agreements-template.md) — Generate an agreement JSON template
     - [`pingcli pingone api`](references/cmd-pingcli-pingone-api.md) — Send a custom REST API request to the management API of PingOne.
-    - [`pingcli pingone app-role-holder-assignments`](references/cmd-pingcli-pingone-app-role-holder-assignments.md) — App Role Holder Assignments
-      - [`pingcli pingone app-role-holder-assignments list`](references/cmd-pingcli-pingone-app-role-holder-assignments-list.md) — List all app role holder assignments
-    - [`pingcli pingone app-role-permissions`](references/cmd-pingcli-pingone-app-role-permissions.md) — Application Role Permissions
-      - [`pingcli pingone app-role-permissions create`](references/cmd-pingcli-pingone-app-role-permissions-create.md) — Create a new application role permission
-      - [`pingcli pingone app-role-permissions delete`](references/cmd-pingcli-pingone-app-role-permissions-delete.md) — Delete an application role permission
-      - [`pingcli pingone app-role-permissions get`](references/cmd-pingcli-pingone-app-role-permissions-get.md) — Read a specific application role permission
-      - [`pingcli pingone app-role-permissions list`](references/cmd-pingcli-pingone-app-role-permissions-list.md) — List all application role permissions
-      - [`pingcli pingone app-role-permissions template`](references/cmd-pingcli-pingone-app-role-permissions-template.md) — Generate an application role permission JSON template
     - [`pingcli pingone applications`](references/cmd-pingcli-pingone-applications.md) — Applications
       - [`pingcli pingone applications application-grants`](references/cmd-pingcli-pingone-applications-application-grants.md) — Application Grants
         - [`pingcli pingone applications application-grants create`](references/cmd-pingcli-pingone-applications-application-grants-create.md) — Create a new application grant
@@ -278,6 +282,14 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
         - [`pingcli pingone authorize application-resource-permissions replace`](references/cmd-pingcli-pingone-authorize-application-resource-permissions-replace.md) — Update an application resource permission
         - [`pingcli pingone authorize application-resource-permissions template`](references/cmd-pingcli-pingone-authorize-application-resource-permissions-template.md) — Generate an application resource permission JSON template
       - [`pingcli pingone authorize application-roles`](references/cmd-pingcli-pingone-authorize-application-roles.md) — Application Roles
+        - [`pingcli pingone authorize application-roles app-role-permissions`](references/cmd-pingcli-pingone-authorize-application-roles-app-role-permissions.md) — Application Role Permissions
+          - [`pingcli pingone authorize application-roles app-role-permissions create`](references/cmd-pingcli-pingone-authorize-application-roles-app-role-permissions-create.md) — Create a new application role permission
+          - [`pingcli pingone authorize application-roles app-role-permissions delete`](references/cmd-pingcli-pingone-authorize-application-roles-app-role-permissions-delete.md) — Delete an application role permission
+          - [`pingcli pingone authorize application-roles app-role-permissions get`](references/cmd-pingcli-pingone-authorize-application-roles-app-role-permissions-get.md) — Read a specific application role permission
+          - [`pingcli pingone authorize application-roles app-role-permissions list`](references/cmd-pingcli-pingone-authorize-application-roles-app-role-permissions-list.md) — List all application role permissions
+          - [`pingcli pingone authorize application-roles app-role-permissions template`](references/cmd-pingcli-pingone-authorize-application-roles-app-role-permissions-template.md) — Generate an application role permission JSON template
+        - [`pingcli pingone authorize application-roles application-role-assignments`](references/cmd-pingcli-pingone-authorize-application-roles-application-role-assignments.md) — Application Role Assignments
+          - [`pingcli pingone authorize application-roles application-role-assignments list`](references/cmd-pingcli-pingone-authorize-application-roles-application-role-assignments-list.md) — List all application role assignments
         - [`pingcli pingone authorize application-roles apply`](references/cmd-pingcli-pingone-authorize-application-roles-apply.md) — Create or update an application role
         - [`pingcli pingone authorize application-roles create`](references/cmd-pingcli-pingone-authorize-application-roles-create.md) — Create a new application role
         - [`pingcli pingone authorize application-roles delete`](references/cmd-pingcli-pingone-authorize-application-roles-delete.md) — Delete an application role
@@ -442,6 +454,10 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
         - [`pingcli pingone mfa mfa-settings get`](references/cmd-pingcli-pingone-mfa-mfa-settings-get.md) — Read MFA settings
         - [`pingcli pingone mfa mfa-settings replace`](references/cmd-pingcli-pingone-mfa-mfa-settings-replace.md) — Update MFA settings
         - [`pingcli pingone mfa mfa-settings template`](references/cmd-pingcli-pingone-mfa-mfa-settings-template.md) — Generate an MFA settings JSON template
+      - [`pingcli pingone mfa user-devices`](references/cmd-pingcli-pingone-mfa-user-devices.md) — User MFA Devices
+        - [`pingcli pingone mfa user-devices delete`](references/cmd-pingcli-pingone-mfa-user-devices-delete.md) — Delete a user MFA device
+        - [`pingcli pingone mfa user-devices get`](references/cmd-pingcli-pingone-mfa-user-devices-get.md) — Read a specific user MFA device
+        - [`pingcli pingone mfa user-devices list`](references/cmd-pingcli-pingone-mfa-user-devices-list.md) — List all user MFA devices
     - [`pingcli pingone notification-policies`](references/cmd-pingcli-pingone-notification-policies.md) — Notification Policies
       - [`pingcli pingone notification-policies apply`](references/cmd-pingcli-pingone-notification-policies-apply.md) — Create or update a notification policy
       - [`pingcli pingone notification-policies create`](references/cmd-pingcli-pingone-notification-policies-create.md) — Create a new notification policy
@@ -510,9 +526,9 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
         - [`pingcli pingone resources resource-scopes replace`](references/cmd-pingcli-pingone-resources-resource-scopes-replace.md) — Update a resource scope
         - [`pingcli pingone resources resource-scopes template`](references/cmd-pingcli-pingone-resources-resource-scopes-template.md) — Generate a resource scope JSON template
       - [`pingcli pingone resources template`](references/cmd-pingcli-pingone-resources-template.md) — Generate a resource JSON template
-    - [`pingcli pingone roles`](references/cmd-pingcli-pingone-roles.md) — Roles
-      - [`pingcli pingone roles get`](references/cmd-pingcli-pingone-roles-get.md) — Read a specific role
-      - [`pingcli pingone roles list`](references/cmd-pingcli-pingone-roles-list.md) — List all roles
+    - [`pingcli pingone roles`](references/cmd-pingcli-pingone-roles.md) — PingOne built-in admin roles
+      - [`pingcli pingone roles get`](references/cmd-pingcli-pingone-roles-get.md) — Read a specific PingOne built-in admin role
+      - [`pingcli pingone roles list`](references/cmd-pingcli-pingone-roles-list.md) — List all PingOne built-in admin roles
     - [`pingcli pingone schemas`](references/cmd-pingcli-pingone-schemas.md) — Schemas
       - [`pingcli pingone schemas get`](references/cmd-pingcli-pingone-schemas-get.md) — Read a specific schema
       - [`pingcli pingone schemas list`](references/cmd-pingcli-pingone-schemas-list.md) — List all schemas
@@ -554,10 +570,6 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
         - [`pingcli pingone users user-application-role-assignments delete`](references/cmd-pingcli-pingone-users-user-application-role-assignments-delete.md) — Delete a user application role assignment
         - [`pingcli pingone users user-application-role-assignments list`](references/cmd-pingcli-pingone-users-user-application-role-assignments-list.md) — List all user application role assignments
         - [`pingcli pingone users user-application-role-assignments template`](references/cmd-pingcli-pingone-users-user-application-role-assignments-template.md) — Generate a user application role assignment JSON template
-      - [`pingcli pingone users user-devices`](references/cmd-pingcli-pingone-users-user-devices.md) — User MFA Devices
-        - [`pingcli pingone users user-devices delete`](references/cmd-pingcli-pingone-users-user-devices-delete.md) — Delete a user MFA device
-        - [`pingcli pingone users user-devices get`](references/cmd-pingcli-pingone-users-user-devices-get.md) — Read a specific user MFA device
-        - [`pingcli pingone users user-devices list`](references/cmd-pingcli-pingone-users-user-devices-list.md) — List all user MFA devices
       - [`pingcli pingone users user-identity-provider`](references/cmd-pingcli-pingone-users-user-identity-provider.md) — User Identity Provider
         - [`pingcli pingone users user-identity-provider get`](references/cmd-pingcli-pingone-users-user-identity-provider-get.md) — Read user identity provider
         - [`pingcli pingone users user-identity-provider replace`](references/cmd-pingcli-pingone-users-user-identity-provider-replace.md) — Update user identity provider

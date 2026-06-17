@@ -17,3 +17,10 @@ release-notes/
     ├── GITHUB_RELEASE.md
     └── RELEASE_NOTES.adoc
 ```
+
+When preparing release notes for a version that includes configuration model
+migration updates, include:
+
+- The introduced/updated `configModelVersion`.
+- Startup consent behavior (interactive prompt vs non-interactive approval requirement).
+- Backup and recovery behavior (backup file naming/location).

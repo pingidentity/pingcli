@@ -48,17 +48,6 @@ Send a custom API request to the configured PingOne tenant, making a GET request
 | `--data string` | `` | The file containing data to send in the request.  Example: './data.json' |
 | `--data-raw string` | `` | The raw data to send in the request.  Example: '{"name": "My environment"}' |
 | `--device-code` | `` | Use device authorization flow |
-| `--pingone-authentication-oauth-grant-type string` | `` | The authorization grant type to use to authenticate to the PingOne management API. (default client_credentials) Options are: authorization_code, client_credentials, device_code. |
-| `--pingone-authorization-code-client-id string` | `` | The authorization code client ID used to authenticate to the PingOne management API. |
-| `--pingone-authorization-code-scopes []string` | `` | The authorization code scopes used to authenticate to the PingOne management API. |
-| `--pingone-client-credentials-client-id string` | `` | The client credentials client ID used to authenticate to the PingOne management API. |
-| `--pingone-client-credentials-client-secret string` | `` | The client credentials client secret used to authenticate to the PingOne management API. |
-| `--pingone-client-credentials-scopes []string` | `` | The client credentials scopes used to authenticate to the PingOne management API. |
-| `--pingone-custom-domain string` | `` | The custom domain of the PingOne tenant. Example: 'auth.bxretail.org' |
-| `--pingone-device-code-client-id string` | `` | The device code client ID used to authenticate to the PingOne management API. |
-| `--pingone-device-code-scopes []string` | `` | The device code scopes used to authenticate to the PingOne management API. |
-| `--pingone-environment-id string` | `` | The ID of the PingOne environment to use for authentication (used by all auth types). |
-| `--pingone-root-domain string` | `` | The root domain of the PingOne tenant. Options are: pingone.asia, pingone.ca, pingone.com, pingone.com.au, pingone.eu, pingone.sg. Example: 'pingone.com' |
 | `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}' |
 
 
@@ -68,14 +57,14 @@ Send a custom API request to the configured PingOne tenant, making a GET request
 |------|---------|-------------|
 | `-C, --config string` | `` | The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml) |
 | `-D, --detailed-exitcode` | `` | Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. |
-| `-O, --output-format string` | `` | Specify the console output format. (default text) Options are: json, ndjson, ndjson-wrapped, text. |
+| `-O, --output-format string` | `` | Specify the console output format. (default text) Options are: json, ndjson, ndjson-typed, ndjson-wrapped, text. |
 | `-P, --profile string` | `` | The name of a configuration profile to use. |
 | `--debug` | `` | Enable debug output for error messages, including stack traces and transaction IDs. (default false) |
 | `--log-file string` | `` | Write logs to a file at the given path. File logging is disabled when not set. |
 | `--log-file-level string` | `` | Set the file log level. Options are: DEBUG, INFO, WARN, ERROR. (default DEBUG) |
 | `--log-level string` | `` | Set the console log level. Options are: DEBUG, INFO, WARN, ERROR. (default WARN) |
 | `--no-color` | `` | Disable text output in color. (default false) |
-| `--query string` | `` | JMESPath expression to filter JSON output. Requires -O json, ndjson, or ndjson-wrapped. Example: --query 'data[?enabled].name' |
+| `--query string` | `` | JMESPath expression to filter JSON output. Requires -O json, ndjson, ndjson-typed, or ndjson-wrapped. Example: --query 'data[?enabled].name' |
 
 
 ## Parent Command

@@ -5,6 +5,22 @@ A CLI tool for managing the configuration of Ping Identity products.
 
 A CLI tool for managing the configuration of Ping Identity products.
 
+Configuration:
+  Settings resolve in priority order: command-line flag, environment variable,
+  configuration file, then built-in default.
+
+  Every configuration key is settable by environment variable. The variable name
+  is the key in upper snake case, prefixed with PINGCLI_ and with each path segment
+  separated by an underscore. For example, the key
+  service.pingOne.authentication.clientCredentials.clientID maps to
+  PINGCLI_SERVICE_PINGONE_AUTHENTICATION_CLIENTCREDENTIALS_CLIENTID. Short aliases
+  such as PINGONE_CLIENT_CREDENTIALS_CLIENT_ID and PINGONE_ENVIRONMENT_ID are also
+  honoured. Invalid environment-variable values are rejected with an error, the
+  same as invalid flag values.
+
+  Use --profile (-P) to select a configured profile for a single command without
+  changing the active profile.
+
 ```
 pingcli
 ```
@@ -16,14 +32,14 @@ pingcli
 | `-h, --help` | `` | help for pingcli |
 | `-C, --config string` | `` | The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml) |
 | `-D, --detailed-exitcode` | `` | Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. |
-| `-O, --output-format string` | `` | Specify the console output format. (default text) Options are: json, ndjson, ndjson-wrapped, text. |
+| `-O, --output-format string` | `` | Specify the console output format. (default text) Options are: json, ndjson, ndjson-typed, ndjson-wrapped, text. |
 | `-P, --profile string` | `` | The name of a configuration profile to use. |
 | `--debug` | `` | Enable debug output for error messages, including stack traces and transaction IDs. (default false) |
 | `--log-file string` | `` | Write logs to a file at the given path. File logging is disabled when not set. |
 | `--log-file-level string` | `` | Set the file log level. Options are: DEBUG, INFO, WARN, ERROR. (default DEBUG) |
 | `--log-level string` | `` | Set the console log level. Options are: DEBUG, INFO, WARN, ERROR. (default WARN) |
 | `--no-color` | `` | Disable text output in color. (default false) |
-| `--query string` | `` | JMESPath expression to filter JSON output. Requires -O json, ndjson, or ndjson-wrapped. Example: --query 'data[?enabled].name' |
+| `--query string` | `` | JMESPath expression to filter JSON output. Requires -O json, ndjson, ndjson-typed, or ndjson-wrapped. Example: --query 'data[?enabled].name' |
 
 
 ## Subcommands
