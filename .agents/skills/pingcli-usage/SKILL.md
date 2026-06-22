@@ -196,6 +196,8 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
       - [`pingcli pingfederate auth status`](references/cmd-pingcli-pingfederate-auth-status.md) — Print details of the current authenticated session.
     - [`pingcli pingfederate init`](references/cmd-pingcli-pingfederate-init.md) — Initialize Ping CLI for the PingFederate management APIs.
   - [`pingcli pingone`](references/cmd-pingcli-pingone.md) — Administration tools for the PingOne platform.
+    - [`pingcli pingone active-identity-counts`](references/cmd-pingcli-pingone-active-identity-counts.md) — Active identity counts
+      - [`pingcli pingone active-identity-counts list`](references/cmd-pingcli-pingone-active-identity-counts-list.md) — List active identity counts
     - [`pingcli pingone agreements`](references/cmd-pingcli-pingone-agreements.md) — Agreements
       - [`pingcli pingone agreements agreement-languages`](references/cmd-pingcli-pingone-agreements-agreement-languages.md) — Agreement Languages
         - [`pingcli pingone agreements agreement-languages apply`](references/cmd-pingcli-pingone-agreements-agreement-languages-apply.md) — Create or update an agreement language
@@ -255,6 +257,7 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
     - [`pingcli pingone auth`](references/cmd-pingcli-pingone-auth.md) — Authenticate Ping CLI to the PingOne management APIs.
       - [`pingcli pingone auth login`](references/cmd-pingcli-pingone-auth-login.md) — Log in to allow Ping CLI to administer PingOne
       - [`pingcli pingone auth logout`](references/cmd-pingcli-pingone-auth-logout.md) — Log out from PingOne
+      - [`pingcli pingone auth refresh`](references/cmd-pingcli-pingone-auth-refresh.md) — Refresh the current authenticated session.
       - [`pingcli pingone auth status`](references/cmd-pingcli-pingone-auth-status.md) — Print details of the current authenticated session.
       - [`pingcli pingone auth token`](references/cmd-pingcli-pingone-auth-token.md) — Print the active token for the current authenticated session.
     - [`pingcli pingone authorize`](references/cmd-pingcli-pingone-authorize.md) — Administration tools for the PingOne Authorize universal service.
@@ -314,6 +317,14 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
         - [`pingcli pingone credentials digital-wallet-applications list`](references/cmd-pingcli-pingone-credentials-digital-wallet-applications-list.md) — List all digital wallet applications
         - [`pingcli pingone credentials digital-wallet-applications replace`](references/cmd-pingcli-pingone-credentials-digital-wallet-applications-replace.md) — Replace a digital wallet application
         - [`pingcli pingone credentials digital-wallet-applications template`](references/cmd-pingcli-pingone-credentials-digital-wallet-applications-template.md) — Generate a digital wallet application JSON template
+    - [`pingcli pingone custom-admin-roles`](references/cmd-pingcli-pingone-custom-admin-roles.md) — Custom Admin Roles
+      - [`pingcli pingone custom-admin-roles apply`](references/cmd-pingcli-pingone-custom-admin-roles-apply.md) — Create or update a custom admin role
+      - [`pingcli pingone custom-admin-roles create`](references/cmd-pingcli-pingone-custom-admin-roles-create.md) — Create a new custom admin role
+      - [`pingcli pingone custom-admin-roles delete`](references/cmd-pingcli-pingone-custom-admin-roles-delete.md) — Delete a custom admin role
+      - [`pingcli pingone custom-admin-roles get`](references/cmd-pingcli-pingone-custom-admin-roles-get.md) — Read a specific custom admin role
+      - [`pingcli pingone custom-admin-roles list`](references/cmd-pingcli-pingone-custom-admin-roles-list.md) — List all custom admin roles
+      - [`pingcli pingone custom-admin-roles replace`](references/cmd-pingcli-pingone-custom-admin-roles-replace.md) — Update a custom admin role
+      - [`pingcli pingone custom-admin-roles template`](references/cmd-pingcli-pingone-custom-admin-roles-template.md) — Generate a custom admin role JSON template
     - [`pingcli pingone davinci`](references/cmd-pingcli-pingone-davinci.md) — Administration tools for the PingOne DaVinci universal service.
       - [`pingcli pingone davinci applications`](references/cmd-pingcli-pingone-davinci-applications.md) — DaVinci Applications
         - [`pingcli pingone davinci applications apply`](references/cmd-pingcli-pingone-davinci-applications-apply.md) — Create or update a DaVinci application

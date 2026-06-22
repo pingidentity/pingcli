@@ -14,9 +14,10 @@ Configuration:
   separated by an underscore. For example, the key
   service.pingOne.authentication.clientCredentials.clientID maps to
   PINGCLI_SERVICE_PINGONE_AUTHENTICATION_CLIENTCREDENTIALS_CLIENTID. Short aliases
-  such as PINGONE_CLIENT_CREDENTIALS_CLIENT_ID and PINGONE_ENVIRONMENT_ID are also
-  honoured. Invalid environment-variable values are rejected with an error, the
-  same as invalid flag values.
+  such as PINGCLI_PINGONE_CLIENT_CREDENTIALS_CLIENT_ID and PINGCLI_PINGONE_ENVIRONMENT_ID
+  are also honoured, as are their bare PINGONE_* equivalents. Invalid
+  environment-variable values are rejected with an error, the same as invalid flag
+  values.
 
   Use --profile (-P) to select a configured profile for a single command without
   changing the active profile.

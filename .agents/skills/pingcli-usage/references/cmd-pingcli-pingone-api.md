@@ -43,11 +43,8 @@ Send a custom API request to the configured PingOne tenant, making a GET request
 | `-f, --fail` | `` | Return non-zero exit code when HTTP custom API request returns a failure status code. |
 | `-m, --http-method string` | `` | The HTTP method to use for the request. (default GET) Options are: DELETE, GET, PATCH, POST, PUT. Example: 'POST' |
 | `-r, --header []string` | `` | A custom header to send in the request. Example: --header "Content-Type: application/vnd.pingidentity.user.import+json" |
-| `--authorization-code` | `` | Use authorization code flow |
-| `--client-credentials` | `` | Use client credentials flow |
 | `--data string` | `` | The file containing data to send in the request.  Example: './data.json' |
 | `--data-raw string` | `` | The raw data to send in the request.  Example: '{"name": "My environment"}' |
-| `--device-code` | `` | Use device authorization flow |
 | `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}' |
 
 
