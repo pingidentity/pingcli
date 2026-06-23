@@ -9,7 +9,7 @@
 - Include HTTP status and request ID in response metadata.
 - PingOne: Added management commands for custom admin roles.
 - PingOne: Added management commands for active identity counts.
-- Added `ndjson-typed` output format and deprecate `ndjson-wrapped`.
+- Added `ndjson-typed` output format.
 - PingOne: Auto-login and auto-refresh for `authorization_code` and `device_code` grants.
 
 ### BUG FIXES
