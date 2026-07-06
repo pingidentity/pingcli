@@ -29,6 +29,7 @@ pingcli mfa
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli mfa fido2-policies` | FIDO2 Policies | [`cmd-pingcli-mfa-fido2-policies.md`](cmd-pingcli-mfa-fido2-policies.md) |
 | `pingcli mfa mfa-device-policies` | MFA Device Policies | [`cmd-pingcli-mfa-mfa-device-policies.md`](cmd-pingcli-mfa-mfa-device-policies.md) |
 | `pingcli mfa mfa-settings` | MFA Settings | [`cmd-pingcli-mfa-mfa-settings.md`](cmd-pingcli-mfa-mfa-settings.md) |
 | `pingcli mfa user-devices` | User MFA Devices | [`cmd-pingcli-mfa-user-devices.md`](cmd-pingcli-mfa-user-devices.md) |

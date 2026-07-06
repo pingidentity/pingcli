@@ -34,6 +34,7 @@ pingcli pingone
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingone active-identity-counts` | Active identity counts | [`cmd-pingcli-pingone-active-identity-counts.md`](cmd-pingcli-pingone-active-identity-counts.md) |
+| `pingcli pingone admin-config` | Administrator Security | [`cmd-pingcli-pingone-admin-config.md`](cmd-pingcli-pingone-admin-config.md) |
 | `pingcli pingone agreements` | Agreements | [`cmd-pingcli-pingone-agreements.md`](cmd-pingcli-pingone-agreements.md) |
 | `pingcli pingone api` | Send a custom REST API request to the management API of PingOne. | [`cmd-pingcli-pingone-api.md`](cmd-pingcli-pingone-api.md) |
 | `pingcli pingone applications` | Applications | [`cmd-pingcli-pingone-applications.md`](cmd-pingcli-pingone-applications.md) |
@@ -41,6 +42,7 @@ pingcli pingone
 | `pingcli pingone authorize` | Administration tools for the PingOne Authorize universal service. | [`cmd-pingcli-pingone-authorize.md`](cmd-pingcli-pingone-authorize.md) |
 | `pingcli pingone credentials` | Administration tools for the PingOne Credentials universal service. | [`cmd-pingcli-pingone-credentials.md`](cmd-pingcli-pingone-credentials.md) |
 | `pingcli pingone custom-admin-roles` | Custom Admin Roles | [`cmd-pingcli-pingone-custom-admin-roles.md`](cmd-pingcli-pingone-custom-admin-roles.md) |
+| `pingcli pingone custom-domains` | Custom Domains | [`cmd-pingcli-pingone-custom-domains.md`](cmd-pingcli-pingone-custom-domains.md) |
 | `pingcli pingone davinci` | Administration tools for the PingOne DaVinci universal service. | [`cmd-pingcli-pingone-davinci.md`](cmd-pingcli-pingone-davinci.md) |
 | `pingcli pingone environments` | Environments | [`cmd-pingcli-pingone-environments.md`](cmd-pingcli-pingone-environments.md) |
 | `pingcli pingone gateways` | Gateways | [`cmd-pingcli-pingone-gateways.md`](cmd-pingcli-pingone-gateways.md) |

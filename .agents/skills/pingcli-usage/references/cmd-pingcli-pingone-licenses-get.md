@@ -23,7 +23,7 @@ pingcli pingone licenses get [flags]
 | `-h, --help` | `` | help for get |
 | `-l, --license-id string` | `` | The license ID |
 | `-o, --organization-id string` | `` | The PingOne organization ID |
-| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}' |
+| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data, so fields are addressed by their JSON names and may be traversed by path. Example: --template '{{.id}}' or --template '{{.data._embedded.environments}}' |
 
 
 ## Inherited Options

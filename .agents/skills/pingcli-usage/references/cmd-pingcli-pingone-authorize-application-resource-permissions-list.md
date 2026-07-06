@@ -23,7 +23,7 @@ pingcli pingone authorize application-resource-permissions list [flags]
 | `-h, --help` | `` | help for list |
 | `-a, --application-resource-id string` | `` | The parent application resource ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}' |
+| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data, so fields are addressed by their JSON names and may be traversed by path. Example: --template '{{.id}}' or --template '{{.data._embedded.environments}}' |
 
 
 ## Inherited Options

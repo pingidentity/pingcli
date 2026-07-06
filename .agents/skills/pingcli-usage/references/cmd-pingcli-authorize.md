@@ -32,6 +32,7 @@ pingcli authorize
 | `pingcli authorize api-servers` | API Servers | [`cmd-pingcli-authorize-api-servers.md`](cmd-pingcli-authorize-api-servers.md) |
 | `pingcli authorize application-resource-permissions` | Application Resource Permissions | [`cmd-pingcli-authorize-application-resource-permissions.md`](cmd-pingcli-authorize-application-resource-permissions.md) |
 | `pingcli authorize application-roles` | Application Roles | [`cmd-pingcli-authorize-application-roles.md`](cmd-pingcli-authorize-application-roles.md) |
+| `pingcli authorize decision-endpoints` | Decision Endpoints | [`cmd-pingcli-authorize-decision-endpoints.md`](cmd-pingcli-authorize-decision-endpoints.md) |
 
 ## Parent Command
 

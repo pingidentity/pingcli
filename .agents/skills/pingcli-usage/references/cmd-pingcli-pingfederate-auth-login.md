@@ -21,24 +21,11 @@ pingcli pingfederate auth login [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for login |
-| `--pingfederate-access-token string` | `` | The PingFederate access token used to authenticate to the PingFederate admin API when using a custom OAuth 2.0 token method. |
 | `--pingfederate-admin-api-path string` | `` | The PingFederate API URL path used to communicate with PingFederate's admin API. (default /pf-admin-api/v1) |
-| `--pingfederate-authentication-oauth-grant-type string` | `` | The authentication type to use when connecting to the PingFederate admin API. Options are: client_credentials. Example: 'client_credentials' |
-| `--pingfederate-authentication-type string` | `` | The authentication type to use when connecting to the PingFederate admin API. Options are: accessTokenAuth, basicAuth, oauth. Example: 'oauth' |
 | `--pingfederate-ca-certificate-pem-files []string` | `` | Relative or full paths to PEM-encoded certificate files to be trusted as root CAs when connecting to the PingFederate server over HTTPS. (default []) Accepts a comma-separated string to delimit multiple PEM files. |
-| `--pingfederate-client-id string` | `` | The PingFederate client ID used to authenticate to the PingFederate admin API when using the client credentials authentication type. |
-| `--pingfederate-client-secret string` | `` | The PingFederate client secret used to authenticate to the PingFederate admin API when using the client credentials authentication type. |
 | `--pingfederate-https-host string` | `` | The PingFederate HTTPS host used to communicate with PingFederate's admin API. Example: 'https://pingfederate-admin.bxretail.org' |
 | `--pingfederate-insecure-trust-all-tls` | `` | Trust any certificate when connecting to the PingFederate server admin API. (default false) This is insecure and shouldn't be enabled outside of testing. |
-| `--pingfederate-oauth-client-id string` | `` | The PingFederate OAuth client ID used when the authentication type is 'oauth' with a client credentials grant type. |
-| `--pingfederate-oauth-client-secret string` | `` | The PingFederate OAuth client secret used when the authentication type is 'oauth' with a client credentials grant type. |
-| `--pingfederate-oauth-scopes []string` | `` | The PingFederate OAuth scopes used when the authentication type is 'oauth' with a client credentials grant type. (default []) Accepts a comma-separated string to delimit multiple scopes. |
-| `--pingfederate-oauth-token-url string` | `` | The PingFederate OAuth token URL used when the authentication type is 'oauth' with a client credentials grant type. |
-| `--pingfederate-password string` | `` | The PingFederate password used to authenticate to the PingFederate admin API when using basic authentication. |
-| `--pingfederate-scopes []string` | `` | The PingFederate scopes used to authenticate to the PingFederate admin API when using the client credentials authentication type. (default []) Accepts a comma-separated string to delimit multiple scopes. Example: 'openid,profile' |
 | `--pingfederate-software-version string` | `` | The PingFederate software version to use when connecting to the PingFederate admin API. This is used to select the correct SDK version for authentication. After successful authentication, the actual running version is auto-detected from the API. (default 13.0) Example: '13.0' |
-| `--pingfederate-token-url string` | `` | The PingFederate token URL used to authenticate to the PingFederate admin API when using the client credentials authentication type. |
-| `--pingfederate-username string` | `` | The PingFederate username used to authenticate to the PingFederate admin API when using basic authentication. Example: 'administrator' |
 | `--pingfederate-x-bypass-external-validation-header` | `` | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false) |
 
 

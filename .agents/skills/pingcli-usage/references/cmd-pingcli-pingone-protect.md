@@ -29,6 +29,7 @@ pingcli pingone protect
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingone protect risk-policy-sets` | Risk Policy Sets | [`cmd-pingcli-pingone-protect-risk-policy-sets.md`](cmd-pingcli-pingone-protect-risk-policy-sets.md) |
 | `pingcli pingone protect risk-predictors` | Risk Predictors | [`cmd-pingcli-pingone-protect-risk-predictors.md`](cmd-pingcli-pingone-protect-risk-predictors.md) |
 
 ## Parent Command
