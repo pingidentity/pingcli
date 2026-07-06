@@ -17,7 +17,7 @@ pingcli pingone users user-role-assignments template [flags]
 Use the JSON template as a starting point:
   1. Run the template command to generate the body skeleton.
   2. Edit the file, replacing placeholder values with real data.
-  3. Feed the edited file back to the create or replace action via --from-file.
+  3. Feed the edited file back to the create action via --from-file.
 
 Example workflow:
   pingcli pingone users user-role-assignments template > body.json

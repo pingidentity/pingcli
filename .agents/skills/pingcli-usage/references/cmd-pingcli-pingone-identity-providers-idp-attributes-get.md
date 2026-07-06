@@ -24,7 +24,7 @@ pingcli pingone identity-providers idp-attributes get [flags]
 | `-a, --attribute-id string` | `` | The identity provider attribute ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-i, --identity-provider-id string` | `` | The identity provider ID |
-| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}' |
+| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data, so fields are addressed by their JSON names and may be traversed by path. Example: --template '{{.id}}' or --template '{{.data._embedded.environments}}' |
 
 
 ## Inherited Options

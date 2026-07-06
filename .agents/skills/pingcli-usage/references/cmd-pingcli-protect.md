@@ -29,6 +29,7 @@ pingcli protect
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli protect risk-policy-sets` | Risk Policy Sets | [`cmd-pingcli-protect-risk-policy-sets.md`](cmd-pingcli-protect-risk-policy-sets.md) |
 | `pingcli protect risk-predictors` | Risk Predictors | [`cmd-pingcli-protect-risk-predictors.md`](cmd-pingcli-protect-risk-predictors.md) |
 
 ## Parent Command

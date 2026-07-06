@@ -23,7 +23,7 @@ pingcli pingone total-identities list [flags]
 | `-h, --help` | `` | help for list |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `--filter string` | `` | SCIM filter expression. At least one of startDate or endDate is required (e.g. startDate eq "2019-05-01T00:00:00Z" and endDate eq "2019-05-31T23:59:59Z"). |
-| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data. Example: --template '{{.Name}}' |
+| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data, so fields are addressed by their JSON names and may be traversed by path. Example: --template '{{.id}}' or --template '{{.data._embedded.environments}}' |
 
 
 ## Inherited Options

@@ -1,0 +1,49 @@
+= Release Notes for v1.2.0
+:toc:
+:toclevels: 3
+:sectnums:
+
+Release Date: 2026-07-06
+
+== BREAKING CHANGES
+* link:https://github.com/ping-internal/ppds-pingcli/commit/bc390a6b[bc390a6b] PingFederate: Removed the `--pingfederate-*` and `--as-pingfederate-*` authentication CLI flags (such as `--pingfederate-client-id`); configure PingFederate authentication via environment variables, the configuration file, or the init wizard instead link:https://github.com/ping-internal/ppds-pingcli/pull/514[#514]
+
+== SECURITY
+* link:https://github.com/ping-internal/ppds-pingcli/commit/96c71892[96c71892] PingOne and PingFederate: Refresh the access token when authentication credentials change so a cached token issued for previous credentials is no longer reused link:https://github.com/ping-internal/ppds-pingcli/pull/505[#505]
+
+== FEATURES
+* link:https://github.com/ping-internal/ppds-pingcli/commit/d07114f2[d07114f2] Added `credential-issuer-profile` resource to the PingOne Credentials connector, supporting `get`, `replace`, and `template` commands link:https://github.com/ping-internal/ppds-pingcli/pull/482[#482]
+
+== ENHANCEMENTS
+* link:https://github.com/ping-internal/ppds-pingcli/commit/66b4ad99[66b4ad99] PingOne: Added management commands for FIDO2 policies link:https://github.com/ping-internal/ppds-pingcli/pull/464[#464]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/ac0dd16d[ac0dd16d] PingOne: Added management commands for admin config link:https://github.com/ping-internal/ppds-pingcli/pull/470[#470]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/078246b9[078246b9] PingFederate: Added management commands for administrative accounts link:https://github.com/ping-internal/ppds-pingcli/pull/474[#474]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/078246b9[078246b9] PingFederate: Added management commands for authentication API settings link:https://github.com/ping-internal/ppds-pingcli/pull/481[#481]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/9ff90b47[9ff90b47] PingFederate: Added management commands for authentication API applications link:https://github.com/ping-internal/ppds-pingcli/pull/483[#483]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/0fa797d2[0fa797d2] PingOne Protect: Added management commands for risk policy sets link:https://github.com/ping-internal/ppds-pingcli/pull/485[#485]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/6b205685[6b205685] PingOne Authorize: Added management commands for decision endpoints link:https://github.com/ping-internal/ppds-pingcli/pull/486[#486]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/f714a694[f714a694] PingFederate: Added management commands for server settings link:https://github.com/ping-internal/ppds-pingcli/pull/488[#488]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/ff3f8c9f[ff3f8c9f] PingFederate: Added management commands for data stores link:https://github.com/ping-internal/ppds-pingcli/pull/489[#489]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/f765d6f5[f765d6f5] PingFederate: Added management command for version link:https://github.com/ping-internal/ppds-pingcli/pull/490[#490]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/d8cacfb1[d8cacfb1] PingFederate: Added management commands for virtual host names link:https://github.com/ping-internal/ppds-pingcli/pull/493[#493]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/136e5ec5[136e5ec5] PingOne: Added management commands for custom domains link:https://github.com/ping-internal/ppds-pingcli/pull/495[#495]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/e4237f38[e4237f38] PingFederate: Added management commands for IdP adapters link:https://github.com/ping-internal/ppds-pingcli/pull/500[#500]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/8aa0f4d0[8aa0f4d0] PingFederate: Added management commands for password credential validators link:https://github.com/ping-internal/ppds-pingcli/pull/503[#503]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/14a6f403[14a6f403] PingOne: Added management commands for user digital wallets link:https://github.com/ping-internal/ppds-pingcli/pull/506[#506]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/4c2dbdb5[4c2dbdb5] PingOne: Added management commands for credential issuance rules link:https://github.com/ping-internal/ppds-pingcli/pull/507[#507]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/06815d5a[06815d5a] PingFederate: Added management commands for local identity profiles link:https://github.com/ping-internal/ppds-pingcli/pull/508[#508]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/89ad97f9[89ad97f9] PingFederate: Added management commands for OAuth clients link:https://github.com/ping-internal/ppds-pingcli/pull/512[#512]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/1059f716[1059f716] PingFederate: Added management commands for extended properties link:https://github.com/ping-internal/ppds-pingcli/pull/516[#516]
+
+== BUG FIXES
+* link:https://github.com/ping-internal/ppds-pingcli/commit/1926b669[1926b669] Fixed template command example text for replace-only resources to show `replace --from-file` instead of `create --from-file` link:https://github.com/ping-internal/ppds-pingcli/pull/491[#491]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/8e8f3c52[8e8f3c52] auth: Added a connector section header to each `auth status` block so statuses for multiple services are clearly distinguishable link:https://github.com/ping-internal/ppds-pingcli/pull/498[#498]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/40888e9a[40888e9a] DaVinci: Fixed template for application resources to correctly omit server-set read-only fields (`apiKey.value`, `oauth.clientSecret`) that were previously included in the generated template skeleton link:https://github.com/ping-internal/ppds-pingcli/pull/502[#502]
+* link:https://github.com/ping-internal/ppds-pingcli/commit/06f1f780[06f1f780] PingOne: Fixed the `--template` flag on `pingone api` so template field traversal works against JSON response data link:https://github.com/ping-internal/ppds-pingcli/pull/515[#515]
+
+== DEPRECATIONS
+* link:https://github.com/ping-internal/ppds-pingcli/commit/bc390a6b[bc390a6b] PingFederate: The `accessTokenAuth` authentication type is deprecated and will be removed in a future release; use the `basicAuth` or `oauth` authentication type instead link:https://github.com/ping-internal/ppds-pingcli/pull/514[#514]
+
+== DOCUMENTATION
+* link:https://github.com/ping-internal/ppds-pingcli/commit/cf9ceca7[cf9ceca7] Updated output schema reference generator with editorial fixes and subfolder restructure link:https://github.com/ping-internal/ppds-pingcli/pull/480[#480]
+

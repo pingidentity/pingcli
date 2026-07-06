@@ -31,6 +31,7 @@ pingcli credentials credential-types [flags]
 |---------|-------------|----------|
 | `pingcli credentials credential-types apply` | Create or update a credential type | [`cmd-pingcli-credentials-credential-types-apply.md`](cmd-pingcli-credentials-credential-types-apply.md) |
 | `pingcli credentials credential-types create` | Create a new credential type | [`cmd-pingcli-credentials-credential-types-create.md`](cmd-pingcli-credentials-credential-types-create.md) |
+| `pingcli credentials credential-types credential-issuance-rules` | Credential Issuance Rules | [`cmd-pingcli-credentials-credential-types-credential-issuance-rules.md`](cmd-pingcli-credentials-credential-types-credential-issuance-rules.md) |
 | `pingcli credentials credential-types delete` | Delete a credential type | [`cmd-pingcli-credentials-credential-types-delete.md`](cmd-pingcli-credentials-credential-types-delete.md) |
 | `pingcli credentials credential-types get` | Read a specific credential type | [`cmd-pingcli-credentials-credential-types-get.md`](cmd-pingcli-credentials-credential-types-get.md) |
 | `pingcli credentials credential-types list` | List all credential types | [`cmd-pingcli-credentials-credential-types-list.md`](cmd-pingcli-credentials-credential-types-list.md) |

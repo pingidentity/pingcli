@@ -17,12 +17,12 @@ pingcli pingone users user-identity-provider template [flags]
 Use the JSON template as a starting point:
   1. Run the template command to generate the body skeleton.
   2. Edit the file, replacing placeholder values with real data.
-  3. Feed the edited file back to the create or replace action via --from-file.
+  3. Feed the edited file back to the replace action via --from-file.
 
 Example workflow:
   pingcli pingone users user-identity-provider template > body.json
   # edit body.json
-  pingcli pingone users user-identity-provider create --from-file body.json
+  pingcli pingone users user-identity-provider replace --from-file body.json
 ```
 
 ## Options

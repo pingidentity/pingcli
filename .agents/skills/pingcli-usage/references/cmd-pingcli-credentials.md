@@ -29,8 +29,10 @@ pingcli credentials
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli credentials credential-issuer-profile` | Credential Issuer Profile | [`cmd-pingcli-credentials-credential-issuer-profile.md`](cmd-pingcli-credentials-credential-issuer-profile.md) |
 | `pingcli credentials credential-types` | Credential Types | [`cmd-pingcli-credentials-credential-types.md`](cmd-pingcli-credentials-credential-types.md) |
 | `pingcli credentials digital-wallet-applications` | Digital Wallet Applications | [`cmd-pingcli-credentials-digital-wallet-applications.md`](cmd-pingcli-credentials-digital-wallet-applications.md) |
+| `pingcli credentials user-digital-wallets` | User Digital Wallets | [`cmd-pingcli-credentials-user-digital-wallets.md`](cmd-pingcli-credentials-user-digital-wallets.md) |
 
 ## Parent Command
 
