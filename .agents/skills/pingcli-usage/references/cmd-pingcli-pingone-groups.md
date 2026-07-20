@@ -33,10 +33,10 @@ pingcli pingone groups [flags]
 | `pingcli pingone groups create` | Create a new group | [`cmd-pingcli-pingone-groups-create.md`](cmd-pingcli-pingone-groups-create.md) |
 | `pingcli pingone groups delete` | Delete a group | [`cmd-pingcli-pingone-groups-delete.md`](cmd-pingcli-pingone-groups-delete.md) |
 | `pingcli pingone groups get` | Read a specific group | [`cmd-pingcli-pingone-groups-get.md`](cmd-pingcli-pingone-groups-get.md) |
-| `pingcli pingone groups group-nestings` | Group Nestings | [`cmd-pingcli-pingone-groups-group-nestings.md`](cmd-pingcli-pingone-groups-group-nestings.md) |
-| `pingcli pingone groups group-role-assignments` | Group Role Assignments | [`cmd-pingcli-pingone-groups-group-role-assignments.md`](cmd-pingcli-pingone-groups-group-role-assignments.md) |
 | `pingcli pingone groups list` | List all groups | [`cmd-pingcli-pingone-groups-list.md`](cmd-pingcli-pingone-groups-list.md) |
+| `pingcli pingone groups nestings` | Group Nestings | [`cmd-pingcli-pingone-groups-nestings.md`](cmd-pingcli-pingone-groups-nestings.md) |
 | `pingcli pingone groups replace` | Update a group | [`cmd-pingcli-pingone-groups-replace.md`](cmd-pingcli-pingone-groups-replace.md) |
+| `pingcli pingone groups role-assignments` | Group Role Assignments | [`cmd-pingcli-pingone-groups-role-assignments.md`](cmd-pingcli-pingone-groups-role-assignments.md) |
 | `pingcli pingone groups template` | Generate a group JSON template | [`cmd-pingcli-pingone-groups-template.md`](cmd-pingcli-pingone-groups-template.md) |
 
 ## Parent Command

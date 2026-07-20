@@ -37,6 +37,7 @@ pingcli pingfederate
 | `pingcli pingfederate api` | Send a custom REST API request to the management API of PingFederate. | [`cmd-pingcli-pingfederate-api.md`](cmd-pingcli-pingfederate-api.md) |
 | `pingcli pingfederate auth` | Authenticate Ping CLI to the PingFederate management APIs. | [`cmd-pingcli-pingfederate-auth.md`](cmd-pingcli-pingfederate-auth.md) |
 | `pingcli pingfederate authentication-api` | Manage PingFederate Authentication API resources | [`cmd-pingcli-pingfederate-authentication-api.md`](cmd-pingcli-pingfederate-authentication-api.md) |
+| `pingcli pingfederate authentication-policies` | Manage PingFederate Authentication Policies resources | [`cmd-pingcli-pingfederate-authentication-policies.md`](cmd-pingcli-pingfederate-authentication-policies.md) |
 | `pingcli pingfederate data-stores` | PingFederate Data Stores | [`cmd-pingcli-pingfederate-data-stores.md`](cmd-pingcli-pingfederate-data-stores.md) |
 | `pingcli pingfederate extended-properties` | PingFederate Extended Properties | [`cmd-pingcli-pingfederate-extended-properties.md`](cmd-pingcli-pingfederate-extended-properties.md) |
 | `pingcli pingfederate idp` | Manage PingFederate IdP resources | [`cmd-pingcli-pingfederate-idp.md`](cmd-pingcli-pingfederate-idp.md) |
@@ -45,6 +46,7 @@ pingcli pingfederate
 | `pingcli pingfederate oauth` | Manage PingFederate OAuth resources | [`cmd-pingcli-pingfederate-oauth.md`](cmd-pingcli-pingfederate-oauth.md) |
 | `pingcli pingfederate password-credential-validators` | PingFederate Password Credential Validators | [`cmd-pingcli-pingfederate-password-credential-validators.md`](cmd-pingcli-pingfederate-password-credential-validators.md) |
 | `pingcli pingfederate server-settings` | PingFederate Server Settings | [`cmd-pingcli-pingfederate-server-settings.md`](cmd-pingcli-pingfederate-server-settings.md) |
+| `pingcli pingfederate session` | Manage PingFederate Session resources | [`cmd-pingcli-pingfederate-session.md`](cmd-pingcli-pingfederate-session.md) |
 | `pingcli pingfederate version` | PingFederate Version | [`cmd-pingcli-pingfederate-version.md`](cmd-pingcli-pingfederate-version.md) |
 | `pingcli pingfederate virtual-host-names` | PingFederate Virtual Host Names | [`cmd-pingcli-pingfederate-virtual-host-names.md`](cmd-pingcli-pingfederate-virtual-host-names.md) |
 

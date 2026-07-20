@@ -29,9 +29,9 @@ pingcli pingone schemas [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingone schemas attributes` | Schema Attributes | [`cmd-pingcli-pingone-schemas-attributes.md`](cmd-pingcli-pingone-schemas-attributes.md) |
 | `pingcli pingone schemas get` | Read a specific schema | [`cmd-pingcli-pingone-schemas-get.md`](cmd-pingcli-pingone-schemas-get.md) |
 | `pingcli pingone schemas list` | List all schemas | [`cmd-pingcli-pingone-schemas-list.md`](cmd-pingcli-pingone-schemas-list.md) |
-| `pingcli pingone schemas schema-attributes` | Schema Attributes | [`cmd-pingcli-pingone-schemas-schema-attributes.md`](cmd-pingcli-pingone-schemas-schema-attributes.md) |
 
 ## Parent Command
 

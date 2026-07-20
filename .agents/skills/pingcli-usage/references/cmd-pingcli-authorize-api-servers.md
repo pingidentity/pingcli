@@ -29,12 +29,12 @@ pingcli authorize api-servers [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
-| `pingcli authorize api-servers api-server-operations` | API Server Operations | [`cmd-pingcli-authorize-api-servers-api-server-operations.md`](cmd-pingcli-authorize-api-servers-api-server-operations.md) |
 | `pingcli authorize api-servers apply` | Create or update an API server | [`cmd-pingcli-authorize-api-servers-apply.md`](cmd-pingcli-authorize-api-servers-apply.md) |
 | `pingcli authorize api-servers create` | Create a new API server | [`cmd-pingcli-authorize-api-servers-create.md`](cmd-pingcli-authorize-api-servers-create.md) |
 | `pingcli authorize api-servers delete` | Delete an API server | [`cmd-pingcli-authorize-api-servers-delete.md`](cmd-pingcli-authorize-api-servers-delete.md) |
 | `pingcli authorize api-servers get` | Read a specific API server | [`cmd-pingcli-authorize-api-servers-get.md`](cmd-pingcli-authorize-api-servers-get.md) |
 | `pingcli authorize api-servers list` | List all API servers | [`cmd-pingcli-authorize-api-servers-list.md`](cmd-pingcli-authorize-api-servers-list.md) |
+| `pingcli authorize api-servers operations` | API Server Operations | [`cmd-pingcli-authorize-api-servers-operations.md`](cmd-pingcli-authorize-api-servers-operations.md) |
 | `pingcli authorize api-servers replace` | Update an API server | [`cmd-pingcli-authorize-api-servers-replace.md`](cmd-pingcli-authorize-api-servers-replace.md) |
 | `pingcli authorize api-servers template` | Generate an API server JSON template | [`cmd-pingcli-authorize-api-servers-template.md`](cmd-pingcli-authorize-api-servers-template.md) |
 

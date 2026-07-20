@@ -29,9 +29,9 @@ pingcli pingone notification-templates [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingone notification-templates contents` | Notification Template Contents | [`cmd-pingcli-pingone-notification-templates-contents.md`](cmd-pingcli-pingone-notification-templates-contents.md) |
 | `pingcli pingone notification-templates get` | Read a specific notification template | [`cmd-pingcli-pingone-notification-templates-get.md`](cmd-pingcli-pingone-notification-templates-get.md) |
 | `pingcli pingone notification-templates list` | List all notification templates | [`cmd-pingcli-pingone-notification-templates-list.md`](cmd-pingcli-pingone-notification-templates-list.md) |
-| `pingcli pingone notification-templates notification-template-contents` | Notification Template Contents | [`cmd-pingcli-pingone-notification-templates-notification-template-contents.md`](cmd-pingcli-pingone-notification-templates-notification-template-contents.md) |
 
 ## Parent Command
 

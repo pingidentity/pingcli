@@ -29,13 +29,13 @@ pingcli pingone authorize application-roles [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
-| `pingcli pingone authorize application-roles app-role-permissions` | Application Role Permissions | [`cmd-pingcli-pingone-authorize-application-roles-app-role-permissions.md`](cmd-pingcli-pingone-authorize-application-roles-app-role-permissions.md) |
-| `pingcli pingone authorize application-roles application-role-assignments` | Application Role Assignments | [`cmd-pingcli-pingone-authorize-application-roles-application-role-assignments.md`](cmd-pingcli-pingone-authorize-application-roles-application-role-assignments.md) |
 | `pingcli pingone authorize application-roles apply` | Create or update an application role | [`cmd-pingcli-pingone-authorize-application-roles-apply.md`](cmd-pingcli-pingone-authorize-application-roles-apply.md) |
+| `pingcli pingone authorize application-roles assignments` | Application Role Assignments | [`cmd-pingcli-pingone-authorize-application-roles-assignments.md`](cmd-pingcli-pingone-authorize-application-roles-assignments.md) |
 | `pingcli pingone authorize application-roles create` | Create a new application role | [`cmd-pingcli-pingone-authorize-application-roles-create.md`](cmd-pingcli-pingone-authorize-application-roles-create.md) |
 | `pingcli pingone authorize application-roles delete` | Delete an application role | [`cmd-pingcli-pingone-authorize-application-roles-delete.md`](cmd-pingcli-pingone-authorize-application-roles-delete.md) |
 | `pingcli pingone authorize application-roles get` | Read a specific application role | [`cmd-pingcli-pingone-authorize-application-roles-get.md`](cmd-pingcli-pingone-authorize-application-roles-get.md) |
 | `pingcli pingone authorize application-roles list` | List all application roles | [`cmd-pingcli-pingone-authorize-application-roles-list.md`](cmd-pingcli-pingone-authorize-application-roles-list.md) |
+| `pingcli pingone authorize application-roles permissions` | Application Role Permissions | [`cmd-pingcli-pingone-authorize-application-roles-permissions.md`](cmd-pingcli-pingone-authorize-application-roles-permissions.md) |
 | `pingcli pingone authorize application-roles replace` | Update an application role | [`cmd-pingcli-pingone-authorize-application-roles-replace.md`](cmd-pingcli-pingone-authorize-application-roles-replace.md) |
 | `pingcli pingone authorize application-roles template` | Generate an application role JSON template | [`cmd-pingcli-pingone-authorize-application-roles-template.md`](cmd-pingcli-pingone-authorize-application-roles-template.md) |
 

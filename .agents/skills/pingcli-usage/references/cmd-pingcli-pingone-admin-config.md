@@ -29,6 +29,7 @@ pingcli pingone admin-config [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingone admin-config apply` | Update administrator security | [`cmd-pingcli-pingone-admin-config-apply.md`](cmd-pingcli-pingone-admin-config-apply.md) |
 | `pingcli pingone admin-config get` | Read administrator security | [`cmd-pingcli-pingone-admin-config-get.md`](cmd-pingcli-pingone-admin-config-get.md) |
 | `pingcli pingone admin-config replace` | Update administrator security | [`cmd-pingcli-pingone-admin-config-replace.md`](cmd-pingcli-pingone-admin-config-replace.md) |
 | `pingcli pingone admin-config template` | Generate an administrator security JSON template | [`cmd-pingcli-pingone-admin-config-template.md`](cmd-pingcli-pingone-admin-config-template.md) |

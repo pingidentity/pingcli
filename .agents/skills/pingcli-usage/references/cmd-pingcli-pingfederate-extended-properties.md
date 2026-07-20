@@ -29,6 +29,7 @@ pingcli pingfederate extended-properties [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate extended-properties apply` | Update extended properties | [`cmd-pingcli-pingfederate-extended-properties-apply.md`](cmd-pingcli-pingfederate-extended-properties-apply.md) |
 | `pingcli pingfederate extended-properties get` | Read extended properties | [`cmd-pingcli-pingfederate-extended-properties-get.md`](cmd-pingcli-pingfederate-extended-properties-get.md) |
 | `pingcli pingfederate extended-properties replace` | Update extended properties | [`cmd-pingcli-pingfederate-extended-properties-replace.md`](cmd-pingcli-pingfederate-extended-properties-replace.md) |
 | `pingcli pingfederate extended-properties template` | Generate an extended properties JSON template | [`cmd-pingcli-pingfederate-extended-properties-template.md`](cmd-pingcli-pingfederate-extended-properties-template.md) |
