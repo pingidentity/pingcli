@@ -29,11 +29,11 @@ pingcli pingone agreements [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
-| `pingcli pingone agreements agreement-languages` | Agreement Languages | [`cmd-pingcli-pingone-agreements-agreement-languages.md`](cmd-pingcli-pingone-agreements-agreement-languages.md) |
 | `pingcli pingone agreements apply` | Create or update an agreement | [`cmd-pingcli-pingone-agreements-apply.md`](cmd-pingcli-pingone-agreements-apply.md) |
 | `pingcli pingone agreements create` | Create a new agreement | [`cmd-pingcli-pingone-agreements-create.md`](cmd-pingcli-pingone-agreements-create.md) |
 | `pingcli pingone agreements delete` | Delete an agreement | [`cmd-pingcli-pingone-agreements-delete.md`](cmd-pingcli-pingone-agreements-delete.md) |
 | `pingcli pingone agreements get` | Read a specific agreement | [`cmd-pingcli-pingone-agreements-get.md`](cmd-pingcli-pingone-agreements-get.md) |
+| `pingcli pingone agreements languages` | Agreement Languages | [`cmd-pingcli-pingone-agreements-languages.md`](cmd-pingcli-pingone-agreements-languages.md) |
 | `pingcli pingone agreements list` | List all agreements | [`cmd-pingcli-pingone-agreements-list.md`](cmd-pingcli-pingone-agreements-list.md) |
 | `pingcli pingone agreements replace` | Update an agreement | [`cmd-pingcli-pingone-agreements-replace.md`](cmd-pingcli-pingone-agreements-replace.md) |
 | `pingcli pingone agreements template` | Generate an agreement JSON template | [`cmd-pingcli-pingone-agreements-template.md`](cmd-pingcli-pingone-agreements-template.md) |

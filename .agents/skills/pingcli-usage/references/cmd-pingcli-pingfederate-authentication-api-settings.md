@@ -29,6 +29,7 @@ pingcli pingfederate authentication-api settings [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate authentication-api settings apply` | Update authentication API settings | [`cmd-pingcli-pingfederate-authentication-api-settings-apply.md`](cmd-pingcli-pingfederate-authentication-api-settings-apply.md) |
 | `pingcli pingfederate authentication-api settings get` | Read authentication API settings | [`cmd-pingcli-pingfederate-authentication-api-settings-get.md`](cmd-pingcli-pingfederate-authentication-api-settings-get.md) |
 | `pingcli pingfederate authentication-api settings replace` | Update authentication API settings | [`cmd-pingcli-pingfederate-authentication-api-settings-replace.md`](cmd-pingcli-pingfederate-authentication-api-settings-replace.md) |
 | `pingcli pingfederate authentication-api settings template` | Generate an authentication API settings JSON template | [`cmd-pingcli-pingfederate-authentication-api-settings-template.md`](cmd-pingcli-pingfederate-authentication-api-settings-template.md) |

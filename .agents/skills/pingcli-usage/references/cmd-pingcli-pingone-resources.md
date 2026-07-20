@@ -29,6 +29,7 @@ pingcli pingone resources [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingone resources application-permissions` | Application Permissions | [`cmd-pingcli-pingone-resources-application-permissions.md`](cmd-pingcli-pingone-resources-application-permissions.md) |
 | `pingcli pingone resources application-resources` | Application Resources | [`cmd-pingcli-pingone-resources-application-resources.md`](cmd-pingcli-pingone-resources-application-resources.md) |
 | `pingcli pingone resources apply` | Create or update a resource | [`cmd-pingcli-pingone-resources-apply.md`](cmd-pingcli-pingone-resources-apply.md) |
 | `pingcli pingone resources create` | Create a new resource | [`cmd-pingcli-pingone-resources-create.md`](cmd-pingcli-pingone-resources-create.md) |
@@ -36,7 +37,7 @@ pingcli pingone resources [flags]
 | `pingcli pingone resources get` | Read a specific resource | [`cmd-pingcli-pingone-resources-get.md`](cmd-pingcli-pingone-resources-get.md) |
 | `pingcli pingone resources list` | List all resources | [`cmd-pingcli-pingone-resources-list.md`](cmd-pingcli-pingone-resources-list.md) |
 | `pingcli pingone resources replace` | Update a resource | [`cmd-pingcli-pingone-resources-replace.md`](cmd-pingcli-pingone-resources-replace.md) |
-| `pingcli pingone resources resource-scopes` | Resource Scopes | [`cmd-pingcli-pingone-resources-resource-scopes.md`](cmd-pingcli-pingone-resources-resource-scopes.md) |
+| `pingcli pingone resources scopes` | Resource Scopes | [`cmd-pingcli-pingone-resources-scopes.md`](cmd-pingcli-pingone-resources-scopes.md) |
 | `pingcli pingone resources template` | Generate a resource JSON template | [`cmd-pingcli-pingone-resources-template.md`](cmd-pingcli-pingone-resources-template.md) |
 
 ## Parent Command

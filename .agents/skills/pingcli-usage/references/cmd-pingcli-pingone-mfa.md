@@ -29,9 +29,9 @@ pingcli pingone mfa
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingone mfa device-policies` | MFA Device Policies | [`cmd-pingcli-pingone-mfa-device-policies.md`](cmd-pingcli-pingone-mfa-device-policies.md) |
 | `pingcli pingone mfa fido2-policies` | FIDO2 Policies | [`cmd-pingcli-pingone-mfa-fido2-policies.md`](cmd-pingcli-pingone-mfa-fido2-policies.md) |
-| `pingcli pingone mfa mfa-device-policies` | MFA Device Policies | [`cmd-pingcli-pingone-mfa-mfa-device-policies.md`](cmd-pingcli-pingone-mfa-mfa-device-policies.md) |
-| `pingcli pingone mfa mfa-settings` | MFA Settings | [`cmd-pingcli-pingone-mfa-mfa-settings.md`](cmd-pingcli-pingone-mfa-mfa-settings.md) |
+| `pingcli pingone mfa settings` | MFA Settings | [`cmd-pingcli-pingone-mfa-settings.md`](cmd-pingcli-pingone-mfa-settings.md) |
 | `pingcli pingone mfa user-devices` | User MFA Devices | [`cmd-pingcli-pingone-mfa-user-devices.md`](cmd-pingcli-pingone-mfa-user-devices.md) |
 
 ## Parent Command

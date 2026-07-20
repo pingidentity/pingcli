@@ -32,7 +32,6 @@ pingcli pingone active-identity-counts list [flags]
 | `--order string` | `` | Sort order for results. Valid values: ASC, DESC. |
 | `--sample-period string` | `` | Sampling period for active identity count aggregation. Valid values: DAY, MONTH. |
 | `--start-date string` | `` | Start date for the query in RFC3339 format (e.g. 2024-01-01T00:00:00Z). Must be within the past 2 years. Required. |
-| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data, so fields are addressed by their JSON names and may be traversed by path. Example: --template '{{.id}}' or --template '{{.data._embedded.environments}}' |
 
 
 ## Inherited Options

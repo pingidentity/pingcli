@@ -30,9 +30,9 @@ pingcli pingone authorize
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingone authorize api-servers` | API Servers | [`cmd-pingcli-pingone-authorize-api-servers.md`](cmd-pingcli-pingone-authorize-api-servers.md) |
-| `pingcli pingone authorize application-resource-permissions` | Application Resource Permissions | [`cmd-pingcli-pingone-authorize-application-resource-permissions.md`](cmd-pingcli-pingone-authorize-application-resource-permissions.md) |
 | `pingcli pingone authorize application-roles` | Application Roles | [`cmd-pingcli-pingone-authorize-application-roles.md`](cmd-pingcli-pingone-authorize-application-roles.md) |
 | `pingcli pingone authorize decision-endpoints` | Decision Endpoints | [`cmd-pingcli-pingone-authorize-decision-endpoints.md`](cmd-pingcli-pingone-authorize-decision-endpoints.md) |
+| `pingcli pingone authorize permissions` | Application Resource Permissions | [`cmd-pingcli-pingone-authorize-permissions.md`](cmd-pingcli-pingone-authorize-permissions.md) |
 
 ## Parent Command
 

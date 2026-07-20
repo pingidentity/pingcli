@@ -45,7 +45,6 @@ Send a custom API request to the configured PingOne tenant, making a GET request
 | `-r, --header []string` | `` | A custom header to send in the request. Example: --header "Content-Type: application/vnd.pingidentity.user.import+json" |
 | `--data string` | `` | The file containing data to send in the request.  Example: './data.json' |
 | `--data-raw string` | `` | The raw data to send in the request.  Example: '{"name": "My environment"}' |
-| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data, so fields are addressed by their JSON names and may be traversed by path. Example: --template '{{.id}}' or --template '{{.data._embedded.environments}}' |
 
 
 ## Inherited Options

@@ -29,12 +29,12 @@ pingcli pingone authorize api-servers [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
-| `pingcli pingone authorize api-servers api-server-operations` | API Server Operations | [`cmd-pingcli-pingone-authorize-api-servers-api-server-operations.md`](cmd-pingcli-pingone-authorize-api-servers-api-server-operations.md) |
 | `pingcli pingone authorize api-servers apply` | Create or update an API server | [`cmd-pingcli-pingone-authorize-api-servers-apply.md`](cmd-pingcli-pingone-authorize-api-servers-apply.md) |
 | `pingcli pingone authorize api-servers create` | Create a new API server | [`cmd-pingcli-pingone-authorize-api-servers-create.md`](cmd-pingcli-pingone-authorize-api-servers-create.md) |
 | `pingcli pingone authorize api-servers delete` | Delete an API server | [`cmd-pingcli-pingone-authorize-api-servers-delete.md`](cmd-pingcli-pingone-authorize-api-servers-delete.md) |
 | `pingcli pingone authorize api-servers get` | Read a specific API server | [`cmd-pingcli-pingone-authorize-api-servers-get.md`](cmd-pingcli-pingone-authorize-api-servers-get.md) |
 | `pingcli pingone authorize api-servers list` | List all API servers | [`cmd-pingcli-pingone-authorize-api-servers-list.md`](cmd-pingcli-pingone-authorize-api-servers-list.md) |
+| `pingcli pingone authorize api-servers operations` | API Server Operations | [`cmd-pingcli-pingone-authorize-api-servers-operations.md`](cmd-pingcli-pingone-authorize-api-servers-operations.md) |
 | `pingcli pingone authorize api-servers replace` | Update an API server | [`cmd-pingcli-pingone-authorize-api-servers-replace.md`](cmd-pingcli-pingone-authorize-api-servers-replace.md) |
 | `pingcli pingone authorize api-servers template` | Generate an API server JSON template | [`cmd-pingcli-pingone-authorize-api-servers-template.md`](cmd-pingcli-pingone-authorize-api-servers-template.md) |
 

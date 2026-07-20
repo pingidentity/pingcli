@@ -29,13 +29,13 @@ pingcli pingone sign-on-policies [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingone sign-on-policies actions` | Sign-On Policy Actions | [`cmd-pingcli-pingone-sign-on-policies-actions.md`](cmd-pingcli-pingone-sign-on-policies-actions.md) |
 | `pingcli pingone sign-on-policies apply` | Create or update a sign-on policy | [`cmd-pingcli-pingone-sign-on-policies-apply.md`](cmd-pingcli-pingone-sign-on-policies-apply.md) |
 | `pingcli pingone sign-on-policies create` | Create a new sign-on policy | [`cmd-pingcli-pingone-sign-on-policies-create.md`](cmd-pingcli-pingone-sign-on-policies-create.md) |
 | `pingcli pingone sign-on-policies delete` | Delete a sign-on policy | [`cmd-pingcli-pingone-sign-on-policies-delete.md`](cmd-pingcli-pingone-sign-on-policies-delete.md) |
 | `pingcli pingone sign-on-policies get` | Read a specific sign-on policy | [`cmd-pingcli-pingone-sign-on-policies-get.md`](cmd-pingcli-pingone-sign-on-policies-get.md) |
 | `pingcli pingone sign-on-policies list` | List all sign-on policies | [`cmd-pingcli-pingone-sign-on-policies-list.md`](cmd-pingcli-pingone-sign-on-policies-list.md) |
 | `pingcli pingone sign-on-policies replace` | Update a sign-on policy | [`cmd-pingcli-pingone-sign-on-policies-replace.md`](cmd-pingcli-pingone-sign-on-policies-replace.md) |
-| `pingcli pingone sign-on-policies sop-actions` | Sign-On Policy Actions | [`cmd-pingcli-pingone-sign-on-policies-sop-actions.md`](cmd-pingcli-pingone-sign-on-policies-sop-actions.md) |
 | `pingcli pingone sign-on-policies template` | Generate a sign-on policy JSON template | [`cmd-pingcli-pingone-sign-on-policies-template.md`](cmd-pingcli-pingone-sign-on-policies-template.md) |
 
 ## Parent Command

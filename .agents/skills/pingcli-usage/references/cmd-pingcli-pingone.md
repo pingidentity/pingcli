@@ -36,6 +36,7 @@ pingcli pingone
 | `pingcli pingone active-identity-counts` | Active identity counts | [`cmd-pingcli-pingone-active-identity-counts.md`](cmd-pingcli-pingone-active-identity-counts.md) |
 | `pingcli pingone admin-config` | Administrator Security | [`cmd-pingcli-pingone-admin-config.md`](cmd-pingcli-pingone-admin-config.md) |
 | `pingcli pingone agreements` | Agreements | [`cmd-pingcli-pingone-agreements.md`](cmd-pingcli-pingone-agreements.md) |
+| `pingcli pingone alert-channels` | Alert Channels | [`cmd-pingcli-pingone-alert-channels.md`](cmd-pingcli-pingone-alert-channels.md) |
 | `pingcli pingone api` | Send a custom REST API request to the management API of PingOne. | [`cmd-pingcli-pingone-api.md`](cmd-pingcli-pingone-api.md) |
 | `pingcli pingone applications` | Applications | [`cmd-pingcli-pingone-applications.md`](cmd-pingcli-pingone-applications.md) |
 | `pingcli pingone auth` | Authenticate Ping CLI to the PingOne management APIs. | [`cmd-pingcli-pingone-auth.md`](cmd-pingcli-pingone-auth.md) |
@@ -44,19 +45,26 @@ pingcli pingone
 | `pingcli pingone custom-admin-roles` | Custom Admin Roles | [`cmd-pingcli-pingone-custom-admin-roles.md`](cmd-pingcli-pingone-custom-admin-roles.md) |
 | `pingcli pingone custom-domains` | Custom Domains | [`cmd-pingcli-pingone-custom-domains.md`](cmd-pingcli-pingone-custom-domains.md) |
 | `pingcli pingone davinci` | Administration tools for the PingOne DaVinci universal service. | [`cmd-pingcli-pingone-davinci.md`](cmd-pingcli-pingone-davinci.md) |
+| `pingcli pingone email-domains` | Email Domains | [`cmd-pingcli-pingone-email-domains.md`](cmd-pingcli-pingone-email-domains.md) |
 | `pingcli pingone environments` | Environments | [`cmd-pingcli-pingone-environments.md`](cmd-pingcli-pingone-environments.md) |
 | `pingcli pingone gateways` | Gateways | [`cmd-pingcli-pingone-gateways.md`](cmd-pingcli-pingone-gateways.md) |
 | `pingcli pingone groups` | Groups | [`cmd-pingcli-pingone-groups.md`](cmd-pingcli-pingone-groups.md) |
 | `pingcli pingone identity-providers` | Identity Providers | [`cmd-pingcli-pingone-identity-providers.md`](cmd-pingcli-pingone-identity-providers.md) |
+| `pingcli pingone images` | Images | [`cmd-pingcli-pingone-images.md`](cmd-pingcli-pingone-images.md) |
 | `pingcli pingone init` | Initialize Ping CLI for the PingOne management APIs. | [`cmd-pingcli-pingone-init.md`](cmd-pingcli-pingone-init.md) |
+| `pingcli pingone integrations` | Integrations | [`cmd-pingcli-pingone-integrations.md`](cmd-pingcli-pingone-integrations.md) |
 | `pingcli pingone languages` | Languages | [`cmd-pingcli-pingone-languages.md`](cmd-pingcli-pingone-languages.md) |
 | `pingcli pingone licenses` | PingOne Licenses | [`cmd-pingcli-pingone-licenses.md`](cmd-pingcli-pingone-licenses.md) |
 | `pingcli pingone mfa` | Administration tools for the PingOne MFA universal service. | [`cmd-pingcli-pingone-mfa.md`](cmd-pingcli-pingone-mfa.md) |
 | `pingcli pingone notification-policies` | Notification Policies | [`cmd-pingcli-pingone-notification-policies.md`](cmd-pingcli-pingone-notification-policies.md) |
 | `pingcli pingone notification-templates` | Notification Templates | [`cmd-pingcli-pingone-notification-templates.md`](cmd-pingcli-pingone-notification-templates.md) |
+| `pingcli pingone notifications-settings` | Notifications Settings | [`cmd-pingcli-pingone-notifications-settings.md`](cmd-pingcli-pingone-notifications-settings.md) |
 | `pingcli pingone password-policies` | Password Policies | [`cmd-pingcli-pingone-password-policies.md`](cmd-pingcli-pingone-password-policies.md) |
 | `pingcli pingone populations` | Populations | [`cmd-pingcli-pingone-populations.md`](cmd-pingcli-pingone-populations.md) |
+| `pingcli pingone propagation-plans` | Identity Propagation Plans | [`cmd-pingcli-pingone-propagation-plans.md`](cmd-pingcli-pingone-propagation-plans.md) |
 | `pingcli pingone protect` | Administration tools for the PingOne Protect universal service. | [`cmd-pingcli-pingone-protect.md`](cmd-pingcli-pingone-protect.md) |
+| `pingcli pingone rate-limit-ip-configs` | Rate Limit IP Configurations | [`cmd-pingcli-pingone-rate-limit-ip-configs.md`](cmd-pingcli-pingone-rate-limit-ip-configs.md) |
+| `pingcli pingone recaptcha-v2-config` | RecaptchaV2 Config | [`cmd-pingcli-pingone-recaptcha-v2-config.md`](cmd-pingcli-pingone-recaptcha-v2-config.md) |
 | `pingcli pingone resources` | Resources | [`cmd-pingcli-pingone-resources.md`](cmd-pingcli-pingone-resources.md) |
 | `pingcli pingone roles` | PingOne built-in admin roles | [`cmd-pingcli-pingone-roles.md`](cmd-pingcli-pingone-roles.md) |
 | `pingcli pingone schemas` | Schemas | [`cmd-pingcli-pingone-schemas.md`](cmd-pingcli-pingone-schemas.md) |

@@ -48,7 +48,6 @@ Send a custom API request to the configured PingFederate server, making a GET re
 | `--pingfederate-insecure-trust-all-tls` | `` | Trust any certificate when connecting to the PingFederate server admin API. (default false) This is insecure and shouldn't be enabled outside of testing. |
 | `--pingfederate-software-version string` | `` | The PingFederate software version to use when connecting to the PingFederate admin API. This is used to select the correct SDK version for authentication. After successful authentication, the actual running version is auto-detected from the API. (default 13.0) Example: '13.0' |
 | `--pingfederate-x-bypass-external-validation-header` | `` | Bypass connection tests when configuring PingFederate (the X-BypassExternalValidation header when using PingFederate's admin API). (default false) |
-| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data, so fields are addressed by their JSON names and may be traversed by path. Example: --template '{{.id}}' or --template '{{.data._embedded.environments}}' |
 
 
 ## Inherited Options
