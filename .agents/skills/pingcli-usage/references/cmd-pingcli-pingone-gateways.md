@@ -31,10 +31,10 @@ pingcli pingone gateways [flags]
 |---------|-------------|----------|
 | `pingcli pingone gateways apply` | Create or update a gateway | [`cmd-pingcli-pingone-gateways-apply.md`](cmd-pingcli-pingone-gateways-apply.md) |
 | `pingcli pingone gateways create` | Create a new gateway | [`cmd-pingcli-pingone-gateways-create.md`](cmd-pingcli-pingone-gateways-create.md) |
+| `pingcli pingone gateways credentials` | Gateway credentials | [`cmd-pingcli-pingone-gateways-credentials.md`](cmd-pingcli-pingone-gateways-credentials.md) |
 | `pingcli pingone gateways delete` | Delete a gateway | [`cmd-pingcli-pingone-gateways-delete.md`](cmd-pingcli-pingone-gateways-delete.md) |
-| `pingcli pingone gateways gateway-credentials` | Gateway credentials | [`cmd-pingcli-pingone-gateways-gateway-credentials.md`](cmd-pingcli-pingone-gateways-gateway-credentials.md) |
-| `pingcli pingone gateways gateway-instances` | Gateway instances | [`cmd-pingcli-pingone-gateways-gateway-instances.md`](cmd-pingcli-pingone-gateways-gateway-instances.md) |
 | `pingcli pingone gateways get` | Read a specific gateway | [`cmd-pingcli-pingone-gateways-get.md`](cmd-pingcli-pingone-gateways-get.md) |
+| `pingcli pingone gateways instances` | Gateway instances | [`cmd-pingcli-pingone-gateways-instances.md`](cmd-pingcli-pingone-gateways-instances.md) |
 | `pingcli pingone gateways list` | List all gateways | [`cmd-pingcli-pingone-gateways-list.md`](cmd-pingcli-pingone-gateways-list.md) |
 | `pingcli pingone gateways replace` | Replace a gateway | [`cmd-pingcli-pingone-gateways-replace.md`](cmd-pingcli-pingone-gateways-replace.md) |
 | `pingcli pingone gateways template` | Generate a gateway JSON template | [`cmd-pingcli-pingone-gateways-template.md`](cmd-pingcli-pingone-gateways-template.md) |

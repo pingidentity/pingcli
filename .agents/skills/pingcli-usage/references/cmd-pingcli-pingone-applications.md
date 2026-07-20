@@ -29,16 +29,17 @@ pingcli pingone applications [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
-| `pingcli pingone applications application-grants` | Application Grants | [`cmd-pingcli-pingone-applications-application-grants.md`](cmd-pingcli-pingone-applications-application-grants.md) |
-| `pingcli pingone applications application-role-assignments` | Application Role Assignments | [`cmd-pingcli-pingone-applications-application-role-assignments.md`](cmd-pingcli-pingone-applications-application-role-assignments.md) |
-| `pingcli pingone applications application-secrets` | Application Secrets | [`cmd-pingcli-pingone-applications-application-secrets.md`](cmd-pingcli-pingone-applications-application-secrets.md) |
 | `pingcli pingone applications apply` | Create or update an application | [`cmd-pingcli-pingone-applications-apply.md`](cmd-pingcli-pingone-applications-apply.md) |
+| `pingcli pingone applications attribute-mappings` | Application Attribute Mappings | [`cmd-pingcli-pingone-applications-attribute-mappings.md`](cmd-pingcli-pingone-applications-attribute-mappings.md) |
 | `pingcli pingone applications create` | Create a new application | [`cmd-pingcli-pingone-applications-create.md`](cmd-pingcli-pingone-applications-create.md) |
 | `pingcli pingone applications delete` | Delete an application | [`cmd-pingcli-pingone-applications-delete.md`](cmd-pingcli-pingone-applications-delete.md) |
 | `pingcli pingone applications flow-policy-assignments` | Flow Policy Assignments | [`cmd-pingcli-pingone-applications-flow-policy-assignments.md`](cmd-pingcli-pingone-applications-flow-policy-assignments.md) |
 | `pingcli pingone applications get` | Read a specific application | [`cmd-pingcli-pingone-applications-get.md`](cmd-pingcli-pingone-applications-get.md) |
+| `pingcli pingone applications grants` | Application Grants | [`cmd-pingcli-pingone-applications-grants.md`](cmd-pingcli-pingone-applications-grants.md) |
 | `pingcli pingone applications list` | List all applications | [`cmd-pingcli-pingone-applications-list.md`](cmd-pingcli-pingone-applications-list.md) |
 | `pingcli pingone applications replace` | Replace an application | [`cmd-pingcli-pingone-applications-replace.md`](cmd-pingcli-pingone-applications-replace.md) |
+| `pingcli pingone applications role-assignments` | Application Role Assignments | [`cmd-pingcli-pingone-applications-role-assignments.md`](cmd-pingcli-pingone-applications-role-assignments.md) |
+| `pingcli pingone applications secrets` | Application Secrets | [`cmd-pingcli-pingone-applications-secrets.md`](cmd-pingcli-pingone-applications-secrets.md) |
 | `pingcli pingone applications sop-assignments` | Sign-On Policy Assignments | [`cmd-pingcli-pingone-applications-sop-assignments.md`](cmd-pingcli-pingone-applications-sop-assignments.md) |
 | `pingcli pingone applications template` | Generate an application JSON template | [`cmd-pingcli-pingone-applications-template.md`](cmd-pingcli-pingone-applications-template.md) |
 

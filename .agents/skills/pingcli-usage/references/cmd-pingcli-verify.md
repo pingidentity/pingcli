@@ -29,7 +29,7 @@ pingcli verify
 
 | Command | Description | Reference |
 |---------|-------------|----------|
-| `pingcli verify verify-policies` | Verify Policies | [`cmd-pingcli-verify-verify-policies.md`](cmd-pingcli-verify-verify-policies.md) |
+| `pingcli verify policies` | Verify Policies | [`cmd-pingcli-verify-policies.md`](cmd-pingcli-verify-policies.md) |
 
 ## Parent Command
 

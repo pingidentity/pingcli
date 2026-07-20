@@ -29,7 +29,7 @@ pingcli pingfederate local-identity
 
 | Command | Description | Reference |
 |---------|-------------|----------|
-| `pingcli pingfederate local-identity identity-profiles` | PingFederate Local Identity Profiles | [`cmd-pingcli-pingfederate-local-identity-identity-profiles.md`](cmd-pingcli-pingfederate-local-identity-identity-profiles.md) |
+| `pingcli pingfederate local-identity profiles` | PingFederate Local Identity Profiles | [`cmd-pingcli-pingfederate-local-identity-profiles.md`](cmd-pingcli-pingfederate-local-identity-profiles.md) |
 
 ## Parent Command
 

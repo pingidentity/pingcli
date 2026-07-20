@@ -29,6 +29,7 @@ pingcli pingfederate data-stores [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate data-stores apply` | Create or update a data store | [`cmd-pingcli-pingfederate-data-stores-apply.md`](cmd-pingcli-pingfederate-data-stores-apply.md) |
 | `pingcli pingfederate data-stores create` | Create a new data store | [`cmd-pingcli-pingfederate-data-stores-create.md`](cmd-pingcli-pingfederate-data-stores-create.md) |
 | `pingcli pingfederate data-stores delete` | Delete a data store | [`cmd-pingcli-pingfederate-data-stores-delete.md`](cmd-pingcli-pingfederate-data-stores-delete.md) |
 | `pingcli pingfederate data-stores get` | Read a specific data store | [`cmd-pingcli-pingfederate-data-stores-get.md`](cmd-pingcli-pingfederate-data-stores-get.md) |

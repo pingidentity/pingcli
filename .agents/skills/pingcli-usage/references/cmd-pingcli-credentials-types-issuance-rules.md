@@ -1,0 +1,43 @@
+# `pingcli credentials types issuance-rules`
+Credential Issuance Rules
+
+## Synopsis
+
+Credential Issuance Rules
+
+```
+pingcli credentials types issuance-rules [flags]
+```
+
+## Inherited Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-C, --config string` | `` | The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml) |
+| `-D, --detailed-exitcode` | `` | Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. |
+| `-O, --output-format string` | `` | Specify the console output format. (default text) Options are: json, ndjson, ndjson-typed, ndjson-wrapped, text. |
+| `-P, --profile string` | `` | The name of a configuration profile to use. |
+| `--debug` | `` | Enable debug output for error messages, including stack traces and transaction IDs. (default false) |
+| `--log-file string` | `` | Write logs to a file at the given path. File logging is disabled when not set. |
+| `--log-file-level string` | `` | Set the file log level. Options are: DEBUG, INFO, WARN, ERROR. (default DEBUG) |
+| `--log-level string` | `` | Set the console log level. Options are: DEBUG, INFO, WARN, ERROR. (default WARN) |
+| `--no-color` | `` | Disable text output in color. (default false) |
+| `--query string` | `` | JMESPath expression to filter JSON output. Requires -O json, ndjson, ndjson-typed, or ndjson-wrapped. Example: --query 'data[?enabled].name' |
+
+
+## Subcommands
+
+| Command | Description | Reference |
+|---------|-------------|----------|
+| `pingcli credentials types issuance-rules create` | Create a new credential issuance rule | [`cmd-pingcli-credentials-types-issuance-rules-create.md`](cmd-pingcli-credentials-types-issuance-rules-create.md) |
+| `pingcli credentials types issuance-rules delete` | Delete a credential issuance rule | [`cmd-pingcli-credentials-types-issuance-rules-delete.md`](cmd-pingcli-credentials-types-issuance-rules-delete.md) |
+| `pingcli credentials types issuance-rules get` | Read a specific credential issuance rule | [`cmd-pingcli-credentials-types-issuance-rules-get.md`](cmd-pingcli-credentials-types-issuance-rules-get.md) |
+| `pingcli credentials types issuance-rules list` | List all credential issuance rules | [`cmd-pingcli-credentials-types-issuance-rules-list.md`](cmd-pingcli-credentials-types-issuance-rules-list.md) |
+| `pingcli credentials types issuance-rules replace` | Replace a credential issuance rule | [`cmd-pingcli-credentials-types-issuance-rules-replace.md`](cmd-pingcli-credentials-types-issuance-rules-replace.md) |
+| `pingcli credentials types issuance-rules template` | Generate a credential issuance rule JSON template | [`cmd-pingcli-credentials-types-issuance-rules-template.md`](cmd-pingcli-credentials-types-issuance-rules-template.md) |
+| `pingcli credentials types issuance-rules usage-counts` | Read credential issuance rule usage counts | [`cmd-pingcli-credentials-types-issuance-rules-usage-counts.md`](cmd-pingcli-credentials-types-issuance-rules-usage-counts.md) |
+| `pingcli credentials types issuance-rules usage-details` | Read credential issuance rule usage details | [`cmd-pingcli-credentials-types-issuance-rules-usage-details.md`](cmd-pingcli-credentials-types-issuance-rules-usage-details.md) |
+
+## Parent Command
+
+- [`pingcli credentials types`](cmd-pingcli-credentials-types.md) — Credential Types

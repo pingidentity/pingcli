@@ -30,10 +30,10 @@ pingcli pingone identity-providers [flags]
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingone identity-providers apply` | Create or update an identity provider | [`cmd-pingcli-pingone-identity-providers-apply.md`](cmd-pingcli-pingone-identity-providers-apply.md) |
+| `pingcli pingone identity-providers attributes` | Identity Provider Attributes | [`cmd-pingcli-pingone-identity-providers-attributes.md`](cmd-pingcli-pingone-identity-providers-attributes.md) |
 | `pingcli pingone identity-providers create` | Create a new identity provider | [`cmd-pingcli-pingone-identity-providers-create.md`](cmd-pingcli-pingone-identity-providers-create.md) |
 | `pingcli pingone identity-providers delete` | Delete an identity provider | [`cmd-pingcli-pingone-identity-providers-delete.md`](cmd-pingcli-pingone-identity-providers-delete.md) |
 | `pingcli pingone identity-providers get` | Read a specific identity provider | [`cmd-pingcli-pingone-identity-providers-get.md`](cmd-pingcli-pingone-identity-providers-get.md) |
-| `pingcli pingone identity-providers idp-attributes` | Identity Provider Attributes | [`cmd-pingcli-pingone-identity-providers-idp-attributes.md`](cmd-pingcli-pingone-identity-providers-idp-attributes.md) |
 | `pingcli pingone identity-providers list` | List all identity providers | [`cmd-pingcli-pingone-identity-providers-list.md`](cmd-pingcli-pingone-identity-providers-list.md) |
 | `pingcli pingone identity-providers replace` | Replace an identity provider | [`cmd-pingcli-pingone-identity-providers-replace.md`](cmd-pingcli-pingone-identity-providers-replace.md) |
 | `pingcli pingone identity-providers template` | Generate an identity provider JSON template | [`cmd-pingcli-pingone-identity-providers-template.md`](cmd-pingcli-pingone-identity-providers-template.md) |

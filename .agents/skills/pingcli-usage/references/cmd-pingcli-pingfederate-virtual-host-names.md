@@ -29,6 +29,7 @@ pingcli pingfederate virtual-host-names [flags]
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate virtual-host-names apply` | Update virtual host names settings | [`cmd-pingcli-pingfederate-virtual-host-names-apply.md`](cmd-pingcli-pingfederate-virtual-host-names-apply.md) |
 | `pingcli pingfederate virtual-host-names get` | Read virtual host names settings | [`cmd-pingcli-pingfederate-virtual-host-names-get.md`](cmd-pingcli-pingfederate-virtual-host-names-get.md) |
 | `pingcli pingfederate virtual-host-names replace` | Update virtual host names settings | [`cmd-pingcli-pingfederate-virtual-host-names-replace.md`](cmd-pingcli-pingfederate-virtual-host-names-replace.md) |
 | `pingcli pingfederate virtual-host-names template` | Generate a virtual host names settings JSON template | [`cmd-pingcli-pingfederate-virtual-host-names-template.md`](cmd-pingcli-pingfederate-virtual-host-names-template.md) |

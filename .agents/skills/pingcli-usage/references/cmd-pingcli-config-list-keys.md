@@ -24,7 +24,6 @@ List all configuration keys stored in the CLI configuration file.
 |------|---------|-------------|
 | `-h, --help` | `` | help for list-keys |
 | `-y, --yaml` | `` | Output configuration keys in YAML format. (default false) |
-| `--template string` | `` | A Go text/template string. When provided, the command output is rendered through the template instead of the default format. The template receives the command's structured response data, so fields are addressed by their JSON names and may be traversed by path. Example: --template '{{.id}}' or --template '{{.data._embedded.environments}}' |
 
 
 ## Inherited Options
