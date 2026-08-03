@@ -12,11 +12,17 @@ pingcli pingone credentials digital-wallet-applications apply [flags]
 ## Examples
 
 ```
-# Create or update a digital wallet application (body supplies name, appOpenUrl, and application.id)
+# Create or update a digital wallet application from flags
+  pingcli pingone credentials digital-wallet-applications apply --environment-id <env-id> --name "My Wallet App" --app-open-url "https://example.com/open" --application-id <app-id>
+
+  # Create or update a digital wallet application (body supplies name, appOpenUrl, and application.id)
   pingcli pingone credentials digital-wallet-applications apply --environment-id <env-id> --from-file digital-wallet-application.json
 
   # Read body from stdin
   pingcli pingone credentials digital-wallet-applications apply --environment-id <env-id> --from-file - < digital-wallet-application.json
+
+  # Create or update from flags, without --from-file
+  pingcli pingone credentials digital-wallet-applications apply --environment-id <env-id> --name "My Wallet App" --app-open-url "https://example.com/open" --application-id <app-id>
 ```
 
 ## Options
@@ -27,6 +33,10 @@ pingcli pingone credentials digital-wallet-applications apply [flags]
 | `-d, --digital-wallet-application-id string` | `` | The digital wallet application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--app-open-url string` | `` | The deep-link URL used to open the digital wallet app on a mobile device |
+| `--application-id string` | `` | The UUID of the linked PingOne application resource (flattened alias for application.id) |
+| `--name string` | `` | The name of the digital wallet application |
+| `--uses-ping-one-wallet-sdk` | `` | Whether the wallet app uses the PingOne Wallet SDK |
 
 
 ## Inherited Options

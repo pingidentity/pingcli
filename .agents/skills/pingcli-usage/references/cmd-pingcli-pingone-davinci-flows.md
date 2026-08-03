@@ -34,10 +34,12 @@ pingcli pingone davinci flows [flags]
 | `pingcli pingone davinci flows create` | Create a new DaVinci flow | [`cmd-pingcli-pingone-davinci-flows-create.md`](cmd-pingcli-pingone-davinci-flows-create.md) |
 | `pingcli pingone davinci flows delete` | Delete a DaVinci flow | [`cmd-pingcli-pingone-davinci-flows-delete.md`](cmd-pingcli-pingone-davinci-flows-delete.md) |
 | `pingcli pingone davinci flows deploy` | Deploy a DaVinci flow | [`cmd-pingcli-pingone-davinci-flows-deploy.md`](cmd-pingcli-pingone-davinci-flows-deploy.md) |
+| `pingcli pingone davinci flows enabled` | DaVinci Flow Enabled | [`cmd-pingcli-pingone-davinci-flows-enabled.md`](cmd-pingcli-pingone-davinci-flows-enabled.md) |
 | `pingcli pingone davinci flows get` | Read a DaVinci flow | [`cmd-pingcli-pingone-davinci-flows-get.md`](cmd-pingcli-pingone-davinci-flows-get.md) |
 | `pingcli pingone davinci flows list` | List DaVinci flows | [`cmd-pingcli-pingone-davinci-flows-list.md`](cmd-pingcli-pingone-davinci-flows-list.md) |
 | `pingcli pingone davinci flows replace` | Update a DaVinci flow | [`cmd-pingcli-pingone-davinci-flows-replace.md`](cmd-pingcli-pingone-davinci-flows-replace.md) |
 | `pingcli pingone davinci flows template` | Generate a DaVinci flow JSON template | [`cmd-pingcli-pingone-davinci-flows-template.md`](cmd-pingcli-pingone-davinci-flows-template.md) |
+| `pingcli pingone davinci flows versions` | DaVinci Flow Versions | [`cmd-pingcli-pingone-davinci-flows-versions.md`](cmd-pingcli-pingone-davinci-flows-versions.md) |
 
 ## Parent Command
 

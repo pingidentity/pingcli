@@ -34,6 +34,7 @@ pingcli pingone email-domains [flags]
 | `pingcli pingone email-domains get` | Read a specific trusted email domain | [`cmd-pingcli-pingone-email-domains-get.md`](cmd-pingcli-pingone-email-domains-get.md) |
 | `pingcli pingone email-domains list` | List all trusted email domains | [`cmd-pingcli-pingone-email-domains-list.md`](cmd-pingcli-pingone-email-domains-list.md) |
 | `pingcli pingone email-domains template` | Generate a trusted email domain JSON template | [`cmd-pingcli-pingone-email-domains-template.md`](cmd-pingcli-pingone-email-domains-template.md) |
+| `pingcli pingone email-domains trusted-email-addresses` | Trusted Email Addresses | [`cmd-pingcli-pingone-email-domains-trusted-email-addresses.md`](cmd-pingcli-pingone-email-domains-trusted-email-addresses.md) |
 
 ## Parent Command
 

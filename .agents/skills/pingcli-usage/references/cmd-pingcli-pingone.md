@@ -41,12 +41,17 @@ pingcli pingone
 | `pingcli pingone applications` | Applications | [`cmd-pingcli-pingone-applications.md`](cmd-pingcli-pingone-applications.md) |
 | `pingcli pingone auth` | Authenticate Ping CLI to the PingOne management APIs. | [`cmd-pingcli-pingone-auth.md`](cmd-pingcli-pingone-auth.md) |
 | `pingcli pingone authorize` | Administration tools for the PingOne Authorize universal service. | [`cmd-pingcli-pingone-authorize.md`](cmd-pingcli-pingone-authorize.md) |
+| `pingcli pingone bill-of-materials` | Bill of Materials | [`cmd-pingcli-pingone-bill-of-materials.md`](cmd-pingcli-pingone-bill-of-materials.md) |
+| `pingcli pingone branding-settings` | Branding Settings | [`cmd-pingcli-pingone-branding-settings.md`](cmd-pingcli-pingone-branding-settings.md) |
+| `pingcli pingone certificates` | Certificates | [`cmd-pingcli-pingone-certificates.md`](cmd-pingcli-pingone-certificates.md) |
 | `pingcli pingone credentials` | Administration tools for the PingOne Credentials universal service. | [`cmd-pingcli-pingone-credentials.md`](cmd-pingcli-pingone-credentials.md) |
 | `pingcli pingone custom-admin-roles` | Custom Admin Roles | [`cmd-pingcli-pingone-custom-admin-roles.md`](cmd-pingcli-pingone-custom-admin-roles.md) |
 | `pingcli pingone custom-domains` | Custom Domains | [`cmd-pingcli-pingone-custom-domains.md`](cmd-pingcli-pingone-custom-domains.md) |
 | `pingcli pingone davinci` | Administration tools for the PingOne DaVinci universal service. | [`cmd-pingcli-pingone-davinci.md`](cmd-pingcli-pingone-davinci.md) |
 | `pingcli pingone email-domains` | Email Domains | [`cmd-pingcli-pingone-email-domains.md`](cmd-pingcli-pingone-email-domains.md) |
 | `pingcli pingone environments` | Environments | [`cmd-pingcli-pingone-environments.md`](cmd-pingcli-pingone-environments.md) |
+| `pingcli pingone flow-policies` | Flow policies | [`cmd-pingcli-pingone-flow-policies.md`](cmd-pingcli-pingone-flow-policies.md) |
+| `pingcli pingone forms` | Forms | [`cmd-pingcli-pingone-forms.md`](cmd-pingcli-pingone-forms.md) |
 | `pingcli pingone gateways` | Gateways | [`cmd-pingcli-pingone-gateways.md`](cmd-pingcli-pingone-gateways.md) |
 | `pingcli pingone groups` | Groups | [`cmd-pingcli-pingone-groups.md`](cmd-pingcli-pingone-groups.md) |
 | `pingcli pingone identity-providers` | Identity Providers | [`cmd-pingcli-pingone-identity-providers.md`](cmd-pingcli-pingone-identity-providers.md) |
@@ -59,6 +64,7 @@ pingcli pingone
 | `pingcli pingone notification-policies` | Notification Policies | [`cmd-pingcli-pingone-notification-policies.md`](cmd-pingcli-pingone-notification-policies.md) |
 | `pingcli pingone notification-templates` | Notification Templates | [`cmd-pingcli-pingone-notification-templates.md`](cmd-pingcli-pingone-notification-templates.md) |
 | `pingcli pingone notifications-settings` | Notifications Settings | [`cmd-pingcli-pingone-notifications-settings.md`](cmd-pingcli-pingone-notifications-settings.md) |
+| `pingcli pingone organizations` | PingOne Organizations | [`cmd-pingcli-pingone-organizations.md`](cmd-pingcli-pingone-organizations.md) |
 | `pingcli pingone password-policies` | Password Policies | [`cmd-pingcli-pingone-password-policies.md`](cmd-pingcli-pingone-password-policies.md) |
 | `pingcli pingone populations` | Populations | [`cmd-pingcli-pingone-populations.md`](cmd-pingcli-pingone-populations.md) |
 | `pingcli pingone propagation-plans` | Identity Propagation Plans | [`cmd-pingcli-pingone-propagation-plans.md`](cmd-pingcli-pingone-propagation-plans.md) |

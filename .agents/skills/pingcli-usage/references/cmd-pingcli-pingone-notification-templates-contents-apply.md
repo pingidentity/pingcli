@@ -12,7 +12,7 @@ pingcli pingone notification-templates contents apply [flags]
 ## Examples
 
 ```
-# Create or update a notification template content (body must have exactly one delivery-method block)
+# Create or update a notification template content
   pingcli pingone notification-templates contents apply --environment-id <env-id> --template-name <template-name> --from-file content.json
 
   # Read body from stdin

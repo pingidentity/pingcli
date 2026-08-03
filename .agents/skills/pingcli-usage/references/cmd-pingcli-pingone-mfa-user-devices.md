@@ -32,6 +32,8 @@ pingcli pingone mfa user-devices [flags]
 | `pingcli pingone mfa user-devices delete` | Delete a user MFA device | [`cmd-pingcli-pingone-mfa-user-devices-delete.md`](cmd-pingcli-pingone-mfa-user-devices-delete.md) |
 | `pingcli pingone mfa user-devices get` | Read a specific user MFA device | [`cmd-pingcli-pingone-mfa-user-devices-get.md`](cmd-pingcli-pingone-mfa-user-devices-get.md) |
 | `pingcli pingone mfa user-devices list` | List all user MFA devices | [`cmd-pingcli-pingone-mfa-user-devices-list.md`](cmd-pingcli-pingone-mfa-user-devices-list.md) |
+| `pingcli pingone mfa user-devices send-logs` | Request log collection from a user MFA device | [`cmd-pingcli-pingone-mfa-user-devices-send-logs.md`](cmd-pingcli-pingone-mfa-user-devices-send-logs.md) |
+| `pingcli pingone mfa user-devices update-nickname` | Update the nickname of a user MFA device | [`cmd-pingcli-pingone-mfa-user-devices-update-nickname.md`](cmd-pingcli-pingone-mfa-user-devices-update-nickname.md) |
 
 ## Parent Command
 

@@ -12,7 +12,7 @@ pingcli pingone identity-providers create [flags]
 ## Examples
 
 ```
-# Create a new identity provider from a JSON file (IdentityProviderBody wrapper shape: one nested type block)
+# Create a new identity provider from a JSON file
   pingcli pingone identity-providers create --environment-id <env-id> --from-file identity-provider.json
 
   # Create a new identity provider from stdin

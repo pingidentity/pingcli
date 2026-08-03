@@ -5,11 +5,9 @@ Generate a gateway JSON template
 
 Generate a JSON skeleton template for gateway create or replace bodies.
 
-The template emits all five variant blocks (ldap, radius, pingFederate,
-apiGatewayIntegration, pingIntelligence) at once. Each block contains the full
-SDK field set including name, enabled, and variant-specific fields. Populate
-exactly one and delete the other four before passing the body to create or
-replace.
+Select the desired gateway type with --template-type (one of: ldap, radius,
+pingFederate, apiGatewayIntegration, pingIntelligence). Defaults to ldap when
+omitted.
 
 ```
 pingcli pingone gateways template [flags]
@@ -18,11 +16,11 @@ pingcli pingone gateways template [flags]
 ## Examples
 
 ```
-# Generate a template and save to a file
-  pingcli pingone gateways template > body.json
+# Generate an LDAP gateway template and save to a file
+  pingcli pingone gateways template --template-type ldap > body.json
 
-  # Edit the template — keep exactly one variant block and fill in the required fields
-  # then pass the body to the create or replace command
+  # Edit the template — fill in the required fields, then pass the body to
+  # the create or replace command
 Use the JSON template as a starting point:
   1. Run the template command to generate the body skeleton.
   2. Edit the file, replacing placeholder values with real data.
@@ -40,6 +38,7 @@ Example workflow:
 |------|---------|-------------|
 | `-h, --help` | `` | help for template |
 | `-o, --output-file string` | `` | Write the JSON template to PATH instead of stdout. Overwrites any existing file. |
+| `--template-type string` | `` | The variant of the template to generate. One of: ldap, radius, pingFederate, apiGatewayIntegration, pingIntelligence. Defaults to "ldap". |
 
 
 ## Inherited Options

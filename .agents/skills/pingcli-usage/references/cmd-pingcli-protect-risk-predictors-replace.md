@@ -5,21 +5,9 @@ Replace a risk predictor
 
 Replace (PUT) a risk predictor in a PingOne environment.
 
-The body supplied via --from-file must use the RiskPredictorBody wrapper shape:
-exactly one nested variant block — "adversaryInTheMiddle", "anonymousNetwork",
-"bot", "composite", "custom", "device", "emailReputation", "geovelocity",
-"ipReputation", "trafficAnomaly", "userLocationAnomaly", "userRiskBehavior",
-or "velocity" — containing all fields including name.
-
-Note: compactName is immutable after creation but must be included in replace
-bodies with the original value. The SDK always serialises it and the API
-rejects an empty compactName string.
-
-Output from get/list uses the SDK flat polymorphic shape where "type" and all
-variant fields are at the top level. Because the input and output shapes differ,
-piping a get result directly into replace requires a manual reshape: move all
-fields under the appropriate nested block and remove server-set read-only fields
-(id, _links, createdAt, updatedAt, environment, licensed, deletable).
+Note: compactName is immutable after creation but must be included in the
+replace body with the original value. The SDK always serialises it and the
+API rejects an empty compactName string.
 
 ```
 pingcli protect risk-predictors replace [flags]
@@ -28,9 +16,9 @@ pingcli protect risk-predictors replace [flags]
 ## Examples
 
 ```
-# Replace a risk predictor from a JSON file (RiskPredictorBody wrapper shape: one nested variant block)
+# Replace a risk predictor from a JSON file
   # Note: include compactName with the original value — the SDK serialises it and the API rejects an empty value.
-  # Note: get/list output uses the SDK flat shape; reshape before piping into replace.
+  # Note: remove server-set read-only fields (id, _links, createdAt, updatedAt, environment, licensed, deletable) before piping get output into replace.
   pingcli protect risk-predictors replace --environment-id <env-id> --risk-predictor-id <predictor-id> --from-file risk-predictor.json
 
   # Replace a risk predictor from stdin

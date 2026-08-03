@@ -12,7 +12,7 @@ pingcli pingone sign-on-policies actions replace [flags]
 ## Examples
 
 ```
-# Update a sign-on policy action from a JSON file (SignOnPolicyActionBody wrapper shape: one nested type block)
+# Update a sign-on policy action from a JSON file
   pingcli pingone sign-on-policies actions replace --environment-id <env-id> --sign-on-policy-id <sop-id> --sign-on-policy-action-id <action-id> --from-file action.json
 
   # Update a sign-on policy action from stdin

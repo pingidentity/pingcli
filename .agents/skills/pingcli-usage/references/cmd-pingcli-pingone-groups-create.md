@@ -26,7 +26,6 @@ pingcli pingone groups create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-p, --population-id string` | `` | The population ID (optional, scopes group to a population) |
 
 
 ## Inherited Options
