@@ -5,17 +5,6 @@ Replace a gateway
 
 Replace (PUT) a gateway in a PingOne environment.
 
-The body supplied via --from-file must use the GatewayBody wrapper shape:
-exactly one nested variant block — "ldap", "radius", "pingFederate",
-"apiGatewayIntegration", or "pingIntelligence" — containing all gateway fields
-(including name and enabled).
-
-Output from get/list uses the SDK flat polymorphic shape where "type" and all
-variant fields are at the top level. Because the input and output shapes differ,
-piping a get result directly into replace requires a manual reshape: move all
-fields under the appropriate nested block and remove server-set read-only fields
-(id, environment, credentials, supportedVersions, currentAlerts).
-
 ```
 pingcli pingone gateways replace [flags]
 ```
@@ -23,8 +12,7 @@ pingcli pingone gateways replace [flags]
 ## Examples
 
 ```
-# Replace a gateway from a JSON file (GatewayBody wrapper shape: one nested variant block)
-  # Note: get/list output uses the SDK flat shape; reshape before piping into replace.
+# Replace a gateway from a JSON file
   pingcli pingone gateways replace --environment-id <env-id> --gateway-id <gateway-id> --from-file gateway.json
 
   # Replace a gateway from stdin

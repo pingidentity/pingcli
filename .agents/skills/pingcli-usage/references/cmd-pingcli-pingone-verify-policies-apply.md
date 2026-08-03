@@ -3,7 +3,7 @@ Create or update a verify policy
 
 ## Synopsis
 
-Idempotently create or update a verify policy looked up by the "name" field in the JSON body within the supplied --environment-id. If no verify policy with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
+Idempotently create or update a verify policy looked up by the "name" field in the request body within the supplied --environment-id. The name may be supplied by --name or by the JSON body. If no verify policy with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
 
 ```
 pingcli pingone verify policies apply [flags]
@@ -27,6 +27,9 @@ pingcli pingone verify policies apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-v, --verify-policy-id string` | `` | The verify policy ID |
+| `--default` | `` | Whether this is the environment default verify policy |
+| `--description string` | `` | The verify policy description |
+| `--name string` | `` | The verify policy name |
 
 
 ## Inherited Options

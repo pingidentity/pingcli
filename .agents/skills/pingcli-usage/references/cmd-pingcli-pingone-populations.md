@@ -31,6 +31,7 @@ pingcli pingone populations [flags]
 |---------|-------------|----------|
 | `pingcli pingone populations apply` | Create or update a population | [`cmd-pingcli-pingone-populations-apply.md`](cmd-pingcli-pingone-populations-apply.md) |
 | `pingcli pingone populations create` | Create a new population | [`cmd-pingcli-pingone-populations-create.md`](cmd-pingcli-pingone-populations-create.md) |
+| `pingcli pingone populations default-identity-provider` | Population Default Identity Provider | [`cmd-pingcli-pingone-populations-default-identity-provider.md`](cmd-pingcli-pingone-populations-default-identity-provider.md) |
 | `pingcli pingone populations delete` | Delete a population | [`cmd-pingcli-pingone-populations-delete.md`](cmd-pingcli-pingone-populations-delete.md) |
 | `pingcli pingone populations get` | Read a specific population | [`cmd-pingcli-pingone-populations-get.md`](cmd-pingcli-pingone-populations-get.md) |
 | `pingcli pingone populations list` | List all populations | [`cmd-pingcli-pingone-populations-list.md`](cmd-pingcli-pingone-populations-list.md) |

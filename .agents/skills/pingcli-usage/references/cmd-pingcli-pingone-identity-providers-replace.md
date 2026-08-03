@@ -5,16 +5,6 @@ Replace an identity provider
 
 Replace (PUT) an identity provider in a PingOne environment.
 
-The body supplied via --from-file must use the IdentityProviderBody wrapper shape:
-exactly one nested type block — "saml", "oidc", "apple", "facebook", "microsoft",
-"paypal", or "clientIdClientSecret" — containing all fields (including name and enabled).
-
-Output from get/list uses the SDK flat polymorphic shape where "type" and all variant
-fields are at the top level. Because the input and output shapes differ, piping a get
-result directly into replace requires a manual reshape: move all fields under the
-appropriate nested block and remove server-set read-only fields (id, _links, createdAt,
-updatedAt, environment).
-
 ```
 pingcli pingone identity-providers replace [flags]
 ```
@@ -22,8 +12,7 @@ pingcli pingone identity-providers replace [flags]
 ## Examples
 
 ```
-# Replace an identity provider from a JSON file (IdentityProviderBody wrapper shape: one nested type block)
-  # Note: get/list output uses the SDK flat shape; reshape before piping into replace.
+# Replace an identity provider from a JSON file
   pingcli pingone identity-providers replace --environment-id <env-id> --identity-provider-id <idp-id> --from-file identity-provider.json
 
   # Replace an identity provider from stdin

@@ -30,6 +30,7 @@ pingcli authorize
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli authorize api-servers` | API Servers | [`cmd-pingcli-authorize-api-servers.md`](cmd-pingcli-authorize-api-servers.md) |
+| `pingcli authorize application-resources` | Application Resources | [`cmd-pingcli-authorize-application-resources.md`](cmd-pingcli-authorize-application-resources.md) |
 | `pingcli authorize application-roles` | Application Roles | [`cmd-pingcli-authorize-application-roles.md`](cmd-pingcli-authorize-application-roles.md) |
 | `pingcli authorize decision-endpoints` | Decision Endpoints | [`cmd-pingcli-authorize-decision-endpoints.md`](cmd-pingcli-authorize-decision-endpoints.md) |
 | `pingcli authorize permissions` | Application Resource Permissions | [`cmd-pingcli-authorize-permissions.md`](cmd-pingcli-authorize-permissions.md) |

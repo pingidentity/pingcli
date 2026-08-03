@@ -12,7 +12,7 @@ pingcli pingone notification-templates contents create [flags]
 ## Examples
 
 ```
-# Create a new notification template content from a JSON file (one delivery-method block)
+# Create a new notification template content from a JSON file
   pingcli pingone notification-templates contents create --environment-id <env-id> --template-name <template-name> --from-file content.json
 
   # Create a new notification template content from stdin

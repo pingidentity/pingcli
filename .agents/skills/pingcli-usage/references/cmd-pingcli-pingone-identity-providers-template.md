@@ -5,10 +5,10 @@ Generate an identity provider JSON template
 
 Generate a JSON skeleton template for identity provider create or replace bodies.
 
-The template emits all seven type blocks (saml, oidc, apple, facebook, microsoft,
-paypal, clientIdClientSecret) at once. Each block contains the full SDK field set
-including name, enabled, type, and type-specific fields. Populate exactly one and
-delete the other six before passing the body to create or replace.
+Select the desired type with --template-type (one of: saml, oidc, apple,
+facebook, microsoft, paypal, clientIdClientSecret — the latter covers Google,
+LinkedIn, LinkedIn-OIDC, Twitter, Amazon, Yahoo, and GitHub). Defaults to oidc
+when omitted.
 
 ```
 pingcli pingone identity-providers template [flags]
@@ -17,11 +17,11 @@ pingcli pingone identity-providers template [flags]
 ## Examples
 
 ```
-# Generate a template and save to a file
-  pingcli pingone identity-providers template > body.json
+# Generate an OIDC identity provider template and save to a file
+  pingcli pingone identity-providers template --template-type oidc > body.json
 
-  # Edit the template — keep exactly one type block and fill in the required fields
-  # then pass the body to the create or replace command
+  # Edit the template — fill in the required fields, then pass the body to
+  # the create or replace command
 Use the JSON template as a starting point:
   1. Run the template command to generate the body skeleton.
   2. Edit the file, replacing placeholder values with real data.
@@ -39,6 +39,7 @@ Example workflow:
 |------|---------|-------------|
 | `-h, --help` | `` | help for template |
 | `-o, --output-file string` | `` | Write the JSON template to PATH instead of stdout. Overwrites any existing file. |
+| `--template-type string` | `` | The variant of the template to generate. One of: saml, oidc, apple, facebook, microsoft, paypal, clientIdClientSecret. Defaults to "oidc". |
 
 
 ## Inherited Options

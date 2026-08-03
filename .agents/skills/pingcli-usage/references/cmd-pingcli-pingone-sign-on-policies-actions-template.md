@@ -5,11 +5,10 @@ Generate a sign-on policy action JSON template
 
 Generate a JSON skeleton template for sign-on policy action create or replace bodies.
 
-The template emits all eight type blocks (login, multiFactorAuthentication, identifierFirst,
-identityProvider, agreement, progressiveProfiling, pingIdWinLoginPasswordless,
-pingIdAuthentication) at once. Each block contains the full SDK field set including
-type, priority, and type-specific fields. Populate exactly one and delete the other
-seven before passing the body to create or replace.
+Select the desired type with --template-type (one of: login,
+multiFactorAuthentication, identifierFirst, identityProvider, agreement,
+progressiveProfiling, pingIdWinLoginPasswordless, pingIdAuthentication).
+Defaults to login when omitted.
 
 ```
 pingcli pingone sign-on-policies actions template [flags]
@@ -18,11 +17,11 @@ pingcli pingone sign-on-policies actions template [flags]
 ## Examples
 
 ```
-# Generate a template and save to a file
-  pingcli pingone sign-on-policies actions template > body.json
+# Generate a login action template and save to a file
+  pingcli pingone sign-on-policies actions template --template-type login > body.json
 
-  # Edit the template — keep exactly one type block and fill in the required fields
-  # then pass the body to the create or replace command
+  # Edit the template — fill in the required fields, then pass the body to
+  # the create or replace command
 Use the JSON template as a starting point:
   1. Run the template command to generate the body skeleton.
   2. Edit the file, replacing placeholder values with real data.
@@ -40,6 +39,7 @@ Example workflow:
 |------|---------|-------------|
 | `-h, --help` | `` | help for template |
 | `-o, --output-file string` | `` | Write the JSON template to PATH instead of stdout. Overwrites any existing file. |
+| `--template-type string` | `` | The variant of the template to generate. One of: login, multiFactorAuthentication, identifierFirst, identityProvider, agreement, progressiveProfiling, pingIdWinLoginPasswordless, pingIdAuthentication. Defaults to "login". |
 
 
 ## Inherited Options

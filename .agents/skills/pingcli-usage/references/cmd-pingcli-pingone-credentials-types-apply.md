@@ -17,6 +17,10 @@ pingcli pingone credentials types apply [flags]
 
   # Read body from stdin
   pingcli pingone credentials types apply --environment-id <env-id> --from-file - < credential-type.json
+
+  # Create or update, overriding scalar fields with flags
+  # ("metadata" always comes from the file - it cannot be set as a flag)
+  pingcli pingone credentials types apply --environment-id <env-id> --title "Employee ID" --from-file credential-type.json
 ```
 
 ## Options
@@ -27,6 +31,11 @@ pingcli pingone credentials types apply [flags]
 | `-c, --credential-type-id string` | `` | The credential type ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--card-design-template string` | `` | The SVG/HTML template string for the visual card design |
+| `--card-type string` | `` | An informal label for the credential type (e.g. EmployeeID) |
+| `--description string` | `` | The description of the credential type |
+| `--issuer-name string` | `` | The display name of the issuing organisation |
+| `--title string` | `` | The display title of the credential type |
 
 
 ## Inherited Options

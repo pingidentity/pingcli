@@ -17,6 +17,10 @@ pingcli credentials types create [flags]
 
   # Create a new credential type from stdin
   pingcli credentials types create --environment-id <env-id> --from-file - < credential-type.json
+
+  # Create a new credential type, overriding scalar fields with flags
+  # ("metadata" always comes from the file - it cannot be set as a flag)
+  pingcli credentials types create --environment-id <env-id> --title "Employee ID" --card-type EmployeeID --from-file credential-type.json
 ```
 
 ## Options
@@ -26,6 +30,11 @@ pingcli credentials types create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--card-design-template string` | `` | The SVG/HTML template string for the visual card design |
+| `--card-type string` | `` | An informal label for the credential type (e.g. EmployeeID) |
+| `--description string` | `` | The description of the credential type |
+| `--issuer-name string` | `` | The display name of the issuing organisation |
+| `--title string` | `` | The display title of the credential type |
 
 
 ## Inherited Options

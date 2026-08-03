@@ -37,6 +37,7 @@ pingcli pingone gateways [flags]
 | `pingcli pingone gateways instances` | Gateway instances | [`cmd-pingcli-pingone-gateways-instances.md`](cmd-pingcli-pingone-gateways-instances.md) |
 | `pingcli pingone gateways list` | List all gateways | [`cmd-pingcli-pingone-gateways-list.md`](cmd-pingcli-pingone-gateways-list.md) |
 | `pingcli pingone gateways replace` | Replace a gateway | [`cmd-pingcli-pingone-gateways-replace.md`](cmd-pingcli-pingone-gateways-replace.md) |
+| `pingcli pingone gateways role-assignments` | Gateway Role Assignments | [`cmd-pingcli-pingone-gateways-role-assignments.md`](cmd-pingcli-pingone-gateways-role-assignments.md) |
 | `pingcli pingone gateways template` | Generate a gateway JSON template | [`cmd-pingcli-pingone-gateways-template.md`](cmd-pingcli-pingone-gateways-template.md) |
 
 ## Parent Command

@@ -1,0 +1,51 @@
+### ENHANCEMENTS
+
+- DaVinci: Added `enable` and `disable` action commands for flows
+- DaVinci: Added clone action for connector instances
+- DaVinci: Added DaVinci flow-policy/flow-policy-events list command
+- PingFederate: Added import, export, CSR, and rotation settings management commands for signing key pairs
+- PingFederate: Added management commands for administrative API CORS settings
+- PingFederate: Added management commands for audit log settings
+- PingFederate: Added management commands for authentication policies settings
+- PingFederate: Added management commands for bulk configuration export
+- PingFederate: Added management commands for bulk configuration import
+- PingFederate: Added management commands for CA certificates
+- PingFederate: Added management commands for CAPTCHA provider settings
+- PingFederate: Added management commands for CAPTCHA providers
+- PingFederate: Added management commands for certificate group certificates
+- PingFederate: Added management commands for cluster settings
+- PingFederate: Added management commands for config store settings
+- PingFederate: Added management commands for log settings
+- PingFederate: Added management commands for OAuth access token manager settings
+- PingFederate: Added management commands for OAuth access token managers
+- PingFederate: Added management commands for OAuth authorization detail types
+- PingFederate: Added management commands for OAuth virtual issuers
+- PingFederate: Added management commands for signing key pairs
+- PingFederate: Added management commands for SP adapters
+- PingFederate: Added management commands for SP connections, including credentials certificates, decryption keys, and signing settings
+- PingFederate: Added management commands for SP IdP connections, including certificates, decryption keys, and signing settings
+- PingFederate: Added management commands for SSL client key pairs
+- PingFederate: Added read-only commands for captcha provider descriptors
+- PingOne Credentials: Added CLI flags for common request body fields
+- PingOne DaVinci: Added management commands for flow versions
+- PingOne MFA: Added `send-logs` and `update-nickname` action commands to `mfa user-devices`
+- PingOne Verify: Added CLI flags for common request body fields
+- PingOne: Added management commands for Authorize application resources
+- PingOne: Added management commands for bill of materials
+- PingOne: Added management commands for branding settings
+- PingOne: Added management commands for certificates
+- PingOne: Added management commands for credential type versions
+- PingOne: Added management commands for forms
+- PingOne: Added management commands for gateway role assignments
+- PingOne: Added management commands for language localization status
+- PingOne: Added management commands for notifications settings phone delivery settings
+- PingOne: Added management commands for notifications settings SMTP email delivery configuration
+- PingOne: Added management commands for organizations, license names, and license active identity counts
+- PingOne: Added management commands for population default identity provider
+- PingOne: Added management commands for resource attributes
+- PingOne: Added management commands for resource client secrets
+- PingOne: Added management commands for trusted email addresses
+- PingOne: Added management commands for user enabled status
+- PingOne: Added read commands for flow policies
+- PingOne: Updated polymorphic resources like applications to accept the same JSON shape as that returned by the API from GET calls, rather than a shape that is custom to the CLI. The prior template shape is deprecated. The template command for these resources now supports a --template-type flag to retrieve a template for the desired type (for example: oidc, saml, etc. for applications). If not provided, --template-type will be set to a default for the resource (oidc for applications).
+

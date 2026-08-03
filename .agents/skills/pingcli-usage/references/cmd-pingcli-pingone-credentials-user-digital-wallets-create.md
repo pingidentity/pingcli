@@ -17,6 +17,9 @@ pingcli pingone credentials user-digital-wallets create [flags]
 
   # Create a new user digital wallet from stdin
   pingcli pingone credentials user-digital-wallets create --environment-id <env-id> --user-id <user-id> --from-file - < user-digital-wallet.json
+
+  # Create a new user digital wallet, overriding fields with flags
+  pingcli pingone credentials user-digital-wallets create --environment-id <env-id> --user-id <user-id> --digital-wallet-application-id <dwa-id> --from-file user-digital-wallet.json
 ```
 
 ## Options
@@ -27,6 +30,8 @@ pingcli pingone credentials user-digital-wallets create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-u, --user-id string` | `` | The user ID |
+| `--digital-wallet-application-id string` | `` | The UUID of the digital wallet application (flattened alias for digitalWalletApplication.id); required for create |
+| `--status string` | `` | The status of the digital wallet (e.g. ACTIVE, DISABLED); required by the API on replace |
 
 
 ## Inherited Options

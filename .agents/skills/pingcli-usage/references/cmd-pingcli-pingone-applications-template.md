@@ -5,10 +5,8 @@ Generate an application JSON template
 
 Generate a JSON skeleton template for application create or replace bodies.
 
-The template emits all four protocol blocks (oidc, saml, wsfed, externalLink)
-at once. Each block contains the full SDK field set including name, enabled,
-and protocol-specific fields. Populate exactly one and delete the other three
-before passing the body to create or replace.
+Select the desired protocol with --template-type (one of: oidc, saml, wsfed,
+externalLink; defaults to oidc).
 
 ```
 pingcli pingone applications template [flags]
@@ -17,11 +15,11 @@ pingcli pingone applications template [flags]
 ## Examples
 
 ```
-# Generate a template and save to a file
-  pingcli pingone applications template > body.json
+# Generate an OIDC application template and save to a file
+  pingcli pingone applications template --template-type oidc > body.json
 
-  # Edit the template — keep exactly one protocol block and fill in the required fields
-  # then pass the body to the create or replace command
+  # Edit the template — fill in the required fields, then pass the body to
+  # the create or replace command
 Use the JSON template as a starting point:
   1. Run the template command to generate the body skeleton.
   2. Edit the file, replacing placeholder values with real data.
@@ -39,6 +37,7 @@ Example workflow:
 |------|---------|-------------|
 | `-h, --help` | `` | help for template |
 | `-o, --output-file string` | `` | Write the JSON template to PATH instead of stdout. Overwrites any existing file. |
+| `--template-type string` | `` | The variant of the template to generate. One of: oidc, saml, wsfed, externalLink. Defaults to "oidc". |
 
 
 ## Inherited Options

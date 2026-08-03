@@ -29,9 +29,12 @@ pingcli pingfederate oauth
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate oauth access-token-managers` | PingFederate OAuth access token managers | [`cmd-pingcli-pingfederate-oauth-access-token-managers.md`](cmd-pingcli-pingfederate-oauth-access-token-managers.md) |
+| `pingcli pingfederate oauth authorization-detail-types` | PingFederate OAuth Authorization Detail Types | [`cmd-pingcli-pingfederate-oauth-authorization-detail-types.md`](cmd-pingcli-pingfederate-oauth-authorization-detail-types.md) |
 | `pingcli pingfederate oauth client-registration-policies` | PingFederate OAuth Client Registration Policies | [`cmd-pingcli-pingfederate-oauth-client-registration-policies.md`](cmd-pingcli-pingfederate-oauth-client-registration-policies.md) |
 | `pingcli pingfederate oauth client-settings` | PingFederate OAuth Client Settings | [`cmd-pingcli-pingfederate-oauth-client-settings.md`](cmd-pingcli-pingfederate-oauth-client-settings.md) |
 | `pingcli pingfederate oauth clients` | PingFederate OAuth Clients | [`cmd-pingcli-pingfederate-oauth-clients.md`](cmd-pingcli-pingfederate-oauth-clients.md) |
+| `pingcli pingfederate oauth issuers` | PingFederate OAuth virtual issuers | [`cmd-pingcli-pingfederate-oauth-issuers.md`](cmd-pingcli-pingfederate-oauth-issuers.md) |
 | `pingcli pingfederate oauth oidc` | Manage PingFederate OAuth/OpenID Connect resources | [`cmd-pingcli-pingfederate-oauth-oidc.md`](cmd-pingcli-pingfederate-oauth-oidc.md) |
 
 ## Parent Command

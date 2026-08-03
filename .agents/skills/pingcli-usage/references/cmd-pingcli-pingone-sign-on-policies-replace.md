@@ -12,11 +12,17 @@ pingcli pingone sign-on-policies replace [flags]
 ## Examples
 
 ```
-# Update a sign-on policy from a JSON file (--environment-id and --sign-on-policy-id are still required)
+# Update a sign-on policy from flags
+  pingcli pingone sign-on-policies replace --environment-id <env-id> --sign-on-policy-id <sign-on-policy-id> --name "Renamed Policy"
+
+  # Update a sign-on policy from a JSON file (--environment-id and --sign-on-policy-id are still required)
   pingcli pingone sign-on-policies replace --environment-id <env-id> --sign-on-policy-id <sign-on-policy-id> --from-file sign-on-policy.json
 
   # Update a sign-on policy from stdin
   pingcli pingone sign-on-policies replace --environment-id <env-id> --sign-on-policy-id <sign-on-policy-id> --from-file - < sign-on-policy.json
+
+  # Update from a JSON file, overriding the description from the file
+  pingcli pingone sign-on-policies replace --environment-id <env-id> --sign-on-policy-id <sign-on-policy-id> --from-file sign-on-policy.json --description "Overridden"
 ```
 
 ## Options
@@ -27,6 +33,9 @@ pingcli pingone sign-on-policies replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-s, --sign-on-policy-id string` | `` | The sign-on policy ID |
+| `--default` | `` | Whether the sign-on policy is the environment default |
+| `--description string` | `` | The sign-on policy description |
+| `--name string` | `` | The sign-on policy name |
 
 
 ## Inherited Options
