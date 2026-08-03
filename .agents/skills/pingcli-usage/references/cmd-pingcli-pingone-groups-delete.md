@@ -23,6 +23,7 @@ pingcli pingone groups delete [flags]
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-g, --group-id string` | `` | The group ID |
+| `-p, --population-id string` | `` | The population ID (optional, scopes group to a population) |
 
 
 ## Inherited Options

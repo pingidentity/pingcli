@@ -17,9 +17,6 @@ pingcli pingone credentials user-digital-wallets replace [flags]
 
   # Replace a user digital wallet from stdin
   pingcli pingone credentials user-digital-wallets replace --environment-id <env-id> --user-id <user-id> --digital-wallet-id <digital-wallet-id> --from-file - < user-digital-wallet.json
-
-  # Replace a user digital wallet, overriding the status field with a flag
-  pingcli pingone credentials user-digital-wallets replace --environment-id <env-id> --user-id <user-id> --digital-wallet-id <digital-wallet-id> --status ACTIVE --from-file user-digital-wallet.json
 ```
 
 ## Options
@@ -31,8 +28,6 @@ pingcli pingone credentials user-digital-wallets replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-u, --user-id string` | `` | The user ID |
-| `--digital-wallet-application-id string` | `` | The UUID of the digital wallet application (flattened alias for digitalWalletApplication.id); required for create |
-| `--status string` | `` | The status of the digital wallet (e.g. ACTIVE, DISABLED); required by the API on replace |
 
 
 ## Inherited Options

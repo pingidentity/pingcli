@@ -31,9 +31,7 @@ pingcli pingone notifications-settings [flags]
 |---------|-------------|----------|
 | `pingcli pingone notifications-settings apply` | Update notifications settings | [`cmd-pingcli-pingone-notifications-settings-apply.md`](cmd-pingcli-pingone-notifications-settings-apply.md) |
 | `pingcli pingone notifications-settings delete` | Delete notifications settings | [`cmd-pingcli-pingone-notifications-settings-delete.md`](cmd-pingcli-pingone-notifications-settings-delete.md) |
-| `pingcli pingone notifications-settings email-delivery-settings` | Notifications Settings SMTP | [`cmd-pingcli-pingone-notifications-settings-email-delivery-settings.md`](cmd-pingcli-pingone-notifications-settings-email-delivery-settings.md) |
 | `pingcli pingone notifications-settings get` | Read notifications settings | [`cmd-pingcli-pingone-notifications-settings-get.md`](cmd-pingcli-pingone-notifications-settings-get.md) |
-| `pingcli pingone notifications-settings phone-delivery-settings` | Phone Delivery Settings | [`cmd-pingcli-pingone-notifications-settings-phone-delivery-settings.md`](cmd-pingcli-pingone-notifications-settings-phone-delivery-settings.md) |
 | `pingcli pingone notifications-settings replace` | Update notifications settings | [`cmd-pingcli-pingone-notifications-settings-replace.md`](cmd-pingcli-pingone-notifications-settings-replace.md) |
 | `pingcli pingone notifications-settings template` | Generate a notifications settings JSON template | [`cmd-pingcli-pingone-notifications-settings-template.md`](cmd-pingcli-pingone-notifications-settings-template.md) |
 

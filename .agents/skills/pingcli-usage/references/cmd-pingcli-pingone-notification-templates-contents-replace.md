@@ -12,7 +12,7 @@ pingcli pingone notification-templates contents replace [flags]
 ## Examples
 
 ```
-# Replace a notification template content from a JSON file
+# Replace a notification template content from a JSON file (one delivery-method block)
   pingcli pingone notification-templates contents replace --environment-id <env-id> --template-name <template-name> --content-id <content-id> --from-file content.json
 
   # Replace a notification template content from stdin

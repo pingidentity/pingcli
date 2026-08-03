@@ -30,7 +30,6 @@ pingcli pingone davinci connector-instances [flags]
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingone davinci connector-instances apply` | Create or update a DaVinci connector instance | [`cmd-pingcli-pingone-davinci-connector-instances-apply.md`](cmd-pingcli-pingone-davinci-connector-instances-apply.md) |
-| `pingcli pingone davinci connector-instances clone` | Clone a DaVinci connector instance | [`cmd-pingcli-pingone-davinci-connector-instances-clone.md`](cmd-pingcli-pingone-davinci-connector-instances-clone.md) |
 | `pingcli pingone davinci connector-instances create` | Create a new DaVinci connector instance | [`cmd-pingcli-pingone-davinci-connector-instances-create.md`](cmd-pingcli-pingone-davinci-connector-instances-create.md) |
 | `pingcli pingone davinci connector-instances delete` | Delete a DaVinci connector instance | [`cmd-pingcli-pingone-davinci-connector-instances-delete.md`](cmd-pingcli-pingone-davinci-connector-instances-delete.md) |
 | `pingcli pingone davinci connector-instances get` | Read a DaVinci connector instance | [`cmd-pingcli-pingone-davinci-connector-instances-get.md`](cmd-pingcli-pingone-davinci-connector-instances-get.md) |

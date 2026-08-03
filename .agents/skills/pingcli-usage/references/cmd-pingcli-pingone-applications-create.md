@@ -12,14 +12,11 @@ pingcli pingone applications create [flags]
 ## Examples
 
 ```
-# Create a new application from a JSON file
+# Create a new application from a JSON file (ApplicationBody wrapper shape: one nested protocol block)
   pingcli pingone applications create --environment-id <env-id> --from-file application.json
 
   # Create a new application from stdin
   pingcli pingone applications create --environment-id <env-id> --from-file - < application.json
-
-  # Create from a JSON file, overriding the name and enabled state
-  pingcli pingone applications create --environment-id <env-id> --from-file application.json --name "Renamed" --enabled=false
 ```
 
 ## Options
@@ -29,9 +26,6 @@ pingcli pingone applications create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--description string` | `` | The application description |
-| `--enabled` | `` | Whether the application is enabled |
-| `--name string` | `` | The application name |
 
 
 ## Inherited Options

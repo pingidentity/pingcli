@@ -27,6 +27,7 @@ pingcli pingone groups replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-g, --group-id string` | `` | The group ID |
+| `-p, --population-id string` | `` | The population ID (optional, scopes group to a population) |
 
 
 ## Inherited Options

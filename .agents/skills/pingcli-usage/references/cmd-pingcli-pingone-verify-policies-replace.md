@@ -17,9 +17,6 @@ pingcli pingone verify policies replace [flags]
 
   # Replace a verify policy from stdin
   pingcli pingone verify policies replace --environment-id <env-id> --verify-policy-id <policy-id> --from-file - < verify-policy.json
-
-  # Replace from a JSON file, overriding the description from the file
-  pingcli pingone verify policies replace --environment-id <env-id> --verify-policy-id <policy-id> --from-file verify-policy.json --description "Overridden"
 ```
 
 ## Options
@@ -30,9 +27,6 @@ pingcli pingone verify policies replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-v, --verify-policy-id string` | `` | The verify policy ID |
-| `--default` | `` | Whether this is the environment default verify policy |
-| `--description string` | `` | The verify policy description |
-| `--name string` | `` | The verify policy name |
 
 
 ## Inherited Options

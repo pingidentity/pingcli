@@ -3,7 +3,7 @@ Rotate an application secret
 
 ## Synopsis
 
-Rotate the secret for a PingOne application. The API generates a new secret and moves the existing secret to the previous-secret slot. Use --from-file to supply a request body specifying previous.expiresAt (max 720h from now). Without --from-file the previous secret expires immediately.
+Rotate the secret for a PingOne application. The API generates a new secret and moves the existing secret to the previous-secret slot. Use --previous-expires-in or --previous-expires-at to keep the previous secret valid during a migration window (max 720h). Without either flag the previous secret expires immediately.
 
 ```
 pingcli pingone applications secrets rotate [flags]
@@ -12,11 +12,15 @@ pingcli pingone applications secrets rotate [flags]
 ## Examples
 
 ```
-# Rotate the application secret (previous secret expires immediately)
+# Rotate the application secret (generates a new secret; the previous secret
+  # is discarded immediately)
   pingcli pingone applications secrets rotate --environment-id <env-id> --application-id <app-id>
 
+  # Rotate and keep the previous secret valid for 24 hours
+  pingcli pingone applications secrets rotate --environment-id <env-id> --application-id <app-id> --previous-expires-in 24h
+
   # Rotate and keep the previous secret valid until a specific time
-  pingcli pingone applications secrets rotate --environment-id <env-id> --application-id <app-id> --from-file body.json
+  pingcli pingone applications secrets rotate --environment-id <env-id> --application-id <app-id> --previous-expires-at 2027-01-01T00:00:00Z
 ```
 
 ## Options
@@ -26,7 +30,8 @@ pingcli pingone applications secrets rotate [flags]
 | `-h, --help` | `` | help for rotate |
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-f, --from-file string` | `` | Path to a JSON file containing the rotate request body, or "-" to read from stdin. |
+| `--previous-expires-at timestamp` | `` | Absolute expiry time for the previous secret in RFC3339 format (e.g. 2027-01-01T00:00:00Z). Must be in the future and within 720h. Mutually exclusive with --previous-expires-in. |
+| `--previous-expires-in duration` | `` | How long the previous secret remains valid after rotation (e.g. 24h, 30m). Supported range: 1m–720h (30 days). Mutually exclusive with --previous-expires-at. |
 
 
 ## Inherited Options

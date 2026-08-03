@@ -36,7 +36,6 @@ pingcli pingone languages [flags]
 | `pingcli pingone languages get` | Read a specific language | [`cmd-pingcli-pingone-languages-get.md`](cmd-pingcli-pingone-languages-get.md) |
 | `pingcli pingone languages list` | List all languages | [`cmd-pingcli-pingone-languages-list.md`](cmd-pingcli-pingone-languages-list.md) |
 | `pingcli pingone languages replace` | Update a language | [`cmd-pingcli-pingone-languages-replace.md`](cmd-pingcli-pingone-languages-replace.md) |
-| `pingcli pingone languages status` | Language Localization Statuses | [`cmd-pingcli-pingone-languages-status.md`](cmd-pingcli-pingone-languages-status.md) |
 | `pingcli pingone languages template` | Generate a language JSON template | [`cmd-pingcli-pingone-languages-template.md`](cmd-pingcli-pingone-languages-template.md) |
 
 ## Parent Command

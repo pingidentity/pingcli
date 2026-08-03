@@ -37,7 +37,6 @@ pingcli credentials types [flags]
 | `pingcli credentials types list` | List all credential types | [`cmd-pingcli-credentials-types-list.md`](cmd-pingcli-credentials-types-list.md) |
 | `pingcli credentials types replace` | Replace a credential type | [`cmd-pingcli-credentials-types-replace.md`](cmd-pingcli-credentials-types-replace.md) |
 | `pingcli credentials types template` | Generate a credential type JSON template | [`cmd-pingcli-credentials-types-template.md`](cmd-pingcli-credentials-types-template.md) |
-| `pingcli credentials types versions` | Credential Type Versions | [`cmd-pingcli-credentials-types-versions.md`](cmd-pingcli-credentials-types-versions.md) |
 
 ## Parent Command
 

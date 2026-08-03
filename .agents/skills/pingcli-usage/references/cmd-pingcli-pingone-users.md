@@ -33,7 +33,6 @@ pingcli pingone users [flags]
 | `pingcli pingone users apply` | Create or update a user | [`cmd-pingcli-pingone-users-apply.md`](cmd-pingcli-pingone-users-apply.md) |
 | `pingcli pingone users create` | Create a new user | [`cmd-pingcli-pingone-users-create.md`](cmd-pingcli-pingone-users-create.md) |
 | `pingcli pingone users delete` | Delete a user | [`cmd-pingcli-pingone-users-delete.md`](cmd-pingcli-pingone-users-delete.md) |
-| `pingcli pingone users enabled` | User Enabled | [`cmd-pingcli-pingone-users-enabled.md`](cmd-pingcli-pingone-users-enabled.md) |
 | `pingcli pingone users get` | Read a specific user | [`cmd-pingcli-pingone-users-get.md`](cmd-pingcli-pingone-users-get.md) |
 | `pingcli pingone users identity-provider` | User Identity Provider | [`cmd-pingcli-pingone-users-identity-provider.md`](cmd-pingcli-pingone-users-identity-provider.md) |
 | `pingcli pingone users list` | List all users | [`cmd-pingcli-pingone-users-list.md`](cmd-pingcli-pingone-users-list.md) |

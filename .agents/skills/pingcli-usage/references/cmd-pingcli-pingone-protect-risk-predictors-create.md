@@ -12,7 +12,7 @@ pingcli pingone protect risk-predictors create [flags]
 ## Examples
 
 ```
-# Create a new risk predictor from a JSON file
+# Create a new risk predictor from a JSON file (RiskPredictorBody wrapper shape: one nested variant block)
   pingcli pingone protect risk-predictors create --environment-id <env-id> --from-file risk-predictor.json
 
   # Create a new risk predictor from stdin

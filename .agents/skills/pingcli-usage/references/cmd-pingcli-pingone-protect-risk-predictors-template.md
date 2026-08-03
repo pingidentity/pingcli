@@ -5,10 +5,14 @@ Generate a risk predictor JSON template
 
 Generate a JSON skeleton template for risk predictor create or replace bodies.
 
-Select the desired type with --template-type (one of: adversaryInTheMiddle,
-anonymousNetwork, bot, composite, custom, device, emailReputation,
-geovelocity, ipReputation, trafficAnomaly, userLocationAnomaly,
-userRiskBehavior, velocity). Defaults to device when omitted.
+The template emits all thirteen variant blocks (adversaryInTheMiddle,
+anonymousNetwork, bot, composite, custom, device, emailReputation, geovelocity,
+ipReputation, trafficAnomaly, userLocationAnomaly, userRiskBehavior, velocity)
+at once. Each block contains required fields (name, compactName, type, and
+variant-specific required fields). Optional fields whose zero values the API
+rejects (description, default, condition, and others) are excluded from the
+template to prevent accidental API 400 errors. Populate exactly one block and
+delete the other twelve before passing the body to create or replace.
 
 Note: compactName is required for both create and replace bodies. It is
 immutable after creation — the SDK always serialises it and the API rejects an
@@ -21,11 +25,11 @@ pingcli pingone protect risk-predictors template [flags]
 ## Examples
 
 ```
-# Generate a device risk predictor template and save to a file
-  pingcli pingone protect risk-predictors template --template-type device > body.json
+# Generate a template and save to a file
+  pingcli pingone protect risk-predictors template > body.json
 
-  # Edit the template — fill in the required fields, then pass the body to
-  # the create or replace command
+  # Edit the template — keep exactly one variant block and fill in the required fields
+  # then pass the body to the create or replace command
 Use the JSON template as a starting point:
   1. Run the template command to generate the body skeleton.
   2. Edit the file, replacing placeholder values with real data.
@@ -43,7 +47,6 @@ Example workflow:
 |------|---------|-------------|
 | `-h, --help` | `` | help for template |
 | `-o, --output-file string` | `` | Write the JSON template to PATH instead of stdout. Overwrites any existing file. |
-| `--template-type string` | `` | The variant of the template to generate. One of: adversaryInTheMiddle, anonymousNetwork, bot, composite, custom, device, emailReputation, geovelocity, ipReputation, trafficAnomaly, userLocationAnomaly, userRiskBehavior, velocity. Defaults to "device". |
 
 
 ## Inherited Options

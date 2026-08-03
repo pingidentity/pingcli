@@ -12,7 +12,7 @@ pingcli pingone sign-on-policies actions create [flags]
 ## Examples
 
 ```
-# Create a new sign-on policy action from a JSON file
+# Create a new sign-on policy action from a JSON file (SignOnPolicyActionBody wrapper shape: one nested type block)
   pingcli pingone sign-on-policies actions create --environment-id <env-id> --sign-on-policy-id <sop-id> --from-file action.json
 
   # Create a new sign-on policy action from stdin

@@ -30,7 +30,6 @@ pingcli pingfederate authentication-policies
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingfederate authentication-policies fragments` | PingFederate Authentication Policy Fragments | [`cmd-pingcli-pingfederate-authentication-policies-fragments.md`](cmd-pingcli-pingfederate-authentication-policies-fragments.md) |
-| `pingcli pingfederate authentication-policies settings` | PingFederate Authentication Policies Settings | [`cmd-pingcli-pingfederate-authentication-policies-settings.md`](cmd-pingcli-pingfederate-authentication-policies-settings.md) |
 
 ## Parent Command
 

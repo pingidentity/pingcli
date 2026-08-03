@@ -32,7 +32,6 @@ pingcli davinci applications flow-policies [flags]
 | `pingcli davinci applications flow-policies apply` | Create or update a DaVinci flow policy | [`cmd-pingcli-davinci-applications-flow-policies-apply.md`](cmd-pingcli-davinci-applications-flow-policies-apply.md) |
 | `pingcli davinci applications flow-policies create` | Create a new DaVinci flow policy | [`cmd-pingcli-davinci-applications-flow-policies-create.md`](cmd-pingcli-davinci-applications-flow-policies-create.md) |
 | `pingcli davinci applications flow-policies delete` | Delete a DaVinci flow policy | [`cmd-pingcli-davinci-applications-flow-policies-delete.md`](cmd-pingcli-davinci-applications-flow-policies-delete.md) |
-| `pingcli davinci applications flow-policies events` | DaVinci Flow Policy Events | [`cmd-pingcli-davinci-applications-flow-policies-events.md`](cmd-pingcli-davinci-applications-flow-policies-events.md) |
 | `pingcli davinci applications flow-policies get` | Read a DaVinci flow policy | [`cmd-pingcli-davinci-applications-flow-policies-get.md`](cmd-pingcli-davinci-applications-flow-policies-get.md) |
 | `pingcli davinci applications flow-policies list` | List DaVinci flow policies | [`cmd-pingcli-davinci-applications-flow-policies-list.md`](cmd-pingcli-davinci-applications-flow-policies-list.md) |
 | `pingcli davinci applications flow-policies replace` | Update a DaVinci flow policy | [`cmd-pingcli-davinci-applications-flow-policies-replace.md`](cmd-pingcli-davinci-applications-flow-policies-replace.md) |

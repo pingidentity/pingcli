@@ -12,7 +12,7 @@ pingcli pingone gateways create [flags]
 ## Examples
 
 ```
-# Create a new gateway from a JSON file
+# Create a new gateway from a JSON file (GatewayBody wrapper shape: one nested variant block)
   pingcli pingone gateways create --environment-id <env-id> --from-file gateway.json
 
   # Create a new gateway from stdin

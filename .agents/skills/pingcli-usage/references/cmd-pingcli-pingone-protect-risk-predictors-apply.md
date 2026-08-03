@@ -3,7 +3,7 @@ Create or update a risk predictor
 
 ## Synopsis
 
-Idempotently create or update a risk predictor looked up by the "name" field within the supplied --environment-id. If no predictor with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
+Idempotently create or update a risk predictor looked up by the "name" field inside the nested variant block within the supplied --environment-id. If no predictor with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
 
 ```
 pingcli pingone protect risk-predictors apply [flags]
@@ -12,7 +12,7 @@ pingcli pingone protect risk-predictors apply [flags]
 ## Examples
 
 ```
-# Create or update a risk predictor
+# Create or update a risk predictor (body must have exactly one variant block with name inside)
   pingcli pingone protect risk-predictors apply --environment-id <env-id> --from-file risk-predictor.json
 
   # Read body from stdin

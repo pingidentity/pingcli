@@ -25,7 +25,7 @@ pingcli pingone groups list [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for list |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-p, --population-id string` | `` | The population ID (optional, filters groups by population on list) |
+| `-p, --population-id string` | `` | The population ID (optional, scopes group to a population) |
 
 
 ## Inherited Options

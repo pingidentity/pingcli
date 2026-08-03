@@ -3,7 +3,7 @@ Create or update a gateway
 
 ## Synopsis
 
-Idempotently create or update a gateway looked up by the "name" field within the supplied --environment-id. If no gateway with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
+Idempotently create or update a gateway looked up by the "name" field inside the nested variant block within the supplied --environment-id. If no gateway with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
 
 ```
 pingcli pingone gateways apply [flags]
@@ -12,7 +12,7 @@ pingcli pingone gateways apply [flags]
 ## Examples
 
 ```
-# Create or update a gateway
+# Create or update a gateway (body must have exactly one variant block with name inside)
   pingcli pingone gateways apply --environment-id <env-id> --from-file gateway.json
 
   # Read body from stdin

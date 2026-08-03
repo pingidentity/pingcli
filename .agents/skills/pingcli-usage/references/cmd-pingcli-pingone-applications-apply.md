@@ -3,7 +3,7 @@ Create or update an application
 
 ## Synopsis
 
-Idempotently create or update an application looked up by the "name" field within the supplied --environment-id. If no application with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
+Idempotently create or update an application looked up by the "name" field inside the nested protocol block within the supplied --environment-id. If no application with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
 
 ```
 pingcli pingone applications apply [flags]
@@ -12,7 +12,7 @@ pingcli pingone applications apply [flags]
 ## Examples
 
 ```
-# Create or update an application
+# Create or update an application (body must have exactly one protocol block with name inside)
   pingcli pingone applications apply --environment-id <env-id> --from-file application.json
 
   # Read body from stdin
@@ -27,9 +27,6 @@ pingcli pingone applications apply [flags]
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--description string` | `` | The application description |
-| `--enabled` | `` | Whether the application is enabled |
-| `--name string` | `` | The application name |
 
 
 ## Inherited Options

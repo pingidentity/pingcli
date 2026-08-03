@@ -3,7 +3,7 @@ Create or update an identity provider
 
 ## Synopsis
 
-Idempotently create or update an identity provider looked up by the "name" field within the supplied --environment-id. If no identity provider with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
+Idempotently create or update an identity provider looked up by the "name" field inside the nested type block within the supplied --environment-id. If no identity provider with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
 
 ```
 pingcli pingone identity-providers apply [flags]
@@ -12,7 +12,7 @@ pingcli pingone identity-providers apply [flags]
 ## Examples
 
 ```
-# Create or update an identity provider
+# Create or update an identity provider (body must have exactly one type block with name inside)
   pingcli pingone identity-providers apply --environment-id <env-id> --from-file identity-provider.json
 
   # Read body from stdin

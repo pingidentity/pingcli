@@ -5,6 +5,16 @@ Replace an application
 
 Replace (PUT) an application in a PingOne environment.
 
+The body supplied via --from-file must use the ApplicationBody wrapper shape:
+exactly one nested protocol block — "oidc", "saml", "wsfed", or "externalLink"
+— containing all application fields (including name and enabled).
+
+Output from get/list uses the SDK flat polymorphic shape where "protocol",
+"type", and all variant fields are at the top level. Because the input and output
+shapes differ, piping a get result directly into replace requires a manual
+reshape: move all fields under the appropriate nested block and remove server-set
+read-only fields (id, _links, createdAt, updatedAt, environment).
+
 ```
 pingcli pingone applications replace [flags]
 ```
@@ -12,14 +22,12 @@ pingcli pingone applications replace [flags]
 ## Examples
 
 ```
-# Replace an application from a JSON file
+# Replace an application from a JSON file (ApplicationBody wrapper shape: one nested protocol block)
+  # Note: get/list output uses the SDK flat shape; reshape before piping into replace.
   pingcli pingone applications replace --environment-id <env-id> --application-id <app-id> --from-file application.json
 
   # Replace an application from stdin
   pingcli pingone applications replace --environment-id <env-id> --application-id <app-id> --from-file - < application.json
-
-  # Replace from a JSON file, overriding the description
-  pingcli pingone applications replace --environment-id <env-id> --application-id <app-id> --from-file application.json --description "Updated description"
 ```
 
 ## Options
@@ -30,9 +38,6 @@ pingcli pingone applications replace [flags]
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--description string` | `` | The application description |
-| `--enabled` | `` | Whether the application is enabled |
-| `--name string` | `` | The application name |
 
 
 ## Inherited Options

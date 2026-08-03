@@ -30,10 +30,8 @@ pingcli pingfederate server-settings [flags]
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingfederate server-settings apply` | Update server settings | [`cmd-pingcli-pingfederate-server-settings-apply.md`](cmd-pingcli-pingfederate-server-settings-apply.md) |
-| `pingcli pingfederate server-settings audit-log-settings` | PingFederate Audit Log Settings | [`cmd-pingcli-pingfederate-server-settings-audit-log-settings.md`](cmd-pingcli-pingfederate-server-settings-audit-log-settings.md) |
 | `pingcli pingfederate server-settings federation-info` | PingFederate Federation Info | [`cmd-pingcli-pingfederate-server-settings-federation-info.md`](cmd-pingcli-pingfederate-server-settings-federation-info.md) |
 | `pingcli pingfederate server-settings get` | Read server settings | [`cmd-pingcli-pingfederate-server-settings-get.md`](cmd-pingcli-pingfederate-server-settings-get.md) |
-| `pingcli pingfederate server-settings log-settings` | PingFederate Log Settings | [`cmd-pingcli-pingfederate-server-settings-log-settings.md`](cmd-pingcli-pingfederate-server-settings-log-settings.md) |
 | `pingcli pingfederate server-settings replace` | Update server settings | [`cmd-pingcli-pingfederate-server-settings-replace.md`](cmd-pingcli-pingfederate-server-settings-replace.md) |
 | `pingcli pingfederate server-settings template` | Generate a server settings JSON template | [`cmd-pingcli-pingfederate-server-settings-template.md`](cmd-pingcli-pingfederate-server-settings-template.md) |
 

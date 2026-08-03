@@ -17,9 +17,6 @@ pingcli pingone verify policies create [flags]
 
   # Create a new verify policy from stdin
   pingcli pingone verify policies create --environment-id <env-id> --from-file - < verify-policy.json
-
-  # Create from a JSON file, overriding the name from the file
-  pingcli pingone verify policies create --environment-id <env-id> --from-file verify-policy.json --name "Overridden Name"
 ```
 
 ## Options
@@ -29,9 +26,6 @@ pingcli pingone verify policies create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--default` | `` | Whether this is the environment default verify policy |
-| `--description string` | `` | The verify policy description |
-| `--name string` | `` | The verify policy name |
 
 
 ## Inherited Options

@@ -31,7 +31,6 @@ pingcli pingone licenses [flags]
 |---------|-------------|----------|
 | `pingcli pingone licenses get` | Read a specific license | [`cmd-pingcli-pingone-licenses-get.md`](cmd-pingcli-pingone-licenses-get.md) |
 | `pingcli pingone licenses list` | List all licenses | [`cmd-pingcli-pingone-licenses-list.md`](cmd-pingcli-pingone-licenses-list.md) |
-| `pingcli pingone licenses names` | Manage PingOne license names | [`cmd-pingcli-pingone-licenses-names.md`](cmd-pingcli-pingone-licenses-names.md) |
 
 ## Parent Command
 

@@ -3,7 +3,7 @@ Create or update a sign-on policy
 
 ## Synopsis
 
-Idempotently create or update a sign-on policy looked up by the "name" field in the request body within the supplied --environment-id. The name may be supplied by --name or by the JSON body. If no sign-on policy with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
+Idempotently create or update a sign-on policy looked up by the "name" field in the JSON body within the supplied --environment-id. If no sign-on policy with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
 
 ```
 pingcli pingone sign-on-policies apply [flags]
@@ -12,10 +12,7 @@ pingcli pingone sign-on-policies apply [flags]
 ## Examples
 
 ```
-# Create or update a sign-on policy from flags
-  pingcli pingone sign-on-policies apply --environment-id <env-id> --name "My Policy" --description "Standard sign-on policy"
-
-  # Create or update a sign-on policy (body supplies name and optional description)
+# Create or update a sign-on policy (body supplies name and optional description)
   pingcli pingone sign-on-policies apply --environment-id <env-id> --from-file sign-on-policy.json
 
   # Read body from stdin
@@ -30,9 +27,6 @@ pingcli pingone sign-on-policies apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-s, --sign-on-policy-id string` | `` | The sign-on policy ID |
-| `--default` | `` | Whether the sign-on policy is the environment default |
-| `--description string` | `` | The sign-on policy description |
-| `--name string` | `` | The sign-on policy name |
 
 
 ## Inherited Options

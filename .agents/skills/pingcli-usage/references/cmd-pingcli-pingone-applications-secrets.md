@@ -32,7 +32,6 @@ pingcli pingone applications secrets [flags]
 | `pingcli pingone applications secrets delete-previous` | Delete the previous application secret | [`cmd-pingcli-pingone-applications-secrets-delete-previous.md`](cmd-pingcli-pingone-applications-secrets-delete-previous.md) |
 | `pingcli pingone applications secrets get` | Read an application secret | [`cmd-pingcli-pingone-applications-secrets-get.md`](cmd-pingcli-pingone-applications-secrets-get.md) |
 | `pingcli pingone applications secrets rotate` | Rotate an application secret | [`cmd-pingcli-pingone-applications-secrets-rotate.md`](cmd-pingcli-pingone-applications-secrets-rotate.md) |
-| `pingcli pingone applications secrets template` | Generate an application secret rotate template | [`cmd-pingcli-pingone-applications-secrets-template.md`](cmd-pingcli-pingone-applications-secrets-template.md) |
 
 ## Parent Command
 

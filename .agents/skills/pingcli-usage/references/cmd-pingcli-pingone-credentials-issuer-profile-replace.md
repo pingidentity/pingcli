@@ -12,17 +12,11 @@ pingcli pingone credentials issuer-profile replace [flags]
 ## Examples
 
 ```
-# Update the credential issuer profile from flags
-  pingcli pingone credentials issuer-profile replace --environment-id <env-id> --name "My Issuer" --site-url "https://example.com"
-
-  # Update the credential issuer profile from a JSON file
+# Update the credential issuer profile from a JSON file
   pingcli pingone credentials issuer-profile replace --environment-id <env-id> --from-file credential-issuer-profile.json
 
   # Update the credential issuer profile from stdin
   pingcli pingone credentials issuer-profile replace --environment-id <env-id> --from-file - < credential-issuer-profile.json
-
-  # Update the credential issuer profile from flags, without --from-file
-  pingcli pingone credentials issuer-profile replace --environment-id <env-id> --name "My Issuer" --site-url "https://example.com"
 ```
 
 ## Options
@@ -32,8 +26,6 @@ pingcli pingone credentials issuer-profile replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--name string` | `` | The display name for the credential issuer profile |
-| `--site-url string` | `` | The URL of the issuer website shown in the credential wallet |
 
 
 ## Inherited Options

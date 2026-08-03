@@ -12,17 +12,11 @@ pingcli pingone sign-on-policies create [flags]
 ## Examples
 
 ```
-# Create a new sign-on policy from flags
-  pingcli pingone sign-on-policies create --environment-id <env-id> --name "My Policy" --description "Standard sign-on policy"
-
-  # Create a new sign-on policy from a JSON file
+# Create a new sign-on policy from a JSON file
   pingcli pingone sign-on-policies create --environment-id <env-id> --from-file sign-on-policy.json
 
   # Create a new sign-on policy from stdin
   pingcli pingone sign-on-policies create --environment-id <env-id> --from-file - < sign-on-policy.json
-
-  # Create from a JSON file, overriding the name from the file
-  pingcli pingone sign-on-policies create --environment-id <env-id> --from-file sign-on-policy.json --name "Overridden Name"
 ```
 
 ## Options
@@ -32,9 +26,6 @@ pingcli pingone sign-on-policies create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--default` | `` | Whether the sign-on policy is the environment default |
-| `--description string` | `` | The sign-on policy description |
-| `--name string` | `` | The sign-on policy name |
 
 
 ## Inherited Options
