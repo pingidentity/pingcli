@@ -17,6 +17,9 @@ pingcli pingone populations replace [flags]
 
   # Update a population from stdin
   pingcli pingone populations replace --environment-id <env-id> --population-id <pop-id> --from-file - < population.json
+
+  # Update a population from flags, without --from-file
+  pingcli pingone populations replace --environment-id <env-id> --population-id <pop-id> --name "My Population" --alternative-identifier alt1,alt2
 ```
 
 ## Options
@@ -27,6 +30,12 @@ pingcli pingone populations replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-p, --population-id string` | `` | The population ID |
+| `--alternative-identifier []string` | `` | Alternative identifiers for the population; repeatable or comma-separated |
+| `--default` | `` | Whether this is the default population for the environment |
+| `--description string` | `` | The description of the population |
+| `--name string` | `` | The name of the population |
+| `--password-policy-id string` | `` | ID of the password policy to associate with this population |
+| `--preferred-language string` | `` | The default preferred language for members of this population |
 
 
 ## Inherited Options

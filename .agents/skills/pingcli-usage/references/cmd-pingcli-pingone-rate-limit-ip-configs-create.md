@@ -17,6 +17,9 @@ pingcli pingone rate-limit-ip-configs create [flags]
 
   # Create a new rate limit IP configuration from stdin
   pingcli pingone rate-limit-ip-configs create --environment-id <env-id> --from-file - < rate-limit-ip-config.json
+
+  # Create a new rate limit IP configuration from flags, without --from-file
+  pingcli pingone rate-limit-ip-configs create --environment-id <env-id> --type WHITELIST --value 203.0.113.0/24
 ```
 
 ## Options
@@ -26,6 +29,8 @@ pingcli pingone rate-limit-ip-configs create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--type string` | `` | The rate limit configuration type (e.g. WHITELIST) |
+| `--value string` | `` | The IP address or CIDR block to exclude from rate limiting |
 
 
 ## Inherited Options

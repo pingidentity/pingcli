@@ -1,0 +1,42 @@
+# `pingcli pingfederate identity-store-provisioners`
+PingFederate Identity Store Provisioners
+
+## Synopsis
+
+PingFederate Identity Store Provisioners
+
+```
+pingcli pingfederate identity-store-provisioners [flags]
+```
+
+## Inherited Options
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `-C, --config string` | `` | The relative or full path to a custom Ping CLI configuration file. (default $HOME/.pingcli/config.yaml) |
+| `-D, --detailed-exitcode` | `` | Enable detailed exit code output. (default false) 0 - pingcli command succeeded with no errors or warnings. 1 - pingcli command failed with errors. 2 - pingcli command succeeded with warnings. |
+| `-O, --output-format string` | `` | Specify the console output format. (default text) Options are: json, ndjson, ndjson-typed, ndjson-wrapped, text. |
+| `-P, --profile string` | `` | The name of a configuration profile to use. |
+| `--debug` | `` | Enable debug output for error messages, including stack traces and transaction IDs. (default false) |
+| `--log-file string` | `` | Write logs to a file at the given path. File logging is disabled when not set. |
+| `--log-file-level string` | `` | Set the file log level. Options are: DEBUG, INFO, WARN, ERROR. (default DEBUG) |
+| `--log-level string` | `` | Set the console log level. Options are: DEBUG, INFO, WARN, ERROR. (default WARN) |
+| `--no-color` | `` | Disable text output in color. (default false) |
+| `--query string` | `` | JMESPath expression to filter JSON output. Requires -O json, ndjson, ndjson-typed, or ndjson-wrapped. Example: --query 'data[?enabled].name' |
+
+
+## Subcommands
+
+| Command | Description | Reference |
+|---------|-------------|----------|
+| `pingcli pingfederate identity-store-provisioners apply` | Create or update an identity store provisioner | [`cmd-pingcli-pingfederate-identity-store-provisioners-apply.md`](cmd-pingcli-pingfederate-identity-store-provisioners-apply.md) |
+| `pingcli pingfederate identity-store-provisioners create` | Create a new identity store provisioner | [`cmd-pingcli-pingfederate-identity-store-provisioners-create.md`](cmd-pingcli-pingfederate-identity-store-provisioners-create.md) |
+| `pingcli pingfederate identity-store-provisioners delete` | Delete an identity store provisioner | [`cmd-pingcli-pingfederate-identity-store-provisioners-delete.md`](cmd-pingcli-pingfederate-identity-store-provisioners-delete.md) |
+| `pingcli pingfederate identity-store-provisioners get` | Read a specific identity store provisioner | [`cmd-pingcli-pingfederate-identity-store-provisioners-get.md`](cmd-pingcli-pingfederate-identity-store-provisioners-get.md) |
+| `pingcli pingfederate identity-store-provisioners list` | List all identity store provisioners | [`cmd-pingcli-pingfederate-identity-store-provisioners-list.md`](cmd-pingcli-pingfederate-identity-store-provisioners-list.md) |
+| `pingcli pingfederate identity-store-provisioners replace` | Update an identity store provisioner | [`cmd-pingcli-pingfederate-identity-store-provisioners-replace.md`](cmd-pingcli-pingfederate-identity-store-provisioners-replace.md) |
+| `pingcli pingfederate identity-store-provisioners template` | Generate an identity store provisioner JSON template | [`cmd-pingcli-pingfederate-identity-store-provisioners-template.md`](cmd-pingcli-pingfederate-identity-store-provisioners-template.md) |
+
+## Parent Command
+
+- [`pingcli pingfederate`](cmd-pingcli-pingfederate.md) — Administration tools for PingFederate deployed as software

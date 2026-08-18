@@ -17,6 +17,9 @@ pingcli pingone authorize api-servers operations replace [flags]
 
   # Update an API server operation from stdin
   pingcli pingone authorize api-servers operations replace --environment-id <env-id> --api-server-id <server-id> --api-server-operation-id <operation-id> --from-file - < api-server-operation.json
+
+  # Update an API server operation from a JSON file, overriding name and methods with flags
+  pingcli pingone authorize api-servers operations replace --environment-id <env-id> --api-server-id <server-id> --api-server-operation-id <operation-id> --from-file api-server-operation.json --name "Read Widgets" --method GET,POST
 ```
 
 ## Options
@@ -28,6 +31,8 @@ pingcli pingone authorize api-servers operations replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-o, --api-server-operation-id string` | `` | The API server operation ID |
+| `--method []string` | `` | The HTTP method(s) permitted for this operation. repeatable or comma-separated |
+| `--name string` | `` | The name of the API server operation |
 
 
 ## Inherited Options

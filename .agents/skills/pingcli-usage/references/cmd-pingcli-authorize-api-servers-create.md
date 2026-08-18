@@ -17,6 +17,9 @@ pingcli authorize api-servers create [flags]
 
   # Create a new API server from stdin
   pingcli authorize api-servers create --environment-id <env-id> --from-file - < api-server.json
+
+  # Create a new API server from a JSON file, overriding name and base URLs with flags
+  pingcli authorize api-servers create --environment-id <env-id> --from-file api-server.json --name "My API Server" --base-url https://api.example.com
 ```
 
 ## Options
@@ -26,6 +29,8 @@ pingcli authorize api-servers create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--base-url []string` | `` | The base URL(s) of the API server; repeatable or comma-separated |
+| `--name string` | `` | The name of the API server |
 
 
 ## Inherited Options

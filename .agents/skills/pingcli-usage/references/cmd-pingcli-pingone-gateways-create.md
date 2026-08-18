@@ -17,6 +17,9 @@ pingcli pingone gateways create [flags]
 
   # Create a new gateway from stdin
   pingcli pingone gateways create --environment-id <env-id> --from-file - < gateway.json
+
+  # Create from a JSON file, overriding the name and enabled state
+  pingcli pingone gateways create --environment-id <env-id> --from-file gateway.json --name "Renamed" --enabled=false
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingone gateways create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The gateway description |
+| `--enabled` | `` | Whether the gateway is enabled |
+| `--name string` | `` | The gateway name |
 
 
 ## Inherited Options

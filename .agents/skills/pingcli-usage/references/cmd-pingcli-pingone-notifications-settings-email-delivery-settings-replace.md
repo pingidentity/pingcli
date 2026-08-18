@@ -17,6 +17,9 @@ pingcli pingone notifications-settings email-delivery-settings replace [flags]
 
   # Update the notifications settings SMTP configuration from stdin
   pingcli pingone notifications-settings email-delivery-settings replace --environment-id <env-id> --from-file - < notifications-settings email-delivery-settings.json
+
+  # Update from a JSON file, overriding the host and port
+  pingcli pingone notifications-settings email-delivery-settings replace --environment-id <env-id> --from-file notifications-settings-email-delivery-settings.json --host smtp.example.com --port 587
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingone notifications-settings email-delivery-settings replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--host string` | `` | The organization's SMTP server hostname |
+| `--port int64` | `` | The port used by the organization's SMTP server to send emails |
+| `--username string` | `` | The organization's SMTP server username |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate certificates groups create [flags]
 
   # Import a new certificate into a certificate group from stdin
   pingcli pingfederate certificates groups create --group-name <group-name> --from-file - < cert.json
+
+  # Import using --id, and --from-file for fileData
+  pingcli pingfederate certificates groups create --group-name <group-name> --id my-cert --from-file cert.json
 ```
 
 ## Options
@@ -26,6 +29,8 @@ pingcli pingfederate certificates groups create [flags]
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-g, --group-name string` | `` | The name of the certificate group |
+| `-i, --id string` | `` | The certificate ID within the group |
+| `--crypto-provider string` | `` | Cryptographic Provider name; only applicable if Hybrid HSM mode is enabled |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate authentication-policies fragments create [flags]
 
   # Create a new authentication policy fragment from stdin
   pingcli pingfederate authentication-policies fragments create --from-file - < fragment.json
+
+  # Create from a JSON file, overriding the name and description
+  pingcli pingfederate authentication-policies fragments create --from-file fragment.json --name "Renamed" --description "Updated"
 ```
 
 ## Options
@@ -25,6 +28,10 @@ pingcli pingfederate authentication-policies fragments create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The authentication policy fragment description |
+| `--inputs-id string` | `` | ID of the resource link describing the fragment's input contract |
+| `--name string` | `` | The authentication policy fragment name |
+| `--outputs-id string` | `` | ID of the resource link describing the fragment's output contract |
 
 
 ## Inherited Options

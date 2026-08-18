@@ -12,7 +12,10 @@ pingcli davinci connector-instances replace [flags]
 ## Examples
 
 ```
-# Update a DaVinci connector instance from a JSON file (--environment-id and --connector-instance-id are still required)
+# Update a DaVinci connector instance from flags
+  pingcli davinci connector-instances replace --environment-id <env-id> --connector-instance-id <instance-id> --name "My Connector" --connector-id pingOneMfaConnector
+
+  # Update a DaVinci connector instance from a JSON file (--environment-id and --connector-instance-id are still required)
   pingcli davinci connector-instances replace --environment-id <env-id> --connector-instance-id <instance-id> --from-file connector-instance.json
 
   # Update a DaVinci connector instance from stdin
@@ -27,6 +30,8 @@ pingcli davinci connector-instances replace [flags]
 | `-c, --connector-instance-id string` | `` | The connector instance ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--connector-id string` | `` | The ID of the DaVinci catalog connector to instantiate, e.g. "pingOneMfaConnector" |
+| `--name string` | `` | The connector instance display name |
 
 
 ## Inherited Options

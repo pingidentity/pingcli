@@ -17,6 +17,9 @@ pingcli pingone languages apply [flags]
 
   # Read body from stdin
   pingcli pingone languages apply --environment-id <env-id> --from-file - < language.json
+  
+  # Create or update a language from flags
+  pingcli pingone languages apply --environment-id <env-id> --locale fr --enabled=false
 ```
 
 ## Options
@@ -27,6 +30,10 @@ pingcli pingone languages apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-l, --language-id string` | `` | The language ID |
+| `--default` | `` | Whether this is the default language for the environment |
+| `--enabled` | `` | Whether this language is enabled in the environment |
+| `--locale string` | `` | The locale code for the language (e.g. en, fr, de) |
+| `--name string` | `` | The display name of the language |
 
 
 ## Inherited Options

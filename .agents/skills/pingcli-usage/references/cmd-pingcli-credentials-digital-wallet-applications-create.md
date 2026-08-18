@@ -33,7 +33,7 @@ pingcli credentials digital-wallet-applications create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--app-open-url string` | `` | The deep-link URL used to open the digital wallet app on a mobile device |
-| `--application-id string` | `` | The UUID of the linked PingOne application resource (flattened alias for application.id) |
+| `--application-id string` | `` | The UUID of the linked PingOne application resource |
 | `--name string` | `` | The name of the digital wallet application |
 | `--uses-ping-one-wallet-sdk` | `` | Whether the wallet app uses the PingOne Wallet SDK |
 

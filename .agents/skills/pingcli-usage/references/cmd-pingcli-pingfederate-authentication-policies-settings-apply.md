@@ -17,6 +17,9 @@ pingcli pingfederate authentication-policies settings apply [flags]
 
   # Update authentication policies settings from stdin
   pingcli pingfederate authentication-policies settings apply --from-file - < settings.json
+
+  # Update authentication policies settings using flags only (no --from-file needed)
+  pingcli pingfederate authentication-policies settings apply --enable-idp-authn-selection --enable-sp-authn-selection
 ```
 
 ## Options
@@ -25,6 +28,8 @@ pingcli pingfederate authentication-policies settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--enable-idp-authn-selection` | `` | Enable IdP authentication policies |
+| `--enable-sp-authn-selection` | `` | Enable SP authentication policies |
 
 
 ## Inherited Options

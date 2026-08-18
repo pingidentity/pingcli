@@ -17,6 +17,9 @@ pingcli pingfederate oauth client-registration-policies create [flags]
 
   # Create a new client registration policy from stdin
   pingcli pingfederate oauth client-registration-policies create --from-file - < policy.json
+
+  # Create from a JSON file, overriding the name
+  pingcli pingfederate oauth client-registration-policies create --from-file policy.json --name "Renamed"
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate oauth client-registration-policies create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | Display name of the client registration policy |
+| `--parent-ref-id string` | `` | ID of a parent client registration policy instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the client registration policy plugin type descriptor |
 
 
 ## Inherited Options

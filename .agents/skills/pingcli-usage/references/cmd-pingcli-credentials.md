@@ -32,6 +32,7 @@ pingcli credentials
 | `pingcli credentials digital-wallet-applications` | Digital Wallet Applications | [`cmd-pingcli-credentials-digital-wallet-applications.md`](cmd-pingcli-credentials-digital-wallet-applications.md) |
 | `pingcli credentials issuer-profile` | Credential Issuer Profile | [`cmd-pingcli-credentials-issuer-profile.md`](cmd-pingcli-credentials-issuer-profile.md) |
 | `pingcli credentials types` | Credential Types | [`cmd-pingcli-credentials-types.md`](cmd-pingcli-credentials-types.md) |
+| `pingcli credentials user-credentials` | User Credentials | [`cmd-pingcli-credentials-user-credentials.md`](cmd-pingcli-credentials-user-credentials.md) |
 | `pingcli credentials user-digital-wallets` | User Digital Wallets | [`cmd-pingcli-credentials-user-digital-wallets.md`](cmd-pingcli-credentials-user-digital-wallets.md) |
 
 ## Parent Command

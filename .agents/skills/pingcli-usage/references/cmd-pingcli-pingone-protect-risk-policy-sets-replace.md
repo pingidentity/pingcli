@@ -17,6 +17,9 @@ pingcli pingone protect risk-policy-sets replace [flags]
 
   # Replace a risk policy set from stdin
   pingcli pingone protect risk-policy-sets replace --environment-id <env-id> --risk-policy-set-id <policy-set-id> --from-file - < risk-policy-set.json
+
+  # Replace from a JSON file, overriding the name
+  pingcli pingone protect risk-policy-sets replace --environment-id <env-id> --risk-policy-set-id <policy-set-id> --from-file risk-policy-set.json --name "Renamed Policy Set"
 ```
 
 ## Options
@@ -27,6 +30,9 @@ pingcli pingone protect risk-policy-sets replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --risk-policy-set-id string` | `` | The risk policy set ID |
+| `--default` | `` | Whether the risk policy set is the environment default |
+| `--description string` | `` | The risk policy set description |
+| `--name string` | `` | The risk policy set name |
 
 
 ## Inherited Options

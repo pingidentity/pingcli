@@ -15,6 +15,9 @@ pingcli pingone webhooks apply [flags]
 # Create or update a webhook (body supplies name, enabled, filterOptions, etc.)
   pingcli pingone webhooks apply --environment-id <env-id> --from-file webhook.json
 
+  # Create or update a webhook from a JSON file, overriding the enabled state
+  pingcli pingone webhooks apply --environment-id <env-id> --from-file webhook.json --enabled=false
+
   # Read body from stdin
   pingcli pingone webhooks apply --environment-id <env-id> --from-file - < webhook.json
 ```
@@ -27,6 +30,11 @@ pingcli pingone webhooks apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-w, --webhook-id string` | `` | The webhook (subscription) ID |
+| `--enabled` | `` | Whether the webhook subscription is active |
+| `--format string` | `` | The payload format for webhook events (e.g. ACTIVITY, SPLUNK, NEWRELIC) |
+| `--name string` | `` | The webhook subscription name |
+| `--tls-client-auth-key-pair-id string` | `` | ID of the key to use for outbound mutual TLS authentication |
+| `--verify-tls-certificates` | `` | Whether TLS certificates are verified when delivering events |
 
 
 ## Inherited Options

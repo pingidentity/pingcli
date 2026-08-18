@@ -12,11 +12,17 @@ pingcli pingone users identity-provider replace [flags]
 ## Examples
 
 ```
-# Update the user identity provider from a JSON file
+# Update the user identity provider from flags
+  pingcli pingone users identity-provider replace --environment-id <env-id> --user-id <user-id> --identity-provider-id <idp-id> --type OPENID_CONNECT
+
+  # Update the user identity provider from a JSON file
   pingcli pingone users identity-provider replace --environment-id <env-id> --user-id <user-id> --from-file idp.json
 
   # Update the user identity provider from stdin
   pingcli pingone users identity-provider replace --environment-id <env-id> --user-id <user-id> --from-file - < idp.json
+
+  # Update the user identity provider from flags, without --from-file
+  pingcli pingone users identity-provider replace --environment-id <env-id> --user-id <user-id> --identity-provider-id <idp-id> --type OPENID_CONNECT
 ```
 
 ## Options
@@ -27,6 +33,8 @@ pingcli pingone users identity-provider replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-u, --user-id string` | `` | The user ID |
+| `--identity-provider-id string` | `` | The external identity provider ID to link to this user |
+| `--type string` | `` | The type of the linked identity provider |
 
 
 ## Inherited Options

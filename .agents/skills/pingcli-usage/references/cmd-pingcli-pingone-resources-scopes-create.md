@@ -17,6 +17,9 @@ pingcli pingone resources scopes create [flags]
 
   # Create a new resource scope from stdin
   pingcli pingone resources scopes create --environment-id <env-id> --resource-id <resource-id> --from-file - < resource-scope.json
+
+  # Create a new resource scope from flags, without --from-file
+  pingcli pingone resources scopes create --environment-id <env-id> --resource-id <resource-id> --name "My Scope" --schema-attributes username,email
 ```
 
 ## Options
@@ -27,6 +30,10 @@ pingcli pingone resources scopes create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --resource-id string` | `` | The resource ID |
+| `--description string` | `` | The description of the resource scope |
+| `--mapped-claims []string` | `` | Mapped claims for this scope; repeatable or comma-separated |
+| `--name string` | `` | The name of the resource scope |
+| `--schema-attributes []string` | `` | Schema attributes mapped to this scope; repeatable or comma-separated |
 
 
 ## Inherited Options

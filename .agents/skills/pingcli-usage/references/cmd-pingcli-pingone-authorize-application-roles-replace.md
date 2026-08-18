@@ -12,11 +12,17 @@ pingcli pingone authorize application-roles replace [flags]
 ## Examples
 
 ```
-# Update an application role from a JSON file (--environment-id and --application-role-id are still required)
+# Replace an application role from flags
+  pingcli pingone authorize application-roles replace --environment-id <env-id> --application-role-id <role-id> --name "My Role" --description "Handles resource X"
+
+  # Update an application role from a JSON file (--environment-id and --application-role-id are still required)
   pingcli pingone authorize application-roles replace --environment-id <env-id> --application-role-id <role-id> --from-file application-role.json
 
   # Update an application role from stdin
   pingcli pingone authorize application-roles replace --environment-id <env-id> --application-role-id <role-id> --from-file - < application-role.json
+
+  # Update an application role from flags, without --from-file
+  pingcli pingone authorize application-roles replace --environment-id <env-id> --application-role-id <role-id> --name "My Role" --description "Handles resource X"
 ```
 
 ## Options
@@ -27,6 +33,8 @@ pingcli pingone authorize application-roles replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --application-role-id string` | `` | The application role ID |
+| `--description string` | `` | The description of the application role |
+| `--name string` | `` | The name of the application role |
 
 
 ## Inherited Options

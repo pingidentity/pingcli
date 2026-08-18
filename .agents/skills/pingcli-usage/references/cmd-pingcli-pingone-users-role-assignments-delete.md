@@ -22,7 +22,7 @@ pingcli pingone users role-assignments delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --role-assignment-id string` | `` | The role assignment ID |
+| `-r, --role-assignment-id string` | `` | The role assignment ID (maps to role.id on create) |
 | `-u, --user-id string` | `` | The user ID |
 
 

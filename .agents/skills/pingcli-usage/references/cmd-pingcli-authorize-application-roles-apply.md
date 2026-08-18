@@ -12,11 +12,17 @@ pingcli authorize application-roles apply [flags]
 ## Examples
 
 ```
-# Create or update an application role (body supplies name and optional description)
+# Create or update an application role from flags
+  pingcli authorize application-roles apply --environment-id <env-id> --name "My Role" --description "Handles resource X"
+
+  # Create or update an application role (body supplies name and optional description)
   pingcli authorize application-roles apply --environment-id <env-id> --from-file application-role.json
 
   # Read body from stdin
   pingcli authorize application-roles apply --environment-id <env-id> --from-file - < application-role.json
+
+  # Create or update from flags, without --from-file
+  pingcli authorize application-roles apply --environment-id <env-id> --name "My Role" --description "Handles resource X"
 ```
 
 ## Options
@@ -27,6 +33,8 @@ pingcli authorize application-roles apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --application-role-id string` | `` | The application role ID |
+| `--description string` | `` | The description of the application role |
+| `--name string` | `` | The name of the application role |
 
 
 ## Inherited Options

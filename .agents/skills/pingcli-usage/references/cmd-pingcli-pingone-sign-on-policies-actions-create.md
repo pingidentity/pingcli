@@ -17,6 +17,9 @@ pingcli pingone sign-on-policies actions create [flags]
 
   # Create a new sign-on policy action from stdin
   pingcli pingone sign-on-policies actions create --environment-id <env-id> --sign-on-policy-id <sop-id> --from-file - < action.json
+
+  # Create from a JSON file, overriding the priority from the file
+  pingcli pingone sign-on-policies actions create --environment-id <env-id> --sign-on-policy-id <sop-id> --from-file action.json --priority 2
 ```
 
 ## Options
@@ -27,6 +30,7 @@ pingcli pingone sign-on-policies actions create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-s, --sign-on-policy-id string` | `` | The sign-on policy ID |
+| `--priority int64` | `` | Execution priority of this sign-on policy action; lower values execute first |
 
 
 ## Inherited Options

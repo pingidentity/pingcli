@@ -17,6 +17,9 @@ pingcli pingone resources application-resources replace [flags]
 
   # Update an application resource from stdin
   pingcli pingone resources application-resources replace --environment-id <env-id> --resource-id <resource-id> --application-resource-id <app-resource-id> --from-file - < application-resource.json
+
+  # Update an application resource from flags, without --from-file
+  pingcli pingone resources application-resources replace --environment-id <env-id> --resource-id <resource-id> --application-resource-id <app-resource-id> --name "My Resource" --description "Handles protected data"
 ```
 
 ## Options
@@ -28,6 +31,8 @@ pingcli pingone resources application-resources replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --resource-id string` | `` | The parent PingOne Authorize resource ID |
+| `--description string` | `` | The description of the application resource |
+| `--name string` | `` | The name of the application resource |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate captcha-providers settings apply [flags]
 
   # Update CAPTCHA providers settings from stdin
   pingcli pingfederate captcha-providers settings apply --from-file - < settings.json
+
+  # Update using the flag, without --from-file
+  pingcli pingfederate captcha-providers settings apply --default-captcha-provider-ref-id <id>
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate captcha-providers settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--default-captcha-provider-ref-id string` | `` | ID of the CAPTCHA provider instance used as the tenant-wide default |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingone resources create [flags]
 
   # Create a new resource from stdin
   pingcli pingone resources create --environment-id <env-id> --from-file - < resource.json
+
+  # Create a new resource from flags, without --from-file
+  pingcli pingone resources create --environment-id <env-id> --name "My Resource" --audience "https://api.example.com" --access-token-validity-seconds 3600
 ```
 
 ## Options
@@ -26,6 +29,10 @@ pingcli pingone resources create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--access-token-validity-seconds int64` | `` | The lifetime of access tokens issued for this resource, in seconds |
+| `--audience string` | `` | The audience string included in access tokens issued for this resource |
+| `--description string` | `` | The description of the resource |
+| `--name string` | `` | The name of the resource |
 
 
 ## Inherited Options

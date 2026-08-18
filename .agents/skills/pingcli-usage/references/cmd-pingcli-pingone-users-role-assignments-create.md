@@ -17,6 +17,9 @@ pingcli pingone users role-assignments create [flags]
 
   # Create a new user role assignment from stdin
   pingcli pingone users role-assignments create --environment-id <env-id> --user-id <user-id> --from-file - < role-assignment.json
+
+  # Create from a JSON file, overriding the role ID from the file
+  pingcli pingone users role-assignments create --environment-id <env-id> --user-id <user-id> --from-file role-assignment.json --role-assignment-id <role-id>
 ```
 
 ## Options
@@ -26,6 +29,7 @@ pingcli pingone users role-assignments create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-r, --role-assignment-id string` | `` | The role assignment ID (maps to role.id on create) |
 | `-u, --user-id string` | `` | The user ID |
 
 

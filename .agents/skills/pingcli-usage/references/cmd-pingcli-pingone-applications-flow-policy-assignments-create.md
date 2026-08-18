@@ -12,11 +12,17 @@ pingcli pingone applications flow-policy-assignments create [flags]
 ## Examples
 
 ```
-# Create a new flow policy assignment from a JSON file
+# Create a new flow policy assignment from flags
+  pingcli pingone applications flow-policy-assignments create --environment-id <env-id> --application-id <app-id> --priority 1 --flow-policy-id <flow-policy-id>
+
+  # Create a new flow policy assignment from a JSON file
   pingcli pingone applications flow-policy-assignments create --environment-id <env-id> --application-id <app-id> --from-file assignment.json
 
   # Create a new flow policy assignment from stdin
   pingcli pingone applications flow-policy-assignments create --environment-id <env-id> --application-id <app-id> --from-file - < assignment.json
+
+  # Create from a JSON file, overriding the priority from the file
+  pingcli pingone applications flow-policy-assignments create --environment-id <env-id> --application-id <app-id> --from-file assignment.json --priority 2
 ```
 
 ## Options
@@ -27,6 +33,8 @@ pingcli pingone applications flow-policy-assignments create [flags]
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--flow-policy-id string` | `` | ID of the DaVinci flow policy to assign |
+| `--priority int64` | `` | Priority order for this flow policy assignment; lower values execute first |
 
 
 ## Inherited Options

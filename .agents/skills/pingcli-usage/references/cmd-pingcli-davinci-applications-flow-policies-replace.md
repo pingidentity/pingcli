@@ -12,7 +12,10 @@ pingcli davinci applications flow-policies replace [flags]
 ## Examples
 
 ```
-# Update a DaVinci flow policy from a JSON file (--environment-id, --application-id, and --flow-policy-id are still required)
+# Update a DaVinci flow policy, overriding name and status via flags
+  pingcli davinci applications flow-policies replace --environment-id <env-id> --application-id <app-id> --flow-policy-id <policy-id> --name "My Policy" --status enabled --from-file flow-policy.json
+
+  # Update a DaVinci flow policy from a JSON file (--environment-id, --application-id, and --flow-policy-id are still required)
   pingcli davinci applications flow-policies replace --environment-id <env-id> --application-id <app-id> --flow-policy-id <fp-id> --from-file flow-policy.json
 
   # Update a DaVinci flow policy from stdin
@@ -28,6 +31,8 @@ pingcli davinci applications flow-policies replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--flow-policy-id string` | `` | The DaVinci flow policy ID |
+| `--name string` | `` | The flow policy name |
+| `--status string` | `` | The flow policy status (enabled or disabled) |
 
 
 ## Inherited Options

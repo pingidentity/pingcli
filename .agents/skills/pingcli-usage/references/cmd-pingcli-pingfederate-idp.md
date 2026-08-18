@@ -30,6 +30,7 @@ pingcli pingfederate idp
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingfederate idp adapters` | PingFederate IDP Adapters | [`cmd-pingcli-pingfederate-idp-adapters.md`](cmd-pingcli-pingfederate-idp-adapters.md) |
+| `pingcli pingfederate idp connectors` | Manage PingFederate IdP Connector resources | [`cmd-pingcli-pingfederate-idp-connectors.md`](cmd-pingcli-pingfederate-idp-connectors.md) |
 | `pingcli pingfederate idp sp-connections` | PingFederate SP Connections | [`cmd-pingcli-pingfederate-idp-sp-connections.md`](cmd-pingcli-pingfederate-idp-sp-connections.md) |
 
 ## Parent Command

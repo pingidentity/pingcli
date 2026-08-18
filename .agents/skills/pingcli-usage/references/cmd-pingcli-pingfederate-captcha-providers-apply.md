@@ -17,6 +17,9 @@ pingcli pingfederate captcha-providers apply [flags]
 
   # Read body from stdin
   pingcli pingfederate captcha-providers apply --from-file - < provider.json
+
+  # Create or update using flags for overriding some fields, and --from-file for full configuration
+  pingcli pingfederate captcha-providers apply --plugin-descriptor-ref-id com.example.Plugin --from-file config.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate captcha-providers apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate CAPTCHA Provider ID |
+| `--name string` | `` | Display name of the CAPTCHA provider |
+| `--parent-ref-id string` | `` | ID of a parent CAPTCHA provider instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the CAPTCHA provider plugin type descriptor |
 
 
 ## Inherited Options

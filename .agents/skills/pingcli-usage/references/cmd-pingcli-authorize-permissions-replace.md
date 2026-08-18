@@ -12,11 +12,17 @@ pingcli authorize permissions replace [flags]
 ## Examples
 
 ```
-# Update an application resource permission from a JSON file (path flags are still required)
+# Replace an application resource permission from flags
+  pingcli authorize permissions replace --environment-id <env-id> --application-resource-id <app-resource-id> --application-resource-permission-id <permission-id> --action read --description "Read access"
+
+  # Update an application resource permission from a JSON file (path flags are still required)
   pingcli authorize permissions replace --environment-id <env-id> --application-resource-id <app-resource-id> --application-resource-permission-id <permission-id> --from-file permission.json
 
   # Update an application resource permission from stdin
   pingcli authorize permissions replace --environment-id <env-id> --application-resource-id <app-resource-id> --application-resource-permission-id <permission-id> --from-file - < permission.json
+
+  # Update an application resource permission from flags, without --from-file
+  pingcli authorize permissions replace --environment-id <env-id> --application-resource-id <app-resource-id> --application-resource-permission-id <permission-id> --action read --description "Read access"
 ```
 
 ## Options
@@ -27,7 +33,9 @@ pingcli authorize permissions replace [flags]
 | `-a, --application-resource-id string` | `` | The parent application resource ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--action string` | `` | The action string identifying this permission (e.g. read, write, execute) |
 | `--application-resource-permission-id string` | `` | The application resource permission ID |
+| `--description string` | `` | The description of the application resource permission |
 
 
 ## Inherited Options

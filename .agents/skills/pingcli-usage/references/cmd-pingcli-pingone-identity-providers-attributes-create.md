@@ -12,11 +12,17 @@ pingcli pingone identity-providers attributes create [flags]
 ## Examples
 
 ```
-# Create a new identity provider attribute from a JSON file
+# Create a new identity provider attribute from flags
+  pingcli pingone identity-providers attributes create --environment-id <env-id> --identity-provider-id <idp-id> --name email --value "${email}" --update ALWAYS
+
+  # Create a new identity provider attribute from a JSON file
   pingcli pingone identity-providers attributes create --environment-id <env-id> --identity-provider-id <idp-id> --from-file attribute.json
 
   # Create a new identity provider attribute from stdin
   pingcli pingone identity-providers attributes create --environment-id <env-id> --identity-provider-id <idp-id> --from-file - < attribute.json
+
+  # Create a new identity provider attribute from flags, without --from-file
+  pingcli pingone identity-providers attributes create --environment-id <env-id> --identity-provider-id <idp-id> --name email --value "${email}" --update ALWAYS
 ```
 
 ## Options
@@ -27,6 +33,9 @@ pingcli pingone identity-providers attributes create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-i, --identity-provider-id string` | `` | The identity provider ID |
+| `--name string` | `` | The user schema attribute name to receive the mapped value |
+| `--update string` | `` | When to update the mapped attribute: ALWAYS overwrites on every login, EMPTY_ONLY updates only if the attribute is currently empty |
+| `--value string` | `` | The expression or literal from the identity provider that is mapped to the user attribute |
 
 
 ## Inherited Options

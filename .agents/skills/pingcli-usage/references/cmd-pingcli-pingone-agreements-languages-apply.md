@@ -17,6 +17,9 @@ pingcli pingone agreements languages apply [flags]
 
   # Read body from stdin
   pingcli pingone agreements languages apply --environment-id <env-id> --agreement-id <agreement-id> --from-file - < language.json
+
+  # Create or update from flags, without --from-file
+  pingcli pingone agreements languages apply --environment-id <env-id> --agreement-id <agreement-id> --display-name "English" --locale en --enabled=true
 ```
 
 ## Options
@@ -28,6 +31,9 @@ pingcli pingone agreements languages apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-l, --language-id string` | `` | The agreement language ID |
+| `--display-name string` | `` | Display name of this language version of the agreement |
+| `--enabled` | `` | Whether this language version of the agreement is enabled |
+| `--locale string` | `` | BCP 47 locale code for this agreement language |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingone resources scopes replace [flags]
 
   # Update a resource scope from stdin
   pingcli pingone resources scopes replace --environment-id <env-id> --resource-id <resource-id> --resource-scope-id <scope-id> --from-file - < resource-scope.json
+
+  # Update a resource scope from flags, without --from-file
+  pingcli pingone resources scopes replace --environment-id <env-id> --resource-id <resource-id> --resource-scope-id <scope-id> --name "My Scope" --mapped-claims claim1,claim2
 ```
 
 ## Options
@@ -28,6 +31,10 @@ pingcli pingone resources scopes replace [flags]
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --resource-id string` | `` | The resource ID |
 | `-s, --resource-scope-id string` | `` | The resource scope ID |
+| `--description string` | `` | The description of the resource scope |
+| `--mapped-claims []string` | `` | Mapped claims for this scope; repeatable or comma-separated |
+| `--name string` | `` | The name of the resource scope |
+| `--schema-attributes []string` | `` | Schema attributes mapped to this scope; repeatable or comma-separated |
 
 
 ## Inherited Options

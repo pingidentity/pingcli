@@ -17,6 +17,9 @@ pingcli pingfederate administrative-accounts apply [flags]
 
   # Read body from stdin
   pingcli pingfederate administrative-accounts apply --from-file - < account.json
+
+  # Create or update an administrative account with flags
+  pingcli pingfederate administrative-accounts apply --description "Support engineer" --active --from-file account.json
 ```
 
 ## Options
@@ -26,6 +29,13 @@ pingcli pingfederate administrative-accounts apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-u, --username string` | `` | The PingFederate administrative account username |
+| `--active` | `` | Whether the account is active |
+| `--auditor` | `` | Whether the account is an auditor |
+| `--department string` | `` | Department name of the account user |
+| `--description string` | `` | Description of the account |
+| `--email-address string` | `` | Email address associated with the account |
+| `--phone-number string` | `` | Phone number associated with the account |
+| `--roles []string` | `` | Administrator roles; repeatable or comma-separated |
 
 
 ## Inherited Options

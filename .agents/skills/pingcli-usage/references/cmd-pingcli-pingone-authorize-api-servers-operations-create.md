@@ -17,6 +17,9 @@ pingcli pingone authorize api-servers operations create [flags]
 
   # Create a new API server operation from stdin
   pingcli pingone authorize api-servers operations create --environment-id <env-id> --api-server-id <server-id> --from-file - < api-server-operation.json
+
+  # Create a new API server operation from a JSON file, overriding name and methods with flags
+  pingcli pingone authorize api-servers operations create --environment-id <env-id> --api-server-id <server-id> --from-file api-server-operation.json --name "Read Widgets" --method GET,POST
 ```
 
 ## Options
@@ -27,6 +30,8 @@ pingcli pingone authorize api-servers operations create [flags]
 | `-a, --api-server-id string` | `` | The API server ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--method []string` | `` | The HTTP method(s) permitted for this operation. repeatable or comma-separated |
+| `--name string` | `` | The name of the API server operation |
 
 
 ## Inherited Options

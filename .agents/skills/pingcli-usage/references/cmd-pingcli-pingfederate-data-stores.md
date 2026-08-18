@@ -32,6 +32,7 @@ pingcli pingfederate data-stores [flags]
 | `pingcli pingfederate data-stores apply` | Create or update a data store | [`cmd-pingcli-pingfederate-data-stores-apply.md`](cmd-pingcli-pingfederate-data-stores-apply.md) |
 | `pingcli pingfederate data-stores create` | Create a new data store | [`cmd-pingcli-pingfederate-data-stores-create.md`](cmd-pingcli-pingfederate-data-stores-create.md) |
 | `pingcli pingfederate data-stores delete` | Delete a data store | [`cmd-pingcli-pingfederate-data-stores-delete.md`](cmd-pingcli-pingfederate-data-stores-delete.md) |
+| `pingcli pingfederate data-stores descriptors` | PingFederate Custom Data Store Descriptors | [`cmd-pingcli-pingfederate-data-stores-descriptors.md`](cmd-pingcli-pingfederate-data-stores-descriptors.md) |
 | `pingcli pingfederate data-stores get` | Read a specific data store | [`cmd-pingcli-pingfederate-data-stores-get.md`](cmd-pingcli-pingfederate-data-stores-get.md) |
 | `pingcli pingfederate data-stores get-action` | Get a data store action | [`cmd-pingcli-pingfederate-data-stores-get-action.md`](cmd-pingcli-pingfederate-data-stores-get-action.md) |
 | `pingcli pingfederate data-stores invoke-action` | Invoke a data store action | [`cmd-pingcli-pingfederate-data-stores-invoke-action.md`](cmd-pingcli-pingfederate-data-stores-invoke-action.md) |

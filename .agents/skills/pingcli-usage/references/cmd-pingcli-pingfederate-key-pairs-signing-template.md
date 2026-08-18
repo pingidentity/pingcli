@@ -1,9 +1,9 @@
 # `pingcli pingfederate key-pairs signing template`
-Generate a signing key pair JSON template
+Generate a signing key pair create, import, import-csr-response, or link JSON template
 
 ## Synopsis
 
-Generate a JSON skeleton template for signing key pair create bodies
+Generate a JSON skeleton template for a signing key pair body. Use --template-type to select create (default), import, import-csr-response, or link.
 
 ```
 pingcli pingfederate key-pairs signing template [flags]
@@ -12,11 +12,19 @@ pingcli pingfederate key-pairs signing template [flags]
 ## Examples
 
 ```
-# Generate a template and save to a file
+# Generate a create template (default) and save to a file
   pingcli pingfederate key-pairs signing template > body.json
 
-  # Edit the template, then generate the signing key pair
+  # Generate an import, import-csr-response, or link template
+  pingcli pingfederate key-pairs signing template --template-type import > key-pair-file.json
+  pingcli pingfederate key-pairs signing template --template-type import-csr-response > csr-response.json
+  pingcli pingfederate key-pairs signing template --template-type link > key-pair-link.json
+
+  # Edit the template, then run the matching action
   pingcli pingfederate key-pairs signing create --from-file body.json
+  pingcli pingfederate key-pairs signing import --from-file key-pair-file.json
+  pingcli pingfederate key-pairs signing import-csr-response --id <id> --from-file csr-response.json
+  pingcli pingfederate key-pairs signing link --from-file key-pair-link.json
 Use the JSON template as a starting point:
   1. Run the template command to generate the body skeleton.
   2. Edit the file, replacing placeholder values with real data.
@@ -34,6 +42,7 @@ Example workflow:
 |------|---------|-------------|
 | `-h, --help` | `` | help for template |
 | `-o, --output-file string` | `` | Write the JSON template to PATH instead of stdout. Overwrites any existing file. |
+| `--template-type string` | `` | The variant of the template to generate. One of: create, import, import-csr-response, link. Defaults to "create". |
 
 
 ## Inherited Options

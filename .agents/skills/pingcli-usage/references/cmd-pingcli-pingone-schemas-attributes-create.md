@@ -17,6 +17,9 @@ pingcli pingone schemas attributes create [flags]
 
   # Create a new schema attribute from stdin
   pingcli pingone schemas attributes create --environment-id <env-id> --schema-id <schema-id> --from-file - < schema-attribute.json
+
+  # Create from a JSON file, overriding the name and enabled state
+  pingcli pingone schemas attributes create --environment-id <env-id> --schema-id <schema-id> --from-file schema-attribute.json --name renamed --enabled=false
 ```
 
 ## Options
@@ -27,6 +30,15 @@ pingcli pingone schemas attributes create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-s, --schema-id string` | `` | The PingOne schema ID |
+| `--description string` | `` | The description of the attribute |
+| `--display-name string` | `` | The display label for the attribute in the UI |
+| `--enabled` | `` | Whether the attribute is active |
+| `--ldap-attribute string` | `` | The corresponding LDAP attribute name |
+| `--multi-valued` | `` | Whether the attribute can hold multiple values |
+| `--name string` | `` | The attribute name (immutable after creation) |
+| `--required` | `` | Whether the attribute must be provided on user creation |
+| `--type string` | `` | The data type of the schema attribute |
+| `--unique` | `` | Whether the attribute value must be unique across all users |
 
 
 ## Inherited Options

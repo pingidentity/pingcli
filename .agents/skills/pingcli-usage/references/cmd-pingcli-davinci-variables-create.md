@@ -12,7 +12,10 @@ pingcli davinci variables create [flags]
 ## Examples
 
 ```
-# Create a new DaVinci variable from a JSON file
+# Create a new DaVinci variable from flags
+  pingcli davinci variables create --environment-id <env-id> --name myVar --context company --data-type string --mutable=true
+
+  # Create a new DaVinci variable from a JSON file
   pingcli davinci variables create --environment-id <env-id> --from-file variable.json
 
   # Create a new DaVinci variable from stdin
@@ -26,6 +29,14 @@ pingcli davinci variables create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--context string` | `` | The variable context scope (company, flow, flowInstance, or user) |
+| `--data-type string` | `` | The variable data type (boolean, number, object, secret, or string) |
+| `--display-name string` | `` | The human-readable display name for the variable |
+| `--flow-id string` | `` | The DaVinci flow ID this variable is scoped to; applicable when --context is flow |
+| `--max string` | `` | The maximum value constraint for numeric variables |
+| `--min string` | `` | The minimum value constraint for numeric variables |
+| `--mutable` | `` | Whether the variable value can be changed at runtime |
+| `--name string` | `` | The variable name |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate authentication-api applications apply [flags]
 
   # Read body from stdin
   pingcli pingfederate authentication-api applications apply --from-file - < application.json
+
+  # Create or update an authentication API application with flags
+  pingcli pingfederate authentication-api applications apply --url https://example.com/callback --from-file application.json
 ```
 
 ## Options
@@ -25,7 +28,12 @@ pingcli pingfederate authentication-api applications apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--additional-allowed-origins []string` | `` | Additional allowed CORS origin URLs beyond the domain in the redirect URL; repeatable or comma-separated |
+| `--client-for-redirectless-mode-ref-id string` | `` | ID of the OAuth client to use in redirectless mode |
+| `--description string` | `` | Description of the application |
 | `--id string` | `` | The PingFederate Authentication API Application ID |
+| `--name string` | `` | Authentication API application name |
+| `--url string` | `` | Redirect URL for the application |
 
 
 ## Inherited Options

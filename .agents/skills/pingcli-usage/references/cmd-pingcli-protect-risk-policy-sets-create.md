@@ -17,6 +17,9 @@ pingcli protect risk-policy-sets create [flags]
 
   # Create a new risk policy set from stdin
   pingcli protect risk-policy-sets create --environment-id <env-id> --from-file - < risk-policy-set.json
+
+  # Create from a JSON file, overriding the name and default flag
+  pingcli protect risk-policy-sets create --environment-id <env-id> --from-file risk-policy-set.json --name "My Policy Set" --default=true
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli protect risk-policy-sets create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--default` | `` | Whether the risk policy set is the environment default |
+| `--description string` | `` | The risk policy set description |
+| `--name string` | `` | The risk policy set name |
 
 
 ## Inherited Options

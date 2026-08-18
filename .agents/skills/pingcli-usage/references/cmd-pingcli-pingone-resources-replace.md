@@ -17,6 +17,9 @@ pingcli pingone resources replace [flags]
 
   # Update a resource from stdin
   pingcli pingone resources replace --environment-id <env-id> --resource-id <resource-id> --from-file - < resource.json
+
+  # Update a resource from flags, without --from-file
+  pingcli pingone resources replace --environment-id <env-id> --resource-id <resource-id> --name "My Resource" --description "Updated description"
 ```
 
 ## Options
@@ -27,6 +30,10 @@ pingcli pingone resources replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --resource-id string` | `` | The resource ID |
+| `--access-token-validity-seconds int64` | `` | The lifetime of access tokens issued for this resource, in seconds |
+| `--audience string` | `` | The audience string included in access tokens issued for this resource |
+| `--description string` | `` | The description of the resource |
+| `--name string` | `` | The name of the resource |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingone environments create [flags]
 
   # Create a new environment from stdin
   pingcli pingone environments create --from-file - < env.json
+
+  # Create from a JSON file, overriding the name and region
+  pingcli pingone environments create --from-file env.json --name "Renamed" --region EU
 ```
 
 ## Options
@@ -25,6 +28,11 @@ pingcli pingone environments create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The description of the environment |
+| `--icon string` | `` | The URL or identifier for the environment icon |
+| `--name string` | `` | The name of the environment |
+| `--region string` | `` | The geographic region code for the environment (e.g. NA, EU, CA, AP) |
+| `--type string` | `` | The environment type (SANDBOX or PRODUCTION) |
 
 
 ## Inherited Options

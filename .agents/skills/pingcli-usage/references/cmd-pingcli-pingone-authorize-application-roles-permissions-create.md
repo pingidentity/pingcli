@@ -12,11 +12,17 @@ pingcli pingone authorize application-roles permissions create [flags]
 ## Examples
 
 ```
-# Create a new application role permission from a JSON file
+# Create a new application role permission from flags
+  pingcli pingone authorize application-roles permissions create --environment-id <env-id> --application-role-id <role-id> --permission-id <permission-id>
+
+  # Create a new application role permission from a JSON file
   pingcli pingone authorize application-roles permissions create --environment-id <env-id> --application-role-id <role-id> --from-file permission.json
 
   # Create a new application role permission from stdin
   pingcli pingone authorize application-roles permissions create --environment-id <env-id> --application-role-id <role-id> --from-file - < permission.json
+
+  # Create a new application role permission from flags, without --from-file
+  pingcli pingone authorize application-roles permissions create --environment-id <env-id> --application-role-id <role-id> --permission-id <permission-id>
 ```
 
 ## Options
@@ -26,6 +32,7 @@ pingcli pingone authorize application-roles permissions create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-p, --permission-id string` | `` | The application role permission ID |
 | `-r, --application-role-id string` | `` | The application role ID |
 
 

@@ -22,7 +22,7 @@ pingcli pingone users role-assignments get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --role-assignment-id string` | `` | The role assignment ID |
+| `-r, --role-assignment-id string` | `` | The role assignment ID (maps to role.id on create) |
 | `-u, --user-id string` | `` | The user ID |
 
 

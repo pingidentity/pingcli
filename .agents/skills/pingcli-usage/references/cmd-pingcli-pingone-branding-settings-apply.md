@@ -17,6 +17,9 @@ pingcli pingone branding-settings apply [flags]
 
   # Update the branding settings configuration from stdin
   pingcli pingone branding-settings apply --environment-id <env-id> --from-file - < branding-settings.json
+
+  # Update from a JSON file, overriding the company name
+  pingcli pingone branding-settings apply --environment-id <env-id> --from-file branding-settings.json --company-name "Renamed Co"
 ```
 
 ## Options
@@ -26,6 +29,7 @@ pingcli pingone branding-settings apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--company-name string` | `` | The company name displayed in PingOne-hosted UIs |
 
 
 ## Inherited Options

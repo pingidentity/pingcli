@@ -12,11 +12,17 @@ pingcli pingone applications sop-assignments replace [flags]
 ## Examples
 
 ```
-# Update a sign-on policy assignment from a JSON file
+# Update a sign-on policy assignment from flags
+  pingcli pingone applications sop-assignments replace --environment-id <env-id> --application-id <app-id> --sop-assignment-id <assignment-id> --priority 1 --sign-on-policy-id <sop-id>
+
+  # Update a sign-on policy assignment from a JSON file
   pingcli pingone applications sop-assignments replace --environment-id <env-id> --application-id <app-id> --sop-assignment-id <assignment-id> --from-file assignment.json
 
   # Update a sign-on policy assignment from stdin
   pingcli pingone applications sop-assignments replace --environment-id <env-id> --application-id <app-id> --sop-assignment-id <assignment-id> --from-file - < assignment.json
+
+  # Update from a JSON file, overriding the priority from the file
+  pingcli pingone applications sop-assignments replace --environment-id <env-id> --application-id <app-id> --sop-assignment-id <assignment-id> --from-file assignment.json --priority 2
 ```
 
 ## Options
@@ -28,6 +34,8 @@ pingcli pingone applications sop-assignments replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-s, --sop-assignment-id string` | `` | The sign-on policy assignment ID |
+| `--priority int64` | `` | Priority of this sign-on policy assignment relative to other assignments on the application |
+| `--sign-on-policy-id string` | `` | UUID of the sign-on policy to assign |
 
 
 ## Inherited Options

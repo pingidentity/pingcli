@@ -17,6 +17,9 @@ pingcli pingone protect risk-predictors apply [flags]
 
   # Read body from stdin
   pingcli pingone protect risk-predictors apply --environment-id <env-id> --from-file - < risk-predictor.json
+
+  # Create or update from a JSON file, overriding the description
+  pingcli pingone protect risk-predictors apply --environment-id <env-id> --from-file risk-predictor.json --description "Updated"
 ```
 
 ## Options
@@ -27,6 +30,9 @@ pingcli pingone protect risk-predictors apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --risk-predictor-id string` | `` | The risk predictor ID |
+| `--compact-name string` | `` | The risk predictor compact name; immutable after creation, but must be supplied on both create and replace |
+| `--description string` | `` | The risk predictor description |
+| `--name string` | `` | The risk predictor name |
 
 
 ## Inherited Options

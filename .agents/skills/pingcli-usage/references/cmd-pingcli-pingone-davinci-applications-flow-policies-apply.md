@@ -28,6 +28,8 @@ pingcli pingone davinci applications flow-policies apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--flow-policy-id string` | `` | The DaVinci flow policy ID |
+| `--name string` | `` | The flow policy name |
+| `--status string` | `` | The flow policy status (enabled or disabled) |
 
 
 ## Inherited Options

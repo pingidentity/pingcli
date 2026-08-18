@@ -27,6 +27,13 @@ pingcli authorize decision-endpoints apply [flags]
 | `-d, --decision-endpoint-id string` | `` | The decision endpoint ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--alternate-id string` | `` | An alternate string identifier for the decision endpoint |
+| `--description string` | `` | The description of the decision endpoint |
+| `--name string` | `` | The name of the decision endpoint |
+| `--policy-id string` | `` | The UUID of the policy associated with this decision endpoint |
+| `--provenance string` | `` | A provenance string indicating the source or origin of the endpoint configuration |
+| `--recent-decisions-enabled` | `` | Whether recent decision history is enabled for this endpoint |
+| `--record-recent-requests` | `` | Whether to record recent requests to this endpoint |
 
 
 ## Inherited Options

@@ -12,7 +12,10 @@ pingcli pingone davinci flows replace [flags]
 ## Examples
 
 ```
-# Update a DaVinci flow from a JSON file (--environment-id and --flow-id are still required)
+# Update a DaVinci flow from flags
+  pingcli pingone davinci flows replace --environment-id <env-id> --flow-id <flow-id> --name "My Flow" --description "A sample flow"
+
+  # Update a DaVinci flow from a JSON file (--environment-id and --flow-id are still required)
   pingcli pingone davinci flows replace --environment-id <env-id> --flow-id <flow-id> --from-file flow.json
 
   # Update a DaVinci flow from stdin
@@ -26,7 +29,10 @@ pingcli pingone davinci flows replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--color string` | `` | The canvas background color for the flow |
+| `--description string` | `` | The flow description |
 | `--flow-id string` | `` | The DaVinci flow ID |
+| `--name string` | `` | The flow name |
 
 
 ## Inherited Options

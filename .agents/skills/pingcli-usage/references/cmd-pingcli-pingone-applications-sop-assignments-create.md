@@ -12,11 +12,17 @@ pingcli pingone applications sop-assignments create [flags]
 ## Examples
 
 ```
-# Create a new sign-on policy assignment from a JSON file
+# Create a new sign-on policy assignment from flags
+  pingcli pingone applications sop-assignments create --environment-id <env-id> --application-id <app-id> --priority 1 --sign-on-policy-id <sop-id>
+
+  # Create a new sign-on policy assignment from a JSON file
   pingcli pingone applications sop-assignments create --environment-id <env-id> --application-id <app-id> --from-file assignment.json
 
   # Create a new sign-on policy assignment from stdin
   pingcli pingone applications sop-assignments create --environment-id <env-id> --application-id <app-id> --from-file - < assignment.json
+
+  # Create from a JSON file, overriding the priority from the file
+  pingcli pingone applications sop-assignments create --environment-id <env-id> --application-id <app-id> --from-file assignment.json --priority 2
 ```
 
 ## Options
@@ -27,6 +33,8 @@ pingcli pingone applications sop-assignments create [flags]
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--priority int64` | `` | Priority of this sign-on policy assignment relative to other assignments on the application |
+| `--sign-on-policy-id string` | `` | UUID of the sign-on policy to assign |
 
 
 ## Inherited Options

@@ -12,7 +12,10 @@ pingcli davinci flows apply [flags]
 ## Examples
 
 ```
-# Create or update a DaVinci flow (body supplies name and optional flow definition)
+# Create or update a DaVinci flow from flags
+  pingcli davinci flows apply --environment-id <env-id> --name "My Flow" --description "A sample flow"
+
+  # Create or update a DaVinci flow (body supplies name and optional flow definition)
   pingcli davinci flows apply --environment-id <env-id> --from-file flow.json
 
   # Read body from stdin
@@ -26,7 +29,10 @@ pingcli davinci flows apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--color string` | `` | The canvas background color for the flow |
+| `--description string` | `` | The flow description |
 | `--flow-id string` | `` | The DaVinci flow ID |
+| `--name string` | `` | The flow name |
 
 
 ## Inherited Options

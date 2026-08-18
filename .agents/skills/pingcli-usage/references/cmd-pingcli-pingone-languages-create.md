@@ -17,6 +17,9 @@ pingcli pingone languages create [flags]
 
   # Create a new language from stdin
   pingcli pingone languages create --environment-id <env-id> --from-file - < language.json
+
+  # Create from a JSON file, overriding the enabled state
+  pingcli pingone languages create --environment-id <env-id> --from-file language.json --enabled=false
 ```
 
 ## Options
@@ -26,6 +29,10 @@ pingcli pingone languages create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--default` | `` | Whether this is the default language for the environment |
+| `--enabled` | `` | Whether this language is enabled in the environment |
+| `--locale string` | `` | The locale code for the language (e.g. en, fr, de) |
+| `--name string` | `` | The display name of the language |
 
 
 ## Inherited Options

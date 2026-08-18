@@ -17,6 +17,9 @@ pingcli pingfederate certificates ca create [flags]
 
   # Import a new trusted CA certificate from stdin
   pingcli pingfederate certificates ca create --from-file - < certificate.json
+
+  # Import using --id, and --from-file for fileData
+  pingcli pingfederate certificates ca create --id my-ca-cert --from-file certificate.json
 ```
 
 ## Options
@@ -25,6 +28,8 @@ pingcli pingfederate certificates ca create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--crypto-provider string` | `` | Cryptographic Provider name; only applicable if Hybrid HSM mode is enabled |
+| `--id string` | `` | The persistent, unique ID of the PingFederate trusted CA certificate |
 
 
 ## Inherited Options

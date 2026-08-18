@@ -17,6 +17,9 @@ pingcli pingone groups role-assignments create [flags]
 
   # Create a new group role assignment from stdin
   pingcli pingone groups role-assignments create --environment-id <env-id> --group-id <group-id> --from-file - < role-assignment.json
+
+  # Create from a JSON file, overriding the role and scope IDs from the file (scope.type must still come from the file)
+  pingcli pingone groups role-assignments create --environment-id <env-id> --group-id <group-id> --from-file role-assignment.json --role-id <role-id> --scope-id <scope-id>
 ```
 
 ## Options
@@ -27,6 +30,8 @@ pingcli pingone groups role-assignments create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-g, --group-id string` | `` | The group ID |
+| `--role-id string` | `` | ID of the role to assign |
+| `--scope-id string` | `` | ID of the assignment scope |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate captcha-providers replace [flags]
 
   # Update a CAPTCHA provider from stdin
   pingcli pingfederate captcha-providers replace --id <id> --from-file - < provider.json
+
+  # Update using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate captcha-providers replace --id <id> --name "My Provider" --plugin-descriptor-ref-id com.example.Plugin --from-file config.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate captcha-providers replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate CAPTCHA Provider ID |
+| `--name string` | `` | Display name of the CAPTCHA provider |
+| `--parent-ref-id string` | `` | ID of a parent CAPTCHA provider instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the CAPTCHA provider plugin type descriptor |
 
 
 ## Inherited Options

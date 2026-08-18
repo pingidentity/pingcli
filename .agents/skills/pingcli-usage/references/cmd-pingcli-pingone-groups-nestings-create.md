@@ -17,6 +17,9 @@ pingcli pingone groups nestings create [flags]
 
   # Create a new group nesting from stdin
   pingcli pingone groups nestings create --environment-id <env-id> --group-id <group-id> --from-file - < nesting.json
+
+  # Create a new group nesting from a JSON file, overriding the nested group ID
+  pingcli pingone groups nestings create --environment-id <env-id> --group-id <group-id> --from-file nesting.json --nested-group-id <nested-group-id>
 ```
 
 ## Options
@@ -27,6 +30,7 @@ pingcli pingone groups nestings create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-g, --group-id string` | `` | The group ID |
+| `-n, --nested-group-id string` | `` | The nested group ID |
 
 
 ## Inherited Options

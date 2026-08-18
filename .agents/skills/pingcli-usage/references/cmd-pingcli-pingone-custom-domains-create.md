@@ -17,6 +17,9 @@ pingcli pingone custom-domains create [flags]
 
   # Create from stdin
   pingcli pingone custom-domains create --environment-id <env-id> --from-file - < domain.json
+
+  # Create a custom domain from flags, without --from-file
+  pingcli pingone custom-domains create --environment-id <env-id> --domain-name auth.example.com
 ```
 
 ## Options
@@ -26,6 +29,7 @@ pingcli pingone custom-domains create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--domain-name string` | `` | The domain name to register |
 
 
 ## Inherited Options

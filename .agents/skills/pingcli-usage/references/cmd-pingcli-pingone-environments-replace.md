@@ -17,6 +17,9 @@ pingcli pingone environments replace [flags]
 
   # Update an environment from stdin
   pingcli pingone environments replace --environment-id <environment-uuid> --from-file - < env.json
+
+  # Update from a JSON file, overriding the name and description
+  pingcli pingone environments replace --environment-id <environment-uuid> --from-file env.json --name "Renamed" --description "Updated"
 ```
 
 ## Options
@@ -26,6 +29,11 @@ pingcli pingone environments replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The description of the environment |
+| `--icon string` | `` | The URL or identifier for the environment icon |
+| `--name string` | `` | The name of the environment |
+| `--region string` | `` | The geographic region code for the environment (e.g. NA, EU, CA, AP) |
+| `--type string` | `` | The environment type (SANDBOX or PRODUCTION) |
 
 
 ## Inherited Options

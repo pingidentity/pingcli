@@ -12,7 +12,10 @@ pingcli pingone davinci applications create [flags]
 ## Examples
 
 ```
-# Create a new DaVinci application from a JSON file
+# Create a new DaVinci application from flags
+  pingcli pingone davinci applications create --environment-id <env-id> --name "My Application"
+
+  # Create a new DaVinci application from a JSON file
   pingcli pingone davinci applications create --environment-id <env-id> --from-file application.json
 
   # Create a new DaVinci application from stdin
@@ -26,6 +29,7 @@ pingcli pingone davinci applications create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The DaVinci application name |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingone agreements create [flags]
 
   # Create a new agreement from stdin
   pingcli pingone agreements create --environment-id <env-id> --from-file - < agreement.json
+
+  # Create from a JSON file, overriding the name from the file
+  pingcli pingone agreements create --environment-id <env-id> --from-file agreement.json --name "Updated Terms"
 ```
 
 ## Options
@@ -26,6 +29,10 @@ pingcli pingone agreements create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | Description of the agreement |
+| `--enabled` | `` | Whether the agreement is active and presented to users |
+| `--name string` | `` | Display name of the agreement |
+| `--reconsent-period-days float64` | `` | Number of days after initial consent after which users must reconsent |
 
 
 ## Inherited Options
