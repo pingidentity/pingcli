@@ -17,6 +17,9 @@ pingcli pingfederate oauth client-registration-policies apply [flags]
 
   # Read body from stdin
   pingcli pingfederate oauth client-registration-policies apply --from-file - < policy.json
+
+  # Create or update from a JSON file, overriding the descriptor ref
+  pingcli pingfederate oauth client-registration-policies apply --from-file policy.json --plugin-descriptor-ref-id com.example.Plugin
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate oauth client-registration-policies apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate OAuth Client Registration Policy ID |
+| `--name string` | `` | Display name of the client registration policy |
+| `--parent-ref-id string` | `` | ID of a parent client registration policy instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the client registration policy plugin type descriptor |
 
 
 ## Inherited Options

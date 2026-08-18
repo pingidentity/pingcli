@@ -17,6 +17,9 @@ pingcli pingone users apply [flags]
 
   # Read body from stdin
   pingcli pingone users apply --environment-id <env-id> --from-file - < user.json
+
+  # Create or update a user from a JSON file, overriding fields with flags
+  pingcli pingone users apply --environment-id <env-id> --user-id <user-id> --from-file user.json --nickname "Jamie" --population-id <pop-id>
 ```
 
 ## Options
@@ -27,6 +30,18 @@ pingcli pingone users apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-u, --user-id string` | `` | The user ID |
+| `--email string` | `` | The email address of the user |
+| `--locale string` | `` | The locale tag for the user |
+| `--mfa-enabled` | `` | Whether MFA is enabled for the user (create only — not writable on update) |
+| `--mobile-phone string` | `` | The mobile phone number for the user |
+| `--nickname string` | `` | The nickname for the user |
+| `--population-id string` | `` | ID of the population to place the user in |
+| `--preferred-language string` | `` | The preferred language for the user |
+| `--primary-phone string` | `` | The primary phone number for the user |
+| `--timezone string` | `` | The timezone for the user |
+| `--title string` | `` | The title or honorific for the user |
+| `--type string` | `` | The user type classification |
+| `--username string` | `` | The username for the user account |
 
 
 ## Inherited Options

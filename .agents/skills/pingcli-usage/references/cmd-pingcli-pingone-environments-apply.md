@@ -17,6 +17,9 @@ pingcli pingone environments apply [flags]
 
   # Read body from stdin
   pingcli pingone environments apply --from-file - < env.json
+
+  # Create or update from a JSON file, overriding the description
+  pingcli pingone environments apply --from-file env.json --description "Updated"
 ```
 
 ## Options
@@ -26,6 +29,11 @@ pingcli pingone environments apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The description of the environment |
+| `--icon string` | `` | The URL or identifier for the environment icon |
+| `--name string` | `` | The name of the environment |
+| `--region string` | `` | The geographic region code for the environment (e.g. NA, EU, CA, AP) |
+| `--type string` | `` | The environment type (SANDBOX or PRODUCTION) |
 
 
 ## Inherited Options

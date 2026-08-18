@@ -17,6 +17,9 @@ pingcli pingfederate authentication-policies fragments replace [flags]
 
   # Update an authentication policy fragment from stdin
   pingcli pingfederate authentication-policies fragments replace --id <id> --from-file - < fragment.json
+
+  # Replace from a JSON file, overriding the name and description
+  pingcli pingfederate authentication-policies fragments replace --id <id> --from-file fragment.json --name "Renamed" --description "Updated"
 ```
 
 ## Options
@@ -25,7 +28,11 @@ pingcli pingfederate authentication-policies fragments replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The authentication policy fragment description |
 | `--id string` | `` | The PingFederate authentication policy fragment ID |
+| `--inputs-id string` | `` | ID of the resource link describing the fragment's input contract |
+| `--name string` | `` | The authentication policy fragment name |
+| `--outputs-id string` | `` | ID of the resource link describing the fragment's output contract |
 
 
 ## Inherited Options

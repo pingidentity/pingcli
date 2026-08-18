@@ -17,6 +17,9 @@ pingcli pingone identity-providers create [flags]
 
   # Create a new identity provider from stdin
   pingcli pingone identity-providers create --environment-id <env-id> --from-file - < identity-provider.json
+
+  # Create from a JSON file, overriding the name and enabled state
+  pingcli pingone identity-providers create --environment-id <env-id> --from-file identity-provider.json --name "Renamed" --enabled=false
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingone identity-providers create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The identity provider description |
+| `--enabled` | `` | Whether the identity provider is enabled |
+| `--name string` | `` | The identity provider name |
 
 
 ## Inherited Options

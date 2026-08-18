@@ -23,6 +23,9 @@ pingcli pingone protect risk-predictors replace [flags]
 
   # Replace a risk predictor from stdin
   pingcli pingone protect risk-predictors replace --environment-id <env-id> --risk-predictor-id <predictor-id> --from-file - < risk-predictor.json
+
+  # Replace from a JSON file, overriding the name and description (compactName still required from the file)
+  pingcli pingone protect risk-predictors replace --environment-id <env-id> --risk-predictor-id <predictor-id> --from-file risk-predictor.json --name "Renamed" --description "Updated"
 ```
 
 ## Options
@@ -33,6 +36,9 @@ pingcli pingone protect risk-predictors replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --risk-predictor-id string` | `` | The risk predictor ID |
+| `--compact-name string` | `` | The risk predictor compact name; immutable after creation, but must be supplied on both create and replace |
+| `--description string` | `` | The risk predictor description |
+| `--name string` | `` | The risk predictor name |
 
 
 ## Inherited Options

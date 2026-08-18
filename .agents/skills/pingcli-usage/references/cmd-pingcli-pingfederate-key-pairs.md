@@ -29,8 +29,11 @@ pingcli pingfederate key-pairs
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate key-pairs key-algorithms` | PingFederate Key Algorithms | [`cmd-pingcli-pingfederate-key-pairs-key-algorithms.md`](cmd-pingcli-pingfederate-key-pairs-key-algorithms.md) |
+| `pingcli pingfederate key-pairs oauth-openid-connect` | PingFederate OAuth/OpenID Connect keys settings | [`cmd-pingcli-pingfederate-key-pairs-oauth-openid-connect.md`](cmd-pingcli-pingfederate-key-pairs-oauth-openid-connect.md) |
 | `pingcli pingfederate key-pairs signing` | PingFederate Signing Key Pairs | [`cmd-pingcli-pingfederate-key-pairs-signing.md`](cmd-pingcli-pingfederate-key-pairs-signing.md) |
 | `pingcli pingfederate key-pairs ssl-client` | PingFederate SSL Client Key Pairs | [`cmd-pingcli-pingfederate-key-pairs-ssl-client.md`](cmd-pingcli-pingfederate-key-pairs-ssl-client.md) |
+| `pingcli pingfederate key-pairs ssl-server` | PingFederate SSL Server Key Pairs | [`cmd-pingcli-pingfederate-key-pairs-ssl-server.md`](cmd-pingcli-pingfederate-key-pairs-ssl-server.md) |
 
 ## Parent Command
 

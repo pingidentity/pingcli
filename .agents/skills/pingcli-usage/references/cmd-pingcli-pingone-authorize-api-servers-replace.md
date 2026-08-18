@@ -17,6 +17,9 @@ pingcli pingone authorize api-servers replace [flags]
 
   # Update an API server from stdin
   pingcli pingone authorize api-servers replace --environment-id <env-id> --api-server-id <api-server-id> --from-file - < api-server.json
+
+  # Update an API server from a JSON file, overriding name and base URLs with flags
+  pingcli pingone authorize api-servers replace --environment-id <env-id> --api-server-id <api-server-id> --from-file api-server.json --name "My API Server" --base-url https://api.example.com,https://api2.example.com
 ```
 
 ## Options
@@ -27,6 +30,8 @@ pingcli pingone authorize api-servers replace [flags]
 | `-a, --api-server-id string` | `` | The API server ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--base-url []string` | `` | The base URL(s) of the API server; repeatable or comma-separated |
+| `--name string` | `` | The name of the API server |
 
 
 ## Inherited Options

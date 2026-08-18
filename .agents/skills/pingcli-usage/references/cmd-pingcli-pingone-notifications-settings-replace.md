@@ -17,6 +17,9 @@ pingcli pingone notifications-settings replace [flags]
 
   # Update the notifications settings configuration from stdin
   pingcli pingone notifications-settings replace --environment-id <env-id> --from-file - < notifications-settings.json
+
+  # Update from a JSON file, overriding the SMS providers fallback chain
+  pingcli pingone notifications-settings replace --environment-id <env-id> --from-file notifications-settings.json --sms-providers-fallback-chain PINGONE_TWILIO
 ```
 
 ## Options
@@ -26,6 +29,7 @@ pingcli pingone notifications-settings replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--sms-providers-fallback-chain []string` | `` | Ordered list of phone delivery settings IDs or PINGONE_TWILIO; repeatable or comma-separated |
 
 
 ## Inherited Options

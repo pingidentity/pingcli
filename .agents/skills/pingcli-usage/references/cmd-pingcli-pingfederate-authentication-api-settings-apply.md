@@ -17,6 +17,9 @@ pingcli pingfederate authentication-api settings apply [flags]
 
   # Update authentication API settings from stdin
   pingcli pingfederate authentication-api settings apply --from-file - < settings.json
+
+  # Update authentication API settings from flags, without --from-file
+  pingcli pingfederate authentication-api settings apply --api-enabled --enable-api-descriptions
 ```
 
 ## Options
@@ -25,6 +28,11 @@ pingcli pingfederate authentication-api settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--api-enabled` | `` | Whether the authentication API is enabled (default false) |
+| `--default-application-ref-id string` | `` | ID of the default OAuth client/application used by the authentication API |
+| `--enable-api-descriptions` | `` | Enables the API Descriptions endpoint |
+| `--include-request-context` | `` | Includes request context parameters in the authentication API response (default false) |
+| `--restrict-access-to-redirectless-mode` | `` | Restricts authentication API redirectless-mode access to specified applications |
 
 
 ## Inherited Options

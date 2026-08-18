@@ -17,6 +17,9 @@ pingcli pingone admin-config apply [flags]
 
   # Update the administrator security configuration from stdin
   pingcli pingone admin-config apply --environment-id <env-id> --from-file - < admin-config.json
+
+  # Update from a JSON file, overriding the MFA status
+  pingcli pingone admin-config apply --environment-id <env-id> --from-file admin-config.json --mfa-status ENFORCE
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingone admin-config apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--authentication-method string` | `` | The authentication method required for administrator access |
+| `--mfa-status string` | `` | The MFA enforcement status for administrators |
+| `--recovery` | `` | Whether account recovery is enabled for administrators |
 
 
 ## Inherited Options

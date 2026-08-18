@@ -17,6 +17,9 @@ pingcli pingfederate oauth client-registration-policies replace [flags]
 
   # Update a client registration policy from stdin
   pingcli pingfederate oauth client-registration-policies replace --id <id> --from-file - < policy.json
+
+  # Replace from a JSON file, overriding the name
+  pingcli pingfederate oauth client-registration-policies replace --id <id> --from-file policy.json --name "Renamed"
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate oauth client-registration-policies replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate OAuth Client Registration Policy ID |
+| `--name string` | `` | Display name of the client registration policy |
+| `--parent-ref-id string` | `` | ID of a parent client registration policy instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the client registration policy plugin type descriptor |
 
 
 ## Inherited Options

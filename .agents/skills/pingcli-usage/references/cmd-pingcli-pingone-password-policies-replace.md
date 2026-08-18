@@ -15,6 +15,9 @@ pingcli pingone password-policies replace [flags]
 # Update a password policy from a JSON file (--environment-id and --password-policy-id are still required)
   pingcli pingone password-policies replace --environment-id <env-id> --password-policy-id <policy-id> --from-file password-policy.json
 
+  # Update a password policy from a JSON file, overriding the max age
+  pingcli pingone password-policies replace --environment-id <env-id> --password-policy-id <policy-id> --from-file password-policy.json --max-age-days 90
+
   # Update a password policy from stdin
   pingcli pingone password-policies replace --environment-id <env-id> --password-policy-id <policy-id> --from-file - < password-policy.json
 ```
@@ -27,6 +30,17 @@ pingcli pingone password-policies replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-p, --password-policy-id string` | `` | The password policy ID |
+| `--default` | `` | Whether this is the default password policy for the environment |
+| `--description string` | `` | The description of the password policy |
+| `--excludes-commonly-used` | `` | Whether commonly used passwords are rejected |
+| `--excludes-profile-data` | `` | Whether passwords that contain user profile data are rejected |
+| `--max-age-days int64` | `` | Maximum password age in days before a change is required |
+| `--max-repeated-characters int64` | `` | Maximum number of consecutive repeated characters allowed |
+| `--min-age-days int64` | `` | Minimum password age in days before a change is permitted |
+| `--min-complexity int64` | `` | Minimum complexity score required |
+| `--min-unique-characters int64` | `` | Minimum number of unique characters required |
+| `--name string` | `` | The name of the password policy |
+| `--not-similar-to-current` | `` | Whether the new password must differ sufficiently from the current password |
 
 
 ## Inherited Options

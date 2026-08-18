@@ -17,6 +17,9 @@ pingcli pingone notification-policies replace [flags]
 
   # Update a notification policy from stdin
   pingcli pingone notification-policies replace --environment-id <env-id> --notification-policy-id <policy-id> --from-file - < notification-policy.json
+
+  # Update from a JSON file, overriding the name and default state
+  pingcli pingone notification-policies replace --environment-id <env-id> --notification-policy-id <policy-id> --from-file notification-policy.json --name "Renamed" --default=true
 ```
 
 ## Options
@@ -27,6 +30,8 @@ pingcli pingone notification-policies replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-n, --notification-policy-id string` | `` | The notification policy ID |
+| `--default` | `` | Whether this is the default notification policy for the environment |
+| `--name string` | `` | The name of the notification policy |
 
 
 ## Inherited Options

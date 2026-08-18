@@ -12,7 +12,10 @@ pingcli pingone davinci applications apply [flags]
 ## Examples
 
 ```
-# Create or update a DaVinci application (body supplies name, and optionally apiKey and oauth settings)
+# Create or update a DaVinci application from flags
+  pingcli pingone davinci applications apply --environment-id <env-id> --name "My Application"
+
+  # Create or update a DaVinci application (body supplies name, and optionally apiKey and oauth settings)
   pingcli pingone davinci applications apply --environment-id <env-id> --from-file application.json
 
   # Read body from stdin
@@ -27,6 +30,7 @@ pingcli pingone davinci applications apply [flags]
 | `-a, --application-id string` | `` | The DaVinci application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The DaVinci application name |
 
 
 ## Inherited Options

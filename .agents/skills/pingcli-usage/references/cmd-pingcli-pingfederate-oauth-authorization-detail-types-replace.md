@@ -17,6 +17,9 @@ pingcli pingfederate oauth authorization-detail-types replace [flags]
 
   # Update an authorization detail type from stdin
   pingcli pingfederate oauth authorization-detail-types replace --id <id> --from-file - < authorization-detail-type.json
+
+  # Update from a JSON file, overriding the type and processor ref
+  pingcli pingfederate oauth authorization-detail-types replace --id <id> --from-file authorization-detail-type.json --type payment --authorization-detail-processor-ref-id proc1
 ```
 
 ## Options
@@ -25,7 +28,11 @@ pingcli pingfederate oauth authorization-detail-types replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--active` | `` | Whether the authorization detail type is active |
+| `--authorization-detail-processor-ref-id string` | `` | ID of the processor plugin instance that handles this type |
+| `--description string` | `` | Description of the authorization detail type |
 | `--id string` | `` | The PingFederate OAuth Authorization Detail Type ID |
+| `--type string` | `` | The authorization detail type value |
 
 
 ## Inherited Options

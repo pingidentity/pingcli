@@ -17,6 +17,9 @@ pingcli pingone populations create [flags]
 
   # Create a new population from stdin
   pingcli pingone populations create --environment-id <env-id> --from-file - < population.json
+
+  # Create a new population from flags, without --from-file
+  pingcli pingone populations create --environment-id <env-id> --name "My Population" --default true
 ```
 
 ## Options
@@ -26,6 +29,12 @@ pingcli pingone populations create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--alternative-identifier []string` | `` | Alternative identifiers for the population; repeatable or comma-separated |
+| `--default` | `` | Whether this is the default population for the environment |
+| `--description string` | `` | The description of the population |
+| `--name string` | `` | The name of the population |
+| `--password-policy-id string` | `` | ID of the password policy to associate with this population |
+| `--preferred-language string` | `` | The default preferred language for members of this population |
 
 
 ## Inherited Options

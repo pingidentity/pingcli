@@ -17,6 +17,9 @@ pingcli pingone agreements apply [flags]
 
   # Read body from stdin
   pingcli pingone agreements apply --environment-id <env-id> --from-file - < agreement.json
+
+  # Create or update from flags, without --from-file
+  pingcli pingone agreements apply --environment-id <env-id> --name "Terms of Service" --enabled=true
 ```
 
 ## Options
@@ -27,6 +30,10 @@ pingcli pingone agreements apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-i, --agreement-id string` | `` | The agreement ID |
+| `--description string` | `` | Description of the agreement |
+| `--enabled` | `` | Whether the agreement is active and presented to users |
+| `--name string` | `` | Display name of the agreement |
+| `--reconsent-period-days float64` | `` | Number of days after initial consent after which users must reconsent |
 
 
 ## Inherited Options

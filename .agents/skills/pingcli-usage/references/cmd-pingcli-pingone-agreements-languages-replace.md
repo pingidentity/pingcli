@@ -17,6 +17,9 @@ pingcli pingone agreements languages replace [flags]
 
   # Update an agreement language from stdin
   pingcli pingone agreements languages replace --environment-id <env-id> --agreement-id <agreement-id> --language-id <language-id> --from-file - < language.json
+
+  # Update from a JSON file, overriding the display name from the file
+  pingcli pingone agreements languages replace --environment-id <env-id> --agreement-id <agreement-id> --language-id <language-id> --from-file language.json --display-name "Updated Name"
 ```
 
 ## Options
@@ -28,6 +31,9 @@ pingcli pingone agreements languages replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-l, --language-id string` | `` | The agreement language ID |
+| `--display-name string` | `` | Display name of this language version of the agreement |
+| `--enabled` | `` | Whether this language version of the agreement is enabled |
+| `--locale string` | `` | BCP 47 locale code for this agreement language |
 
 
 ## Inherited Options

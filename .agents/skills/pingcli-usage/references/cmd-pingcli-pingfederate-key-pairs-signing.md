@@ -41,7 +41,7 @@ pingcli pingfederate key-pairs signing [flags]
 | `pingcli pingfederate key-pairs signing link` | Link a signing key pair private key and certificate (HSM only) | [`cmd-pingcli-pingfederate-key-pairs-signing-link.md`](cmd-pingcli-pingfederate-key-pairs-signing-link.md) |
 | `pingcli pingfederate key-pairs signing list` | List all signing key pairs | [`cmd-pingcli-pingfederate-key-pairs-signing-list.md`](cmd-pingcli-pingfederate-key-pairs-signing-list.md) |
 | `pingcli pingfederate key-pairs signing rotation-settings` | PingFederate signing key pair rotation settings | [`cmd-pingcli-pingfederate-key-pairs-signing-rotation-settings.md`](cmd-pingcli-pingfederate-key-pairs-signing-rotation-settings.md) |
-| `pingcli pingfederate key-pairs signing template` | Generate a signing key pair JSON template | [`cmd-pingcli-pingfederate-key-pairs-signing-template.md`](cmd-pingcli-pingfederate-key-pairs-signing-template.md) |
+| `pingcli pingfederate key-pairs signing template` | Generate a signing key pair create, import, import-csr-response, or link JSON template | [`cmd-pingcli-pingfederate-key-pairs-signing-template.md`](cmd-pingcli-pingfederate-key-pairs-signing-template.md) |
 
 ## Parent Command
 

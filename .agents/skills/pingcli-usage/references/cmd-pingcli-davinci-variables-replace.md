@@ -12,7 +12,10 @@ pingcli davinci variables replace [flags]
 ## Examples
 
 ```
-# Update a DaVinci variable from a JSON file (--environment-id and --variable-id are still required)
+# Update a DaVinci variable from flags
+  pingcli davinci variables replace --environment-id <env-id> --variable-id <var-id> --name myVar --context company --data-type string --mutable=true
+
+  # Update a DaVinci variable from a JSON file (--environment-id and --variable-id are still required)
   pingcli davinci variables replace --environment-id <env-id> --variable-id <var-id> --from-file variable.json
 
   # Update a DaVinci variable from stdin
@@ -27,6 +30,14 @@ pingcli davinci variables replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-v, --variable-id string` | `` | The variable ID |
+| `--context string` | `` | The variable context scope (company, flow, flowInstance, or user) |
+| `--data-type string` | `` | The variable data type (boolean, number, object, secret, or string) |
+| `--display-name string` | `` | The human-readable display name for the variable |
+| `--flow-id string` | `` | The DaVinci flow ID this variable is scoped to; applicable when --context is flow |
+| `--max string` | `` | The maximum value constraint for numeric variables |
+| `--min string` | `` | The minimum value constraint for numeric variables |
+| `--mutable` | `` | Whether the variable value can be changed at runtime |
+| `--name string` | `` | The variable name |
 
 
 ## Inherited Options

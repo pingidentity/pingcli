@@ -17,6 +17,9 @@ pingcli pingone languages status create [flags]
 
   # Create a new language localization status from stdin
   pingcli pingone languages status create --environment-id <env-id> --language-id <language-id> --from-file - < status.json
+
+  # Create from a JSON file, overriding the localization-complete state
+  pingcli pingone languages status create --environment-id <env-id> --language-id <language-id> --from-file status.json --localization-complete=false
 ```
 
 ## Options
@@ -27,6 +30,9 @@ pingcli pingone languages status create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-l, --language-id string` | `` | The language ID |
+| `--localization-complete` | `` | Whether localization for this service is complete |
+| `--service string` | `` | The PingOne service whose localization status is being recorded |
+| `--status-details string` | `` | Additional detail about the localization status |
 
 
 ## Inherited Options

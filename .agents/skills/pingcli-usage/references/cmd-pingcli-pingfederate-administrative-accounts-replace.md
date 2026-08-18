@@ -17,6 +17,9 @@ pingcli pingfederate administrative-accounts replace [flags]
 
   # Update an administrative account from stdin
   pingcli pingfederate administrative-accounts replace --username <username> --from-file - < account.json
+
+  # Update an administrative account, overriding scalar fields with flags
+  pingcli pingfederate administrative-accounts replace --username <username> --description "updated" --active --department Support --from-file account.json
 ```
 
 ## Options
@@ -26,6 +29,13 @@ pingcli pingfederate administrative-accounts replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-u, --username string` | `` | The PingFederate administrative account username |
+| `--active` | `` | Whether the account is active |
+| `--auditor` | `` | Whether the account is an auditor |
+| `--department string` | `` | Department name of the account user |
+| `--description string` | `` | Description of the account |
+| `--email-address string` | `` | Email address associated with the account |
+| `--phone-number string` | `` | Phone number associated with the account |
+| `--roles []string` | `` | Administrator roles; repeatable or comma-separated |
 
 
 ## Inherited Options

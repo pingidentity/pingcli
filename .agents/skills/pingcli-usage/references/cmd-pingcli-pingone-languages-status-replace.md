@@ -17,6 +17,9 @@ pingcli pingone languages status replace [flags]
 
   # Update a language localization status from stdin
   pingcli pingone languages status replace --environment-id <env-id> --language-id <language-id> --localization-status-id <status-id> --from-file - < status.json
+
+  # Update from a JSON file, overriding the localization-complete state
+  pingcli pingone languages status replace --environment-id <env-id> --language-id <language-id> --localization-status-id <status-id> --from-file status.json --localization-complete=false
 ```
 
 ## Options
@@ -28,6 +31,9 @@ pingcli pingone languages status replace [flags]
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-l, --language-id string` | `` | The language ID |
 | `-s, --localization-status-id string` | `` | The language localization status ID |
+| `--localization-complete` | `` | Whether localization for this service is complete |
+| `--service string` | `` | The PingOne service whose localization status is being recorded |
+| `--status-details string` | `` | Additional detail about the localization status |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingone groups apply [flags]
 
   # Read body from stdin
   pingcli pingone groups apply --environment-id <env-id> --from-file - < group.json
+
+  # Create or update a group from a JSON file, overriding fields with flags
+  pingcli pingone groups apply --environment-id <env-id> --group-id <group-id> --from-file group.json --display-name "Engineering"
 ```
 
 ## Options
@@ -27,6 +30,11 @@ pingcli pingone groups apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-g, --group-id string` | `` | The group ID |
+| `--description string` | `` | The description of the group |
+| `--display-name string` | `` | The human-friendly display name shown in the UI |
+| `--external-id string` | `` | An external identifier for the group in an upstream directory |
+| `--name string` | `` | The display name of the group |
+| `--user-filter string` | `` | SCIM filter expression for dynamic group membership |
 
 
 ## Inherited Options

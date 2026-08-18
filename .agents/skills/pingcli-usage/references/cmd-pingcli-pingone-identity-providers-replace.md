@@ -17,6 +17,9 @@ pingcli pingone identity-providers replace [flags]
 
   # Replace an identity provider from stdin
   pingcli pingone identity-providers replace --environment-id <env-id> --identity-provider-id <idp-id> --from-file - < identity-provider.json
+
+  # Replace from a JSON file, overriding the name and enabled state
+  pingcli pingone identity-providers replace --environment-id <env-id> --identity-provider-id <idp-id> --from-file identity-provider.json --name "Renamed" --enabled=false
 ```
 
 ## Options
@@ -27,6 +30,9 @@ pingcli pingone identity-providers replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-i, --identity-provider-id string` | `` | The identity provider ID |
+| `--description string` | `` | The identity provider description |
+| `--enabled` | `` | Whether the identity provider is enabled |
+| `--name string` | `` | The identity provider name |
 
 
 ## Inherited Options

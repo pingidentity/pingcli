@@ -12,11 +12,17 @@ pingcli pingone authorize application-roles create [flags]
 ## Examples
 
 ```
-# Create a new application role from a JSON file
+# Create a new application role from flags
+  pingcli pingone authorize application-roles create --environment-id <env-id> --name "My Role" --description "Handles resource X"
+
+  # Create a new application role from a JSON file
   pingcli pingone authorize application-roles create --environment-id <env-id> --from-file application-role.json
 
   # Create a new application role from stdin
   pingcli pingone authorize application-roles create --environment-id <env-id> --from-file - < application-role.json
+
+  # Create a new application role from flags, without --from-file
+  pingcli pingone authorize application-roles create --environment-id <env-id> --name "My Role" --description "Handles resource X"
 ```
 
 ## Options
@@ -26,6 +32,8 @@ pingcli pingone authorize application-roles create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The description of the application role |
+| `--name string` | `` | The name of the application role |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingone languages agreement-revisions create [flags]
 
   # Create a new agreement language revision from stdin
   pingcli pingone languages agreement-revisions create --environment-id <env-id> --agreement-id <agreement-id> --language-id <language-id> --from-file - < revision.json
+
+  # Create from a JSON file, overriding the effective date from the file
+  pingcli pingone languages agreement-revisions create --environment-id <env-id> --agreement-id <agreement-id> --language-id <language-id> --from-file revision.json --effective-at 2026-09-01T00:00:00Z
 ```
 
 ## Options
@@ -28,6 +31,9 @@ pingcli pingone languages agreement-revisions create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-l, --language-id string` | `` | The language ID |
+| `--content-type string` | `` | MIME type of the revision content |
+| `--effective-at timestamp` | `` | Date and time from which this revision becomes the active version of the agreement (RFC3339) |
+| `--require-reconsent` | `` | Whether users who previously consented must reconsent to this revision |
 
 
 ## Inherited Options

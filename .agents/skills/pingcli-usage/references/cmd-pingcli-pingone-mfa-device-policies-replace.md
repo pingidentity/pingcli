@@ -17,6 +17,10 @@ pingcli pingone mfa device-policies replace [flags]
 
   # Update an MFA device policy from stdin
   pingcli pingone mfa device-policies replace --environment-id <env-id> --mfa-device-policy-id <policy-id> --from-file - < mfa-device-policy.json
+
+  # Update an MFA device policy, overriding scalar fields with flags
+  # (the authentication method channel objects always come from the file - they cannot be set as flags)
+  pingcli pingone mfa device-policies replace --environment-id <env-id> --mfa-device-policy-id <policy-id> --name "Default Policy" --from-file mfa-device-policy.json
 ```
 
 ## Options
@@ -27,6 +31,10 @@ pingcli pingone mfa device-policies replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-m, --mfa-device-policy-id string` | `` | The MFA device policy ID |
+| `--default` | `` | Whether this policy is the environment default MFA device policy |
+| `--ignore-user-lock` | `` | Whether to bypass user lock-out enforcement during MFA |
+| `--name string` | `` | The MFA device policy name |
+| `--new-device-notification string` | `` | The notification sent to existing devices when a new device is paired |
 
 
 ## Inherited Options

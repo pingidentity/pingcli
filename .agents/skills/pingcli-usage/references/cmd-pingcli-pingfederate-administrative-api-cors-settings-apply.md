@@ -17,6 +17,9 @@ pingcli pingfederate administrative-api cors-settings apply [flags]
 
   # Update administrative API CORS settings from stdin
   pingcli pingfederate administrative-api cors-settings apply --from-file - < settings.json
+
+  # Update administrative API CORS settings from flags, without --from-file
+  pingcli pingfederate administrative-api cors-settings apply --enabled --allowed-origins-list https://example.com,https://example.org
 ```
 
 ## Options
@@ -25,6 +28,8 @@ pingcli pingfederate administrative-api cors-settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--allowed-origins-list []string` | `` | List of allowed CORS origins; repeatable or comma-separated |
+| `--enabled` | `` | Whether cross-origin resource sharing (CORS) is enabled for the Administrative API |
 
 
 ## Inherited Options

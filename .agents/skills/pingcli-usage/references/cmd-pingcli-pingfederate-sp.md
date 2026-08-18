@@ -30,7 +30,9 @@ pingcli pingfederate sp
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingfederate sp adapters` | PingFederate SP adapters | [`cmd-pingcli-pingfederate-sp-adapters.md`](cmd-pingcli-pingfederate-sp-adapters.md) |
+| `pingcli pingfederate sp default-urls` | PingFederate SP Default URLs | [`cmd-pingcli-pingfederate-sp-default-urls.md`](cmd-pingcli-pingfederate-sp-default-urls.md) |
 | `pingcli pingfederate sp idp-connections` | PingFederate SP IdP Connections | [`cmd-pingcli-pingfederate-sp-idp-connections.md`](cmd-pingcli-pingfederate-sp-idp-connections.md) |
+| `pingcli pingfederate sp target-url-mappings` | PingFederate SP Target URL Mappings | [`cmd-pingcli-pingfederate-sp-target-url-mappings.md`](cmd-pingcli-pingfederate-sp-target-url-mappings.md) |
 
 ## Parent Command
 

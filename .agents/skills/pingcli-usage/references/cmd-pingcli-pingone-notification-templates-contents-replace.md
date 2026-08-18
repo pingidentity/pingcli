@@ -17,6 +17,9 @@ pingcli pingone notification-templates contents replace [flags]
 
   # Replace a notification template content from stdin
   pingcli pingone notification-templates contents replace --environment-id <env-id> --template-name <template-name> --content-id <content-id> --from-file - < content.json
+
+  # Replace from a JSON file, overriding the locale and default state
+  pingcli pingone notification-templates contents replace --environment-id <env-id> --template-name <template-name> --content-id <content-id> --from-file content.json --locale fr --default=false
 ```
 
 ## Options
@@ -28,6 +31,9 @@ pingcli pingone notification-templates contents replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-t, --template-name string` | `` | The notification template name |
+| `--default` | `` | Specifies whether the template is a predefined default template |
+| `--locale string` | `` | The locale for this content variant |
+| `--variant string` | `` | Holds the unique user-defined name for each content variant that uses the same template + deliveryMethod + locale combination |
 
 
 ## Inherited Options

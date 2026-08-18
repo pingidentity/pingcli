@@ -12,7 +12,10 @@ pingcli pingone davinci applications flow-policies create [flags]
 ## Examples
 
 ```
-# Create a new DaVinci flow policy from a JSON file
+# Create a new DaVinci flow policy, overriding name via flags
+  pingcli pingone davinci applications flow-policies create --environment-id <env-id> --application-id <app-id> --name "My Policy" --from-file flow-policy.json
+
+  # Create a new DaVinci flow policy from a JSON file
   pingcli pingone davinci applications flow-policies create --environment-id <env-id> --application-id <app-id> --from-file flow-policy.json
 
   # Create a new DaVinci flow policy from stdin
@@ -27,6 +30,8 @@ pingcli pingone davinci applications flow-policies create [flags]
 | `-a, --application-id string` | `` | The DaVinci application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The flow policy name |
+| `--status string` | `` | The flow policy status (enabled or disabled) |
 
 
 ## Inherited Options

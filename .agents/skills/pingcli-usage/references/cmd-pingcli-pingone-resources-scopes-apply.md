@@ -17,6 +17,9 @@ pingcli pingone resources scopes apply [flags]
 
   # Read body from stdin
   pingcli pingone resources scopes apply --environment-id <env-id> --resource-id <resource-id> --from-file - < resource-scope.json
+
+  # Create or update from flags, without --from-file
+  pingcli pingone resources scopes apply --environment-id <env-id> --resource-id <resource-id> --name "My Scope" --description "Read access to profile data"
 ```
 
 ## Options
@@ -28,6 +31,10 @@ pingcli pingone resources scopes apply [flags]
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --resource-id string` | `` | The resource ID |
 | `-s, --resource-scope-id string` | `` | The resource scope ID |
+| `--description string` | `` | The description of the resource scope |
+| `--mapped-claims []string` | `` | Mapped claims for this scope; repeatable or comma-separated |
+| `--name string` | `` | The name of the resource scope |
+| `--schema-attributes []string` | `` | Schema attributes mapped to this scope; repeatable or comma-separated |
 
 
 ## Inherited Options

@@ -12,7 +12,10 @@ pingcli pingone davinci applications replace [flags]
 ## Examples
 
 ```
-# Update a DaVinci application from a JSON file (--environment-id and --application-id are still required)
+# Update a DaVinci application from flags
+  pingcli pingone davinci applications replace --environment-id <env-id> --application-id <app-id> --name "My Application"
+
+  # Update a DaVinci application from a JSON file (--environment-id and --application-id are still required)
   pingcli pingone davinci applications replace --environment-id <env-id> --application-id <app-id> --from-file application.json
 
   # Update a DaVinci application from stdin
@@ -27,6 +30,7 @@ pingcli pingone davinci applications replace [flags]
 | `-a, --application-id string` | `` | The DaVinci application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The DaVinci application name |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingone users application-role-assignments create [flags]
 
   # Create a new user application role assignment from stdin
   pingcli pingone users application-role-assignments create --environment-id <env-id> --user-id <user-id> --from-file - < application-role-assignment.json
+
+  # Create from a JSON file, overriding the role ID from the file
+  pingcli pingone users application-role-assignments create --environment-id <env-id> --user-id <user-id> --from-file application-role-assignment.json --application-role-id <role-id>
 ```
 
 ## Options
@@ -24,6 +27,7 @@ pingcli pingone users application-role-assignments create [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
+| `-a, --application-role-id string` | `` | UUID of the application role to assign to the user |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-u, --user-id string` | `` | The user ID |

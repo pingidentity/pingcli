@@ -12,7 +12,10 @@ pingcli pingone davinci flows create [flags]
 ## Examples
 
 ```
-# Create a new DaVinci flow from a JSON file
+# Create a new DaVinci flow from flags
+  pingcli pingone davinci flows create --environment-id <env-id> --name "My Flow" --description "A sample flow"
+
+  # Create a new DaVinci flow from a JSON file
   pingcli pingone davinci flows create --environment-id <env-id> --from-file flow.json
 
   # Create a new DaVinci flow from stdin
@@ -26,6 +29,9 @@ pingcli pingone davinci flows create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--color string` | `` | The canvas background color for the flow |
+| `--description string` | `` | The flow description |
+| `--name string` | `` | The flow name |
 
 
 ## Inherited Options

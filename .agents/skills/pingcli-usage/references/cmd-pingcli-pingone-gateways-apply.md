@@ -27,6 +27,9 @@ pingcli pingone gateways apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-g, --gateway-id string` | `` | The gateway ID |
+| `--description string` | `` | The gateway description |
+| `--enabled` | `` | Whether the gateway is enabled |
+| `--name string` | `` | The gateway name |
 
 
 ## Inherited Options

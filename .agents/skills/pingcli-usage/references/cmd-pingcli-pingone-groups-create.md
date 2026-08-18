@@ -17,6 +17,9 @@ pingcli pingone groups create [flags]
 
   # Create a new group from stdin
   pingcli pingone groups create --environment-id <env-id> --from-file - < group.json
+
+  # Create a new group from a JSON file, overriding fields with flags
+  pingcli pingone groups create --environment-id <env-id> --from-file group.json --display-name "Engineering"
 ```
 
 ## Options
@@ -26,6 +29,11 @@ pingcli pingone groups create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The description of the group |
+| `--display-name string` | `` | The human-friendly display name shown in the UI |
+| `--external-id string` | `` | An external identifier for the group in an upstream directory |
+| `--name string` | `` | The display name of the group |
+| `--user-filter string` | `` | SCIM filter expression for dynamic group membership |
 
 
 ## Inherited Options

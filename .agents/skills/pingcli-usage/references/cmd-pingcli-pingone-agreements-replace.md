@@ -17,6 +17,9 @@ pingcli pingone agreements replace [flags]
 
   # Update an agreement from stdin
   pingcli pingone agreements replace --environment-id <env-id> --agreement-id <agreement-id> --from-file - < agreement.json
+
+  # Update from a JSON file, overriding the name from the file
+  pingcli pingone agreements replace --environment-id <env-id> --agreement-id <agreement-id> --from-file agreement.json --name "Updated Terms"
 ```
 
 ## Options
@@ -27,6 +30,10 @@ pingcli pingone agreements replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-i, --agreement-id string` | `` | The agreement ID |
+| `--description string` | `` | Description of the agreement |
+| `--enabled` | `` | Whether the agreement is active and presented to users |
+| `--name string` | `` | Display name of the agreement |
+| `--reconsent-period-days float64` | `` | Number of days after initial consent after which users must reconsent |
 
 
 ## Inherited Options

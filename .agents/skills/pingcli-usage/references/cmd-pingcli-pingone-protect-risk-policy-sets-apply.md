@@ -3,7 +3,7 @@ Create or update a risk policy set
 
 ## Synopsis
 
-Idempotently create or update a risk policy set looked up by the "name" field within the supplied --environment-id. If no policy set with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
+Idempotently create or update a risk policy set looked up by the "name" field within the supplied --environment-id. The name comes from the --from-file JSON body, optionally overridden by --name. If no policy set with the given name exists it is created; if exactly one exists it is updated; if more than one exists the command fails.
 
 ```
 pingcli pingone protect risk-policy-sets apply [flags]
@@ -12,11 +12,14 @@ pingcli pingone protect risk-policy-sets apply [flags]
 ## Examples
 
 ```
-# Create or update a risk policy set (body must include name)
+# Create or update a risk policy set from a JSON file
   pingcli pingone protect risk-policy-sets apply --environment-id <env-id> --from-file risk-policy-set.json
 
   # Read body from stdin
   pingcli pingone protect risk-policy-sets apply --environment-id <env-id> --from-file - < risk-policy-set.json
+
+  # Create or update from a JSON file, overriding the default flag
+  pingcli pingone protect risk-policy-sets apply --environment-id <env-id> --from-file risk-policy-set.json --default=true
 ```
 
 ## Options
@@ -27,6 +30,9 @@ pingcli pingone protect risk-policy-sets apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --risk-policy-set-id string` | `` | The risk policy set ID |
+| `--default` | `` | Whether the risk policy set is the environment default |
+| `--description string` | `` | The risk policy set description |
+| `--name string` | `` | The risk policy set name |
 
 
 ## Inherited Options

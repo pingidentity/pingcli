@@ -40,7 +40,7 @@ pingcli pingfederate key-pairs ssl-client [flags]
 | `pingcli pingfederate key-pairs ssl-client import-csr-response` | Import an SSL client key pair CSR response | [`cmd-pingcli-pingfederate-key-pairs-ssl-client-import-csr-response.md`](cmd-pingcli-pingfederate-key-pairs-ssl-client-import-csr-response.md) |
 | `pingcli pingfederate key-pairs ssl-client link` | Link an SSL client key pair private key and certificate (HSM only) | [`cmd-pingcli-pingfederate-key-pairs-ssl-client-link.md`](cmd-pingcli-pingfederate-key-pairs-ssl-client-link.md) |
 | `pingcli pingfederate key-pairs ssl-client list` | List all SSL client key pairs | [`cmd-pingcli-pingfederate-key-pairs-ssl-client-list.md`](cmd-pingcli-pingfederate-key-pairs-ssl-client-list.md) |
-| `pingcli pingfederate key-pairs ssl-client template` | Generate an SSL client key pair JSON template | [`cmd-pingcli-pingfederate-key-pairs-ssl-client-template.md`](cmd-pingcli-pingfederate-key-pairs-ssl-client-template.md) |
+| `pingcli pingfederate key-pairs ssl-client template` | Generate an SSL client key pair create, import, import-csr-response, or link JSON template | [`cmd-pingcli-pingfederate-key-pairs-ssl-client-template.md`](cmd-pingcli-pingfederate-key-pairs-ssl-client-template.md) |
 
 ## Parent Command
 

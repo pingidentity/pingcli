@@ -27,6 +27,10 @@ pingcli pingone mfa device-policies apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-m, --mfa-device-policy-id string` | `` | The MFA device policy ID |
+| `--default` | `` | Whether this policy is the environment default MFA device policy |
+| `--ignore-user-lock` | `` | Whether to bypass user lock-out enforcement during MFA |
+| `--name string` | `` | The MFA device policy name |
+| `--new-device-notification string` | `` | The notification sent to existing devices when a new device is paired |
 
 
 ## Inherited Options

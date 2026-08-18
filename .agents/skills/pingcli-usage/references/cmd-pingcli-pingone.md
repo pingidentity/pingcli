@@ -58,6 +58,7 @@ pingcli pingone
 | `pingcli pingone images` | Images | [`cmd-pingcli-pingone-images.md`](cmd-pingcli-pingone-images.md) |
 | `pingcli pingone init` | Initialize Ping CLI for the PingOne management APIs. | [`cmd-pingcli-pingone-init.md`](cmd-pingcli-pingone-init.md) |
 | `pingcli pingone integrations` | Integrations | [`cmd-pingcli-pingone-integrations.md`](cmd-pingcli-pingone-integrations.md) |
+| `pingcli pingone keys` | Keys | [`cmd-pingcli-pingone-keys.md`](cmd-pingcli-pingone-keys.md) |
 | `pingcli pingone languages` | Languages | [`cmd-pingcli-pingone-languages.md`](cmd-pingcli-pingone-languages.md) |
 | `pingcli pingone licenses` | PingOne Licenses | [`cmd-pingcli-pingone-licenses.md`](cmd-pingcli-pingone-licenses.md) |
 | `pingcli pingone mfa` | Administration tools for the PingOne MFA universal service. | [`cmd-pingcli-pingone-mfa.md`](cmd-pingcli-pingone-mfa.md) |

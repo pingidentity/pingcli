@@ -17,6 +17,11 @@ pingcli pingone mfa fido2-policies create [flags]
 
   # Create a new FIDO2 policy from stdin
   pingcli pingone mfa fido2-policies create --environment-id <env-id> --from-file - < fido2-policy.json
+
+  # Create a new FIDO2 policy, overriding scalar fields with flags
+  # ("backupEligibility", "mdsAuthenticatorsRequirements", "userDisplayNameAttributes",
+  # and "userVerification" always come from the file - they cannot be set as flags)
+  pingcli pingone mfa fido2-policies create --environment-id <env-id> --name "Default FIDO2 Policy" --relying-party-id example.com --from-file fido2-policy.json
 ```
 
 ## Options
@@ -26,6 +31,15 @@ pingcli pingone mfa fido2-policies create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--attestation-requirements string` | `` | The level of attestation required from authenticators |
+| `--authenticator-attachment string` | `` | The allowed authenticator attachment modality |
+| `--default` | `` | Whether this policy should serve as the environment default FIDO2 policy |
+| `--description string` | `` | The description of the FIDO2 policy |
+| `--device-display-name string` | `` | The name to display for the device in registration and authentication windows |
+| `--discoverable-credentials string` | `` | The server-side discoverable credential preference |
+| `--name string` | `` | The name to use for the FIDO2 policy |
+| `--public-key-credential-hint []string` | `` | Ordered hints for preferred public-key credential types; repeatable or comma-separated |
+| `--relying-party-id string` | `` | The ID of the relying party, typically a domain name |
 
 
 ## Inherited Options

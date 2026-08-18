@@ -17,6 +17,9 @@ pingcli pingone custom-admin-roles replace [flags]
 
   # Update a custom admin role from stdin
   pingcli pingone custom-admin-roles replace --environment-id <env-id> --custom-admin-role-id <role-id> --from-file - < custom_admin_role.json
+
+  # Update from a JSON file, overriding the name and description from the file
+  pingcli pingone custom-admin-roles replace --environment-id <env-id> --custom-admin-role-id <role-id> --from-file custom_admin_role.json --name "My Custom Role" --description "Updated description"
 ```
 
 ## Options
@@ -27,6 +30,9 @@ pingcli pingone custom-admin-roles replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-i, --custom-admin-role-id string` | `` | The custom admin role ID |
+| `--applicable-to []string` | `` | The scope types to which the role can be applied; repeatable or comma-separated |
+| `--description string` | `` | The description of the custom admin role |
+| `--name string` | `` | The name of the custom admin role |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingone users population apply [flags]
 
   # Update the user population from stdin
   pingcli pingone users population apply --environment-id <env-id> --user-id <user-id> --from-file - < population.json
+
+  # Update the user population from a flag, without --from-file
+  pingcli pingone users population apply --environment-id <env-id> --user-id <user-id> --population-id <pop-id>
 ```
 
 ## Options
@@ -27,6 +30,7 @@ pingcli pingone users population apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-u, --user-id string` | `` | The user ID |
+| `--population-id string` | `` | ID of the population to assign the user to |
 
 
 ## Inherited Options

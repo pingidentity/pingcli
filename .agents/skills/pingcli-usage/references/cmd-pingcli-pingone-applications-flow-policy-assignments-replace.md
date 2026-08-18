@@ -12,11 +12,17 @@ pingcli pingone applications flow-policy-assignments replace [flags]
 ## Examples
 
 ```
-# Update a flow policy assignment from a JSON file
+# Update a flow policy assignment from flags
+  pingcli pingone applications flow-policy-assignments replace --environment-id <env-id> --application-id <app-id> --flow-policy-assignment-id <assignment-id> --priority 1 --flow-policy-id <flow-policy-id>
+
+  # Update a flow policy assignment from a JSON file
   pingcli pingone applications flow-policy-assignments replace --environment-id <env-id> --application-id <app-id> --flow-policy-assignment-id <assignment-id> --from-file assignment.json
 
   # Update a flow policy assignment from stdin
   pingcli pingone applications flow-policy-assignments replace --environment-id <env-id> --application-id <app-id> --flow-policy-assignment-id <assignment-id> --from-file - < assignment.json
+
+  # Update from a JSON file, overriding the priority from the file
+  pingcli pingone applications flow-policy-assignments replace --environment-id <env-id> --application-id <app-id> --flow-policy-assignment-id <assignment-id> --from-file assignment.json --priority 2
 ```
 
 ## Options
@@ -28,6 +34,8 @@ pingcli pingone applications flow-policy-assignments replace [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--flow-policy-assignment-id string` | `` | The flow policy assignment ID |
+| `--flow-policy-id string` | `` | ID of the DaVinci flow policy to assign |
+| `--priority int64` | `` | Priority order for this flow policy assignment; lower values execute first |
 
 
 ## Inherited Options

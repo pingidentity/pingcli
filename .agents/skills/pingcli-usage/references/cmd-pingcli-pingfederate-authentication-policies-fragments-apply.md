@@ -17,6 +17,9 @@ pingcli pingfederate authentication-policies fragments apply [flags]
 
   # Read body from stdin
   pingcli pingfederate authentication-policies fragments apply --from-file - < fragment.json
+
+  # Create or update from a JSON file, overriding the description
+  pingcli pingfederate authentication-policies fragments apply --from-file fragment.json --description "Updated"
 ```
 
 ## Options
@@ -25,7 +28,11 @@ pingcli pingfederate authentication-policies fragments apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The authentication policy fragment description |
 | `--id string` | `` | The PingFederate authentication policy fragment ID |
+| `--inputs-id string` | `` | ID of the resource link describing the fragment's input contract |
+| `--name string` | `` | The authentication policy fragment name |
+| `--outputs-id string` | `` | ID of the resource link describing the fragment's output contract |
 
 
 ## Inherited Options

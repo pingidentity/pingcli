@@ -12,11 +12,17 @@ pingcli pingone authorize permissions apply [flags]
 ## Examples
 
 ```
-# Create or update an application resource permission (body supplies action and optional description)
+# Create or update an application resource permission from flags
+  pingcli pingone authorize permissions apply --environment-id <env-id> --application-resource-id <app-resource-id> --action read --description "Read access"
+
+  # Create or update an application resource permission (body supplies action and optional description)
   pingcli pingone authorize permissions apply --environment-id <env-id> --application-resource-id <app-resource-id> --from-file permission.json
 
   # Read body from stdin
   pingcli pingone authorize permissions apply --environment-id <env-id> --application-resource-id <app-resource-id> --from-file - < permission.json
+
+  # Create or update from flags, without --from-file
+  pingcli pingone authorize permissions apply --environment-id <env-id> --application-resource-id <app-resource-id> --action read --description "Read access"
 ```
 
 ## Options
@@ -27,7 +33,9 @@ pingcli pingone authorize permissions apply [flags]
 | `-a, --application-resource-id string` | `` | The parent application resource ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--action string` | `` | The action string identifying this permission (e.g. read, write, execute) |
 | `--application-resource-permission-id string` | `` | The application resource permission ID |
+| `--description string` | `` | The description of the application resource permission |
 
 
 ## Inherited Options
