@@ -17,6 +17,9 @@ pingcli pingfederate token-processor-to-token-generator-mappings replace [flags]
 
   # Update a token processor to token generator mapping from stdin
   pingcli pingfederate token-processor-to-token-generator-mappings replace --id <id> --from-file - < token-processor-to-token-generator-mapping.json
+
+  # Update using --from-file for the attribute contract fulfillment, overriding the source and target
+  pingcli pingfederate token-processor-to-token-generator-mappings replace --id <id> --from-file token-processor-to-token-generator-mapping.json --source-id <processor-id> --target-id <generator-id>
 ```
 
 ## Options
@@ -25,7 +28,11 @@ pingcli pingfederate token-processor-to-token-generator-mappings replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--default-target-resource string` | `` | The default target URL for this token processor to token generator mapping configuration |
 | `--id string` | `` | The ID of the token processor to token generator mapping |
+| `--license-connection-group-assignment string` | `` | The license connection group |
+| `--source-id string` | `` | The ID of the Token Processor |
+| `--target-id string` | `` | The ID of the Token Generator |
 
 
 ## Inherited Options

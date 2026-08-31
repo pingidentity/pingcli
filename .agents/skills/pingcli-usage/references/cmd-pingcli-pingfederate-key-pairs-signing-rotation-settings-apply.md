@@ -12,11 +12,14 @@ pingcli pingfederate key-pairs signing rotation-settings apply [flags]
 ## Examples
 
 ```
-# Update rotation settings for a signing key pair from a JSON file
+# Update rotation settings from a JSON file
   pingcli pingfederate key-pairs signing rotation-settings apply --signing-key-pair-id <id> --from-file rotation-settings.json
 
   # Update rotation settings from stdin
   pingcli pingfederate key-pairs signing rotation-settings apply --signing-key-pair-id <id> --from-file - < rotation-settings.json
+
+  # Update rotation settings from flags, without --from-file
+  pingcli pingfederate key-pairs signing rotation-settings apply --signing-key-pair-id <id> --creation-buffer-days 5 --activation-buffer-days 2 --valid-days 365 --key-algorithm RSA --key-size 2048 --signature-algorithm SHA256withRSA
 ```
 
 ## Options
@@ -25,7 +28,13 @@ pingcli pingfederate key-pairs signing rotation-settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--activation-buffer-days int64` | `` | Buffer days before key pair expiration for activation of the new key pair |
+| `--creation-buffer-days int64` | `` | Buffer days before key pair expiration for creation of a new key pair |
+| `--key-algorithm string` | `` | Key algorithm for the new key pair |
+| `--key-size int64` | `` | Key size in bits for the new key pair |
+| `--signature-algorithm string` | `` | Signature algorithm for the new key pair |
 | `--signing-key-pair-id string` | `` | The persistent, unique ID of the parent PingFederate signing key pair |
+| `--valid-days int64` | `` | Valid days for the new key pair |
 
 
 ## Inherited Options

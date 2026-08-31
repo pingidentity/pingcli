@@ -30,6 +30,9 @@ pingcli pingfederate oauth auth-server-settings scopes
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingfederate oauth auth-server-settings scopes common` | PingFederate OAuth common scopes | [`cmd-pingcli-pingfederate-oauth-auth-server-settings-scopes-common.md`](cmd-pingcli-pingfederate-oauth-auth-server-settings-scopes-common.md) |
+| `pingcli pingfederate oauth auth-server-settings scopes common-scope-groups` | PingFederate OAuth common scope groups | [`cmd-pingcli-pingfederate-oauth-auth-server-settings-scopes-common-scope-groups.md`](cmd-pingcli-pingfederate-oauth-auth-server-settings-scopes-common-scope-groups.md) |
+| `pingcli pingfederate oauth auth-server-settings scopes exclusive` | PingFederate OAuth exclusive scopes | [`cmd-pingcli-pingfederate-oauth-auth-server-settings-scopes-exclusive.md`](cmd-pingcli-pingfederate-oauth-auth-server-settings-scopes-exclusive.md) |
+| `pingcli pingfederate oauth auth-server-settings scopes exclusive-scope-groups` | PingFederate OAuth exclusive scope groups | [`cmd-pingcli-pingfederate-oauth-auth-server-settings-scopes-exclusive-scope-groups.md`](cmd-pingcli-pingfederate-oauth-auth-server-settings-scopes-exclusive-scope-groups.md) |
 
 ## Parent Command
 

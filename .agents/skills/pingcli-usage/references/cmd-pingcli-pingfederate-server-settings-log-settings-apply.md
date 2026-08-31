@@ -17,6 +17,9 @@ pingcli pingfederate server-settings log-settings apply [flags]
 
   # Update log settings from stdin
   pingcli pingfederate server-settings log-settings apply --from-file - < settings.json
+
+  # Update log settings from flags, without --from-file
+  pingcli pingfederate server-settings log-settings apply --verbose-logging-lifetime 60
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate server-settings log-settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--verbose-logging-lifetime int64` | `` | Minutes verbose logging stays enabled for log categories |
 
 
 ## Inherited Options

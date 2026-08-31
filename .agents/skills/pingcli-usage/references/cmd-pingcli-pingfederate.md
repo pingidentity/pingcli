@@ -54,13 +54,20 @@ pingcli pingfederate
 | `pingcli pingfederate extended-properties` | PingFederate Extended Properties | [`cmd-pingcli-pingfederate-extended-properties.md`](cmd-pingcli-pingfederate-extended-properties.md) |
 | `pingcli pingfederate identity-store-provisioners` | PingFederate Identity Store Provisioners | [`cmd-pingcli-pingfederate-identity-store-provisioners.md`](cmd-pingcli-pingfederate-identity-store-provisioners.md) |
 | `pingcli pingfederate idp` | Manage PingFederate IdP resources | [`cmd-pingcli-pingfederate-idp.md`](cmd-pingcli-pingfederate-idp.md) |
+| `pingcli pingfederate incoming-proxy-settings` | PingFederate incoming proxy settings | [`cmd-pingcli-pingfederate-incoming-proxy-settings.md`](cmd-pingcli-pingfederate-incoming-proxy-settings.md) |
 | `pingcli pingfederate init` | Initialize Ping CLI for the PingFederate management APIs. | [`cmd-pingcli-pingfederate-init.md`](cmd-pingcli-pingfederate-init.md) |
+| `pingcli pingfederate kerberos` | Manage PingFederate Kerberos resources | [`cmd-pingcli-pingfederate-kerberos.md`](cmd-pingcli-pingfederate-kerberos.md) |
 | `pingcli pingfederate key-pairs` | Manage PingFederate Key Pairs resources | [`cmd-pingcli-pingfederate-key-pairs.md`](cmd-pingcli-pingfederate-key-pairs.md) |
+| `pingcli pingfederate license` | PingFederate license | [`cmd-pingcli-pingfederate-license.md`](cmd-pingcli-pingfederate-license.md) |
 | `pingcli pingfederate local-identity` | Manage PingFederate Local Identity resources | [`cmd-pingcli-pingfederate-local-identity.md`](cmd-pingcli-pingfederate-local-identity.md) |
+| `pingcli pingfederate metadata-urls` | PingFederate metadata URLs | [`cmd-pingcli-pingfederate-metadata-urls.md`](cmd-pingcli-pingfederate-metadata-urls.md) |
+| `pingcli pingfederate notification-publishers` | PingFederate notification publishers | [`cmd-pingcli-pingfederate-notification-publishers.md`](cmd-pingcli-pingfederate-notification-publishers.md) |
 | `pingcli pingfederate oauth` | Manage PingFederate OAuth resources | [`cmd-pingcli-pingfederate-oauth.md`](cmd-pingcli-pingfederate-oauth.md) |
 | `pingcli pingfederate password-credential-validators` | PingFederate Password Credential Validators | [`cmd-pingcli-pingfederate-password-credential-validators.md`](cmd-pingcli-pingfederate-password-credential-validators.md) |
 | `pingcli pingfederate ping-one-connections` | PingFederate PingOne connections | [`cmd-pingcli-pingfederate-ping-one-connections.md`](cmd-pingcli-pingfederate-ping-one-connections.md) |
+| `pingcli pingfederate pingone-for-enterprise` | Manage the PingFederate connection to PingOne for Enterprise | [`cmd-pingcli-pingfederate-pingone-for-enterprise.md`](cmd-pingcli-pingfederate-pingone-for-enterprise.md) |
 | `pingcli pingfederate protocol-metadata` | Manage PingFederate Protocol Metadata resources | [`cmd-pingcli-pingfederate-protocol-metadata.md`](cmd-pingcli-pingfederate-protocol-metadata.md) |
+| `pingcli pingfederate redirect-validation` | PingFederate Redirect Validation Settings | [`cmd-pingcli-pingfederate-redirect-validation.md`](cmd-pingcli-pingfederate-redirect-validation.md) |
 | `pingcli pingfederate secret-managers` | PingFederate Secret Managers | [`cmd-pingcli-pingfederate-secret-managers.md`](cmd-pingcli-pingfederate-secret-managers.md) |
 | `pingcli pingfederate server-settings` | PingFederate Server Settings | [`cmd-pingcli-pingfederate-server-settings.md`](cmd-pingcli-pingfederate-server-settings.md) |
 | `pingcli pingfederate session` | Manage PingFederate Session resources | [`cmd-pingcli-pingfederate-session.md`](cmd-pingcli-pingfederate-session.md) |

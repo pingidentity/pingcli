@@ -13,7 +13,7 @@ pingcli pingfederate oauth auth-server-settings scopes common delete [flags]
 
 ```
 # Delete an OAuth common scope
-  pingcli pingfederate oauth auth-server-settings scopes common delete --id <id>
+  pingcli pingfederate oauth auth-server-settings scopes common delete --name <name>
 ```
 
 ## Options
@@ -21,7 +21,7 @@ pingcli pingfederate oauth auth-server-settings scopes common delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The OAuth common scope name |
+| `--name string` | `` | The OAuth common scope name |
 
 
 ## Inherited Options

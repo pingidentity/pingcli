@@ -35,6 +35,7 @@ pingcli pingfederate oauth
 | `pingcli pingfederate oauth authentication-policy-contract-mappings` | PingFederate OAuth Authentication Policy Contract Mappings | [`cmd-pingcli-pingfederate-oauth-authentication-policy-contract-mappings.md`](cmd-pingcli-pingfederate-oauth-authentication-policy-contract-mappings.md) |
 | `pingcli pingfederate oauth authorization-detail-processors` | PingFederate OAuth authorization detail processors | [`cmd-pingcli-pingfederate-oauth-authorization-detail-processors.md`](cmd-pingcli-pingfederate-oauth-authorization-detail-processors.md) |
 | `pingcli pingfederate oauth authorization-detail-types` | PingFederate OAuth Authorization Detail Types | [`cmd-pingcli-pingfederate-oauth-authorization-detail-types.md`](cmd-pingcli-pingfederate-oauth-authorization-detail-types.md) |
+| `pingcli pingfederate oauth ciba-server-policy` | Manage PingFederate OAuth CIBA Server Policy resources | [`cmd-pingcli-pingfederate-oauth-ciba-server-policy.md`](cmd-pingcli-pingfederate-oauth-ciba-server-policy.md) |
 | `pingcli pingfederate oauth client-registration-policies` | PingFederate OAuth Client Registration Policies | [`cmd-pingcli-pingfederate-oauth-client-registration-policies.md`](cmd-pingcli-pingfederate-oauth-client-registration-policies.md) |
 | `pingcli pingfederate oauth client-settings` | PingFederate OAuth Client Settings | [`cmd-pingcli-pingfederate-oauth-client-settings.md`](cmd-pingcli-pingfederate-oauth-client-settings.md) |
 | `pingcli pingfederate oauth clients` | PingFederate OAuth Clients | [`cmd-pingcli-pingfederate-oauth-clients.md`](cmd-pingcli-pingfederate-oauth-clients.md) |
@@ -43,6 +44,8 @@ pingcli pingfederate oauth
 | `pingcli pingfederate oauth oidc` | Manage PingFederate OAuth/OpenID Connect resources | [`cmd-pingcli-pingfederate-oauth-oidc.md`](cmd-pingcli-pingfederate-oauth-oidc.md) |
 | `pingcli pingfederate oauth out-of-band-auth-plugins` | PingFederate OAuth out-of-band authenticator plugin instances | [`cmd-pingcli-pingfederate-oauth-out-of-band-auth-plugins.md`](cmd-pingcli-pingfederate-oauth-out-of-band-auth-plugins.md) |
 | `pingcli pingfederate oauth processor-policy-mappings` | PingFederate OAuth processor policy mappings | [`cmd-pingcli-pingfederate-oauth-processor-policy-mappings.md`](cmd-pingcli-pingfederate-oauth-processor-policy-mappings.md) |
+| `pingcli pingfederate oauth resource-owner-credentials-mappings` | PingFederate OAuth Resource Owner Credentials Mappings | [`cmd-pingcli-pingfederate-oauth-resource-owner-credentials-mappings.md`](cmd-pingcli-pingfederate-oauth-resource-owner-credentials-mappings.md) |
+| `pingcli pingfederate oauth token-exchange` | Manage PingFederate OAuth Token Exchange resources | [`cmd-pingcli-pingfederate-oauth-token-exchange.md`](cmd-pingcli-pingfederate-oauth-token-exchange.md) |
 
 ## Parent Command
 

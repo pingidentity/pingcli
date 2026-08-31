@@ -17,6 +17,9 @@ pingcli pingfederate sp idp-connections create [flags]
 
   # Create a new IdP connection from stdin
   pingcli pingfederate sp idp-connections create --from-file - < idp-connection.json
+
+  # Create using flags for identity fields and --from-file for full configuration
+  pingcli pingfederate sp idp-connections create --entity-id https://idp.example.com --name "My IdP Connection" --active --from-file config.json
 ```
 
 ## Options
@@ -25,6 +28,16 @@ pingcli pingfederate sp idp-connections create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--active` | `` | Whether the connection is active |
+| `--base-url string` | `` | The partner federation deployment base URL |
+| `--default-virtual-entity-id string` | `` | The default alternate entity ID for this connection |
+| `--entity-id string` | `` | The partner entity ID or issuer value |
+| `--error-page-msg-id string` | `` | The identifier for the user-facing error page message |
+| `--license-connection-group string` | `` | The license connection group assigned to this connection |
+| `--logging-mode string` | `` | The transaction logging level for this connection |
+| `--name string` | `` | The connection display name |
+| `--type string` | `` | The connection type |
+| `--virtual-entity-ids []string` | `` | Alternate entity IDs for this connection; repeat or separate values with commas |
 
 
 ## Inherited Options

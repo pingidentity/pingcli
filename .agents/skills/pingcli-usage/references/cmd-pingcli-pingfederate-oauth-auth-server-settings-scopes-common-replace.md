@@ -12,11 +12,14 @@ pingcli pingfederate oauth auth-server-settings scopes common replace [flags]
 ## Examples
 
 ```
-# Update an OAuth common scope from a JSON file (--id is still required)
-  pingcli pingfederate oauth auth-server-settings scopes common replace --id <id> --from-file common-scope.json
+# Update an OAuth common scope from a JSON file (--name is still required)
+  pingcli pingfederate oauth auth-server-settings scopes common replace --name <name> --from-file common-scope.json
 
   # Update an OAuth common scope from stdin
-  pingcli pingfederate oauth auth-server-settings scopes common replace --id <id> --from-file - < common-scope.json
+  pingcli pingfederate oauth auth-server-settings scopes common replace --name <name> --from-file - < common-scope.json
+
+  # Update an OAuth common scope using flags only (no --from-file)
+  pingcli pingfederate oauth auth-server-settings scopes common replace --name <name> --description "Updated scope" --dynamic=false
 ```
 
 ## Options
@@ -25,7 +28,9 @@ pingcli pingfederate oauth auth-server-settings scopes common replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The OAuth common scope name |
+| `--description string` | `` | The OAuth common scope description |
+| `--dynamic` | `` | Whether the OAuth common scope is dynamic |
+| `--name string` | `` | The OAuth common scope name |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate oauth auth-server-settings scopes common create [flags]
 
   # Create a new OAuth common scope from stdin
   pingcli pingfederate oauth auth-server-settings scopes common create --from-file - < common-scope.json
+
+  # Create a new OAuth common scope using flags only (no --from-file)
+  pingcli pingfederate oauth auth-server-settings scopes common create --name myScope --description "Example scope" --dynamic=false
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate oauth auth-server-settings scopes common create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | The OAuth common scope description |
+| `--dynamic` | `` | Whether the OAuth common scope is dynamic |
+| `--name string` | `` | The OAuth common scope name |
 
 
 ## Inherited Options

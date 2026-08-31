@@ -17,6 +17,10 @@ pingcli pingfederate data-stores create [flags]
 
   # Create a new data store from stdin
   pingcli pingfederate data-stores create --from-file - < data-store.json
+
+  # Create a new data store, masking attribute values in the log (--from-file
+  # is still required for the type-specific body fields)
+  pingcli pingfederate data-stores create --from-file data-store.json --mask-attribute-values
 ```
 
 ## Options
@@ -25,6 +29,7 @@ pingcli pingfederate data-stores create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--mask-attribute-values` | `` | Whether attribute values should be masked in the log |
 
 
 ## Inherited Options

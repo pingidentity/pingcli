@@ -19,7 +19,7 @@ pingcli pingone notification-policies create [flags]
   pingcli pingone notification-policies create --environment-id <env-id> --from-file - < notification-policy.json
 
   # Create from a JSON file, overriding the name and default state
-  pingcli pingone notification-policies create --environment-id <env-id> --from-file notification-policy.json --name "Renamed" --default=true
+  pingcli pingone notification-policies create --environment-id <env-id> --from-file notification-policy.json --name "Example" --default=true
 ```
 
 ## Options

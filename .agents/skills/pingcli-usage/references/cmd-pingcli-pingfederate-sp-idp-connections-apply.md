@@ -17,6 +17,9 @@ pingcli pingfederate sp idp-connections apply [flags]
 
   # Read body from stdin
   pingcli pingfederate sp idp-connections apply --from-file - < idp-connection.json
+
+  # Create or update using flags to override fields in the JSON body
+  pingcli pingfederate sp idp-connections apply --entity-id https://idp.example.com --active --from-file config.json
 ```
 
 ## Options
@@ -25,7 +28,17 @@ pingcli pingfederate sp idp-connections apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--active` | `` | Whether the connection is active |
+| `--base-url string` | `` | The partner federation deployment base URL |
+| `--default-virtual-entity-id string` | `` | The default alternate entity ID for this connection |
+| `--entity-id string` | `` | The partner entity ID or issuer value |
+| `--error-page-msg-id string` | `` | The identifier for the user-facing error page message |
 | `--id string` | `` | The PingFederate SP IdP connection ID |
+| `--license-connection-group string` | `` | The license connection group assigned to this connection |
+| `--logging-mode string` | `` | The transaction logging level for this connection |
+| `--name string` | `` | The connection display name |
+| `--type string` | `` | The connection type |
+| `--virtual-entity-ids []string` | `` | Alternate entity IDs for this connection; repeat or separate values with commas |
 
 
 ## Inherited Options

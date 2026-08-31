@@ -17,6 +17,9 @@ pingcli pingfederate key-pairs oauth-openid-connect replace [flags]
 
   # Update OAuth/OpenID Connect keys settings from stdin
   pingcli pingfederate key-pairs oauth-openid-connect replace --from-file - < settings.json
+
+  # Update OAuth/OpenID Connect keys settings using flags only (no --from-file needed)
+  pingcli pingfederate key-pairs oauth-openid-connect replace --static-jwks-enabled=false
 ```
 
 ## Options
@@ -25,6 +28,48 @@ pingcli pingfederate key-pairs oauth-openid-connect replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--p256-active-cert-ref-id string` | `` | ID of the active P-256 certificate |
+| `--p256-active-key-id string` | `` | ID of the active P-256 key |
+| `--p256-decryption-active-cert-ref-id string` | `` | ID of the active P-256 decryption certificate |
+| `--p256-decryption-active-key-id string` | `` | ID of the active P-256 decryption key |
+| `--p256-decryption-previous-cert-ref-id string` | `` | ID of the previous P-256 decryption certificate |
+| `--p256-decryption-previous-key-id string` | `` | ID of the previous P-256 decryption key |
+| `--p256-decryption-publish-x5c-parameter` | `` | Whether to publish the P-256 decryption certificate chain |
+| `--p256-previous-cert-ref-id string` | `` | ID of the previous P-256 certificate |
+| `--p256-previous-key-id string` | `` | ID of the previous P-256 key |
+| `--p256-publish-x5c-parameter` | `` | Whether to publish the P-256 certificate chain |
+| `--p384-active-cert-ref-id string` | `` | ID of the active P-384 certificate |
+| `--p384-active-key-id string` | `` | ID of the active P-384 key |
+| `--p384-decryption-active-cert-ref-id string` | `` | ID of the active P-384 decryption certificate |
+| `--p384-decryption-active-key-id string` | `` | ID of the active P-384 decryption key |
+| `--p384-decryption-previous-cert-ref-id string` | `` | ID of the previous P-384 decryption certificate |
+| `--p384-decryption-previous-key-id string` | `` | ID of the previous P-384 decryption key |
+| `--p384-decryption-publish-x5c-parameter` | `` | Whether to publish the P-384 decryption certificate chain |
+| `--p384-previous-cert-ref-id string` | `` | ID of the previous P-384 certificate |
+| `--p384-previous-key-id string` | `` | ID of the previous P-384 key |
+| `--p384-publish-x5c-parameter` | `` | Whether to publish the P-384 certificate chain |
+| `--p521-active-cert-ref-id string` | `` | ID of the active P-521 certificate |
+| `--p521-active-key-id string` | `` | ID of the active P-521 key |
+| `--p521-decryption-active-cert-ref-id string` | `` | ID of the active P-521 decryption certificate |
+| `--p521-decryption-active-key-id string` | `` | ID of the active P-521 decryption key |
+| `--p521-decryption-previous-cert-ref-id string` | `` | ID of the previous P-521 decryption certificate |
+| `--p521-decryption-previous-key-id string` | `` | ID of the previous P-521 decryption key |
+| `--p521-decryption-publish-x5c-parameter` | `` | Whether to publish the P-521 decryption certificate chain |
+| `--p521-previous-cert-ref-id string` | `` | ID of the previous P-521 certificate |
+| `--p521-previous-key-id string` | `` | ID of the previous P-521 key |
+| `--p521-publish-x5c-parameter` | `` | Whether to publish the P-521 certificate chain |
+| `--publish-dynamic-key-x5cs` | `` | Whether to publish dynamic key certificate chains |
+| `--rsa-active-cert-ref-id string` | `` | ID of the active RSA certificate |
+| `--rsa-active-key-id string` | `` | ID of the active RSA key |
+| `--rsa-decryption-active-cert-ref-id string` | `` | ID of the active RSA decryption certificate |
+| `--rsa-decryption-active-key-id string` | `` | ID of the active RSA decryption key |
+| `--rsa-decryption-previous-cert-ref-id string` | `` | ID of the previous RSA decryption certificate |
+| `--rsa-decryption-previous-key-id string` | `` | ID of the previous RSA decryption key |
+| `--rsa-decryption-publish-x5c-parameter` | `` | Whether to publish the RSA decryption certificate chain |
+| `--rsa-previous-cert-ref-id string` | `` | ID of the previous RSA certificate |
+| `--rsa-previous-key-id string` | `` | ID of the previous RSA key |
+| `--rsa-publish-x5c-parameter` | `` | Whether to publish the RSA certificate chain |
+| `--static-jwks-enabled` | `` | Whether static keys are enabled |
 
 
 ## Inherited Options

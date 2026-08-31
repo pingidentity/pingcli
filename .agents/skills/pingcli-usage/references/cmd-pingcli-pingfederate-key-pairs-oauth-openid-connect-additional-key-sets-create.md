@@ -17,6 +17,9 @@ pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets create [
 
   # Create a new OAuth/OpenID Connect additional key set from stdin
   pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets create --from-file - < key-set.json
+
+  # Create from a file while overriding the optional description
+  pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets create --from-file key-set.json --description "Signing keys for production"
 ```
 
 ## Options
@@ -25,6 +28,8 @@ pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets create [
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | Description of the OAuth/OpenID Connect additional key set |
+| `--name string` | `` | Name of the OAuth/OpenID Connect additional key set |
 
 
 ## Inherited Options

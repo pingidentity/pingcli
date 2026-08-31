@@ -17,6 +17,9 @@ pingcli pingfederate key-pairs ssl-server settings replace [flags]
 
   # Update SSL server settings from stdin
   pingcli pingfederate key-pairs ssl-server settings replace --from-file - < settings.json
+
+  # Update from a JSON file, overriding the runtime server and admin console certificate references
+  pingcli pingfederate key-pairs ssl-server settings replace --from-file settings.json --runtime-server-cert-ref-id <id> --admin-console-cert-ref-id <id>
 ```
 
 ## Options
@@ -25,6 +28,8 @@ pingcli pingfederate key-pairs ssl-server settings replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--admin-console-cert-ref-id string` | `` | ID of the administrative console SSL certificate key pair |
+| `--runtime-server-cert-ref-id string` | `` | ID of the runtime server SSL certificate key pair |
 
 
 ## Inherited Options

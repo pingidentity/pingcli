@@ -13,7 +13,7 @@ pingcli pingfederate oauth auth-server-settings scopes common get [flags]
 
 ```
 # Read a specific OAuth common scope
-  pingcli pingfederate oauth auth-server-settings scopes common get --id <id>
+  pingcli pingfederate oauth auth-server-settings scopes common get --name <name>
 ```
 
 ## Options
@@ -21,7 +21,7 @@ pingcli pingfederate oauth auth-server-settings scopes common get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The OAuth common scope name |
+| `--name string` | `` | The OAuth common scope name |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate authentication-policy-contracts replace [flags]
 
   # Update an authentication policy contract from stdin
   pingcli pingfederate authentication-policy-contracts replace --id <id> --from-file - < contract.json
+
+  # Replace from a JSON file, overriding the name
+  pingcli pingfederate authentication-policy-contracts replace --id <id> --from-file contract.json --name "Renamed"
 ```
 
 ## Options
@@ -26,6 +29,7 @@ pingcli pingfederate authentication-policy-contracts replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate authentication policy contract ID |
+| `--name string` | `` | The authentication policy contract name |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate oauth authentication-policy-contract-mappings create [flags
 
   # Create a new authentication policy contract mapping from stdin
   pingcli pingfederate oauth authentication-policy-contract-mappings create --from-file - < apc-mapping.json
+
+  # Create from a JSON file, overriding optional body fields with flags
+  pingcli pingfederate oauth authentication-policy-contract-mappings create --from-file apc-mapping.json --authentication-policy-contract-ref-id <apc-id>
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate oauth authentication-policy-contract-mappings create [flags
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--authentication-policy-contract-ref-id string` | `` | ID of the authentication policy contract referenced by this mapping |
 
 
 ## Inherited Options

@@ -17,6 +17,12 @@ pingcli pingfederate oauth issuers create [flags]
 
   # Create a new OAuth virtual issuer from stdin
   pingcli pingfederate oauth issuers create --from-file - < issuer.json
+
+  # Create a new OAuth virtual issuer from flags, without --from-file
+  pingcli pingfederate oauth issuers create --name "My Issuer" --host issuer.example.com
+
+  # Create using flags for common fields, and --from-file for the rest
+  pingcli pingfederate oauth issuers create --name "My Issuer" --host issuer.example.com --from-file issuer.json
 ```
 
 ## Options
@@ -25,6 +31,10 @@ pingcli pingfederate oauth issuers create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | Description of the virtual issuer |
+| `--host string` | `` | Hostname of the virtual issuer |
+| `--name string` | `` | Unique display name for the virtual issuer |
+| `--path string` | `` | Path of the virtual issuer |
 
 
 ## Inherited Options

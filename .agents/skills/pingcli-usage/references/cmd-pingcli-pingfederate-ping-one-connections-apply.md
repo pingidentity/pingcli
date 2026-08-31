@@ -17,6 +17,9 @@ pingcli pingfederate ping-one-connections apply [flags]
 
   # Read body from stdin
   pingcli pingfederate ping-one-connections apply --from-file - < ping-one-connection.json
+
+  # Create or update from a JSON file, overriding the description and active state
+  pingcli pingfederate ping-one-connections apply --from-file ping-one-connection.json --description "Updated description" --active=false
 ```
 
 ## Options
@@ -25,7 +28,10 @@ pingcli pingfederate ping-one-connections apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--active` | `` | Whether the PingOne connection is active |
+| `--description string` | `` | A description for the PingOne connection |
 | `--id string` | `` | The ID of the PingOne connection |
+| `--name string` | `` | The name of the PingOne connection |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate secret-managers replace [flags]
 
   # Update a secret manager from stdin
   pingcli pingfederate secret-managers replace --id <id> --from-file - < secret-manager.json
+
+  # Update from a JSON file, overriding the name
+  pingcli pingfederate secret-managers replace --id <id> --from-file secret-manager.json --name "My Secret Manager"
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate secret-managers replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate Secret Manager ID |
+| `--name string` | `` | Secret manager instance name |
+| `--parent-ref-id string` | `` | ID of a parent secret manager instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the secret manager plugin type descriptor |
 
 
 ## Inherited Options

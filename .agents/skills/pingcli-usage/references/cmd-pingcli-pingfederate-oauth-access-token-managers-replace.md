@@ -17,6 +17,9 @@ pingcli pingfederate oauth access-token-managers replace [flags]
 
   # Update an access token manager from stdin
   pingcli pingfederate oauth access-token-managers replace --id <id> --from-file - < access-token-manager.json
+
+  # Update using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate oauth access-token-managers replace --id <id> --name "My ATM" --plugin-descriptor-ref-id com.example.Plugin --from-file config.json
 ```
 
 ## Options
@@ -26,6 +29,10 @@ pingcli pingfederate oauth access-token-managers replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate access token manager instance ID |
+| `--name string` | `` | Display name of the access token manager |
+| `--parent-ref-id string` | `` | ID of a parent access token manager instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the access token manager plugin type descriptor |
+| `--sequence-number int64` | `` | Number added to an access token to identify which access token manager issued the token |
 
 
 ## Inherited Options

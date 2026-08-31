@@ -17,6 +17,9 @@ pingcli pingfederate sp idp-connections signing-settings replace [flags]
 
   # Replace the signing settings from stdin
   pingcli pingfederate sp idp-connections signing-settings replace --connection-id <connection-id> --from-file - < signing-settings.json
+
+  # Replace the signing settings with a signing key pair
+  pingcli pingfederate sp idp-connections signing-settings replace --connection-id <connection-id> --signing-key-pair-ref-id <key-pair-id>
 ```
 
 ## Options
@@ -25,7 +28,11 @@ pingcli pingfederate sp idp-connections signing-settings replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--algorithm string` | `` | The algorithm used to sign messages |
 | `--connection-id string` | `` | The ID of the parent PingFederate SP IdP connection |
+| `--include-cert-in-signature` | `` | Whether to include the signing certificate in the signature |
+| `--include-raw-key-in-signature` | `` | Whether to include the raw public key in the signature |
+| `--signing-key-pair-ref-id string` | `` | The ID of the key pair used to sign messages |
 
 
 ## Inherited Options

@@ -19,7 +19,7 @@ pingcli pingone identity-providers create [flags]
   pingcli pingone identity-providers create --environment-id <env-id> --from-file - < identity-provider.json
 
   # Create from a JSON file, overriding the name and enabled state
-  pingcli pingone identity-providers create --environment-id <env-id> --from-file identity-provider.json --name "Renamed" --enabled=false
+  pingcli pingone identity-providers create --environment-id <env-id> --from-file identity-provider.json --name "Example" --enabled=false
 ```
 
 ## Options

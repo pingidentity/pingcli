@@ -3,7 +3,7 @@ Create or update an authentication policy contract mapping
 
 ## Synopsis
 
-Idempotently create or update a PingFederate OAuth authentication policy contract mapping looked up by the "id" field in the JSON body. If no mapping with the given id exists it is created; if it exists it is updated.
+Idempotently create or update a PingFederate OAuth authentication policy contract mapping looked up by "authenticationPolicyContractRef.id" in the JSON body.
 
 ```
 pingcli pingfederate oauth authentication-policy-contract-mappings apply [flags]
@@ -12,11 +12,14 @@ pingcli pingfederate oauth authentication-policy-contract-mappings apply [flags]
 ## Examples
 
 ```
-# Create or update an authentication policy contract mapping (body supplies id and other fields)
+# Create or update an authentication policy contract mapping (body supplies the contract reference)
   pingcli pingfederate oauth authentication-policy-contract-mappings apply --from-file apc-mapping.json
 
   # Read body from stdin
   pingcli pingfederate oauth authentication-policy-contract-mappings apply --from-file - < apc-mapping.json
+
+  # Create or update using optional body-field flags (the body supplies required nested fields)
+  pingcli pingfederate oauth authentication-policy-contract-mappings apply --from-file apc-mapping.json --authentication-policy-contract-ref-id <apc-id>
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate oauth authentication-policy-contract-mappings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--authentication-policy-contract-ref-id string` | `` | ID of the authentication policy contract referenced by this mapping |
 | `--id string` | `` | The ID of the authentication policy contract to persistent grant mapping |
 
 

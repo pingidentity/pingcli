@@ -17,6 +17,9 @@ pingcli pingfederate config-store-settings apply [flags]
 
   # Read body from stdin
   pingcli pingfederate config-store-settings apply --bundle <bundle> --id <id> --from-file - < config-store-setting.json
+
+  # Create or update a STRING-typed setting from flags, without --from-file
+  pingcli pingfederate config-store-settings apply --bundle <bundle> --id <id> --type STRING --string-value <value>
 ```
 
 ## Options
@@ -27,6 +30,9 @@ pingcli pingfederate config-store-settings apply [flags]
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--bundle string` | `` | The PingFederate configuration store bundle name |
 | `--id string` | `` | The PingFederate configuration store setting ID |
+| `--list-value []string` | `` | The setting's values when type is LIST; repeatable or comma-separated |
+| `--string-value string` | `` | The setting's value when type is STRING |
+| `--type string` | `` | The type of the setting's value |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate server-settings audit-log-settings apply [flags]
 
   # Update audit log settings from stdin
   pingcli pingfederate server-settings audit-log-settings apply --from-file - < audit-log-settings.json
+
+  # Update audit log settings from flags, without --from-file
+  pingcli pingfederate server-settings audit-log-settings apply --failure-mode BLOCK --threshold 80 --interval 300
 ```
 
 ## Options
@@ -25,6 +28,12 @@ pingcli pingfederate server-settings audit-log-settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--emails-to-notify []string` | `` | Email addresses notified when the audit logging failure threshold is hit; repeatable or comma-separated |
+| `--failure-mode string` | `` | What happens to transactions when the failure threshold is hit |
+| `--interval int64` | `` | Interval in seconds over which the failure rate is calculated |
+| `--notification-publisher-id string` | `` | ID of the notification publisher used for audit log notifications |
+| `--threshold int64` | `` | Percent of failed auditing attempts within the interval that triggers a failure state |
+| `--track-audit-log-failures` | `` | Whether PingFederate tracks audit log failures to enable failure notifications |
 
 
 ## Inherited Options

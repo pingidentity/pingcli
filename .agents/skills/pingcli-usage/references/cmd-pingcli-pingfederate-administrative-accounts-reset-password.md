@@ -3,7 +3,7 @@ Reset a PingFederate administrative account password
 
 ## Synopsis
 
-Reset the password for a PingFederate administrative account
+Reset the password for a PingFederate administrative account. Supply the new password via --new-password, --from-file (decoded as a UserCredentials JSON body; only "newPassword" is read), or both — --new-password overrides the file's value. At least one must effectively supply a non-empty new password.
 
 ```
 pingcli pingfederate administrative-accounts reset-password [flags]
@@ -14,6 +14,9 @@ pingcli pingfederate administrative-accounts reset-password [flags]
 ```
 # Reset password for an administrative account
   pingcli pingfederate administrative-accounts reset-password --username <username> --new-password <new-password>
+
+  # Reset password for an administrative account from a JSON file
+  pingcli pingfederate administrative-accounts reset-password --username <username> --from-file password.json
 ```
 
 ## Options
@@ -21,6 +24,7 @@ pingcli pingfederate administrative-accounts reset-password [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for reset-password |
+| `-f, --from-file string` | `` | Path to a JSON file containing a UserCredentials body (the "newPassword" key is used; "currentPassword" is ignored) for the reset-password request, or "-" to read from stdin. --new-password overrides the file's newPassword if both are supplied. |
 | `-u, --username string` | `` | The PingFederate administrative account username |
 | `--new-password string` | `` | The new password for the PingFederate administrative account |
 

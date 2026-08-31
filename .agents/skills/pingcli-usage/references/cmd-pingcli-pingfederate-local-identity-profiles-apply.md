@@ -15,6 +15,9 @@ pingcli pingfederate local-identity profiles apply [flags]
 # Create or update a local identity profile (body supplies name and other fields)
   pingcli pingfederate local-identity profiles apply --from-file profile.json
 
+  # Override profile body values with flags
+  pingcli pingfederate local-identity profiles apply --from-file profile.json --apc-id <apc-id> --registration-enabled=false --profile-enabled=true
+
   # Read body from stdin
   pingcli pingfederate local-identity profiles apply --from-file - < profile.json
 ```
@@ -25,7 +28,11 @@ pingcli pingfederate local-identity profiles apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--apc-id string` | `` | The authentication policy contract ID |
 | `--id string` | `` | The PingFederate Local Identity Profile ID |
+| `--name string` | `` | The local identity profile name |
+| `--profile-enabled` | `` | Whether the local identity profile is enabled |
+| `--registration-enabled` | `` | Whether registration is enabled |
 
 
 ## Inherited Options

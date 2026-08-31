@@ -29,6 +29,8 @@ pingcli pingfederate session
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate session application-session-policy` | PingFederate Application Session Policy | [`cmd-pingcli-pingfederate-session-application-session-policy.md`](cmd-pingcli-pingfederate-session-application-session-policy.md) |
+| `pingcli pingfederate session authentication-session-policies` | PingFederate authentication session policies | [`cmd-pingcli-pingfederate-session-authentication-session-policies.md`](cmd-pingcli-pingfederate-session-authentication-session-policies.md) |
 | `pingcli pingfederate session quotas` | PingFederate Session Quotas | [`cmd-pingcli-pingfederate-session-quotas.md`](cmd-pingcli-pingfederate-session-quotas.md) |
 | `pingcli pingfederate session settings` | PingFederate Session Settings | [`cmd-pingcli-pingfederate-session-settings.md`](cmd-pingcli-pingfederate-session-settings.md) |
 

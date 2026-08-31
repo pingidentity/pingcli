@@ -17,6 +17,9 @@ pingcli pingfederate oauth oidc policies replace [flags]
 
   # Update an OAuth/OpenID Connect policy from stdin
   pingcli pingfederate oauth oidc policies replace --id <id> --from-file - < policy.json
+
+  # Update from a JSON file, overriding the ID token lifetime
+  pingcli pingfederate oauth oidc policies replace --id <id> --from-file policy.json --id-token-lifetime 10
 ```
 
 ## Options
@@ -25,7 +28,19 @@ pingcli pingfederate oauth oidc policies replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--access-token-manager-id string` | `` | ID of the access token manager associated with this policy |
+| `--allow-id-token-introspection` | `` | Allow the introspection endpoint to validate an ID token |
 | `--id string` | `` | The PingFederate OAuth/OpenID Connect Policy ID |
+| `--id-token-lifetime int64` | `` | ID Token lifetime, in minutes |
+| `--id-token-typ-header-value string` | `` | ID Token Type (typ) header value |
+| `--include-shash-in-id-token` | `` | Include the State Hash in the ID token |
+| `--include-sri-in-id-token` | `` | Include a Session Reference Identifier in the ID token |
+| `--include-user-info-in-id-token` | `` | Always include User Info in the ID token |
+| `--include-x5t-in-id-token` | `` | Include the X.509 thumbprint header in the ID token |
+| `--name string` | `` | Display name for the OIDC policy |
+| `--reissue-id-token-in-hybrid-flow` | `` | Return a new ID Token during hybrid-flow token requests |
+| `--return-id-token-on-refresh-grant` | `` | Return an ID Token when the refresh grant is requested |
+| `--return-id-token-on-token-exchange-grant` | `` | Return an ID Token when token exchange is requested |
 
 
 ## Inherited Options

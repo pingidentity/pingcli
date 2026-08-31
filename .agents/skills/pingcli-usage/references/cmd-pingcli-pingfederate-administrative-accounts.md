@@ -30,6 +30,7 @@ pingcli pingfederate administrative-accounts [flags]
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingfederate administrative-accounts apply` | Create or update an administrative account | [`cmd-pingcli-pingfederate-administrative-accounts-apply.md`](cmd-pingcli-pingfederate-administrative-accounts-apply.md) |
+| `pingcli pingfederate administrative-accounts change-password` | Change the currently-authenticated administrative account's password | [`cmd-pingcli-pingfederate-administrative-accounts-change-password.md`](cmd-pingcli-pingfederate-administrative-accounts-change-password.md) |
 | `pingcli pingfederate administrative-accounts create` | Create a new administrative account | [`cmd-pingcli-pingfederate-administrative-accounts-create.md`](cmd-pingcli-pingfederate-administrative-accounts-create.md) |
 | `pingcli pingfederate administrative-accounts delete` | Delete an administrative account | [`cmd-pingcli-pingfederate-administrative-accounts-delete.md`](cmd-pingcli-pingfederate-administrative-accounts-delete.md) |
 | `pingcli pingfederate administrative-accounts get` | Read a specific administrative account | [`cmd-pingcli-pingfederate-administrative-accounts-get.md`](cmd-pingcli-pingfederate-administrative-accounts-get.md) |

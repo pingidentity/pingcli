@@ -17,6 +17,9 @@ pingcli pingfederate idp adapters replace [flags]
 
   # Update an IDP adapter from stdin
   pingcli pingfederate idp adapters replace --id <id> --from-file - < idp-adapter.json
+
+  # Update using flags for identity fields and --from-file for full configuration
+  pingcli pingfederate idp adapters replace --id <id> --name "My IDP Adapter" --authn-ctx-class-ref <authn-ctx-class-ref> --from-file config.json
 ```
 
 ## Options
@@ -25,7 +28,9 @@ pingcli pingfederate idp adapters replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--authn-ctx-class-ref string` | `` | The fixed value indicating how the user was authenticated |
 | `--id string` | `` | The PingFederate IDP Adapter ID |
+| `--name string` | `` | The plugin instance name for the IDP adapter |
 
 
 ## Inherited Options

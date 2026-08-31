@@ -17,6 +17,9 @@ pingcli pingfederate password-credential-validators apply [flags]
 
   # Read body from stdin
   pingcli pingfederate password-credential-validators apply --from-file - < validator.json
+
+  # Create or update from a JSON file, overriding the parent reference
+  pingcli pingfederate password-credential-validators apply --from-file validator.json --parent-ref-id my-parent-validator
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate password-credential-validators apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate Password Credential Validator ID |
+| `--name string` | `` | Plugin instance display name |
+| `--parent-ref-id string` | `` | ID of a parent password credential validator instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the password credential validator plugin type descriptor |
 
 
 ## Inherited Options

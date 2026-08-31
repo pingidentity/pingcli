@@ -17,6 +17,9 @@ pingcli pingfederate session quotas replace [flags]
 
   # Update session quotas from stdin
   pingcli pingfederate session quotas replace --from-file - < settings.json
+
+  # Update session quotas from flags, without --from-file
+  pingcli pingfederate session quotas replace --enable-session-quotas --session-quota-behavior DENY_ACCESS --session-limit 5
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate session quotas replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--enable-session-quotas` | `` | Whether session quotas are enabled for users |
+| `--session-limit int64` | `` | Number of active sessions a user can have (required by the API when quotas are enabled) |
+| `--session-quota-behavior string` | `` | Behavior when a user's session quota is reached (required by the API when quotas are enabled) |
 
 
 ## Inherited Options

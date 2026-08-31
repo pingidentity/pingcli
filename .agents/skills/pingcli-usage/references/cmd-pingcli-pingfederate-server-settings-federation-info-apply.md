@@ -17,6 +17,9 @@ pingcli pingfederate server-settings federation-info apply [flags]
 
   # Update federation info from stdin
   pingcli pingfederate server-settings federation-info apply --from-file - < federation-info.json
+
+  # Update federation info from flags, without --from-file
+  pingcli pingfederate server-settings federation-info apply --base-url https://fed.example.com --saml2-entity-id https://fed.example.com/saml
 ```
 
 ## Options
@@ -25,6 +28,11 @@ pingcli pingfederate server-settings federation-info apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--base-url string` | `` | Fully qualified host, port, and path on which PingFederate runs |
+| `--saml1x-issuer-id string` | `` | SAML 1.x issuer ID for this federation server |
+| `--saml1x-source-id string` | `` | SAML 1.x Source ID override (derived from the issuer ID if omitted) |
+| `--saml2-entity-id string` | `` | SAML 2.0 entity ID for this federation server |
+| `--wsfed-realm string` | `` | URI of the WS-Federation realm associated with this server |
 
 
 ## Inherited Options

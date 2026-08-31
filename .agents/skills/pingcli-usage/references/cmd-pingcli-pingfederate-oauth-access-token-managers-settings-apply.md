@@ -17,6 +17,9 @@ pingcli pingfederate oauth access-token-managers settings apply [flags]
 
   # Update access token manager settings from stdin
   pingcli pingfederate oauth access-token-managers settings apply --from-file - < settings.json
+
+  # Update access token manager settings from flags, without --from-file
+  pingcli pingfederate oauth access-token-managers settings apply --default-access-token-manager-ref-id my-atm
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate oauth access-token-managers settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--default-access-token-manager-ref-id string` | `` | ID of the default access token manager |
 
 
 ## Inherited Options

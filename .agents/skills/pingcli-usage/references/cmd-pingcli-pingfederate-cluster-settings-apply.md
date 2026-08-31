@@ -17,6 +17,9 @@ pingcli pingfederate cluster settings apply [flags]
 
   # Update cluster settings from stdin
   pingcli pingfederate cluster settings apply --from-file - < settings.json
+
+  # Update cluster settings from flags, without --from-file
+  pingcli pingfederate cluster settings apply --replicate-connections-on-save --replicate-clients-on-save --replicate-log-settings-on-save
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate cluster settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--replicate-clients-on-save` | `` | Whether changes to OAuth clients are automatically replicated to the cluster on save |
+| `--replicate-connections-on-save` | `` | Whether changes to connections are automatically replicated to the cluster on save |
+| `--replicate-log-settings-on-save` | `` | Whether changes to log settings are automatically replicated to the cluster on save |
 
 
 ## Inherited Options

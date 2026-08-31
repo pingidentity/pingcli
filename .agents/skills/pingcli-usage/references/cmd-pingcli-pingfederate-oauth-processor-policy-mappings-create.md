@@ -17,6 +17,9 @@ pingcli pingfederate oauth processor-policy-mappings create [flags]
 
   # Create a new processor policy mapping from stdin
   pingcli pingfederate oauth processor-policy-mappings create --from-file - < processor-policy-mapping.json
+
+  # Create from a JSON file, overriding the processor policy reference
+  pingcli pingfederate oauth processor-policy-mappings create --from-file processor-policy-mapping.json --processor-policy-ref-id <policy-id>
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate oauth processor-policy-mappings create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--processor-policy-ref-id string` | `` | The ID of the token exchange processor policy |
 
 
 ## Inherited Options

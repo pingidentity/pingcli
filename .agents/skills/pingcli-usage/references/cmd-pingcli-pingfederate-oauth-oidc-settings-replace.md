@@ -17,6 +17,9 @@ pingcli pingfederate oauth oidc settings replace [flags]
 
   # Update OAuth/OpenID Connect settings from stdin
   pingcli pingfederate oauth oidc settings replace --from-file - < settings.json
+
+  # Update OAuth/OpenID Connect settings from flags, without --from-file
+  pingcli pingfederate oauth oidc settings replace --default-policy-id my-policy
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate oauth oidc settings replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--default-policy-id string` | `` | ID of the default OIDC policy |
 
 
 ## Inherited Options

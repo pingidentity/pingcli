@@ -19,7 +19,7 @@ pingcli protect risk-predictors create [flags]
   pingcli protect risk-predictors create --environment-id <env-id> --from-file - < risk-predictor.json
 
   # Create from a JSON file, overriding the name, compact name, and description
-  pingcli protect risk-predictors create --environment-id <env-id> --from-file risk-predictor.json --name "Renamed" --compact-name "renamedPredictor" --description "Updated"
+  pingcli protect risk-predictors create --environment-id <env-id> --from-file risk-predictor.json --name "Example" --compact-name "examplePredictor" --description "Description"
 ```
 
 ## Options
