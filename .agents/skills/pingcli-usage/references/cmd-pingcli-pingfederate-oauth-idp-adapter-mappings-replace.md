@@ -17,6 +17,9 @@ pingcli pingfederate oauth idp-adapter-mappings replace [flags]
 
   # Update an IdP adapter mapping from stdin
   pingcli pingfederate oauth idp-adapter-mappings replace --id <id> --from-file - < idp-adapter-mapping.json
+
+  # Update from a JSON file, overriding the adapter reference
+  pingcli pingfederate oauth idp-adapter-mappings replace --id <id> --from-file idp-adapter-mapping.json --idp-adapter-ref-id <adapter-id>
 ```
 
 ## Options
@@ -26,6 +29,7 @@ pingcli pingfederate oauth idp-adapter-mappings replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The ID of the IdP adapter mapping |
+| `--idp-adapter-ref-id string` | `` | ID of the IdP adapter referenced by this mapping |
 
 
 ## Inherited Options

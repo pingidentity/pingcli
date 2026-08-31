@@ -17,6 +17,9 @@ pingcli pingfederate idp adapters create [flags]
 
   # Create a new IDP adapter from stdin
   pingcli pingfederate idp adapters create --from-file - < idp-adapter.json
+
+  # Create using flags for identity fields and --from-file for full configuration
+  pingcli pingfederate idp adapters create --name "My IDP Adapter" --authn-ctx-class-ref <authn-ctx-class-ref> --from-file config.json
 ```
 
 ## Options
@@ -25,6 +28,8 @@ pingcli pingfederate idp adapters create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--authn-ctx-class-ref string` | `` | The fixed value indicating how the user was authenticated |
+| `--name string` | `` | The plugin instance name for the IDP adapter |
 
 
 ## Inherited Options

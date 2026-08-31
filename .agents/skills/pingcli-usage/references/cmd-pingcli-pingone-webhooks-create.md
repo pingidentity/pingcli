@@ -16,7 +16,7 @@ pingcli pingone webhooks create [flags]
   pingcli pingone webhooks create --environment-id <env-id> --from-file webhook.json
 
   # Create a new webhook from a JSON file, overriding the name and enabled state
-  pingcli pingone webhooks create --environment-id <env-id> --from-file webhook.json --name "Renamed" --enabled=false
+  pingcli pingone webhooks create --environment-id <env-id> --from-file webhook.json --name "Example" --enabled=false
 
   # Create a new webhook from stdin
   pingcli pingone webhooks create --environment-id <env-id> --from-file - < webhook.json

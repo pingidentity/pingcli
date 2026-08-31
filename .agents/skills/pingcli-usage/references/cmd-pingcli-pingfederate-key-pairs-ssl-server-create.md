@@ -12,7 +12,10 @@ pingcli pingfederate key-pairs ssl-server create [flags]
 ## Examples
 
 ```
-# Generate a new SSL server key pair from a JSON file
+# Generate a new SSL server key pair from flags
+  pingcli pingfederate key-pairs ssl-server create --id my-ssl-server-key --common-name example.com --subject-alternative-names example.com,www.example.com --organization "Example Corp" --organization-unit Engineering --city Denver --state Colorado --country US --valid-days 365 --key-algorithm RSA --key-size 2048 --signature-algorithm SHA256withRSA
+
+  # Generate a new SSL server key pair from a JSON file
   pingcli pingfederate key-pairs ssl-server create --from-file key-pair.json
 
   # Generate a new SSL server key pair from stdin
@@ -25,6 +28,19 @@ pingcli pingfederate key-pairs ssl-server create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--city string` | `` | City for the key pair subject |
+| `--common-name string` | `` | Common name for the key pair subject |
+| `--country string` | `` | Country for the key pair subject |
+| `--crypto-provider string` | `` | Cryptographic provider used in Hybrid HSM mode |
+| `--id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
+| `--key-algorithm string` | `` | Key generation algorithm |
+| `--key-size int64` | `` | Key size in bits |
+| `--organization string` | `` | Organization for the key pair subject |
+| `--organization-unit string` | `` | Organization unit for the key pair subject |
+| `--signature-algorithm string` | `` | Signature algorithm |
+| `--state string` | `` | State for the key pair subject |
+| `--subject-alternative-names []string` | `` | Subject alternative names for the key pair |
+| `--valid-days int64` | `` | Number of days the key pair will be valid |
 
 
 ## Inherited Options

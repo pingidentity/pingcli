@@ -17,6 +17,9 @@ pingcli pingfederate key-pairs ssl-server settings apply [flags]
 
   # Update SSL server settings from stdin
   pingcli pingfederate key-pairs ssl-server settings apply --from-file - < settings.json
+
+  # Update from a JSON file, overriding the runtime server certificate reference
+  pingcli pingfederate key-pairs ssl-server settings apply --from-file settings.json --runtime-server-cert-ref-id <id>
 ```
 
 ## Options
@@ -25,6 +28,8 @@ pingcli pingfederate key-pairs ssl-server settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--admin-console-cert-ref-id string` | `` | ID of the administrative console SSL certificate key pair |
+| `--runtime-server-cert-ref-id string` | `` | ID of the runtime server SSL certificate key pair |
 
 
 ## Inherited Options

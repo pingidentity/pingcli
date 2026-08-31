@@ -17,6 +17,9 @@ pingcli pingfederate session settings replace [flags]
 
   # Update session settings from stdin
   pingcli pingfederate session settings replace --from-file - < settings.json
+
+  # Update session settings from flags, without --from-file
+  pingcli pingfederate session settings replace --revoke-user-session-on-logout --session-revocation-lifetime 60
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate session settings replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--revoke-user-session-on-logout` | `` | Revoke the user's session on logout |
+| `--session-revocation-lifetime int64` | `` | Minutes a session revocation is tracked and stored |
+| `--track-adapter-sessions-for-logout` | `` | Track adapter sessions for cleanup during single logout |
 
 
 ## Inherited Options

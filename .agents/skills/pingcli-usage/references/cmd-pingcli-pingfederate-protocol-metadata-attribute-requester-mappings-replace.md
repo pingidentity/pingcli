@@ -17,6 +17,12 @@ pingcli pingfederate protocol-metadata attribute-requester-mappings replace [fla
 
   # Update attribute requester mappings from stdin
   pingcli pingfederate protocol-metadata attribute-requester-mappings replace --from-file - < attribute-requester-mappings.json
+
+  # Update attribute requester mappings from flags, without --from-file
+  pingcli pingfederate protocol-metadata attribute-requester-mappings replace --default-idp-entity-id https://idp.example.com
+
+  # Update from a JSON file, overriding the default IdP entity ID
+  pingcli pingfederate protocol-metadata attribute-requester-mappings replace --from-file attribute-requester-mappings.json --default-idp-entity-id https://idp.example.com
 ```
 
 ## Options
@@ -25,6 +31,7 @@ pingcli pingfederate protocol-metadata attribute-requester-mappings replace [fla
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--default-idp-entity-id string` | `` | The entity ID of the default IdP connection |
 
 
 ## Inherited Options

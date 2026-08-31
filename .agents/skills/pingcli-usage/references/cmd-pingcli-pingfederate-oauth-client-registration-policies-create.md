@@ -19,7 +19,7 @@ pingcli pingfederate oauth client-registration-policies create [flags]
   pingcli pingfederate oauth client-registration-policies create --from-file - < policy.json
 
   # Create from a JSON file, overriding the name
-  pingcli pingfederate oauth client-registration-policies create --from-file policy.json --name "Renamed"
+  pingcli pingfederate oauth client-registration-policies create --from-file policy.json --name "Example"
 ```
 
 ## Options

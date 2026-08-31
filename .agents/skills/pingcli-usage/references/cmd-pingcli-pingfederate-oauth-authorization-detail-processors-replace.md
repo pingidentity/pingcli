@@ -17,6 +17,9 @@ pingcli pingfederate oauth authorization-detail-processors replace [flags]
 
   # Update an authorization detail processor from stdin
   pingcli pingfederate oauth authorization-detail-processors replace --id <id> --from-file - < authorization-detail-processor.json
+
+  # Update using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate oauth authorization-detail-processors replace --id <id> --name <name> --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file authorization-detail-processor.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate oauth authorization-detail-processors replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate authorization detail processor instance ID |
+| `--name string` | `` | The authorization detail processor plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent authorization detail processor instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

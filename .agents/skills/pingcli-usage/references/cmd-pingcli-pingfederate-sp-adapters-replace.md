@@ -17,6 +17,9 @@ pingcli pingfederate sp adapters replace [flags]
 
   # Update an SP adapter from stdin
   pingcli pingfederate sp adapters replace --id <id> --from-file - < adapter.json
+
+  # Update using flags for identity fields and --from-file for full configuration
+  pingcli pingfederate sp adapters replace --id <id> --name "My SP Adapter" --plugin-descriptor-ref-id com.example.Plugin --parent-ref-id <parent-id> --from-file config.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate sp adapters replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate SP adapter instance ID |
+| `--name string` | `` | The plugin instance name for the SP adapter |
+| `--parent-ref-id string` | `` | ID of the parent plugin instance this adapter overrides, if any |
+| `--plugin-descriptor-ref-id string` | `` | ID of the SP adapter plugin type descriptor |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate secret-managers create [flags]
 
   # Create a new secret manager from stdin
   pingcli pingfederate secret-managers create --from-file - < secret-manager.json
+
+  # Create from a JSON file, overriding the name and plugin descriptor reference
+  pingcli pingfederate secret-managers create --from-file secret-manager.json --name "My Secret Manager" --plugin-descriptor-ref-id com.pingidentity.pf.secretmanagers.cyberark.CyberArkCredentialProvider
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate secret-managers create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | Secret manager instance name |
+| `--parent-ref-id string` | `` | ID of a parent secret manager instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the secret manager plugin type descriptor |
 
 
 ## Inherited Options

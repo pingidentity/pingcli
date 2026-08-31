@@ -17,6 +17,9 @@ pingcli pingfederate oauth processor-policy-mappings replace [flags]
 
   # Update a processor policy mapping from stdin
   pingcli pingfederate oauth processor-policy-mappings replace --id <id> --from-file - < processor-policy-mapping.json
+
+  # Update from a JSON file, overriding the processor policy reference
+  pingcli pingfederate oauth processor-policy-mappings replace --id <id> --from-file processor-policy-mapping.json --processor-policy-ref-id <policy-id>
 ```
 
 ## Options
@@ -26,6 +29,7 @@ pingcli pingfederate oauth processor-policy-mappings replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate OAuth processor policy mapping ID |
+| `--processor-policy-ref-id string` | `` | The ID of the token exchange processor policy |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate identity-store-provisioners create [flags]
 
   # Create a new identity store provisioner from stdin
   pingcli pingfederate identity-store-provisioners create --from-file - < provisioner.json
+
+  # Create using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate identity-store-provisioners create --name <name> --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file provisioner.json
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate identity-store-provisioners create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The identity store provisioner plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent identity store provisioner instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

@@ -17,6 +17,9 @@ pingcli pingfederate oauth access-token-mappings replace [flags]
 
   # Update an access token mapping from stdin
   pingcli pingfederate oauth access-token-mappings replace --id <id> --from-file - < access-token-mapping.json
+
+  # Replace with a flag override
+  pingcli pingfederate oauth access-token-mappings replace --id <id> --access-token-manager-ref-id <access-token-manager-id> --from-file access-token-mapping.json
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate oauth access-token-mappings replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--access-token-manager-ref-id string` | `` | ID of the access token manager used by this mapping |
 | `--id string` | `` | The PingFederate OAuth access token mapping ID |
 
 

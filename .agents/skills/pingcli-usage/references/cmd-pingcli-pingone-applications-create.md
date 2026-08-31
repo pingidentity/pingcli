@@ -19,7 +19,7 @@ pingcli pingone applications create [flags]
   pingcli pingone applications create --environment-id <env-id> --from-file - < application.json
 
   # Create from a JSON file, overriding the name and enabled state
-  pingcli pingone applications create --environment-id <env-id> --from-file application.json --name "Renamed" --enabled=false
+  pingcli pingone applications create --environment-id <env-id> --from-file application.json --name "Example" --enabled=false
 ```
 
 ## Options

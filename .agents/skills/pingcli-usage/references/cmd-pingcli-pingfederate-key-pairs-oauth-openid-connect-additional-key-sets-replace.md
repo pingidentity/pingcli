@@ -17,6 +17,9 @@ pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets replace 
 
   # Update an OAuth/OpenID Connect additional key set from stdin
   pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets replace --id <id> --from-file - < key-set.json
+
+  # Update from a file while overriding the optional description
+  pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets replace --id <id> --from-file key-set.json --description "Updated signing keys"
 ```
 
 ## Options
@@ -25,7 +28,9 @@ pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets replace 
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | Description of the OAuth/OpenID Connect additional key set |
 | `--id string` | `` | The persistent, unique ID of the PingFederate OAuth/OpenID Connect additional key set |
+| `--name string` | `` | Name of the OAuth/OpenID Connect additional key set |
 
 
 ## Inherited Options

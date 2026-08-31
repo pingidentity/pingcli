@@ -17,6 +17,9 @@ pingcli pingfederate idp adapters apply [flags]
 
   # Read body from stdin
   pingcli pingfederate idp adapters apply --from-file - < idp-adapter.json
+
+  # Create or update using flags to override fields in the JSON body
+  pingcli pingfederate idp adapters apply --authn-ctx-class-ref <authn-ctx-class-ref> --from-file config.json
 ```
 
 ## Options
@@ -25,7 +28,9 @@ pingcli pingfederate idp adapters apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--authn-ctx-class-ref string` | `` | The fixed value indicating how the user was authenticated |
 | `--id string` | `` | The PingFederate IDP Adapter ID |
+| `--name string` | `` | The plugin instance name for the IDP adapter |
 
 
 ## Inherited Options

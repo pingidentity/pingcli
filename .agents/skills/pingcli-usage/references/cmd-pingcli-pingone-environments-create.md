@@ -19,7 +19,7 @@ pingcli pingone environments create [flags]
   pingcli pingone environments create --from-file - < env.json
 
   # Create from a JSON file, overriding the name and region
-  pingcli pingone environments create --from-file env.json --name "Renamed" --region EU
+  pingcli pingone environments create --from-file env.json --name "Example" --region EU
 ```
 
 ## Options

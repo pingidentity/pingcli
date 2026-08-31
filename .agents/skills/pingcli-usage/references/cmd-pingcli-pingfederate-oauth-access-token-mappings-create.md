@@ -17,6 +17,9 @@ pingcli pingfederate oauth access-token-mappings create [flags]
 
   # Create a new access token mapping from stdin
   pingcli pingfederate oauth access-token-mappings create --from-file - < access-token-mapping.json
+
+  # Create with a flag override
+  pingcli pingfederate oauth access-token-mappings create --access-token-manager-ref-id <access-token-manager-id> --from-file access-token-mapping.json
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate oauth access-token-mappings create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--access-token-manager-ref-id string` | `` | ID of the access token manager used by this mapping |
 
 
 ## Inherited Options

@@ -19,7 +19,7 @@ pingcli pingfederate authentication-policies fragments create [flags]
   pingcli pingfederate authentication-policies fragments create --from-file - < fragment.json
 
   # Create from a JSON file, overriding the name and description
-  pingcli pingfederate authentication-policies fragments create --from-file fragment.json --name "Renamed" --description "Updated"
+  pingcli pingfederate authentication-policies fragments create --from-file fragment.json --name "Example" --description "Description"
 ```
 
 ## Options

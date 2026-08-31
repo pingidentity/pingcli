@@ -17,6 +17,9 @@ pingcli pingfederate idp sp-connections signing-settings apply [flags]
 
   # Update the signing settings from stdin
   pingcli pingfederate idp sp-connections signing-settings apply --id <sp-connection-id> --from-file - < signing-settings.json
+
+  # Update using the flags, without --from-file
+  pingcli pingfederate idp sp-connections signing-settings apply --id <sp-connection-id> --signing-key-pair-ref-id <key-pair-id>
 ```
 
 ## Options
@@ -25,7 +28,11 @@ pingcli pingfederate idp sp-connections signing-settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--algorithm string` | `` | The algorithm used to sign messages sent to this partner |
 | `--id string` | `` | The PingFederate SP connection ID |
+| `--include-cert-in-signature` | `` | Whether the signing certificate is included in the signature |
+| `--include-raw-key-in-signature` | `` | Whether the raw public key is included in the signature |
+| `--signing-key-pair-ref-id string` | `` | The ID of the key pair used to sign messages sent to this partner |
 
 
 ## Inherited Options

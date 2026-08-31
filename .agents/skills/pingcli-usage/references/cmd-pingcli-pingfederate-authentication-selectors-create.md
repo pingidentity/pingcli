@@ -17,6 +17,9 @@ pingcli pingfederate authentication-selectors create [flags]
 
   # Create a new authentication selector from stdin
   pingcli pingfederate authentication-selectors create --from-file - < authentication-selector.json
+
+  # Create using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate authentication-selectors create --name <name> --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file authentication-selector.json
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate authentication-selectors create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The authentication selector plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent authentication selector instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

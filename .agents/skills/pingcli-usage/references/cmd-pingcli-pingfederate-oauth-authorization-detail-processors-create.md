@@ -17,6 +17,9 @@ pingcli pingfederate oauth authorization-detail-processors create [flags]
 
   # Create a new authorization detail processor from stdin
   pingcli pingfederate oauth authorization-detail-processors create --from-file - < authorization-detail-processor.json
+
+  # Create using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate oauth authorization-detail-processors create --name <name> --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file authorization-detail-processor.json
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate oauth authorization-detail-processors create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The authorization detail processor plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent authorization detail processor instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

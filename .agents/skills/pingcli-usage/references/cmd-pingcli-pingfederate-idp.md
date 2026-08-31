@@ -31,7 +31,9 @@ pingcli pingfederate idp
 |---------|-------------|----------|
 | `pingcli pingfederate idp adapters` | PingFederate IDP Adapters | [`cmd-pingcli-pingfederate-idp-adapters.md`](cmd-pingcli-pingfederate-idp-adapters.md) |
 | `pingcli pingfederate idp connectors` | Manage PingFederate IdP Connector resources | [`cmd-pingcli-pingfederate-idp-connectors.md`](cmd-pingcli-pingfederate-idp-connectors.md) |
+| `pingcli pingfederate idp default-urls` | PingFederate IdP Default URLs | [`cmd-pingcli-pingfederate-idp-default-urls.md`](cmd-pingcli-pingfederate-idp-default-urls.md) |
 | `pingcli pingfederate idp sp-connections` | PingFederate SP Connections | [`cmd-pingcli-pingfederate-idp-sp-connections.md`](cmd-pingcli-pingfederate-idp-sp-connections.md) |
+| `pingcli pingfederate idp token-processors` | PingFederate Token Processors | [`cmd-pingcli-pingfederate-idp-token-processors.md`](cmd-pingcli-pingfederate-idp-token-processors.md) |
 
 ## Parent Command
 

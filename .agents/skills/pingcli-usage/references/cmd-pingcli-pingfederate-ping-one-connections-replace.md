@@ -17,6 +17,9 @@ pingcli pingfederate ping-one-connections replace [flags]
 
   # Update a PingOne connection from stdin
   pingcli pingfederate ping-one-connections replace --id <id> --from-file - < ping-one-connection.json
+
+  # Update from a JSON file, overriding the description and active state
+  pingcli pingfederate ping-one-connections replace --id <id> --from-file ping-one-connection.json --description "Updated description" --active=false
 ```
 
 ## Options
@@ -25,7 +28,10 @@ pingcli pingfederate ping-one-connections replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--active` | `` | Whether the PingOne connection is active |
+| `--description string` | `` | A description for the PingOne connection |
 | `--id string` | `` | The ID of the PingOne connection |
+| `--name string` | `` | The name of the PingOne connection |
 
 
 ## Inherited Options

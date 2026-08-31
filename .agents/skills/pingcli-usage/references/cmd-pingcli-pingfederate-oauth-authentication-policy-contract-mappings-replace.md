@@ -17,6 +17,9 @@ pingcli pingfederate oauth authentication-policy-contract-mappings replace [flag
 
   # Update an authentication policy contract mapping from stdin
   pingcli pingfederate oauth authentication-policy-contract-mappings replace --id <id> --from-file - < apc-mapping.json
+
+  # Update from a JSON file, overriding optional body fields with flags
+  pingcli pingfederate oauth authentication-policy-contract-mappings replace --id <id> --from-file apc-mapping.json --authentication-policy-contract-ref-id <apc-id>
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate oauth authentication-policy-contract-mappings replace [flag
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--authentication-policy-contract-ref-id string` | `` | ID of the authentication policy contract referenced by this mapping |
 | `--id string` | `` | The ID of the authentication policy contract to persistent grant mapping |
 
 

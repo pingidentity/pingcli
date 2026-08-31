@@ -17,6 +17,12 @@ pingcli pingfederate oauth issuers replace [flags]
 
   # Update an OAuth virtual issuer from stdin
   pingcli pingfederate oauth issuers replace --id <id> --from-file - < issuer.json
+
+  # Update an OAuth virtual issuer from flags, without --from-file
+  pingcli pingfederate oauth issuers replace --id <id> --name "My Issuer" --host issuer.example.com
+
+  # Update using flags for common fields, and --from-file for the rest
+  pingcli pingfederate oauth issuers replace --id <id> --name "My Issuer" --host issuer.example.com --from-file issuer.json
 ```
 
 ## Options
@@ -25,7 +31,11 @@ pingcli pingfederate oauth issuers replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | Description of the virtual issuer |
+| `--host string` | `` | Hostname of the virtual issuer |
 | `--id string` | `` | The PingFederate virtual issuer ID |
+| `--name string` | `` | Unique display name for the virtual issuer |
+| `--path string` | `` | Path of the virtual issuer |
 
 
 ## Inherited Options

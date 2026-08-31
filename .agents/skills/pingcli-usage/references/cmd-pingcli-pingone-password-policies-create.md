@@ -16,7 +16,7 @@ pingcli pingone password-policies create [flags]
   pingcli pingone password-policies create --environment-id <env-id> --from-file password-policy.json
 
   # Create a new password policy from a JSON file, overriding the name and complexity rules
-  pingcli pingone password-policies create --environment-id <env-id> --from-file password-policy.json --name "Renamed" --excludes-commonly-used=true --excludes-profile-data=true --not-similar-to-current=true
+  pingcli pingone password-policies create --environment-id <env-id> --from-file password-policy.json --name "Example" --excludes-commonly-used=true --excludes-profile-data=true --not-similar-to-current=true
 
   # Create a new password policy from stdin
   pingcli pingone password-policies create --environment-id <env-id> --from-file - < password-policy.json

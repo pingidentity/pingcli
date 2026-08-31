@@ -17,6 +17,9 @@ pingcli pingfederate oauth out-of-band-auth-plugins create [flags]
 
   # Create a new out-of-band authenticator plugin instance from stdin
   pingcli pingfederate oauth out-of-band-auth-plugins create --from-file - < out-of-band-auth-plugin.json
+
+  # Create using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate oauth out-of-band-auth-plugins create --name <name> --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file out-of-band-auth-plugin.json
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate oauth out-of-band-auth-plugins create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The out-of-band authenticator plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent out-of-band authenticator plugin instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

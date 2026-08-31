@@ -12,11 +12,14 @@ pingcli pingfederate oauth auth-server-settings scopes common apply [flags]
 ## Examples
 
 ```
-# Create or update an OAuth common scope (body supplies name and other fields)
+# Create or update an OAuth common scope (body supplies the lookup name)
   pingcli pingfederate oauth auth-server-settings scopes common apply --from-file common-scope.json
 
   # Read body from stdin
   pingcli pingfederate oauth auth-server-settings scopes common apply --from-file - < common-scope.json
+
+  # Override a non-identifying field while looking up by the file's name
+  pingcli pingfederate oauth auth-server-settings scopes common apply --from-file common-scope.json --description "Updated description" --dynamic=false
 ```
 
 ## Options
@@ -25,7 +28,9 @@ pingcli pingfederate oauth auth-server-settings scopes common apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The OAuth common scope name |
+| `--description string` | `` | The OAuth common scope description |
+| `--dynamic` | `` | Whether the OAuth common scope is dynamic |
+| `--name string` | `` | The OAuth common scope name |
 
 
 ## Inherited Options

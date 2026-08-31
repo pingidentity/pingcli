@@ -17,6 +17,9 @@ pingcli pingfederate ping-one-connections create [flags]
 
   # Create a new PingOne connection from stdin
   pingcli pingfederate ping-one-connections create --from-file - < ping-one-connection.json
+
+  # Create from a JSON file, overriding the name, description, and active state
+  pingcli pingfederate ping-one-connections create --from-file ping-one-connection.json --name "My PingOne Connection" --description "Used by the mobile app" --active
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate ping-one-connections create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--active` | `` | Whether the PingOne connection is active |
+| `--description string` | `` | A description for the PingOne connection |
+| `--name string` | `` | The name of the PingOne connection |
 
 
 ## Inherited Options

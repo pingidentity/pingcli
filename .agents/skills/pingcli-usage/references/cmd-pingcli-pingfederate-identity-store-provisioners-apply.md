@@ -17,6 +17,9 @@ pingcli pingfederate identity-store-provisioners apply [flags]
 
   # Read body from stdin
   pingcli pingfederate identity-store-provisioners apply --from-file - < provisioner.json
+
+  # Create or update using flags to override fields in the JSON body
+  pingcli pingfederate identity-store-provisioners apply --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file provisioner.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate identity-store-provisioners apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate Identity Store Provisioner ID |
+| `--name string` | `` | The identity store provisioner plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent identity store provisioner instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

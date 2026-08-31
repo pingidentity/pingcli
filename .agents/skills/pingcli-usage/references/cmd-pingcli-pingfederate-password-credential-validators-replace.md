@@ -17,6 +17,9 @@ pingcli pingfederate password-credential-validators replace [flags]
 
   # Update a password credential validator from stdin
   pingcli pingfederate password-credential-validators replace --id <id> --from-file - < validator.json
+
+  # Update using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate password-credential-validators replace --id <id> --name "My Validator" --plugin-descriptor-ref-id org.sourceid.saml20.domain.SimpleUsernamePasswordCredentialValidator --from-file configuration.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate password-credential-validators replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate Password Credential Validator ID |
+| `--name string` | `` | Plugin instance display name |
+| `--parent-ref-id string` | `` | ID of a parent password credential validator instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the password credential validator plugin type descriptor |
 
 
 ## Inherited Options

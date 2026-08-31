@@ -17,6 +17,9 @@ pingcli pingfederate idp sp-connections decryption-keys replace [flags]
 
   # Update the decryption keys from stdin
   pingcli pingfederate idp sp-connections decryption-keys replace --id <sp-connection-id> --from-file - < decryption-keys.json
+
+  # Update using the flags, without --from-file
+  pingcli pingfederate idp sp-connections decryption-keys replace --id <sp-connection-id> --primary-key-ref-id <key-pair-id>
 ```
 
 ## Options
@@ -26,6 +29,8 @@ pingcli pingfederate idp sp-connections decryption-keys replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate SP connection ID |
+| `--primary-key-ref-id string` | `` | ID of the primary decryption key pair |
+| `--secondary-key-pair-ref-id string` | `` | ID of the secondary decryption key pair |
 
 
 ## Inherited Options

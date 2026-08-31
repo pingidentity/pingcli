@@ -17,6 +17,9 @@ pingcli pingfederate oauth out-of-band-auth-plugins apply [flags]
 
   # Read body from stdin
   pingcli pingfederate oauth out-of-band-auth-plugins apply --from-file - < out-of-band-auth-plugin.json
+
+  # Create or update using flags to override fields in the JSON body
+  pingcli pingfederate oauth out-of-band-auth-plugins apply --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file out-of-band-auth-plugin.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate oauth out-of-band-auth-plugins apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate out-of-band authenticator plugin instance ID |
+| `--name string` | `` | The out-of-band authenticator plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent out-of-band authenticator plugin instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

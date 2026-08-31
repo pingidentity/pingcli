@@ -17,6 +17,9 @@ pingcli pingfederate identity-store-provisioners replace [flags]
 
   # Update an identity store provisioner from stdin
   pingcli pingfederate identity-store-provisioners replace --id <id> --from-file - < provisioner.json
+
+  # Update using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate identity-store-provisioners replace --id <id> --name <name> --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file provisioner.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate identity-store-provisioners replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate Identity Store Provisioner ID |
+| `--name string` | `` | The identity store provisioner plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent identity store provisioner instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

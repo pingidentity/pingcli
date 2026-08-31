@@ -17,6 +17,9 @@ pingcli pingfederate password-credential-validators create [flags]
 
   # Create a new password credential validator from stdin
   pingcli pingfederate password-credential-validators create --from-file - < validator.json
+
+  # Create using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate password-credential-validators create --name "My Validator" --plugin-descriptor-ref-id org.sourceid.saml20.domain.SimpleUsernamePasswordCredentialValidator --from-file configuration.json
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate password-credential-validators create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | Plugin instance display name |
+| `--parent-ref-id string` | `` | ID of a parent password credential validator instance to inherit configuration from |
+| `--plugin-descriptor-ref-id string` | `` | ID of the password credential validator plugin type descriptor |
 
 
 ## Inherited Options

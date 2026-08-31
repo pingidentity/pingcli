@@ -17,6 +17,9 @@ pingcli pingfederate sp default-urls apply [flags]
 
   # Update SP default URLs from stdin
   pingcli pingfederate sp default-urls apply --from-file - < settings.json
+
+  # Update SP default URLs using flags, without --from-file
+  pingcli pingfederate sp default-urls apply --sso-success-url https://sso.example.com --slo-success-url https://slo.example.com
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate sp default-urls apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--confirm-slo` | `` | Whether the user is prompted to confirm Single Logout (SLO) |
+| `--slo-success-url string` | `` | The default URL to send the user to when Single Logout (SLO) has succeeded |
+| `--sso-success-url string` | `` | The default URL to send the user to when Single Sign On (SSO) has succeeded |
 
 
 ## Inherited Options

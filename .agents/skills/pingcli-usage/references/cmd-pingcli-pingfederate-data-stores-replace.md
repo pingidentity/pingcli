@@ -17,6 +17,10 @@ pingcli pingfederate data-stores replace [flags]
 
   # Update a data store from stdin
   pingcli pingfederate data-stores replace --id <id> --from-file - < data-store.json
+
+  # Update a data store, also toggling whether attribute values are masked in
+  # the log (--from-file is still required for the type-specific body fields)
+  pingcli pingfederate data-stores replace --id <id> --from-file data-store.json --mask-attribute-values
 ```
 
 ## Options
@@ -26,6 +30,7 @@ pingcli pingfederate data-stores replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate Data Store ID |
+| `--mask-attribute-values` | `` | Whether attribute values should be masked in the log |
 
 
 ## Inherited Options

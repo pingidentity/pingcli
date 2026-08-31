@@ -17,6 +17,9 @@ pingcli pingfederate authentication-policy-contracts create [flags]
 
   # Create a new authentication policy contract from stdin
   pingcli pingfederate authentication-policy-contracts create --from-file - < contract.json
+
+  # Create from a JSON file, overriding the name
+  pingcli pingfederate authentication-policy-contracts create --from-file contract.json --name "Example"
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate authentication-policy-contracts create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The authentication policy contract name |
 
 
 ## Inherited Options

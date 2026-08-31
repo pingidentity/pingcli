@@ -17,6 +17,9 @@ pingcli pingfederate virtual-host-names replace [flags]
 
   # Update virtual host names settings from stdin
   pingcli pingfederate virtual-host-names replace --from-file - < settings.json
+
+  # Update virtual host names settings from flags, without --from-file
+  pingcli pingfederate virtual-host-names replace --virtual-host-names host1.example.com,host2.example.com
 ```
 
 ## Options
@@ -25,6 +28,7 @@ pingcli pingfederate virtual-host-names replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--virtual-host-names []string` | `` | List of virtual host names; repeatable or comma-separated |
 
 
 ## Inherited Options

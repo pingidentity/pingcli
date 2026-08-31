@@ -17,6 +17,9 @@ pingcli pingfederate sp adapters create [flags]
 
   # Create a new SP adapter from stdin
   pingcli pingfederate sp adapters create --from-file - < adapter.json
+
+  # Create using flags for identity fields and --from-file for full configuration
+  pingcli pingfederate sp adapters create --name "My SP Adapter" --plugin-descriptor-ref-id com.example.Plugin --parent-ref-id <parent-id> --from-file config.json
 ```
 
 ## Options
@@ -25,6 +28,9 @@ pingcli pingfederate sp adapters create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--name string` | `` | The plugin instance name for the SP adapter |
+| `--parent-ref-id string` | `` | ID of the parent plugin instance this adapter overrides, if any |
+| `--plugin-descriptor-ref-id string` | `` | ID of the SP adapter plugin type descriptor |
 
 
 ## Inherited Options

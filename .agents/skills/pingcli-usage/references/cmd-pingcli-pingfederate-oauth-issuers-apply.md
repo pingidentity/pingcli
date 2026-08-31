@@ -17,6 +17,9 @@ pingcli pingfederate oauth issuers apply [flags]
 
   # Read body from stdin
   pingcli pingfederate oauth issuers apply --from-file - < issuer.json
+
+  # Create or update from a JSON file, overriding the host and description
+  pingcli pingfederate oauth issuers apply --from-file issuer.json --host issuer.example.com --description "Updated description"
 ```
 
 ## Options
@@ -25,7 +28,11 @@ pingcli pingfederate oauth issuers apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--description string` | `` | Description of the virtual issuer |
+| `--host string` | `` | Hostname of the virtual issuer |
 | `--id string` | `` | The PingFederate virtual issuer ID |
+| `--name string` | `` | Unique display name for the virtual issuer |
+| `--path string` | `` | Path of the virtual issuer |
 
 
 ## Inherited Options

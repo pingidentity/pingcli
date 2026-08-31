@@ -19,7 +19,7 @@ pingcli pingone gateways create [flags]
   pingcli pingone gateways create --environment-id <env-id> --from-file - < gateway.json
 
   # Create from a JSON file, overriding the name and enabled state
-  pingcli pingone gateways create --environment-id <env-id> --from-file gateway.json --name "Renamed" --enabled=false
+  pingcli pingone gateways create --environment-id <env-id> --from-file gateway.json --name "Example" --enabled=false
 ```
 
 ## Options

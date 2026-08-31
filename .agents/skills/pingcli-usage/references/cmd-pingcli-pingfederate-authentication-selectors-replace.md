@@ -17,6 +17,9 @@ pingcli pingfederate authentication-selectors replace [flags]
 
   # Update an authentication selector from stdin
   pingcli pingfederate authentication-selectors replace --id <id> --from-file - < authentication-selector.json
+
+  # Update using flags for identity fields, and --from-file for configuration
+  pingcli pingfederate authentication-selectors replace --id <id> --name <name> --plugin-descriptor-ref-id <descriptor-id> --parent-ref-id <parent-id> --from-file authentication-selector.json
 ```
 
 ## Options
@@ -26,6 +29,9 @@ pingcli pingfederate authentication-selectors replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--id string` | `` | The PingFederate Authentication Selector ID |
+| `--name string` | `` | The authentication selector plugin instance name |
+| `--parent-ref-id string` | `` | ID of the parent authentication selector instance |
+| `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |
 
 
 ## Inherited Options

@@ -31,6 +31,7 @@ pingcli pingfederate certificates
 |---------|-------------|----------|
 | `pingcli pingfederate certificates ca` | PingFederate Trusted CA Certificates | [`cmd-pingcli-pingfederate-certificates-ca.md`](cmd-pingcli-pingfederate-certificates-ca.md) |
 | `pingcli pingfederate certificates groups` | PingFederate certificate group certificates | [`cmd-pingcli-pingfederate-certificates-groups.md`](cmd-pingcli-pingfederate-certificates-groups.md) |
+| `pingcli pingfederate certificates revocation` | Manage PingFederate Certificates Revocation resources | [`cmd-pingcli-pingfederate-certificates-revocation.md`](cmd-pingcli-pingfederate-certificates-revocation.md) |
 
 ## Parent Command
 
