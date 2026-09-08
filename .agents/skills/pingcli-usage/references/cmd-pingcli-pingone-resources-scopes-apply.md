@@ -30,7 +30,6 @@ pingcli pingone resources scopes apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --resource-id string` | `` | The resource ID |
-| `-s, --resource-scope-id string` | `` | The resource scope ID |
 | `--description string` | `` | The description of the resource scope |
 | `--mapped-claims []string` | `` | Mapped claims for this scope; repeatable or comma-separated |
 | `--name string` | `` | The name of the resource scope |

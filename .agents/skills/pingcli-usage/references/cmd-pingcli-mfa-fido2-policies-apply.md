@@ -32,7 +32,6 @@ pingcli mfa fido2-policies apply [flags]
 | `--description string` | `` | The description of the FIDO2 policy |
 | `--device-display-name string` | `` | The name to display for the device in registration and authentication windows |
 | `--discoverable-credentials string` | `` | The server-side discoverable credential preference |
-| `--fido2-policy-id string` | `` | The FIDO2 policy ID |
 | `--name string` | `` | The name to use for the FIDO2 policy |
 | `--public-key-credential-hint []string` | `` | Ordered hints for preferred public-key credential types; repeatable or comma-separated |
 | `--relying-party-id string` | `` | The ID of the relying party, typically a domain name |

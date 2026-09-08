@@ -27,7 +27,6 @@ pingcli authorize api-servers operations apply [flags]
 | `-a, --api-server-id string` | `` | The API server ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-o, --api-server-operation-id string` | `` | The API server operation ID |
 | `--method []string` | `` | The HTTP method(s) permitted for this operation. repeatable or comma-separated |
 | `--name string` | `` | The name of the API server operation |
 

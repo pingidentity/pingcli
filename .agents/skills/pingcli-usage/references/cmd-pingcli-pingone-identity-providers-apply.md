@@ -26,7 +26,6 @@ pingcli pingone identity-providers apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-i, --identity-provider-id string` | `` | The identity provider ID |
 | `--description string` | `` | The identity provider description |
 | `--enabled` | `` | Whether the identity provider is enabled |
 | `--name string` | `` | The identity provider name |

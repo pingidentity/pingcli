@@ -25,7 +25,6 @@ pingcli pingfederate authentication-policy-contracts apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate authentication policy contract ID |
 | `--name string` | `` | The authentication policy contract name |
 
 

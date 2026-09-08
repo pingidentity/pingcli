@@ -29,7 +29,6 @@ pingcli pingone populations apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-p, --population-id string` | `` | The population ID |
 | `--alternative-identifier []string` | `` | Alternative identifiers for the population; repeatable or comma-separated |
 | `--default` | `` | Whether this is the default population for the environment |
 | `--description string` | `` | The description of the population |

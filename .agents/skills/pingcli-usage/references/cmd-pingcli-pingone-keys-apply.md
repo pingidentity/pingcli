@@ -29,7 +29,6 @@ pingcli pingone keys apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-k, --key-id string` | `` | The key ID |
 | `--algorithm string` | `` | The key algorithm (e.g. RSA, EC) |
 | `--custom-crl string` | `` | A custom Certificate Revocation List endpoint URL, used for certificates of type ISSUANCE |
 | `--default` | `` | Whether this is the default key for the environment |

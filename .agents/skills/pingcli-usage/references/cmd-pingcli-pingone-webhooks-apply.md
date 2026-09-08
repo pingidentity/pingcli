@@ -29,7 +29,6 @@ pingcli pingone webhooks apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-w, --webhook-id string` | `` | The webhook (subscription) ID |
 | `--enabled` | `` | Whether the webhook subscription is active |
 | `--format string` | `` | The payload format for webhook events (e.g. ACTIVITY, SPLUNK, NEWRELIC) |
 | `--name string` | `` | The webhook subscription name |

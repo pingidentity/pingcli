@@ -29,7 +29,6 @@ pingcli pingone davinci variables apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-v, --variable-id string` | `` | The variable ID |
 | `--context string` | `` | The variable context scope (company, flow, flowInstance, or user) |
 | `--data-type string` | `` | The variable data type (boolean, number, object, secret, or string) |
 | `--display-name string` | `` | The human-readable display name for the variable |

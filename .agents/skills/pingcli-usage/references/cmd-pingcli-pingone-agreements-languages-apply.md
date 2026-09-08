@@ -30,7 +30,6 @@ pingcli pingone agreements languages apply [flags]
 | `-a, --agreement-id string` | `` | The agreement ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-l, --language-id string` | `` | The agreement language ID |
 | `--display-name string` | `` | Display name of this language version of the agreement |
 | `--enabled` | `` | Whether this language version of the agreement is enabled |
 | `--locale string` | `` | BCP 47 locale code for this agreement language |

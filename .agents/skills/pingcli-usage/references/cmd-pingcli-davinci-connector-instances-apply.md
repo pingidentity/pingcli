@@ -27,7 +27,6 @@ pingcli davinci connector-instances apply [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
-| `-c, --connector-instance-id string` | `` | The connector instance ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--connector-id string` | `` | The ID of the DaVinci catalog connector to instantiate, e.g. "pingOneMfaConnector" |

@@ -29,7 +29,9 @@ pingcli pingfederate oauth token-exchange
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate oauth token-exchange generator` | Manage PingFederate OAuth Token Exchange generator resources | [`cmd-pingcli-pingfederate-oauth-token-exchange-generator.md`](cmd-pingcli-pingfederate-oauth-token-exchange-generator.md) |
 | `pingcli pingfederate oauth token-exchange processor` | Manage PingFederate OAuth Token Exchange processor resources | [`cmd-pingcli-pingfederate-oauth-token-exchange-processor.md`](cmd-pingcli-pingfederate-oauth-token-exchange-processor.md) |
+| `pingcli pingfederate oauth token-exchange token-generator-mappings` | PingFederate Token Exchange Processor policy to Token Generator Mappings | [`cmd-pingcli-pingfederate-oauth-token-exchange-token-generator-mappings.md`](cmd-pingcli-pingfederate-oauth-token-exchange-token-generator-mappings.md) |
 
 ## Parent Command
 

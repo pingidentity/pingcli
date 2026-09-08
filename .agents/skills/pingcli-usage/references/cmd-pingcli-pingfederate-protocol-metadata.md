@@ -30,6 +30,8 @@ pingcli pingfederate protocol-metadata
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingfederate protocol-metadata attribute-requester-mappings` | PingFederate Protocol Metadata Attribute Requester Mappings | [`cmd-pingcli-pingfederate-protocol-metadata-attribute-requester-mappings.md`](cmd-pingcli-pingfederate-protocol-metadata-attribute-requester-mappings.md) |
+| `pingcli pingfederate protocol-metadata lifetime-settings` | PingFederate Protocol Metadata Lifetime Settings | [`cmd-pingcli-pingfederate-protocol-metadata-lifetime-settings.md`](cmd-pingcli-pingfederate-protocol-metadata-lifetime-settings.md) |
+| `pingcli pingfederate protocol-metadata signing-settings` | PingFederate Protocol Metadata Signing Settings | [`cmd-pingcli-pingfederate-protocol-metadata-signing-settings.md`](cmd-pingcli-pingfederate-protocol-metadata-signing-settings.md) |
 
 ## Parent Command
 

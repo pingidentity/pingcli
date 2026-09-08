@@ -32,8 +32,12 @@ pingcli pingfederate sp adapters [flags]
 | `pingcli pingfederate sp adapters apply` | Create or update an SP adapter | [`cmd-pingcli-pingfederate-sp-adapters-apply.md`](cmd-pingcli-pingfederate-sp-adapters-apply.md) |
 | `pingcli pingfederate sp adapters create` | Create a new SP adapter | [`cmd-pingcli-pingfederate-sp-adapters-create.md`](cmd-pingcli-pingfederate-sp-adapters-create.md) |
 | `pingcli pingfederate sp adapters delete` | Delete an SP adapter | [`cmd-pingcli-pingfederate-sp-adapters-delete.md`](cmd-pingcli-pingfederate-sp-adapters-delete.md) |
+| `pingcli pingfederate sp adapters descriptors` | PingFederate SP Adapter Descriptors | [`cmd-pingcli-pingfederate-sp-adapters-descriptors.md`](cmd-pingcli-pingfederate-sp-adapters-descriptors.md) |
 | `pingcli pingfederate sp adapters get` | Read a specific SP adapter | [`cmd-pingcli-pingfederate-sp-adapters-get.md`](cmd-pingcli-pingfederate-sp-adapters-get.md) |
+| `pingcli pingfederate sp adapters get-action` | Get an SP adapter action | [`cmd-pingcli-pingfederate-sp-adapters-get-action.md`](cmd-pingcli-pingfederate-sp-adapters-get-action.md) |
+| `pingcli pingfederate sp adapters invoke-action` | Invoke an SP adapter action | [`cmd-pingcli-pingfederate-sp-adapters-invoke-action.md`](cmd-pingcli-pingfederate-sp-adapters-invoke-action.md) |
 | `pingcli pingfederate sp adapters list` | List all SP adapters | [`cmd-pingcli-pingfederate-sp-adapters-list.md`](cmd-pingcli-pingfederate-sp-adapters-list.md) |
+| `pingcli pingfederate sp adapters list-actions` | List SP adapter actions | [`cmd-pingcli-pingfederate-sp-adapters-list-actions.md`](cmd-pingcli-pingfederate-sp-adapters-list-actions.md) |
 | `pingcli pingfederate sp adapters replace` | Update an SP adapter | [`cmd-pingcli-pingfederate-sp-adapters-replace.md`](cmd-pingcli-pingfederate-sp-adapters-replace.md) |
 | `pingcli pingfederate sp adapters template` | Generate an SP adapter JSON template | [`cmd-pingcli-pingfederate-sp-adapters-template.md`](cmd-pingcli-pingfederate-sp-adapters-template.md) |
 

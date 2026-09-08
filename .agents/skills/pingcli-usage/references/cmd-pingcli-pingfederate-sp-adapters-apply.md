@@ -28,7 +28,6 @@ pingcli pingfederate sp adapters apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate SP adapter instance ID |
 | `--name string` | `` | The plugin instance name for the SP adapter |
 | `--parent-ref-id string` | `` | ID of the parent plugin instance this adapter overrides, if any |
 | `--plugin-descriptor-ref-id string` | `` | ID of the SP adapter plugin type descriptor |

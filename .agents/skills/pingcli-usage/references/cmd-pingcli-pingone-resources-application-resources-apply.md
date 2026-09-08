@@ -27,7 +27,6 @@ pingcli pingone resources application-resources apply [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
-| `-a, --application-resource-id string` | `` | The application resource ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-r, --resource-id string` | `` | The parent PingOne Authorize resource ID |

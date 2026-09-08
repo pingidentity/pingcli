@@ -29,7 +29,6 @@ pingcli pingone password-policies apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-p, --password-policy-id string` | `` | The password policy ID |
 | `--default` | `` | Whether this is the default password policy for the environment |
 | `--description string` | `` | The description of the password policy |
 | `--excludes-commonly-used` | `` | Whether commonly used passwords are rejected |

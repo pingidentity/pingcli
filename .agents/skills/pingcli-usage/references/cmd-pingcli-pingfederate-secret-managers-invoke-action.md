@@ -3,7 +3,7 @@ Invoke a secret manager action
 
 ## Synopsis
 
-Invoke an action for a PingFederate secret manager instance. Only parameterless actions are supported; actions that require parameters in the ActionOptions body will return a server error.
+Invoke an action for a PingFederate secret manager instance.
 
 ```
 pingcli pingfederate secret-managers invoke-action [flags]
@@ -13,7 +13,7 @@ pingcli pingfederate secret-managers invoke-action [flags]
 
 ```
 # Invoke an action for a secret manager
-  pingcli pingfederate secret-managers invoke-action --id <id> --action-id <action-id>
+  pingcli pingfederate secret-managers invoke-action --id <id> --action-id <action-id> --from-file action-options.json
 ```
 
 ## Options
@@ -21,6 +21,7 @@ pingcli pingfederate secret-managers invoke-action [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
+| `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--action-id string` | `` | The PingFederate Secret Manager action ID |
 | `--id string` | `` | The PingFederate Secret Manager ID |
 

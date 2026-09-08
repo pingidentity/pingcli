@@ -3,7 +3,7 @@ Invoke an IDP adapter action
 
 ## Synopsis
 
-Invoke an action for a PingFederate IDP adapter instance. Only parameterless actions are supported; actions that require parameters in the ActionOptions body will return a server error.
+Invoke an action for a PingFederate IDP adapter instance.
 
 ```
 pingcli pingfederate idp adapters invoke-action [flags]
@@ -13,7 +13,7 @@ pingcli pingfederate idp adapters invoke-action [flags]
 
 ```
 # Invoke an action for an IDP adapter
-  pingcli pingfederate idp adapters invoke-action --id <id> --action-id <action-id>
+  pingcli pingfederate idp adapters invoke-action --id <id> --action-id <action-id> --from-file action-options.json
 ```
 
 ## Options
@@ -21,6 +21,7 @@ pingcli pingfederate idp adapters invoke-action [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
+| `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--action-id string` | `` | The PingFederate IDP adapter action ID |
 | `--id string` | `` | The PingFederate IDP Adapter ID |
 

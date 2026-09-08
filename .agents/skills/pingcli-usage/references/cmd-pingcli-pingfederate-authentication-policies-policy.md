@@ -32,6 +32,7 @@ pingcli pingfederate authentication-policies policy [flags]
 | `pingcli pingfederate authentication-policies policy create` | Create an Authentication Policy | [`cmd-pingcli-pingfederate-authentication-policies-policy-create.md`](cmd-pingcli-pingfederate-authentication-policies-policy-create.md) |
 | `pingcli pingfederate authentication-policies policy delete` | Delete an Authentication Policy | [`cmd-pingcli-pingfederate-authentication-policies-policy-delete.md`](cmd-pingcli-pingfederate-authentication-policies-policy-delete.md) |
 | `pingcli pingfederate authentication-policies policy get` | Read Authentication Policy | [`cmd-pingcli-pingfederate-authentication-policies-policy-get.md`](cmd-pingcli-pingfederate-authentication-policies-policy-get.md) |
+| `pingcli pingfederate authentication-policies policy move` | Move an authentication policy to a location within the policy tree | [`cmd-pingcli-pingfederate-authentication-policies-policy-move.md`](cmd-pingcli-pingfederate-authentication-policies-policy-move.md) |
 | `pingcli pingfederate authentication-policies policy replace` | Update Authentication Policy | [`cmd-pingcli-pingfederate-authentication-policies-policy-replace.md`](cmd-pingcli-pingfederate-authentication-policies-policy-replace.md) |
 | `pingcli pingfederate authentication-policies policy template` | Generate an Authentication Policy JSON template | [`cmd-pingcli-pingfederate-authentication-policies-policy-template.md`](cmd-pingcli-pingfederate-authentication-policies-policy-template.md) |
 

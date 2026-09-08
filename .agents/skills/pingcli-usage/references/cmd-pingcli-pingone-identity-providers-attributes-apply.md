@@ -13,7 +13,7 @@ pingcli pingone identity-providers attributes apply [flags]
 
 ```
 # Create or update an identity provider attribute from flags
-  pingcli pingone identity-providers attributes apply --environment-id <env-id> --identity-provider-id <idp-id> --attribute-id <attribute-id> --name email --value "${email}" --update ALWAYS
+  pingcli pingone identity-providers attributes apply --environment-id <env-id> --identity-provider-id <idp-id> --name email --value "${email}" --update ALWAYS
 
   # Create or update an identity provider attribute
   pingcli pingone identity-providers attributes apply --environment-id <env-id> --identity-provider-id <idp-id> --from-file attribute.json
@@ -27,7 +27,6 @@ pingcli pingone identity-providers attributes apply [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
-| `-a, --attribute-id string` | `` | The identity provider attribute ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-i, --identity-provider-id string` | `` | The identity provider ID |

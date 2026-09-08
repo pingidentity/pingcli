@@ -27,7 +27,6 @@ pingcli pingone environments apply [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
-| `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--description string` | `` | The description of the environment |
 | `--icon string` | `` | The URL or identifier for the environment icon |
