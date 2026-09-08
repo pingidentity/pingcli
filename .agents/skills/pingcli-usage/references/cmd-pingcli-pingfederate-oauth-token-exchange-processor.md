@@ -30,6 +30,7 @@ pingcli pingfederate oauth token-exchange processor
 | Command | Description | Reference |
 |---------|-------------|----------|
 | `pingcli pingfederate oauth token-exchange processor policies` | PingFederate OAuth 2.0 Token Exchange processor policies | [`cmd-pingcli-pingfederate-oauth-token-exchange-processor-policies.md`](cmd-pingcli-pingfederate-oauth-token-exchange-processor-policies.md) |
+| `pingcli pingfederate oauth token-exchange processor settings` | PingFederate OAuth 2.0 Token Exchange processor settings | [`cmd-pingcli-pingfederate-oauth-token-exchange-processor-settings.md`](cmd-pingcli-pingfederate-oauth-token-exchange-processor-settings.md) |
 
 ## Parent Command
 

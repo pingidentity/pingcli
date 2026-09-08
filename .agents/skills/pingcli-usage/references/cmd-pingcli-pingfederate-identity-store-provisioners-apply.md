@@ -28,7 +28,6 @@ pingcli pingfederate identity-store-provisioners apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate Identity Store Provisioner ID |
 | `--name string` | `` | The identity store provisioner plugin instance name |
 | `--parent-ref-id string` | `` | ID of the parent identity store provisioner instance |
 | `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |

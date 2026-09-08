@@ -6,7 +6,7 @@ Manage the PingFederate connection to PingOne for Enterprise
 Manage the PingFederate connection to PingOne for Enterprise
 
 ```
-pingcli pingfederate pingone-for-enterprise
+pingcli pingfederate pingone-for-enterprise [flags]
 ```
 
 ## Inherited Options
@@ -29,8 +29,12 @@ pingcli pingfederate pingone-for-enterprise
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli pingfederate pingone-for-enterprise apply` | Update PingOne for Enterprise settings | [`cmd-pingcli-pingfederate-pingone-for-enterprise-apply.md`](cmd-pingcli-pingfederate-pingone-for-enterprise-apply.md) |
 | `pingcli pingfederate pingone-for-enterprise disconnect` | Disconnect PingFederate from PingOne for Enterprise | [`cmd-pingcli-pingfederate-pingone-for-enterprise-disconnect.md`](cmd-pingcli-pingfederate-pingone-for-enterprise-disconnect.md) |
+| `pingcli pingfederate pingone-for-enterprise get` | Read PingOne for Enterprise settings | [`cmd-pingcli-pingfederate-pingone-for-enterprise-get.md`](cmd-pingcli-pingfederate-pingone-for-enterprise-get.md) |
 | `pingcli pingfederate pingone-for-enterprise key-pairs` | Manage PingOne for Enterprise key pairs | [`cmd-pingcli-pingfederate-pingone-for-enterprise-key-pairs.md`](cmd-pingcli-pingfederate-pingone-for-enterprise-key-pairs.md) |
+| `pingcli pingfederate pingone-for-enterprise replace` | Update PingOne for Enterprise settings | [`cmd-pingcli-pingfederate-pingone-for-enterprise-replace.md`](cmd-pingcli-pingfederate-pingone-for-enterprise-replace.md) |
+| `pingcli pingfederate pingone-for-enterprise template` | Generate a PingOne for Enterprise settings JSON template | [`cmd-pingcli-pingfederate-pingone-for-enterprise-template.md`](cmd-pingcli-pingfederate-pingone-for-enterprise-template.md) |
 | `pingcli pingfederate pingone-for-enterprise update-identity-repository` | Update the PingOne for Enterprise identity repository | [`cmd-pingcli-pingfederate-pingone-for-enterprise-update-identity-repository.md`](cmd-pingcli-pingfederate-pingone-for-enterprise-update-identity-repository.md) |
 
 ## Parent Command

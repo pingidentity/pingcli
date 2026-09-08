@@ -54,6 +54,7 @@ pingcli pingfederate
 | `pingcli pingfederate extended-properties` | PingFederate Extended Properties | [`cmd-pingcli-pingfederate-extended-properties.md`](cmd-pingcli-pingfederate-extended-properties.md) |
 | `pingcli pingfederate identity-store-provisioners` | PingFederate Identity Store Provisioners | [`cmd-pingcli-pingfederate-identity-store-provisioners.md`](cmd-pingcli-pingfederate-identity-store-provisioners.md) |
 | `pingcli pingfederate idp` | Manage PingFederate IdP resources | [`cmd-pingcli-pingfederate-idp.md`](cmd-pingcli-pingfederate-idp.md) |
+| `pingcli pingfederate idp-to-sp-adapter-mappings` | PingFederate IdP-to-SP Adapter Mappings | [`cmd-pingcli-pingfederate-idp-to-sp-adapter-mappings.md`](cmd-pingcli-pingfederate-idp-to-sp-adapter-mappings.md) |
 | `pingcli pingfederate incoming-proxy-settings` | PingFederate incoming proxy settings | [`cmd-pingcli-pingfederate-incoming-proxy-settings.md`](cmd-pingcli-pingfederate-incoming-proxy-settings.md) |
 | `pingcli pingfederate init` | Initialize Ping CLI for the PingFederate management APIs. | [`cmd-pingcli-pingfederate-init.md`](cmd-pingcli-pingfederate-init.md) |
 | `pingcli pingfederate kerberos` | Manage PingFederate Kerberos resources | [`cmd-pingcli-pingfederate-kerberos.md`](cmd-pingcli-pingfederate-kerberos.md) |
@@ -70,6 +71,7 @@ pingcli pingfederate
 | `pingcli pingfederate redirect-validation` | PingFederate Redirect Validation Settings | [`cmd-pingcli-pingfederate-redirect-validation.md`](cmd-pingcli-pingfederate-redirect-validation.md) |
 | `pingcli pingfederate secret-managers` | PingFederate Secret Managers | [`cmd-pingcli-pingfederate-secret-managers.md`](cmd-pingcli-pingfederate-secret-managers.md) |
 | `pingcli pingfederate server-settings` | PingFederate Server Settings | [`cmd-pingcli-pingfederate-server-settings.md`](cmd-pingcli-pingfederate-server-settings.md) |
+| `pingcli pingfederate service-authentication` | PingFederate Service Authentication | [`cmd-pingcli-pingfederate-service-authentication.md`](cmd-pingcli-pingfederate-service-authentication.md) |
 | `pingcli pingfederate session` | Manage PingFederate Session resources | [`cmd-pingcli-pingfederate-session.md`](cmd-pingcli-pingfederate-session.md) |
 | `pingcli pingfederate sp` | Manage PingFederate SP resources | [`cmd-pingcli-pingfederate-sp.md`](cmd-pingcli-pingfederate-sp.md) |
 | `pingcli pingfederate token-processor-to-token-generator-mappings` | PingFederate Token Processor to Token Generator Mappings | [`cmd-pingcli-pingfederate-token-processor-to-token-generator-mappings.md`](cmd-pingcli-pingfederate-token-processor-to-token-generator-mappings.md) |

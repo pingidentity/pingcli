@@ -32,6 +32,7 @@ pingcli pingfederate cluster
 | `pingcli pingfederate cluster admin-node` | Manage PingFederate Cluster Admin Node resources | [`cmd-pingcli-pingfederate-cluster-admin-node.md`](cmd-pingcli-pingfederate-cluster-admin-node.md) |
 | `pingcli pingfederate cluster replicate` | Trigger PingFederate cluster replication | [`cmd-pingcli-pingfederate-cluster-replicate.md`](cmd-pingcli-pingfederate-cluster-replicate.md) |
 | `pingcli pingfederate cluster settings` | PingFederate Cluster Settings | [`cmd-pingcli-pingfederate-cluster-settings.md`](cmd-pingcli-pingfederate-cluster-settings.md) |
+| `pingcli pingfederate cluster status` | Read PingFederate cluster status | [`cmd-pingcli-pingfederate-cluster-status.md`](cmd-pingcli-pingfederate-cluster-status.md) |
 
 ## Parent Command
 

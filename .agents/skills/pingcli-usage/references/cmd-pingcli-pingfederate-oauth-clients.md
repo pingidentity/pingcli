@@ -36,6 +36,7 @@ pingcli pingfederate oauth clients [flags]
 | `pingcli pingfederate oauth clients get-secret` | Get an OAuth client secret | [`cmd-pingcli-pingfederate-oauth-clients-get-secret.md`](cmd-pingcli-pingfederate-oauth-clients-get-secret.md) |
 | `pingcli pingfederate oauth clients list` | List all OAuth clients | [`cmd-pingcli-pingfederate-oauth-clients-list.md`](cmd-pingcli-pingfederate-oauth-clients-list.md) |
 | `pingcli pingfederate oauth clients replace` | Update an OAuth client | [`cmd-pingcli-pingfederate-oauth-clients-replace.md`](cmd-pingcli-pingfederate-oauth-clients-replace.md) |
+| `pingcli pingfederate oauth clients revoke-secondary-secrets` | Revoke an OAuth client's secondary secrets | [`cmd-pingcli-pingfederate-oauth-clients-revoke-secondary-secrets.md`](cmd-pingcli-pingfederate-oauth-clients-revoke-secondary-secrets.md) |
 | `pingcli pingfederate oauth clients template` | Generate an OAuth client JSON template | [`cmd-pingcli-pingfederate-oauth-clients-template.md`](cmd-pingcli-pingfederate-oauth-clients-template.md) |
 | `pingcli pingfederate oauth clients update-secret` | Update an OAuth client secret | [`cmd-pingcli-pingfederate-oauth-clients-update-secret.md`](cmd-pingcli-pingfederate-oauth-clients-update-secret.md) |
 

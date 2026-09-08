@@ -29,7 +29,6 @@ pingcli pingone languages apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-l, --language-id string` | `` | The language ID |
 | `--default` | `` | Whether this is the default language for the environment |
 | `--enabled` | `` | Whether this language is enabled in the environment |
 | `--locale string` | `` | The locale code for the language (e.g. en, fr, de) |

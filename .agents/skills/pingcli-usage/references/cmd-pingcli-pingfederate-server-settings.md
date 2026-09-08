@@ -35,9 +35,12 @@ pingcli pingfederate server-settings [flags]
 | `pingcli pingfederate server-settings general-settings` | PingFederate General Settings | [`cmd-pingcli-pingfederate-server-settings-general-settings.md`](cmd-pingcli-pingfederate-server-settings-general-settings.md) |
 | `pingcli pingfederate server-settings get` | Read server settings | [`cmd-pingcli-pingfederate-server-settings-get.md`](cmd-pingcli-pingfederate-server-settings-get.md) |
 | `pingcli pingfederate server-settings log-settings` | PingFederate Log Settings | [`cmd-pingcli-pingfederate-server-settings-log-settings.md`](cmd-pingcli-pingfederate-server-settings-log-settings.md) |
+| `pingcli pingfederate server-settings notifications` | PingFederate Notification Settings | [`cmd-pingcli-pingfederate-server-settings-notifications.md`](cmd-pingcli-pingfederate-server-settings-notifications.md) |
+| `pingcli pingfederate server-settings outbound-provisioning` | PingFederate Outbound Provisioning | [`cmd-pingcli-pingfederate-server-settings-outbound-provisioning.md`](cmd-pingcli-pingfederate-server-settings-outbound-provisioning.md) |
 | `pingcli pingfederate server-settings replace` | Update server settings | [`cmd-pingcli-pingfederate-server-settings-replace.md`](cmd-pingcli-pingfederate-server-settings-replace.md) |
 | `pingcli pingfederate server-settings system-keys` | PingFederate Server Settings System Keys | [`cmd-pingcli-pingfederate-server-settings-system-keys.md`](cmd-pingcli-pingfederate-server-settings-system-keys.md) |
 | `pingcli pingfederate server-settings template` | Generate a server settings JSON template | [`cmd-pingcli-pingfederate-server-settings-template.md`](cmd-pingcli-pingfederate-server-settings-template.md) |
+| `pingcli pingfederate server-settings ws-trust-sts-settings` | PingFederate WS-Trust STS Settings | [`cmd-pingcli-pingfederate-server-settings-ws-trust-sts-settings.md`](cmd-pingcli-pingfederate-server-settings-ws-trust-sts-settings.md) |
 
 ## Parent Command
 

@@ -26,7 +26,6 @@ pingcli pingone propagation-plans apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-p, --plan-id string` | `` | The identity propagation plan ID |
 
 
 ## Inherited Options

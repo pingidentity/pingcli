@@ -19,7 +19,7 @@ pingcli pingone notification-templates contents apply [flags]
   pingcli pingone notification-templates contents apply --environment-id <env-id> --template-name <template-name> --from-file - < content.json
 
   # Create or update from a JSON file, overriding the locale and default state
-  pingcli pingone notification-templates contents apply --environment-id <env-id> --template-name <template-name> --content-id <content-id> --from-file content.json --locale fr --default=false
+  pingcli pingone notification-templates contents apply --environment-id <env-id> --template-name <template-name> --from-file content.json --locale fr --default=false
 ```
 
 ## Options
@@ -27,7 +27,6 @@ pingcli pingone notification-templates contents apply [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
-| `-c, --content-id string` | `` | The notification template content ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-t, --template-name string` | `` | The notification template name |

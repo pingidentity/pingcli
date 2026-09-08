@@ -30,7 +30,6 @@ pingcli credentials digital-wallet-applications apply [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
-| `-d, --digital-wallet-application-id string` | `` | The digital wallet application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--app-open-url string` | `` | The deep-link URL used to open the digital wallet app on a mobile device |

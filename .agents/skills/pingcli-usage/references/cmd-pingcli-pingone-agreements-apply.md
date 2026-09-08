@@ -29,7 +29,6 @@ pingcli pingone agreements apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-i, --agreement-id string` | `` | The agreement ID |
 | `--description string` | `` | Description of the agreement |
 | `--enabled` | `` | Whether the agreement is active and presented to users |
 | `--name string` | `` | Display name of the agreement |

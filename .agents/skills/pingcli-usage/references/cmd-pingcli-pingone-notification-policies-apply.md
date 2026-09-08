@@ -19,7 +19,7 @@ pingcli pingone notification-policies apply [flags]
   pingcli pingone notification-policies apply --environment-id <env-id> --from-file - < notification-policy.json
 
   # Create or update from a JSON file, overriding the default state
-  pingcli pingone notification-policies apply --environment-id <env-id> --notification-policy-id <policy-id> --from-file notification-policy.json --default=true
+  pingcli pingone notification-policies apply --environment-id <env-id> --from-file notification-policy.json --default=true
 ```
 
 ## Options
@@ -29,7 +29,6 @@ pingcli pingone notification-policies apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-n, --notification-policy-id string` | `` | The notification policy ID |
 | `--default` | `` | Whether this is the default notification policy for the environment |
 | `--name string` | `` | The name of the notification policy |
 

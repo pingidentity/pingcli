@@ -27,7 +27,6 @@ pingcli pingone applications attribute-mappings apply [flags]
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-m, --attribute-mapping-id string` | `` | The application attribute mapping ID |
 
 
 ## Inherited Options

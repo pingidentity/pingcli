@@ -24,7 +24,6 @@ pingcli pingone alert-channels apply [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
-| `-a, --alert-channel-id string` | `` | The alert channel ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 

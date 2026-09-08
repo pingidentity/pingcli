@@ -34,7 +34,6 @@ pingcli authorize permissions apply [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--action string` | `` | The action string identifying this permission (e.g. read, write, execute) |
-| `--application-resource-permission-id string` | `` | The application resource permission ID |
 | `--description string` | `` | The description of the application resource permission |
 
 

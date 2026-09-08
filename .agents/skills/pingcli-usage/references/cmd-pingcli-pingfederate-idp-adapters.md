@@ -32,6 +32,7 @@ pingcli pingfederate idp adapters [flags]
 | `pingcli pingfederate idp adapters apply` | Create or update an IDP adapter | [`cmd-pingcli-pingfederate-idp-adapters-apply.md`](cmd-pingcli-pingfederate-idp-adapters-apply.md) |
 | `pingcli pingfederate idp adapters create` | Create a new IDP adapter | [`cmd-pingcli-pingfederate-idp-adapters-create.md`](cmd-pingcli-pingfederate-idp-adapters-create.md) |
 | `pingcli pingfederate idp adapters delete` | Delete an IDP adapter | [`cmd-pingcli-pingfederate-idp-adapters-delete.md`](cmd-pingcli-pingfederate-idp-adapters-delete.md) |
+| `pingcli pingfederate idp adapters descriptors` | PingFederate IDP Adapter Descriptors | [`cmd-pingcli-pingfederate-idp-adapters-descriptors.md`](cmd-pingcli-pingfederate-idp-adapters-descriptors.md) |
 | `pingcli pingfederate idp adapters get` | Read a specific IDP adapter | [`cmd-pingcli-pingfederate-idp-adapters-get.md`](cmd-pingcli-pingfederate-idp-adapters-get.md) |
 | `pingcli pingfederate idp adapters get-action` | Get an IDP adapter action | [`cmd-pingcli-pingfederate-idp-adapters-get-action.md`](cmd-pingcli-pingfederate-idp-adapters-get-action.md) |
 | `pingcli pingfederate idp adapters invoke-action` | Invoke an IDP adapter action | [`cmd-pingcli-pingfederate-idp-adapters-invoke-action.md`](cmd-pingcli-pingfederate-idp-adapters-invoke-action.md) |

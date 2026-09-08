@@ -28,7 +28,6 @@ pingcli pingone credentials types apply [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
-| `-c, --credential-type-id string` | `` | The credential type ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--card-design-template string` | `` | The SVG/HTML template string for the visual card design |

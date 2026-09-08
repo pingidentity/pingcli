@@ -28,7 +28,6 @@ pingcli pingfederate oauth processor-policy-mappings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate OAuth processor policy mapping ID |
 | `--processor-policy-ref-id string` | `` | The ID of the token exchange processor policy |
 
 

@@ -29,7 +29,6 @@ pingcli pingone schemas attributes apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-i, --attribute-id string` | `` | The schema attribute ID |
 | `-s, --schema-id string` | `` | The PingOne schema ID |
 | `--description string` | `` | The description of the attribute |
 | `--display-name string` | `` | The display label for the attribute in the UI |

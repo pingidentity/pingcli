@@ -3,7 +3,7 @@ Invoke a data store action
 
 ## Synopsis
 
-Invoke an action for a PingFederate data store instance. Only parameterless actions are supported; actions that require parameters in the ActionOptions body will return a server error.
+Invoke an action for a PingFederate data store instance.
 
 ```
 pingcli pingfederate data-stores invoke-action [flags]
@@ -13,7 +13,7 @@ pingcli pingfederate data-stores invoke-action [flags]
 
 ```
 # Invoke an action for a data store
-  pingcli pingfederate data-stores invoke-action --id <id> --action-id <action-id>
+  pingcli pingfederate data-stores invoke-action --id <id> --action-id <action-id> --from-file action-options.json
 ```
 
 ## Options
@@ -21,6 +21,7 @@ pingcli pingfederate data-stores invoke-action [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
+| `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--action-id string` | `` | The PingFederate data store action ID |
 | `--id string` | `` | The PingFederate Data Store ID |
 
