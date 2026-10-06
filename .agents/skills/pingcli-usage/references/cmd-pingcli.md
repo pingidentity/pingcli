@@ -47,6 +47,7 @@ pingcli
 
 | Command | Description | Reference |
 |---------|-------------|----------|
+| `pingcli advanced-services` | Administration tools for your PingOne Advanced Services tenant. | [`cmd-pingcli-advanced-services.md`](cmd-pingcli-advanced-services.md) |
 | `pingcli agent-skills` | Find and install agent skills for Ping CLI. | [`cmd-pingcli-agent-skills.md`](cmd-pingcli-agent-skills.md) |
 | `pingcli auth` | Authenticate (or refresh authentication) for multiple connected products and services at once. | [`cmd-pingcli-auth.md`](cmd-pingcli-auth.md) |
 | `pingcli authorize` | Administration tools for the PingOne Authorize universal service. | [`cmd-pingcli-authorize.md`](cmd-pingcli-authorize.md) |

@@ -28,6 +28,7 @@ pingcli pingfederate oauth token-exchange generator groups apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The PingFederate Token Exchange generator group ID |
 | `--name string` | `` | The Token Exchange generator group name |
 | `--resource-uris []string` | `` | The list of resource URIs which map to this Token Exchange generator group |
 

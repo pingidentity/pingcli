@@ -16,16 +16,6 @@ pingcli pingone auth login [flags]
     pingcli pingone auth login
 ```
 
-## Options
-
-| Flag | Default | Description |
-|------|---------|-------------|
-| `-h, --help` | `` | help for login |
-| `--authorization-code` | `` | Use authorization code flow |
-| `--client-credentials` | `` | Use client credentials flow |
-| `--device-code` | `` | Use device authorization flow |
-
-
 ## Inherited Options
 
 | Flag | Default | Description |

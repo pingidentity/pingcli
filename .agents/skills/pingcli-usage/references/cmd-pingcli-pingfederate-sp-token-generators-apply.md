@@ -28,6 +28,7 @@ pingcli pingfederate sp token-generators apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The PingFederate token generator instance ID |
 | `--name string` | `` | Plugin instance display name |
 | `--parent-ref-id string` | `` | ID of a parent token generator instance to inherit configuration from |
 | `--plugin-descriptor-ref-id string` | `` | ID of the token generator plugin type descriptor |

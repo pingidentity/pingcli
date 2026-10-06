@@ -29,6 +29,7 @@ pingcli pingfederate local-identity profiles create [flags]
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--apc-id string` | `` | The authentication policy contract ID |
+| `--id string` | `` | The PingFederate Local Identity Profile ID |
 | `--name string` | `` | The local identity profile name |
 | `--profile-enabled` | `` | Whether the local identity profile is enabled |
 | `--registration-enabled` | `` | Whether registration is enabled |

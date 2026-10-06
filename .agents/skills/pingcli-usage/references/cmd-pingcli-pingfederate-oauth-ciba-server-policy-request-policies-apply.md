@@ -30,6 +30,7 @@ pingcli pingfederate oauth ciba-server-policy request-policies apply [flags]
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--allow-unsigned-login-hint-token` | `` | Allow an unsigned login hint token |
 | `--authenticator-ref-id string` | `` | ID of the out-of-band authenticator this request policy uses |
+| `--id string` | `` | The PingFederate CIBA request policy ID |
 | `--name string` | `` | The CIBA request policy name |
 | `--require-token-for-identity-hint` | `` | Require a token for the identity hint |
 | `--transaction-lifetime int64` | `` | The transaction lifetime in seconds |

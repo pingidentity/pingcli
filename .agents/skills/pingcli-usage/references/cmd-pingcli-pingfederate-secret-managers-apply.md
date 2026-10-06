@@ -28,6 +28,7 @@ pingcli pingfederate secret-managers apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The PingFederate Secret Manager ID |
 | `--name string` | `` | Secret manager instance name |
 | `--parent-ref-id string` | `` | ID of a parent secret manager instance to inherit configuration from |
 | `--plugin-descriptor-ref-id string` | `` | ID of the secret manager plugin type descriptor |

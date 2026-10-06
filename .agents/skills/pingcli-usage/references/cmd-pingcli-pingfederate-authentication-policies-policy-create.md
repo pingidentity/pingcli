@@ -32,6 +32,7 @@ pingcli pingfederate authentication-policies policy create [flags]
 | `--description string` | `` | Authentication policy description |
 | `--enabled` | `` | Whether or not this authentication policy tree is enabled. Default is true. |
 | `--handle-failures-locally` | `` | If a policy ends in failure keep the user local |
+| `--id string` | `` | The PingFederate authentication policy ID |
 | `--name string` | `` | Authentication policy name |
 
 

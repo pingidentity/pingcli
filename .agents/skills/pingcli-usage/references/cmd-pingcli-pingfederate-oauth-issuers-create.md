@@ -33,6 +33,7 @@ pingcli pingfederate oauth issuers create [flags]
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--description string` | `` | Description of the virtual issuer |
 | `--host string` | `` | Hostname of the virtual issuer |
+| `--id string` | `` | The PingFederate virtual issuer ID |
 | `--name string` | `` | Unique display name for the virtual issuer |
 | `--path string` | `` | Path of the virtual issuer |
 

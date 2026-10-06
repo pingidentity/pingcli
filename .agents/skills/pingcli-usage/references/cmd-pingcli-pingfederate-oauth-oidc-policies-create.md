@@ -30,6 +30,7 @@ pingcli pingfederate oauth oidc policies create [flags]
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--access-token-manager-id string` | `` | ID of the access token manager associated with this policy |
 | `--allow-id-token-introspection` | `` | Allow the introspection endpoint to validate an ID token |
+| `--id string` | `` | The PingFederate OAuth/OpenID Connect Policy ID |
 | `--id-token-lifetime int64` | `` | ID Token lifetime, in minutes |
 | `--id-token-typ-header-value string` | `` | ID Token Type (typ) header value |
 | `--include-shash-in-id-token` | `` | Include the State Hash in the ID token |
