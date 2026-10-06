@@ -3,7 +3,7 @@ Create or update a token processor to token generator mapping
 
 ## Synopsis
 
-Idempotently create or update a PingFederate token processor to token generator mapping looked up by the "id" field in the JSON body. If no mapping with the given id exists it is created; if it exists it is updated.
+Idempotently create or update a PingFederate token processor to token generator mapping looked up by the mapping's sourceId and targetId. If no mapping with the matching id exists it is created; if it exists it is updated.
 
 ```
 pingcli pingfederate token-processor-to-token-generator-mappings apply [flags]
@@ -12,7 +12,7 @@ pingcli pingfederate token-processor-to-token-generator-mappings apply [flags]
 ## Examples
 
 ```
-# Create or update a token processor to token generator mapping (body supplies id and other fields)
+# Create or update a token processor to token generator mapping (body supplies sourceId, targetId, and other fields)
   pingcli pingfederate token-processor-to-token-generator-mappings apply --from-file token-processor-to-token-generator-mapping.json
 
   # Read body from stdin

@@ -28,6 +28,7 @@ pingcli pingfederate authentication-selectors apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The PingFederate Authentication Selector ID |
 | `--name string` | `` | The authentication selector plugin instance name |
 | `--parent-ref-id string` | `` | ID of the parent authentication selector instance |
 | `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |

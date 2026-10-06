@@ -29,6 +29,7 @@ pingcli pingfederate oauth token-exchange processor policies create [flags]
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--actor-token-required` | `` | Require an Actor token on a OAuth 2.0 Token Exchange request |
+| `--id string` | `` | The PingFederate Token Exchange processor policy ID |
 | `--name string` | `` | The Token Exchange processor policy name |
 
 

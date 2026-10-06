@@ -33,6 +33,7 @@ pingcli pingfederate sp idp-connections create [flags]
 | `--default-virtual-entity-id string` | `` | The default alternate entity ID for this connection |
 | `--entity-id string` | `` | The partner entity ID or issuer value |
 | `--error-page-msg-id string` | `` | The identifier for the user-facing error page message |
+| `--id string` | `` | The PingFederate SP IdP connection ID |
 | `--license-connection-group string` | `` | The license connection group assigned to this connection |
 | `--logging-mode string` | `` | The transaction logging level for this connection |
 | `--name string` | `` | The connection display name |

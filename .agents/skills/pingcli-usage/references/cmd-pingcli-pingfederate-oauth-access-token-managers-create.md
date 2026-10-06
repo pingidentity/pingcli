@@ -28,6 +28,7 @@ pingcli pingfederate oauth access-token-managers create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The PingFederate access token manager instance ID |
 | `--name string` | `` | Display name of the access token manager |
 | `--parent-ref-id string` | `` | ID of a parent access token manager instance to inherit configuration from |
 | `--plugin-descriptor-ref-id string` | `` | ID of the access token manager plugin type descriptor |

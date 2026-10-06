@@ -29,6 +29,7 @@ pingcli pingfederate kerberos realms apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `--connection-type string` | `` | Controls how PingFederate connects to the Active Directory/Kerberos Realm. One of DIRECT, LDAP_GATEWAY, or LOCAL_VALIDATION. Defaults to DIRECT |
+| `--id string` | `` | The persistent, unique ID for the Kerberos Realm |
 | `--kerberos-realm-name string` | `` | The Domain/Realm name used for display in UI screens |
 | `--kerberos-username string` | `` | The Domain/Realm username. Only required when connection-type is DIRECT or LOCAL_VALIDATION |
 | `--key-distribution-centers []string` | `` | The Domain Controller/Key Distribution Center host names; repeatable or comma-separated. Only applicable when connection-type is DIRECT |

@@ -28,6 +28,7 @@ pingcli pingfederate captcha-providers create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The PingFederate CAPTCHA Provider ID |
 | `--name string` | `` | Display name of the CAPTCHA provider |
 | `--parent-ref-id string` | `` | ID of a parent CAPTCHA provider instance to inherit configuration from |
 | `--plugin-descriptor-ref-id string` | `` | ID of the CAPTCHA provider plugin type descriptor |

@@ -28,6 +28,7 @@ pingcli pingfederate metadata-urls create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The persistent, unique ID for the Metadata URL. It can be any combination of [a-zA-Z0-9._-]. This property is system-assigned if not specified |
 | `--name string` | `` | The name for the Metadata URL |
 | `--url string` | `` | The Metadata URL |
 | `--validate-signature` | `` | Perform Metadata Signature Validation. The default value is TRUE |

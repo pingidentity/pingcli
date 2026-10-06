@@ -25,6 +25,7 @@ pingcli pingfederate notification-publishers apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The PingFederate notification publisher instance ID |
 | `--name string` | `` | Notification publisher display name |
 | `--parent-ref-id string` | `` | ID of a parent notification publisher instance to inherit configuration from |
 | `--plugin-descriptor-ref-id string` | `` | ID of the notification publisher plugin type descriptor |

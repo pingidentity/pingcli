@@ -35,6 +35,7 @@ pingcli pingfederate idp sp-connections apply [flags]
 | `--connection-target-type string` | `` | The connection target type (bulk import/export usage only) |
 | `--default-virtual-entity-id string` | `` | The default alternate entity ID for this connection |
 | `--entity-id string` | `` | The partner entity ID or issuer value |
+| `--id string` | `` | The PingFederate SP connection ID |
 | `--license-connection-group string` | `` | The license connection group assigned to this connection |
 | `--logging-mode string` | `` | The transaction logging level for this connection |
 | `--name string` | `` | The connection display name |

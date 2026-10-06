@@ -35,6 +35,7 @@ pingcli pingone agreements languages [flags]
 | `pingcli pingone agreements languages get` | Read a specific agreement language | [`cmd-pingcli-pingone-agreements-languages-get.md`](cmd-pingcli-pingone-agreements-languages-get.md) |
 | `pingcli pingone agreements languages list` | List all agreement languages | [`cmd-pingcli-pingone-agreements-languages-list.md`](cmd-pingcli-pingone-agreements-languages-list.md) |
 | `pingcli pingone agreements languages replace` | Update an agreement language | [`cmd-pingcli-pingone-agreements-languages-replace.md`](cmd-pingcli-pingone-agreements-languages-replace.md) |
+| `pingcli pingone agreements languages revisions` | Agreement Language Revisions | [`cmd-pingcli-pingone-agreements-languages-revisions.md`](cmd-pingcli-pingone-agreements-languages-revisions.md) |
 | `pingcli pingone agreements languages template` | Generate an agreement language JSON template | [`cmd-pingcli-pingone-agreements-languages-template.md`](cmd-pingcli-pingone-agreements-languages-template.md) |
 
 ## Parent Command

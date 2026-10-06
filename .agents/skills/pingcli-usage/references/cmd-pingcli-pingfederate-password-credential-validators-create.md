@@ -28,6 +28,7 @@ pingcli pingfederate password-credential-validators create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `--id string` | `` | The PingFederate Password Credential Validator ID |
 | `--name string` | `` | Plugin instance display name |
 | `--parent-ref-id string` | `` | ID of a parent password credential validator instance to inherit configuration from |
 | `--plugin-descriptor-ref-id string` | `` | ID of the password credential validator plugin type descriptor |
