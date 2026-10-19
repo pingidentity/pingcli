@@ -36,6 +36,8 @@ pingcli pingone environments [flags]
 | `pingcli pingone environments list` | List all environments | [`cmd-pingcli-pingone-environments-list.md`](cmd-pingcli-pingone-environments-list.md) |
 | `pingcli pingone environments replace` | Update environment | [`cmd-pingcli-pingone-environments-replace.md`](cmd-pingcli-pingone-environments-replace.md) |
 | `pingcli pingone environments template` | Generate an environment JSON template | [`cmd-pingcli-pingone-environments-template.md`](cmd-pingcli-pingone-environments-template.md) |
+| `pingcli pingone environments update-status` | Update environment status | [`cmd-pingcli-pingone-environments-update-status.md`](cmd-pingcli-pingone-environments-update-status.md) |
+| `pingcli pingone environments update-type` | Update environment type | [`cmd-pingcli-pingone-environments-update-type.md`](cmd-pingcli-pingone-environments-update-type.md) |
 
 ## Parent Command
 

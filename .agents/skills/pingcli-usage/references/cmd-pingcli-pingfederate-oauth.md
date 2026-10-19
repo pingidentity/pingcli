@@ -36,6 +36,7 @@ pingcli pingfederate oauth
 | `pingcli pingfederate oauth authorization-detail-processors` | PingFederate OAuth authorization detail processors | [`cmd-pingcli-pingfederate-oauth-authorization-detail-processors.md`](cmd-pingcli-pingfederate-oauth-authorization-detail-processors.md) |
 | `pingcli pingfederate oauth authorization-detail-types` | PingFederate OAuth Authorization Detail Types | [`cmd-pingcli-pingfederate-oauth-authorization-detail-types.md`](cmd-pingcli-pingfederate-oauth-authorization-detail-types.md) |
 | `pingcli pingfederate oauth ciba-server-policy` | Manage PingFederate OAuth CIBA Server Policy resources | [`cmd-pingcli-pingfederate-oauth-ciba-server-policy.md`](cmd-pingcli-pingfederate-oauth-ciba-server-policy.md) |
+| `pingcli pingfederate oauth cimd-policies` | PingFederate OAuth CIMD policies | [`cmd-pingcli-pingfederate-oauth-cimd-policies.md`](cmd-pingcli-pingfederate-oauth-cimd-policies.md) |
 | `pingcli pingfederate oauth client-registration-policies` | PingFederate OAuth Client Registration Policies | [`cmd-pingcli-pingfederate-oauth-client-registration-policies.md`](cmd-pingcli-pingfederate-oauth-client-registration-policies.md) |
 | `pingcli pingfederate oauth client-settings` | PingFederate OAuth Client Settings | [`cmd-pingcli-pingfederate-oauth-client-settings.md`](cmd-pingcli-pingfederate-oauth-client-settings.md) |
 | `pingcli pingfederate oauth clients` | PingFederate OAuth Clients | [`cmd-pingcli-pingfederate-oauth-clients.md`](cmd-pingcli-pingfederate-oauth-clients.md) |
