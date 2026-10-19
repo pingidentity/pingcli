@@ -545,6 +545,14 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
             - [`pingcli advanced-services pingfederate oauth ciba-server-policy settings get`](references/cmd-pingcli-advanced-services-pingfederate-oauth-ciba-server-policy-settings-get.md) — Read CIBA server policy settings
             - [`pingcli advanced-services pingfederate oauth ciba-server-policy settings replace`](references/cmd-pingcli-advanced-services-pingfederate-oauth-ciba-server-policy-settings-replace.md) — Update CIBA server policy settings
             - [`pingcli advanced-services pingfederate oauth ciba-server-policy settings template`](references/cmd-pingcli-advanced-services-pingfederate-oauth-ciba-server-policy-settings-template.md) — Generate a CIBA server policy settings JSON template
+        - [`pingcli advanced-services pingfederate oauth cimd-policies`](references/cmd-pingcli-advanced-services-pingfederate-oauth-cimd-policies.md) — PingFederate OAuth CIMD policies
+          - [`pingcli advanced-services pingfederate oauth cimd-policies apply`](references/cmd-pingcli-advanced-services-pingfederate-oauth-cimd-policies-apply.md) — Create or update a CIMD policy
+          - [`pingcli advanced-services pingfederate oauth cimd-policies create`](references/cmd-pingcli-advanced-services-pingfederate-oauth-cimd-policies-create.md) — Create a new CIMD policy
+          - [`pingcli advanced-services pingfederate oauth cimd-policies delete`](references/cmd-pingcli-advanced-services-pingfederate-oauth-cimd-policies-delete.md) — Delete a CIMD policy
+          - [`pingcli advanced-services pingfederate oauth cimd-policies get`](references/cmd-pingcli-advanced-services-pingfederate-oauth-cimd-policies-get.md) — Read a specific CIMD policy
+          - [`pingcli advanced-services pingfederate oauth cimd-policies list`](references/cmd-pingcli-advanced-services-pingfederate-oauth-cimd-policies-list.md) — List all CIMD policies
+          - [`pingcli advanced-services pingfederate oauth cimd-policies replace`](references/cmd-pingcli-advanced-services-pingfederate-oauth-cimd-policies-replace.md) — Update a CIMD policy
+          - [`pingcli advanced-services pingfederate oauth cimd-policies template`](references/cmd-pingcli-advanced-services-pingfederate-oauth-cimd-policies-template.md) — Generate a CIMD policy JSON template
         - [`pingcli advanced-services pingfederate oauth client-registration-policies`](references/cmd-pingcli-advanced-services-pingfederate-oauth-client-registration-policies.md) — PingFederate OAuth Client Registration Policies
           - [`pingcli advanced-services pingfederate oauth client-registration-policies apply`](references/cmd-pingcli-advanced-services-pingfederate-oauth-client-registration-policies-apply.md) — Create or update a client registration policy
           - [`pingcli advanced-services pingfederate oauth client-registration-policies create`](references/cmd-pingcli-advanced-services-pingfederate-oauth-client-registration-policies-create.md) — Create a new client registration policy
@@ -1619,6 +1627,14 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
           - [`pingcli pingfederate oauth ciba-server-policy settings get`](references/cmd-pingcli-pingfederate-oauth-ciba-server-policy-settings-get.md) — Read CIBA server policy settings
           - [`pingcli pingfederate oauth ciba-server-policy settings replace`](references/cmd-pingcli-pingfederate-oauth-ciba-server-policy-settings-replace.md) — Update CIBA server policy settings
           - [`pingcli pingfederate oauth ciba-server-policy settings template`](references/cmd-pingcli-pingfederate-oauth-ciba-server-policy-settings-template.md) — Generate a CIBA server policy settings JSON template
+      - [`pingcli pingfederate oauth cimd-policies`](references/cmd-pingcli-pingfederate-oauth-cimd-policies.md) — PingFederate OAuth CIMD policies
+        - [`pingcli pingfederate oauth cimd-policies apply`](references/cmd-pingcli-pingfederate-oauth-cimd-policies-apply.md) — Create or update a CIMD policy
+        - [`pingcli pingfederate oauth cimd-policies create`](references/cmd-pingcli-pingfederate-oauth-cimd-policies-create.md) — Create a new CIMD policy
+        - [`pingcli pingfederate oauth cimd-policies delete`](references/cmd-pingcli-pingfederate-oauth-cimd-policies-delete.md) — Delete a CIMD policy
+        - [`pingcli pingfederate oauth cimd-policies get`](references/cmd-pingcli-pingfederate-oauth-cimd-policies-get.md) — Read a specific CIMD policy
+        - [`pingcli pingfederate oauth cimd-policies list`](references/cmd-pingcli-pingfederate-oauth-cimd-policies-list.md) — List all CIMD policies
+        - [`pingcli pingfederate oauth cimd-policies replace`](references/cmd-pingcli-pingfederate-oauth-cimd-policies-replace.md) — Update a CIMD policy
+        - [`pingcli pingfederate oauth cimd-policies template`](references/cmd-pingcli-pingfederate-oauth-cimd-policies-template.md) — Generate a CIMD policy JSON template
       - [`pingcli pingfederate oauth client-registration-policies`](references/cmd-pingcli-pingfederate-oauth-client-registration-policies.md) — PingFederate OAuth Client Registration Policies
         - [`pingcli pingfederate oauth client-registration-policies apply`](references/cmd-pingcli-pingfederate-oauth-client-registration-policies-apply.md) — Create or update a client registration policy
         - [`pingcli pingfederate oauth client-registration-policies create`](references/cmd-pingcli-pingfederate-oauth-client-registration-policies-create.md) — Create a new client registration policy
@@ -2289,6 +2305,8 @@ For example, `pingcli config get` → `references/cmd-pingcli-config-get.md`
       - [`pingcli pingone environments list`](references/cmd-pingcli-pingone-environments-list.md) — List all environments
       - [`pingcli pingone environments replace`](references/cmd-pingcli-pingone-environments-replace.md) — Update environment
       - [`pingcli pingone environments template`](references/cmd-pingcli-pingone-environments-template.md) — Generate an environment JSON template
+      - [`pingcli pingone environments update-status`](references/cmd-pingcli-pingone-environments-update-status.md) — Update environment status
+      - [`pingcli pingone environments update-type`](references/cmd-pingcli-pingone-environments-update-type.md) — Update environment type
     - [`pingcli pingone flow-policies`](references/cmd-pingcli-pingone-flow-policies.md) — Flow policies
       - [`pingcli pingone flow-policies get`](references/cmd-pingcli-pingone-flow-policies-get.md) — Read a specific flow policy
       - [`pingcli pingone flow-policies list`](references/cmd-pingcli-pingone-flow-policies-list.md) — List all flow policies

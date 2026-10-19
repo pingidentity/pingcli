@@ -3,7 +3,7 @@ Delete environment
 
 ## Synopsis
 
-Delete an environment (environment must be empty of resources)
+Delete an environment (environment must be empty of resources). PRODUCTION environments must first be soft-deleted via "update-status --status DELETE_PENDING"; soft-deleted environments are automatically deleted by PingOne after a 30-day waiting period.
 
 ```
 pingcli pingone environments delete [flags]
