@@ -21,8 +21,8 @@ pingcli pingone applications delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --application-id string` | `` | The application ID |
 
 
 ## Inherited Options

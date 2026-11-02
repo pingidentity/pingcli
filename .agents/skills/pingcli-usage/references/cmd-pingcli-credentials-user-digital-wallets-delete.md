@@ -21,8 +21,8 @@ pingcli credentials user-digital-wallets delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-d, --digital-wallet-id string` | `` | The digital wallet ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --digital-wallet-id string` | `` | The digital wallet ID |
 | `-u, --user-id string` | `` | The user ID |
 
 

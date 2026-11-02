@@ -22,8 +22,8 @@ pingcli pingfederate notification-publishers invoke-action [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate notification publisher instance ID |
 | `--action-id string` | `` | The PingFederate Notification Publisher action ID |
-| `--id string` | `` | The PingFederate notification publisher instance ID |
 
 
 ## Inherited Options

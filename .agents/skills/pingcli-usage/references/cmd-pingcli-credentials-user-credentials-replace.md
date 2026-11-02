@@ -24,9 +24,9 @@ pingcli credentials user-credentials replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-c, --credential-id string` | `` | The user credential ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --credential-id string` | `` | The user credential ID |
 | `-u, --user-id string` | `` | The user ID |
 
 

@@ -25,7 +25,7 @@ pingcli advanced-services pingfederate idp sts-request-parameters-contracts appl
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The STS request parameters contract ID |
+| `-i, --id string` | `` | The STS request parameters contract ID |
 | `--name string` | `` | The STS request parameters contract name |
 | `--parameters []string` | `` | Request parameter names or values; repeatable or comma-separated |
 

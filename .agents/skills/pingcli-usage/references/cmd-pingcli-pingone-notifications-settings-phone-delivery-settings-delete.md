@@ -22,7 +22,7 @@ pingcli pingone notifications-settings phone-delivery-settings delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-p, --phone-delivery-settings-id string` | `` | The phone delivery settings ID |
+| `-i, --phone-delivery-settings-id string` | `` | The phone delivery settings ID |
 
 
 ## Inherited Options

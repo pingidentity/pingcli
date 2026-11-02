@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate sp adapters descriptors get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate SP adapter plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate SP adapter plugin descriptor ID |
 
 
 ## Inherited Options

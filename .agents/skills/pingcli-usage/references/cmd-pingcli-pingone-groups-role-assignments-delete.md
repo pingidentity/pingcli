@@ -23,7 +23,7 @@ pingcli pingone groups role-assignments delete [flags]
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-g, --group-id string` | `` | The group ID |
-| `-r, --role-assignment-id string` | `` | The role assignment ID |
+| `-i, --role-assignment-id string` | `` | The role assignment ID |
 
 
 ## Inherited Options

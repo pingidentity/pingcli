@@ -21,7 +21,7 @@ pingcli pingfederate notification-publishers delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate notification publisher instance ID |
+| `-i, --id string` | `` | The PingFederate notification publisher instance ID |
 
 
 ## Inherited Options

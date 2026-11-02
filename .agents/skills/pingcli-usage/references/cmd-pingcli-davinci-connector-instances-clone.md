@@ -21,8 +21,8 @@ pingcli davinci connector-instances clone [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for clone |
-| `-c, --connector-instance-id string` | `` | The connector instance ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --connector-instance-id string` | `` | The connector instance ID |
 
 
 ## Inherited Options

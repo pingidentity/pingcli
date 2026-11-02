@@ -23,8 +23,8 @@ pingcli pingone davinci connector-instances delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-c, --connector-instance-id string` | `` | The connector instance ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --connector-instance-id string` | `` | The connector instance ID |
 
 
 ## Inherited Options

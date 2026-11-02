@@ -29,9 +29,9 @@ pingcli pingone davinci flows replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --flow-id string` | `` | The DaVinci flow ID |
 | `--color string` | `` | The canvas background color for the flow |
 | `--description string` | `` | The flow description |
-| `--flow-id string` | `` | The DaVinci flow ID |
 | `--name string` | `` | The flow name |
 
 

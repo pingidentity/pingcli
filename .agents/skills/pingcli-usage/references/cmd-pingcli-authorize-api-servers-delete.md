@@ -21,8 +21,8 @@ pingcli authorize api-servers delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-a, --api-server-id string` | `` | The API server ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --api-server-id string` | `` | The API server ID |
 
 
 ## Inherited Options

@@ -21,8 +21,8 @@ pingcli pingone users application-role-assignments delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-a, --application-role-id string` | `` | UUID of the application role to assign to the user |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --application-role-id string` | `` | UUID of the application role to assign to the user |
 | `-u, --user-id string` | `` | The user ID |
 
 

@@ -23,7 +23,7 @@ pingcli pingone email-domains trusted-email-addresses get [flags]
 | `-h, --help` | `` | help for get |
 | `-d, --email-domain-id string` | `` | The email domain ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-t, --trusted-email-id string` | `` | The trusted email address ID |
+| `-i, --trusted-email-id string` | `` | The trusted email address ID |
 
 
 ## Inherited Options

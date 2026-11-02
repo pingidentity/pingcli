@@ -21,7 +21,7 @@ pingcli pingfederate idp-to-sp-adapter-mappings get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The ID of the IdP-to-SP Adapter mapping |
+| `-i, --id string` | `` | The ID of the IdP-to-SP Adapter mapping |
 
 
 ## Inherited Options

@@ -21,8 +21,8 @@ pingcli pingone resources application-resources delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-a, --application-resource-id string` | `` | The application resource ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --application-resource-id string` | `` | The application resource ID |
 | `-r, --resource-id string` | `` | The parent PingOne Authorize resource ID |
 
 

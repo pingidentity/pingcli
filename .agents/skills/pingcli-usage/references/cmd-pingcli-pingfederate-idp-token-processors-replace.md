@@ -28,7 +28,7 @@ pingcli pingfederate idp token-processors replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate Token Processor ID |
+| `-i, --id string` | `` | The PingFederate Token Processor ID |
 | `--name string` | `` | Plugin instance display name |
 | `--parent-ref-id string` | `` | ID of a parent token processor instance to inherit configuration from |
 | `--plugin-descriptor-ref-id string` | `` | ID of the token processor plugin type descriptor |

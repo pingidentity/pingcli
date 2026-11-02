@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate administrative-accounts delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-u, --username string` | `` | The PingFederate administrative account username |
+| `-i, --username string` | `` | The PingFederate administrative account username |
 
 
 ## Inherited Options

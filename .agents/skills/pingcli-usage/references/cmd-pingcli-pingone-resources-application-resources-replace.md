@@ -27,9 +27,9 @@ pingcli pingone resources application-resources replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-a, --application-resource-id string` | `` | The application resource ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --application-resource-id string` | `` | The application resource ID |
 | `-r, --resource-id string` | `` | The parent PingOne Authorize resource ID |
 | `--description string` | `` | The description of the application resource |
 | `--name string` | `` | The name of the application resource |

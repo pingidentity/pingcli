@@ -22,7 +22,7 @@ pingcli pingone gateways delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-g, --gateway-id string` | `` | The gateway ID |
+| `-i, --gateway-id string` | `` | The gateway ID |
 
 
 ## Inherited Options

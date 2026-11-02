@@ -29,7 +29,7 @@ pingcli pingone keys replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-k, --key-id string` | `` | The key ID |
+| `-i, --key-id string` | `` | The key ID |
 | `--default` | `` | Whether this is the default key for the environment |
 | `--issuer-dn string` | `` | The distinguished name of the certificate issuer |
 | `--usage-type string` | `` | The intended key usage (e.g. SIGNING, ENCRYPTION, SIGNING_AND_ENCRYPTION) |

@@ -23,7 +23,7 @@ pingcli credentials types issuance-rules usage-counts [flags]
 | `-h, --help` | `` | help for usage-counts |
 | `-c, --credential-type-id string` | `` | The credential type ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --credential-issuance-rule-id string` | `` | The credential issuance rule ID |
+| `-i, --credential-issuance-rule-id string` | `` | The credential issuance rule ID |
 
 
 ## Inherited Options

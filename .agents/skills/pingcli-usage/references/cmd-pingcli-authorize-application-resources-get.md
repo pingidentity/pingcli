@@ -22,7 +22,7 @@ pingcli authorize application-resources get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--application-resource-id string` | `` | The application resource ID |
+| `-i, --application-resource-id string` | `` | The application resource ID |
 
 
 ## Inherited Options

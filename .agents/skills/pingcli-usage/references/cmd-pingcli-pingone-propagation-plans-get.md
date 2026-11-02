@@ -22,7 +22,7 @@ pingcli pingone propagation-plans get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-p, --plan-id string` | `` | The identity propagation plan ID |
+| `-i, --plan-id string` | `` | The identity propagation plan ID |
 
 
 ## Inherited Options

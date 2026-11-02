@@ -23,7 +23,7 @@ pingcli pingone applications sop-assignments get [flags]
 | `-h, --help` | `` | help for get |
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-s, --sop-assignment-id string` | `` | The sign-on policy assignment ID |
+| `-i, --sop-assignment-id string` | `` | The sign-on policy assignment ID |
 
 
 ## Inherited Options

@@ -28,7 +28,7 @@ pingcli advanced-services pingfederate oauth idp-adapter-mappings create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The ID of the IdP adapter mapping |
+| `-i, --id string` | `` | The ID of the IdP adapter mapping |
 | `--idp-adapter-ref-id string` | `` | ID of the IdP adapter referenced by this mapping |
 
 

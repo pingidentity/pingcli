@@ -22,7 +22,7 @@ pingcli pingone protect risk-predictors get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --risk-predictor-id string` | `` | The risk predictor ID |
+| `-i, --risk-predictor-id string` | `` | The risk predictor ID |
 
 
 ## Inherited Options

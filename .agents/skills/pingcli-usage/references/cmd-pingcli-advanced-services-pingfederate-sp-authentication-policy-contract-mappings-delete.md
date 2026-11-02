@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate sp authentication-policy-contract-mapping
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The ID of the APC-to-SP Adapter mapping |
+| `-i, --id string` | `` | The ID of the APC-to-SP Adapter mapping |
 
 
 ## Inherited Options

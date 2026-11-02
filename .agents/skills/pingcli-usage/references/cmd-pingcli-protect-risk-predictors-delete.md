@@ -22,7 +22,7 @@ pingcli protect risk-predictors delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --risk-predictor-id string` | `` | The risk predictor ID |
+| `-i, --risk-predictor-id string` | `` | The risk predictor ID |
 
 
 ## Inherited Options

@@ -21,8 +21,8 @@ pingcli credentials digital-wallet-applications delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-d, --digital-wallet-application-id string` | `` | The digital wallet application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --digital-wallet-application-id string` | `` | The digital wallet application ID |
 
 
 ## Inherited Options

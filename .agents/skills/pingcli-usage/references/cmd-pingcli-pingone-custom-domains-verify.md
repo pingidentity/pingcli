@@ -21,8 +21,8 @@ pingcli pingone custom-domains verify [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for verify |
-| `-d, --custom-domain-id string` | `` | The custom domain ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --custom-domain-id string` | `` | The custom domain ID |
 
 
 ## Inherited Options

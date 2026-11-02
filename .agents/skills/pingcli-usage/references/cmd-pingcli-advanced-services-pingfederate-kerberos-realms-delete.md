@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate kerberos realms delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The persistent, unique ID for the Kerberos Realm |
+| `-i, --id string` | `` | The persistent, unique ID for the Kerberos Realm |
 
 
 ## Inherited Options

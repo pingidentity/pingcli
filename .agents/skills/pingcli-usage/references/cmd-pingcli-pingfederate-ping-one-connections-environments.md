@@ -24,8 +24,8 @@ pingcli pingfederate ping-one-connections environments [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for environments |
+| `-i, --id string` | `` | The ID of the PingOne connection |
 | `--filter string` | `` | Filter criteria limiting the environments returned. |
-| `--id string` | `` | The ID of the PingOne connection |
 | `--number-per-page int64` | `` | Number of environments to return per page. |
 | `--page int64` | `` | Page number of environments to retrieve. |
 

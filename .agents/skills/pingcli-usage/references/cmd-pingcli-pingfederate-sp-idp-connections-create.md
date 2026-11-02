@@ -28,12 +28,12 @@ pingcli pingfederate sp idp-connections create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate SP IdP connection ID |
 | `--active` | `` | Whether the connection is active |
 | `--base-url string` | `` | The partner federation deployment base URL |
 | `--default-virtual-entity-id string` | `` | The default alternate entity ID for this connection |
 | `--entity-id string` | `` | The partner entity ID or issuer value |
 | `--error-page-msg-id string` | `` | The identifier for the user-facing error page message |
-| `--id string` | `` | The PingFederate SP IdP connection ID |
 | `--license-connection-group string` | `` | The license connection group assigned to this connection |
 | `--logging-mode string` | `` | The transaction logging level for this connection |
 | `--name string` | `` | The connection display name |

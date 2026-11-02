@@ -24,9 +24,9 @@ pingcli pingone alert-channels replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-a, --alert-channel-id string` | `` | The alert channel ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --alert-channel-id string` | `` | The alert channel ID |
 
 
 ## Inherited Options

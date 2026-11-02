@@ -21,7 +21,7 @@ pingcli pingfederate oauth client-registration-policies get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate OAuth Client Registration Policy ID |
+| `-i, --id string` | `` | The PingFederate OAuth Client Registration Policy ID |
 
 
 ## Inherited Options

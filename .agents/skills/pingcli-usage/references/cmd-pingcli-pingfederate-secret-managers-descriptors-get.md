@@ -21,7 +21,7 @@ pingcli pingfederate secret-managers descriptors get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate secret manager plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate secret manager plugin descriptor ID |
 
 
 ## Inherited Options

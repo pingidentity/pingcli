@@ -21,7 +21,7 @@ pingcli pingfederate session authentication-session-policies get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate authentication session policy ID |
+| `-i, --id string` | `` | The PingFederate authentication session policy ID |
 
 
 ## Inherited Options

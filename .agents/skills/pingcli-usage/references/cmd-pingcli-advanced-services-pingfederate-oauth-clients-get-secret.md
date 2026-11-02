@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth clients get-secret [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get-secret |
-| `--id string` | `` | The PingFederate OAuth Client ID |
+| `-i, --id string` | `` | The PingFederate OAuth Client ID |
 
 
 ## Inherited Options

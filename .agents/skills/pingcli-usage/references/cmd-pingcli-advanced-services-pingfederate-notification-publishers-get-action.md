@@ -21,8 +21,8 @@ pingcli advanced-services pingfederate notification-publishers get-action [flags
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get-action |
+| `-i, --id string` | `` | The PingFederate notification publisher instance ID |
 | `--action-id string` | `` | The PingFederate Notification Publisher action ID |
-| `--id string` | `` | The PingFederate notification publisher instance ID |
 
 
 ## Inherited Options

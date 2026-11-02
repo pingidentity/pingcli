@@ -21,7 +21,7 @@ pingcli pingfederate oauth ciba-server-policy request-policies delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate CIBA request policy ID |
+| `-i, --id string` | `` | The PingFederate CIBA request policy ID |
 
 
 ## Inherited Options

@@ -21,7 +21,7 @@ pingcli pingfederate oauth oidc policies get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate OAuth/OpenID Connect Policy ID |
+| `-i, --id string` | `` | The PingFederate OAuth/OpenID Connect Policy ID |
 
 
 ## Inherited Options

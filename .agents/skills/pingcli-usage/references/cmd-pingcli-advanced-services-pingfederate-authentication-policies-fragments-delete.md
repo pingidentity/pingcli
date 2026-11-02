@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate authentication-policies fragments delete 
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate authentication policy fragment ID |
+| `-i, --id string` | `` | The PingFederate authentication policy fragment ID |
 
 
 ## Inherited Options

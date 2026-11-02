@@ -21,7 +21,7 @@ pingcli pingfederate oauth auth-server-settings scopes exclusive get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--name string` | `` | The PingFederate OAuth exclusive scope name |
+| `-i, --name string` | `` | The PingFederate OAuth exclusive scope name |
 
 
 ## Inherited Options

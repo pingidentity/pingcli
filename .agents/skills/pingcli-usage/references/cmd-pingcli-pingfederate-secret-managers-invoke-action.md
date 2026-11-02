@@ -22,8 +22,8 @@ pingcli pingfederate secret-managers invoke-action [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate Secret Manager ID |
 | `--action-id string` | `` | The PingFederate Secret Manager action ID |
-| `--id string` | `` | The PingFederate Secret Manager ID |
 
 
 ## Inherited Options

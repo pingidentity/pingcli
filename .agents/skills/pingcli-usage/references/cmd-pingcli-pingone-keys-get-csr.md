@@ -25,7 +25,7 @@ pingcli pingone keys get-csr [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get-csr |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-k, --key-id string` | `` | The key ID |
+| `-i, --key-id string` | `` | The key ID |
 | `--format string` | `PEM` | CSR export format. Valid values: PEM, PKCS10. Defaults to PEM. |
 
 

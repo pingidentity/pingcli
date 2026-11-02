@@ -28,8 +28,8 @@ pingcli pingfederate oauth auth-server-settings scopes exclusive-scope-groups ap
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --name string` | `` | The PingFederate exclusive scope group name |
 | `--description string` | `` | The description of the scope group |
-| `--name string` | `` | The PingFederate exclusive scope group name |
 | `--scopes []string` | `` | The set of scopes for this scope group; repeatable or comma-separated |
 
 

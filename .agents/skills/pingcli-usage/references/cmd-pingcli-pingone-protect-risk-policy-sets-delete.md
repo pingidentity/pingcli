@@ -22,7 +22,7 @@ pingcli pingone protect risk-policy-sets delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --risk-policy-set-id string` | `` | The risk policy set ID |
+| `-i, --risk-policy-set-id string` | `` | The risk policy set ID |
 
 
 ## Inherited Options

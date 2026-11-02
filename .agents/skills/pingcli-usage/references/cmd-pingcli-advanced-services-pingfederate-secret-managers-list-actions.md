@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate secret-managers list-actions [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for list-actions |
-| `--id string` | `` | The PingFederate Secret Manager ID |
+| `-i, --id string` | `` | The PingFederate Secret Manager ID |
 
 
 ## Inherited Options

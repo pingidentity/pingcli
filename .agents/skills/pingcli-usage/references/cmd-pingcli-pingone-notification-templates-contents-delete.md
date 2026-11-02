@@ -21,8 +21,8 @@ pingcli pingone notification-templates contents delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-c, --content-id string` | `` | The notification template content ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --content-id string` | `` | The notification template content ID |
 | `-t, --template-name string` | `` | The notification template name |
 
 

@@ -28,10 +28,10 @@ pingcli pingfederate oauth authorization-detail-types replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate OAuth Authorization Detail Type ID |
 | `--active` | `` | Whether the authorization detail type is active |
 | `--authorization-detail-processor-ref-id string` | `` | ID of the processor plugin instance that handles this type |
 | `--description string` | `` | Description of the authorization detail type |
-| `--id string` | `` | The PingFederate OAuth Authorization Detail Type ID |
 | `--type string` | `` | The authorization detail type value |
 
 

@@ -28,8 +28,8 @@ pingcli pingfederate server-settings ws-trust-sts-settings issuer-certificates c
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The persistent, unique ID of the WS-Trust STS issuer certificate |
 | `--crypto-provider string` | `` | Cryptographic Provider name; only applicable if Hybrid HSM mode is enabled |
-| `--id string` | `` | The persistent, unique ID of the WS-Trust STS issuer certificate |
 
 
 ## Inherited Options

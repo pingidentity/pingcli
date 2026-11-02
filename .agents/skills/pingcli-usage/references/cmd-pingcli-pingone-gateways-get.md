@@ -22,7 +22,7 @@ pingcli pingone gateways get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-g, --gateway-id string` | `` | The gateway ID |
+| `-i, --gateway-id string` | `` | The gateway ID |
 
 
 ## Inherited Options

@@ -24,8 +24,8 @@ pingcli advanced-services pingfederate key-pairs ssl-server generate-csr [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for generate-csr |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
 | `-o, --output-file string` | `` | Optional path to write the raw result payload to, instead of only printing it to the terminal. Overwrites any existing file. |
-| `--id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
 
 
 ## Inherited Options

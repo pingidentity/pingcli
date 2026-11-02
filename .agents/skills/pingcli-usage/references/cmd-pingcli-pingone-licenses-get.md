@@ -21,7 +21,7 @@ pingcli pingone licenses get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-l, --license-id string` | `` | The license ID |
+| `-i, --license-id string` | `` | The license ID |
 | `-o, --organization-id string` | `` | The PingOne organization ID |
 
 

@@ -21,8 +21,8 @@ pingcli pingone credentials user-credentials provisioned-credentials [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for provisioned-credentials |
-| `-c, --credential-id string` | `` | The user credential ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --credential-id string` | `` | The user credential ID |
 | `-u, --user-id string` | `` | The user ID |
 
 

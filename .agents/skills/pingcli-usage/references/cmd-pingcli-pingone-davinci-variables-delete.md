@@ -24,7 +24,7 @@ pingcli pingone davinci variables delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-v, --variable-id string` | `` | The variable ID |
+| `-i, --variable-id string` | `` | The variable ID |
 
 
 ## Inherited Options

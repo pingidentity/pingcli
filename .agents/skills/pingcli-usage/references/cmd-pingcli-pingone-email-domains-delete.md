@@ -21,8 +21,8 @@ pingcli pingone email-domains delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-d, --email-domain-id string` | `` | The email domain ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --email-domain-id string` | `` | The email domain ID |
 
 
 ## Inherited Options

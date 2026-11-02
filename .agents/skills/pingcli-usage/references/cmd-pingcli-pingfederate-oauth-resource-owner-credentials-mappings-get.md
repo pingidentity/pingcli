@@ -21,7 +21,7 @@ pingcli pingfederate oauth resource-owner-credentials-mappings get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The ID of the resource owner credentials mapping |
+| `-i, --id string` | `` | The ID of the resource owner credentials mapping |
 
 
 ## Inherited Options

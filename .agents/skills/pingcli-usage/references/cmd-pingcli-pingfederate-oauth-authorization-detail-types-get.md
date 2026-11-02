@@ -21,7 +21,7 @@ pingcli pingfederate oauth authorization-detail-types get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate OAuth Authorization Detail Type ID |
+| `-i, --id string` | `` | The PingFederate OAuth Authorization Detail Type ID |
 
 
 ## Inherited Options

@@ -23,8 +23,8 @@ pingcli davinci connector-instances get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-c, --connector-instance-id string` | `` | The connector instance ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --connector-instance-id string` | `` | The connector instance ID |
 
 
 ## Inherited Options

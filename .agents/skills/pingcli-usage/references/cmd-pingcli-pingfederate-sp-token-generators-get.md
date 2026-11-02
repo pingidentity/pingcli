@@ -21,7 +21,7 @@ pingcli pingfederate sp token-generators get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate token generator instance ID |
+| `-i, --id string` | `` | The PingFederate token generator instance ID |
 
 
 ## Inherited Options

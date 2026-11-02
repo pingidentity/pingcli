@@ -28,8 +28,8 @@ pingcli advanced-services pingfederate token-processor-to-token-generator-mappin
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The ID of the token processor to token generator mapping |
 | `--default-target-resource string` | `` | The default target URL for this token processor to token generator mapping configuration |
-| `--id string` | `` | The ID of the token processor to token generator mapping |
 | `--license-connection-group-assignment string` | `` | The license connection group |
 | `--source-id string` | `` | The ID of the Token Processor |
 | `--target-id string` | `` | The ID of the Token Generator |

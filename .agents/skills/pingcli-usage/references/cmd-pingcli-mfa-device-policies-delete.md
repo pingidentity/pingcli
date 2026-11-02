@@ -22,7 +22,7 @@ pingcli mfa device-policies delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-m, --mfa-device-policy-id string` | `` | The MFA device policy ID |
+| `-i, --mfa-device-policy-id string` | `` | The MFA device policy ID |
 
 
 ## Inherited Options

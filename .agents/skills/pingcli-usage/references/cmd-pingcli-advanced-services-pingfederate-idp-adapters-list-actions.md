@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate idp adapters list-actions [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for list-actions |
-| `--id string` | `` | The PingFederate IDP Adapter ID |
+| `-i, --id string` | `` | The PingFederate IDP Adapter ID |
 
 
 ## Inherited Options

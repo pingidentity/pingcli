@@ -30,7 +30,7 @@ pingcli davinci applications flow-policies replace [flags]
 | `-a, --application-id string` | `` | The DaVinci application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--flow-policy-id string` | `` | The DaVinci flow policy ID |
+| `-i, --flow-policy-id string` | `` | The DaVinci flow policy ID |
 | `--name string` | `` | The flow policy name |
 | `--status string` | `` | The flow policy status (enabled or disabled) |
 

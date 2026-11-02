@@ -22,7 +22,7 @@ pingcli pingone sign-on-policies get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-s, --sign-on-policy-id string` | `` | The sign-on policy ID |
+| `-i, --sign-on-policy-id string` | `` | The sign-on policy ID |
 
 
 ## Inherited Options

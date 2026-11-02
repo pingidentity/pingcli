@@ -21,7 +21,7 @@ pingcli pingfederate oauth clients get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate OAuth Client ID |
+| `-i, --id string` | `` | The PingFederate OAuth Client ID |
 
 
 ## Inherited Options

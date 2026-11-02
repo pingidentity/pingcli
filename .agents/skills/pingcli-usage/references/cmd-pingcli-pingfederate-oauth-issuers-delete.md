@@ -21,7 +21,7 @@ pingcli pingfederate oauth issuers delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate virtual issuer ID |
+| `-i, --id string` | `` | The PingFederate virtual issuer ID |
 
 
 ## Inherited Options

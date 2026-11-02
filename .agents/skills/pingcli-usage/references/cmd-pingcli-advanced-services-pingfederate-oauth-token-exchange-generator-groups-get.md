@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth token-exchange generator groups get
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate Token Exchange generator group ID |
+| `-i, --id string` | `` | The PingFederate Token Exchange generator group ID |
 
 
 ## Inherited Options

@@ -28,7 +28,7 @@ pingcli pingfederate idp sp-connections decryption-keys apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate SP connection ID |
+| `-i, --id string` | `` | The PingFederate SP connection ID |
 | `--primary-key-ref-id string` | `` | ID of the primary decryption key pair |
 | `--secondary-key-pair-ref-id string` | `` | ID of the secondary decryption key pair |
 

@@ -21,7 +21,7 @@ pingcli pingfederate oauth token-exchange generator groups delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate Token Exchange generator group ID |
+| `-i, --id string` | `` | The PingFederate Token Exchange generator group ID |
 
 
 ## Inherited Options

@@ -22,7 +22,7 @@ pingcli pingone authorize application-roles get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --application-role-id string` | `` | The application role ID |
+| `-i, --application-role-id string` | `` | The application role ID |
 
 
 ## Inherited Options

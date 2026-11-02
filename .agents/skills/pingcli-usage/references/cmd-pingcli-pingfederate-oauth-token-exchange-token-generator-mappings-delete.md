@@ -21,7 +21,7 @@ pingcli pingfederate oauth token-exchange token-generator-mappings delete [flags
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The ID of the token exchange processor policy to token generator mapping |
+| `-i, --id string` | `` | The ID of the token exchange processor policy to token generator mapping |
 
 
 ## Inherited Options

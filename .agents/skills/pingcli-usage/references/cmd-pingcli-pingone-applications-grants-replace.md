@@ -27,7 +27,7 @@ pingcli pingone applications grants replace [flags]
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-g, --application-grant-id string` | `` | The application grant ID |
+| `-i, --application-grant-id string` | `` | The application grant ID |
 
 
 ## Inherited Options

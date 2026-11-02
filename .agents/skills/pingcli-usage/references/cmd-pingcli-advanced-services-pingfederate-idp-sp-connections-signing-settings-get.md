@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate idp sp-connections signing-settings get [
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate SP connection ID |
+| `-i, --id string` | `` | The PingFederate SP connection ID |
 
 
 ## Inherited Options

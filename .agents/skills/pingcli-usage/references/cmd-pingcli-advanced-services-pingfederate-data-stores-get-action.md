@@ -21,8 +21,8 @@ pingcli advanced-services pingfederate data-stores get-action [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get-action |
+| `-i, --id string` | `` | The PingFederate Data Store ID |
 | `--action-id string` | `` | The PingFederate data store action ID |
-| `--id string` | `` | The PingFederate Data Store ID |
 
 
 ## Inherited Options

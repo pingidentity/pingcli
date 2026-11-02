@@ -26,7 +26,7 @@ pingcli pingone notifications-settings phone-delivery-settings replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-p, --phone-delivery-settings-id string` | `` | The phone delivery settings ID |
+| `-i, --phone-delivery-settings-id string` | `` | The phone delivery settings ID |
 
 
 ## Inherited Options

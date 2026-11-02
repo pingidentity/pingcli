@@ -24,7 +24,7 @@ pingcli pingone environments update-status [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for update-status |
-| `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --environment-id string` | `` | The PingOne environment ID |
 | `--license-id string` | `` | The ID of the PingOne license to assign when --status is ACTIVE. Required for ACTIVE; ignored for DELETE_PENDING. Discover licenses with the pingcli pingone licenses list command. |
 | `--status string` | `` | The new environment status. Options are: ACTIVE, DELETE_PENDING. Applies to PRODUCTION environments only. --status ACTIVE requires --license-id. |
 

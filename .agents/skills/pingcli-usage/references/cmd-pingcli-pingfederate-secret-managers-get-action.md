@@ -21,8 +21,8 @@ pingcli pingfederate secret-managers get-action [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get-action |
+| `-i, --id string` | `` | The PingFederate Secret Manager ID |
 | `--action-id string` | `` | The PingFederate Secret Manager action ID |
-| `--id string` | `` | The PingFederate Secret Manager ID |
 
 
 ## Inherited Options

@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth clients revoke-secondary-secrets [f
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for revoke-secondary-secrets |
-| `--id string` | `` | The PingFederate OAuth Client ID |
+| `-i, --id string` | `` | The PingFederate OAuth Client ID |
 
 
 ## Inherited Options

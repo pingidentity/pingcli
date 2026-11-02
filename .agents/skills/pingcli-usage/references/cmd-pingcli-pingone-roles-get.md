@@ -22,7 +22,7 @@ pingcli pingone roles get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --role-id string` | `` | The role ID |
+| `-i, --role-id string` | `` | The role ID |
 
 
 ## Inherited Options

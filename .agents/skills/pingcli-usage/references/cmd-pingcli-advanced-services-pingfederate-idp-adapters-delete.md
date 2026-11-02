@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate idp adapters delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate IDP Adapter ID |
+| `-i, --id string` | `` | The PingFederate IDP Adapter ID |
 
 
 ## Inherited Options

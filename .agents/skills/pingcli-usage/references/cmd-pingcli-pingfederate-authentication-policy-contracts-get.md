@@ -21,7 +21,7 @@ pingcli pingfederate authentication-policy-contracts get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate authentication policy contract ID |
+| `-i, --id string` | `` | The PingFederate authentication policy contract ID |
 
 
 ## Inherited Options

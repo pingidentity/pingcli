@@ -21,7 +21,7 @@ pingcli pingfederate secret-managers delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate Secret Manager ID |
+| `-i, --id string` | `` | The PingFederate Secret Manager ID |
 
 
 ## Inherited Options

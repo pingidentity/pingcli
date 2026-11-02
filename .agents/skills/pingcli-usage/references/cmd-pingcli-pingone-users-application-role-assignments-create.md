@@ -27,9 +27,9 @@ pingcli pingone users application-role-assignments create [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
-| `-a, --application-role-id string` | `` | UUID of the application role to assign to the user |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --application-role-id string` | `` | UUID of the application role to assign to the user |
 | `-u, --user-id string` | `` | The user ID |
 
 

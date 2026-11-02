@@ -25,7 +25,7 @@ pingcli advanced-services pingfederate administrative-accounts reset-password [f
 |------|---------|-------------|
 | `-h, --help` | `` | help for reset-password |
 | `-f, --from-file string` | `` | Path to a JSON file containing a UserCredentials body (the "newPassword" key is used; "currentPassword" is ignored) for the reset-password request, or "-" to read from stdin. --new-password overrides the file's newPassword if both are supplied. |
-| `-u, --username string` | `` | The PingFederate administrative account username |
+| `-i, --username string` | `` | The PingFederate administrative account username |
 | `--new-password string` | `` | The new password for the PingFederate administrative account |
 
 

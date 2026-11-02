@@ -21,8 +21,8 @@ pingcli pingone credentials user-digital-wallets provisioned-credentials [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for provisioned-credentials |
-| `-d, --digital-wallet-id string` | `` | The digital wallet ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --digital-wallet-id string` | `` | The digital wallet ID |
 | `-u, --user-id string` | `` | The user ID |
 
 

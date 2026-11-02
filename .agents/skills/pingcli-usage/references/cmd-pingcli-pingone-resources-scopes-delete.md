@@ -22,8 +22,8 @@ pingcli pingone resources scopes delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --resource-scope-id string` | `` | The resource scope ID |
 | `-r, --resource-id string` | `` | The resource ID |
-| `-s, --resource-scope-id string` | `` | The resource scope ID |
 
 
 ## Inherited Options

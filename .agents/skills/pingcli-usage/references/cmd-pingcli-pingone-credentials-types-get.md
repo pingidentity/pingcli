@@ -21,8 +21,8 @@ pingcli pingone credentials types get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-c, --credential-type-id string` | `` | The credential type ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --credential-type-id string` | `` | The credential type ID |
 
 
 ## Inherited Options

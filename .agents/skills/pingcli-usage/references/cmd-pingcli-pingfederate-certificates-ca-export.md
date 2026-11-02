@@ -21,7 +21,7 @@ pingcli pingfederate certificates ca export [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for export |
-| `--id string` | `` | The persistent, unique ID of the PingFederate trusted CA certificate |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate trusted CA certificate |
 
 
 ## Inherited Options

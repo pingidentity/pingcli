@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate server-settings ws-trust-sts-settings iss
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The persistent, unique ID of the WS-Trust STS issuer certificate |
+| `-i, --id string` | `` | The persistent, unique ID of the WS-Trust STS issuer certificate |
 
 
 ## Inherited Options

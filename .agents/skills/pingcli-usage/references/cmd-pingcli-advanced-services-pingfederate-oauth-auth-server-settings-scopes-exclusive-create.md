@@ -28,9 +28,9 @@ pingcli advanced-services pingfederate oauth auth-server-settings scopes exclusi
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --name string` | `` | The PingFederate OAuth exclusive scope name |
 | `--description string` | `` | The description of the scope that appears when the user is prompted for authorization |
 | `--dynamic` | `` | True if the scope is dynamic (defaults to false) |
-| `--name string` | `` | The PingFederate OAuth exclusive scope name |
 
 
 ## Inherited Options

@@ -23,8 +23,8 @@ pingcli davinci connectors details [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for details |
-| `-c, --connector-id string` | `` | The DaVinci connector ID (e.g. "pingOneMfaConnector") |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --connector-id string` | `` | The DaVinci connector ID (e.g. "pingOneMfaConnector") |
 
 
 ## Inherited Options

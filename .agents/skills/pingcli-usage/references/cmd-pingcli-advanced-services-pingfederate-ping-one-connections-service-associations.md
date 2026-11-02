@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate ping-one-connections service-associations
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for service-associations |
-| `--id string` | `` | The ID of the PingOne connection |
+| `-i, --id string` | `` | The ID of the PingOne connection |
 
 
 ## Inherited Options

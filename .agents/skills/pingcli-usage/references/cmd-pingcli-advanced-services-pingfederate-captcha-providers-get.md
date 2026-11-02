@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate captcha-providers get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate CAPTCHA Provider ID |
+| `-i, --id string` | `` | The PingFederate CAPTCHA Provider ID |
 
 
 ## Inherited Options

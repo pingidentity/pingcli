@@ -28,8 +28,8 @@ pingcli advanced-services pingfederate idp sp-connections signing-settings apply
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate SP connection ID |
 | `--algorithm string` | `` | The algorithm used to sign messages sent to this partner |
-| `--id string` | `` | The PingFederate SP connection ID |
 | `--include-cert-in-signature` | `` | Whether the signing certificate is included in the signature |
 | `--include-raw-key-in-signature` | `` | Whether the raw public key is included in the signature |
 | `--signing-key-pair-ref-id string` | `` | The ID of the key pair used to sign messages sent to this partner |

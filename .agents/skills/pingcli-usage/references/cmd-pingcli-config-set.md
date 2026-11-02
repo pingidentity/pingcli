@@ -6,7 +6,7 @@ Set stored configuration settings for the CLI.
 Set stored configuration settings for the CLI.
 
 The `--profile` parameter can be used to set configuration settings for a specified custom configuration profile.
-Where `--profile` is not specified, configuration settings will be set for the currently active profile.
+Where `--profile` is not specified, the profile named by the `PINGCLI_PROFILE` environment variable is used, otherwise the currently active profile.
 
 ```
 pingcli config set [flags] key=value
@@ -15,7 +15,7 @@ pingcli config set [flags] key=value
 ## Examples
 
 ```
-Set the color setting to true for the currently active profile.
+Set the color setting to true for the selected profile.
     pingcli config set color=true
 
   Set the PingOne endpoint root domain setting to 'pingone.eu' for the profile named 'myprofile'.

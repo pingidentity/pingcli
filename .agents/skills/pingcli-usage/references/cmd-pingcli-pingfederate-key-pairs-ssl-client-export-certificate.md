@@ -24,8 +24,8 @@ pingcli pingfederate key-pairs ssl-client export-certificate [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for export-certificate |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate SSL client key pair |
 | `-o, --output-file string` | `` | Optional path to write the raw result payload to, instead of only printing it to the terminal. Overwrites any existing file. |
-| `--id string` | `` | The persistent, unique ID of the PingFederate SSL client key pair |
 
 
 ## Inherited Options

@@ -29,7 +29,7 @@ pingcli pingone users replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-u, --user-id string` | `` | The user ID |
+| `-i, --user-id string` | `` | The user ID |
 | `--email string` | `` | The email address of the user |
 | `--locale string` | `` | The locale tag for the user |
 | `--mobile-phone string` | `` | The mobile phone number for the user |

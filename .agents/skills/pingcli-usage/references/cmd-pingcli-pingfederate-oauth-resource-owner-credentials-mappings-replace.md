@@ -25,7 +25,7 @@ pingcli pingfederate oauth resource-owner-credentials-mappings replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The ID of the resource owner credentials mapping |
+| `-i, --id string` | `` | The ID of the resource owner credentials mapping |
 
 
 ## Inherited Options

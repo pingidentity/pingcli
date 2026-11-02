@@ -28,7 +28,7 @@ pingcli advanced-services pingfederate oauth processor-policy-mappings replace [
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate OAuth processor policy mapping ID |
+| `-i, --id string` | `` | The PingFederate OAuth processor policy mapping ID |
 | `--processor-policy-ref-id string` | `` | The ID of the token exchange processor policy |
 
 

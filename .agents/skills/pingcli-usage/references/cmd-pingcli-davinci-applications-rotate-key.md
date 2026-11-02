@@ -21,8 +21,8 @@ pingcli davinci applications rotate-key [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for rotate-key |
-| `-a, --application-id string` | `` | The DaVinci application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --application-id string` | `` | The DaVinci application ID |
 
 
 ## Inherited Options

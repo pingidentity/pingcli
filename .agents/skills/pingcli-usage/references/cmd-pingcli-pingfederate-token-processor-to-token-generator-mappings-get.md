@@ -21,7 +21,7 @@ pingcli pingfederate token-processor-to-token-generator-mappings get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The ID of the token processor to token generator mapping |
+| `-i, --id string` | `` | The ID of the token processor to token generator mapping |
 
 
 ## Inherited Options

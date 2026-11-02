@@ -27,9 +27,9 @@ pingcli pingone sign-on-policies actions replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-a, --sign-on-policy-action-id string` | `` | The sign-on policy action ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --sign-on-policy-action-id string` | `` | The sign-on policy action ID |
 | `-s, --sign-on-policy-id string` | `` | The sign-on policy ID |
 | `--priority int64` | `` | Execution priority of this sign-on policy action; lower values execute first |
 

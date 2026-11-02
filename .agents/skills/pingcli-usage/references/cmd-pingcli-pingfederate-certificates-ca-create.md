@@ -28,8 +28,8 @@ pingcli pingfederate certificates ca create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate trusted CA certificate |
 | `--crypto-provider string` | `` | Cryptographic Provider name; only applicable if Hybrid HSM mode is enabled |
-| `--id string` | `` | The persistent, unique ID of the PingFederate trusted CA certificate |
 
 
 ## Inherited Options

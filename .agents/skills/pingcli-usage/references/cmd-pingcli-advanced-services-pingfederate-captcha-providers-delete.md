@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate captcha-providers delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate CAPTCHA Provider ID |
+| `-i, --id string` | `` | The PingFederate CAPTCHA Provider ID |
 
 
 ## Inherited Options

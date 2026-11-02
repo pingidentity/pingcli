@@ -29,8 +29,8 @@ pingcli pingone users population replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --population-id string` | `` | ID of the population to assign the user to |
 | `-u, --user-id string` | `` | The user ID |
-| `--population-id string` | `` | ID of the population to assign the user to |
 
 
 ## Inherited Options

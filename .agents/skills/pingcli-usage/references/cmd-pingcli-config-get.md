@@ -6,7 +6,7 @@ Read stored configuration settings for the CLI.
 Read stored configuration settings for the CLI.
 
 The `--profile` parameter can be used to read configuration settings for a specified custom configuration profile.
-Where `--profile` is not specified, configuration settings will be read for the currently active profile.
+Where `--profile` is not specified, the profile named by the `PINGCLI_PROFILE` environment variable is used, otherwise the currently active profile.
 
 ```
 pingcli config get [flags] key
@@ -15,7 +15,7 @@ pingcli config get [flags] key
 ## Examples
 
 ```
-Read all the configuration settings for the PingOne service in the active (or default) profile.
+Read all the configuration settings for the PingOne service in the selected profile.
     pingcli config get pingone
 
   Read the noColor setting for the profile named 'myprofile'.

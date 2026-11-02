@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth authorization-detail-types delete [
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate OAuth Authorization Detail Type ID |
+| `-i, --id string` | `` | The PingFederate OAuth Authorization Detail Type ID |
 
 
 ## Inherited Options

@@ -28,9 +28,9 @@ pingcli advanced-services pingfederate session authentication-session-policies c
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate authentication session policy ID |
 | `--authn-context-sensitive` | `` | Whether the policy is sensitive to authentication context |
 | `--enable-sessions` | `` | Whether authentication sessions are enabled for this source |
-| `--id string` | `` | The PingFederate authentication session policy ID |
 | `--idle-timeout-mins int64` | `` | Idle timeout in minutes for authentication sessions |
 | `--max-timeout-mins int64` | `` | Maximum timeout in minutes for authentication sessions |
 | `--persistent` | `` | Whether authentication sessions are persistent |

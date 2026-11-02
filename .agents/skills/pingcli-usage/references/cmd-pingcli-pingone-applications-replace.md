@@ -27,9 +27,9 @@ pingcli pingone applications replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --application-id string` | `` | The application ID |
 | `--description string` | `` | The application description |
 | `--enabled` | `` | Whether the application is enabled |
 | `--name string` | `` | The application name |

@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate notification-publishers list-actions [fla
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for list-actions |
-| `--id string` | `` | The PingFederate notification publisher instance ID |
+| `-i, --id string` | `` | The PingFederate notification publisher instance ID |
 
 
 ## Inherited Options

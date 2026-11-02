@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth access-token-mappings get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate OAuth access token mapping ID |
+| `-i, --id string` | `` | The PingFederate OAuth access token mapping ID |
 
 
 ## Inherited Options

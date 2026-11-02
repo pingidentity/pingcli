@@ -27,7 +27,7 @@ pingcli pingone credentials types issuance-rules replace [flags]
 | `-c, --credential-type-id string` | `` | The credential type ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-r, --credential-issuance-rule-id string` | `` | The credential issuance rule ID |
+| `-i, --credential-issuance-rule-id string` | `` | The credential issuance rule ID |
 
 
 ## Inherited Options

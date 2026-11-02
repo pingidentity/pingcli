@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate certificates ca delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The persistent, unique ID of the PingFederate trusted CA certificate |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate trusted CA certificate |
 
 
 ## Inherited Options

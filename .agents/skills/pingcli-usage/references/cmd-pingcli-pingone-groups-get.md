@@ -22,7 +22,7 @@ pingcli pingone groups get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-g, --group-id string` | `` | The group ID |
+| `-i, --group-id string` | `` | The group ID |
 
 
 ## Inherited Options

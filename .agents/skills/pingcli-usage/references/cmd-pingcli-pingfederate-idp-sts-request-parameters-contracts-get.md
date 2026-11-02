@@ -21,7 +21,7 @@ pingcli pingfederate idp sts-request-parameters-contracts get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The STS request parameters contract ID |
+| `-i, --id string` | `` | The STS request parameters contract ID |
 
 
 ## Inherited Options

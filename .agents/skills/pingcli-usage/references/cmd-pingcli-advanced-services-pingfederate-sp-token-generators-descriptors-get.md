@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate sp token-generators descriptors get [flag
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate token generator plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate token generator plugin descriptor ID |
 
 
 ## Inherited Options

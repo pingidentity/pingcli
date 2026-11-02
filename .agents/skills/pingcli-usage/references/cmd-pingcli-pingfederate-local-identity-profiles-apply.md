@@ -28,8 +28,8 @@ pingcli pingfederate local-identity profiles apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate Local Identity Profile ID |
 | `--apc-id string` | `` | The authentication policy contract ID |
-| `--id string` | `` | The PingFederate Local Identity Profile ID |
 | `--name string` | `` | The local identity profile name |
 | `--profile-enabled` | `` | Whether the local identity profile is enabled |
 | `--registration-enabled` | `` | Whether registration is enabled |

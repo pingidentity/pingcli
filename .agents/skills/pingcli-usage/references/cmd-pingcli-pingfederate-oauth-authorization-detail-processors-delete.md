@@ -21,7 +21,7 @@ pingcli pingfederate oauth authorization-detail-processors delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate authorization detail processor instance ID |
+| `-i, --id string` | `` | The PingFederate authorization detail processor instance ID |
 
 
 ## Inherited Options

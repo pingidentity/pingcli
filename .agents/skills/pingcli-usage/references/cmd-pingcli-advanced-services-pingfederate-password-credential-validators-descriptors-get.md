@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate password-credential-validators descriptor
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate password credential validator plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate password credential validator plugin descriptor ID |
 
 
 ## Inherited Options

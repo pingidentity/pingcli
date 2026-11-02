@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate ping-one-connections credential-status [f
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for credential-status |
-| `--id string` | `` | The ID of the PingOne connection |
+| `-i, --id string` | `` | The ID of the PingOne connection |
 
 
 ## Inherited Options

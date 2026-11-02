@@ -21,7 +21,7 @@ pingcli pingfederate oauth clients delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate OAuth Client ID |
+| `-i, --id string` | `` | The PingFederate OAuth Client ID |
 
 
 ## Inherited Options

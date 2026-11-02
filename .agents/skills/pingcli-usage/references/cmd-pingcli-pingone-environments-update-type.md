@@ -21,7 +21,7 @@ pingcli pingone environments update-type [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for update-type |
-| `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --environment-id string` | `` | The PingOne environment ID |
 | `--type string` | `` | The new environment type. Options are: PRODUCTION, SANDBOX. The change is one-way: a PRODUCTION environment cannot be downgraded to SANDBOX. |
 
 

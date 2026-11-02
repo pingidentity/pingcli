@@ -25,7 +25,7 @@ pingcli pingfederate oauth cimd-policies apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The CIMD policy ID. Client-supplied; must be unique. |
+| `-i, --id string` | `` | The CIMD policy ID. Client-supplied; must be unique. |
 
 
 ## Inherited Options

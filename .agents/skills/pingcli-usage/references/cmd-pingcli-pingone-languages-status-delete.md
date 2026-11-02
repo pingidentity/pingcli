@@ -22,8 +22,8 @@ pingcli pingone languages status delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --localization-status-id string` | `` | The language localization status ID |
 | `-l, --language-id string` | `` | The language ID |
-| `-s, --localization-status-id string` | `` | The language localization status ID |
 
 
 ## Inherited Options

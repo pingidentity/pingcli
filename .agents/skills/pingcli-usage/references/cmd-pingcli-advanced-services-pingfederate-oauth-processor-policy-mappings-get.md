@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth processor-policy-mappings get [flag
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate OAuth processor policy mapping ID |
+| `-i, --id string` | `` | The PingFederate OAuth processor policy mapping ID |
 
 
 ## Inherited Options

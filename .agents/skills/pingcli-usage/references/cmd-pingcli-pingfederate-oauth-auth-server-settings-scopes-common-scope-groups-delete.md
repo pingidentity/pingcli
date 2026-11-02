@@ -21,7 +21,7 @@ pingcli pingfederate oauth auth-server-settings scopes common-scope-groups delet
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--name string` | `` | The PingFederate OAuth common scope group name |
+| `-i, --name string` | `` | The PingFederate OAuth common scope group name |
 
 
 ## Inherited Options

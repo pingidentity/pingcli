@@ -29,8 +29,8 @@ pingcli pingone languages status replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --localization-status-id string` | `` | The language localization status ID |
 | `-l, --language-id string` | `` | The language ID |
-| `-s, --localization-status-id string` | `` | The language localization status ID |
 | `--localization-complete` | `` | Whether localization for this service is complete |
 | `--service string` | `` | The PingOne service whose localization status is being recorded |
 | `--status-details string` | `` | Additional detail about the localization status |

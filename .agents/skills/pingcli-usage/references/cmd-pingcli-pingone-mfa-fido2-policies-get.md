@@ -22,7 +22,7 @@ pingcli pingone mfa fido2-policies get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--fido2-policy-id string` | `` | The FIDO2 policy ID |
+| `-i, --fido2-policy-id string` | `` | The FIDO2 policy ID |
 
 
 ## Inherited Options

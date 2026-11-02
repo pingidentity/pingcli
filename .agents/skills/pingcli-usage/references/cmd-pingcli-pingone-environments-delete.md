@@ -21,7 +21,7 @@ pingcli pingone environments delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --environment-id string` | `` | The PingOne environment ID |
 
 
 ## Inherited Options

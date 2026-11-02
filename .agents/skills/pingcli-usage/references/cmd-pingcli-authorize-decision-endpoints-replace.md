@@ -27,9 +27,9 @@ pingcli authorize decision-endpoints replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-d, --decision-endpoint-id string` | `` | The decision endpoint ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --decision-endpoint-id string` | `` | The decision endpoint ID |
 | `--alternate-id string` | `` | An alternate string identifier for the decision endpoint |
 | `--description string` | `` | The description of the decision endpoint |
 | `--name string` | `` | The name of the decision endpoint |

@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth cimd-policies get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The CIMD policy ID. Client-supplied; must be unique. |
+| `-i, --id string` | `` | The CIMD policy ID. Client-supplied; must be unique. |
 
 
 ## Inherited Options

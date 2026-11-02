@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth client-registration-policies delete
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate OAuth Client Registration Policy ID |
+| `-i, --id string` | `` | The PingFederate OAuth Client Registration Policy ID |
 
 
 ## Inherited Options

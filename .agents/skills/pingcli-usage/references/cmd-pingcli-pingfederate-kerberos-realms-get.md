@@ -21,7 +21,7 @@ pingcli pingfederate kerberos realms get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The persistent, unique ID for the Kerberos Realm |
+| `-i, --id string` | `` | The persistent, unique ID for the Kerberos Realm |
 
 
 ## Inherited Options

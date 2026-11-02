@@ -22,7 +22,7 @@ pingcli pingone flow-policies get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--flow-policy-id string` | `` | The flow policy ID |
+| `-i, --flow-policy-id string` | `` | The flow policy ID |
 
 
 ## Inherited Options

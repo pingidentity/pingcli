@@ -27,9 +27,9 @@ pingcli pingone authorize api-servers replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-a, --api-server-id string` | `` | The API server ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --api-server-id string` | `` | The API server ID |
 | `--base-url []string` | `` | The base URL(s) of the API server; repeatable or comma-separated |
 | `--name string` | `` | The name of the API server |
 

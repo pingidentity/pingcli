@@ -28,8 +28,8 @@ pingcli advanced-services pingfederate sp authentication-policy-contract-mapping
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The ID of the APC-to-SP Adapter mapping |
 | `--default-target-resource string` | `` | Default target URL for this APC-to-adapter mapping configuration |
-| `--id string` | `` | The ID of the APC-to-SP Adapter mapping |
 | `--license-connection-group-assignment string` | `` | The license connection group |
 | `--source-id string` | `` | The id of the Authentication Policy Contract |
 | `--target-id string` | `` | The id of the SP Adapter |

@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate key-pairs ssl-server delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
 
 
 ## Inherited Options

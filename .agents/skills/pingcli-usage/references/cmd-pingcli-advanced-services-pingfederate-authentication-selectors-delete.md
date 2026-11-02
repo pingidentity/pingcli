@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate authentication-selectors delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate Authentication Selector ID |
+| `-i, --id string` | `` | The PingFederate Authentication Selector ID |
 
 
 ## Inherited Options

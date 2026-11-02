@@ -28,8 +28,8 @@ pingcli advanced-services pingfederate oauth auth-server-settings scopes common-
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --name string` | `` | The PingFederate OAuth common scope group name |
 | `--description string` | `` | Description of the common scope group |
-| `--name string` | `` | The PingFederate OAuth common scope group name |
 | `--scopes []string` | `` | Common scope names that belong to the group; repeatable or comma-separated |
 
 

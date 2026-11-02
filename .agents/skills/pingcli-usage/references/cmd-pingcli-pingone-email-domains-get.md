@@ -21,8 +21,8 @@ pingcli pingone email-domains get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-d, --email-domain-id string` | `` | The email domain ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --email-domain-id string` | `` | The email domain ID |
 
 
 ## Inherited Options

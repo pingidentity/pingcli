@@ -32,8 +32,8 @@ pingcli pingone users identity-provider apply [flags]
 | `-h, --help` | `` | help for apply |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --identity-provider-id string` | `` | The external identity provider ID to link to this user |
 | `-u, --user-id string` | `` | The user ID |
-| `--identity-provider-id string` | `` | The external identity provider ID to link to this user |
 | `--type string` | `` | The type of the linked identity provider |
 
 

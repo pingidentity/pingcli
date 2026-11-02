@@ -28,7 +28,7 @@ pingcli advanced-services pingfederate oauth cimd-policies create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The CIMD policy ID. Client-supplied; must be unique. |
+| `-i, --id string` | `` | The CIMD policy ID. Client-supplied; must be unique. |
 | `--name string` | `` | The CIMD policy name |
 
 

@@ -29,7 +29,7 @@ pingcli advanced-services pingfederate data-stores apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate Data Store ID |
+| `-i, --id string` | `` | The PingFederate Data Store ID |
 | `--mask-attribute-values` | `` | Whether attribute values should be masked in the log |
 
 

@@ -21,7 +21,7 @@ pingcli pingfederate data-stores descriptors get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate custom data store plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate custom data store plugin descriptor ID |
 
 
 ## Inherited Options

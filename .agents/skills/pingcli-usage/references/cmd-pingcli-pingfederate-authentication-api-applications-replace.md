@@ -28,10 +28,10 @@ pingcli pingfederate authentication-api applications replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate Authentication API Application ID |
 | `--additional-allowed-origins []string` | `` | Additional allowed CORS origin URLs beyond the domain in the redirect URL; repeatable or comma-separated |
 | `--client-for-redirectless-mode-ref-id string` | `` | ID of the OAuth client to use in redirectless mode |
 | `--description string` | `` | Description of the application |
-| `--id string` | `` | The PingFederate Authentication API Application ID |
 | `--name string` | `` | Authentication API application name |
 | `--url string` | `` | Redirect URL for the application |
 

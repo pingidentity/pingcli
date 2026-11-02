@@ -29,7 +29,7 @@ pingcli pingone verify policies replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-v, --verify-policy-id string` | `` | The verify policy ID |
+| `-i, --verify-policy-id string` | `` | The verify policy ID |
 | `--default` | `` | Whether this is the environment default verify policy |
 | `--description string` | `` | The verify policy description |
 | `--name string` | `` | The verify policy name |

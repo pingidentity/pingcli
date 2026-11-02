@@ -21,8 +21,8 @@ pingcli pingone certificates get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-c, --certificate-id string` | `` | The PingOne certificate ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --certificate-id string` | `` | The PingOne certificate ID |
 
 
 ## Inherited Options

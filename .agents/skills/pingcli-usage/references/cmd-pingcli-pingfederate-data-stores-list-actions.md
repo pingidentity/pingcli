@@ -21,7 +21,7 @@ pingcli pingfederate data-stores list-actions [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for list-actions |
-| `--id string` | `` | The PingFederate Data Store ID |
+| `-i, --id string` | `` | The PingFederate Data Store ID |
 
 
 ## Inherited Options

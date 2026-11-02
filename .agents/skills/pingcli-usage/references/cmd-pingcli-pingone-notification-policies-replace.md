@@ -29,7 +29,7 @@ pingcli pingone notification-policies replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-n, --notification-policy-id string` | `` | The notification policy ID |
+| `-i, --notification-policy-id string` | `` | The notification policy ID |
 | `--default` | `` | Whether this is the default notification policy for the environment |
 | `--name string` | `` | The name of the notification policy |
 

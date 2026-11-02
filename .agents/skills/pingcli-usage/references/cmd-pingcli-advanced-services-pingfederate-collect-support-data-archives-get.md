@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate collect-support-data archives get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate CSD (Collect Support Data) archive ID |
+| `-i, --id string` | `` | The PingFederate CSD (Collect Support Data) archive ID |
 
 
 ## Inherited Options
