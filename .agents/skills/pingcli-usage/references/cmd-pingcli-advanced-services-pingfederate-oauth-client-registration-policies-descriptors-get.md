@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth client-registration-policies descri
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate OAuth client registration policy plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate OAuth client registration policy plugin descriptor ID |
 
 
 ## Inherited Options

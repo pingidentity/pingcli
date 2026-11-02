@@ -31,13 +31,13 @@ pingcli pingone mfa fido2-policies replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --fido2-policy-id string` | `` | The FIDO2 policy ID |
 | `--attestation-requirements string` | `` | The level of attestation required from authenticators |
 | `--authenticator-attachment string` | `` | The allowed authenticator attachment modality |
 | `--default` | `` | Whether this policy should serve as the environment default FIDO2 policy |
 | `--description string` | `` | The description of the FIDO2 policy |
 | `--device-display-name string` | `` | The name to display for the device in registration and authentication windows |
 | `--discoverable-credentials string` | `` | The server-side discoverable credential preference |
-| `--fido2-policy-id string` | `` | The FIDO2 policy ID |
 | `--name string` | `` | The name to use for the FIDO2 policy |
 | `--public-key-credential-hint []string` | `` | Ordered hints for preferred public-key credential types; repeatable or comma-separated |
 | `--relying-party-id string` | `` | The ID of the relying party, typically a domain name |

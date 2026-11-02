@@ -33,7 +33,7 @@ pingcli pingone applications sop-assignments replace [flags]
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-s, --sop-assignment-id string` | `` | The sign-on policy assignment ID |
+| `-i, --sop-assignment-id string` | `` | The sign-on policy assignment ID |
 | `--priority int64` | `` | Priority of this sign-on policy assignment relative to other assignments on the application |
 | `--sign-on-policy-id string` | `` | UUID of the sign-on policy to assign |
 

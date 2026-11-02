@@ -21,7 +21,7 @@ pingcli pingfederate authentication-api applications get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate Authentication API Application ID |
+| `-i, --id string` | `` | The PingFederate Authentication API Application ID |
 
 
 ## Inherited Options

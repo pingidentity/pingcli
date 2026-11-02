@@ -25,7 +25,7 @@ pingcli pingone keys import-csr-response [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for import-csr-response |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-k, --key-id string` | `` | The key ID |
+| `-i, --key-id string` | `` | The key ID |
 | `--file string` | `` | Path to the CA-signed certificate response file (PEM or PKCS7). Use - to read from stdin. |
 
 

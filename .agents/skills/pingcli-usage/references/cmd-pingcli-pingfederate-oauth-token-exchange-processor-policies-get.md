@@ -21,7 +21,7 @@ pingcli pingfederate oauth token-exchange processor policies get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate Token Exchange processor policy ID |
+| `-i, --id string` | `` | The PingFederate Token Exchange processor policy ID |
 
 
 ## Inherited Options

@@ -27,9 +27,9 @@ pingcli pingone davinci applications replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-a, --application-id string` | `` | The DaVinci application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --application-id string` | `` | The DaVinci application ID |
 | `--name string` | `` | The DaVinci application name |
 
 

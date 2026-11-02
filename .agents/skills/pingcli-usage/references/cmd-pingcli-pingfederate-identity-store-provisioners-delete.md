@@ -21,7 +21,7 @@ pingcli pingfederate identity-store-provisioners delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate Identity Store Provisioner ID |
+| `-i, --id string` | `` | The PingFederate Identity Store Provisioner ID |
 
 
 ## Inherited Options

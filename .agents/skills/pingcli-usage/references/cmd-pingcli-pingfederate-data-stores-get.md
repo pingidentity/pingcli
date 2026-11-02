@@ -21,7 +21,7 @@ pingcli pingfederate data-stores get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate Data Store ID |
+| `-i, --id string` | `` | The PingFederate Data Store ID |
 
 
 ## Inherited Options

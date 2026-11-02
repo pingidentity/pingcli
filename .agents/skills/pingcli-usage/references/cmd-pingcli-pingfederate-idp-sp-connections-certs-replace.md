@@ -25,7 +25,7 @@ pingcli pingfederate idp sp-connections certs replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate SP connection ID |
+| `-i, --id string` | `` | The PingFederate SP connection ID |
 
 
 ## Inherited Options

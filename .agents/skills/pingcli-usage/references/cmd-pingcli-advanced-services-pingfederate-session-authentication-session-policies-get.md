@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate session authentication-session-policies g
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate authentication session policy ID |
+| `-i, --id string` | `` | The PingFederate authentication session policy ID |
 
 
 ## Inherited Options

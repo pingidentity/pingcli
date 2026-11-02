@@ -23,8 +23,8 @@ pingcli pingone davinci applications get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-a, --application-id string` | `` | The DaVinci application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --application-id string` | `` | The DaVinci application ID |
 
 
 ## Inherited Options

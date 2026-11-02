@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate authentication-selectors get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate Authentication Selector ID |
+| `-i, --id string` | `` | The PingFederate Authentication Selector ID |
 
 
 ## Inherited Options

@@ -22,7 +22,7 @@ pingcli pingone users get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-u, --user-id string` | `` | The user ID |
+| `-i, --user-id string` | `` | The user ID |
 
 
 ## Inherited Options

@@ -31,6 +31,7 @@ pingcli pingfederate oauth clients replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate OAuth Client ID |
 | `--allow-authentication-api-init` | `` | Allow this client to initiate the Authentication API redirectless flow |
 | `--authorization-detail-types []string` | `` | Authorization detail types available to this client; repeatable or comma-separated |
 | `--bypass-activation-code-confirmation-override` | `` | Bypass the Activation Code Confirmation page for this client |
@@ -52,7 +53,6 @@ pingcli pingfederate oauth clients replace [flags]
 | `--enabled` | `` | Whether the client is enabled |
 | `--exclusive-scopes []string` | `` | Scopes exclusively available to this client; repeatable or comma-separated |
 | `--grant-types []string` | `` | Grant types allowed for this client; repeatable or comma-separated |
-| `--id string` | `` | The PingFederate OAuth Client ID |
 | `--jwt-secured-authorization-response-mode-content-encryption-algorithm string` | `` | Content encryption algorithm used for the JWT Secured Authorization Response |
 | `--jwt-secured-authorization-response-mode-encryption-algorithm string` | `` | Key management algorithm used to encrypt the JWT Secured Authorization Response |
 | `--jwt-secured-authorization-response-mode-signing-algorithm string` | `` | Signing algorithm used for the JWT Secured Authorization Response |

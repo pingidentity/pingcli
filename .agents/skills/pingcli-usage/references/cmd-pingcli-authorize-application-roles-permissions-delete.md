@@ -22,7 +22,7 @@ pingcli authorize application-roles permissions delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-p, --permission-id string` | `` | The application role permission ID |
+| `-i, --permission-id string` | `` | The application role permission ID |
 | `-r, --application-role-id string` | `` | The application role ID |
 
 

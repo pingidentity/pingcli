@@ -22,7 +22,7 @@ pingcli pingone resources delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --resource-id string` | `` | The resource ID |
+| `-i, --resource-id string` | `` | The resource ID |
 
 
 ## Inherited Options

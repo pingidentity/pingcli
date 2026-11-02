@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate key-pairs signing rotation-settings delet
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--signing-key-pair-id string` | `` | The persistent, unique ID of the parent PingFederate signing key pair |
+| `-i, --signing-key-pair-id string` | `` | The persistent, unique ID of the parent PingFederate signing key pair |
 
 
 ## Inherited Options

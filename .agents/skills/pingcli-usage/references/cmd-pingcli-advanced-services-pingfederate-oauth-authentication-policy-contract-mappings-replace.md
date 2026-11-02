@@ -28,8 +28,8 @@ pingcli advanced-services pingfederate oauth authentication-policy-contract-mapp
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The ID of the authentication policy contract to persistent grant mapping |
 | `--authentication-policy-contract-ref-id string` | `` | ID of the authentication policy contract referenced by this mapping |
-| `--id string` | `` | The ID of the authentication policy contract to persistent grant mapping |
 
 
 ## Inherited Options

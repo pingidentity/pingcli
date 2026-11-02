@@ -28,11 +28,11 @@ pingcli advanced-services pingfederate key-pairs ssl-client create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate SSL client key pair |
 | `--city string` | `` | City for the key pair subject |
 | `--common-name string` | `` | Common name for the key pair subject |
 | `--country string` | `` | Country for the key pair subject |
 | `--crypto-provider string` | `` | Cryptographic provider used in Hybrid HSM mode |
-| `--id string` | `` | The persistent, unique ID of the PingFederate SSL client key pair |
 | `--key-algorithm string` | `` | Key generation algorithm |
 | `--key-size int64` | `` | Key size in bits |
 | `--organization string` | `` | Organization for the key pair subject |

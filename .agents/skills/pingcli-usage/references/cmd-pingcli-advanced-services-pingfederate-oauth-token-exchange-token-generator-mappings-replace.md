@@ -28,7 +28,7 @@ pingcli advanced-services pingfederate oauth token-exchange token-generator-mapp
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The ID of the token exchange processor policy to token generator mapping |
+| `-i, --id string` | `` | The ID of the token exchange processor policy to token generator mapping |
 | `--license-connection-group-assignment string` | `` | The license connection group |
 | `--source-id string` | `` | The ID of the Token Exchange Processor policy |
 | `--target-id string` | `` | The ID of the Token Generator |

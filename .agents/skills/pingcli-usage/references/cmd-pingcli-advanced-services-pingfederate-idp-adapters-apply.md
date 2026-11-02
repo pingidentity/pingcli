@@ -28,8 +28,8 @@ pingcli advanced-services pingfederate idp adapters apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate IDP Adapter ID |
 | `--authn-ctx-class-ref string` | `` | The fixed value indicating how the user was authenticated |
-| `--id string` | `` | The PingFederate IDP Adapter ID |
 | `--name string` | `` | The plugin instance name for the IDP adapter |
 
 

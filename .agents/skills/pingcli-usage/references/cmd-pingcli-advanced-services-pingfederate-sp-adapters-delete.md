@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate sp adapters delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate SP adapter instance ID |
+| `-i, --id string` | `` | The PingFederate SP adapter instance ID |
 
 
 ## Inherited Options

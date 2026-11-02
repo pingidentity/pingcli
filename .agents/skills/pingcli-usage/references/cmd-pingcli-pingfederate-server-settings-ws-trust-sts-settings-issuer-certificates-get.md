@@ -21,7 +21,7 @@ pingcli pingfederate server-settings ws-trust-sts-settings issuer-certificates g
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The persistent, unique ID of the WS-Trust STS issuer certificate |
+| `-i, --id string` | `` | The persistent, unique ID of the WS-Trust STS issuer certificate |
 
 
 ## Inherited Options

@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate key-pairs signing delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The persistent, unique ID of the PingFederate signing key pair |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate signing key pair |
 
 
 ## Inherited Options

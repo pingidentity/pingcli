@@ -28,7 +28,7 @@ pingcli advanced-services pingfederate authentication-policy-contracts replace [
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate authentication policy contract ID |
+| `-i, --id string` | `` | The PingFederate authentication policy contract ID |
 | `--name string` | `` | The authentication policy contract name |
 
 

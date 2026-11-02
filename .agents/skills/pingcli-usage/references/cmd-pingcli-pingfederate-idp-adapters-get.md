@@ -21,7 +21,7 @@ pingcli pingfederate idp adapters get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate IDP Adapter ID |
+| `-i, --id string` | `` | The PingFederate IDP Adapter ID |
 
 
 ## Inherited Options

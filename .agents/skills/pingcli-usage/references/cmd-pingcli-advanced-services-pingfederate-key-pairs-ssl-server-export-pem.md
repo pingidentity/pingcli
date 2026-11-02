@@ -24,8 +24,8 @@ pingcli advanced-services pingfederate key-pairs ssl-server export-pem [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for export-pem |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
 | `-o, --output-file string` | `` | Optional path to write the raw result payload to, instead of only printing it to the terminal. Overwrites any existing file. |
-| `--id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
 | `--password string` | `` | Password used to protect the exported file contents. |
 
 

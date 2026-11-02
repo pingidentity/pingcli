@@ -30,7 +30,7 @@ pingcli pingone groups nestings create [flags]
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
 | `-g, --group-id string` | `` | The group ID |
-| `-n, --nested-group-id string` | `` | The nested group ID |
+| `-i, --nested-group-id string` | `` | The nested group ID |
 
 
 ## Inherited Options

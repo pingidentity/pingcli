@@ -29,7 +29,7 @@ pingcli pingone groups replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-g, --group-id string` | `` | The group ID |
+| `-i, --group-id string` | `` | The group ID |
 | `--description string` | `` | The description of the group |
 | `--display-name string` | `` | The human-friendly display name shown in the UI |
 | `--external-id string` | `` | An external identifier for the group in an upstream directory |

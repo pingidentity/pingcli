@@ -22,7 +22,7 @@ pingcli pingone password-policies delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-p, --password-policy-id string` | `` | The password policy ID |
+| `-i, --password-policy-id string` | `` | The password policy ID |
 
 
 ## Inherited Options

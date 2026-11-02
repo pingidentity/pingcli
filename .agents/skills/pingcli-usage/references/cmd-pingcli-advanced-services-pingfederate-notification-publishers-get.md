@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate notification-publishers get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate notification publisher instance ID |
+| `-i, --id string` | `` | The PingFederate notification publisher instance ID |
 
 
 ## Inherited Options

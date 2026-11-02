@@ -21,7 +21,7 @@ pingcli pingfederate key-pairs ssl-server get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate SSL server key pair |
 
 
 ## Inherited Options

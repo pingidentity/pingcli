@@ -35,7 +35,7 @@ pingcli pingone protect risk-predictors replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-r, --risk-predictor-id string` | `` | The risk predictor ID |
+| `-i, --risk-predictor-id string` | `` | The risk predictor ID |
 | `--compact-name string` | `` | The risk predictor compact name; immutable after creation, but must be supplied on both create and replace |
 | `--description string` | `` | The risk predictor description |
 | `--name string` | `` | The risk predictor name |

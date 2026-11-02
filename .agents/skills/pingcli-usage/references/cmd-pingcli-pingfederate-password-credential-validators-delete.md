@@ -21,7 +21,7 @@ pingcli pingfederate password-credential-validators delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate Password Credential Validator ID |
+| `-i, --id string` | `` | The PingFederate Password Credential Validator ID |
 
 
 ## Inherited Options

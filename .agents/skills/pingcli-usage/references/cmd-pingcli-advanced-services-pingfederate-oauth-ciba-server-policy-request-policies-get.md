@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth ciba-server-policy request-policies
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate CIBA request policy ID |
+| `-i, --id string` | `` | The PingFederate CIBA request policy ID |
 
 
 ## Inherited Options

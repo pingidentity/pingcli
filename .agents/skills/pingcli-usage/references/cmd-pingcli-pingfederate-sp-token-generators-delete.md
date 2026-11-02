@@ -21,7 +21,7 @@ pingcli pingfederate sp token-generators delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate token generator instance ID |
+| `-i, --id string` | `` | The PingFederate token generator instance ID |
 
 
 ## Inherited Options

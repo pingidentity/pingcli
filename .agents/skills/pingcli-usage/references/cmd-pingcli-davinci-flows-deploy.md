@@ -22,7 +22,7 @@ pingcli davinci flows deploy [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for deploy |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--flow-id string` | `` | The DaVinci flow ID |
+| `-i, --flow-id string` | `` | The DaVinci flow ID |
 
 
 ## Inherited Options

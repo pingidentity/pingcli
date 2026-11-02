@@ -21,8 +21,8 @@ pingcli advanced-services pingfederate sp adapters get-action [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get-action |
+| `-i, --id string` | `` | The PingFederate SP adapter instance ID |
 | `--action-id string` | `` | The PingFederate SP adapter action ID |
-| `--id string` | `` | The PingFederate SP adapter instance ID |
 
 
 ## Inherited Options

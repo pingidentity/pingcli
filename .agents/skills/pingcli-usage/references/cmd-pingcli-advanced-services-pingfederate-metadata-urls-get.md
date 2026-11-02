@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate metadata-urls get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The persistent, unique ID for the Metadata URL. It can be any combination of [a-zA-Z0-9._-]. This property is system-assigned if not specified |
+| `-i, --id string` | `` | The persistent, unique ID for the Metadata URL. It can be any combination of [a-zA-Z0-9._-]. This property is system-assigned if not specified |
 
 
 ## Inherited Options

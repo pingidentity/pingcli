@@ -24,7 +24,7 @@ pingcli davinci flows delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--flow-id string` | `` | The DaVinci flow ID |
+| `-i, --flow-id string` | `` | The DaVinci flow ID |
 
 
 ## Inherited Options

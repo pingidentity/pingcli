@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate key-pairs oauth-openid-connect additional
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The persistent, unique ID of the PingFederate OAuth/OpenID Connect additional key set |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate OAuth/OpenID Connect additional key set |
 
 
 ## Inherited Options

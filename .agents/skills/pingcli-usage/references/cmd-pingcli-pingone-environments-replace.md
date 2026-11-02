@@ -27,8 +27,8 @@ pingcli pingone environments replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --environment-id string` | `` | The PingOne environment ID |
 | `--description string` | `` | The description of the environment |
 | `--icon string` | `` | The URL or identifier for the environment icon |
 | `--name string` | `` | The name of the environment |

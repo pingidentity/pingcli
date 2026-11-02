@@ -27,9 +27,9 @@ pingcli pingone notification-templates contents replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-c, --content-id string` | `` | The notification template content ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --content-id string` | `` | The notification template content ID |
 | `-t, --template-name string` | `` | The notification template name |
 | `--default` | `` | Specifies whether the template is a predefined default template |
 | `--locale string` | `` | The locale for this content variant |

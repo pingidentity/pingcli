@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate local-identity profiles get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate Local Identity Profile ID |
+| `-i, --id string` | `` | The PingFederate Local Identity Profile ID |
 
 
 ## Inherited Options

@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth access-token-mappings delete [flags
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate OAuth access token mapping ID |
+| `-i, --id string` | `` | The PingFederate OAuth access token mapping ID |
 
 
 ## Inherited Options

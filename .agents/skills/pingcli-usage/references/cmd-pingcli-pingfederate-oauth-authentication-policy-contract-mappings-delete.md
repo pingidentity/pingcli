@@ -21,7 +21,7 @@ pingcli pingfederate oauth authentication-policy-contract-mappings delete [flags
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The ID of the authentication policy contract to persistent grant mapping |
+| `-i, --id string` | `` | The ID of the authentication policy contract to persistent grant mapping |
 
 
 ## Inherited Options

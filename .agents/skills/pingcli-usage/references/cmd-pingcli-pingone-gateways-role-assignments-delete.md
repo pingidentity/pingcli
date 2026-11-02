@@ -23,7 +23,7 @@ pingcli pingone gateways role-assignments delete [flags]
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-g, --gateway-id string` | `` | The PingOne gateway ID |
-| `-r, --role-assignment-id string` | `` | The role assignment ID |
+| `-i, --role-assignment-id string` | `` | The role assignment ID |
 
 
 ## Inherited Options

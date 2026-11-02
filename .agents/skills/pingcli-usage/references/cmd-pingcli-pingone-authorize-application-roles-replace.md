@@ -32,7 +32,7 @@ pingcli pingone authorize application-roles replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-r, --application-role-id string` | `` | The application role ID |
+| `-i, --application-role-id string` | `` | The application role ID |
 | `--description string` | `` | The description of the application role |
 | `--name string` | `` | The name of the application role |
 

@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth auth-server-settings scopes common 
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--name string` | `` | The OAuth common scope name |
+| `-i, --name string` | `` | The OAuth common scope name |
 
 
 ## Inherited Options

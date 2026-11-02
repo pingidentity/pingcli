@@ -28,11 +28,11 @@ pingcli pingfederate authentication-policies policy create [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate authentication policy ID |
 | `--authentication-api-application-ref-id string` | `` | ID of the Authentication API application associated with the policy |
 | `--description string` | `` | Authentication policy description |
 | `--enabled` | `` | Whether or not this authentication policy tree is enabled. Default is true. |
 | `--handle-failures-locally` | `` | If a policy ends in failure keep the user local |
-| `--id string` | `` | The PingFederate authentication policy ID |
 | `--name string` | `` | Authentication policy name |
 
 

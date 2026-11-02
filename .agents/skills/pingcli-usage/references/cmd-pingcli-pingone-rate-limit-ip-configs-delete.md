@@ -22,7 +22,7 @@ pingcli pingone rate-limit-ip-configs delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --rate-limit-configuration-id string` | `` | The rate limit configuration ID |
+| `-i, --rate-limit-configuration-id string` | `` | The rate limit configuration ID |
 
 
 ## Inherited Options

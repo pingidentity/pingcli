@@ -23,7 +23,7 @@ pingcli pingone applications role-assignments get [flags]
 | `-h, --help` | `` | help for get |
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --role-assignment-id string` | `` | The role assignment ID |
+| `-i, --role-assignment-id string` | `` | The role assignment ID |
 
 
 ## Inherited Options

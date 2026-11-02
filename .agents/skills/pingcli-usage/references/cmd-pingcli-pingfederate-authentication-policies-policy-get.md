@@ -21,7 +21,7 @@ pingcli pingfederate authentication-policies policy get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate authentication policy ID |
+| `-i, --id string` | `` | The PingFederate authentication policy ID |
 
 
 ## Inherited Options

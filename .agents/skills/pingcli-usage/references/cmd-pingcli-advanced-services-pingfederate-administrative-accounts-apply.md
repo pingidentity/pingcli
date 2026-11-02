@@ -28,7 +28,7 @@ pingcli advanced-services pingfederate administrative-accounts apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-u, --username string` | `` | The PingFederate administrative account username |
+| `-i, --username string` | `` | The PingFederate administrative account username |
 | `--active` | `` | Whether the account is active |
 | `--auditor` | `` | Whether the account is an auditor |
 | `--department string` | `` | Department name of the account user |

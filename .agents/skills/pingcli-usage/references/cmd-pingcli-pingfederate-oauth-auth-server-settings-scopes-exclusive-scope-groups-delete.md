@@ -21,7 +21,7 @@ pingcli pingfederate oauth auth-server-settings scopes exclusive-scope-groups de
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--name string` | `` | The PingFederate exclusive scope group name |
+| `-i, --name string` | `` | The PingFederate exclusive scope group name |
 
 
 ## Inherited Options

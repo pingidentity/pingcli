@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate idp sp-connections delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate SP connection ID |
+| `-i, --id string` | `` | The PingFederate SP connection ID |
 
 
 ## Inherited Options

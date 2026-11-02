@@ -28,9 +28,9 @@ pingcli pingfederate ping-one-connections apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The ID of the PingOne connection |
 | `--active` | `` | Whether the PingOne connection is active |
 | `--description string` | `` | A description for the PingOne connection |
-| `--id string` | `` | The ID of the PingOne connection |
 | `--name string` | `` | The name of the PingOne connection |
 
 

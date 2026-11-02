@@ -22,8 +22,8 @@ pingcli advanced-services pingfederate data-stores invoke-action [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate Data Store ID |
 | `--action-id string` | `` | The PingFederate data store action ID |
-| `--id string` | `` | The PingFederate Data Store ID |
 
 
 ## Inherited Options

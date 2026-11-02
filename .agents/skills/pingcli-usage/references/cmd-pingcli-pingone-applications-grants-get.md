@@ -23,7 +23,7 @@ pingcli pingone applications grants get [flags]
 | `-h, --help` | `` | help for get |
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-g, --application-grant-id string` | `` | The application grant ID |
+| `-i, --application-grant-id string` | `` | The application grant ID |
 
 
 ## Inherited Options

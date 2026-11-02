@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth access-token-managers descriptors g
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate access token manager plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate access token manager plugin descriptor ID |
 
 
 ## Inherited Options

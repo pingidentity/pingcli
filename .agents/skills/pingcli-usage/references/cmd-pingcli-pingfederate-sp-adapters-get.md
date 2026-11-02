@@ -21,7 +21,7 @@ pingcli pingfederate sp adapters get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate SP adapter instance ID |
+| `-i, --id string` | `` | The PingFederate SP adapter instance ID |
 
 
 ## Inherited Options

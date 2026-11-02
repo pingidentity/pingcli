@@ -21,7 +21,7 @@ pingcli pingfederate notification-publishers descriptors get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate notification publisher plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate notification publisher plugin descriptor ID |
 
 
 ## Inherited Options

@@ -21,7 +21,7 @@ pingcli pingfederate oauth idp-adapter-mappings get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The ID of the IdP adapter mapping |
+| `-i, --id string` | `` | The ID of the IdP adapter mapping |
 
 
 ## Inherited Options

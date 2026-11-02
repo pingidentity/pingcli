@@ -21,7 +21,7 @@ pingcli pingfederate oauth authorization-detail-processors descriptors get [flag
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate authorization detail processor plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate authorization detail processor plugin descriptor ID |
 
 
 ## Inherited Options

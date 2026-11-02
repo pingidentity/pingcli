@@ -22,7 +22,7 @@ pingcli pingone mfa device-policies get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-m, --mfa-device-policy-id string` | `` | The MFA device policy ID |
+| `-i, --mfa-device-policy-id string` | `` | The MFA device policy ID |
 
 
 ## Inherited Options

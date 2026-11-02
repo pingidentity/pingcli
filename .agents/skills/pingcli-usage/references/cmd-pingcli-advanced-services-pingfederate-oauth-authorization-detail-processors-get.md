@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth authorization-detail-processors get
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate authorization detail processor instance ID |
+| `-i, --id string` | `` | The PingFederate authorization detail processor instance ID |
 
 
 ## Inherited Options

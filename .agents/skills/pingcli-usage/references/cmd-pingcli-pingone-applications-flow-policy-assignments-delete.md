@@ -23,7 +23,7 @@ pingcli pingone applications flow-policy-assignments delete [flags]
 | `-h, --help` | `` | help for delete |
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--flow-policy-assignment-id string` | `` | The flow policy assignment ID |
+| `-i, --flow-policy-assignment-id string` | `` | The flow policy assignment ID |
 
 
 ## Inherited Options

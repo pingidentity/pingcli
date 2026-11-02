@@ -22,7 +22,7 @@ pingcli pingone protect risk-policy-sets get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --risk-policy-set-id string` | `` | The risk policy set ID |
+| `-i, --risk-policy-set-id string` | `` | The risk policy set ID |
 
 
 ## Inherited Options

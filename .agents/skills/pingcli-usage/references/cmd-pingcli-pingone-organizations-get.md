@@ -21,7 +21,7 @@ pingcli pingone organizations get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-o, --organization-id string` | `` | The PingOne organization ID |
+| `-i, --organization-id string` | `` | The PingOne organization ID |
 
 
 ## Inherited Options

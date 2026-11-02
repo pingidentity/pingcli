@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate identity-store-provisioners descriptors g
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate identity store provisioner plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate identity store provisioner plugin descriptor ID |
 
 
 ## Inherited Options

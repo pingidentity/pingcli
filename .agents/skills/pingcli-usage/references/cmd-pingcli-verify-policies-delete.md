@@ -22,7 +22,7 @@ pingcli verify policies delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-v, --verify-policy-id string` | `` | The verify policy ID |
+| `-i, --verify-policy-id string` | `` | The verify policy ID |
 
 
 ## Inherited Options

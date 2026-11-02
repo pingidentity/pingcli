@@ -26,7 +26,7 @@ pingcli pingone davinci applications flow-policies get [flags]
 | `-h, --help` | `` | help for get |
 | `-a, --application-id string` | `` | The DaVinci application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--flow-policy-id string` | `` | The DaVinci flow policy ID |
+| `-i, --flow-policy-id string` | `` | The DaVinci flow policy ID |
 
 
 ## Inherited Options

@@ -22,7 +22,7 @@ pingcli pingone populations delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-p, --population-id string` | `` | The population ID |
+| `-i, --population-id string` | `` | The population ID |
 
 
 ## Inherited Options

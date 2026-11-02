@@ -28,7 +28,7 @@ pingcli advanced-services pingfederate oauth authorization-detail-processors app
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate authorization detail processor instance ID |
+| `-i, --id string` | `` | The PingFederate authorization detail processor instance ID |
 | `--name string` | `` | The authorization detail processor plugin instance name |
 | `--parent-ref-id string` | `` | ID of the parent authorization detail processor instance |
 | `--plugin-descriptor-ref-id string` | `` | ID of the plugin type descriptor |

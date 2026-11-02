@@ -23,7 +23,7 @@ pingcli credentials types versions get [flags]
 | `-h, --help` | `` | help for get |
 | `-c, --credential-type-id string` | `` | The credential type ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-v, --credential-type-version-id string` | `` | The credential type version ID |
+| `-i, --credential-type-version-id string` | `` | The credential type version ID |
 
 
 ## Inherited Options

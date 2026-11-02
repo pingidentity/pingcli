@@ -21,7 +21,7 @@ pingcli pingfederate ping-one-connections usage [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for usage |
-| `--id string` | `` | The ID of the PingOne connection |
+| `-i, --id string` | `` | The ID of the PingOne connection |
 
 
 ## Inherited Options

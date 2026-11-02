@@ -22,7 +22,7 @@ pingcli pingone webhooks delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-w, --webhook-id string` | `` | The webhook (subscription) ID |
+| `-i, --webhook-id string` | `` | The webhook (subscription) ID |
 
 
 ## Inherited Options

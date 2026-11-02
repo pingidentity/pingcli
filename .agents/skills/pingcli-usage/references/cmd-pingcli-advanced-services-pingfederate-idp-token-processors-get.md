@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate idp token-processors get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate Token Processor ID |
+| `-i, --id string` | `` | The PingFederate Token Processor ID |
 
 
 ## Inherited Options

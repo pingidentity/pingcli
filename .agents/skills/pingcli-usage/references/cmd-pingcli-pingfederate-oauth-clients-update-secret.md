@@ -22,7 +22,7 @@ pingcli pingfederate oauth clients update-secret [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for update-secret |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--id string` | `` | The PingFederate OAuth Client ID |
+| `-i, --id string` | `` | The PingFederate OAuth Client ID |
 
 
 ## Inherited Options

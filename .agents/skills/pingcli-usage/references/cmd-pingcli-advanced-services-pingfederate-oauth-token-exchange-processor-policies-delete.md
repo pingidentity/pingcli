@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth token-exchange processor policies d
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate Token Exchange processor policy ID |
+| `-i, --id string` | `` | The PingFederate Token Exchange processor policy ID |
 
 
 ## Inherited Options

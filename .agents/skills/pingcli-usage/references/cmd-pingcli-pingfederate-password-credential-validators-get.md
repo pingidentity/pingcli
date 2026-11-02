@@ -21,7 +21,7 @@ pingcli pingfederate password-credential-validators get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate Password Credential Validator ID |
+| `-i, --id string` | `` | The PingFederate Password Credential Validator ID |
 
 
 ## Inherited Options

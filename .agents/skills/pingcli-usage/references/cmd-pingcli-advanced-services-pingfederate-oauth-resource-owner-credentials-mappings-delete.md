@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth resource-owner-credentials-mappings
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The ID of the resource owner credentials mapping |
+| `-i, --id string` | `` | The ID of the resource owner credentials mapping |
 
 
 ## Inherited Options

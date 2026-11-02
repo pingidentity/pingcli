@@ -31,7 +31,7 @@ pingcli pingone keys get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-k, --key-id string` | `` | The key ID |
+| `-i, --key-id string` | `` | The key ID |
 | `-o, --output-file string` | `` | Write the response to PATH instead of stdout. Only valid with --format PEM or PKCS7. Overwrites any existing file. |
 | `--format string` | `JSON` | Response format. Valid values: JSON, PEM, PKCS7. Defaults to JSON. |
 

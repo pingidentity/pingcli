@@ -33,7 +33,7 @@ pingcli pingone applications flow-policy-assignments replace [flags]
 | `-a, --application-id string` | `` | The application ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `--flow-policy-assignment-id string` | `` | The flow policy assignment ID |
+| `-i, --flow-policy-assignment-id string` | `` | The flow policy assignment ID |
 | `--flow-policy-id string` | `` | ID of the DaVinci flow policy to assign |
 | `--priority int64` | `` | Priority order for this flow policy assignment; lower values execute first |
 

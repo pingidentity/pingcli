@@ -23,7 +23,7 @@ pingcli authorize permissions delete [flags]
 | `-h, --help` | `` | help for delete |
 | `-a, --application-resource-id string` | `` | The parent application resource ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `--application-resource-permission-id string` | `` | The application resource permission ID |
+| `-i, --application-resource-permission-id string` | `` | The application resource permission ID |
 
 
 ## Inherited Options

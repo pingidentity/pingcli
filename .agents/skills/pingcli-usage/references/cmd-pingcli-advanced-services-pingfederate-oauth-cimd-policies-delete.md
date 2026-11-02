@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth cimd-policies delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The CIMD policy ID. Client-supplied; must be unique. |
+| `-i, --id string` | `` | The CIMD policy ID. Client-supplied; must be unique. |
 
 
 ## Inherited Options

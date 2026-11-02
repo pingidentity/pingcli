@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate idp sts-request-parameters-contracts dele
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The STS request parameters contract ID |
+| `-i, --id string` | `` | The STS request parameters contract ID |
 
 
 ## Inherited Options

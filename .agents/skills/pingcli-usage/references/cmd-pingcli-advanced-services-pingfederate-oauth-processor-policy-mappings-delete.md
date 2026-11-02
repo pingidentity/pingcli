@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth processor-policy-mappings delete [f
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate OAuth processor policy mapping ID |
+| `-i, --id string` | `` | The PingFederate OAuth processor policy mapping ID |
 
 
 ## Inherited Options

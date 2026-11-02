@@ -21,8 +21,8 @@ pingcli pingfederate config-store-settings get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
+| `-i, --id string` | `` | The PingFederate configuration store setting ID |
 | `--bundle string` | `` | The PingFederate configuration store bundle name |
-| `--id string` | `` | The PingFederate configuration store setting ID |
 
 
 ## Inherited Options

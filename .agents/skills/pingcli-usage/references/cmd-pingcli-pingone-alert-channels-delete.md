@@ -21,8 +21,8 @@ pingcli pingone alert-channels delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-a, --alert-channel-id string` | `` | The alert channel ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --alert-channel-id string` | `` | The alert channel ID |
 
 
 ## Inherited Options

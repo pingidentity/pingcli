@@ -21,8 +21,8 @@ pingcli pingone mfa user-devices send-logs [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for send-logs |
-| `-d, --device-id string` | `` | The MFA device ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --device-id string` | `` | The MFA device ID |
 | `-u, --user-id string` | `` | The PingOne user ID |
 
 

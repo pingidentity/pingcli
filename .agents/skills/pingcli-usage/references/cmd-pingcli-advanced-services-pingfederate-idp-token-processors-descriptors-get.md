@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate idp token-processors descriptors get [fla
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate token processor plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate token processor plugin descriptor ID |
 
 
 ## Inherited Options

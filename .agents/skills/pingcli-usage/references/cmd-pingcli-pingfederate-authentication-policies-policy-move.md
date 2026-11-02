@@ -24,7 +24,7 @@ pingcli pingfederate authentication-policies policy move [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for move |
-| `--id string` | `` | The PingFederate authentication policy ID |
+| `-i, --id string` | `` | The PingFederate authentication policy ID |
 | `--location string` | `` | Position for the policy: START, END, BEFORE, or AFTER |
 | `--move-to-id string` | `` | Target policy ID when location is BEFORE or AFTER |
 

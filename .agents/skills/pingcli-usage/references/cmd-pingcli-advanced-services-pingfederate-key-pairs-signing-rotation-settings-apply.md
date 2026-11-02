@@ -28,12 +28,12 @@ pingcli advanced-services pingfederate key-pairs signing rotation-settings apply
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --signing-key-pair-id string` | `` | The persistent, unique ID of the parent PingFederate signing key pair |
 | `--activation-buffer-days int64` | `` | Buffer days before key pair expiration for activation of the new key pair |
 | `--creation-buffer-days int64` | `` | Buffer days before key pair expiration for creation of a new key pair |
 | `--key-algorithm string` | `` | Key algorithm for the new key pair |
 | `--key-size int64` | `` | Key size in bits for the new key pair |
 | `--signature-algorithm string` | `` | Signature algorithm for the new key pair |
-| `--signing-key-pair-id string` | `` | The persistent, unique ID of the parent PingFederate signing key pair |
 | `--valid-days int64` | `` | Valid days for the new key pair |
 
 

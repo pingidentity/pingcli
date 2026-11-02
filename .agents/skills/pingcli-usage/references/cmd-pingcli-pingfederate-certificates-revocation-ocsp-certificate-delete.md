@@ -21,7 +21,7 @@ pingcli pingfederate certificates revocation ocsp-certificate delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The persistent, unique ID of the PingFederate OCSP certificate |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate OCSP certificate |
 
 
 ## Inherited Options

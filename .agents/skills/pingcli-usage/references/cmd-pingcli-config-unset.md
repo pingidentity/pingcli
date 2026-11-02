@@ -6,7 +6,7 @@ Unset stored configuration settings for the CLI.
 Unset stored configuration settings for the CLI.
 
 The `--profile` parameter can be used to unset configuration settings for a specified custom configuration profile.
-Where `--profile` is not specified, configuration settings will be unset for the currently active profile.
+Where `--profile` is not specified, the profile named by the `PINGCLI_PROFILE` environment variable is used, otherwise the currently active profile.
 
 ```
 pingcli config unset [flags] key
@@ -15,7 +15,7 @@ pingcli config unset [flags] key
 ## Examples
 
 ```
-Unset the color setting for the currently active profile.
+Unset the color setting for the selected profile.
     pingcli config unset color
 
   Unset the PingOne endpoint root domain setting for the profile named 'myprofile'.

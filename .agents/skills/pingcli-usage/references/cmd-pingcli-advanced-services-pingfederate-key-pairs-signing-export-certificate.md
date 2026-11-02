@@ -24,8 +24,8 @@ pingcli advanced-services pingfederate key-pairs signing export-certificate [fla
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for export-certificate |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate signing key pair |
 | `-o, --output-file string` | `` | Optional path to write the raw result payload to, instead of only printing it to the terminal. Overwrites any existing file. |
-| `--id string` | `` | The persistent, unique ID of the PingFederate signing key pair |
 
 
 ## Inherited Options

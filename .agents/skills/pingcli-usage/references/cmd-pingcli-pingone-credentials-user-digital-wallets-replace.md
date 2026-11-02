@@ -27,9 +27,9 @@ pingcli pingone credentials user-digital-wallets replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-d, --digital-wallet-id string` | `` | The digital wallet ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --digital-wallet-id string` | `` | The digital wallet ID |
 | `-u, --user-id string` | `` | The user ID |
 | `--digital-wallet-application-id string` | `` | The UUID of the digital wallet application; required for create |
 | `--status string` | `` | The status of the digital wallet (e.g. ACTIVE, DISABLED); required by the API on replace |

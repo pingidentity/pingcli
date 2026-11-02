@@ -21,8 +21,8 @@ pingcli authorize decision-endpoints delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-d, --decision-endpoint-id string` | `` | The decision endpoint ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --decision-endpoint-id string` | `` | The decision endpoint ID |
 
 
 ## Inherited Options

@@ -21,9 +21,9 @@ pingcli pingone gateways credentials delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-c, --credential-id string` | `` | The gateway credential ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-g, --gateway-id string` | `` | The PingOne gateway ID |
+| `-i, --credential-id string` | `` | The gateway credential ID |
 
 
 ## Inherited Options

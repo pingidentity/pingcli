@@ -22,8 +22,8 @@ pingcli pingfederate idp adapters invoke-action [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate IDP Adapter ID |
 | `--action-id string` | `` | The PingFederate IDP adapter action ID |
-| `--id string` | `` | The PingFederate IDP Adapter ID |
 
 
 ## Inherited Options

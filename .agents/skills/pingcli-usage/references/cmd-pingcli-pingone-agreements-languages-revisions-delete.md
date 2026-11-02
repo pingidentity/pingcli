@@ -23,8 +23,8 @@ pingcli pingone agreements languages revisions delete [flags]
 | `-h, --help` | `` | help for delete |
 | `-a, --agreement-id string` | `` | The agreement ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --revision-id string` | `` | The revision ID |
 | `-l, --language-id string` | `` | The language ID |
-| `-v, --revision-id string` | `` | The revision ID |
 
 
 ## Inherited Options

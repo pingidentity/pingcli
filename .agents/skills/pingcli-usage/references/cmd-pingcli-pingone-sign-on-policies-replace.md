@@ -32,7 +32,7 @@ pingcli pingone sign-on-policies replace [flags]
 | `-h, --help` | `` | help for replace |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-s, --sign-on-policy-id string` | `` | The sign-on policy ID |
+| `-i, --sign-on-policy-id string` | `` | The sign-on policy ID |
 | `--default` | `` | Whether the sign-on policy is the environment default |
 | `--description string` | `` | The sign-on policy description |
 | `--name string` | `` | The sign-on policy name |

@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth oidc policies delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate OAuth/OpenID Connect Policy ID |
+| `-i, --id string` | `` | The PingFederate OAuth/OpenID Connect Policy ID |
 
 
 ## Inherited Options

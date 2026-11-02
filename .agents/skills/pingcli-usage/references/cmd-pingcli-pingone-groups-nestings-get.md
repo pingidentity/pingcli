@@ -23,7 +23,7 @@ pingcli pingone groups nestings get [flags]
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-g, --group-id string` | `` | The group ID |
-| `-n, --nested-group-id string` | `` | The nested group ID |
+| `-i, --nested-group-id string` | `` | The nested group ID |
 
 
 ## Inherited Options

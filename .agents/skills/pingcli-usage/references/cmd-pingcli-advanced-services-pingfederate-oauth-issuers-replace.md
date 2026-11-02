@@ -31,9 +31,9 @@ pingcli advanced-services pingfederate oauth issuers replace [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate virtual issuer ID |
 | `--description string` | `` | Description of the virtual issuer |
 | `--host string` | `` | Hostname of the virtual issuer |
-| `--id string` | `` | The PingFederate virtual issuer ID |
 | `--name string` | `` | Unique display name for the virtual issuer |
 | `--path string` | `` | Path of the virtual issuer |
 

@@ -28,10 +28,10 @@ pingcli advanced-services pingfederate idp-to-sp-adapter-mappings replace [flags
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The ID of the IdP-to-SP Adapter mapping |
 | `--application-icon-url string` | `` | The application icon URL |
 | `--application-name string` | `` | The application name |
 | `--default-target-resource string` | `` | The default target URL for this adapter-to-adapter mapping configuration |
-| `--id string` | `` | The ID of the IdP-to-SP Adapter mapping |
 | `--license-connection-group-assignment string` | `` | The license connection group |
 | `--source-id string` | `` | The ID of the IdP Adapter |
 | `--target-id string` | `` | The ID of the SP Adapter |

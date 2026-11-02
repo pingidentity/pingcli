@@ -21,8 +21,8 @@ pingcli mfa user-devices update-nickname [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for update-nickname |
-| `-d, --device-id string` | `` | The MFA device ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --device-id string` | `` | The MFA device ID |
 | `-n, --nickname string` | `` | The nickname to assign to the device. |
 | `-u, --user-id string` | `` | The PingOne user ID |
 

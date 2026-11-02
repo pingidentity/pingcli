@@ -21,7 +21,7 @@ pingcli pingfederate oauth auth-server-settings scopes common get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--name string` | `` | The OAuth common scope name |
+| `-i, --name string` | `` | The OAuth common scope name |
 
 
 ## Inherited Options

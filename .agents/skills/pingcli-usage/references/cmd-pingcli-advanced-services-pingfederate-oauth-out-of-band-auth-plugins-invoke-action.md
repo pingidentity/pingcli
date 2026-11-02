@@ -22,8 +22,8 @@ pingcli advanced-services pingfederate oauth out-of-band-auth-plugins invoke-act
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate out-of-band authenticator plugin instance ID |
 | `--action-id string` | `` | The PingFederate out-of-band authenticator plugin action ID |
-| `--id string` | `` | The PingFederate out-of-band authenticator plugin instance ID |
 
 
 ## Inherited Options

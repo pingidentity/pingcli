@@ -22,7 +22,7 @@ pingcli advanced-services pingfederate key-pairs signing import-csr-response [fl
 |------|---------|-------------|
 | `-h, --help` | `` | help for import-csr-response |
 | `-f, --from-file string` | `` | Path to a JSON file containing a CSRResponse body (fileData), or "-" to read from stdin. |
-| `--id string` | `` | The persistent, unique ID of the PingFederate signing key pair |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate signing key pair |
 
 
 ## Inherited Options

@@ -22,7 +22,7 @@ pingcli pingone schemas get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-s, --schema-id string` | `` | The schema ID |
+| `-i, --schema-id string` | `` | The schema ID |
 
 
 ## Inherited Options

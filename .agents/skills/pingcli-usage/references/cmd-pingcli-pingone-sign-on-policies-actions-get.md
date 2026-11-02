@@ -21,8 +21,8 @@ pingcli pingone sign-on-policies actions get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-a, --sign-on-policy-action-id string` | `` | The sign-on policy action ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --sign-on-policy-action-id string` | `` | The sign-on policy action ID |
 | `-s, --sign-on-policy-id string` | `` | The sign-on policy ID |
 
 

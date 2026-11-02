@@ -28,8 +28,8 @@ pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets create [
 |------|---------|-------------|
 | `-h, --help` | `` | help for create |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate OAuth/OpenID Connect additional key set |
 | `--description string` | `` | Description of the OAuth/OpenID Connect additional key set |
-| `--id string` | `` | The persistent, unique ID of the PingFederate OAuth/OpenID Connect additional key set |
 | `--name string` | `` | Name of the OAuth/OpenID Connect additional key set |
 
 

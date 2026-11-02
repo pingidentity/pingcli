@@ -21,7 +21,7 @@ pingcli pingfederate ping-one-connections get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The ID of the PingOne connection |
+| `-i, --id string` | `` | The ID of the PingOne connection |
 
 
 ## Inherited Options

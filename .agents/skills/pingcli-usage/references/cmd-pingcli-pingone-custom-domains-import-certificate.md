@@ -24,8 +24,8 @@ pingcli pingone custom-domains import-certificate [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for import-certificate |
-| `-d, --custom-domain-id string` | `` | The custom domain ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --custom-domain-id string` | `` | The custom domain ID |
 | `--cert-file string` | `` | Path to a JSON file containing certificate, privateKey, and optionally intermediateCertificates fields. Use - to read from stdin. |
 
 

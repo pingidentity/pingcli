@@ -21,7 +21,7 @@ pingcli pingfederate captcha-providers descriptors get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate CAPTCHA Provider plugin descriptor ID |
+| `-i, --id string` | `` | The PingFederate CAPTCHA Provider plugin descriptor ID |
 
 
 ## Inherited Options

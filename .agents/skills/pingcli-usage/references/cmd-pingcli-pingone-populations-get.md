@@ -22,7 +22,7 @@ pingcli pingone populations get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-p, --population-id string` | `` | The population ID |
+| `-i, --population-id string` | `` | The population ID |
 
 
 ## Inherited Options

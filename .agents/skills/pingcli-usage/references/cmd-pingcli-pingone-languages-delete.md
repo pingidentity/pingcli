@@ -22,7 +22,7 @@ pingcli pingone languages delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-l, --language-id string` | `` | The language ID |
+| `-i, --language-id string` | `` | The language ID |
 
 
 ## Inherited Options

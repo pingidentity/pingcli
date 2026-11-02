@@ -21,7 +21,7 @@ pingcli pingfederate key-pairs oauth-openid-connect additional-key-sets delete [
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The persistent, unique ID of the PingFederate OAuth/OpenID Connect additional key set |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate OAuth/OpenID Connect additional key set |
 
 
 ## Inherited Options

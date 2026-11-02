@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate idp-to-sp-adapter-mappings delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The ID of the IdP-to-SP Adapter mapping |
+| `-i, --id string` | `` | The ID of the IdP-to-SP Adapter mapping |
 
 
 ## Inherited Options

@@ -28,8 +28,8 @@ pingcli pingfederate config-store-settings apply [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate configuration store setting ID |
 | `--bundle string` | `` | The PingFederate configuration store bundle name |
-| `--id string` | `` | The PingFederate configuration store setting ID |
 | `--list-value []string` | `` | The setting's values when type is LIST; repeatable or comma-separated |
 | `--string-value string` | `` | The setting's value when type is STRING |
 | `--type string` | `` | The type of the setting's value |

@@ -22,7 +22,7 @@ pingcli pingone notification-policies delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-n, --notification-policy-id string` | `` | The notification policy ID |
+| `-i, --notification-policy-id string` | `` | The notification policy ID |
 
 
 ## Inherited Options

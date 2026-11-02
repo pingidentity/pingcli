@@ -24,7 +24,7 @@ pingcli davinci variables get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-v, --variable-id string` | `` | The variable ID |
+| `-i, --variable-id string` | `` | The variable ID |
 
 
 ## Inherited Options

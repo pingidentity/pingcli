@@ -21,8 +21,8 @@ pingcli advanced-services pingfederate collect-support-data archives export [fla
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for export |
+| `-i, --id string` | `` | The PingFederate CSD (Collect Support Data) archive ID |
 | `-o, --output-file string` | `` | Path to write the raw archive bytes to. Overwrites any existing file. |
-| `--id string` | `` | The PingFederate CSD (Collect Support Data) archive ID |
 
 
 ## Inherited Options

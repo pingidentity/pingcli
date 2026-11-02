@@ -22,8 +22,8 @@ pingcli pingfederate sp adapters invoke-action [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for invoke-action |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate SP adapter instance ID |
 | `--action-id string` | `` | The PingFederate SP adapter action ID |
-| `--id string` | `` | The PingFederate SP adapter instance ID |
 
 
 ## Inherited Options

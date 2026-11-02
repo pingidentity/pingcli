@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth access-token-managers get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate access token manager instance ID |
+| `-i, --id string` | `` | The PingFederate access token manager instance ID |
 
 
 ## Inherited Options

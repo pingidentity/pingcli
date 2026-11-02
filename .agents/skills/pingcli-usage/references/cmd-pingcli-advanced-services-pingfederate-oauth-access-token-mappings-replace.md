@@ -28,8 +28,8 @@ pingcli advanced-services pingfederate oauth access-token-mappings replace [flag
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --id string` | `` | The PingFederate OAuth access token mapping ID |
 | `--access-token-manager-ref-id string` | `` | ID of the access token manager used by this mapping |
-| `--id string` | `` | The PingFederate OAuth access token mapping ID |
 
 
 ## Inherited Options

@@ -21,8 +21,8 @@ pingcli pingone resources attributes delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `-a, --resource-attribute-id string` | `` | The resource attribute ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
+| `-i, --resource-attribute-id string` | `` | The resource attribute ID |
 | `-r, --resource-id string` | `` | The resource ID |
 
 

@@ -21,7 +21,7 @@ pingcli pingfederate oauth access-token-managers delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate access token manager instance ID |
+| `-i, --id string` | `` | The PingFederate access token manager instance ID |
 
 
 ## Inherited Options

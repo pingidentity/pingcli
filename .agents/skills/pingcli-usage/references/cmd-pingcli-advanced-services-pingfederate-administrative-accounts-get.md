@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate administrative-accounts get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `-u, --username string` | `` | The PingFederate administrative account username |
+| `-i, --username string` | `` | The PingFederate administrative account username |
 
 
 ## Inherited Options

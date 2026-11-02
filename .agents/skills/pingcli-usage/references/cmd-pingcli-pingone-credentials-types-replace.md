@@ -28,9 +28,9 @@ pingcli pingone credentials types replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-c, --credential-type-id string` | `` | The credential type ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --credential-type-id string` | `` | The credential type ID |
 | `--card-design-template string` | `` | The SVG/HTML template string for the visual card design |
 | `--card-type string` | `` | An informal label for the credential type (e.g. EmployeeID) |
 | `--description string` | `` | The description of the credential type |

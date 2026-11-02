@@ -21,7 +21,7 @@ pingcli pingfederate oauth idp-adapter-mappings delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The ID of the IdP adapter mapping |
+| `-i, --id string` | `` | The ID of the IdP adapter mapping |
 
 
 ## Inherited Options

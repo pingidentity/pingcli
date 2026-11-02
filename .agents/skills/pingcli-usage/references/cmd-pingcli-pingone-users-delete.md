@@ -22,7 +22,7 @@ pingcli pingone users delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-u, --user-id string` | `` | The user ID |
+| `-i, --user-id string` | `` | The user ID |
 
 
 ## Inherited Options

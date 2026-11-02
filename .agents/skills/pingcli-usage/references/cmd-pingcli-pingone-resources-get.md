@@ -22,7 +22,7 @@ pingcli pingone resources get [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-r, --resource-id string` | `` | The resource ID |
+| `-i, --resource-id string` | `` | The resource ID |
 
 
 ## Inherited Options

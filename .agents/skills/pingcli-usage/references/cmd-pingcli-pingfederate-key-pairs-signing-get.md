@@ -21,7 +21,7 @@ pingcli pingfederate key-pairs signing get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The persistent, unique ID of the PingFederate signing key pair |
+| `-i, --id string` | `` | The persistent, unique ID of the PingFederate signing key pair |
 
 
 ## Inherited Options

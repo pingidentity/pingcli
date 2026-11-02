@@ -23,7 +23,7 @@ pingcli pingone authorize api-servers operations delete [flags]
 | `-h, --help` | `` | help for delete |
 | `-a, --api-server-id string` | `` | The API server ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-o, --api-server-operation-id string` | `` | The API server operation ID |
+| `-i, --api-server-operation-id string` | `` | The API server operation ID |
 
 
 ## Inherited Options

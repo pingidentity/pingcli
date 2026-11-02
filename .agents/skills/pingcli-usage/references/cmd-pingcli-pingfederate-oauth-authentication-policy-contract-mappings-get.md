@@ -21,7 +21,7 @@ pingcli pingfederate oauth authentication-policy-contract-mappings get [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The ID of the authentication policy contract to persistent grant mapping |
+| `-i, --id string` | `` | The ID of the authentication policy contract to persistent grant mapping |
 
 
 ## Inherited Options

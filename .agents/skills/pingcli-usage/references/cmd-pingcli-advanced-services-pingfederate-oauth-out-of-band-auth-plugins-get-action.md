@@ -21,8 +21,8 @@ pingcli advanced-services pingfederate oauth out-of-band-auth-plugins get-action
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get-action |
+| `-i, --id string` | `` | The PingFederate out-of-band authenticator plugin instance ID |
 | `--action-id string` | `` | The PingFederate out-of-band authenticator plugin action ID |
-| `--id string` | `` | The PingFederate out-of-band authenticator plugin instance ID |
 
 
 ## Inherited Options

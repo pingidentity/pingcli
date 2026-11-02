@@ -22,7 +22,7 @@ pingcli pingone keys delete [flags]
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
-| `-k, --key-id string` | `` | The key ID |
+| `-i, --key-id string` | `` | The key ID |
 
 
 ## Inherited Options

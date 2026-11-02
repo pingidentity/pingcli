@@ -32,7 +32,7 @@ pingcli authorize application-roles permissions create [flags]
 | `-h, --help` | `` | help for create |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
-| `-p, --permission-id string` | `` | The application role permission ID |
+| `-i, --permission-id string` | `` | The application role permission ID |
 | `-r, --application-role-id string` | `` | The application role ID |
 
 

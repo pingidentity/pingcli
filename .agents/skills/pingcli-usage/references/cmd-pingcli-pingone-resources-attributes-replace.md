@@ -24,9 +24,9 @@ pingcli pingone resources attributes replace [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for replace |
-| `-a, --resource-attribute-id string` | `` | The resource attribute ID |
 | `-e, --environment-id string` | `` | The PingOne environment ID |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --resource-attribute-id string` | `` | The resource attribute ID |
 | `-r, --resource-id string` | `` | The resource ID |
 
 

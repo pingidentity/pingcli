@@ -21,7 +21,7 @@ pingcli advanced-services pingfederate oauth out-of-band-auth-plugins get [flags
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for get |
-| `--id string` | `` | The PingFederate out-of-band authenticator plugin instance ID |
+| `-i, --id string` | `` | The PingFederate out-of-band authenticator plugin instance ID |
 
 
 ## Inherited Options

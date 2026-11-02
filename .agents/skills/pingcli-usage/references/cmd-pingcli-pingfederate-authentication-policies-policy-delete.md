@@ -21,7 +21,7 @@ pingcli pingfederate authentication-policies policy delete [flags]
 | Flag | Default | Description |
 |------|---------|-------------|
 | `-h, --help` | `` | help for delete |
-| `--id string` | `` | The PingFederate authentication policy ID |
+| `-i, --id string` | `` | The PingFederate authentication policy ID |
 
 
 ## Inherited Options

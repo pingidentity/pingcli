@@ -28,9 +28,9 @@ pingcli advanced-services pingfederate oauth auth-server-settings scopes common 
 |------|---------|-------------|
 | `-h, --help` | `` | help for apply |
 | `-f, --from-file string` | `` | Path to a JSON file containing the request body, or "-" to read from stdin. |
+| `-i, --name string` | `` | The OAuth common scope name |
 | `--description string` | `` | The OAuth common scope description |
 | `--dynamic` | `` | Whether the OAuth common scope is dynamic |
-| `--name string` | `` | The OAuth common scope name |
 
 
 ## Inherited Options
